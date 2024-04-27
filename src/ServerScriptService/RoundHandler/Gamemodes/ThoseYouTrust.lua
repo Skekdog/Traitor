@@ -1,5 +1,4 @@
 -- Based off of GMod TTT.
---!strict
 
 local Types = require(script.Parent.Parent.Types)
 local common = require(script.Parent.Common)

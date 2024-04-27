@@ -35,7 +35,7 @@ local function diffTime(Time:number): number
 end
 
 local weapons = {}
-for _,v in game.ReplicatedStorage.Items:GetChildren() do
+for _,v in ReplicatedStorage.Items:GetChildren() do
 	if v:GetAttribute("Weapon") then
 		local explosive = v.Configuration.Damage.Uniques:GetAttribute("Explos")
 		weapons[v.Name] = explosive

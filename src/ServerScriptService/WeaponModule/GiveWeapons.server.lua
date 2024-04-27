@@ -1,3 +1,4 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local conversions = {
 	["Deagle"] = "Deagle",
 	["Shotgun"] = "XM1014",
@@ -21,7 +22,7 @@ local conversions = {
 
 local function setup(v)
 	v.Name = conversions[v.Name] or v.Name
-	local serverItem = game.ReplicatedStorage.Items:FindFirstChild(v.Name)
+	local serverItem = ReplicatedStorage.Items:FindFirstChild(v.Name)
 	if serverItem then
 		local priPart = v:IsA("Model") and v.PrimaryPart or v
 		local con

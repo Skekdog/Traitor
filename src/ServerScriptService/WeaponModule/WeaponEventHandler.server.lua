@@ -1,4 +1,5 @@
 local RS = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local cs = RS.ClientServer
 local weaponModule = require(script.Parent)
@@ -55,7 +56,7 @@ RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,positio
 		plr.Character.Humanoid.Health <= 0 or
 		not weapon:FindFirstAncestor(plr.Name) or
 		
-		not game.ReplicatedStorage.Items:FindFirstChild(weapon.Name) or
+		not ReplicatedStorage.Items:FindFirstChild(weapon.Name) or
 		not (weapon:GetAttribute("Weapon") or weapon:GetAttribute("Tool"))
 	then 
 		print(reloading, --in process of reloading
@@ -64,7 +65,7 @@ RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,positio
 			(config.Aim:GetAttribute("ScopeRequired") and not plr:GetAttribute("Aim")), --No scope with scope required
 			plr.Character.Humanoid.Health <= 0, --player is dead
 			not weapon:FindFirstAncestor(plr.Name), --weapon is not parented to player **NEEDS TWEAKING**
-			not game.ReplicatedStorage.Items:FindFirstChild(weapon.Name), --weapon does not exist, maybe ban if this is triggered
+			not ReplicatedStorage.Items:FindFirstChild(weapon.Name), --weapon does not exist, maybe ban if this is triggered
 			not (weapon:GetAttribute("Weapon") or weapon:GetAttribute("Tool")) --not a weapon/tool
 		)
 		return 

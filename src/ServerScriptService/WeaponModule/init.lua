@@ -309,7 +309,7 @@ function module.SpawnProjectile(shooter,weapon,rayinfo,position)
 	local humanoid = shooter.Character.Humanoid
 	local rand = Random.new()
 	
-	local serverWeapon = game.ReplicatedStorage.Items:FindFirstChild(weapon.Name)
+	local serverWeapon = ReplicatedStorage.Items:FindFirstChild(weapon.Name)
 	if not serverWeapon then --[[ban plr]] end
 	
 	local configS = serverWeapon.Configuration
@@ -553,7 +553,7 @@ function module.OnHit(part,weapon,shooter,distance,rayResult,rayInfo)
 end
 
 function module.PlaceTool(plr,tool,ray,pos)
-	local serverTool = game.ReplicatedStorage.Items:FindFirstChild(tool.Name)
+	local serverTool = ReplicatedStorage.Items:FindFirstChild(tool.Name)
 	if not serverTool then --[[ban plr]] end
 
 	local configS = serverTool.Configuration
