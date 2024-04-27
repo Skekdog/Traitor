@@ -1,0 +1,523 @@
+local HTTPService = game:GetService("HttpService")
+
+local UIScript
+local UI
+local UIS
+local settingsUI
+local uiThemes
+
+if game:GetService("RunService"):IsClient() then
+	UIScript = game:GetService("ReplicatedFirst").UIManager
+	UI = require(UIScript)
+	UIS = game:GetService("UserInputService")
+	settingsUI = UI.WaitForUI("Settings","UserTriggered")
+	settingsFrame = settingsUI.UI
+	
+	uiThemes = {}
+	for i,_ in UI.Themes do table.insert(uiThemes, i) end
+end
+
+export type SettingDefinition = {
+	Name: string,
+	Tab: "Display" | "Gameplay" | "Controls" | "Touch" | "General",
+	Category: string,
+	Tooltip: string,
+	PossibleValues: {string} | "Boolean" | "Keybind" | "TouchPosition" | "TouchScale",
+	Default: Setting,
+	SpecifyToggle: boolean, -- Whether the user can change if this is toggled or not. Only for keybinds.
+	Callback: (val: string | boolean, name: string) -> nil,
+}
+
+export type Keybind = Enum.UserInputType | Enum.KeyCode
+export type KeybindSetting = {
+	["Keycodes"]: {{Keybind | nil}}, -- KeyCode + Modifier
+	["Toggled"]: boolean,
+}
+export type Setting = KeybindSetting | string | boolean | UDim2 | number -- SelectionChoice, Boolean, TouchPosition, TouchScale
+
+local module = {}
+
+local function keybindCallback(val, name)
+	local updated = script:FindFirstChild("SettingUpdated")
+	updated:Fire(name, val)
+end
+
+module["AvailableSettings"] = {
+	{
+		Name = "Shadows",
+		Tab = "Display",
+		Category = "Lighting",
+		Tooltip = "Enable or disable global shadows.",
+		PossibleValues = "Boolean",
+		Default = true,
+		Callback = function(val) game:GetService("Lighting").GlobalShadows = val end,
+	},
+	{
+		Name = "Use FIB Lighting",
+		Tab = "Display",
+		Category = "Lighting",
+		Tooltip = "If you have modified your client to use Future lighting, enable this for better map compatibility.",
+		PossibleValues = "Boolean",
+		Default = false,
+		Callback = function(val)
+			local map = workspace:WaitForChild("__Map", 1)
+			if not map then
+				return
+			end
+			local mapConfig = map:FindFirstChild(val and "FIBLighting" or "Lighting")
+			if mapConfig then
+				for _,prop in mapConfig:GetChildren() do
+					if prop:IsA("ValueBase") then
+						if game:GetService("Lighting")[prop.Name] then
+							game:GetService("Lighting")[prop.Name] = prop.Value
+						end
+					end
+				end
+			end
+		end,
+	},
+	
+	{
+		Name = "UI Theme",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "Select a theme for the UI.",
+		PossibleValues = uiThemes,
+		Default = "Dark",
+		Callback = function(val) UI.UpdateTheme(val) end,
+	},
+	{
+		Name = "Animate UI Transitions",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "Enables animated transitions for all UI.",
+		PossibleValues = "Boolean",
+		Default = true,
+		Callback = function() end,
+	},
+	{
+		Name = "Always Show Sidebar",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "This setting has no effect if a keyboard is not connected.",
+		PossibleValues = "Boolean",
+		Default = true,
+		Callback = function(val)
+			if not UIS.KeyboardEnabled then return end
+			local sidebar = UI.WaitForUI("Sidebar", "Buttons")
+			if sidebar then sidebar:ToggleVisible(val) end
+		end
+	},
+	{
+		Name = "Background Menus",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "Hidden - Menus are not visible behind other menus, but are shown again when the menu is closed.\nClosed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
+		PossibleValues = {"Hidden", "Closed", "Stacked"},
+		Default = "Hidden",
+		Callback = function(val) UIScript:SetAttribute("BackgroundMenuMode", val) end,
+	},
+	
+	{
+		Name = "Snap to Ladders",
+		Tab = "Gameplay",
+		Category = "Controls",
+		Tooltip = "Toggles automatic snapping to ladders. Ladders can still be manually used.",
+		PossibleValues = "Boolean",
+		Default = true,
+		Callback = function() end,
+	},
+	
+	{
+		Name = "Primary Fire",
+		Tab = "Keybinds",
+		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Tooltip = "For using weapons or planting equipment.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.UserInputType.MouseButton1,nil}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Reload Weapon",
+		Tab = "Keybinds",
+		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Reloads the currently equipped weapon.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.R,nil}, {Enum.KeyCode.ButtonX, nil}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Drop",
+		Tab = "Keybinds",
+		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Q,nil}, {Enum.KeyCode.DPadDown}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Alternate Fire",
+		Tab = "Keybinds",
+		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Tooltip = "For aiming weapons or using the alternate item function.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = true,
+		Default = {Keycodes={{Enum.UserInputType.MouseButton2,nil}, {Enum.KeyCode.ButtonL2, nil}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Interact",
+		Tab = "Keybinds",
+		Category = "Gameplay",
+		Tooltip = "General interaction",
+		PossibleValues = "Keybind",
+		Default = {Keycodes={{Enum.KeyCode.E,nil}, {Enum.KeyCode.ButtonA, nil}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Spectate Next",
+		Tab = "Keybinds",
+		Category = "Spectating - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Spectates the next player.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.E,nil}, {Enum.KeyCode.DPadRight, nil}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Spectate Previous",
+		Tab = "Keybinds",
+		Category = "Spectating - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Spectates the previous player.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Q,nil}, {Enum.KeyCode.DPadLeft, nil}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	--{
+	--	Name = "Crouch",
+	--	Tab = "Keybinds",
+	--	Category = "Movement - Enable the checkbox to make a keybind toggled",
+	--	Tooltip = "Not functional.",
+	--	PossibleValues = "Keybind",
+	--  SpecifyToggle = true,
+	--	Default = {Keycodes={{Enum.KeyCode.LeftControl,nil}},Toggled=false},
+	--	Callback = keybindCallback,
+	--},
+	{
+		Name = "Close UI",
+		Tab = "Keybinds",
+		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Closes the fore-most UI.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.X,nil}, {Enum.KeyCode.ButtonB, nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	
+	{
+		Name = "Next Weapon",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Cycles to the next weapon. Primarily used for controllers.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.ButtonY,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 1",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 1.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.One,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 2",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 2.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Two,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 3",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 3.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Three,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 4",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 4.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Four,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 5",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 5.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Five,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 6",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 6.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Six,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 7",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 7.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Seven,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 8",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 8.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Eight,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Slot 9",
+		Tab = "Keybinds",
+		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Equips the item in slot 9.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Nine,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	
+	{
+		Name = "Equipment Shop",
+		Tab = "Keybinds",
+		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Opens the equipment shop. Only available for certain roles.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = true,
+		Default = {Keycodes={{Enum.KeyCode.C,nil}, {Enum.KeyCode.DPadUp, nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Playerlist",
+		Tab = "Keybinds",
+		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Opens the playerlist.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = true,
+		Default = {Keycodes={{Enum.KeyCode.Tab,nil}, {Enum.KeyCode.ButtonL3, nil}},Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Settings",
+		Tab = "Keybinds",
+		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Opens the settings page. Can also be opened by typing !settings in chat.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = true,
+		Default = {Keycodes={{Enum.KeyCode.G,nil}, {Enum.KeyCode.ButtonR3, nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Highlights",
+		Tab = "Keybinds",
+		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Opens the round highlights.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = true,
+		Default = {Keycodes={{Enum.KeyCode.B,nil}},Toggled=true},
+		Callback = keybindCallback,
+	},
+	
+	
+	{
+		Name = "Primary Fire Position",
+		Tab = "Touch",
+		Category = "Button Positions",
+		Tooltip = "Primary fire is used to shoot a weapon or plant equipment.",
+		PossibleValues = "TouchPosition",
+		Default = UDim2.fromScale(0.1,0.1),
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Reload Weapon Position",
+		Tab = "Touch",
+		Category = "Button Positions",
+		Tooltip = "Reloads the currently equipped weapon.",
+		PossibleValues = "TouchPosition",
+		Default = UDim2.fromScale(0.1,0.2),
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Drop Position",
+		Tab = "Touch",
+		Category = "Button Positions",
+		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
+		PossibleValues = "TouchPosition",
+		Default = UDim2.fromScale(0.1,0.3),
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Alternate Fire Position",
+		Tab = "Touch",
+		Category = "Button Positions",
+		Tooltip = "Alternate fire is used to aim a weapon or use the alternate function of equipment.",
+		PossibleValues = "TouchPosition",
+		Default = UDim2.fromScale(0.1,0.4),
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Interact Position",
+		Tab = "Touch",
+		Category = "Button Positions",
+		Tooltip = "Used for general interaction, such as climbing ladders or using Health Stations.",
+		PossibleValues = "TouchPosition",
+		Default = UDim2.fromScale(0.1, 0.5),
+		Callback = keybindCallback,
+	},
+	
+	{
+		Name = "Primary Fire Scale",
+		Tab = "Touch",
+		Category = "Button Scale",
+		Tooltip = "Primary fire is used to shoot a weapon or plant equipment.",
+		PossibleValues = "TouchScale",
+		Default = 1,
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Reload Weapon Scale",
+		Tab = "Touch",
+		Category = "Button Scale",
+		Tooltip = "Reloads the currently equipped weapon.",
+		PossibleValues = "TouchScale",
+		Default = 1,
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Drop Scale",
+		Tab = "Touch",
+		Category = "Button Scale",
+		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
+		PossibleValues = "TouchScale",
+		Default = 1,
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Alternate Fire Scale",
+		Tab = "Touch",
+		Category = "Button Scale",
+		Tooltip = "Alternate fire is used to aim a weapon or use the alternate function of equipment.",
+		PossibleValues = "TouchScale",
+		Default = 1,
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Interact Scale",
+		Tab = "Touch",
+		Category = "Button Scale",
+		Tooltip = "Used for general interaction, such as climbing ladders or using Health Stations.",
+		PossibleValues = "TouchScale",
+		Default = 1,
+		Callback = keybindCallback,
+	},
+
+}
+
+module["Settings"] = {}
+for _, v in module.AvailableSettings do
+	module["Settings"][v.Name] = v.Default
+end
+
+function module.SetSetting(setting: string, settingValue: Setting)
+	module.Settings[setting] = settingValue
+end
+
+function module.GetSetting(settingName: string): Setting
+	return module.Settings[settingName]
+end
+
+-- This whole section of serialisation is horrid but it works
+local function keybindToJson(keybind: KeybindSetting): string
+	local keycodeText = '['
+	for i, v in keybind.Keycodes do
+		keycodeText = keycodeText..'["'..tostring(v[1])..(v[2] and '","'..tostring(v[2])..'"' or '"')..']'
+		if i < #keybind.Keycodes then
+			keycodeText = keycodeText..","
+		end
+	end
+	keycodeText = keycodeText..']'
+	return ('{"Keycodes":'..keycodeText..',"Toggled":'..tostring(keybind.Toggled)..'}')
+end
+
+function module.JSONEncode(): string
+	local toEncode = {}
+	for i, v in module.Settings do
+		if typeof(v) == "UDim2" then
+			v = {v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset}
+		elseif (typeof(v) == "table") and v["Keycodes"] then
+			v = keybindToJson(v)
+		end
+		toEncode[i] = v
+	end
+	return HTTPService:JSONEncode(toEncode)
+end
+
+function module.JSONDecode(options): {}
+	options = HTTPService:JSONDecode(options)
+	for i, v in options do
+		local isKeybind, isTouchPosition
+		for _, p in module.AvailableSettings do
+			if p.Name == i then
+				isKeybind = p.PossibleValues == "Keybind"
+				isTouchPosition = p.PossibleValues == "TouchPosition"
+				break
+			end
+		end
+		if isKeybind then
+			local result = HTTPService:JSONDecode(v)
+			for b, keybindList in result.Keycodes do
+				for a, keybind in keybindList do
+					result.Keycodes[b][a] = (Enum :: any)[keybind:split(".")[2]][keybind:split(".")[3]]
+				end
+			end
+			options[i] = result
+		elseif isTouchPosition then
+			options[i] = UDim2.new(v[1], v[2], v[3], v[4])
+		end
+	end
+	return options
+end
+
+return module
