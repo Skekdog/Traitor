@@ -1,4 +1,6 @@
+local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 
 local API = require(game.ReplicatedFirst.API)
@@ -41,18 +43,23 @@ local function createPlrs(plrs,status)
 		local elm = c:Clone()
 		elm.Name = status.."-"..v.Name
 		elm.Parent = list
-		if v.Name == game.Players.LocalPlayer.Name and status == "Alive" then
+		if v.Name == Players.LocalPlayer.Name and status == "Alive" then
 			elm.Username.Size += UDim2.new(0.1,20,0,0)
 		end
 		elm.Username.Text = "@"..v.Name
 		if gm then
 			local role = roundInfo.PlayerRoles[v.Name]
-			if role ~= "__!!Unknown" and role and gm then elm.Username.TextColor3 = gm.Roles[role].Colour elm.Username:SetAttribute("StyleData","KeepText")
-			else elm.Username.TextColor3 = elm:GetAttribute("DefaultTextColour") end
+			if role ~= "__!!Unknown" and role and gm then
+				elm.Username.TextColor3 = gm.Roles[role].Colour
+				elm.Username:SetAttribute("StyleData","KeepText")
+			else
+				elm.Username.TextColor3 = elm:GetAttribute("DefaultTextColour")
+			end
 		end
-		pcall(function()elm.Avatar.Image = table.pack(game.Players:GetUserThumbnailAsync(v.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size48x48))[1]end)
-		elm.Karma.Text = tostring(game.ReplicatedStorage.ClientServer.GetKarma:InvokeServer(v))
-		elm.Points.Text = tostring(v:GetAttribute("Points")) elm.Total.Text = tostring(v:GetAttribute("Total"))
+		pcall(function()elm.Avatar.Image = table.pack(Players:GetUserThumbnailAsync(v.UserId,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size48x48))[1]end)
+		elm.Karma.Text = tostring(ReplicatedStorage.ClientServer.GetKarma:InvokeServer(v))
+		elm.Points.Text = tostring(v:GetAttribute("Points"))
+		elm.Total.Text = tostring(v:GetAttribute("Total"))
 		elm.LayoutOrder = orderOffset+i
 		elm.Visible = true
 		
@@ -63,7 +70,10 @@ local function createPlrs(plrs,status)
 		local marks = {}
 		for _,b in elm:GetChildren() do
 			if b.ClassName == "TextButton" then
-				if v.Name == game.Players.LocalPlayer.Name then b:Destroy() continue end
+				if v.Name == Players.LocalPlayer.Name then
+					b:Destroy()
+					continue
+				end
 				table.insert(marks,b)
 				b.MouseButton1Click:Connect(function()
 					if b.UIStroke.Enabled then for _,n in marks do n.UIStroke.Enabled = false end v:SetAttribute("Mark","") return end
@@ -81,7 +91,7 @@ local function createPlrs(plrs,status)
 			end)
 		end
 		
-		if v.Name == game.Players.LocalPlayer.Name then
+		if v.Name == Players.LocalPlayer.Name then
 			elm:SetAttribute("Style","Primary")
 			uiManager.UpdateThemeInstance(elm)
 			TS:Create(elm,TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.In,math.huge,true),{BackgroundTransparency=0}):Play()
@@ -139,12 +149,15 @@ end
 RS.ServerClient.PlayerStateChange.OnClientEvent:Connect(changeStati)
 RS.ServerClient.CorpseSearched.OnClientEvent:Connect(function(name)
 	local elm = API.FindFirstChildSplit(list,"-",name,2)
-	if elm.ClassName == "TextButton" then game.Players[name]:SetAttribute("Searched",true) elm.Search.Visible = true end
+	if elm.ClassName == "TextButton" then
+		Players[name]:SetAttribute("Searched", true)
+		elm.Search.Visible = true
+	end
 end)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList,false)
 
-game.Players.PlayerRemoving:Connect(function(plr)removePlrs({plr})end)
+Players.PlayerRemoving:Connect(function(plr)removePlrs({plr})end)
 
 RS.ServerClient.MapChanged.OnClientEvent:Connect(function(mapCreator,map:string,gamemode:string,gamemodeCreator)
 	info.RoundInfo.Info.Map.Text = "Map: "..map

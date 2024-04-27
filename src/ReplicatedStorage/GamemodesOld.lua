@@ -70,6 +70,8 @@
 	}
 ]]
 
+--[[
+
 globalHighlights = {
 	SuicideCult = function(round)
 		local suiciders = {}
@@ -441,3 +443,5 @@ function gamemodes.ValidateGamemode(gamemode)
 end
 
 return gamemodes
+
+]]
