@@ -112,7 +112,7 @@ local function showCorpse(info)
 	
 	frame.TextLabel.Text = "@"..info.Name.."'s Corpse | "..("<font color='"..info.RoleColour.."'>"..info.Role.."</font>")
 	
-	uiManager.GetUI("Inspect Corpse"):ToggleVisible(true)
+	uiManager.WaitForUI("Inspect Corpse"):ToggleVisible(true)
 end
 
 for _,v in pairs(infoGrid:GetChildren()) do

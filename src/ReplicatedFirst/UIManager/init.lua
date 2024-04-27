@@ -175,6 +175,15 @@ function UIManager.UnregisterUI(name:string,uiType:UIType): nil
 	return
 end
 
+function UIManager.TryGetUI(name: string, uiType: UIType?): UI?
+	for _,v in _G.RegisteredUIs do
+		if (v.UIType == (uiType or v.UIType)) and (v.Name == name) then
+			return v
+		end
+	end
+	return
+end
+
 function UIManager.GetUI(name:string,uiType:UIType?): UI
 	for _,v in _G.RegisteredUIs do
 		if (v.UIType == (uiType or v.UIType)) and (v.Name == name) then
@@ -203,8 +212,8 @@ function UIManager.WaitForUI(name:string,uiType:UIType?): UI
 				warn("Infinite yield possible on WaitForUI("..name..")\n"..debug.traceback())
 			end
 		end
-	until UIManager.GetUI(name,uiType)
-	return UIManager.GetUI(name,uiType) :: any
+	until UIManager.TryGetUI(name,uiType)
+	return UIManager.TryGetUI(name,uiType) :: any
 end
 
 UIManager.Themes = {

@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIManager = require(script.Parent.Parent)
 --this script could do with a clean up
 --should also figure out a good way to make use of ClientStorage, with round info
 
@@ -21,7 +22,7 @@ local karmaDefs = { --These are absolute karma values
 }
 
 local mouse = Players.LocalPlayer:GetMouse()
-local ui = script.Parent
+local ui = UIManager.WaitForUI("CrosshairInfo").UI
 
 game:GetService("RunService").Heartbeat:Connect(function() --cant do getpropertychangedsignal
 	local show = false

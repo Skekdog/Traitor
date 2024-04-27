@@ -11,7 +11,7 @@ local plr = game:GetService("Players").LocalPlayer
 local frame = script.Parent
 local purchaseButton = frame.Purchase
 
-local UI = UIManager.GetUI("Equipment Shop").UI
+local UI = UIManager.WaitForUI("Equipment Shop").UI
 
 local radarCooldown = 5
 

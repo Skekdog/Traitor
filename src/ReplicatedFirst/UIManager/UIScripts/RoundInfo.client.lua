@@ -2,7 +2,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local plr = game:GetService("Players").LocalPlayer
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local frame = (UIManager.GetUI("RoundInfo").UI :: any).Frame
+local frame = (UIManager.WaitForUI("RoundInfo").UI :: any).Frame
 local health = frame.HealthBar
 
 plr:GetPropertyChangedSignal("Character"):Connect(function()
