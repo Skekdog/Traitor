@@ -1,9 +1,15 @@
 -- Implementation-dependent functions that *should* be customised.
 
+error("UPDATE THE CheckForUpdate ADAPTER!")
+
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local API = require(script.Parent.API)
 local Types = require(ReplicatedFirst.RoundHandlerTypes)
+
+local getProfile = ServerScriptService.PlayerSetup.GetProfile
+local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile
 
 local remotes = ReplicatedStorage:FindFirstChild("RoundHandler")
 
@@ -101,11 +107,11 @@ local module: Types.Adapter = {
         -- This is only used when first adding the Participant to the round, Participant.Karma is used for the duration of the round.
         -- SetKarma() is used when the round ends.
 
-        return plr:GetAttribute("Karma")
+        return getProfile:Invoke(plr).Karma
     end,
 
     SetKarma = function(plr, karma)
-        plr:SetAttribute("Karma", karma)
+        return updateProfile:Fire(plr, "Karma", karma)
     end,
 
     OnCharacterLoad = function(char)
