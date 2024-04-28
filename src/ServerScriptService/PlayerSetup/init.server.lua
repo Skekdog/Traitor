@@ -24,7 +24,7 @@ Players.PlayerAdded:Connect(function(plr)
 	if script.Parent:FindFirstChild("RoundHandler"):GetAttribute("ServerLocked") then
 		return plr:Kick("This server is shutting down.")
 	end
-	Instance.new("Folder",plr).Name = "Inventory"
+	Instance.new("Folder", plr).Name = "Inventory"
 	
 	local profile: Profile = ProfileStore:LoadProfileAsync("Player"..plr.UserId)
 	if profile then

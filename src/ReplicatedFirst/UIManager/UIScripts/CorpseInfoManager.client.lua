@@ -18,7 +18,7 @@ local sd = infoGrid.SD
 
 local function convertTime(rawSeconds)
 	local minutes = tostring(math.floor(rawSeconds/60))
-	local seconds = tostring(math.fmod(rawSeconds,60))
+	local seconds = tostring(math.fmod(rawSeconds, 60))
 
 	if string.len(minutes) < 2 then
 		minutes = "0"..minutes
@@ -30,12 +30,12 @@ local function convertTime(rawSeconds)
 	return minutes..":"..seconds
 end
 
-local function diffTime(Time:number): number
+local function diffTime(Time: number): number
 	return workspace:GetServerTimeNow()-Time
 end
 
 local weapons = {}
-for _,v in ReplicatedStorage.Items:GetChildren() do
+for _, v in ReplicatedStorage.Items:GetChildren() do
 	if v:GetAttribute("Weapon") then
 		local explosive = v.Configuration.Damage.Uniques:GetAttribute("Explos")
 		weapons[v.Name] = explosive
@@ -58,7 +58,7 @@ flavourText = {
 }
 
 local function showCorpse(info)
-	avatar.Image = game:GetService("Players"):GetUserThumbnailAsync(info.UserID,Enum.ThumbnailType.HeadShot,Enum.ThumbnailSize.Size420x420)
+	avatar.Image = game:GetService("Players"):GetUserThumbnailAsync(info.UserID, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
 	local weapon = info.MurderWeapon
 	if weapon == "__!!Explosion" then weapon = "Explosion" end
@@ -69,9 +69,9 @@ local function showCorpse(info)
 	local dthTm = math.round(diffTime(info.DeathTime))
 	deathTime.TextLabel.Text = convertTime(dthTm)
 
-	avatar:SetAttribute(df,string.format(avatar:GetAttribute(d),info.Name,("<font color='"..info.RoleColour.."'>"..info.Role.."</font>")))
-	murderWeapon:SetAttribute(df,string.format(murderWeapon:GetAttribute(d),weapon))
-	deathTime:SetAttribute(df,string.format(deathTime:GetAttribute(d),dthTm))
+	avatar:SetAttribute(df, string.format(avatar:GetAttribute(d), info.Name, ("<font color='"..info.RoleColour.."'>"..info.Role.."</font>")))
+	murderWeapon:SetAttribute(df, string.format(murderWeapon:GetAttribute(d), weapon))
+	deathTime:SetAttribute(df, string.format(deathTime:GetAttribute(d), dthTm))
 
 	if info.FreeKill then freeKill.Visible = true
 	else freeKill.Visible = false end
@@ -87,26 +87,26 @@ local function showCorpse(info)
 	end
 	
 	local splitKills = info.KillList:split(";")
-	table.remove(splitKills,#splitKills)
+	table.remove(splitKills, #splitKills)
 	if #splitKills > 0 then
 		local kills = "\n"
-		for i,v in splitKills do
+		for i, v in splitKills do
 			local prefix = (i == 1 and "") or (i == #splitKills and " and ") or ", "
 			kills = kills..prefix..v
 		end
-		killList:SetAttribute(df,string.format(killList:GetAttribute(d),kills))
+		killList:SetAttribute(df, string.format(killList:GetAttribute(d), kills))
 		killList.Visible = true
 	else killList.Visible = false end
 	
 	local splitEquipment = info.EquipmentList:split(";")
-	table.remove(splitEquipment,#splitEquipment)
+	table.remove(splitEquipment, #splitEquipment)
 	if #splitEquipment > 0 then
 		local list = "\n"
-		for i,v in splitEquipment do
+		for i, v in splitEquipment do
 			local prefix = (i == 1 and "") or (i == #splitEquipment and " and ") or ", "
 			list = list..prefix..v
 		end
-		equipmentList:SetAttribute(df,string.format(equipmentList:GetAttribute(d),list))
+		equipmentList:SetAttribute(df, string.format(equipmentList:GetAttribute(d), list))
 		equipmentList.Visible = true 
 	else equipmentList.Visible = false end
 	
@@ -115,7 +115,7 @@ local function showCorpse(info)
 	uiManager.WaitForUI("Inspect Corpse"):ToggleVisible(true)
 end
 
-for _,v in pairs(infoGrid:GetChildren()) do
+for _, v in pairs(infoGrid:GetChildren()) do
 	if v.ClassName == "ImageButton" then
 		v.MouseButton1Click:Connect(function()
 			frame.Information.Text = v:GetAttribute("DescriptionFormatted")

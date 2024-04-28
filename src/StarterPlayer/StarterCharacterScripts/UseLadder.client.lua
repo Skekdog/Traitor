@@ -8,8 +8,8 @@ local scriptCons = game:WaitForChild("ClientStorage"):WaitForChild("ScriptConnec
 local event = scriptCons.ClimbEvent
 local func = scriptCons.DisableActionFunction
 
-event.Event:Connect(function(v,_,id)
-	func:Invoke(id,true)
+event.Event:Connect(function(v, _, id)
+	func:Invoke(id, true)
 	local plrModule = require((plr :: any).PlayerScripts:WaitForChild("PlayerModule"))
 
 	local top = v.AccessZone:FindFirstChild("Top")
@@ -40,8 +40,8 @@ event.Event:Connect(function(v,_,id)
 		climbForce.Enabled = false
 		climbForce.LineVelocity = 0
 		hum.WalkSpeed = 16 --close enough
-		func:Invoke(id,false)
-		plr:SetAttribute("LadderTime",workspace:GetServerTimeNow()) --Cooldown between *snapping* to ladder
+		func:Invoke(id, false)
+		plr:SetAttribute("LadderTime", workspace:GetServerTimeNow()) --Cooldown between *snapping* to ladder
 												 --I don't intend a cooldown for non-snap laddering
 	end
 	
@@ -58,7 +58,7 @@ event.Event:Connect(function(v,_,id)
 		end
 	end)
 	
-	local function move(action: string,state: Enum.UserInputState,input: InputObject)
+	local function move(action: string, state: Enum.UserInputState, input: InputObject)
 		if (state == Enum.UserInputState.End and (action == "Up" or action == "Down")) or action == "Stop" then
 			climbForce.LineVelocity = 0
 			return
@@ -72,7 +72,7 @@ event.Event:Connect(function(v,_,id)
 		end
 	end
 	
-	began = UIS.InputBegan:Connect(function(input: InputObject,proc)
+	began = UIS.InputBegan:Connect(function(input: InputObject, proc)
 		if not proc then
 			if input.UserInputState ~= Enum.UserInputState.End and 
 				(input.UserInputType == Enum.UserInputType.Keyboard or
@@ -81,11 +81,11 @@ event.Event:Connect(function(v,_,id)
 				local function doMove()
 					local movementVector = plrModule:GetControls():GetMoveVector()
 					if movementVector.Z < 0 then --forward
-						move("Up",input.UserInputState,input)
+						move("Up", input.UserInputState, input)
 					elseif movementVector.Z > 0 then --backward
-						move("Down",input.UserInputState,input)
+						move("Down", input.UserInputState, input)
 					elseif movementVector.Z == 0 then --stop
-						move("Stop",input.UserInputState,input)
+						move("Stop", input.UserInputState, input)
 					end
 				end
 

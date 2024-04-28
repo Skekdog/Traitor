@@ -23,7 +23,7 @@ function textInput.Create(text: string, inputType: "Number", range: string, cont
 		local num = tonumber(box.Text)
 		if inputType == "Number" then
 			if num then
-				val.Value = math.clamp(num,min,max)
+				val.Value = math.clamp(num, min, max)
 			end
 			return
 		end

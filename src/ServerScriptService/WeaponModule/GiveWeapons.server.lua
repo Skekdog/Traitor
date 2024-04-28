@@ -33,7 +33,7 @@ local function setup(v)
 				local hum = player.Character:FindFirstChild("Humanoid")
 				if hum then
 					if hum.Health > 0 then
-						for i2,v2 in pairs(player.Inventory:GetChildren()) do
+						for i2, v2 in pairs(player.Inventory:GetChildren()) do
 							if v2:GetAttribute("Slot") == serverItem:GetAttribute("Slot") then
 								return
 							end
@@ -51,7 +51,7 @@ end
 workspace.ChildAdded:Connect(function(child)
 	if child.Name:match(ServerStorage:GetAttribute("RoundID") or "") then
 		local spawns = child.WeaponSpawns
-		for _,v in pairs(spawns:GetChildren()) do
+		for _, v in pairs(spawns:GetChildren()) do
 			setup(v)
 		end
 		spawns.ChildAdded:Connect(setup)

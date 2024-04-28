@@ -8,16 +8,16 @@ local screenMessageFormats = {
 		LabelProperties = {
 			Text = "Standard Message",
 			TextScaled = true,
-			TextColor3 = Color3.new(1,1,1),
-			TextStrokeColor3 = Color3.new(0,0,0),
+			TextColor3 = Color3.new(1, 1, 1),
+			TextStrokeColor3 = Color3.new(0, 0, 0),
 			TextStrokeTransparency = 0.5,
-			FontFace = Font.fromName("SourceSansPro",Enum.FontWeight.Medium,Enum.FontStyle.Normal),
+			FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
 			BackgroundTransparency = 0.5,
 			RichText = true,
 
-			Size = UDim2.fromScale(0.2,0.1),
-			Position = UDim2.fromScale(0.5,0),
-			AnchorPoint = Vector2.new(0.5,0.5),
+			Size = UDim2.fromScale(0.2, 0.1),
+			Position = UDim2.fromScale(0.5, 0),
+			AnchorPoint = Vector2.new(0.5, 0.5),
 		},
 		TweenProperties = {  -- time, easingStyle, easingDirection, repeatCount, reverses, delayTime
 			3,
@@ -33,8 +33,8 @@ local screenMessageFormats = {
 		InheritsFrom = "Standard",
 		LabelProperties = {
 			Text = "Error Message",
-			TextColor3 = Color3.new(1,0,0),
-			TextStrokeColor3 = Color3.new(0.9,0.9,0.9)
+			TextColor3 = Color3.new(1, 0, 0),
+			TextStrokeColor3 = Color3.new(0.9, 0.9, 0.9)
 		},
 	},
 	Info = {
@@ -50,8 +50,8 @@ local screenMessageFormats = {
 		InheritsFrom = "Standard",
 		LabelProperties = {
 			Text = "Success Message",
-			TextColor3 = Color3.new(0,0.71,0),
-			TextStrokeColor3 = Color3.new(0.5,0.5,0.5)
+			TextColor3 = Color3.new(0, 0.71, 0),
+			TextStrokeColor3 = Color3.new(0.5, 0.5, 0.5)
 		}
 	},
 	Warn = {
@@ -59,7 +59,7 @@ local screenMessageFormats = {
 		InheritsFrom = "Standard",
 		LabelProperties = {
 			Text = "Warning Message",
-			TextColor3 = Color3.new(1,0.48,0.13)
+			TextColor3 = Color3.new(1, 0.48, 0.13)
 		}
 	},
 	NiceTry = {
@@ -67,42 +67,42 @@ local screenMessageFormats = {
 		InheritsFrom = "Error",
 		LabelProperties = {
 			Text = "Nice try.",
-			TextStrokeColor3 = Color3.new(0.314,0.047,0.047)
+			TextStrokeColor3 = Color3.new(0.314, 0.047, 0.047)
 		}
 	}
 }
 
 local module = {}
 
-function module.ReverseList(list:{}): {} --Reverses the order of a list
+function module.ReverseList(list: {}): {} --Reverses the order of a list
 	local reversedList = {}
-	for i = #list,1,-1 do
-		table.insert(reversedList,list[i])
+	for i = #list, 1, -1 do
+		table.insert(reversedList, list[i])
 	end
 	return reversedList
 end
 
-function module.ShuffleList(list:{}): {} --Randomly shuffles a list using the Fisher-Yates algorithm
+function module.ShuffleList(list: {}): {} --Randomly shuffles a list using the Fisher-Yates algorithm
 	math.randomseed(workspace:GetServerTimeNow())
 	local shuffledList = {}
-	for _,v in ipairs(list) do
-		local pos = math.random(1,#shuffledList+1)
-		table.insert(shuffledList,pos,v)
+	for _, v in ipairs(list) do
+		local pos = math.random(1, #shuffledList+1)
+		table.insert(shuffledList, pos, v)
 	end
 	return shuffledList
 end
 
-function module.LerpNumber(num1:number,num2:number,decimal:number): number --Linearly interpolates a number
+function module.LerpNumber(num1: number, num2: number, decimal: number): number --Linearly interpolates a number
 	return num1 + ((num2 - num1) * decimal)
 end
 
-function module.HexToColor3(hex:string):Color3 --Credit: @Blockzez
-	local r,g,b = string.match(hex, "^#?(%w%w)(%w%w)(%w%w)$")
-	return Color3.fromRGB(tonumber(r,16),tonumber(g,16),tonumber(b,16))
+function module.HexToColor3(hex: string):Color3 --Credit: @Blockzez
+	local r, g, b = string.match(hex, "^#?(%w%w)(%w%w)(%w%w)$")
+	return Color3.fromRGB(tonumber(r, 16), tonumber(g, 16), tonumber(b, 16))
 end
 
-function module.Color3ToHex(color:Color3):string --Credit: @Blockzez
-	return string.format("#%02X%02X%02X",color.R*0xFF,color.G*0xFF,color.B*0xFF)
+function module.Color3ToHex(color: Color3):string --Credit: @Blockzez
+	return string.format("#%02X%02X%02X", color.R*0xFF, color.G*0xFF, color.B*0xFF)
 end
 
 function module.ScreenMessage(format: string, text: string, formatOverrides: {}?): TextLabel
@@ -154,10 +154,10 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {}?
 	return label
 end
 
-function module.WaitForChildOfClass(instance:Instance,className:string,timeout:number?):Instance?
+function module.WaitForChildOfClass(instance: Instance, className: string, timeout: number?):Instance?
 	if typeof(instance) ~= "Instance" then error("Expected Instance in Instance of WaitForChildOfClass, got "..typeof(instance)) end
 	if typeof(className) ~= "string" then error("Expected string for className of WaitForChildOfClass, got "..typeof(className)) end
-	if not table.find({"number","nil"},typeof(timeout)) then error("Expected number or nil for timeout of WaitForChildOfClass, got "..typeof(timeout)) end
+	if not table.find({"number", "nil"}, typeof(timeout)) then error("Expected number or nil for timeout of WaitForChildOfClass, got "..typeof(timeout)) end
 	local start = os.time()
 	local endTime = start+(timeout or math.huge)
 	local warned = false
@@ -173,12 +173,12 @@ function module.WaitForChildOfClass(instance:Instance,className:string,timeout:n
 	return instance:FindFirstChildOfClass(className)
 end
 
-function module.FindFirstChildSplit(instance:Instance,split:string,target:string,index:number): Instance?
+function module.FindFirstChildSplit(instance: Instance, split: string, target: string, index: number): Instance?
 	if typeof(instance) ~= "Instance" then error("Expected Instance in Instance of MatchFirstChild, got "..typeof(instance)) end
 	if typeof(split) ~= "string" then error("Expected string for split of FindFirstChildSplit, got "..typeof(split)) end
 	if typeof(target) ~= "string" then error("Expected string for target of FindFirstChildSplit, got "..typeof(target)) end
 	if typeof(index) ~= "number" then error("Expected number for index of FindFirstChildSplit, got "..typeof(index)) end
-	for _,v in instance:GetChildren() do
+	for _, v in instance:GetChildren() do
 		if v.Name:split(split)[index] == target then return v end
 	end
 	return nil

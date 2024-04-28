@@ -15,18 +15,18 @@ local UI = UIManager.WaitForUI("Equipment Shop").UI
 
 local radarCooldown = 5
 
-local function update(item,credits)
+local function update(item, credits)
 	frame.CurrentCredits.Text = "You have "..tostring(credits).." credit(s)."
 	if credits >= frame.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost") then
-		frame.CreditCost.TextColor3 = Color3.new(0.294118,1,0.243137)
-		frame.CurrentCredits.TextColor3 = Color3.new(0.294118,1,0.243137)
-		purchaseButton.TextColor3 = Color3.fromRGB(56,167,31)
-		purchaseButton.BackgroundColor3 = Color3.new(1,1,1)
+		frame.CreditCost.TextColor3 = Color3.new(0.294118, 1, 0.243137)
+		frame.CurrentCredits.TextColor3 = Color3.new(0.294118, 1, 0.243137)
+		purchaseButton.TextColor3 = Color3.fromRGB(56, 167, 31)
+		purchaseButton.BackgroundColor3 = Color3.new(1, 1, 1)
 	else
-		frame.CreditCost.TextColor3 = Color3.fromRGB(167,0,0)
-		frame.CurrentCredits.TextColor3 = Color3.fromRGB(167,0,0)
-		purchaseButton.TextColor3 = Color3.fromRGB(167,0,0)
-		purchaseButton.BackgroundColor3 = Color3.fromRGB(185,185,185)
+		frame.CreditCost.TextColor3 = Color3.fromRGB(167, 0, 0)
+		frame.CurrentCredits.TextColor3 = Color3.fromRGB(167, 0, 0)
+		purchaseButton.TextColor3 = Color3.fromRGB(167, 0, 0)
+		purchaseButton.BackgroundColor3 = Color3.fromRGB(185, 185, 185)
 	end
 end
 
@@ -55,7 +55,7 @@ end
 UI.ScrollingFrame.ChildAdded:Connect(function(v)
 	if v:IsA("ImageButton") then
 		v.MouseButton1Click:Connect(function()
-			purchaseButton:SetAttribute("Item",v.Name)
+			purchaseButton:SetAttribute("Item", v.Name)
 			frame.CreditCost.Text = "This costs "..tostring(v:GetAttribute("CreditCost")).." credit(s)."
 			frame.Description.Text = v:GetAttribute("Description")
 			frame:FindFirstChild("Name").Text = v.Name
@@ -79,7 +79,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 
 	local credits = participant.Credits
 	
-	update(item,credits)
+	update(item, credits)
 	
 	if purchaseCon then purchaseCon:Disconnect() end
 	purchaseCon = purchaseButton.MouseButton1Click:Connect(function()

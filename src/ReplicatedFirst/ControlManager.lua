@@ -84,25 +84,25 @@ function module.SetupTouchButton(actionName)
 	local butt = CAS:GetButton(actionName)
 	if butt then
 		butt.Position = getSetting(actionName.." Position")
-		butt.Size = UDim2.fromScale(0.2,0.2)
+		butt.Size = UDim2.fromScale(0.2, 0.2)
 		butt.AnchorPoint = Vector2.one/2
 
-		Instance.new("UIAspectRatioConstraint",butt)
+		Instance.new("UIAspectRatioConstraint", butt)
 		local scale = Instance.new("UIScale")
 		scale.Scale = getSetting(actionName.." Scale")
 		scale.Parent = butt
 
 		local actionText = butt.ActionTitle
 		actionText.Text = actionName
-		actionText.Size = UDim2.fromScale(0.9,1)
-		actionText.Position = UDim2.fromScale(0.5,0)
+		actionText.Size = UDim2.fromScale(0.9, 1)
+		actionText.Position = UDim2.fromScale(0.5, 0)
 		actionText.AnchorPoint = Vector2.xAxis/2
 		actionText.TextScaled = true
-		CS:AddTag(actionText,"StyledUI")
+		CS:AddTag(actionText, "StyledUI")
 
-		CS:AddTag(butt,"StyledUI")
-		butt:SetAttribute("Style","Primary")
-		butt:SetAttribute("StyleData","UpdateImage")
+		CS:AddTag(butt, "StyledUI")
+		butt:SetAttribute("Style", "Primary")
+		butt:SetAttribute("StyleData", "UpdateImage")
 
 		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(butt)
 		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(actionText)
@@ -125,12 +125,12 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 	
 	local triggers = {}
 	local modifiers = {}
-	for _,v in keybinds do
-		table.insert(triggers,v[1])
+	for _, v in keybinds do
+		table.insert(triggers, v[1])
 		modifiers[v[1]] = v[2]
 	end
 	
-	CAS:BindAction(actionName,function(action, state, input: InputObject)
+	CAS:BindAction(actionName, function(action, state, input: InputObject)
 		local inp = input.KeyCode or input.UserInputType
 		
 		if (not modifiers[inp]) or (UIS:IsKeyDown(modifiers[inp])) then
@@ -139,7 +139,7 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 			if (not toggled) and ((state == Enum.UserInputState.Begin) or (state == Enum.UserInputState.End)) then show = true end
 
 			if show then
-				callback(action,state,input,toggled)
+				callback(action, state, input, toggled)
 			end
 		end
 	end, createTouchButton, table.unpack(triggers))

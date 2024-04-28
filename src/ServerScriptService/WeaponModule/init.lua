@@ -21,21 +21,21 @@ local indirectDamageTime = 10
 
 local module = {}
 
-local function isCorrectDamage(plr1:Player,plr2:Player,checkSDorFreeKill:boolean): boolean
+local function isCorrectDamage(plr1: Player, plr2: Player, checkSDorFreeKill: boolean): boolean
 	if plr1:IsA("Player") and plr2:IsA("Player") then
 		local round = RoundHandler.GetRound(SS:GetAttribute("RoundID"))
 		
 		if round then
 			local roles = round.Gamemode.Roles
 			
-			local plr1Role = round:GetRole(plr1.Name,false)
-			local plr2Role = round:GetRole(plr2.Name,false)
+			local plr1Role = round:GetRole(plr1.Name, false)
+			local plr2Role = round:GetRole(plr2.Name, false)
 			
 			local p1Val = round:GetPlayerValue(plr1.Name)
 			if p1Val then
 				local p2Val = round:GetPlayerValue(plr2.Name)
 				if p2Val:GetAttribute("FreeKill") then return true end
-				for _,v in p1Val.SelfDefenseList:GetChildren() do
+				for _, v in p1Val.SelfDefenseList:GetChildren() do
 					if v.Name == plr2.Name then
 						if v.Value > workspace:GetServerTimeNow() then
 							return true
@@ -44,7 +44,7 @@ local function isCorrectDamage(plr1:Player,plr2:Player,checkSDorFreeKill:boolean
 				end
 			end
 			
-			if table.find(roles[plr1Role].Allies,plr2Role) then
+			if table.find(roles[plr1Role].Allies, plr2Role) then
 				return false --bad damage, lose karma or whatever
 			else
 				return true
@@ -59,7 +59,7 @@ local function flashem(victim)
 	if victim then flash:FireClient(victim) end
 end
 
-local function onDamage(assailant:Player?,victim:Player,damage:number,damageSource:string?,applyKarma:boolean,trueHealth:number?,part:BasePart?)
+local function onDamage(assailant: Player?, victim: Player, damage: number, damageSource: string?, applyKarma: boolean, trueHealth: number?, part: BasePart?)
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then return end
 
@@ -75,11 +75,11 @@ local function onDamage(assailant:Player?,victim:Player,damage:number,damageSour
 
 		if aVal and assailant then
 			local aSD = false --attacker is acting in self-defense
-			for _,v: NumberValue in aVal:FindFirstChild("SelfDefenseList"):GetChildren() do
+			for _, v: NumberValue in aVal:FindFirstChild("SelfDefenseList"):GetChildren() do
 				if v.Name == victim.Name and workspace:GetServerTimeNow() < v.Value then --Attacker is acting in self-defense
 					aSD = true
 					if vHum and vVal then
-						vVal:SetAttribute("KilledInSelfDefense",vHumHealth <= 0)
+						vVal:SetAttribute("KilledInSelfDefense", vHumHealth <= 0)
 					end
 					break
 				end
@@ -87,7 +87,7 @@ local function onDamage(assailant:Player?,victim:Player,damage:number,damageSour
 			
 			if damageSource ~= "Accident" and assailant ~= victim then
 				if not aSD then
-					for _,v: NumberValue in vVal:FindFirstChild("SelfDefenseList"):GetChildren() do
+					for _, v: NumberValue in vVal:FindFirstChild("SelfDefenseList"):GetChildren() do
 						if v.Value >= workspace:GetServerTimeNow() then --Remove old self-defense listings
 							v:Destroy()
 						end
@@ -107,32 +107,32 @@ local function onDamage(assailant:Player?,victim:Player,damage:number,damageSour
 					val.Parent = vVal:FindFirstChild("SelfDefenseList")
 				end
 				
-				local correctDmg = isCorrectDamage(assailant,victim,false)
+				local correctDmg = isCorrectDamage(assailant, victim, false)
 				if correctDmg then
 					if applyKarma then
-						setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma+(damage/2),1,1000))
+						setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma+(damage/2), 1, 1000))
 					end
 				elseif not aSD then
 					if vHum then
 						if vHumHealth <= 0 then
-							aVal:SetAttribute("FreeKill",true)
-							aVal:SetAttribute("FreeKillReason","RandomKill")
-							aVal:SetAttribute("RandomKills",aVal:GetAttribute("RandomKills")+1)
+							aVal:SetAttribute("FreeKill", true)
+							aVal:SetAttribute("FreeKillReason", "RandomKill")
+							aVal:SetAttribute("RandomKills", aVal:GetAttribute("RandomKills")+1)
 						end
 					end
 					if applyKarma then
-						setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma-damage,1,1000))
+						setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma-damage, 1, 1000))
 					end
 				end
 			end
 		end
 		
 		if vHumHealth <= 0 then
-			vVal:SetAttribute("MurderWeapon",damageSource)
-			if part and part.Name == "Head" then vVal:SetAttribute("Headshot",true) end
+			vVal:SetAttribute("MurderWeapon", damageSource)
+			if part and part.Name == "Head" then vVal:SetAttribute("Headshot", true) end
 			if damageSource == "__!!Explosion" then damageSource = "Explosion"
 			else damageSource = "Weapon" end
-			vVal:SetAttribute("DeathType",damageSource)
+			vVal:SetAttribute("DeathType", damageSource)
 			
 			if assailant then
 				local killListVal = Instance.new("BoolValue")
@@ -144,8 +144,8 @@ local function onDamage(assailant:Player?,victim:Player,damage:number,damageSour
 	end
 end
 
-local function calculateDamage(shooter:Player?,part:BasePart,damageData:{any},explosivePosition:Vector3?)
-	local sChar,sKarma = nil,0
+local function calculateDamage(shooter: Player?, part: BasePart, damageData: {any}, explosivePosition: Vector3?)
+	local sChar, sKarma = nil, 0
 	if shooter then
 		sChar = shooter.Character
 		sKarma = getProfile:Invoke(shooter).Karma
@@ -171,7 +171,7 @@ local function calculateDamage(shooter:Player?,part:BasePart,damageData:{any},ex
 			
 			if baseDmg then
 				local falloffDmg:number
-				local dist:number = 0
+				local dist: number = 0
 				if explosivePosition then
 					dist = (explosivePosition - part.Position).Magnitude
 				elseif sChar then
@@ -181,7 +181,7 @@ local function calculateDamage(shooter:Player?,part:BasePart,damageData:{any},ex
 				
 				if falloffStart and falloffEnd and falloffMult then
 					if dist >= falloffStart and dist < falloffEnd then
-						falloffMult = require(game.ReplicatedFirst.API).LerpNumber(1,falloffMult,(dist-falloffStart)/falloffEnd)
+						falloffMult = require(game.ReplicatedFirst.API).LerpNumber(1, falloffMult, (dist-falloffStart)/falloffEnd)
 					elseif dist <= falloffStart then 
 						falloffMult = 1
 					end
@@ -195,7 +195,7 @@ local function calculateDamage(shooter:Player?,part:BasePart,damageData:{any},ex
 	return
 end
 
-function module.CreateExplosion(assailant:Player?,position:Vector3,radius:number,damageData:{["FalloffStart"]:number,["FalloffEnd"]:number,["Falloff"]:number,["Base"]:number},force:number,flashbang:boolean?)
+function module.CreateExplosion(assailant: Player?, position: Vector3, radius: number, damageData:{["FalloffStart"]:number, ["FalloffEnd"]:number, ["Falloff"]:number, ["Base"]:number}, force: number, flashbang: boolean?)
 	local explosion = Instance.new("Explosion")
 	explosion.BlastRadius = radius
 	explosion.BlastPressure = force
@@ -214,7 +214,7 @@ function module.CreateExplosion(assailant:Player?,position:Vector3,radius:number
 	soundPart.Position = position
 	soundPart.CastShadow = false
 	soundPart.Size = Vector3.zero
-	soundPart.Color = Color3.new(0,0,0)
+	soundPart.Color = Color3.new(0, 0, 0)
 	soundPart.Parent = (workspace :: any).Proj.ImpactHoles
 	local sound = ServerStorage.Explosion:Clone()
 	sound.Parent = soundPart
@@ -224,13 +224,13 @@ function module.CreateExplosion(assailant:Player?,position:Vector3,radius:number
 	end)
 
 	local filter = {workspace:FindFirstChild("__Map"):FindFirstChild("Props")}
-	for _,v in Players:GetPlayers() do
+	for _, v in Players:GetPlayers() do
 		local char = v.Character
 		if char then
 			local hum = char:FindFirstChild("Humanoid")
 			if hum then
 				if hum.Health > 0 then
-					table.insert(filter,char)
+					table.insert(filter, char)
 				end
 			end
 		end
@@ -240,10 +240,10 @@ function module.CreateExplosion(assailant:Player?,position:Vector3,radius:number
 	params.RespectCanCollide = false
 	params.FilterType = Enum.RaycastFilterType.Include
 	params.FilterDescendantsInstances = filter
-	local hitParts = workspace:GetPartBoundsInRadius(position,radius,params)
+	local hitParts = workspace:GetPartBoundsInRadius(position, radius, params)
 
 	local hitHums = {} -- hrp: hum
-	for _,v in hitParts do
+	for _, v in hitParts do
 		local root = v.Parent:FindFirstChild("HumanoidRootPart")
 		if v:FindFirstAncestor("Props") then
 			root = v:FindFirstAncestorWhichIsA("BasePart") or v
@@ -265,26 +265,26 @@ function module.CreateExplosion(assailant:Player?,position:Vector3,radius:number
 		if flashbang and Players:GetPlayerFromCharacter(hum.Parent) then
 			flashem(Players:GetPlayerFromCharacter(hum.Parent))
 		else
-			local damage = calculateDamage(assailant,root,damageData,position) or 0
+			local damage = calculateDamage(assailant, root, damageData, position) or 0
 			local trueHealth = hum.Health - damage
 			if hum:FindFirstAncestor("Props") then
 				hum.Health = trueHealth
 				if trueHealth < 0 then
-					local onBreak = hum.Parent:FindFirstChild("OnBreak",true)
+					local onBreak = hum.Parent:FindFirstChild("OnBreak", true)
 					if onBreak then require(onBreak)(assailant) end
 					hum.Parent:Destroy()
 				end
 			else
 				local round = RoundHandler.GetRound(SS:GetAttribute("RoundID"))
 				--prioritise OnDeath, in doing so: pass a trueHealth argument to onDamage, run OnDeath before taking damage, and set OverrideDeathLogic
-				onDamage(assailant, Players:GetPlayerFromCharacter(hum.Parent),damage,"__!!Explosion",true,trueHealth)
+				onDamage(assailant, Players:GetPlayerFromCharacter(hum.Parent), damage, "__!!Explosion", true, trueHealth)
 				if trueHealth < 0 and round.RoundPhase == "Playing" then
 					round:OnDeath(hum)
-					hum:SetStateEnabled(Enum.HumanoidStateType.Freefall,true)
-					hum:SetAttribute("OverrideDeathLogic",true)
+					hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
+					hum:SetAttribute("OverrideDeathLogic", true)
 
 					hum.AutoRotate = false
-					for i2,v2 in hum.Parent:GetDescendants() do
+					for i2, v2 in hum.Parent:GetDescendants() do
 						if v2:IsA("BasePart") then
 							v2:SetNetworkOwner()
 						end
@@ -306,7 +306,7 @@ function module.CreateExplosion(assailant:Player?,position:Vector3,radius:number
 	end
 end
 
-function module.SpawnProjectile(shooter,weapon,rayinfo,position)
+function module.SpawnProjectile(shooter, weapon, rayinfo, position)
 	local humanoid = shooter.Character.Humanoid
 	local rand = Random.new()
 	
@@ -331,7 +331,7 @@ function module.SpawnProjectile(shooter,weapon,rayinfo,position)
 	else
 		spreadVal = configS.Proj:GetAttribute("Spread")*100
 	end
-	local spread = Vector3.new(rand:NextNumber(-spreadVal,spreadVal)/100,rand:NextNumber(-spreadVal,spreadVal)/100,rand:NextNumber(-spreadVal,spreadVal)/100)
+	local spread = Vector3.new(rand:NextNumber(-spreadVal, spreadVal)/100, rand:NextNumber(-spreadVal, spreadVal)/100, rand:NextNumber(-spreadVal, spreadVal)/100)
 
 	local char = shooter.Character
 	local charWeapon = char:FindFirstChild(weapon.Name)
@@ -345,7 +345,7 @@ function module.SpawnProjectile(shooter,weapon,rayinfo,position)
 		local mzl = weapon.Model.PrimaryPart:FindFirstChild("MuzzleFlash")
 		if mzl then
 			mzl.Enabled = true
-			task.delay(0.1,function()
+			task.delay(0.1, function()
 				if weapon then if weapon:FindFirstChildOfClass("Model") then weapon:FindFirstChildOfClass("Model").PrimaryPart.MuzzleFlash.Enabled = false end end
 			end)
 		end
@@ -363,12 +363,12 @@ function module.SpawnProjectile(shooter,weapon,rayinfo,position)
 			if (not proj) or (not proj.Parent) then
 				return -- i.e, grenade was disarmed by shooting it
 			end
-			module.CreateExplosion(shooter,proj.Position,configS.Damage.Uniques:GetAttribute("ExplosRadius"),configS.Damage:GetAttributes(),configS.Damage.Uniques:GetAttribute("ExplosPressure"),serverWeapon.Name=="Flashbang")
+			module.CreateExplosion(shooter, proj.Position, configS.Damage.Uniques:GetAttribute("ExplosRadius"), configS.Damage:GetAttributes(), configS.Damage.Uniques:GetAttribute("ExplosPressure"), serverWeapon.Name=="Flashbang")
 			proj:Destroy()
 		end)
 	else
 		local rayParams = RaycastParams.new()
-		rayParams.FilterDescendantsInstances = {char,(workspace:FindFirstChild("Proj") :: any):FindFirstChild("ImpactHoles"),workspace:FindFirstChild("__Map"):FindFirstChild("Bounds")}
+		rayParams.FilterDescendantsInstances = {char, (workspace:FindFirstChild("Proj") :: any):FindFirstChild("ImpactHoles"), workspace:FindFirstChild("__Map"):FindFirstChild("Bounds")}
 		rayParams.FilterType = Enum.RaycastFilterType.Exclude
 		rayParams.CollisionGroup = "WeaponProjectiles"
 		rayParams.IgnoreWater = true
@@ -378,13 +378,13 @@ function module.SpawnProjectile(shooter,weapon,rayinfo,position)
 		local dir = rayinfo.Direction*configS.Proj:GetAttribute("MaxDistance")+spread
 		local dirAim = rayinfo.Unit.Direction*configS.Proj:GetAttribute("MaxDistance")+(spread*configS.Aim:GetAttribute("SpreadMult"))
 		if shooter:GetAttribute("Aim") then
-			rayResult = workspace:Raycast(char.Head.Position,dirAim,rayParams)
+			rayResult = workspace:Raycast(char.Head.Position, dirAim, rayParams)
 			endPos = rayResult and rayResult.Position or dirAim*configS.Proj:GetAttribute("MaxDistance")
 			if proj then
 				proj.CFrame = CFrame.lookAt(char.Head.Position, endPos)
 			end
 		else
-			rayResult = workspace:Raycast(position,dir,rayParams)
+			rayResult = workspace:Raycast(position, dir, rayParams)
 			endPos = rayResult and rayResult.Position or dir*configS.Proj:GetAttribute("MaxDistance")
 			if proj then
 				proj.CFrame = CFrame.lookAt(char.Head.Position, endPos)
@@ -397,7 +397,7 @@ function module.SpawnProjectile(shooter,weapon,rayinfo,position)
 				endPos = rayResult.Position
 			end
 			
-			local tween = TS:Create(proj,TweenInfo.new(((char.Head.Position-endPos).Magnitude)/configS.Proj:GetAttribute("Speed")),{Position = endPos})
+			local tween = TS:Create(proj, TweenInfo.new(((char.Head.Position-endPos).Magnitude)/configS.Proj:GetAttribute("Speed")), {Position = endPos})
 			tween:Play()
 			tween.Completed:Once(function()
 				proj:Destroy()
@@ -407,22 +407,22 @@ function module.SpawnProjectile(shooter,weapon,rayinfo,position)
 		
 		if rayResult then
 			if weapon:FindFirstChildOfClass("Model") then
-				module.OnHit(rayResult.Instance,serverWeapon,shooter,(rayResult.Position-weapon:FindFirstChildOfClass("Model").PrimaryPart.Position).Magnitude,rayResult,rayinfo)
+				module.OnHit(rayResult.Instance, serverWeapon, shooter, (rayResult.Position-weapon:FindFirstChildOfClass("Model").PrimaryPart.Position).Magnitude, rayResult, rayinfo)
 			end	
 		end
 	end
 	--TODO: single use should be changed to MaxUses
 	if configS.General:GetAttribute("SingleUse") then
-		ReplicatedStorage.ServerClient.EquipWeapon:FireClient(shooter,false,weapon,nil,true)
+		ReplicatedStorage.ServerClient.EquipWeapon:FireClient(shooter, false, weapon, nil, true)
 		shooter.Inventory:FindFirstChild(weapon.Name):Destroy()
 	end
 end
 
-function module.CreateBulletHole(part,position,colour,rayResult)
+function module.CreateBulletHole(part, position, colour, rayResult)
 	local impactHole = Instance.new("Part")
 	impactHole.Anchored = false
 	impactHole.Transparency = 1
-	impactHole.Size = Vector3.new(0.5,0.5,0.1)
+	impactHole.Size = Vector3.new(0.5, 0.5, 0.1)
 	impactHole.CFrame = CFrame.lookAt(rayResult.Position, rayResult.Position + rayResult.Normal)
 	
 	impactHole.CanCollide = false
@@ -439,9 +439,9 @@ function module.CreateBulletHole(part,position,colour,rayResult)
 	weld.Part1 = impactHole
 	weld.Parent = rayResult.Instance
 	
-	delay(5,function()
-		TS:Create(impactDecal,TweenInfo.new(5),{Transparency = 1}):Play()
-		delay(5,function()
+	delay(5, function()
+		TS:Create(impactDecal, TweenInfo.new(5), {Transparency = 1}):Play()
+		delay(5, function()
 			weld:Destroy()
 			impactHole:Destroy()
 			impactHole = nil
@@ -453,13 +453,13 @@ function module.CreateBulletHole(part,position,colour,rayResult)
 	impactHole.Parent = part
 end
 
-function module.OnHit(part,weapon,shooter,distance,rayResult,rayInfo)
+function module.OnHit(part, weapon, shooter, distance, rayResult, rayInfo)
 	local model = part:FindFirstAncestorOfClass("Model")
 	if model then
-		local humanoid:Humanoid = model:FindFirstChildOfClass("Humanoid")
+		local humanoid: Humanoid = model:FindFirstChildOfClass("Humanoid")
 		if humanoid then
 			local plr = Players:GetPlayerFromCharacter(model)
-			local damage = calculateDamage(shooter,part,weapon.Configuration.Damage:GetAttributes()) or 0
+			local damage = calculateDamage(shooter, part, weapon.Configuration.Damage:GetAttributes()) or 0
 			local doDamage = true
 			
 			if humanoid then
@@ -476,12 +476,12 @@ function module.OnHit(part,weapon,shooter,distance,rayResult,rayInfo)
 				local mods = val:FindFirstChild("Modifiers")
 				if not mods then skip = true end
 				if not skip then
-					for i,v in val.Modifiers:GetAttributes() do
-						local split = string.split(i,"_")
+					for i, v in val.Modifiers:GetAttributes() do
+						local split = string.split(i, "_")
 						if split[1] ~= "AbsorbDamage" then continue end
-						for _,v2 in string.split(split[2],"0") do
-							if not string.match(part.Name,v2) then continue end
-							mods:SetAttribute(i,v-damage)
+						for _, v2 in string.split(split[2], "0") do
+							if not string.match(part.Name, v2) then continue end
+							mods:SetAttribute(i, v-damage)
 							doDamage = false
 							if mods:GetAttribute(i) <= 0 then mods:SetAttribute(i) end
 							break
@@ -497,10 +497,10 @@ function module.OnHit(part,weapon,shooter,distance,rayResult,rayInfo)
 					if weapon:FindFirstChildOfClass("Model").PrimaryPart:FindFirstChild("HitFlesh") then shooter.Character:FindFirstChildOfClass("Model"):FindFirstChildOfClass("Model").PrimaryPart.HitFlesh:Play() end
 					if plr then
 						if weapon.Configuration.Damage:GetAttribute("PunishmentProtectsVictim") then
-							damageVictim = isCorrectDamage(shooter,plr,true)
+							damageVictim = isCorrectDamage(shooter, plr, true)
 						end
 						if weapon.Configuration.Damage:GetAttribute("PunishWrongDamage") then
-							damageShooter = not isCorrectDamage(shooter,plr,true)
+							damageShooter = not isCorrectDamage(shooter, plr, true)
 						end
 					end
 					if damageVictim then
@@ -510,8 +510,8 @@ function module.OnHit(part,weapon,shooter,distance,rayResult,rayInfo)
 						shooter.Character.Humanoid:TakeDamage(damage)
 					end
 					if humanoid.Health <= 0 then
-						humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,true)
-						for i,v in model:GetDescendants() do
+						humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall, true)
+						for i, v in model:GetDescendants() do
 							if v:IsA("BasePart") and not v.Anchored then
 								v:SetNetworkOwner()
 							end
@@ -529,14 +529,14 @@ function module.OnHit(part,weapon,shooter,distance,rayResult,rayInfo)
 						end
 						
 						if part:FindFirstAncestor("Props") then
-							local onBreak = part.Parent:FindFirstChild("OnBreak",true)
+							local onBreak = part.Parent:FindFirstChild("OnBreak", true)
 							if onBreak then require(onBreak)(shooter) end
 							part.Parent:Destroy()
 						end
 					end
 				end
 				if plr then
-					onDamage(shooter,plr,damage,weapon.Name,damageVictim,nil,part)
+					onDamage(shooter, plr, damage, weapon.Name, damageVictim, nil, part)
 				end
 			end
 			--onDamage is called here, regardless of doDamage, because self defense and such should still apply, even if no damage is dealt
@@ -549,17 +549,17 @@ function module.OnHit(part,weapon,shooter,distance,rayResult,rayInfo)
 			end
 		end
 	end
-	module.CreateBulletHole(part,part.Position,part.Color,rayResult)
+	module.CreateBulletHole(part, part.Position, part.Color, rayResult)
 	return true
 end
 
-function module.PlaceTool(plr,tool,ray,pos)
+function module.PlaceTool(plr, tool, ray, pos)
 	local serverTool = ReplicatedStorage.Items:FindFirstChild(tool.Name)
 	if not serverTool then --[[ban plr]] end
 
 	local configS = serverTool.Configuration
 	if configS.General:GetAttribute("SingleUse") then
-		ReplicatedStorage.ServerClient.EquipWeapon:FireClient(plr,false,tool,nil,true)
+		ReplicatedStorage.ServerClient.EquipWeapon:FireClient(plr, false, tool, nil, true)
 		plr.Inventory:FindFirstChild(tool.Name):Destroy()
 	end
 	
@@ -568,7 +568,7 @@ function module.PlaceTool(plr,tool,ray,pos)
 	
 	local prop = serverTool:FindFirstChildOfClass("Model"):Clone()
 	local part = prop.PrimaryPart
-	for _,v in part:GetChildren() do
+	for _, v in part:GetChildren() do
 		if v:IsA("Script") then
 			v.Enabled = true
 		else
@@ -584,10 +584,10 @@ function module.PlaceTool(plr,tool,ray,pos)
 	hum.Parent = prop
 	
 	local toolData = Instance.new("Folder")
-	for i,v in configS.ToolUsed:GetAttributes() do
-		toolData:SetAttribute(i,v)
+	for i, v in configS.ToolUsed:GetAttributes() do
+		toolData:SetAttribute(i, v)
 	end
-	for i,v in configS.ToolData:GetAttributes() do
+	for i, v in configS.ToolData:GetAttributes() do
 		local class = ""
 		if typeof(v) == "string" then class = "StringValue" elseif typeof(v) == "number" then class = "IntValue" end
 		local val = Instance.new(class)

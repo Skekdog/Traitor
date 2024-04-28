@@ -5,7 +5,7 @@ Players.PlayerAdded:Connect(function(plr)
 	local suc = false
 	repeat
 		suc = pcall(function()
-			BS:AwardBadge(plr.UserId,2136698808)
+			BS:AwardBadge(plr.UserId, 2136698808)
 		end)
 		task.wait(1)
 	until suc or tries > 3

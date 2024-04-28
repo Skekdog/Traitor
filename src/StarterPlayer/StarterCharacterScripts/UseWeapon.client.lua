@@ -11,13 +11,13 @@ local controls = require(ReplicatedFirst.ControlManager)
 local clientStorage = game:WaitForChild("ClientStorage")
 local scriptCons = clientStorage:WaitForChild("ScriptConnections")
 
-local function reloadFunc(tool,config)
+local function reloadFunc(tool, config)
 	if tool.Parent == nil or tool.CurrentAmmo.Value == config.Reload:GetAttribute("MagCapacity") then
 		task.wait()
 		return
 	end
 	if config.Reload:GetAttribute("AllowReload") then
-		local anim:AnimationTrack = plr.Character.Humanoid:LoadAnimation(tool.ReloadAnimation)
+		local anim: AnimationTrack = plr.Character.Humanoid:LoadAnimation(tool.ReloadAnimation)
 		anim:Play()
 		local animCon
 		animCon = anim.Stopped:Connect(function()
@@ -32,21 +32,21 @@ local function reloadFunc(tool,config)
 end
 
 --local ammoCon
-scriptCons.EquipEvent.Event:Connect(function(tool,equip)
+scriptCons.EquipEvent.Event:Connect(function(tool, equip)
 	if equip then
 		local config = tool.Configuration
 		local curAmmo = tool:FindFirstChild("CurrentAmmo")
 		local lastFire = tool:FindFirstChild("LastFireTime")
 		
 		if config:FindFirstChild("Reload") and config.Reload:GetAttribute("AllowReload") then
-			controls.Register("Reload Weapon", true, function()reloadFunc(tool,config)end)
+			controls.Register("Reload Weapon", true, function()reloadFunc(tool, config)end)
 		else
 			controls.Unregister("Reload Weapon")
 		end
 		
 		--all of this is function is garbage todo rewrite
 		
-		local function shoot(action,state,input)
+		local function shoot(action, state, input)
 			if state == Enum.UserInputState.Begin then
 				repeat
 					local reloadDisable = false
@@ -79,7 +79,7 @@ scriptCons.EquipEvent.Event:Connect(function(tool,equip)
 								scriptCons.FireEvent:Fire()
 								ReplicatedStorage.ClientServer.FireWeapon:FireServer(tool,
 									workspace.CurrentCamera:ViewportPointToRay(
-										workspace.CurrentCamera.ViewportSize.X/2,workspace.CurrentCamera.ViewportSize.Y/2,1),
+										workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1),
 									primaryPart.Position)
 
 								lastFire.Value = workspace:GetServerTimeNow()
@@ -88,7 +88,7 @@ scriptCons.EquipEvent.Event:Connect(function(tool,equip)
 								local flash = primaryPart:FindFirstChild("MuzzleFlash")
 								if flash then
 									local num = Instance.new("NumberValue")
-									local tween = TS:Create(num,TweenInfo.new(0.1),{Value = 1})
+									local tween = TS:Create(num, TweenInfo.new(0.1), {Value = 1})
 									tween:Play()
 									local muzzleThread
 									flash.Enabled = true
@@ -111,13 +111,13 @@ scriptCons.EquipEvent.Event:Connect(function(tool,equip)
 							end
 						end
 					elseif curAmmo.Value <= 0 then
-						reloadFunc(tool,config)
+						reloadFunc(tool, config)
 					elseif reloadDisable then
 						curAmmo.Changed:Wait()
 					elseif tool.Parent == nil then
 						break
 					else
-						warn("An unknown issue occurred whilst trying to shoot",tool.Name)
+						warn("An unknown issue occurred whilst trying to shoot", tool.Name)
 						task.wait() --nobody likes freezing
 					end
 				until input.UserInputState == Enum.UserInputState.End or input.UserInputState == Enum.UserInputState.Cancel

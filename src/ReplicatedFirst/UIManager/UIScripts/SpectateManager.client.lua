@@ -8,14 +8,14 @@ local camera = workspace.CurrentCamera
 local ui = uiManager.WaitForUI("Spectate")
 local uiO = ui.UI
 
-local function spectateFunc(action,state)
+local function spectateFunc(action, state)
 	local chars = {}
 	for _, v in Players:GetPlayers() do
 		local char = v.Character
 		if char then
 			local hum = char:FindFirstChildOfClass("Humanoid")
 			if hum and hum.Health > 0 then
-				table.insert(chars,hum)
+				table.insert(chars, hum)
 			end
 		end
 	end
@@ -26,7 +26,7 @@ local function spectateFunc(action,state)
 	end
 
 	local lastKey = nil
-	for i,v in chars do
+	for i, v in chars do
 		if v == camera.CameraSubject then
 			lastKey = i
 		end

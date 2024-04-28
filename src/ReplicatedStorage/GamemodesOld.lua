@@ -75,79 +75,79 @@
 globalHighlights = {
 	SuicideCult = function(round)
 		local suiciders = {}
-		for _,v in round.Location.Players:GetChildren() do
-			if v:GetAttribute("DeathType") == "Suicide" then table.insert(suiciders,v) end
+		for _, v in round.Location.Players:GetChildren() do
+			if v:GetAttribute("DeathType") == "Suicide" then table.insert(suiciders, v) end
 		end
-		if #suiciders == 1 then return "Lonely and Depressed",suiciders[1].Name.." was the only one to kill themselves."
+		if #suiciders == 1 then return "Lonely and Depressed", suiciders[1].Name.." was the only one to kill themselves."
 		elseif #suiciders == 0 then return end
-		local earliestTime,earliestPlr = math.huge,nil
-		for _,v in suiciders do
-			if v:GetAttribute("DeathTime") < earliestTime then earliestTime,earliestPlr = v:GetAttribute("DeathTime"),v end
+		local earliestTime, earliestPlr = math.huge, nil
+		for _, v in suiciders do
+			if v:GetAttribute("DeathTime") < earliestTime then earliestTime, earliestPlr = v:GetAttribute("DeathTime"), v end
 		end
-		return "Suicide Cult Leader",earliestPlr.Name.." showed the other suiciders how to do it by being the first to go."
+		return "Suicide Cult Leader", earliestPlr.Name.." showed the other suiciders how to do it by being the first to go."
 	end,
 	Explosives = function(round)
 		local plrs = round.Location.Players
 		local kills = {}
-		for _,v in plrs:GetChildren() do
+		for _, v in plrs:GetChildren() do
 			kills[v.Name] = {}
-			for _,kill in v.KillList do
+			for _, kill in v.KillList do
 				local val = plrs:FindFirstChild(kill.Name)
-				if val and val:GetAttribute("DeathType") == "Explosion" then table.insert(kills[v],val) end
+				if val and val:GetAttribute("DeathType") == "Explosion" then table.insert(kills[v], val) end
 			end
 		end
 		
-		local mostCount,mostPlr,killList = 0,nil,{}
-		for i,v in kills do if #v > mostCount then mostCount,mostPlr,killList = #v,i,v end end
+		local mostCount, mostPlr, killList = 0, nil, {}
+		for i, v in kills do if #v > mostCount then mostCount, mostPlr, killList = #v, i, v end end
 		
 		if mostPlr then
-			if table.find(killList,plrs:FindFirstChild(mostPlr.Name)) then
-				return "Field Research",mostPlr.Name.." tested their own resistance to explosions. It was not high enough."
+			if table.find(killList, plrs:FindFirstChild(mostPlr.Name)) then
+				return "Field Research", mostPlr.Name.." tested their own resistance to explosions. It was not high enough."
 			end
-			return "Explosives Research Grant",mostPlr.Name.." was recognised for their research on explosions. "..tostring(mostCount).." test subjects helped out."
+			return "Explosives Research Grant", mostPlr.Name.." was recognised for their research on explosions. "..tostring(mostCount).." test subjects helped out."
 		end
 	end,
 	FirstBlood = function(round)
 		local plrs = round.Location.Players
-		local firstKill,killTime,firstDeath = nil,math.huge,nil
-		for _,v in plrs:GetChildren() do
-			for _,kill in v.KillList:GetChildren() do
+		local firstKill, killTime, firstDeath = nil, math.huge, nil
+		for _, v in plrs:GetChildren() do
+			for _, kill in v.KillList:GetChildren() do
 				local val = plrs:FindFirstChild(kill.Name)
 				if (val) and (val:GetAttribute("DeathTime") < killTime) then
-					firstKill,killTime,firstDeath = v,val:GetAttribute("DeathTime"),val
+					firstKill, killTime, firstDeath = v, val:GetAttribute("DeathTime"), val
 				end
 			end
 		end
 		
 		if firstKill and firstDeath then
-			if round:IsDamageJustified(firstKill,firstDeath,true) then
-				return "First Blood",firstKill.Name.." delivered the first death but did not receive a medal."
+			if round:IsDamageJustified(firstKill, firstDeath, true) then
+				return "First Blood", firstKill.Name.." delivered the first death but did not receive a medal."
 			end
-			return "First Bloody Stupid Kill",firstKill.Name.." scored the first kill by shooting a friend. Good job."
+			return "First Bloody Stupid Kill", firstKill.Name.." scored the first kill by shooting a friend. Good job."
 		end
 	end,
 	BadLuck = function(round)
-		local earliestDeath,earliestPlr = math.huge,nil
-		for _,v in round.Location.Players:GetChildren() do
+		local earliestDeath, earliestPlr = math.huge, nil
+		for _, v in round.Location.Players:GetChildren() do
 			local t = v:GetAttribute("DeathTime")
 			if (t ~= 0) and (t<earliestDeath) then
 				if (t-round.StartTime) < 0.5 then
-					earliestDeath,earliestPlr = t,v
+					earliestDeath, earliestPlr = t, v
 				end
 			end
 		end
 		
-		if earliestPlr then return "I Hate This Game",earliestPlr.Name.." died right after the start of the round." end
-		local latestDeath,latestPlr = 0,nil
-		for _,v in round.Location.Players:GetChildren() do
+		if earliestPlr then return "I Hate This Game", earliestPlr.Name.." died right after the start of the round." end
+		local latestDeath, latestPlr = 0, nil
+		for _, v in round.Location.Players:GetChildren() do
 			local t = v:GetAttribute("DeathTime")
-			if (t ~= 0) and (t>latestDeath) and (round:GetRole(v.Name,true) == round.Victory) then
+			if (t ~= 0) and (t>latestDeath) and (round:GetRole(v.Name, true) == round.Victory) then
 				if ((round.EndTime-t) < 0.5) then
-					latestDeath,latestPlr = t,v
+					latestDeath, latestPlr = t, v
 				end
 			end
 		end
-		if latestPlr then return "Pyrrhic Victory",latestPlr.Name.." died just before their team won the round." end
+		if latestPlr then return "Pyrrhic Victory", latestPlr.Name.." died just before their team won the round." end
 	end,
 }
 
@@ -180,18 +180,18 @@ local gamemodes = {
 			["HUGE"] = {items["HUGE"]},
 			["Glock"] = {items["Glock"]},
 
-			["Golden Gun"] = {items["Golden Gun"],2,"Instant kills if the death is justified. Otherwise - bad luck.","10282780102"},
-			["Silenced Pistol"] = {items["Silenced Pistol"],1,"A significantly quieter variant of the Five-SeveN. Spies killed by silenced weapons will not scream.","299432421"},
-			["Grenade"] = {items["Grenade"],2,"Explodes in a decent radius after a few seconds. Can be disarmed by being shot.","8096856961"},
-			["AWP"] = {items["AWP"],1,"Slow-firing, high-power sniper rifle. Can only be shot whilst scoped in.","4772214897"},
-			["Flashbang"] = {items["Flashbang"],1,"Blinds and deafens anyone in the radius, but can be disarmed by being shot.","10753198321"},
+			["Golden Gun"] = {items["Golden Gun"], 2, "Instant kills if the death is justified. Otherwise - bad luck.", "10282780102"},
+			["Silenced Pistol"] = {items["Silenced Pistol"], 1, "A significantly quieter variant of the Five-SeveN. Spies killed by silenced weapons will not scream.", "299432421"},
+			["Grenade"] = {items["Grenade"], 2, "Explodes in a decent radius after a few seconds. Can be disarmed by being shot.", "8096856961"},
+			["AWP"] = {items["AWP"], 1, "Slow-firing, high-power sniper rifle. Can only be shot whilst scoped in.", "4772214897"},
+			["Flashbang"] = {items["Flashbang"], 1, "Blinds and deafens anyone in the radius, but can be disarmed by being shot.", "10753198321"},
 
 			["Bullet Vest"] = {function(plrVal)
-				plrVal:FindFirstChild("Modifiers"):SetAttribute("AbsorbDamage_Torso0HumanoidRootPart_Body_Armor","60")
-			end,1,"Resists damage to torso, but will break after too much.","395920626"},
-			["Radar"] = {function()end,1,"Reveals the location of all players every 30 seconds.","62159372"}, -- radar is handled on the client, so mark it as a function and allow the EquipmentManager to inform the client
-			["Health Station"] = {items["Health Station"],1,"Heals anyone who uses it, but needs to slowly recharge and can be destroyed by Traitors.","6567078483"},
-			["Death Station"] = {items["Death Station"],1,"Kills innocents who use it, but can be destroyed by them aswell.","17068622097"}
+				plrVal:FindFirstChild("Modifiers"):SetAttribute("AbsorbDamage_Torso0HumanoidRootPart_Body_Armor", "60")
+			end, 1, "Resists damage to torso, but will break after too much.", "395920626"},
+			["Radar"] = {function()end, 1, "Reveals the location of all players every 30 seconds.", "62159372"}, -- radar is handled on the client, so mark it as a function and allow the EquipmentManager to inform the client
+			["Health Station"] = {items["Health Station"], 1, "Heals anyone who uses it, but needs to slowly recharge and can be destroyed by Traitors.", "6567078483"},
+			["Death Station"] = {items["Death Station"], 1, "Kills innocents who use it, but can be destroyed by them aswell.", "17068622097"}
 		},
 		StartWith = {"Crowbar"},
 
@@ -203,13 +203,13 @@ local gamemodes = {
 				Minimum = 0,
 
 				Hint = "Survive the <font color='#ff0000'>Traitors</font>.",
-				Colour = Color3.new(0,1,0),
+				Colour = Color3.new(0, 1, 0),
 				Sound = 9042819926,
 				
 				KnowMissing = false,
 				PublicityLevel = "Nobody",
 				AlwaysSeeKnownAllies = false,
-				Allies = {"Detective","Innocent"},
+				Allies = {"Detective", "Innocent"},
 				
 				EquipmentShop = {},
 				StartsWith = {},
@@ -226,7 +226,7 @@ local gamemodes = {
 				Minimum = 1,
 
 				Hint = "Kill all of the <font color='#00ff00'>Innocents</font>.",
-				Colour = Color3.new(1,0,0),
+				Colour = Color3.new(1, 0, 0),
 				Sound = 9042088276,
 				
 				KnowMissing = true,
@@ -263,17 +263,17 @@ local gamemodes = {
 				Minimum = 0,
 
 				Hint = "Use your <font color='#0000ff'>Equipment</font> to discover the <font color='#ff0000'>Traitors</font>.",
-				Colour = Color3.new(0,0.34902,1),
+				Colour = Color3.new(0, 0.34902, 1),
 				Sound = 9042823666,
 				Accessories = {"Detective Hat"},
 				
 				KnowMissing = false,
 				PublicityLevel = "All",
 				AlwaysSeeKnownAllies = false,
-				Allies = {"Innocent","Detective"},
+				Allies = {"Innocent", "Detective"},
 
 				StartingCredits = 2,
-				EquipmentShop = {"Radar","Golden Gun","Health Station","Flashbang"},
+				EquipmentShop = {"Radar", "Golden Gun", "Health Station", "Flashbang"},
 				StartsWith = {"Bullet Vest"},
 				
 				AwardOnDeath = {
@@ -299,8 +299,8 @@ local gamemodes = {
 		TimeLimitBase = 120,
 		TimePerPlayer = 15,
 		
-		PyrrhicVictory = "Competitor",--"__!!MostPoints-Solo",
-		TimeVictory = "Competitor",--"__!!MostPoints-Solo",
+		PyrrhicVictory = "Competitor", --"__!!MostPoints-Solo",
+		TimeVictory = "Competitor", --"__!!MostPoints-Solo",
 		TimeVictoryMusic = vm.Traitor,
 
 		Equipment = {
@@ -314,18 +314,18 @@ local gamemodes = {
 			["HUGE"] = {items["HUGE"]},
 			["Glock"] = {items["Glock"]},
 
-			["Golden Gun"] = {items["Golden Gun"],2,"Instant kills if the death is justified. Otherwise - bad luck.","10282780102"},
-			["Silenced Pistol"] = {items["Silenced Pistol"],1,"A significantly quieter variant of the Five-SeveN. Spies killed by silenced weapons will not scream.","299432421"},
-			["Grenade"] = {items["Grenade"],2,"Explodes in a decent radius after a few seconds. Can be disarmed by being shot.","8096856961"},
-			["AWP"] = {items["AWP"],1,"Slow-firing, high-power sniper rifle. Can only be shot whilst scoped in.","4772214897"},
-			["Flashbang"] = {items["Flashbang"],1,"Blinds and deafens anyone in the radius, but can be disarmed by being shot.","10753198321"},
+			["Golden Gun"] = {items["Golden Gun"], 2, "Instant kills if the death is justified. Otherwise - bad luck.", "10282780102"},
+			["Silenced Pistol"] = {items["Silenced Pistol"], 1, "A significantly quieter variant of the Five-SeveN. Spies killed by silenced weapons will not scream.", "299432421"},
+			["Grenade"] = {items["Grenade"], 2, "Explodes in a decent radius after a few seconds. Can be disarmed by being shot.", "8096856961"},
+			["AWP"] = {items["AWP"], 1, "Slow-firing, high-power sniper rifle. Can only be shot whilst scoped in.", "4772214897"},
+			["Flashbang"] = {items["Flashbang"], 1, "Blinds and deafens anyone in the radius, but can be disarmed by being shot.", "10753198321"},
 
 			["Bullet Vest"] = {function(plrVal)
-				plrVal:FindFirstChild("Modifiers"):SetAttribute("AbsorbDamage_Torso0HumanoidRootPart_Body_Armor","60")
-			end,1,"Resists damage to torso, but will break after too much.","395920626"},
-			["Radar"] = {function()end,1,"Reveals the location of all players every 30 seconds.","62159372"}, -- radar is handled on the client, so mark it as a function and allow the EquipmentManager to inform the client
-			["Health Station"] = {items["Health Station"],1,"Heals anyone who uses it, but needs to slowly recharge and can be destroyed.","6567078483"},
-			["Death Station"] = {items["Death Station"],1,"Kills anyone who uses it, but can be destroyed.","17068622097"}
+				plrVal:FindFirstChild("Modifiers"):SetAttribute("AbsorbDamage_Torso0HumanoidRootPart_Body_Armor", "60")
+			end, 1, "Resists damage to torso, but will break after too much.", "395920626"},
+			["Radar"] = {function()end, 1, "Reveals the location of all players every 30 seconds.", "62159372"}, -- radar is handled on the client, so mark it as a function and allow the EquipmentManager to inform the client
+			["Health Station"] = {items["Health Station"], 1, "Heals anyone who uses it, but needs to slowly recharge and can be destroyed.", "6567078483"},
+			["Death Station"] = {items["Death Station"], 1, "Kills anyone who uses it, but can be destroyed.", "17068622097"}
 		},
 		StartWith = {"Crowbar"},
 
@@ -337,7 +337,7 @@ local gamemodes = {
 				Minimum = 0,
 
 				Hint = "Leave <font color='#ff0000'>Nobody</font> Standing.",
-				Colour = Color3.new(1,0.0823529,0.0823529),
+				Colour = Color3.new(1, 0.0823529, 0.0823529),
 				Sound = 9042088276,
 				
 				KnowMissing = true,
@@ -346,7 +346,7 @@ local gamemodes = {
 				Allies = {},
 				
 				StartingCredits = 1,
-				EquipmentShop = {"Golden Gun","Bullet Vest","Grenade","Health Station","Death Station","Flashbang"},
+				EquipmentShop = {"Golden Gun", "Bullet Vest", "Grenade", "Health Station", "Death Station", "Flashbang"},
 				StartsWith = {"Radar"},
 				
 				StealCredits = true,
@@ -397,7 +397,7 @@ function gamemodes.ValidateGamemode(gamemode)
 	elseif #gamemode.Roles < 1 then
 		error("Roles cannot be empty")
 	end
-	for i,v in pairs(gamemode.Roles) do
+	for i, v in pairs(gamemode.Roles) do
 		if not v.Name or v.Name == "" then
 			error("Role"..tostring(i).." Name"..notFoundOr.."blank")
 		end
@@ -413,7 +413,7 @@ function gamemodes.ValidateGamemode(gamemode)
 		end
 		if typeof(v.Colour) ~= "Color3" then
 			warn(v.Name.." Colour"..notFoundOrNot.."Color3, check the spelling!")
-			v.Colour = Color3.new(0,0,0)
+			v.Colour = Color3.new(0, 0, 0)
 		end
 		if typeof(v.Public) ~= "boolean" then
 			warn(v.Name.." Public"..notFoundOrNot.."boolean"..defaulted.."true")

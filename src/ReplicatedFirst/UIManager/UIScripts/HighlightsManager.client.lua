@@ -7,22 +7,22 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local hFrame, eFrame, sFrame = ui.Page.Highlights, ui.Page.Events, ui.Page.Scores
 local eTemplate = eFrame.Template
 
-ReplicatedStorage.OnClientEvent:Connect(function(phase,round,result)
+ReplicatedStorage.OnClientEvent:Connect(function(phase, round, result)
 	if (phase ~= "Highlights") or (round ~= "Main") then return end
 	local soloVictor, music, victors = result.SoloVictor, result.Music[2], result.Victors
 	local events, _scores, _highlights = result.Events, result.Scores, result.Highlights
 	
-	hFrame.Winners.TextColor3 = ReplicatedStorage.ClientServer.GetRoundInfo:InvokeServer("Main","Round").RoundInfo.Gamemode.Roles[victors].Colour
+	hFrame.Winners.TextColor3 = ReplicatedStorage.ClientServer.GetRoundInfo:InvokeServer("Main", "Round").RoundInfo.Gamemode.Roles[victors].Colour
 	hFrame.Winners.Text = (soloVictor and soloVictor:upper().." WINS") or "THE "..victors:upper().."S WIN"
 	hFrame.Music:FindFirstChild("Text").Text = music
 	
-	for _,v in eFrame:GetChildren() do if (v.Name ~= "UIListLayout") and ((v.Name ~= "Template") and (v.Name ~= "EventFilters")) then v:Destroy() end end
-	for _,v in sFrame:GetChildren() do if (v.Name ~= "UIListLayout") and (v.Name ~= "Template") then v:Destroy() end end
+	for _, v in eFrame:GetChildren() do if (v.Name ~= "UIListLayout") and ((v.Name ~= "Template") and (v.Name ~= "EventFilters")) then v:Destroy() end end
+	for _, v in sFrame:GetChildren() do if (v.Name ~= "UIListLayout") and (v.Name ~= "Template") then v:Destroy() end end
 	
-	--for _,v in highlights do
+	--for _, v in highlights do
 		
 	--end
-	for i,v in events do
+	for i, v in events do
 		local e = eTemplate:Clone()
 		
 		e.TextLabel.Text = v.Text
@@ -41,7 +41,7 @@ ReplicatedStorage.OnClientEvent:Connect(function(phase,round,result)
 		
 		e.SelfDefense.Visible = v.SelfDefense
 		
-		for _,k in eFrame.EventFilters:GetChildren() do
+		for _, k in eFrame.EventFilters:GetChildren() do
 			if k:GetAttribute("Visible") then
 				e.Visible = true
 				break
@@ -49,7 +49,7 @@ ReplicatedStorage.OnClientEvent:Connect(function(phase,round,result)
 		end
 		e.LayoutOrder = i+1
 		
-		e:SetAttribute("Category",v.Category)
+		e:SetAttribute("Category", v.Category)
 		e.Name = "Event"..tostring(i)
 		e.Parent = eFrame
 	end
@@ -72,21 +72,21 @@ local function showTab(tab)
 	API.TransitionUIPage(ui.Page:FindFirstChild(curPage), pageOrders[curPage], ui.Page:FindFirstChild(tab), pageOrders[tab], UDim2.fromScale(0.5, 0.5))
 end
 
-local function _adjustEventFilter(filter,visible)
-	for _,v in eFrame:GetChildren() do if v:GetAttribute("Category") == filter then v.Visible = visible end end
+local function _adjustEventFilter(filter, visible)
+	for _, v in eFrame:GetChildren() do if v:GetAttribute("Category") == filter then v.Visible = visible end end
 end
 
 ui.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
 ui.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
 ui.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
 
-for _,v in eFrame.EventFilters:GetChildren() do
+for _, v in eFrame.EventFilters:GetChildren() do
 	if v.ClassName == "UIGridLayout" then continue end
 	v.ImageLabel.MouseButton1Click:Connect(function()
 		local visible = not v:GetAttribute("Visible")
-		for _,k in eFrame:GetChildren() do if k:GetAttribute("Category") == v.Name then k.Visible = visible end end
+		for _, k in eFrame:GetChildren() do if k:GetAttribute("Category") == v.Name then k.Visible = visible end end
 		v.ImageLabel.Image = (visible and "rbxassetid://9155626912") or "rbxassetid://9155599240"
-		v:SetAttribute("Visible",visible)
+		v:SetAttribute("Visible", visible)
 	end)
 end
 

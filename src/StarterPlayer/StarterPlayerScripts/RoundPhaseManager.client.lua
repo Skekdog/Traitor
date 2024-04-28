@@ -76,12 +76,12 @@ local function update(round: Types.PartialRound?)
             v:Destroy()
         end
 
-        for _,v in Players:GetPlayers() do
+        for _, v in Players:GetPlayers() do
             v:SetAttribute("Mark", "")
             v:SetAttribute("Searched", false)
         end
 
-        UIManager.UnregisterUI("Equipment Shop","UserTriggered")
+        UIManager.UnregisterUI("Equipment Shop", "UserTriggered")
 
         return
     end
@@ -113,7 +113,7 @@ local function update(round: Types.PartialRound?)
                     nameToObj[e.Name] = e
                 end
 
-                for _,v in ownRole.EquipmentShop do
+                for _, v in ownRole.EquipmentShop do
                     local equipment = nameToObj[v]
                     
                     local entry = shop.Entry:Clone()
@@ -163,7 +163,7 @@ local function update(round: Types.PartialRound?)
         if SettingsManager.GetSetting("Use FIB Lighting") then
             local mapConfig = round.Map:WaitForChild("FIBLighting", 3)
             if mapConfig then
-                for _,prop in mapConfig:GetChildren() do
+                for _, prop in mapConfig:GetChildren() do
                     if prop:IsA("ValueBase") then
                         if Lighting[prop.Name] then
                             Lighting[prop.Name] = prop.Value
@@ -180,8 +180,8 @@ local function update(round: Types.PartialRound?)
         sound.SoundGroup = SoundService.RoundEndMusic
         sound.Volume = 0
         
-        local fadeIn = TweenService:Create(sound,TweenInfo.new(1),{Volume = 0.5})
-        local fadeOut = TweenService:Create(sound,TweenInfo.new(1),{Volume = 0})
+        local fadeIn = TweenService:Create(sound, TweenInfo.new(1), {Volume = 0.5})
+        local fadeOut = TweenService:Create(sound, TweenInfo.new(1), {Volume = 0})
         
         sound.SoundId = round.RoundEndInfo.Winners.VictoryMusic[1].SoundId
         sound.Name = round.RoundEndInfo.Winners.VictoryMusic[1].Name

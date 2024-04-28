@@ -14,14 +14,14 @@ local scriptCons = clientStorage:WaitForChild("ScriptConnections")
 
 this.UI.MouseButton1Click:Connect(function()
 	ReplicatedStorage.ClientServer.JoinRound:FireServer("Main")
-	plr:SetAttribute("InRound",true)
+	plr:SetAttribute("InRound", true)
 	this:ToggleVisible(false)
 	roundInfo.Frame.Role.Text = "PREPARING"
-	roundInfo.Frame.Role.TextColor3 = Color3.new(1,1,1)
+	roundInfo.Frame.Role.TextColor3 = Color3.new(1, 1, 1)
 	
 	scriptCons.JoinRoundEvent:Fire("Main")
-	for _,v in plr:WaitForChild("Inventory"):GetChildren() do
-		scriptCons.RemoteEquipEvent:Fire(false,v,nil,false)
+	for _, v in plr:WaitForChild("Inventory"):GetChildren() do
+		scriptCons.RemoteEquipEvent:Fire(false, v, nil, false)
 	end
 	
 	local karma = ReplicatedStorage.ClientServer.GetKarma:InvokeServer(plr)
@@ -33,7 +33,7 @@ this.UI.MouseButton1Click:Connect(function()
 	end
 	
 	plr.PlayerGui:WaitForChild("HUD"):WaitForChild("Credits").Visible = true
-	delay(5,function()
+	delay(5, function()
 		plr.PlayerGui:WaitForChild("HUD"):WaitForChild("Credits").Visible = false
 	end)
 end)

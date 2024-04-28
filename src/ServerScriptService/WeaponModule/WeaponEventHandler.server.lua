@@ -8,8 +8,8 @@ local weaponModule = require(script.Parent)
 
 -- WOW I forgot how much all the weapon stuff SUCKS
 
-local classesToKeep = {"WeldConstraint","Motor6D","Sound","Model","FileMesh","SpecialMesh"}
-local function dropWeapon(plr,weapon)
+local classesToKeep = {"WeldConstraint", "Motor6D", "Sound", "Model", "FileMesh", "SpecialMesh"}
+local function dropWeapon(plr, weapon)
 	local char = plr.Character
 	if not char then return end
 	local hum = plr.Character.Humanoid
@@ -25,8 +25,8 @@ local function dropWeapon(plr,weapon)
 			plr.Inventory:FindFirstChild(weapon):Destroy()
 
 			local model = RS.Items:FindFirstChild(weapon):FindFirstChildOfClass("Model"):Clone()
-			for i,v: Instance in model:GetDescendants() do
-				if not (v:IsA("BasePart") or table.find(classesToKeep,v.ClassName)) then
+			for i, v: Instance in model:GetDescendants() do
+				if not (v:IsA("BasePart") or table.find(classesToKeep, v.ClassName)) then
 					v:Destroy()
 				end
 				if v:IsA("BasePart") then
@@ -43,7 +43,7 @@ local function dropWeapon(plr,weapon)
 	end
 end
 
-RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,position)
+RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr, weapon, ray, position)
 	if not plr.Character then return end
 	local config = weapon:FindFirstChild("Configuration")
 	if not config then return end
@@ -54,8 +54,8 @@ RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,positio
 
 	local round = RoundHandler.GetRound(roundId)
 	
-	local curAmmo,lastFireTime = weapon:FindFirstChild("CurrentAmmo"),weapon:FindFirstChild("LastFireTime")
-	local reloading,ammo,fireTime
+	local curAmmo, lastFireTime = weapon:FindFirstChild("CurrentAmmo"), weapon:FindFirstChild("LastFireTime")
+	local reloading, ammo, fireTime
 	if weapon:FindFirstChild("Reloading") then reloading = weapon:FindFirstChild("Reloading").Value end
 	if curAmmo then ammo = (curAmmo.Value <= 0) end
 	if lastFireTime then
@@ -90,17 +90,17 @@ RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,positio
 	if lastFireTime then lastFireTime.Value = workspace:GetServerTimeNow() end
 	
 	if weapon:GetAttribute("Weapon") then
-		for i=1,weapon.Configuration.Proj:GetAttribute("Amount") do
-			weaponModule.SpawnProjectile(plr,weapon,ray,position)
+		for i=1, weapon.Configuration.Proj:GetAttribute("Amount") do
+			weaponModule.SpawnProjectile(plr, weapon, ray, position)
 		end
 	else
 		if not round.Map.Props then return end
-		weaponModule.PlaceTool(plr,weapon,ray,position)
+		weaponModule.PlaceTool(plr, weapon, ray, position)
 	end
 end)
 
-RS.ClientServer.AimWeapon.OnServerEvent:Connect(function(plr,aim)
-	plr:SetAttribute("Aim",aim)
+RS.ClientServer.AimWeapon.OnServerEvent:Connect(function(plr, aim)
+	plr:SetAttribute("Aim", aim)
 end)
 
 
@@ -109,14 +109,14 @@ cs.DropWeapon.OnServerEvent:Connect(dropWeapon)
 local dropEvent = script.Parent:FindFirstChild("DropWeapon")
 dropEvent.Event:Connect(dropWeapon)
 
-local neckC0 = CFrame.new(0, 0.8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1);
-local waistC0 = CFrame.new(0, 0.2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1);
-local rShoulderC0 = CFrame.new(1, 0.5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1);
-local lShoulderC0 = CFrame.new(-1, 0.5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1);
+local neckC0 = CFrame.new(0, 0.8, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+local waistC0 = CFrame.new(0, 0.2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+local rShoulderC0 = CFrame.new(1, 0.5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
+local lShoulderC0 = CFrame.new(-1, 0.5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1)
 
-cs.AttachWeapon.OnServerEvent:Connect(function(plr,weapon,equip)
+cs.AttachWeapon.OnServerEvent:Connect(function(plr, weapon, equip)
 	if not plr.Character then return end
-	for _,v in plr.Character:GetChildren() do
+	for _, v in plr.Character:GetChildren() do
 		if v.ClassName == "Model" then
 			v:Destroy()
 		end
@@ -124,8 +124,8 @@ cs.AttachWeapon.OnServerEvent:Connect(function(plr,weapon,equip)
 	if equip and weapon then
 		weapon = weapon:Clone()
 
-		for i,v: Instance in weapon:GetDescendants() do
-			if not (v:IsA("BasePart") or table.find(classesToKeep,v.ClassName) or v.Name == "LaserPos") then
+		for i, v: Instance in weapon:GetDescendants() do
+			if not (v:IsA("BasePart") or table.find(classesToKeep, v.ClassName) or v.Name == "LaserPos") then
 				v:Destroy()
 			end
 		end
@@ -140,7 +140,7 @@ end)
 
 local rotateEvent = cs.RotateHead
 
-rotateEvent.OnServerEvent:Connect(function(plr,theta)
+rotateEvent.OnServerEvent:Connect(function(plr, theta)
 	local char = plr.Character
 	if char then
 		local ut = char:FindFirstChild("UpperTorso")
@@ -161,18 +161,18 @@ rotateEvent.OnServerEvent:Connect(function(plr,theta)
 				tJoint.Parent = head
 			end
 			
-			local neck = head:FindFirstChild("Neck");
-			local waist = char.UpperTorso:FindFirstChild("Waist");
-			local rShoulder = char.RightUpperArm:FindFirstChild("RightShoulder");
-			local lShoulder = char.LeftUpperArm:FindFirstChild("LeftShoulder");
+			local neck = head:FindFirstChild("Neck")
+			local waist = char.UpperTorso:FindFirstChild("Waist")
+			local rShoulder = char.RightUpperArm:FindFirstChild("RightShoulder")
+			local lShoulder = char.LeftUpperArm:FindFirstChild("LeftShoulder")
 			
 			if neck and waist and rShoulder and lShoulder then
 			
 				local theta2 = tJoint.CurrentAngle
-				neck.C0 = neckC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0);
-				waist.C0 = waistC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0);
-				rShoulder.C0 = rShoulderC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0);
-				lShoulder.C0 = lShoulderC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0);
+				neck.C0 = neckC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0)
+				waist.C0 = waistC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0)
+				rShoulder.C0 = rShoulderC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0)
+				lShoulder.C0 = lShoulderC0 * CFrame.fromEulerAnglesYXZ(theta2*0.5, 0, 0)
 				
 			end
 		end
@@ -181,12 +181,12 @@ end)
 
 type InvWeapon = Model --saves me a headache
 local reloadTable = {}
-cs.ReloadWeapon.OnServerEvent:Connect(function(plr:Player,weapon:InvWeapon)
-	if table.find(reloadTable,plr) then return end
+cs.ReloadWeapon.OnServerEvent:Connect(function(plr: Player, weapon: InvWeapon)
+	if table.find(reloadTable, plr) then return end
 	local char = plr.Character
 	if char then
 		local charWeapon: Model
-		for _,v in char:GetChildren() do
+		for _, v in char:GetChildren() do
 			if v:IsA("Model") and v:GetAttribute("Weapon") and v.Name == weapon.Name then
 				charWeapon = v
 				break
@@ -205,12 +205,12 @@ cs.ReloadWeapon.OnServerEvent:Connect(function(plr:Player,weapon:InvWeapon)
 						if magCapacity then
 							if curAmmo.Value < magCapacity then
 								reloading.Value = true
-								table.insert(reloadTable,plr)
+								table.insert(reloadTable, plr)
 								local con
 								local cancel
 								con = charWeapon.Destroying:Connect(function()
 									cancel = true
-									table.remove(reloadTable,table.find(reloadTable,plr))
+									table.remove(reloadTable, table.find(reloadTable, plr))
 									con:Disconnect()
 								end)
 								
@@ -219,10 +219,10 @@ cs.ReloadWeapon.OnServerEvent:Connect(function(plr:Player,weapon:InvWeapon)
 									reloadSound:Play()
 								end
 								
-								delay(reload:GetAttribute("Time"),function()
+								delay(reload:GetAttribute("Time"), function()
 									if not cancel then
 										curAmmo.Value = magCapacity
-										table.remove(reloadTable,table.find(reloadTable,plr))
+										table.remove(reloadTable, table.find(reloadTable, plr))
 										reloading.Value = false
 									end
 								end)

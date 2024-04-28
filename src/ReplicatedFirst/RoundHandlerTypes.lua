@@ -162,7 +162,7 @@ export type Round = {
     GetParticipant: (self: Round, name: Username) -> Participant, -- Returns a Participant from a username. Errors if Participant is not in round.
     JoinRound: (self: Round, plr: Player) -> Participant,         -- Adds a Participant to this Round.
     
-    GetPartialRound: (self: Round) -> PartialRound, -- Returns a limited view of the round, safe for clients to peak at. Does not include any Participants, see Participant:ViewPartialParticipant for that.
+    GetPartialRound: (self: Round) -> PartialRound, -- Returns a limited view of the round, safe for clients to peak at. Does not include any Participants, see Participant: ViewPartialParticipant for that.
     PauseRound: (self: Round) -> (), -- Pauses the round. Errors if the round is not in progress.
     StartRound: (self: Round) -> (), -- Starts this round. Usually shouldn't be called externally.
     EndRound: (self: Round, victors: Role) -> (),  -- Ends this round.

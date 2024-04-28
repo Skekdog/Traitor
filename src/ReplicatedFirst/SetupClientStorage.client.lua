@@ -5,7 +5,7 @@ store.Parent = game
 local scriptConnections = Instance.new("Folder")
 scriptConnections.Name = "ScriptConnections"
 
-local function makeEvent(name:string, isFunction: boolean?): BindableEvent | BindableFunction
+local function makeEvent(name: string, isFunction: boolean?): BindableEvent | BindableFunction
 	local suffix: string
 	local event: any
 	if isFunction then

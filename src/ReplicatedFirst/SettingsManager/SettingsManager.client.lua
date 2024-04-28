@@ -270,7 +270,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		
 		local function updateBinds(binds: {{SM.Keybind}})
 			local numBoundKeys = 0
-			for _,v in m:FindFirstChild("Keybinds"):GetChildren() do
+			for _, v in m:FindFirstChild("Keybinds"):GetChildren() do
 				if v:IsA("Frame") and (v.Name ~= "__KeybindFrame") then
 					numBoundKeys += 1
 				end
@@ -350,7 +350,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		end
 		
 		f:FindFirstChild("ClickDetector").MouseButton1Click:Connect(function()
-			for _,v in keybindingCons do v:Disconnect() end
+			for _, v in keybindingCons do v:Disconnect() end
 			local msg = API.ScreenMessage("Info", "Press F5 to cancel keybinding.\nYou can also add a modifier key, such as Shift or Ctrl.")
 			CAS:BindActionAtPriority("SelectKeybind", function(_, state, input)
 				

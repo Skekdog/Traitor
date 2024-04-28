@@ -29,20 +29,20 @@ UIManager.__index = UIManager
 
 export type UIType = "HUD"|"Popup"|"UserTriggered"|"Buttons"
 
-export type UI = typeof(setmetatable({},{})) & {
-	ToggleVisible:(self:UI, force: boolean?, ignoreOtherUIs: boolean?) -> nil,
-	Name:string, --An identifier of the UI. Must be unique in a UIType.
+export type UI = typeof(setmetatable({}, {})) & {
+	ToggleVisible:(self: UI, force: boolean?, ignoreOtherUIs: boolean?) -> nil,
+	Name: string, --An identifier of the UI. Must be unique in a UIType.
 	DisplayName: string, -- Name showed in sidebar
-	Visible:boolean, --Self-explanatory.
-	PreventClose:boolean, --Prevents the UI from being closed with the X key.
-	UIType:UIType, --UIType
-	UI:Frame, --A reference to the frame object.
+	Visible: boolean, --Self-explanatory.
+	PreventClose: boolean, --Prevents the UI from being closed with the X key.
+	UIType: UIType, --UIType
+	UI: Frame, --A reference to the frame object.
 }
 
 if not _G.RegisteredUIs then _G.RegisteredUIs = {} end
 
 local UIRegistered = script:FindFirstChild("Event") or Instance.new("BindableEvent", script)
-function UIManager.RegisterUI(name:string,uiType:UIType,ignoreInset:boolean,ui:Frame,displayName:string?,preventClose:boolean): UI
+function UIManager.RegisterUI(name: string, uiType: UIType, ignoreInset: boolean, ui: Frame, displayName: string?, preventClose: boolean): UI
 	local self: UI = {} :: UI
 	
 	self.Name = name
@@ -116,8 +116,8 @@ function UIManager.RegisterUI(name:string,uiType:UIType,ignoreInset:boolean,ui:F
 	end
 	
 	if ignoreInset then
-		ui.Position -= UDim2.fromOffset(inset.X,inset.Y)
-		ui.Size += UDim2.fromOffset(inset.X,inset.Y)
+		ui.Position -= UDim2.fromOffset(inset.X, inset.Y)
+		ui.Size += UDim2.fromOffset(inset.X, inset.Y)
 	end
 	
 	local transitionStyle = ui:GetAttribute("TransitionStyle")
@@ -144,18 +144,18 @@ function UIManager.RegisterUI(name:string,uiType:UIType,ignoreInset:boolean,ui:F
 	end
 	
 	ui.Parent = uis[uiType]
-	self = setmetatable(self::any,UIManager)
+	self = setmetatable(self::any, UIManager)
 	table.insert(_G.RegisteredUIs, self)
 	UIRegistered:Fire(self.Name)
 	return self
 end
 
-function UIManager.UnregisterUI(name:string,uiType:UIType): nil
+function UIManager.UnregisterUI(name: string, uiType: UIType): nil
 	local reg
-	for i,v in _G.RegisteredUIs do
+	for i, v in _G.RegisteredUIs do
 		if (v.UIType == (uiType or v.UIType)) and (v.Name == name) then -- que?
 			reg = v
-			table.remove(_G.RegisteredUIs,i)
+			table.remove(_G.RegisteredUIs, i)
 			break
 		end
 	end
@@ -176,7 +176,7 @@ function UIManager.UnregisterUI(name:string,uiType:UIType): nil
 end
 
 function UIManager.TryGetUI(name: string): UI?
-	for _,v in _G.RegisteredUIs do
+	for _, v in _G.RegisteredUIs do
 		if v.Name == name then
 			return v
 		end
@@ -185,7 +185,7 @@ function UIManager.TryGetUI(name: string): UI?
 end
 
 function UIManager.GetUI(name: string): UI
-	for _,v in _G.RegisteredUIs do
+	for _, v in _G.RegisteredUIs do
 		if v.Name == name then
 			return v
 		end
@@ -193,11 +193,11 @@ function UIManager.GetUI(name: string): UI
 	error("Failed to find UI: "..name)
 end
 
-function UIManager.GetUIs(uiType:UIType): {UI}
+function UIManager.GetUIs(uiType: UIType): {UI}
 	local uis = {}
-	for _,v in _G.RegisteredUIs do
+	for _, v in _G.RegisteredUIs do
 		if v.UIType == uiType then
-			table.insert(uis,v)
+			table.insert(uis, v)
 		end
 	end
 	return uis
@@ -287,12 +287,12 @@ function UIManager.UpdateThemeInstance(v, theme): nil
 	return
 end
 
-function UIManager.UpdateTheme(themeName:string): nil
+function UIManager.UpdateTheme(themeName: string): nil
 	local theme = UIManager.Themes[themeName]
 	if not theme then return error("Theme "..tostring(themeName).." not found!") end
 
-	for _,v in game:GetService("CollectionService"):GetTagged("StyledUI") do
-		UIManager.UpdateThemeInstance(v,theme)
+	for _, v in game:GetService("CollectionService"):GetTagged("StyledUI") do
+		UIManager.UpdateThemeInstance(v, theme)
 	end
 	return
 end
