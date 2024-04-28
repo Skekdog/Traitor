@@ -10,14 +10,12 @@ local uiO = ui.UI
 
 local function spectateFunc(action,state)
 	local chars = {}
-	for _,v in Players:GetPlayers() do
+	for _, v in Players:GetPlayers() do
 		local char = v.Character
 		if char then
 			local hum = char:FindFirstChildOfClass("Humanoid")
-			if hum then
-				if hum.Health > 0 then
-					table.insert(chars,hum)
-				end
+			if hum and hum.Health > 0 then
+				table.insert(chars,hum)
 			end
 		end
 	end
