@@ -37,4 +37,6 @@ local currentMapObject = Instance.new("ObjectValue")
 currentMapObject.Name = "CurrentMapObject"
 currentMapObject.Parent = store
 
+store:SetAttribute("IsSpectating", true)
+
 scriptConnections.Parent = store

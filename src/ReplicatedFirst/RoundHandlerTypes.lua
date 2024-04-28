@@ -347,7 +347,9 @@ export type Participant = {
 export type MapStructure = Folder & {
     EngineVersion: StringValue,
     WeaponSpawns: Folder,
+    ActionItems: Folder,
     Spawns: Folder,
+    Doors: Folder,
     Props: Folder,
     Map: Folder
 }
