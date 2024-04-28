@@ -8,8 +8,6 @@ local getOwnInfo = RS.RoundHandler.GetOwnInfo
 local API = require(RF.API)
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 
-local plr = game:GetService("Players").LocalPlayer
-
 local frame = script.Parent
 local purchaseButton = frame.Purchase
 
