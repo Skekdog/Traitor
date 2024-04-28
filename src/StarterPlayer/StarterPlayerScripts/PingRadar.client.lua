@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local roundInfo = nil
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 local plr = Players.LocalPlayer
 
 local scriptCons = game:WaitForChild("ClientStorage"):WaitForChild("ScriptConnections")
@@ -8,10 +9,11 @@ local scriptCons = game:WaitForChild("ClientStorage"):WaitForChild("ScriptConnec
 scriptCons:WaitForChild("PingRadarEvent").Event:Connect(function()
 	(workspace :: any).RadarPoints:ClearAllChildren()
 	
-	local info = roundInfo:InvokeServer(plr:GetAttribute("CurrentRound"),"Players")
+	local info: {RoundHandlerTypes.PartialParticipant}? = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
 	if info then
-		for i,v in info.Players do
-			if v and v.Character and (v.Name ~= plr.Name) and v.Character:FindFirstChild("Humanoid") and (v.Character:FindFirstChild("Humanoid").Health > 0) then
+		for _, v in info do
+			local char = v.Player.Character
+			if char and (char.Name ~= plr.Name) and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
 				local clone = ReplicatedFirst.RadarPoint:Clone()
 				clone:SetPrimaryPartCFrame(v.Character.HumanoidRootPart.CFrame)
 				clone.RadarPoint.TextLabel.Text = math.round(plr:DistanceFromCharacter(v.Character.HumanoidRootPart.Position))
