@@ -3,6 +3,8 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedFirst.RoundHandlerTypes)
 local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local UIManager = require(ReplicatedFirst.UIManager)
@@ -51,6 +53,8 @@ for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
     end)
 end
 
+local stopMusic: (() -> ())?
+
 local lastTimerThread: thread?
 local function update(round: (Types.PartialRound & {Role: Types.Role})?)
     if lastTimerThread then
@@ -74,6 +78,10 @@ local function update(round: (Types.PartialRound & {Role: Types.Role})?)
         UIManager.UnregisterUI("Equipment Shop","UserTriggered")
 
         return
+    end
+
+    if stopMusic then
+        stopMusic()
     end
 
     joinRound:ToggleVisible((round.RoundPhase == "Waiting") or (round.RoundPhase == "Preparing"))
@@ -154,6 +162,41 @@ local function update(round: (Types.PartialRound & {Role: Types.Role})?)
                 end
             else
                 print("FIB Lighting settings were not found for "..roundInfo.MapName)
+            end
+        end
+    elseif round.RoundPhase == "Highlights" then
+        assert(round.RoundEndInfo and round.RoundEndInfo.Winners.VictoryMusic)
+        local sound = Instance.new("Sound")
+        sound.SoundGroup = SoundService.RoundEndMusic
+        sound.Volume = 0
+        
+        local fadeIn = TweenService:Create(sound,TweenInfo.new(1),{Volume = 0.5})
+        local fadeOut = TweenService:Create(sound,TweenInfo.new(1),{Volume = 0})
+        
+        sound.SoundId = round.RoundEndInfo.Winners.VictoryMusic[1].SoundId
+        sound.Name = round.RoundEndInfo.Winners.VictoryMusic[1].Name
+
+        sound.Parent = SoundService.RoundEndMusic
+        sound:Play()
+        
+        fadeIn:Play()
+
+        stopMusic = function()
+            if not sound then
+                return
+            end
+            fadeOut:Play()
+            task.delay(1, function()
+                sound:Stop()
+                sound:Destroy()
+            end)
+        end
+        
+        if not sound:GetAttribute("FullSong") then
+            if sound.TimeLength > 0 then
+                task.delay(sound.TimeLength-1, stopMusic :: any)
+            else
+                sound:GetPropertyChangedSignal("TimeLength"):Connect(task.delay, sound.TimeLength-1, stopMusic)
             end
         end
     end
