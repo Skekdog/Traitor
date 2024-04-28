@@ -12,9 +12,7 @@ local voteMap = remotes.VoteMap
 
 getPartialParticipants.OnServerInvoke = function(plr)
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
-		return
-	end
+	if not roundId then return end
 
 	local round = RoundHandler.GetRound(roundId)
 	local self = round:GetParticipant(plr.Name)

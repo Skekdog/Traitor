@@ -16,9 +16,7 @@ local function dropWeapon(plr,weapon)
 	local invW = plr.Inventory:FindFirstChild(weapon)
 
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
-		return
-	end
+	if not roundId then return end
 
 	local round = RoundHandler.GetRound(roundId)
 
@@ -52,9 +50,7 @@ RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,positio
 	if not plr.Character:FindFirstChild("Humanoid") then return end
 
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
-		return
-	end
+	if not roundId then return end
 
 	local round = RoundHandler.GetRound(roundId)
 	

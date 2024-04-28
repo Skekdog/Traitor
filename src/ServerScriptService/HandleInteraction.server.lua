@@ -8,9 +8,7 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr,pa
 	local char = plr.Character
 
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
-		return
-	end
+	if not roundId then return end
 
 	local round = RoundHandler.GetRound(roundId)
 	

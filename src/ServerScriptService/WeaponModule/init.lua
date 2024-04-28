@@ -1,10 +1,15 @@
+--!nolint
+--!nocheck
+
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TS = game:GetService("TweenService")
 local SSS = game:GetService("ServerScriptService")
 local SS = game:GetService("ServerStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 local RoundHandler = require(SSS.RoundHandler.RoundHandler)
 
 local getProfile: BindableFunction = SSS.PlayerSetup.GetProfile
@@ -55,89 +60,85 @@ local function flashem(victim)
 end
 
 local function onDamage(assailant:Player?,victim:Player,damage:number,damageSource:string?,applyKarma:boolean,trueHealth:number?,part:BasePart?)
-	if victim and damage then
-		if victim:IsA("Player") and type(damage) == "number" then
-			
-			local vChar = victim.Character
-			
-			local round = RoundHandler.GetRound(SS:GetAttribute("RoundID"))
-			
-			if vChar and round then
-				if round.RoundPhase ~= "Playing" then return end
-				local vHum = vChar:FindFirstChildOfClass("Humanoid")
-				local vHumHealth = trueHealth or vHum.Health
-				local aVal
-				if assailant then aVal = round:GetPlayerValue(assailant.Name) end
-				local vVal = round:GetPlayerValue(victim.Name)
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then return end
 
-				if aVal and assailant then
-					local aSD = false --attacker is acting in self-defense
-					for _,v: NumberValue in aVal:FindFirstChild("SelfDefenseList"):GetChildren() do
-						if v.Name == victim.Name and workspace:GetServerTimeNow() < v.Value then --Attacker is acting in self-defense
-							aSD = true
-							if vHum and vVal then
-								vVal:SetAttribute("KilledInSelfDefense",vHumHealth <= 0)
-							end
-							break
+	local round: RoundHandlerTypes.Round = RoundHandler.GetRound(roundId)
+	local vChar = victim.Character
+	if victim and damage and round:IsRoundInProgress() and vChar then
+
+		local vHum = vChar:FindFirstChildOfClass("Humanoid")
+		local vHumHealth = trueHealth or vHum.Health
+		local aVal
+		if assailant then aVal = round:GetPlayerValue(assailant.Name) end
+		local vVal = round:GetPlayerValue(victim.Name)
+
+		if aVal and assailant then
+			local aSD = false --attacker is acting in self-defense
+			for _,v: NumberValue in aVal:FindFirstChild("SelfDefenseList"):GetChildren() do
+				if v.Name == victim.Name and workspace:GetServerTimeNow() < v.Value then --Attacker is acting in self-defense
+					aSD = true
+					if vHum and vVal then
+						vVal:SetAttribute("KilledInSelfDefense",vHumHealth <= 0)
+					end
+					break
+				end
+			end
+			
+			if damageSource ~= "Accident" and assailant ~= victim then
+				if not aSD then
+					for _,v: NumberValue in vVal:FindFirstChild("SelfDefenseList"):GetChildren() do
+						if v.Value >= workspace:GetServerTimeNow() then --Remove old self-defense listings
+							v:Destroy()
 						end
 					end
-					
-					if damageSource ~= "Accident" and assailant ~= victim then
-						if not aSD then
-							for _,v: NumberValue in vVal:FindFirstChild("SelfDefenseList"):GetChildren() do
-								if v.Value >= workspace:GetServerTimeNow() then --Remove old self-defense listings
-									v:Destroy()
-								end
-							end
 
-							local addTime = 20
-							if damageSource == "Explosion" or "Weapon" then
-								addTime = directDamageTime
-							elseif damageSource == "Push" then
-								addTime = indirectDamageTime
-							end
-
-							local val = Instance.new("NumberValue")
-							val.Value = workspace:GetServerTimeNow()+addTime
-
-							val.Name = assailant.Name
-							val.Parent = vVal:FindFirstChild("SelfDefenseList")
-						end
-						
-						local correctDmg = isCorrectDamage(assailant,victim,false)
-						if correctDmg then
-							if applyKarma then
-								setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma+(damage/2),1,1000))
-							end
-						elseif not aSD then
-							if vHum then
-								if vHumHealth <= 0 then
-									aVal:SetAttribute("FreeKill",true)
-									aVal:SetAttribute("FreeKillReason","RandomKill")
-									aVal:SetAttribute("RandomKills",aVal:GetAttribute("RandomKills")+1)
-								end
-							end
-							if applyKarma then
-								setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma-damage,1,1000))
-							end
-						end
+					local addTime = 20
+					if damageSource == "Explosion" or "Weapon" then
+						addTime = directDamageTime
+					elseif damageSource == "Push" then
+						addTime = indirectDamageTime
 					end
+
+					local val = Instance.new("NumberValue")
+					val.Value = workspace:GetServerTimeNow()+addTime
+
+					val.Name = assailant.Name
+					val.Parent = vVal:FindFirstChild("SelfDefenseList")
 				end
 				
-				if vHumHealth <= 0 then
-					vVal:SetAttribute("MurderWeapon",damageSource)
-					if part and part.Name == "Head" then vVal:SetAttribute("Headshot",true) end
-					if damageSource == "__!!Explosion" then damageSource = "Explosion"
-					else damageSource = "Weapon" end
-					vVal:SetAttribute("DeathType",damageSource)
-					
-					if assailant then
-						local killListVal = Instance.new("BoolValue")
-						killListVal.Name = victim.Name
-						killListVal.Value = true
-						killListVal.Parent = aVal.KillList
+				local correctDmg = isCorrectDamage(assailant,victim,false)
+				if correctDmg then
+					if applyKarma then
+						setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma+(damage/2),1,1000))
+					end
+				elseif not aSD then
+					if vHum then
+						if vHumHealth <= 0 then
+							aVal:SetAttribute("FreeKill",true)
+							aVal:SetAttribute("FreeKillReason","RandomKill")
+							aVal:SetAttribute("RandomKills",aVal:GetAttribute("RandomKills")+1)
+						end
+					end
+					if applyKarma then
+						setProfile:Fire(assailant, "Karma", math.clamp(getProfile:Invoke(assailant).Karma-damage,1,1000))
 					end
 				end
+			end
+		end
+		
+		if vHumHealth <= 0 then
+			vVal:SetAttribute("MurderWeapon",damageSource)
+			if part and part.Name == "Head" then vVal:SetAttribute("Headshot",true) end
+			if damageSource == "__!!Explosion" then damageSource = "Explosion"
+			else damageSource = "Weapon" end
+			vVal:SetAttribute("DeathType",damageSource)
+			
+			if assailant then
+				local killListVal = Instance.new("BoolValue")
+				killListVal.Name = victim.Name
+				killListVal.Value = true
+				killListVal.Parent = aVal.KillList
 			end
 		end
 	end
