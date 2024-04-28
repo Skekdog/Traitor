@@ -5,7 +5,7 @@ local uiManager = require(game:GetService("ReplicatedFirst").UIManager)
 local controls = require(game:GetService("ReplicatedFirst").ControlManager)
 
 local camera = workspace.CurrentCamera
-local ui = uiManager.WaitForUI("Spectate","HUD")
+local ui = uiManager.WaitForUI("Spectate")
 local uiO = ui.UI
 
 local function spectateFunc(action,state)

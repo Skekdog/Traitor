@@ -249,7 +249,7 @@ Players.LocalPlayer.Inventory.ChildAdded:Connect(function(child)
 						
 					if aimConfig:GetAttribute("Scope") then
 						UIS.MouseIconEnabled = not isAiming
-						local scope = ui.WaitForUI("Scope", "UserTriggered")
+						local scope = ui.WaitForUI("Scope")
 						if scope then
 							scope:ToggleVisible(isAiming)
 							for _,v in scope.UI:GetDescendants() do
@@ -343,7 +343,7 @@ local function onDied()
 	controls.Unregister("Alternate Fire")
 	workspace.CurrentCamera.FieldOfView = 70
 	if workspace.CurrentCamera:FindFirstChild("ViewModel") then (workspace :: any).CurrentCamera.ViewModel:Destroy() end
-	local scope = ui.WaitForUI("Scope","UserTriggered")
+	local scope = ui.WaitForUI("Scope")
 	if scope then scope:ToggleVisible(false) end
 	viewModel.Parent = nil
 	viewModel:Destroy()

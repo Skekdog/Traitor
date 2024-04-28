@@ -3,7 +3,7 @@ local TCS = game:GetService("TextChatService")
 local system = TCS:WaitForChild("TextChannels"):WaitForChild("RBXSystem")
 
 local UIManager = require(game:GetService("ReplicatedFirst").UIManager)
-local ui = UIManager.WaitForUI("CornerNotification", "HUD").UI
+local ui = UIManager.WaitForUI("CornerNotification").UI
 
 local TS = game:GetService("TweenService")
 

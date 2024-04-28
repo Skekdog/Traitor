@@ -10,7 +10,7 @@ if game:GetService("RunService"):IsClient() then
 	UIScript = game:GetService("ReplicatedFirst").UIManager
 	UI = require(UIScript)
 	UIS = game:GetService("UserInputService")
-	settingsUI = UI.WaitForUI("Settings","UserTriggered")
+	settingsUI = UI.WaitForUI("Settings")
 	settingsFrame = settingsUI.UI
 	
 	uiThemes = {}
@@ -104,7 +104,7 @@ module["AvailableSettings"] = {
 		Default = true,
 		Callback = function(val)
 			if not UIS.KeyboardEnabled then return end
-			local sidebar = UI.WaitForUI("Sidebar", "Buttons")
+			local sidebar = UI.WaitForUI("Sidebar")
 			if sidebar then sidebar:ToggleVisible(val) end
 		end
 	},

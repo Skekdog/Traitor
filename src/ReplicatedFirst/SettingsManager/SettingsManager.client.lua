@@ -24,7 +24,7 @@ local keybindFrame = script:FindFirstChild("__SettingKeybind")
 local selectorFrame = script:FindFirstChild("__SettingSelector")
 local booleanFrame = script:FindFirstChild("__SettingBoolean")
 local touchFrame = script:FindFirstChild("__SettingTouch")
-local settingsFrame = UIManager.WaitForUI("Settings", "UserTriggered").UI:FindFirstChild("Main")
+local settingsFrame = UIManager.WaitForUI("Settings").UI:FindFirstChild("Main")
 
 local tabsFrame: ScrollingFrame = settingsFrame:FindFirstChild("Tabs")
 local tabUnderline: Frame = tabsFrame:FindFirstChild("Underline") :: Frame

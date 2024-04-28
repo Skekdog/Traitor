@@ -38,6 +38,7 @@ local function clearMarks()
 	end
 end
 
+
 --RoundInfo
 local paused = false
 local lastTime = "00:00"

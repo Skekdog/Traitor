@@ -1,7 +1,10 @@
 local CollectionService = game:GetService("CollectionService")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedFirst.RoundHandlerTypes)
+local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local remotes = ReplicatedStorage.RoundHandler
@@ -35,6 +38,19 @@ local function updateTimer()
 	roundInfo.Timer.Text = minutes..":"..seconds
 end
 
+local vote = UIManager.WaitForUI("VotingScreen")
+for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
+	local clone = vote.UI:FindFirstChild("Sample"):Clone()
+	clone.Text = v
+	clone.Visible = true
+	clone.Name = v
+	clone.Parent = vote.UI:FindFirstChild("Choices")
+
+    clone.MouseButton1Click:Connect(function()
+        ReplicatedStorage.RoundHandler.VoteMap:FireServer(v)
+    end)
+end
+
 local lastTimerThread: thread?
 local function update(round: (Types.PartialRound & {Role: Types.Role})?)
     if lastTimerThread then
@@ -48,6 +64,11 @@ local function update(round: (Types.PartialRound & {Role: Types.Role})?)
 
         for _, v in CollectionService:GetTagged("AllyMarker") do
             v:Destroy()
+        end
+
+        for _,v in Players:GetPlayers() do
+            v:SetAttribute("Mark", "")
+            v:SetAttribute("Searched", false)
         end
 
         UIManager.UnregisterUI("Equipment Shop","UserTriggered")
@@ -120,8 +141,27 @@ local function update(round: (Types.PartialRound & {Role: Types.Role})?)
                 clone.Parent = v.Player.Character
             end
         end
+    elseif round.RoundPhase == "Waiting" then
+        if SettingsManager.GetSetting("Use FIB Lighting") then
+            local mapConfig = round.Map:WaitForChild("FIBLighting", 3)
+            if mapConfig then
+                for _,prop in mapConfig:GetChildren() do
+                    if prop:IsA("ValueBase") then
+                        if Lighting[prop.Name] then
+                            Lighting[prop.Name] = prop.Value
+                        end
+                    end
+                end
+            else
+                print("FIB Lighting settings were not found for "..roundInfo.MapName)
+            end
+        end
     end
 end
+
+ReplicatedStorage.RoundHandler.VoteMap.OnClientEvent:Connect(function(allow)
+    vote:ToggleVisible(allow)
+end)
 
 ReplicatedStorage.RoundHandler.RoundPause.OnClientEvent:Connect(function(pausedOrResumeTime: true | number)
     if pausedOrResumeTime == true then
@@ -131,8 +171,6 @@ ReplicatedStorage.RoundHandler.RoundPause.OnClientEvent:Connect(function(pausedO
     end
     timeTarget = pausedOrResumeTime
 end)
-
--- todo: map voting and load lighting settings
 
 ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(update)
 

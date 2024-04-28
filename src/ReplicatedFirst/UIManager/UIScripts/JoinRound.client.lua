@@ -4,8 +4,8 @@ local TCS = game:GetService("TextChatService")
 
 local plr = Players.LocalPlayer
 local UI = require(game:GetService("ReplicatedFirst").UIManager)
-local roundInfo = UI.WaitForUI("RoundInfo","HUD").UI
-local this = UI.WaitForUI("JoinRound","HUD")
+local roundInfo = UI.WaitForUI("RoundInfo").UI
+local this = UI.WaitForUI("JoinRound")
 
 local system = TCS:WaitForChild("TextChannels"):WaitForChild("RBXSystem")
 

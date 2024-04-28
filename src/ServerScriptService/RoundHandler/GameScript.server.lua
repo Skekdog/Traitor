@@ -7,6 +7,7 @@ local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
 local getPartialParticipants = remotes.GetPartialParticipants
 local getPartialRound = remotes.GetPartialRound
+local voteMap = remotes.VoteMap
 
 getPartialParticipants.OnServerInvoke = function(plr)
 	local roundId = ServerStorage:GetAttribute("RoundID")
@@ -62,10 +63,43 @@ end
 ReplicatedStorage.ClientServer.JoinRound.OnServerEvent:Connect(function(plr)
 	local round
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if (not roundId) then
-		round = RoundHandler.CreateRound((ServerStorage :: any).Maps["Mesa Monocraft"], gamemodes[math.random(1, #gamemodes)])
+
+	if not ServerStorage:GetAttribute("NextRoundReady") then
+		return
+	end
+
+	if not roundId then
+		round = RoundHandler.CreateRound(ServerStorage:GetAttribute("NextMap"), gamemodes[math.random(1, #gamemodes)])
 		round.RoundEndEvent.Event:Once(function()
+			ServerStorage:SetAttribute("NextRoundReady", false)
 			ServerStorage:SetAttribute("RoundID", nil)
+
+			local votes = {}
+			for _, map in ServerStorage.Maps:GetChildren() do
+				votes[map] = {}
+			end
+			local voteCon = voteMap.OnServerEvent:Connect(function(plr, map)
+				if not table.find(votes[map], plr) then
+					table.insert(votes[map], plr)
+				end
+			end)
+			voteMap:FireAllClients(true)
+
+			task.delay(10, function()
+				voteMap:FireAllClients(false)
+				voteCon:Disconnect()
+
+				local chosenMap = "Mesa Monocraft"
+				local highestVotes = 0
+				for map, voters in votes do
+					if #voters > highestVotes then
+						chosenMap = map
+					end
+				end
+
+				ServerStorage:SetAttribute("NextMap", chosenMap)
+				ServerStorage:SetAttribute("NextRoundReady", true)
+			end)
 		end)
 	else
 		round = RoundHandler.GetRound(roundId)

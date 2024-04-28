@@ -54,7 +54,7 @@ ReplicatedStorage.OnClientEvent:Connect(function(phase,round,result)
 		e.Parent = eFrame
 	end
 	
-	uiManager.WaitForUI("Highlights","UserTriggered"):ToggleVisible(true)
+	uiManager.WaitForUI("Highlights"):ToggleVisible(true)
 end)
 
 local pageOrders = {

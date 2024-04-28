@@ -39,7 +39,7 @@ controls.Register("Close UI", false, function()
 end)
 
 ReplicatedStorage.ServerClient.OpenSettings.OnClientEvent:Connect(function()
-	manager.WaitForUI("Settings", "UserTriggered"):ToggleVisible(true)
+	manager.WaitForUI("Settings"):ToggleVisible(true)
 end)
 
 local CASui: ScreenGui = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge) :: any

@@ -69,7 +69,7 @@ function UIManager.RegisterUI(name:string,uiType:UIType,ignoreInset:boolean,ui:F
 	end
 	
 	if ui:GetAttribute("Sidebar") then
-		local sb = UIManager.GetUI("Sidebar","Buttons")
+		local sb = UIManager.GetUI("Sidebar")
 		local function add()
 			if not game:GetService("ReplicatedFirst"):GetAttribute("ControlsReady") then
 				game:GetService("ReplicatedFirst"):GetAttributeChangedSignal("ControlsReady"):Wait()
@@ -95,7 +95,7 @@ function UIManager.RegisterUI(name:string,uiType:UIType,ignoreInset:boolean,ui:F
 		if not sb then
 			UIRegistered.Event:Connect(function(regName)
 				if regName == "Sidebar" then
-					sb = UIManager.GetUI("Sidebar","Buttons")
+					sb = UIManager.GetUI("Sidebar")
 					add()
 				end
 			end)
@@ -167,7 +167,7 @@ function UIManager.UnregisterUI(name:string,uiType:UIType): nil
 			pcall(function()
 				reg.UI.Visible = false
 				reg.UI.Parent = script:FindFirstChild("UnregisteredUIs")[uiType]
-				local sb = (UIManager.GetUI("Sidebar","Buttons") :: UI).UI
+				local sb = (UIManager.GetUI("Sidebar") :: UI).UI
 				sb:FindFirstChild(name):Destroy()
 			end)
 		end
@@ -175,18 +175,18 @@ function UIManager.UnregisterUI(name:string,uiType:UIType): nil
 	return
 end
 
-function UIManager.TryGetUI(name: string, uiType: UIType?): UI?
+function UIManager.TryGetUI(name: string): UI?
 	for _,v in _G.RegisteredUIs do
-		if (v.UIType == (uiType or v.UIType)) and (v.Name == name) then
+		if v.Name == name then
 			return v
 		end
 	end
 	return
 end
 
-function UIManager.GetUI(name:string,uiType:UIType?): UI
+function UIManager.GetUI(name: string): UI
 	for _,v in _G.RegisteredUIs do
-		if (v.UIType == (uiType or v.UIType)) and (v.Name == name) then
+		if v.Name == name then
 			return v
 		end
 	end
@@ -195,13 +195,15 @@ end
 
 function UIManager.GetUIs(uiType:UIType): {UI}
 	local uis = {}
-	for _,v in _G.RegisteredUIs do if v.UIType == uiType then table.insert(uis,v) end end
+	for _,v in _G.RegisteredUIs do
+		if v.UIType == uiType then
+			table.insert(uis,v)
+		end
+	end
 	return uis
 end
 
-function UIManager.WaitForUI(name:string,uiType:UIType?): UI
-	if typeof(name) ~= "string" then error("Expected string for name of WaitForUI, got "..typeof(name)) end
-	if not table.find({"string","nil"},typeof(uiType)) then error("Expected string or nil for uiType of WaitForUI, got "..typeof(uiType)) end
+function UIManager.WaitForUI(name: string): UI
 	local start = os.time()
 	local warned = false
 	repeat
@@ -212,8 +214,8 @@ function UIManager.WaitForUI(name:string,uiType:UIType?): UI
 				warn("Infinite yield possible on WaitForUI("..name..")\n"..debug.traceback())
 			end
 		end
-	until UIManager.TryGetUI(name,uiType)
-	return UIManager.TryGetUI(name,uiType) :: any
+	until UIManager.TryGetUI(name)
+	return UIManager.TryGetUI(name) :: any
 end
 
 UIManager.Themes = {
@@ -331,7 +333,7 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 		if bgMenuMode == "Closed" then
 			for _, v in scrUI:GetChildren() do
 				if v ~= frame then
-					(UIManager.GetUI(v.Name, self.UIType) :: UI):ToggleVisible(false, true)
+					(UIManager.GetUI(v.Name) :: UI):ToggleVisible(false, true)
 				end
 			end
 			return
@@ -347,7 +349,7 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 			end
 		else
 			local nextUI = scrUI:GetAttribute("NextUI"):split(";")
-			local ui = UIManager.GetUI(nextUI[1], self.UIType)
+			local ui = UIManager.GetUI(nextUI[1])
 			if not ui then
 				return
 			end
