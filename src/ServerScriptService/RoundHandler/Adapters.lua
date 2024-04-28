@@ -1,3 +1,4 @@
+--!nolint
 -- Implementation-dependent functions that *should* be customised.
 
 error("UPDATE THE CheckForUpdate ADAPTER!")
