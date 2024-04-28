@@ -2,8 +2,8 @@ local store = Instance.new("Folder")
 store.Name = "ClientStorage"
 store.Parent = game
 
-local folder = Instance.new("Folder")
-folder.Name = "ScriptConnections"
+local scriptConnections = Instance.new("Folder")
+scriptConnections.Name = "ScriptConnections"
 
 local function makeEvent(name:string, isFunction: boolean?): BindableEvent | BindableFunction
 	local suffix: string
@@ -16,7 +16,7 @@ local function makeEvent(name:string, isFunction: boolean?): BindableEvent | Bin
 		suffix = "Event"
 	end
 	event.Name = name..suffix
-	event.Parent = folder
+	event.Parent = scriptConnections
 	return event
 end
 
@@ -35,4 +35,8 @@ makeEvent("ShowCorpse")
 
 makeEvent("JoinRound")
 
-folder.Parent = store
+local currentMapObject = Instance.new("ObjectValue")
+currentMapObject.Name = "CurrentMapObject"
+currentMapObject.Parent = store
+
+scriptConnections.Parent = store

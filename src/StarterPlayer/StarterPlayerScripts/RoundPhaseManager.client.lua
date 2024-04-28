@@ -80,6 +80,8 @@ local function update(round: (Types.PartialRound & {Role: Types.Role})?)
         return
     end
 
+    (game :: any):FindFirstChild("ClientStorage").CurrentMapObject.Value = round.Map
+
     if stopMusic then
         stopMusic()
     end
