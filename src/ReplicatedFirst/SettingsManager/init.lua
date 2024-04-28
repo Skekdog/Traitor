@@ -60,7 +60,7 @@ module["AvailableSettings"] = {
 		PossibleValues = "Boolean",
 		Default = false,
 		Callback = function(val)
-			local map = workspace:WaitForChild("__Map", 1)
+			local map = (game :: any).ClientStorage.CurrentMapObject
 			if not map then
 				return
 			end

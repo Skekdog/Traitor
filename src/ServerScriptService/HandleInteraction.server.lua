@@ -7,7 +7,12 @@ local RoundHandler = require(ServerScriptService.RoundHandler.RoundHandler)
 ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr,part:BasePart)
 	local char = plr.Character
 
-	local round = RoundHandler.GetRound(ServerStorage:GetAttribute("RoundID"))
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return
+	end
+
+	local round = RoundHandler.GetRound(roundId)
 	
 	if char then
 		local hum = char.Humanoid

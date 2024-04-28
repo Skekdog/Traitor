@@ -1,8 +1,12 @@
 local RS = game:GetService("ReplicatedStorage")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local cs = RS.ClientServer
+local RoundHandler = require(ServerScriptService.RoundHandler.RoundHandler)
 local weaponModule = require(script.Parent)
+
+-- WOW I forgot how much all the weapon stuff SUCKS
 
 local classesToKeep = {"WeldConstraint","Motor6D","Sound","Model","FileMesh","SpecialMesh"}
 local function dropWeapon(plr,weapon)
@@ -10,6 +14,14 @@ local function dropWeapon(plr,weapon)
 	if not char then return end
 	local hum = plr.Character.Humanoid
 	local invW = plr.Inventory:FindFirstChild(weapon)
+
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return
+	end
+
+	local round = RoundHandler.GetRound(roundId)
+
 	if invW then
 		if invW:GetAttribute("CanBeDropped") then
 			plr.Inventory:FindFirstChild(weapon):Destroy()
@@ -27,7 +39,7 @@ local function dropWeapon(plr,weapon)
 
 			model.Name = weapon
 			model:SetPrimaryPartCFrame(char.Head.CFrame + (char.Head.CFrame.LookVector*5))
-			model.Parent = workspace["__Map"].WeaponSpawns
+			model.Parent = round.Map.WeaponSpawns
 			model.PrimaryPart.AssemblyLinearVelocity = hum.MoveDirection * hum.WalkSpeed
 		end
 	end
@@ -38,6 +50,13 @@ RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,positio
 	local config = weapon:FindFirstChild("Configuration")
 	if not config then return end
 	if not plr.Character:FindFirstChild("Humanoid") then return end
+
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return
+	end
+
+	local round = RoundHandler.GetRound(roundId)
 	
 	local curAmmo,lastFireTime = weapon:FindFirstChild("CurrentAmmo"),weapon:FindFirstChild("LastFireTime")
 	local reloading,ammo,fireTime
@@ -79,8 +98,7 @@ RS.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr,weapon,ray,positio
 			weaponModule.SpawnProjectile(plr,weapon,ray,position)
 		end
 	else
-		if not workspace:FindFirstChild("__Map") then return end
-		if not workspace["__Map"]:FindFirstChild("Props") then return end
+		if not round.Map.Props then return end
 		weaponModule.PlaceTool(plr,weapon,ray,position)
 	end
 end)

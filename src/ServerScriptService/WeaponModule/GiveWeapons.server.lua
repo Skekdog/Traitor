@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 local conversions = {
 	["Deagle"] = "Deagle",
 	["Shotgun"] = "XM1014",
@@ -48,8 +49,8 @@ local function setup(v)
 end
 
 workspace.ChildAdded:Connect(function(child)
-	if child.Name == "__Map" then
-		local spawns = child:WaitForChild("WeaponSpawns")
+	if child.Name:match(ServerStorage:GetAttribute("RoundID") or "") then
+		local spawns = child.WeaponSpawns
 		for _,v in pairs(spawns:GetChildren()) do
 			setup(v)
 		end
