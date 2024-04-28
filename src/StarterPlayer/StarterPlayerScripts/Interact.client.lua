@@ -23,7 +23,7 @@ plr:GetAttributeChangedSignal("CurrentRoundID"):Connect(function()
 		if ray then
 			local inst = ray.Instance
 			if inst then
-				if (map :: any):FindFirstChild("ActionItems"):IsAncestorOf(inst) or (map :: any):FindFirstChild("ActionItems"):IsAncestorOf(inst) or map.Props:IsAncestorOf(inst) then
+				if (map :: any):FindFirstChild("ActionItems"):IsAncestorOf(inst) or (map :: any):FindFirstChild("Doors"):IsAncestorOf(inst) or map.Props:IsAncestorOf(inst) then
 					RS.ClientServer.Interaction:FireServer(inst)
 				end
 			end

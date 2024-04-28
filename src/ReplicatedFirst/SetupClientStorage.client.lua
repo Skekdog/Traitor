@@ -29,8 +29,6 @@ makeEvent("Reload")
 makeEvent("Fire")
 makeEvent("ADS")
 
-makeEvent("Climb")
-makeEvent("DisableAction", true)
 makeEvent("ShowCorpse")
 
 makeEvent("JoinRound")
