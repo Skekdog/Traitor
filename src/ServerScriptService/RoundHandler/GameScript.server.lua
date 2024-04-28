@@ -60,18 +60,21 @@ for _, v in script.Parent.Gamemodes:GetChildren() do
 	end
 end
 
+local nextRoundReady = true
+local nextMap = "Mesa Monocraft"
+
 ReplicatedStorage.ClientServer.JoinRound.OnServerEvent:Connect(function(plr)
 	local round
 	local roundId = ServerStorage:GetAttribute("RoundID")
 
-	if not ServerStorage:GetAttribute("NextRoundReady") then
+	if not nextRoundReady then
 		return
 	end
 
 	if not roundId then
-		round = RoundHandler.CreateRound(ServerStorage:GetAttribute("NextMap"), gamemodes[math.random(1, #gamemodes)])
+		round = RoundHandler.CreateRound(nextMap, gamemodes[math.random(1, #gamemodes)])
 		round.RoundEndEvent.Event:Once(function()
-			ServerStorage:SetAttribute("NextRoundReady", false)
+			nextRoundReady = false
 			ServerStorage:SetAttribute("RoundID", nil)
 
 			local votes = {}
@@ -97,8 +100,8 @@ ReplicatedStorage.ClientServer.JoinRound.OnServerEvent:Connect(function(plr)
 					end
 				end
 
-				ServerStorage:SetAttribute("NextMap", chosenMap)
-				ServerStorage:SetAttribute("NextRoundReady", true)
+				nextMap = chosenMap
+				nextRoundReady = true
 			end)
 		end)
 	else

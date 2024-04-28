@@ -46,9 +46,10 @@ local function spectateFunc(action,state)
 	uiO.Username.Text = camera.CameraSubject.Parent.Name
 end
 
-plr:GetAttributeChangedSignal("IsSpectator"):Connect(function()
+local clientStorage = (game :: any).ClientStorage
+clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
 	uiO.Username.Text = "Use buttons to spectate"
-	if plr:GetAttribute("IsSpectator") then
+	if clientStorage:GetAttribute("IsSpectating") then
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
 		plr.CameraMode = Enum.CameraMode.Classic
@@ -66,9 +67,9 @@ plr:GetAttributeChangedSignal("IsSpectator"):Connect(function()
 end)
 
 uiO.Forward.MouseButton1Click:Connect(function()
-	spectateFunc("Spectate Next",Enum.UserInputState.End)
+	spectateFunc("Spectate Next", Enum.UserInputState.End)
 end)
 
 uiO.Back.MouseButton1Click:Connect(function()
-	spectateFunc("Spectate Previous",Enum.UserInputState.End)
+	spectateFunc("Spectate Previous", Enum.UserInputState.End)
 end)
