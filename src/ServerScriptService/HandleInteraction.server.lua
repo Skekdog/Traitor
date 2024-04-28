@@ -1,15 +1,20 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
 local TS = game:GetService("TweenService")
+local RoundHandler = require(ServerScriptService.RoundHandler.RoundHandler)
 
 ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr,part:BasePart)
 	local char = plr.Character
+
+	local round = RoundHandler.GetRound(ServerStorage:GetAttribute("RoundID"))
 	
 	if char then
 		local hum = char.Humanoid
 		if hum.Health > 0 and (char.PrimaryPart.Position-part.Position).Magnitude < 10 then
-			if part:FindFirstAncestor("ActionItems") then
+			if round.Map.ActionItems:IsAncestorOf(part) then
 				require((part :: any).Parent:FindFirstChildOfClass("ModuleScript"))()
-			elseif part:FindFirstAncestor("Doors") and not part:GetAttribute("Opening") then
+			elseif round.Map.Doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
 				part:SetAttribute("Opening",true)
 				part:SetAttribute("Open",not part:GetAttribute("Open"))
 				local angle = math.rad(part:GetAttribute("Open") and -90 or 90)
@@ -27,7 +32,7 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr,pa
 					end
 				end
 				sounds[math.random(1,#sounds)]:Play()
-			elseif part:FindFirstAncestor("Props") then
+			elseif round.Map.Props:IsAncestorOf(part) then
 				local prop = part.Parent
 				if prop.Name:sub(1,10) ~= "Equipment_" then return end
 				
