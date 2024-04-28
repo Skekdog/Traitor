@@ -4,9 +4,10 @@ local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local Adapters = require(script.Parent.Adapters)
-local Types = require(script.Parent.Types)
+local Types = require(ReplicatedFirst.RoundHandlerTypes)
 local API = require(script.Parent.API)
 
 --- The main module. New rounds are created from here via module.CreateRound().

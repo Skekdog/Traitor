@@ -1,8 +1,9 @@
 -- Implementation-dependent functions that *should* be customised.
 
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local API = require(script.Parent.API)
-local Types = require(script.Parent.Types)
+local Types = require(ReplicatedFirst.RoundHandlerTypes)
 
 local remotes = ReplicatedStorage:FindFirstChild("RoundHandler")
 

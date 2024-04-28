@@ -1,5 +1,6 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 -- Returns whether the gamemode is valid, and a list of issues with the gamemode
-local Types = require(script.Parent.Types)
+local Types = require(ReplicatedFirst.RoundHandlerTypes)
 local EngineVersion = "0.0.1"
 
 local module = {}

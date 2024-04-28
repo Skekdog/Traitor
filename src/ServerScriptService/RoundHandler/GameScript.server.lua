@@ -6,6 +6,7 @@ local RoundHandler = require(script.Parent.RoundHandler)
 local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
 local getPartialParticipants = remotes.GetPartialParticipants
+local getPartialRound = remotes.GetPartialRound
 
 getPartialParticipants.OnServerInvoke = function(plr)
 	local roundId = ServerStorage:GetAttribute("RoundID")
@@ -22,6 +23,15 @@ getPartialParticipants.OnServerInvoke = function(plr)
 	end
 
 	return participants
+end
+
+getPartialRound.OnServerInvoke = function(plr)
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return
+	end
+
+	return RoundHandler.GetRound(roundId):GetPartialRound()
 end
 
 slayVote.OnServerEvent:Connect(function(plr, target: Player)
