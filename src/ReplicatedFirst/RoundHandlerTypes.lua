@@ -15,8 +15,8 @@ export type RoleName = string
 export type Asset = "rbxassetid://" | string
 export type PauseFailReason = "RoundNotInProgress"
 
-type MessageSeverity = "info" | "warn" | "error"
-type MessageType = "update" | "bodyFound" | "disconnect" | "creditsEarned" | "karma" | "timeToRoundStart"
+export type MessageSeverity = "info" | "warn" | "error"
+export type MessageType = "update" | "bodyFound" | "disconnect" | "creditsEarned" | "karma" | "timeToRoundStart"
 export type Adapter = {
     Configuration: {
         PREPARING_TIME: number,
