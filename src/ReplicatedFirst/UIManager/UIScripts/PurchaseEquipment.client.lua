@@ -1,10 +1,12 @@
 local RS = game:GetService("ReplicatedStorage")
 local RF = game:GetService("ReplicatedFirst")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local UIManager = require(RF.UIManager)
 
-local roundInfo = RS.ClientServer.GetRoundInfo
+local getOwnInfo = RS.RoundHandler.GetOwnInfo
 local API = require(RF.API)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 
 local plr = game:GetService("Players").LocalPlayer
 
@@ -72,7 +74,12 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	end
 	
 	local creditCost = frame.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost")
-	local credits = roundInfo:InvokeServer(plr:GetAttribute("CurrentRound"),"Self").PlayerInfo.Credits
+
+	local participant: RoundHandlerTypes.Participant? = getOwnInfo:InvokeServer()
+
+	if not participant then return end
+
+	local credits = participant.Credits
 	
 	update(item,credits)
 	
@@ -94,7 +101,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 				end
 			end
 		end
-		update(item,roundInfo:InvokeServer(plr:GetAttribute("CurrentRound"),"Self").PlayerInfo.Credits)
+		update(item, participant.Credits)
 	end)
 end)
 

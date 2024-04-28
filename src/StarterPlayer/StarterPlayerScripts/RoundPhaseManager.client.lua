@@ -56,12 +56,18 @@ end
 local stopMusic: (() -> ())?
 
 local lastTimerThread: thread?
-local function update(round: (Types.PartialRound & {Role: Types.Role})?)
+local function update(round: Types.PartialRound?)
     if lastTimerThread then
         task.cancel(lastTimerThread)
     end
 
     round = round or ReplicatedStorage.RoundHandler.GetPartialRound:InvokeServer()
+    local participant: Types.Participant? = ReplicatedStorage.GetOwnInfo:InvokeServer()
+    local ownRole: Types.Role?
+    if participant then
+        ownRole = participant.Role
+    end
+
     if not round then
         -- Allow for creation of a new round
         joinRound:ToggleVisible(true)
@@ -80,7 +86,7 @@ local function update(round: (Types.PartialRound & {Role: Types.Role})?)
         return
     end
 
-    (game :: any):FindFirstChild("ClientStorage").CurrentMapObject.Value = round.Map
+    (game :: any).ClientStorage.CurrentMapObject.Value = round.Map
 
     if stopMusic then
         stopMusic()
@@ -97,58 +103,60 @@ local function update(round: (Types.PartialRound & {Role: Types.Role})?)
     end)
 
     if round.RoundPhase == "Playing" then
-        if #round.Role.EquipmentShop > 0 then
-            local shop = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI
-            shop.PurchaseEquipment.Reset:Fire()
+        if ownRole then
+            if #ownRole.EquipmentShop > 0 then
+                local shop = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI
+                shop.PurchaseEquipment.Reset:Fire()
 
-            local nameToObj = {}
-            for _, e in round.Gamemode.AvailableEquipment do
-                nameToObj[e.Name] = e
-            end
+                local nameToObj = {}
+                for _, e in round.Gamemode.AvailableEquipment do
+                    nameToObj[e.Name] = e
+                end
 
-            for _,v in round.Role.EquipmentShop do
-                local equipment = nameToObj[v]
-                
-                local entry = shop.Entry:Clone()
-                entry:SetAttribute("CreditCost", equipment.Cost)
-                entry:SetAttribute("Description", equipment.Description)
-                
-                entry.Image = equipment.Icon
-                entry.Name = equipment.Name
-                entry.Visible = true
-                entry.Parent = shop.ScrollingFrame
-            end
-        end
-
-        local participants: {Types.PartialParticipant} = remotes.GetPartialParticipants:InvokeServer()
-
-        local roleHighlights = {}
-
-        for _, role in round.Gamemode.Roles do
-            local thisRelation = table.find(role.Allies, round.Role.Name) and "__Ally" or "__Enemy"
-            local verdict
-            for relation, highlight in round.Role.HighlightRules do
-                if relation == role.Name then
-                    verdict = highlight
-                    break
-                elseif verdict == nil then
-                    verdict = if relation == "__All" then highlight else thisRelation == relation
+                for _,v in ownRole.EquipmentShop do
+                    local equipment = nameToObj[v]
+                    
+                    local entry = shop.Entry:Clone()
+                    entry:SetAttribute("CreditCost", equipment.Cost)
+                    entry:SetAttribute("Description", equipment.Description)
+                    
+                    entry.Image = equipment.Icon
+                    entry.Name = equipment.Name
+                    entry.Visible = true
+                    entry.Parent = shop.ScrollingFrame
                 end
             end
-            roleHighlights[role.Name] = verdict
-        end
 
-        for _, v in participants do
-            if not v.Role then
-                continue
+            local participants: {Types.PartialParticipant} = remotes.GetPartialParticipants:InvokeServer()
+
+            local roleHighlights = {}
+
+            for _, role in round.Gamemode.Roles do
+                local thisRelation = table.find(role.Allies, ownRole.Name) and "__Ally" or "__Enemy"
+                local verdict
+                for relation, highlight in ownRole.HighlightRules do
+                    if relation == role.Name then
+                        verdict = highlight
+                        break
+                    elseif verdict == nil then
+                        verdict = if relation == "__All" then highlight else thisRelation == relation
+                    end
+                end
+                roleHighlights[role.Name] = verdict
             end
-            if roleHighlights[v.Role.Name] then
-                local clone = Instance.new("Highlight")
-                CollectionService:AddTag(clone, "AllyMarker")
-                clone.FillTransparency = 1
-                clone.OutlineColor = v.Role.Colour
-                clone.OutlineTransparency = 0
-                clone.Parent = v.Player.Character
+
+            for _, v in participants do
+                if not v.Role then
+                    continue
+                end
+                if roleHighlights[v.Role.Name] then
+                    local clone = Instance.new("Highlight")
+                    CollectionService:AddTag(clone, "AllyMarker")
+                    clone.FillTransparency = 1
+                    clone.OutlineColor = v.Role.Colour
+                    clone.OutlineTransparency = 0
+                    clone.Parent = v.Player.Character
+                end
             end
         end
     elseif round.RoundPhase == "Waiting" then

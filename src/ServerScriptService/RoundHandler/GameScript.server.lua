@@ -7,6 +7,7 @@ local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
 local getPartialParticipants = remotes.GetPartialParticipants
 local getPartialRound = remotes.GetPartialRound
+local getOwnInfo = remotes.GetOwnInfo
 local voteMap = remotes.VoteMap
 
 getPartialParticipants.OnServerInvoke = function(plr)
@@ -24,6 +25,15 @@ getPartialParticipants.OnServerInvoke = function(plr)
 	end
 
 	return participants
+end
+
+getOwnInfo.OnServerInvoke = function(plr)
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return
+	end
+
+	return RoundHandler.GetRound(roundId):TryGetParticipant(plr.Name)
 end
 
 getPartialRound.OnServerInvoke = function(plr)
