@@ -1,7 +1,9 @@
-local UI = require(game:GetService("ReplicatedFirst").UIManager).WaitForUI("MapCredits").UI
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-ReplicatedStorage.ServerClient.MapChanged.OnClientEvent:Connect(function(mapCreator, map, gamemode)
-	UI.Text.Text = string.format("Map Loaded: %s by %s", map, mapCreator)
-	UI.Visible = true
-	task.delay(5, function()UI.Visible = false end)
+local UI = require(ReplicatedFirst.UIManager).WaitForUI("MapCredits")
+
+ReplicatedStorage.RoundHandler.MapChanged.OnClientEvent:Connect(function(mapCreator, map, gamemode)
+	UI.UI.Text.Text = `Map Loaded: {map} by {mapCreator}`
+	UI:ToggleVisible(true)
+	task.delay(5, UI.ToggleVisible, UI, false)
 end)
