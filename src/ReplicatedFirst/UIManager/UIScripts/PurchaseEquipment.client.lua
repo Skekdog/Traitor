@@ -1,11 +1,10 @@
-local RS = game:GetService("ReplicatedStorage")
-local RF = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local UIManager = require(RF.UIManager)
+local UIManager = require(ReplicatedFirst.UIManager)
 
-local getOwnInfo = RS.RoundHandler.GetOwnInfo
-local API = require(RF.API)
+local getOwnInfo = ReplicatedStorage.RoundHandler.GetOwnInfo
+local API = require(ReplicatedFirst.API)
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 
 local frame = script.Parent
@@ -84,7 +83,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	if purchaseCon then purchaseCon:Disconnect() end
 	purchaseCon = purchaseButton.MouseButton1Click:Connect(function()
 		if credits >= creditCost then
-			local response = RS.ClientServer.PurchaseEquipment:InvokeServer(item)
+			local response = ReplicatedStorage.ClientServer.PurchaseEquipment:InvokeServer(item)
 			if response == "ItemError" then
 				API.ScreenMessage("Error", "Equipment not found on server")
 			elseif response == "CreditError" then
@@ -103,7 +102,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	end)
 end)
 
-RS:WaitForChild("ServerClient").InformClientSideEquipment.OnClientEvent:Connect(function(item)
+ReplicatedStorage:WaitForChild("ServerClient").InformClientSideEquipment.OnClientEvent:Connect(function(item)
 	if item == "Radar" then
 		radar()
 	end

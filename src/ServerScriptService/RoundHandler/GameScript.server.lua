@@ -1,28 +1,61 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 local RoundHandler = require(script.Parent.RoundHandler)
 
 local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
 local getPartialParticipants = remotes.GetPartialParticipants
+local getPartialParticipant = remotes.GetPartialParticipant
 local getPartialRound = remotes.GetPartialRound
 local getOwnInfo = remotes.GetOwnInfo
 local voteMap = remotes.VoteMap
+
+local function getMinimalParticipant(participant: RoundHandlerTypes.Participant): RoundHandlerTypes.PartialParticipant
+	return {
+		Player = participant.Player,
+		Status = participant.Status
+	}
+end
 
 getPartialParticipants.OnServerInvoke = function(plr)
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then return end
 
 	local round = RoundHandler.GetRound(roundId)
-	local self = round:GetParticipant(plr.Name)
+	local self = round:TryGetParticipant(plr.Name)
 
 	local participants = {}
-	for _, v in round.Participants do
-		table.insert(participants, self:ViewPartialParticipant(v))
+	if not self then
+		for _, v in round.Participants do
+			table.insert(participants, getMinimalParticipant(v))
+		end
+	else
+		for _, v in round.Participants do
+			table.insert(participants, self:ViewPartialParticipant(v))
+		end
 	end
 
 	return participants
+end
+
+getPartialParticipant.OnServerInvoke = function(plr, targetName: string)
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then return end
+
+	local round = RoundHandler.GetRound(roundId)
+	local self = round:TryGetParticipant(plr.Name)
+	local target = round:TryGetParticipant(targetName)
+
+	if self and target then
+		return self:ViewPartialParticipant(target)
+	elseif not target then
+		return
+	end
+
+	return getMinimalParticipant(target)
 end
 
 getOwnInfo.OnServerInvoke = function(plr)
