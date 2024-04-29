@@ -11,6 +11,7 @@ local getPartialParticipants = remotes.GetPartialParticipants
 local getPartialParticipant = remotes.GetPartialParticipant
 local getPartialRound = remotes.GetPartialRound
 local getOwnInfo = remotes.GetOwnInfo
+local joinRound = remotes.JoinRound
 local voteMap = remotes.VoteMap
 
 local function getMinimalParticipant(participant: RoundHandlerTypes.Participant): RoundHandlerTypes.PartialParticipant
@@ -104,7 +105,7 @@ end
 local nextRoundReady = true
 local nextMap = "Mesa Monocraft"
 
-ReplicatedStorage.ClientServer.JoinRound.OnServerEvent:Connect(function(plr)
+joinRound.OnServerInvoke = function(plr)
 	local round
 	local roundId = ServerStorage:GetAttribute("RoundID")
 
@@ -151,5 +152,7 @@ ReplicatedStorage.ClientServer.JoinRound.OnServerEvent:Connect(function(plr)
 	
 	if not round:TryGetParticipant(plr.Name) then
 		round:JoinRound(plr)
+		return true
 	end
-end)
+	return
+end

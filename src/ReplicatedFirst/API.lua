@@ -61,14 +61,6 @@ local screenMessageFormats = {
 			Text = "Warning Message",
 			TextColor3 = Color3.new(1, 0.48, 0.13)
 		}
-	},
-	NiceTry = {
-		Name = "NiceTry",
-		InheritsFrom = "Error",
-		LabelProperties = {
-			Text = "Nice try.",
-			TextStrokeColor3 = Color3.new(0.314, 0.047, 0.047)
-		}
 	}
 }
 
