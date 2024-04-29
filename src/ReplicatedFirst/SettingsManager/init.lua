@@ -472,13 +472,13 @@ end
 local function keybindToJson(keybind: KeybindSetting): string
 	local keycodeText = '['
 	for i, v in keybind.Keycodes do
-		keycodeText = keycodeText..'["'..tostring(v[1])..(v[2] and '", "'..tostring(v[2])..'"' or '"')..']'
+		keycodeText = `{keycodeText}["{v[1]}{v[2] and `","{v[2]}"` or `"`}]`
 		if i < #keybind.Keycodes then
-			keycodeText = keycodeText..", "
+			keycodeText = keycodeText..","
 		end
 	end
 	keycodeText = keycodeText..']'
-	return ('{"Keycodes":'..keycodeText..', "Toggled":'..tostring(keybind.Toggled)..'}')
+	return `\{"Keycodes":{keycodeText},"Toggled":{keybind.Toggled}}"`
 end
 
 function module.JSONEncode(): string
