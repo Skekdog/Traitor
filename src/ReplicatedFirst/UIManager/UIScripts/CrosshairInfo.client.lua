@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UIManager = require(script.Parent.Parent)
 --this script could do with a clean up
---should also figure out a good way to make use of ClientStorage, with round info
 
 --To keep these ordered, they are regular tables, not dictionaries
 local healthDefs = { --These are percentages of MaxHealth
