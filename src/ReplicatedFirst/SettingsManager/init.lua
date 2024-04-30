@@ -478,7 +478,7 @@ local function keybindToJson(keybind: KeybindSetting): string
 		end
 	end
 	keycodeText = keycodeText..']'
-	return `\{"Keycodes":{keycodeText},"Toggled":{keybind.Toggled}}"`
+	return `\{"Keycodes":{keycodeText},"Toggled":{keybind.Toggled}}`
 end
 
 function module.JSONEncode(): string

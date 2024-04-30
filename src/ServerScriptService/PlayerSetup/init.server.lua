@@ -68,7 +68,6 @@ end)
 local get = script:FindFirstChild("GetProfile")
 get.OnInvoke = function(plr: Player)
 	if not profiles[plr] then
-		print(profiles)
 		return warn(plr.Name.." profile not found!")
 	end
 	return profiles[plr].Data
@@ -77,7 +76,6 @@ end
 local update = script:FindFirstChild("UpdateProfile")
 update.Event:Connect(function(plr: Player, key: string, value: string | number)
 	if not profiles[plr] then
-		print(profiles)
 		return warn(plr.Name.." profile not found!")
 	end
 	profiles[plr].Data[key] = value

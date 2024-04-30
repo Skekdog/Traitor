@@ -3,9 +3,9 @@ local RS = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
 local ui = UIManager.WaitForUI("RoleAlert")
-RS.RoundHandler.SendRoleAlert.OnClientEvent:Connect(function(name, colour, description)
+RS.RoundHandler.SendRoleAlert.OnClientEvent:Connect(function(name, colour, description, soundId)
 	local sound = Instance.new("Sound")
-	sound.SoundId = "rbxassetid://"..tostring("")
+	sound.SoundId = "rbxassetid://"..tostring(soundId)
 	sound.SoundGroup = SoundService.RoleReveals
 	sound.Parent = SoundService.RoleReveals
 	sound:Play()

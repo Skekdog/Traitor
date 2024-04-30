@@ -22,7 +22,7 @@ local uis = {
 	Special = plrUi:WaitForChild("Special", math.huge) -- The highest priority. Intended for special cases like ScreenMessage.
 }
 
-local requestSetting = script.Parent.SettingsManager
+local requestSetting = (script :: any).Parent.SettingsManager.RequestSetting
 
 local UIManager = {}
 UIManager.__index = UIManager
@@ -203,12 +203,12 @@ function UIManager.GetUIs(uiType: UIType): {UI}
 	return uis
 end
 
-function UIManager.WaitForUI(name: string): UI
+function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 	local start = os.time()
 	local warned = false
 	repeat
 		task.wait()
-		if not warned then
+		if not warned and not ignoreYield then
 			if start+5 <= os.time() then
 				warned = true
 				warn("Infinite yield possible on WaitForUI("..name..")\n"..debug.traceback())
@@ -326,7 +326,6 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 		return
 	end
 	
-	
 	local bgMenuMode = script:GetAttribute("BackgroundMenuMode")
 	
 	if bgMenuMode ~= "Stacked" then
@@ -349,6 +348,9 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 			end
 		else
 			local nextUI = scrUI:GetAttribute("NextUI"):split(";")
+			if not nextUI[1] or nextUI[1] == "" then
+				return
+			end
 			local ui = UIManager.GetUI(nextUI[1])
 			if not ui then
 				return

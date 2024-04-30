@@ -1,7 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = game:GetService("Players").LocalPlayer
+local UIManager = require(script.Parent.Parent)
 local controls = require(game:GetService("ReplicatedFirst").ControlManager)
-local screenUi = script.Parent
+local screenUi = UIManager.WaitForUI("Backpack").UI
 
 local clientStorage = game:WaitForChild("ClientStorage")
 local scriptCons = clientStorage:WaitForChild("ScriptConnections")
@@ -35,7 +36,6 @@ plr:GetPropertyChangedSignal("Character"):Connect(function()
 		controls.Unregister("Primary Fire")
 		controls.Unregister("Drop")
 		controls.Unregister("Reload Weapon")
-		hum = nil
 	end)
 end)
 

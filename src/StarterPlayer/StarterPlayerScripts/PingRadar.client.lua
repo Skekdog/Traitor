@@ -14,7 +14,7 @@ scriptCons:WaitForChild("PingRadarEvent").Event:Connect(function()
 		for _, v in info do
 			local char = v.Player.Character
 			if char and (char.Name ~= plr.Name) and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
-				local clone = ReplicatedFirst.RadarPoint:Clone()
+				local clone = ReplicatedStorage.RadarPoint:Clone()
 				clone:SetPrimaryPartCFrame(v.Character.HumanoidRootPart.CFrame)
 				clone.RadarPoint.TextLabel.Text = math.round(plr:DistanceFromCharacter(v.Character.HumanoidRootPart.Position))
 				clone.RadarPoint.Enabled = true

@@ -207,6 +207,7 @@ local module: Types.Gamemode = {
             Extras = {
                 AssignmentProportion = 0.25,
                 AssignmentPriority = 1,
+                Sound = 9042088276,
             },
 
             Allies = {"Traitor"},
@@ -250,6 +251,7 @@ local module: Types.Gamemode = {
             Extras = {
                 AssignmentProportion = 0.125,
                 AssignmentPriority = 2,
+                Sound = 9042823666,
             },
 
             Allies = {"Innocent", "Detective"},
@@ -288,6 +290,7 @@ local module: Types.Gamemode = {
             Extras = {
                 AssignmentProportion = 0.625,
                 AssignmentPriority = 3,
+                Sound = 9042819926,
             },
 
             Allies = {"Detective", "Innocent"},

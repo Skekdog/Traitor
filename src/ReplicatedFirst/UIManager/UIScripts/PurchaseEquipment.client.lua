@@ -7,23 +7,21 @@ local getOwnInfo = ReplicatedStorage.RoundHandler.GetOwnInfo
 local API = require(ReplicatedFirst.API)
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 
-local frame = script.Parent
-local purchaseButton = frame.Purchase
-
-local UI = UIManager.WaitForUI("Equipment Shop").UI
+local UI = UIManager.WaitForUI("Equipment Shop", true).UI
+local purchaseButton = UI.Purchase
 
 local radarCooldown = 5
 
 local function update(item, credits)
-	frame.CurrentCredits.Text = "You have "..tostring(credits).." credit(s)."
-	if credits >= frame.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost") then
-		frame.CreditCost.TextColor3 = Color3.new(0.294118, 1, 0.243137)
-		frame.CurrentCredits.TextColor3 = Color3.new(0.294118, 1, 0.243137)
+	UI.CurrentCredits.Text = "You have "..tostring(credits).." credit(s)."
+	if credits >= UI.ScrollingUI:FindFirstChild(item):GetAttribute("CreditCost") then
+		UI.CreditCost.TextColor3 = Color3.new(0.294118, 1, 0.243137)
+		UI.CurrentCredits.TextColor3 = Color3.new(0.294118, 1, 0.243137)
 		purchaseButton.TextColor3 = Color3.fromRGB(56, 167, 31)
 		purchaseButton.BackgroundColor3 = Color3.new(1, 1, 1)
 	else
-		frame.CreditCost.TextColor3 = Color3.fromRGB(167, 0, 0)
-		frame.CurrentCredits.TextColor3 = Color3.fromRGB(167, 0, 0)
+		UI.CreditCost.TextColor3 = Color3.fromRGB(167, 0, 0)
+		UI.CurrentCredits.TextColor3 = Color3.fromRGB(167, 0, 0)
 		purchaseButton.TextColor3 = Color3.fromRGB(167, 0, 0)
 		purchaseButton.BackgroundColor3 = Color3.fromRGB(185, 185, 185)
 	end
@@ -31,10 +29,10 @@ end
 
 UI.Reset.Event:Connect(function()
 	purchaseButton:SetAttribute("Item", "")
-	frame.CreditCost.Text = ""
-	frame.CurrentCredits.Text = ""
-	frame.Description.Text = "Click on an item to view more information."
-	frame:FindFirstChild("Name").Text = "Item"
+	UI.CreditCost.Text = ""
+	UI.CurrentCredits.Text = ""
+	UI.Description.Text = "Click on an item to view more information."
+	UI:FindFirstChild("Name").Text = "Item"
 	purchaseButton.TextColor3 = Color3.fromRGB(167, 0, 0)
 end)
 
@@ -51,13 +49,13 @@ local function radar()
 	end
 end
 
-UI.ScrollingFrame.ChildAdded:Connect(function(v)
+UI.ScrollingUI.ChildAdded:Connect(function(v)
 	if v:IsA("ImageButton") then
 		v.MouseButton1Click:Connect(function()
 			purchaseButton:SetAttribute("Item", v.Name)
-			frame.CreditCost.Text = "This costs "..tostring(v:GetAttribute("CreditCost")).." credit(s)."
-			frame.Description.Text = v:GetAttribute("Description")
-			frame:FindFirstChild("Name").Text = v.Name
+			UI.CreditCost.Text = "This costs "..tostring(v:GetAttribute("CreditCost")).." credit(s)."
+			UI.Description.Text = v:GetAttribute("Description")
+			UI:FindFirstChild("Name").Text = v.Name
 		end)
 	end
 end)
@@ -70,7 +68,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 		return
 	end
 	
-	local creditCost = frame.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost")
+	local creditCost = UI.ScrollingUI:FindFirstChild(item):GetAttribute("CreditCost")
 
 	local participant: RoundHandlerTypes.Participant? = getOwnInfo:InvokeServer()
 

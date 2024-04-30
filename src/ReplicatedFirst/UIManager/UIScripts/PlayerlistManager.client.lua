@@ -46,6 +46,9 @@ local function createPlr(plr: Player)
 	clone.Parent = list
 
 	for _, v in clone.Marks:GetChildren() do
+		if v.ClassName ~= "TextButton" then
+			continue
+		end
 		v.MouseButton1Click:Connect(function()
 			if v.UIStroke.Enabled then
 				plr:SetAttribute("Mark", "")
@@ -54,6 +57,9 @@ local function createPlr(plr: Player)
 			end
 
 			for _, b in clone.Marks:GetChildren() do
+				if v.ClassName ~= "TextButton" then
+					continue
+				end
 				b.UIStroke.Enabled = false
 			end
 			v.UIStroke.Enabled = true
@@ -65,8 +71,10 @@ local function createPlr(plr: Player)
 		clone.SearchedIcon.Visible = true
 	end)
 	clone.SearchedIcon.Visible = plr:GetAttribute("Searched")
-	clone.ViewBodyButton.MouseButton1Click:Connect(function()
-		ReplicatedStorage.ClientServer.GetCorpseInfo:FireServer(plr.Name)
+	clone.MouseButton1Click:Connect(function()
+		if (clone.LayoutOrder // 1000) == layoutOrders["Dead"] or (clone.LayoutOrder // 1000) == layoutOrders["Missing"] then
+			ReplicatedStorage.ClientServer.GetCorpseInfo:FireServer(plr.Name)
+		end
 	end)
 
 	updatePlr(plr, clone)
@@ -79,8 +87,7 @@ local function movePlr(plr: Player, status: "Alive" | "Missing" | "Dead" | "Spec
 	
 	clone.LayoutOrder = layoutOrders[status]+1
 
-	clone.Marks.Visible = status ~= "Alive"
-	clone.ViewBodyButton.Visible = (status ~= "Alive") and (status ~= "Spectating")
+	clone.Marks.Visible = status == "Alive"
 end
 
 local function removePlr(plr: Player)
@@ -95,7 +102,7 @@ Players.PlayerAdded:Connect(function(plr)
 	movePlr(plr, "Spectating")
 end)
 
-local participants: {RoundHandlerTypes.PartialParticipant} = ReplicatedStorage.RoundHandler.GetPartialParticipants
+local participants: {RoundHandlerTypes.PartialParticipant} = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
 local plrToParticipant: {[Player]: RoundHandlerTypes.PartialParticipant} = {}
 
 for _, v in participants do
@@ -110,13 +117,13 @@ for _, plr in Players:GetPlayers() do
 	end
 end
 
-ReplicatedStorage.RoundHandler.RoundPhaseChanged:Connect(function()
+ReplicatedStorage.RoundHandler.RoundPhaseChanged.OnClientEvent:Connect(function()
 	for _, plr in Players:GetPlayers() do
 		updatePlr(plr, findPlr(plr))
 	end
 end)
 
-ReplicatedStorage.RoundHandler.CorpseSearched:Connect(function(name)
+ReplicatedStorage.RoundHandler.CorpseSearched.OnClientEvent:Connect(function(name)
 	local plr = Players:FindFirstChild(name)
 	if not plr then return end
 

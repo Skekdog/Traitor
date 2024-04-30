@@ -23,7 +23,7 @@ end
 
 getPartialParticipants.OnServerInvoke = function(plr)
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then return end
+	if not roundId then return {} end
 
 	local round = RoundHandler.GetRound(roundId)
 	local self = round:TryGetParticipant(plr.Name)
@@ -61,9 +61,7 @@ end
 
 getOwnInfo.OnServerInvoke = function(plr)
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
-		return
-	end
+	if not roundId then return end
 
 	return RoundHandler.GetRound(roundId):TryGetParticipant(plr.Name)
 end
@@ -114,14 +112,15 @@ joinRound.OnServerInvoke = function(plr)
 	end
 
 	if not roundId then
-		round = RoundHandler.CreateRound(nextMap, gamemodes[math.random(1, #gamemodes)])
+		round = RoundHandler.CreateRound(ServerStorage.Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
+		ServerStorage:SetAttribute("RoundID", round.ID)
 		round.RoundEndEvent.Event:Once(function()
 			nextRoundReady = false
 			ServerStorage:SetAttribute("RoundID", nil)
 
 			local votes = {}
 			for _, map in ServerStorage.Maps:GetChildren() do
-				votes[map] = {}
+				votes[map.Name] = {}
 			end
 			local voteCon = voteMap.OnServerEvent:Connect(function(plr, map)
 				if not table.find(votes[map], plr) then
