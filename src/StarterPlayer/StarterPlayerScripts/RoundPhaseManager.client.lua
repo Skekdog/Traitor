@@ -70,6 +70,7 @@ local function update(round: Types.PartialRound?)
     end
 
     if not round then
+        print("nay round")
         -- Allow for creation of a new round
         joinRound:ToggleVisible(true)
 
@@ -123,6 +124,7 @@ local function update(round: Types.PartialRound?)
                     entry:SetAttribute("CreditCost", equipment.Cost)
                     entry:SetAttribute("Description", equipment.Description)
                     
+                    entry.BackgroundTransparency = 0
                     entry.Image = equipment.Icon
                     entry.Name = equipment.Name
                     entry.Visible = true

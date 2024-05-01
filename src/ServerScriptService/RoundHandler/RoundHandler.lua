@@ -520,6 +520,7 @@ local function newRound(gamemode): Types.Round
                 Highlights = highlights
             }
 
+            self.RoundPhaseChange:Fire("Highlights")
             Adapters.SendRoundHighlights(self.Participants, highlights, events, scores, victors)
 
             local updateNeeded = Adapters.CheckForUpdate(self)
@@ -538,7 +539,7 @@ local function newRound(gamemode): Types.Round
                 end)
             end
 
-            self.RoundPhaseChange:Fire("Highlights")
+            self.RoundPhaseChange:Fire("Destroy")
             self.RoundPhaseChange:Destroy()
 
             self.Map:Destroy()

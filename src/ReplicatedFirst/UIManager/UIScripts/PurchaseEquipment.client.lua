@@ -14,7 +14,7 @@ local radarCooldown = 5
 
 local function update(item, credits)
 	UI.CurrentCredits.Text = "You have "..tostring(credits).." credit(s)."
-	if credits >= UI.ScrollingUI:FindFirstChild(item):GetAttribute("CreditCost") then
+	if credits >= UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost") then
 		UI.CreditCost.TextColor3 = Color3.new(0.294118, 1, 0.243137)
 		UI.CurrentCredits.TextColor3 = Color3.new(0.294118, 1, 0.243137)
 		purchaseButton.TextColor3 = Color3.fromRGB(56, 167, 31)
@@ -68,7 +68,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 		return
 	end
 	
-	local creditCost = UI.ScrollingUI:FindFirstChild(item):GetAttribute("CreditCost")
+	local creditCost = UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost")
 
 	local participant: RoundHandlerTypes.Participant? = getOwnInfo:InvokeServer()
 

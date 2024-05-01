@@ -77,7 +77,10 @@ getOwnInfo.OnServerInvoke = function(plr): RoundHandlerTypes.PartialParticipant?
 	if not p then
 		return
 	end
-	return p:ViewPartialParticipant(p)
+
+	local a = p:ViewPartialParticipant(p)
+	a.Credits = p.Credits
+	return a
 end
 
 getPartialRound.OnServerInvoke = function(plr)
@@ -129,8 +132,8 @@ joinRound.OnServerInvoke = function(plr)
 		round = RoundHandler.CreateRound(ServerStorage.Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
 		ServerStorage:SetAttribute("RoundID", round.ID)
 		round.RoundPhaseChange.Event:Connect(function(phase)
-			roundPhaseChange:FireAllClients(phase)
-			if phase ~= "Highlights" then
+			if phase ~= "Destroy" then
+				roundPhaseChange:FireAllClients(phase)
 				return
 			end
 
