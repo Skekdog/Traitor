@@ -233,7 +233,7 @@ function module.TransitionUIState(frame: Frame, open: boolean)
 	end
 	
 	local UI_TRANSITION_TIME = requestSetting:Invoke("Animate UI Transitions") and 0.2 or 0
-	local UI_SCALE_FACTOR = 0.75
+	local UI_SCALE_FACTOR = tonumber(requestSetting:Invoke("Close Scale"))
 	
 	local isSize = frame:GetAttribute("TransitionStyle") == "Size"
 	

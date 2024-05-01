@@ -1,5 +1,6 @@
---hoowah
+--!strict
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 
 export type AmmoType = "Assault Rifle" | "SMG" | "Pistol" | "Deagle" | "None"
 export type Weapon = {
@@ -33,13 +34,20 @@ export type Weapon = {
     Model: Model,
 }
 
+export type ExplosionInfo = {
+    Radius: number,
+    Pressure: number,
+    Damage: number,
+
+}
+
 local module = {}
 
 local function spawnProjectile()
 
 end
 
-module.CalculateDamage(weapon: Weapon, partName: string, distance: number): number
+function module.CalculateDamage(weapon: Weapon, partName: string, distance: number): number
     local damage = 0
     if partName == "Head" then
         damage = weapon.DamageHead
@@ -48,6 +56,12 @@ module.CalculateDamage(weapon: Weapon, partName: string, distance: number): numb
     else
         damage = weapon.DamageLimb
     end
+
+    return damage
+end
+
+function module.CreateExplosion(radius: number, pressure: number, damage: number, falloffStart: number, falloffEnd: number, falloffMultiplier: number, attacker: RoundHandlerTypes.Participant?, item: RoundHandlerTypes.Equipment?): ()
+    
 end
 
 return module
