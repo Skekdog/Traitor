@@ -49,7 +49,7 @@ local function radar()
 	end
 end
 
-UI.ScrollingUI.ChildAdded:Connect(function(v)
+UI.ScrollingFrame.ChildAdded:Connect(function(v)
 	if v:IsA("ImageButton") then
 		v.MouseButton1Click:Connect(function()
 			purchaseButton:SetAttribute("Item", v.Name)

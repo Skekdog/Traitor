@@ -58,7 +58,7 @@ local function createPlr(plr: Player)
 			end
 
 			for _, b in clone.Marks:GetChildren() do
-				if v.ClassName ~= "TextButton" then
+				if b.ClassName ~= "TextButton" then
 					continue
 				end
 				b.UIStroke.Enabled = false
