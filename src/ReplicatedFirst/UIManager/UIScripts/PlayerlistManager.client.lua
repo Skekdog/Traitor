@@ -19,11 +19,12 @@ local function findPlr(plr: Player)
 	return list:FindFirstChild("Player-"..plr.Name)
 end
 
-local function updatePlr(plr: Player, clone)
+function updatePlr(plr: Player, clone)
 	local participant: RoundHandlerTypes.PartialParticipant? = ReplicatedStorage.RoundHandler.GetPartialParticipant:InvokeServer(plr.Name)
 	if participant and participant.Role then
 		clone.Username.TextColor3 = participant.Role.Colour
 		clone.Username:SetAttribute("StyleData", "KeepText")
+		movePlr(plr, participant.Status)
 	end
 end
 
@@ -82,11 +83,9 @@ local function createPlr(plr: Player)
 	return clone
 end
 
-local function movePlr(plr: Player, status: "Alive" | "Missing" | "Dead" | "Spectating")
+function movePlr(plr: Player, status: "Alive" | "Missing" | "Dead" | "Spectating")
 	local clone = findPlr(plr) or createPlr(plr)
-	
 	clone.LayoutOrder = layoutOrders[status]+1
-
 	clone.Marks.Visible = status == "Alive"
 end
 

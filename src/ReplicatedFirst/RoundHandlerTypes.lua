@@ -66,17 +66,12 @@ export type RoleRelationship = "__All" | "__Ally" | "__Enemy" | RoleName -- when
 
 export type ScoreReason = "KilledEnemy" | "KilledAlly" | "LeftoverCredits" | "Actions" | string
 
-export type PartialRole = {
-    Name: string,   -- Name of the original Role.
-    Colour: Color3, -- Colour of the original Role.
-}
-
 export type MurderWeapon = Equipment | DeathType
 
 export type ParticipantStatus = "Alive" | "Missing" | "Dead"
 export type PartialParticipant = {
     Player: Player,
-    Role: PartialRole?,
+    Role: Role?,
     Status: ParticipantStatus
 }
 
@@ -301,7 +296,7 @@ export type Participant = {
     GetRole: (self: Participant) -> Role,       -- Returns this Participant's Role. Errors if nil.
     GetAllegiance: (self: Participant) -> Role, -- Returns this Participant's Role allegiance. Errors if nil.
     AssignRole: (self: Participant, role: Role) -> (), -- Assigns Role to this Participant. By default does not override inventory or credits.
-    TryViewParticipantRole: (self: Participant, target: Participant) -> PartialRole?,       -- Returns the target's RoleName and RoleColour, if allowed by the viewer's Role.
+    TryViewParticipantRole: (self: Participant, target: Participant) -> Role?,       -- Returns the target's Role, if allowed by the viewer's Role.
     ViewPartialParticipant: (self: Participant, target: Participant) -> PartialParticipant, -- Returns a limited view of the Participant, for clients.
     
     LeaveRound: (self: Participant) -> (), -- Removes this Participant from the Round.

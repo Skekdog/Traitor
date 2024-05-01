@@ -96,6 +96,15 @@ module["AvailableSettings"] = {
 		Callback = function() end,
 	},
 	{
+		Name = "Close Speed",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "",
+		PossibleValues = {"0.2", "0.3", "0.4", "0.5"},
+		Default = "0.75",
+		Callback = function() end,
+	},
+	{
 		Name = "Animate UI Transitions",
 		Tab = "Display",
 		Category = "User Interface",

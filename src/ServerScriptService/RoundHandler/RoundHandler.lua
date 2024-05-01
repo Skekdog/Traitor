@@ -140,10 +140,7 @@ local function newParticipant(round, plr): Types.Participant
                 return
             end
 
-            return {
-                Name = targetRole.Name,
-                Colour = targetRole.Colour
-            }
+            return targetRole
         end,
 
         AssignRole = function(self, role)

@@ -57,7 +57,6 @@ local stopMusic: (() -> ())?
 
 local lastTimerThread: thread?
 local function update(round: Types.PartialRound?)
-    print("airfairf")
     if lastTimerThread then
         task.cancel(lastTimerThread)
     end

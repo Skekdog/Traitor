@@ -232,7 +232,16 @@ function module.TransitionUIState(frame: Frame, open: boolean)
 		oldTween:Destroy()
 	end
 	
-	local UI_TRANSITION_TIME = requestSetting:Invoke("Animate UI Transitions") and 0.2 or 0
+	local UI_TRANSITION_TIME: number
+	if requestSetting:Invoke("Animate UI Transitions") then
+		if not open then
+			UI_TRANSITION_TIME = tonumber(requestSetting:Invoke("Close Speed")) :: any
+		else
+			UI_TRANSITION_TIME = 0.2
+		end
+	else
+		UI_TRANSITION_TIME = 0
+	end
 	local UI_SCALE_FACTOR = tonumber(requestSetting:Invoke("Close Scale"))
 	
 	local isSize = frame:GetAttribute("TransitionStyle") == "Size"
