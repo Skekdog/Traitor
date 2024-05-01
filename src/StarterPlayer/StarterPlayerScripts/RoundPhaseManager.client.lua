@@ -27,7 +27,7 @@ local function updateTimer()
 		return
 	end
 
-	local minutes = tostring(math.floor(timeTarget / 60))
+	local minutes = tostring(timeTarget // 60)
 	local seconds = tostring(math.fmod(timeTarget, 60))
 
 	if string.len(minutes) < 2 then
@@ -57,12 +57,13 @@ local stopMusic: (() -> ())?
 
 local lastTimerThread: thread?
 local function update(round: Types.PartialRound?)
+    print("airfairf")
     if lastTimerThread then
         task.cancel(lastTimerThread)
     end
 
     round = round or ReplicatedStorage.RoundHandler.GetPartialRound:InvokeServer()
-    local participant: Types.Participant? = ReplicatedStorage.GetOwnInfo:InvokeServer()
+    local participant: Types.Participant? = ReplicatedStorage.RoundHandler.GetOwnInfo:InvokeServer()
     local ownRole: Types.Role?
     if participant then
         ownRole = participant.Role
@@ -96,6 +97,7 @@ local function update(round: Types.PartialRound?)
 
     timeTarget = round.TimeMilestone
     lastTimerThread = task.spawn(function()
+        print(round)
         while workspace:GetServerTimeNow() < round.TimeMilestone do
             updateTimer()
             task.wait(1)
@@ -225,6 +227,8 @@ ReplicatedStorage.RoundHandler.RoundPause.OnClientEvent:Connect(function(pausedO
     timeTarget = pausedOrResumeTime
 end)
 
-ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(update)
+ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(function()
+    update()
+end)
 
 update()

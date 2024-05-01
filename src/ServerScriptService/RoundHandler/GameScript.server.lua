@@ -9,9 +9,11 @@ local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
 local getPartialParticipants = remotes.GetPartialParticipants
 local getPartialParticipant = remotes.GetPartialParticipant
+local roundPhaseChange = remotes.RoundPhaseChange
 local getPartialRound = remotes.GetPartialRound
 local getOwnInfo = remotes.GetOwnInfo
 local joinRound = remotes.JoinRound
+local getMaps = remotes.GetMaps
 local voteMap = remotes.VoteMap
 
 local function getMinimalParticipant(participant: RoundHandlerTypes.Participant): RoundHandlerTypes.PartialParticipant
@@ -19,6 +21,14 @@ local function getMinimalParticipant(participant: RoundHandlerTypes.Participant)
 		Player = participant.Player,
 		Status = participant.Status
 	}
+end
+
+getMaps.OnServerInvoke = function()
+	local names = {}
+	for _, v in ServerStorage.Maps:GetChildren() do
+		table.insert(names, v.Name)
+	end
+	return names
 end
 
 getPartialParticipants.OnServerInvoke = function(plr)
@@ -59,11 +69,15 @@ getPartialParticipant.OnServerInvoke = function(plr, targetName: string)
 	return getMinimalParticipant(target)
 end
 
-getOwnInfo.OnServerInvoke = function(plr)
+getOwnInfo.OnServerInvoke = function(plr): RoundHandlerTypes.PartialParticipant?
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then return end
 
-	return RoundHandler.GetRound(roundId):TryGetParticipant(plr.Name)
+	local p = RoundHandler.GetRound(roundId):TryGetParticipant(plr.Name)
+	if not p then
+		return
+	end
+	return p:ViewPartialParticipant(p)
 end
 
 getPartialRound.OnServerInvoke = function(plr)
@@ -104,7 +118,7 @@ local nextRoundReady = true
 local nextMap = "Mesa Monocraft"
 
 joinRound.OnServerInvoke = function(plr)
-	local round
+	local round: RoundHandlerTypes.Round
 	local roundId = ServerStorage:GetAttribute("RoundID")
 
 	if not nextRoundReady then
@@ -114,7 +128,12 @@ joinRound.OnServerInvoke = function(plr)
 	if not roundId then
 		round = RoundHandler.CreateRound(ServerStorage.Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
 		ServerStorage:SetAttribute("RoundID", round.ID)
-		round.RoundEndEvent.Event:Once(function()
+		round.RoundPhaseChange.Event:Connect(function(phase)
+			roundPhaseChange:FireAllClients(phase)
+			if phase ~= "Highlights" then
+				return
+			end
+
 			nextRoundReady = false
 			ServerStorage:SetAttribute("RoundID", nil)
 

@@ -18,7 +18,7 @@ local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0
 local module: Types.Adapter = {
     Configuration = {
         HIGHLIGHTS_TIME = 10, -- Time to spend after the round ends before destroying the round
-        PREPARING_TIME = 10, -- Time to spend after a round is created where players can join the round
+        PREPARING_TIME = 1, -- Time to spend after a round is created where players can join the round
         SLAY_VOTES = 2, -- Minimum number of votes to slay someone, at which point they will be slain
     },
 
@@ -105,10 +105,10 @@ local module: Types.Adapter = {
         remote:FireClient(recipient.Player, role.Name, role.Colour, role.Description, role.Extras.Sound)
     end,
 
-    SendRoundHighlights = function(recipients, highlights, events, scores)
+    SendRoundHighlights = function(recipients, highlights, events, scores, victors)
         local remote = remotes:FindFirstChild("SendHighlights") :: RemoteEvent
         for _, v in recipients do
-            remote:FireClient(v.Player, highlights, events, scores)
+            remote:FireClient(v.Player, highlights, events, scores, victors)
         end
     end,
 

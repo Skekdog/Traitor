@@ -117,7 +117,7 @@ for _, plr in Players:GetPlayers() do
 	end
 end
 
-ReplicatedStorage.RoundHandler.RoundPhaseChanged.OnClientEvent:Connect(function()
+ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(function()
 	for _, plr in Players:GetPlayers() do
 		updatePlr(plr, findPlr(plr))
 	end
