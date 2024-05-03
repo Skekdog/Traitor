@@ -1,3 +1,4 @@
+--!nocheck
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local wm = require(game.ServerScriptService.WeaponModule)
 

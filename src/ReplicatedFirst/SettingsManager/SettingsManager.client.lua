@@ -422,7 +422,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	end
 	
 	if not f then
-		return
+		continue
 	end
 	
 	f.Visible = true
@@ -439,6 +439,4 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		end
 		tooltip(setting.Tooltip, newPos)
 	end)
-
-	return
 end

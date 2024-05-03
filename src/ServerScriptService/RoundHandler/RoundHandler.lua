@@ -1,4 +1,5 @@
 -- The main RoundHandler. Used to create and interact with rounds.
+--!strict
 
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
@@ -139,10 +140,7 @@ local function newParticipant(round, plr): Types.Participant
                 return
             end
 
-            return {
-                Name = targetRole.Name,
-                Colour = targetRole.Colour
-            }
+            return targetRole
         end,
 
         AssignRole = function(self, role)
@@ -341,8 +339,7 @@ local function newRound(gamemode): Types.Round
         RoundPhase = "Waiting",
         Paused = false,
 
-        RoundStartEvent = Instance.new("BindableEvent"),
-        RoundEndEvent = Instance.new("BindableEvent"),
+        RoundPhaseChange = Instance.new("BindableEvent"),
 
         Participants = {},
         EventLog = {},
@@ -459,9 +456,15 @@ local function newRound(gamemode): Types.Round
             local participants = self.Participants
             API.ShuffleInPlace(participants)
 
+            local duration = self.Gamemode:Duration(#self.Participants)
+            self.TimeMilestone = workspace:GetServerTimeNow() + duration
+            self._roundTimerThread = task.delay(duration, function()
+                self:EndRound(self.Gamemode:TimeoutVictors(self))
+            end)
+
             gm:AssignRoles(participants)
 
-            return self.RoundStartEvent:Fire()
+            return self.RoundPhaseChange:Fire("Playing")
         end,
         PauseRound = function(self)
             if not self:IsRoundInProgress() then
@@ -500,6 +503,7 @@ local function newRound(gamemode): Types.Round
         EndRound = function(self, victors)
             self:LogEvent("Round", "End")
             self.RoundPhase = "Highlights"
+            self.TimeMilestone = workspace:GetServerTimeNow() + Adapters.Configuration.HIGHLIGHTS_TIME
 
             local scores = {}
             for _, v in self.Participants do
@@ -516,7 +520,8 @@ local function newRound(gamemode): Types.Round
                 Highlights = highlights
             }
 
-            Adapters.SendRoundHighlights(self.Participants, highlights, events, scores)
+            self.RoundPhaseChange:Fire("Highlights")
+            Adapters.SendRoundHighlights(self.Participants, highlights, events, scores, victors)
 
             local updateNeeded = Adapters.CheckForUpdate(self)
             if updateNeeded then
@@ -534,10 +539,8 @@ local function newRound(gamemode): Types.Round
                 end)
             end
 
-            self.RoundEndEvent:Fire()
-
-            self.RoundEndEvent:Destroy()
-            self.RoundStartEvent:Destroy()
+            self.RoundPhaseChange:Fire("Destroy")
+            self.RoundPhaseChange:Destroy()
 
             self.Map:Destroy()
 

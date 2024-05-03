@@ -52,6 +52,10 @@ end
 -- I don't like this
 function module.GetWeaponHighlights(roundEvents: {["Death"]: {Types.RoundEvent_Death}}): {[Types.EquipmentName]: {Types.Username | Types.PositiveInteger}}
     local deathEvents = roundEvents.Death
+
+    if not deathEvents then
+        return {}
+    end
     
     local counter: {[Types.EquipmentName]: {[Types.Participant]: Types.Integer}} = {} -- yeah i'm not giving this a nice name
     for _, v in deathEvents do

@@ -11,7 +11,7 @@ local UIS = game:GetService("UserInputService")
 local module = {}
 
 local function getSetting(name)
-	return ReplicatedFirst.Settings.GetSetting:Invoke(name)
+	return ReplicatedFirst.SettingsManager.RequestSetting:Invoke(name)
 end
 
 type params = any

@@ -1,11 +1,10 @@
---!nolint
 -- Implementation-dependent functions that *should* be customised.
-
-error("UPDATE THE CheckForUpdate ADAPTER!")
 
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
+local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
 local API = require(script.Parent.API)
 local Types = require(ReplicatedFirst.RoundHandlerTypes)
 
@@ -13,6 +12,8 @@ local getProfile = ServerScriptService.PlayerSetup.GetProfile
 local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile
 
 local remotes = ReplicatedStorage:FindFirstChild("RoundHandler")
+
+local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
 
 local module: Types.Adapter = {
     Configuration = {
@@ -24,31 +25,27 @@ local module: Types.Adapter = {
     GiveEquipment = function(participant, item)
         -- Gives an item to a player. If the item is a function, calls it. The standard implementation uses the Backpack.
         -- Returns a string if there was an issue giving the item.
+
+        local plr = participant.Player
+
         if type(item.Item) == "function" then
             item.Item(participant, item.Name)
+            remotes.InformClientSideEquipment:FireClient(plr, item.Name)
             return
         end
-    
-        local plr = participant.Player
-        if not plr.Parent then
-            return "PlayerDisconnected"
+
+        local slot = item.Item:GetAttribute("Slot")
+        for _,v in plr:WaitForChild("Inventory"):GetChildren() do
+            if v:GetAttribute("Slot") == slot then
+                return "SlotError"
+            end
         end
-        
-		local backpack = plr:FindFirstChildOfClass("Backpack")
-		print(item.Item.Name)
-        if backpack and backpack:FindFirstChild(item.Item.Name) then
-            return "EquipmentAlreadyInInventory"
-        end
-        item.Item:Clone().Parent = backpack
+        item.Item:Clone().Parent = plr:WaitForChild("Inventory", 0.001)
+
         return
     end,
 
     RemoveEquipment = function(participant, item)
-        -- Removes an item from a player. The standard implementation uses the Backpack.
-        if not participant.Player.Parent then
-            return
-        end
-        return ((participant.Player:FindFirstChild("Backpack") :: Backpack):FindFirstChild(item.Name) :: Tool):Destroy()
     end,
 
     CheckForUpdate = function(round)
@@ -60,10 +57,21 @@ local module: Types.Adapter = {
     
         -- Additional processing, such as saving player data, can also be done here.
     
+        if not game:GetService("RunService"):IsStudio() then
+            local newVersion: ProfileService.Profile & {Data: {Version: string}} = ProfileStore:ViewProfileAsync("Version")
+
+            if newVersion then
+                if newVersion.Data.Version ~= script:GetAttribute("Version") then
+                    ServerStorage:SetAttribute("ServerLocked", true)
+                    ServerScriptService.PlayerSetup.ReleaseAllProfiles:Fire()
+                    return true
+                end
+            end
+        end
         return false
     end,
 
-    SendMessage = function(recipients, message, severity, messageType, isGlobal)
+    SendMessage = function(message, severity, messageType, recipients)
         -- If isGlobal = true, then recipients is empty. The adapter is expected to send this message to all connected players (Players:GetPlayers()).
         -- Sends a private server message to each recipient.
         -- The message can be further processed here, such as using rich text to change text colour depending on severity.
@@ -81,7 +89,7 @@ local module: Types.Adapter = {
         end
         message = `<font color='{fontColour}'>{message}</font>`
 
-        if isGlobal then
+        if recipients == true then
             return remote:FireAllClients(message, messageType)
         end
         for _, v in recipients do
@@ -94,13 +102,13 @@ local module: Types.Adapter = {
 
     SendRoleAlert = function(recipient, role)
         local remote = remotes:FindFirstChild("SendRoleAlert") :: RemoteEvent
-        remote:FireClient(recipient.Player, role.Name, role.Colour, role.Description)
+        remote:FireClient(recipient.Player, role.Name, role.Colour, role.Description, role.Extras.Sound)
     end,
 
-    SendRoundHighlights = function(recipients, highlights, events, scores)
+    SendRoundHighlights = function(recipients, highlights, events, scores, victors)
         local remote = remotes:FindFirstChild("SendHighlights") :: RemoteEvent
         for _, v in recipients do
-            remote:FireClient(v.Player, highlights, events, scores)
+            remote:FireClient(v.Player, highlights, events, scores, victors)
         end
     end,
 

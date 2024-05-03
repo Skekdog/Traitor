@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local plr = Players.LocalPlayer
 local API = require(ReplicatedFirst.API)
-local UI = require(game:GetService("ReplicatedFirst").UIManager)
+local UI = require(ReplicatedFirst.UIManager)
 local roundInfo = UI.WaitForUI("RoundInfo").UI
 local this = UI.WaitForUI("JoinRound")
 

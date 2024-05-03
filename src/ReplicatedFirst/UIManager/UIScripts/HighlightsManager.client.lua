@@ -1,60 +1,57 @@
-local ui = script.Parent
 local uiManager = require(game:GetService("ReplicatedFirst").UIManager)
 local API = require(game.ReplicatedFirst.API)
 
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 
-local hFrame, eFrame, sFrame = ui.Page.Highlights, ui.Page.Events, ui.Page.Scores
+local UI = uiManager.WaitForUI("Highlights")
+local page = UI.UI.Page
+
+local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
 local eTemplate = eFrame.Template
 
-ReplicatedStorage.OnClientEvent:Connect(function(phase, round, result)
-	if (phase ~= "Highlights") or (round ~= "Main") then return end
-	local soloVictor, music, victors = result.SoloVictor, result.Music[2], result.Victors
-	local events, _scores, _highlights = result.Events, result.Scores, result.Highlights
-	
-	hFrame.Winners.TextColor3 = ReplicatedStorage.ClientServer.GetRoundInfo:InvokeServer("Main", "Round").RoundInfo.Gamemode.Roles[victors].Colour
-	hFrame.Winners.Text = (soloVictor and soloVictor:upper().." WINS") or "THE "..victors:upper().."S WIN"
-	hFrame.Music:FindFirstChild("Text").Text = music
-	
-	for _, v in eFrame:GetChildren() do if (v.Name ~= "UIListLayout") and ((v.Name ~= "Template") and (v.Name ~= "EventFilters")) then v:Destroy() end end
-	for _, v in sFrame:GetChildren() do if (v.Name ~= "UIListLayout") and (v.Name ~= "Template") then v:Destroy() end end
-	
-	--for _, v in highlights do
-		
-	--end
-	for i, v in events do
+ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {RoundHandlerTypes.RoundHighlight}, events: {RoundHandlerTypes.UserFacingRoundEvent}, scores: {[RoundHandlerTypes.Participant]: RoundHandlerTypes.ParticipantScoring}, victors: RoundHandlerTypes.Role)
+	print(highlights)
+	hFrame.Winners.Text = `THE {victors.Name:upper()} WIN`
+	hFrame.Winners.TextColor3 = victors.Colour
+
+	for _, v in eFrame:GetChildren() do
+		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.Name ~= "EventFilters" then
+			v:Destroy()
+		end
+	end
+	for _, v in sFrame:GetChildren() do
+		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" then
+			v:Destroy()
+		end
+	end
+	for _, v in hFrame.Highlights:GetChildren() do
+		if v.ClassName == "Frame" then
+			v.Description.Text = ""
+			v.Highlight.Text = ""
+		end
+	end
+
+	for i, v in highlights do
+		if i >= 5 then
+			break
+		end
+		local h = hFrame.Highlights:FindFirstChild("Highlight"..tostring(i))
+		h.Description.Text = v.Description
+		h.Highlight.Text = v.Name
+	end
+	-- todo: need something for syncing music
+
+	for _, v in events do
 		local e = eTemplate:Clone()
-		
 		e.TextLabel.Text = v.Text
-		e.Time.Text = v.RoundTime
-		
-		local correctImage, correct = e.CorrectDamage, v.Correct
-		if correct then
-			correctImage.Image = "rbxassetid://6972510111"
-			correctImage.Visible = true
-		elseif correct == false then
-			correctImage.Image = "rbxassetid://15000532008"
-			correctImage.Visible = true
-		else
-			correctImage.Visible = false
-		end
-		
-		e.SelfDefense.Visible = v.SelfDefense
-		
-		for _, k in eFrame.EventFilters:GetChildren() do
-			if k:GetAttribute("Visible") then
-				e.Visible = true
-				break
-			end
-		end
-		e.LayoutOrder = i+1
-		
-		e:SetAttribute("Category", v.Category)
-		e.Name = "Event"..tostring(i)
+		e.Time.Text = v.Timestamp
+		e.Visible = true
 		e.Parent = eFrame
 	end
 	
-	uiManager.WaitForUI("Highlights"):ToggleVisible(true)
+	UI:ToggleVisible(true)
 end)
 
 local pageOrders = {
@@ -69,16 +66,16 @@ local function showTab(tab)
 		return
 	end
 	script:SetAttribute("CurrentTab", tab)
-	API.TransitionUIPage(ui.Page:FindFirstChild(curPage), pageOrders[curPage], ui.Page:FindFirstChild(tab), pageOrders[tab], UDim2.fromScale(0.5, 0.5))
+	API.TransitionUIPage(page:FindFirstChild(curPage), pageOrders[curPage], page:FindFirstChild(tab), pageOrders[tab], UDim2.fromScale(0.5, 0.5))
 end
 
 local function _adjustEventFilter(filter, visible)
 	for _, v in eFrame:GetChildren() do if v:GetAttribute("Category") == filter then v.Visible = visible end end
 end
 
-ui.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
-ui.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
-ui.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
+page.Parent.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
+page.Parent.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
+page.Parent.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
 
 for _, v in eFrame.EventFilters:GetChildren() do
 	if v.ClassName == "UIGridLayout" then continue end

@@ -87,6 +87,24 @@ module["AvailableSettings"] = {
 		Callback = function(val) UI.UpdateTheme(val) end,
 	},
 	{
+		Name = "Close Scale",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "",
+		PossibleValues = {"0", "0.25", "0.5", "0.75"},
+		Default = "0.75",
+		Callback = function() end,
+	},
+	{
+		Name = "Close Speed",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "",
+		PossibleValues = {"0.2", "0.3", "0.4", "0.5"},
+		Default = "0.75",
+		Callback = function() end,
+	},
+	{
 		Name = "Animate UI Transitions",
 		Tab = "Display",
 		Category = "User Interface",
@@ -478,7 +496,7 @@ local function keybindToJson(keybind: KeybindSetting): string
 		end
 	end
 	keycodeText = keycodeText..']'
-	return `\{"Keycodes":{keycodeText},"Toggled":{keybind.Toggled}}"`
+	return `\{"Keycodes":{keycodeText},"Toggled":{keybind.Toggled}}`
 end
 
 function module.JSONEncode(): string

@@ -17,9 +17,9 @@ local joinRound = UIManager.WaitForUI("JoinRound")
 local timeTarget = 0
 local paused = false
 local lastTime = ""
-local function updateTimer()
+local function updateTimer(time)
     if paused then
-		if os.time()%2 == 1 then --Alternate every second
+		if time%2 == 1 then --Alternate every second
 			roundInfo.Timer.Text = "PAUSED"
 		else
 			roundInfo.Timer.Text = lastTime
@@ -27,8 +27,9 @@ local function updateTimer()
 		return
 	end
 
-	local minutes = tostring(math.floor(timeTarget / 60))
-	local seconds = tostring(math.fmod(timeTarget, 60))
+    local diffTime = math.max(math.round(timeTarget) - math.round(time), 0)
+	local minutes = tostring(diffTime // 60)
+	local seconds = tostring(math.fmod(diffTime, 60))
 
 	if string.len(minutes) < 2 then
 		minutes = "0"..minutes
@@ -62,13 +63,14 @@ local function update(round: Types.PartialRound?)
     end
 
     round = round or ReplicatedStorage.RoundHandler.GetPartialRound:InvokeServer()
-    local participant: Types.Participant? = ReplicatedStorage.GetOwnInfo:InvokeServer()
+    local participant: Types.Participant? = ReplicatedStorage.RoundHandler.GetOwnInfo:InvokeServer()
     local ownRole: Types.Role?
     if participant then
         ownRole = participant.Role
     end
 
     if not round then
+        print("nay round")
         -- Allow for creation of a new round
         joinRound:ToggleVisible(true)
 
@@ -96,9 +98,11 @@ local function update(round: Types.PartialRound?)
 
     timeTarget = round.TimeMilestone
     lastTimerThread = task.spawn(function()
-        while workspace:GetServerTimeNow() < round.TimeMilestone do
-            updateTimer()
+        local t = workspace:GetServerTimeNow()
+        while t < round.TimeMilestone do
+            updateTimer(t)
             task.wait(1)
+            t = workspace:GetServerTimeNow()
         end
     end)
 
@@ -106,7 +110,7 @@ local function update(round: Types.PartialRound?)
         if ownRole then
             if #ownRole.EquipmentShop > 0 then
                 local shop = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI
-                shop.PurchaseEquipment.Reset:Fire()
+                shop.Reset:Fire()
 
                 local nameToObj = {}
                 for _, e in round.Gamemode.AvailableEquipment do
@@ -116,10 +120,11 @@ local function update(round: Types.PartialRound?)
                 for _, v in ownRole.EquipmentShop do
                     local equipment = nameToObj[v]
                     
-                    local entry = shop.Entry:Clone()
+                    local entry = shop.EquipmentEntry:Clone()
                     entry:SetAttribute("CreditCost", equipment.Cost)
                     entry:SetAttribute("Description", equipment.Description)
                     
+                    entry.BackgroundTransparency = 0
                     entry.Image = equipment.Icon
                     entry.Name = equipment.Name
                     entry.Visible = true
@@ -225,6 +230,8 @@ ReplicatedStorage.RoundHandler.RoundPause.OnClientEvent:Connect(function(pausedO
     timeTarget = pausedOrResumeTime
 end)
 
-ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(update)
+ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(function()
+    update()
+end)
 
 update()

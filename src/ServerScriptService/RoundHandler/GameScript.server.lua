@@ -9,9 +9,11 @@ local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
 local getPartialParticipants = remotes.GetPartialParticipants
 local getPartialParticipant = remotes.GetPartialParticipant
+local roundPhaseChange = remotes.RoundPhaseChange
 local getPartialRound = remotes.GetPartialRound
 local getOwnInfo = remotes.GetOwnInfo
 local joinRound = remotes.JoinRound
+local getMaps = remotes.GetMaps
 local voteMap = remotes.VoteMap
 
 local function getMinimalParticipant(participant: RoundHandlerTypes.Participant): RoundHandlerTypes.PartialParticipant
@@ -21,9 +23,17 @@ local function getMinimalParticipant(participant: RoundHandlerTypes.Participant)
 	}
 end
 
+getMaps.OnServerInvoke = function()
+	local names = {}
+	for _, v in ServerStorage.Maps:GetChildren() do
+		table.insert(names, v.Name)
+	end
+	return names
+end
+
 getPartialParticipants.OnServerInvoke = function(plr)
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then return end
+	if not roundId then return {} end
 
 	local round = RoundHandler.GetRound(roundId)
 	local self = round:TryGetParticipant(plr.Name)
@@ -59,13 +69,18 @@ getPartialParticipant.OnServerInvoke = function(plr, targetName: string)
 	return getMinimalParticipant(target)
 end
 
-getOwnInfo.OnServerInvoke = function(plr)
+getOwnInfo.OnServerInvoke = function(plr): RoundHandlerTypes.PartialParticipant?
 	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
+	if not roundId then return end
+
+	local p = RoundHandler.GetRound(roundId):TryGetParticipant(plr.Name)
+	if not p then
 		return
 	end
 
-	return RoundHandler.GetRound(roundId):TryGetParticipant(plr.Name)
+	local a = p:ViewPartialParticipant(p)
+	a.Credits = p.Credits
+	return a
 end
 
 getPartialRound.OnServerInvoke = function(plr)
@@ -106,7 +121,7 @@ local nextRoundReady = true
 local nextMap = "Mesa Monocraft"
 
 joinRound.OnServerInvoke = function(plr)
-	local round
+	local round: RoundHandlerTypes.Round
 	local roundId = ServerStorage:GetAttribute("RoundID")
 
 	if not nextRoundReady then
@@ -114,14 +129,20 @@ joinRound.OnServerInvoke = function(plr)
 	end
 
 	if not roundId then
-		round = RoundHandler.CreateRound(nextMap, gamemodes[math.random(1, #gamemodes)])
-		round.RoundEndEvent.Event:Once(function()
+		round = RoundHandler.CreateRound(ServerStorage.Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
+		ServerStorage:SetAttribute("RoundID", round.ID)
+		round.RoundPhaseChange.Event:Connect(function(phase)
+			if phase ~= "Destroy" then
+				roundPhaseChange:FireAllClients(phase)
+				return
+			end
+
 			nextRoundReady = false
 			ServerStorage:SetAttribute("RoundID", nil)
 
 			local votes = {}
 			for _, map in ServerStorage.Maps:GetChildren() do
-				votes[map] = {}
+				votes[map.Name] = {}
 			end
 			local voteCon = voteMap.OnServerEvent:Connect(function(plr, map)
 				if not table.find(votes[map], plr) then
