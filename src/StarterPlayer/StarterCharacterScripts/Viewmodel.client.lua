@@ -3,6 +3,7 @@ local CAS = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 local plr = Players.LocalPlayer
@@ -277,18 +278,16 @@ Players.LocalPlayer.Inventory.ChildAdded:Connect(function(child)
 
 							aimCount = aimCount + 1
 							local current = aimCount
-							local co
-							co = coroutine.create(function()
-								for t = 0, 101, 10 do
-									if (current ~= aimCount) then break end
-									game:GetService("RunService").RenderStepped:Wait()
-									if not joint then break end
-									joint.C1 = start:Lerp(goal, t/100)
+							local num = 0
+							local con
+							con = RunService.RenderStepped:Connect(function(dt)
+								num += 10
+								if (num > 101) or (current ~= aimCount) or (not joint) then
+									return con:Disconnect()
 								end
-								coroutine.yield(co)
-								coroutine.close(co)
+								joint.C1 = start:Lerp(goal, num / 100 * dt)
+								return
 							end)
-							coroutine.resume(co)
 						end
 					end
 
