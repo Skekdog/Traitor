@@ -20,6 +20,7 @@ export type MessageType = "update" | "bodyFound" | "disconnect" | "creditsEarned
 export type Adapter = {
     Configuration: {
         PREPARING_TIME: number,
+        MAP_VOTING_TIME: number,
         HIGHLIGHTS_TIME: number,
         SLAY_VOTES: PositiveInteger,
     },
@@ -37,6 +38,8 @@ export type Adapter = {
     SendMessage: (message: string, severity: MessageSeverity, messageType: MessageType, recipients: {Participant}) -> () & (message: string, severity: MessageSeverity, messageType: MessageType, isGlobal: true) -> (),
     SendRoleAlert: (recipient: Participant, role: Role) -> (),
     CheckForUpdate: (round: Round) -> boolean,
+    ShouldStartMapVote: (round: Round) -> boolean,
+    TriggerMapVote: (round: Round) -> (),
     SendRoundHighlights: (recipients: {Participant}, highlights: {RoundHighlight}, events: {UserFacingRoundEvent}, scores: {[FormattedUsername]: ParticipantScoring}, victors: Role) -> (),
 
     OnCharacterLoad: (char: Model) -> (),
