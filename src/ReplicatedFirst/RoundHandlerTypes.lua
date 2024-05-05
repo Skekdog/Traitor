@@ -42,8 +42,8 @@ export type Adapter = {
     TriggerMapVote: (round: Round) -> (),
     SendRoundHighlights: (recipients: {Participant}, highlights: {RoundHighlight}, events: {UserFacingRoundEvent}, scores: {[FormattedUsername]: ParticipantScoring}, victors: Role) -> (),
 
-    OnCharacterLoad: (char: Model) -> (),
-    OnDeath: (char: Model) -> (),
+    OnCharacterLoad: (participant: Participant) -> (),
+    OnDeath: (victim: Participant) -> (),
 }
 
 export type Extras = {[any]: any}?
@@ -316,6 +316,7 @@ export type Participant = {
     KilledByHeadshot: boolean,             -- True if they were killed by a headshot.
     Kill: (self: Participant, attacker: Participant?, weapon: MurderWeapon?, headshot: boolean?, ignoreKarma: boolean?) -> (), -- Sets the Humanoid's Health to 0 and sets relevant properties on the Participant.
     
+    IsDamageJustifiedAgainst: (self: Participant, target: Participant) -> boolean, -- true if selfdefense, freekill, or enemy
     Karma: number,                     -- The Participant's current karma. When the round ends, this is applied using Adapters.SetKarma() if applicable. Initially set by Adapters.GetKarma().
     FreeKillReasons: {FreeKillReason}, -- A list of all the reasons this Participant is a Free Kill, if any. Free kill can be checked by #FreeKillReasons == 0.
     SlayVotes: {Participant},          -- A list of Participants who have voted to slay this person due to RDM.

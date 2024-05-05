@@ -46,7 +46,7 @@ local function onDeath(self: Types.Participant)
     }
 
     self.Round:LogEvent("Death", data)
-    Adapters.OnDeath(self.Character)
+    Adapters.OnDeath(self)
     self.Round.Gamemode:OnDeath(self)
 end
 
@@ -326,6 +326,20 @@ local function newParticipant(round, plr): Types.Participant
                 hum.Health = 0
             end
         end,
+
+        IsDamageJustifiedAgainst = function(self, target)
+            if self.Round:CompareRoles(self:GetRole(), self:GetRole(), "__Enemy") then
+                return true
+            end
+            if self:HasSelfDefenseAgainst(target) then
+                return true
+            end
+
+            if #target.FreeKillReasons > 0 then
+                return true
+            end
+            return false
+        end
     }
 end
 
@@ -408,7 +422,7 @@ local function newRound(gamemode): Types.Round
                 char:PivotTo((spawns[chosen] :: BasePart).CFrame)
                 local hum: Humanoid = char:WaitForChild("Humanoid") :: Humanoid
                 participant.Character = char
-                Adapters.OnCharacterLoad(char)
+                Adapters.OnCharacterLoad(participant)
                 self.Gamemode:OnCharacterLoad(char)
                 hum.Died:Once(function()
                     if self:IsRoundPreparing() then

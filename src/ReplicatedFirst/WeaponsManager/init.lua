@@ -3,26 +3,47 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 local Adapters = require(ServerScriptService.RoundHandler.Adapters)
 local API = require(ReplicatedFirst.API)
 
 type BeforeHitFunction = (attacker: RoundHandlerTypes.Participant?, target: RoundHandlerTypes.Participant, willDie: boolean) -> ()
+type AimInfo = {
+    FOV: number,
+    HasScope: boolean?,
+    ScopeRequired: boolean?,
+    SpreadMultiplier: number,
+}
+type DamageInfo = number | {
+    Head: number,
+    Body: number,
+    Limb: number,
+}
+type MultiUseInfo = {
+    FireTime: number, -- Delay between firing
+    ReloadTime: number,
+    MaxReserve: number,
+    MagazineSize: number,
+    AmmoType: AmmoType?,
+}
+type ProjectileInfo = {
+    Base: PVInstance,
+    Speed: number,
+}
 
-export type Entity = RoundHandlerTypes.Participant | RoundHandlerTypes.Prop
+type Entity = RoundHandlerTypes.Participant | RoundHandlerTypes.Prop
 
-export type AmmoType = "Assault Rifle" | "SMG" | "Pistol" | "Deagle"
+export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
 export type Weapon = {
     Name: string,
     Description: string,
 
     Slot: number,
-    CanDrop: boolean?,
+    CanDrop: boolean,
 
-    DamageHead: number,
-    DamageBody: number,
-    DamageLimb: number,
+    Damage: DamageInfo,
 
     FalloffStart: number,
     FalloffEnd: number,
@@ -31,31 +52,19 @@ export type Weapon = {
     ExplosionInfo: ExplosionInfo?,
     FuseTime: number?,
 
-    CanAim: boolean?,
-    AimFOV: number,
-    AimSensitivityMultiplier: number,
+    AimInfo: AimInfo | false, -- nil if aiming should be disabled
 
     Recoil: number,
     Spread: number,
-    AimSpreadMultiplier: number,
+    
+    MultiUse: MultiUseInfo | false,
+    BulletsPerShot: number?,
 
-    HasScope: boolean?,
-    ScopeRequired: boolean?, -- Required to be scoped in to shoot
-
-    FireTime: number, -- Delay between firing
-    BulletsPerShot: number,
-
-    ProjectileBase: PVInstance?,
-    ProjectileSpeed: number?,
-
-    ReloadTime: number,
-    MaxReserve: number,
-    MagazineSize: number,
-    AmmoType: AmmoType?,
-
-    BeforeHitParticipant: BeforeHitFunction?,
+    ProjectileInfo: ProjectileInfo | false,
 
     Model: Model,
+
+    BeforeHitParticipant: BeforeHitFunction?,
 }
 
 export type ExplosionInfo = {
@@ -71,13 +80,17 @@ export type ExplosionInfo = {
 local module = {}
 
 local function calculateDamage(attacker: RoundHandlerTypes.Participant?, weapon: Weapon, partName: string, distance: number): number
-    local damage
-    if partName == "Head" then
-        damage = weapon.DamageHead
-    elseif partName == "HumanoidRootPart" or partName:match("Torso") then
-        damage = weapon.DamageBody
+    local damage: number
+    if type(weapon.Damage) == "table" then
+        if partName == "Head" then
+            damage = weapon.Damage.Head
+        elseif partName == "HumanoidRootPart" or partName:match("Torso") then
+            damage = weapon.Damage.Body
+        else
+            damage = weapon.Damage.Limb
+        end
     else
-        damage = weapon.DamageLimb
+        damage = weapon.Damage
     end
 
     if distance >= weapon.FalloffStart then
@@ -111,11 +124,9 @@ local function onEntityHit(round: RoundHandlerTypes.Round, weapon: Weapon, attac
 
     local canDamage = if sameTeam then round.Gamemode.FriendlyFire else true
     if canDamage then
+        local willDie = (hum.Health - damage) <= 0
         if type(entity) == "table" then
-            local willDie = false
-            if (hum.Health - damage) <= 0 then
-                willDie = true
-
+            if willDie then
                 local death = (entity.Character:FindFirstChild("HumanoidRootPart") :: any):FindFirstChild("DeathSound", true)
                 if death and partName == "Head" then
                     death.Volume = 0
@@ -126,14 +137,16 @@ local function onEntityHit(round: RoundHandlerTypes.Round, weapon: Weapon, attac
                 entity:AddSelfDefense(attacker, 15)
             end
 
-            if attacker and not attacker:HasSelfDefenseAgainst(entity) and #entity.FreeKillReasons < 1 then
-                attacker.Karma -= damage * 1.5
+            if attacker then
+                local karmaDiff = damage * 1.5
+                karmaDiff *= if attacker:IsDamageJustifiedAgainst(entity) then 1 else -1
+                attacker.Karma += karmaDiff
             end
 
             if weapon.BeforeHitParticipant then
                 weapon.BeforeHitParticipant(attacker, entity, willDie)
             end
-        elseif entity.OnBreak then
+        elseif entity.OnBreak and willDie then
             (require)(entity.OnBreak)(if attacker then attacker.Player else nil)
         end
         
@@ -203,6 +216,24 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo,
     explosion.BlastPressure = explosionInfo.Pressure
     explosion.DestroyJointRadiusPercent = 0
     explosion.ExplosionType = Enum.ExplosionType.NoCraters
+
+    local soundPart = Instance.new("Part")
+	soundPart.Transparency = 1
+	soundPart.CanTouch = false
+	soundPart.CanCollide = false
+	soundPart.CanQuery = false
+	soundPart.Anchored = true
+	soundPart.Position = position
+	soundPart.CastShadow = false
+	soundPart.Size = Vector3.zero
+	soundPart.Parent = (workspace :: any).Proj.ImpactHoles
+    
+	local sound = (ServerStorage :: any).ExplosionSound:Clone()
+	sound.Parent = soundPart
+	sound.Ended:Connect(function()
+		soundPart:Destroy()
+	end)
+    sound:Play()
 
     explosion.Parent = workspace
 end

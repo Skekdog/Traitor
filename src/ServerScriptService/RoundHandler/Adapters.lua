@@ -159,7 +159,7 @@ local module: Types.Adapter = {
     end,
 
     OnCharacterLoad = function(char)
-        -- You could, for example, implement ragdolls here
+        ServerStorage.DeathSound:Clone().Parent = char
     end,
 
     SendSlayVote = function(to, target)
@@ -171,8 +171,32 @@ local module: Types.Adapter = {
         return 1-((1000 - karma) / 1000)
     end,
 
-    OnDeath = function(char)
-        -- As above
+    OnDeath = function(victim)
+        local char = victim.Character
+        if not char:IsDescendantOf(workspace) then
+            return
+        end
+
+        char.Archivable = true
+        local clone = char:Clone()
+        
+        ServerStorage.RagdollJoints:Clone().Parent = clone
+
+        local root = clone:FindFirstChild("HumanoidRootPart")
+        local hum = clone:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
+            hum.EvaluateStateMachine = false
+        end
+        if root then
+            root.CanCollide = false
+            root.CanTouch = false
+            root.CanQuery = false
+        end
+
+        char:Destroy()
+        clone.Parent = workspace
+        victim.Character = clone
     end,
 
     CalculateUserFacingEvents = function(events, winners)
