@@ -2,8 +2,8 @@ local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
-local Controls = require(game:GetService("ReplicatedFirst").ControlManager)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Controls = require(ReplicatedFirst.ControlManager)
 
 local plr = Players.LocalPlayer
 local cam = workspace.CurrentCamera

@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 local UIManager = require(script.Parent.Parent)
 
 local ui = UIManager.WaitForUI("Playerlist").UI

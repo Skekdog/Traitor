@@ -1,7 +1,7 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local API = require(ReplicatedFirst.API)
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 local uiManager = require(ReplicatedFirst.UIManager)
 
 local UI = uiManager.WaitForUI("Highlights")

@@ -1,17 +1,15 @@
 -- The main RoundHandler. Used to create and interact with rounds.
---!strict
 
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local Adapters = require(script.Parent.Adapters)
-local Types = require(ReplicatedFirst.RoundHandlerTypes)
+local Types = require(script.Parent.RoundHandlerTypes)
 local API = require(script.Parent.API)
 
---- The main module. New rounds are created from here via module.CreateRound().
+-- The main module. New rounds are created from here via module.CreateRound().
 local module = {
     Rounds = {}
 }
@@ -148,7 +146,7 @@ local function newParticipant(round, plr): Types.Participant
             self.Role = role
             self.Credits += role.StartingCredits
             for _, v in role.StartingEquipment do
-                Adapters.GiveEquipment(self, self.Round:GetEquipment(v))
+                Adapters.GiveEquipment(self, self.Round:GetEquipment(v) :: Types.Equipment)
             end
             Adapters.SendRoleAlert(self, role)
             role:OnRoleAssigned(self)
@@ -353,7 +351,7 @@ local function newRound(gamemode): Types.Round
         RoundPhase = "Waiting",
         Paused = false,
 
-        RoundPhaseChange = Instance.new("BindableEvent"),
+        RoundPhaseChangeEvent = Instance.new("BindableEvent") :: any,
 
         Participants = {},
         EventLog = {},
@@ -378,14 +376,6 @@ local function newRound(gamemode): Types.Round
                     return participant
                 end
             end
-            error(`Could not find Participant {name} in Round {self.ID}`)
-        end,
-        TryGetParticipant = function(self, name)
-            for _, participant in self.Participants do
-                if participant.Player.Name == name then
-                    return participant
-                end
-            end
             return
         end,
         GetParticipantsWithRole  = function(self, roleName)
@@ -400,7 +390,7 @@ local function newRound(gamemode): Types.Round
         end,
         
         JoinRound = function(self, plr)
-            if self:TryGetParticipant(plr.Name) then
+            if self:GetParticipant(plr.Name) then
                 error(`{plr.Name} is already a Participant in Round {self.ID}`)
             end
             if not self:IsRoundPreparing() then
@@ -478,7 +468,7 @@ local function newRound(gamemode): Types.Round
 
             gm:AssignRoles(participants)
 
-            return self.RoundPhaseChange:Fire("Playing")
+            return self.RoundPhaseChangeEvent:Fire("Playing")
         end,
         PauseRound = function(self)
             if not self:IsRoundInProgress() then
@@ -527,15 +517,17 @@ local function newRound(gamemode): Types.Round
             local events = Adapters.CalculateUserFacingEvents(self.EventLog, victors)
             local highlights = self.Gamemode:CalculateRoundHighlights(self)
 
+            assert(victors.VictoryMusic)
             self.RoundEndInfo = {
                 Winners = victors,
                 Events = events,
                 Scores = scores,
-                Highlights = highlights
+                Highlights = highlights,
+                Music = victors.VictoryMusic[math.random(1, math.max(#victors.VictoryMusic, 1))]
             }
 
-            self.RoundPhaseChange:Fire("Highlights")
-            Adapters.SendRoundHighlights(self.Participants, highlights, events, scores, victors)
+            self.RoundPhaseChangeEvent:Fire("Highlights")
+            Adapters.SendRoundHighlights(self.Participants, highlights, events, scores)
 
             local updateNeeded = Adapters.CheckForUpdate(self)
             if updateNeeded then
@@ -553,10 +545,8 @@ local function newRound(gamemode): Types.Round
                 end)
             end
 
-            self.RoundPhaseChange:Fire("Destroy")
-            self.RoundPhaseChange:Destroy()
-
             self.Map:Destroy()
+            self.RoundPhaseChangeEvent:Fire("Intermission")
 
             module.Rounds[self.ID] = nil
         end,
@@ -590,11 +580,11 @@ local function newRound(gamemode): Types.Round
                         weapon.Anchored = false
                         
                         weapon.Touched:Connect(function(part)
-                            local plr = Players:GetPlayerFromCharacter(part.Parent :: any)
+                            local plr = Players:GetPlayerFromCharacter(part.Parent :: Model)
                             if plr then
-                                local participant = self:TryGetParticipant(plr.Name)
+                                local participant = self:GetParticipant(plr.Name)
                                 if participant then
-                                    local equipment = self:TryGetEquipment(weapon.Name)
+                                    local equipment = self:GetEquipment(weapon.Name)
                                     if not equipment then
                                         return warn(`{weapon.Name} not found as Equipment`)
                                     end
@@ -602,15 +592,10 @@ local function newRound(gamemode): Types.Round
                                     weapon:Destroy()
                                 end
                             end
-                            return
                         end)
                     end
                 elseif v.Name == "Props" then
-                    for _, prop: Types.Prop in (v:GetChildren() :: any) do
-                        if not prop:IsA("BasePart") then
-                            continue
-                        end
-
+                    for _, prop in (v:GetChildren() :: {Types.Prop}) do
                         prop.Humanoid.Died:Connect(function()
                             if prop:FindFirstChild("OnBreak") then
                                 (require)(prop.OnBreak)()
@@ -618,7 +603,7 @@ local function newRound(gamemode): Types.Round
                         end)
                     end
                 elseif v.Name == "Lighting" then
-                    for _, property: any in v:GetChildren() do
+                    for _, property: any in(v:GetChildren()) do
                         (Lighting :: any)[property.Name] = property.Value
                     end
                 end
@@ -640,21 +625,13 @@ local function newRound(gamemode): Types.Round
             return self.RoundPhase == "Intermission" or self.RoundPhase == "Highlights"
         end,
 
-        TryGetEquipment = function(self, name)
-            for _, v in self.Gamemode.AvailableEquipment do
-                if v.Name == name then
-                    return v
-                end
-            end
-            return
-        end,
         GetEquipment = function(self, name)
             for _, v in self.Gamemode.AvailableEquipment do
                 if v.Name == name then
                     return v
                 end
             end
-            error(`Equipment {name} not found`)
+            return
         end,
         GetRoleFromName = function(self, roleName)
             for _, v in self.Gamemode.Roles do
@@ -692,7 +669,7 @@ local function newRound(gamemode): Types.Round
     }
 end
 
-function module.CreateRound(map: Types.MapStructure, gamemode: Types.Gamemode): Types.Round --- Creates a new Round and returns it.
+function module.CreateRound(map: Types.MapStructure, gamemode: Types.Gamemode): Types.Round -- Creates a new Round and returns it.
     local self: Types.Round = newRound(gamemode)
     self:LoadMap(map)
     

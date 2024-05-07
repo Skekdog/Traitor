@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ReplicatedFirst.RoundHandler.Adapters)
 
@@ -163,7 +163,7 @@ local function onPartHit(round: RoundHandlerTypes.Round, weapon: Weapon, attacke
 
     local plr = Players:GetPlayerFromCharacter(parent)
     if plr then
-        local victim = round:TryGetParticipant(plr.Name)
+        local victim = round:GetParticipant(plr.Name)
         if not victim then
             return
         end

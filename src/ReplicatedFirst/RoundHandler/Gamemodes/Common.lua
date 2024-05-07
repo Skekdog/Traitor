@@ -2,7 +2,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 -- Not a Gamemode, but contains some useful functions that are used by multiple Gamemodes.
 -- Not a part of the standard implementation, can be removed to your tastes.
 
-local Types = require(ReplicatedFirst.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 
 local module = {}
 

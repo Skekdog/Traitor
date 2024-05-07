@@ -1,9 +1,9 @@
 -- Based off of GMod TTT.
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local Types = require(ReplicatedFirst.RoundHandlerTypes)
-local common = require(script.Parent.Common)
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Types = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local common = require(script.Parent.Common)
 
 local items = ReplicatedStorage.Items
 

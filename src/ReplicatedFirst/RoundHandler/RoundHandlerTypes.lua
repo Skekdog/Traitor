@@ -20,7 +20,6 @@ export type MessageType = "update" | "bodyFound" | "disconnect" | "creditsEarned
 export type Adapter = {
     Configuration: {
         PREPARING_TIME: number,
-        MAP_VOTING_TIME: number,
         HIGHLIGHTS_TIME: number,
         SLAY_VOTES: PositiveInteger,
     },
@@ -38,9 +37,7 @@ export type Adapter = {
     SendMessage: (message: string, severity: MessageSeverity, messageType: MessageType, recipients: {Participant}) -> () & (message: string, severity: MessageSeverity, messageType: MessageType, isGlobal: true) -> (),
     SendRoleAlert: (recipient: Participant, role: Role) -> (),
     CheckForUpdate: (round: Round) -> boolean,
-    ShouldStartMapVote: (round: Round) -> boolean,
-    TriggerMapVote: (round: Round) -> (),
-    SendRoundHighlights: (recipients: {Participant}, highlights: {RoundHighlight}, events: {UserFacingRoundEvent}, scores: {[FormattedUsername]: ParticipantScoring}, victors: Role) -> (),
+    SendRoundHighlights: (recipients: {Participant}, highlights: {RoundHighlight}, events: {UserFacingRoundEvent}, scores: {[FormattedUsername]: {[ScoreReason]: Integer}}) -> (),
 
     OnCharacterLoad: (participant: Participant) -> (),
     OnDeath: (victim: Participant) -> (),
@@ -153,13 +150,12 @@ export type Round = {
 
     DoMassDeath: (self: Round, victims: {Participant}, weapon: Equipment | DeathType, attacker: Participant, noGuilt: boolean) -> () & (self: Round, victims: {Participant}, weapon: Equipment | DeathType) -> (), -- PLAYERS SHOULD NOT BE KILLED BEFORE CALLING THIS! Accepts a table of Participants, who will be correctly killed for Phyrric victory to occur. Should be called when something that can kill multiple people at once, such as an explosion, occurs.
 
-    RoundPhaseChange: BindableEvent, -- Fires whenever the phase changes.
+    RoundPhaseChangeEvent: {Event: RBXScriptSignal<RoundPhase>, Fire: (self: any, phase: RoundPhase) -> ()},
 
-    TryGetParticipant: (self: Round, name: Username) -> Participant?, -- Returns a Participant or nil, without erroring.
-    GetParticipant: (self: Round, name: Username) -> Participant, -- Returns a Participant from a username. Errors if Participant is not in round.
+    GetParticipant: (self: Round, name: Username) -> Participant?, -- Returns a Participant from a username.
     JoinRound: (self: Round, plr: Player) -> Participant,         -- Adds a Participant to this Round.
     
-    GetPartialRound: (self: Round) -> PartialRound, -- Returns a limited view of the round, safe for clients to peak at. Does not include any Participants, see Participant: ViewPartialParticipant for that.
+    GetPartialRound: (self: Round) -> PartialRound, -- Returns a limited view of the round, safe for clients to peak at. Does not include any Participants, see Participant:ViewPartialParticipant for that.
     PauseRound: (self: Round) -> (), -- Pauses the round. Errors if the round is not in progress.
     StartRound: (self: Round) -> (), -- Starts this round. Usually shouldn't be called externally.
     EndRound: (self: Round, victors: Role) -> (),  -- Ends this round.
@@ -170,8 +166,7 @@ export type Round = {
 
     GetFormattedRole: (self: Round, role: Role) -> FormattedRole,
 
-    TryGetEquipment: (self: Round, name: EquipmentName) -> Equipment?,       -- Returns Equipment from a name, or nil if it does not exist. Does not error.
-    GetEquipment: (self: Round, name: EquipmentName) -> Equipment,           -- Returns the Equipment from Gamemode.
+    GetEquipment: (self: Round, name: EquipmentName) -> Equipment?,           -- Returns the Equipment from Gamemode.
     GetParticipantsWithRole: (self: Round, name: RoleName) -> {Participant}, -- Returns a list of Participants with the specified role.
     GetRoleFromName: (self: Round, name: RoleName) -> Role,                  -- Returns a Role.
     CompareRoles: (self: Round, role1: Role, role2: Role, comparison: RoleRelationship) -> boolean, -- Tests whether two roles are related by comparison.
@@ -190,6 +185,7 @@ export type Round = {
 ]]
 export type RoundEndInfo = {
     Winners: Role,
+    Music: Sound?,
     Highlights: {RoundHighlight},
     Events: {UserFacingRoundEvent},
     Scores: {[FormattedUsername]: ParticipantScoring}
@@ -299,13 +295,14 @@ export type Participant = {
     GetRole: (self: Participant) -> Role,       -- Returns this Participant's Role. Errors if nil.
     GetAllegiance: (self: Participant) -> Role, -- Returns this Participant's Role allegiance. Errors if nil.
     AssignRole: (self: Participant, role: Role) -> (), -- Assigns Role to this Participant. By default does not override inventory or credits.
-    TryViewParticipantRole: (self: Participant, target: Participant) -> Role?,       -- Returns the target's Role, if allowed by the viewer's Role.
+    TryViewParticipantRole: (self: Participant, target: Participant) -> Role?,       -- Returns the target's RoleName and RoleColour, if allowed by the viewer's Role.
     ViewPartialParticipant: (self: Participant, target: Participant) -> PartialParticipant, -- Returns a limited view of the Participant, for clients.
     
     LeaveRound: (self: Participant) -> (), -- Removes this Participant from the Round.
 
     GetFormattedName: (self: Participant) -> string, -- Returns the username, formatted to a role colour.
 
+    IsDamageJustifiedAgainst: (self: Participant, target: Participant) -> boolean,
     SearchedBy: {Participant},             -- A list of Participants who have searched this Corpse.
     Status: ParticipantStatus,  -- Missing if dead but body has not been searched by anyone.
     KilledAt: Timestamp,                   -- Timestamp of the Participant's demise. Initially 0.
@@ -316,7 +313,6 @@ export type Participant = {
     KilledByHeadshot: boolean,             -- True if they were killed by a headshot.
     Kill: (self: Participant, attacker: Participant?, weapon: MurderWeapon?, headshot: boolean?, ignoreKarma: boolean?) -> (), -- Sets the Humanoid's Health to 0 and sets relevant properties on the Participant.
     
-    IsDamageJustifiedAgainst: (self: Participant, target: Participant) -> boolean, -- true if selfdefense, freekill, or enemy
     Karma: number,                     -- The Participant's current karma. When the round ends, this is applied using Adapters.SetKarma() if applicable. Initially set by Adapters.GetKarma().
     FreeKillReasons: {FreeKillReason}, -- A list of all the reasons this Participant is a Free Kill, if any. Free kill can be checked by #FreeKillReasons == 0.
     SlayVotes: {Participant},          -- A list of Participants who have voted to slay this person due to RDM.
@@ -346,6 +342,7 @@ export type MapStructure = Folder & {
     EngineVersion: StringValue,
     WeaponSpawns: Folder,
     ActionItems: Folder,
+    Lighting: Folder?,
     Spawns: Folder,
     Doors: Folder,
     Props: Folder,

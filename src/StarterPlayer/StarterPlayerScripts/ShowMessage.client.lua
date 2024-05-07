@@ -5,7 +5,7 @@ local UIManager = require(game:GetService("ReplicatedFirst").UIManager)
 local ui = UIManager.WaitForUI("CornerNotification").UI
 
 local TS = game:GetService("TweenService")
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 
 local global = ui.Global
 local priv = ui.Private

@@ -1,12 +1,11 @@
 -- Implementation-dependent functions that *should* be customised.
 
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
 local API = require(script.Parent.API)
-local Types = require(ReplicatedFirst.RoundHandlerTypes)
+local Types = require(script.Parent.RoundHandlerTypes)
 
 local getProfile = ServerScriptService.PlayerSetup.GetProfile
 local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile

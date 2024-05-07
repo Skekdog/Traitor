@@ -5,7 +5,7 @@ local UIManager = require(ReplicatedFirst.UIManager)
 
 local getOwnInfo = ReplicatedStorage.RoundHandler.GetOwnInfo
 local API = require(ReplicatedFirst.API)
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 
 local UI = UIManager.WaitForUI("Equipment Shop", true).UI
 local purchaseButton = UI.Purchase

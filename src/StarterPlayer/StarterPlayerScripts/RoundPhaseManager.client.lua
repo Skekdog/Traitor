@@ -5,7 +5,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local Types = require(ReplicatedFirst.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local UIManager = require(ReplicatedFirst.UIManager)
 

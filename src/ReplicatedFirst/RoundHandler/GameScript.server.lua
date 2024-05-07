@@ -1,8 +1,7 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
+local RoundHandlerTypes = require(script.Parent.RoundHandlerTypes)
 local RoundHandler = require(script.Parent.RoundHandler)
 
 local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
@@ -72,7 +71,7 @@ getOwnInfo.OnServerInvoke = function(plr): RoundHandlerTypes.PartialParticipant?
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then return end
 
-	local p = RoundHandler.GetRound(roundId):TryGetParticipant(plr.Name)
+	local p = RoundHandler.GetRound(roundId):GetParticipant(plr.Name)
 	if not p then
 		return
 	end
@@ -130,9 +129,9 @@ joinRound.OnServerInvoke = function(plr)
 	if not roundId then
 		round = RoundHandler.CreateRound(ServerStorage.Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
 		ServerStorage:SetAttribute("RoundID", round.ID)
-		round.RoundPhaseChange.Event:Connect(function(phase)
+		round.RoundPhaseChangeEvent.Event:Connect(function(phase)
 			roundPhaseChange:FireAllClients(phase)
-			if phase ~= "Destroy" then
+			if phase ~= "Intermission" then
 				return
 			end
 
@@ -143,7 +142,7 @@ joinRound.OnServerInvoke = function(plr)
 		round = RoundHandler.GetRound(roundId)
 	end
 	
-	if not round:TryGetParticipant(plr.Name) then
+	if not round:GetParticipant(plr.Name) then
 		round:JoinRound(plr)
 		return true
 	end

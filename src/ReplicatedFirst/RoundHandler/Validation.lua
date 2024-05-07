@@ -1,13 +1,37 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
--- Returns whether the gamemode is valid, and a list of issues with the gamemode
-local Types = require(ReplicatedFirst.RoundHandlerTypes)
+-- Functions to check if gamemodes / maps are correctly defined, when the type-checker is unable to do so.
+local Types = require(script.Parent.RoundHandlerTypes)
 local EngineVersion = "0.0.1"
+
+local Lighting = game:GetService("Lighting")
 
 local module = {}
 
-function module.ValidateGamemode(gamemode: Types.Gamemode, runFunctions: boolean, checkVersion: boolean): (boolean, {string})
-    local issues = {}
-    local i = function(issue: string)
+local function validateVersion(targetVersion: string, objectName: string): string?
+    local major = tonumber(EngineVersion:split(".")[1])
+    local minor = tonumber(EngineVersion:split(".")[2])
+
+    local targetMajor = tonumber(targetVersion:split(".")[1])
+    local targetMinor = tonumber(targetVersion:split(".")[2])
+
+    if targetMajor ~= major then
+        if targetMajor < major then
+            return `This {objectName} was designed for an older version of RoundHandler ({targetVersion} < {version}) and is very likely to not work.`
+        else
+            return `This {objectName} was designed for a newer version of RoundHandler ({targetVersion} > {version}) and is very likely to not work.`
+        end
+    elseif targetMinor ~= minor then
+        if targetMinor < minor then
+            return `This {objectName} was designed for an older version of RoundHandler ({targetVersion} < {version}) and may not work.`
+        else
+            return `This {objectName} was designed for a newer version of RoundHandler ({targetVersion} > {version}) and may not work.`
+        end
+    end
+    return
+end
+
+function module.ValidateGamemode(gamemode: Types.Gamemode): (boolean, {string?})
+    local issues: {string?} = {}
+    local i = function(issue: string?)
         table.insert(issues, issue)
     end
 
@@ -104,33 +128,34 @@ function module.ValidateGamemode(gamemode: Types.Gamemode, runFunctions: boolean
         validateRoleRelationship(role.AwardOnDeath, `{role.Name}.AwardOnDeath`)
     end
 
-    local function doCheckVersion()
-        local version = EngineVersion
-        local major = tonumber(version:split(".")[1])
-        local minor = tonumber(version:split(".")[2])
+    i(validateVersion(gamemode.EngineVersion, "gamemode"))
 
-        local gmVersion = gamemode.EngineVersion
-        local gmMajor = tonumber(gmVersion:split(".")[1])
-        local gmMinor = tonumber(gmVersion:split(".")[2])
+    return #issues<1, issues
+end
 
-        if gmMajor ~= major then
-            if gmMajor < major then
-                i(`This gamemode was designed for an older version of RoundHandler ({gmVersion} < {version}) and is very likely to not work.`)
-            else
-                i(`This gamemode was designed for a newer version of RoundHandler ({gmVersion} > {version}) and is very likely to not work.`)
-            end
-        elseif gmMinor ~= minor then
-            if gmMinor < minor then
-                i(`This gamemode was designed for an older version of RoundHandler ({gmVersion} < {version}) and may not work.`)
-            else
-                i(`This gamemode was designed for a newer version of RoundHandler ({gmVersion} > {version}) and may not work.`)
+function module.ValidateMap(map: Types.MapStructure): (boolean, {string?})
+    local issues = {}
+    local i = function(issue: string)
+        table.insert(issues, issue)
+    end
+
+    local lightingSettings = map:FindFirstChild("Lighting")
+    if lightingSettings then
+        for _, v in lightingSettings:GetChildren() do
+            local success, _ = pcall(function()
+                (Lighting :: any)[lightingSettings.Name] = (v :: any).Value
+            end)
+            if not success then
+                i(`Failed to set property {v.Name} of Lighting, check that it is the correct type and that it exists.`)
             end
         end
     end
 
-    if checkVersion then
-        doCheckVersion()
+    if #map.Spawns:GetChildren() < 1 then
+        i("Map must have at least 1 spawn.")
     end
+
+    validateVersion(map.EngineVersion.Value, map)
 
     return #issues<1, issues
 end
