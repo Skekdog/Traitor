@@ -1,9 +1,8 @@
-local uiManager = require(game:GetService("ReplicatedFirst").UIManager)
-local API = require(game.ReplicatedFirst.API)
-
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local API = require(ReplicatedFirst.API)
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
+local uiManager = require(ReplicatedFirst.UIManager)
 
 local UI = uiManager.WaitForUI("Highlights")
 local page = UI.UI.Page

@@ -1,8 +1,8 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TS = game:GetService("TweenService")
-local RoundHandler = require(ServerScriptService.RoundHandler.RoundHandler)
+local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 
 ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, part: BasePart)
 	local char = plr.Character

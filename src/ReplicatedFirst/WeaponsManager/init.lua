@@ -2,12 +2,11 @@
 --todo: Look into FastCast
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
-local Adapters = require(ServerScriptService.RoundHandler.Adapters)
 local API = require(ReplicatedFirst.API)
+local Adapters = require(ReplicatedFirst.RoundHandler.Adapters)
 
 type BeforeHitFunction = (attacker: RoundHandlerTypes.Participant?, target: RoundHandlerTypes.Participant, willDie: boolean) -> ()
 type AimInfo = {
