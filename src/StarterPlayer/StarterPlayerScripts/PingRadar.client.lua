@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandlerTypes)
 local plr = Players.LocalPlayer
 
-local scriptCons = game:WaitForChild("ClientStorage"):WaitForChild("ScriptConnections")
+local scriptCons = (game :: any).ClientStorage.ScriptConnections
 
 scriptCons:WaitForChild("PingRadarEvent").Event:Connect(function()
 	(workspace :: any).RadarPoints:ClearAllChildren()
