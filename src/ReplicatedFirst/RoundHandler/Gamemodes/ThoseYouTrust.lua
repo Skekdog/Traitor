@@ -22,6 +22,7 @@ local module: Types.Gamemode = {
         return self.Roles[3]
     end,
     PhyrricVictors = "Traitor",
+    Extras = {},
 
     CalculateRoundHighlights = function(self, round)
         local weaponList = common.GetWeaponHighlights(round.EventLog :: any)
@@ -161,6 +162,7 @@ local module: Types.Gamemode = {
             MaxStock = 1,
             AttackType = "Blunt",
             NoGuilt = false,
+            Extras = {},
 
             Item = items:FindFirstChild("Crowbar")
         },
@@ -172,6 +174,7 @@ local module: Types.Gamemode = {
             MaxStock = 1,
             AttackType = "Firearm",
             NoGuilt = false,
+            Extras = {},
 
             Item = items:FindFirstChild("Pistol")
         },
@@ -183,6 +186,7 @@ local module: Types.Gamemode = {
             MaxStock = 1,
             AttackType = "Explosion",
             NoGuilt = false,
+            Extras = {},
 
             Item = items:FindFirstChild("Grenade")
         },
@@ -194,6 +198,7 @@ local module: Types.Gamemode = {
             MaxStock = 1,
             AttackType = "None",
             NoGuilt = false,
+            Extras = {},
 
             Item = function(item, participant)
                 print(`{participant.Player.Name} got radar`)
@@ -214,7 +219,7 @@ local module: Types.Gamemode = {
 
             Allies = {"Traitor"},
             Allegiance = "Traitor",
-            VictoryMusic = {},
+            VictoryMusic = game.ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
             VictoryText = "The dastardly traitors have won the round!",
 
             AnnounceDisconnect = true,
@@ -297,7 +302,7 @@ local module: Types.Gamemode = {
 
             Allies = {"Detective", "Innocent"},
             Allegiance = "Innocent",
-            VictoryMusic = {},
+            VictoryMusic = game.ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
             VictoryText = "The loveable innocents have won the round!",
 
             AnnounceDisconnect = false,

@@ -12,11 +12,11 @@ scriptCons:WaitForChild("PingRadarEvent").Event:Connect(function()
 	local info: {RoundHandlerTypes.PartialParticipant}? = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
 	if info then
 		for _, v in info do
-			local char = v.Player.Character
+			local char = v.Player.Character :: any
 			if char and (char.Name ~= plr.Name) and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
 				local clone = ReplicatedStorage.RadarPoint:Clone()
-				clone:SetPrimaryPartCFrame(v.Character.HumanoidRootPart.CFrame)
-				clone.RadarPoint.TextLabel.Text = math.round(plr:DistanceFromCharacter(v.Character.HumanoidRootPart.Position))
+				clone:PivotTo((char :: any).HumanoidRootPart.CFrame)
+				clone.RadarPoint.TextLabel.Text = tostring(math.round(plr:DistanceFromCharacter(char.HumanoidRootPart.Position)))
 				clone.RadarPoint.Enabled = true
 				clone.Parent = (workspace :: any).RadarPoints
 			end

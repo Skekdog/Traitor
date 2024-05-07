@@ -1,6 +1,6 @@
 local char = script.Parent
 
-local hum = char:FindFirstChildOfClass("Humanoid")
+local hum = char:FindFirstChildOfClass("Humanoid") :: Humanoid
 hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
 hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
 hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)

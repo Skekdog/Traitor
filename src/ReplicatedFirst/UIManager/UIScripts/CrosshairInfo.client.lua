@@ -5,37 +5,37 @@ local UIManager = require(script.Parent.Parent)
 
 --To keep these ordered, they are regular tables, not dictionaries
 local healthDefs = { --These are percentages of MaxHealth
-	{100, "Healthy"},
-	{80, "Hurt"},
-	{60, "Wounded"},
-	{40, "Badly Wounded"},
-	{20, "Near Death"},
+	{100 :: any, "Healthy"},
+	{80 :: any, "Hurt"},
+	{60 :: any, "Wounded"},
+	{40 :: any, "Badly Wounded"},
+	{20 :: any, "Near Death"},
 }
 
 local karmaDefs = { --These are absolute karma values
-	{1000, "Reputable"},
-	{900, "Crude"},
-	{800, "Trigger-Happy"},
-	{700, "Dangerous"},
-	{600, "Liability"},
+	{1000 :: any, "Reputable"},
+	{900 :: any, "Crude"},
+	{800 :: any, "Trigger-Happy"},
+	{700 :: any, "Dangerous"},
+	{600 :: any, "Liability"},
 }
 
 local mouse = Players.LocalPlayer:GetMouse()
-local ui = UIManager.WaitForUI("CrosshairInfo").UI
+local ui = UIManager.WaitForUI("CrosshairInfo").UI :: any
 
 game:GetService("RunService").Heartbeat:Connect(function() --cant do getpropertychangedsignal
 	local show = false
 	if mouse.Target then
 		local char = mouse.Target.Parent
 		if char then
-			local plr = Players:GetPlayerFromCharacter(char)
+			local plr = Players:GetPlayerFromCharacter(char :: any)
 			if plr then
-				local hum = char:FindFirstChild("Humanoid")
+				local hum = char:FindFirstChildOfClass("Humanoid")
 				if hum then
 					local health = hum.Health
 					if health > 0 then --finally
 						local round = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
-						ui:FindFirstChild("Name").Text = plr.Name
+						ui.Name.Text = plr.Name
 
 						health = health/hum.MaxHealth*100
 						local healthText = "Near Death"

@@ -527,7 +527,7 @@ local function newRound(gamemode): Types.Round
             }
 
             self.RoundPhaseChangeEvent:Fire("Highlights")
-            Adapters.SendRoundHighlights(self.Participants, highlights, events, scores)
+            Adapters.SendRoundHighlights(self.Participants, highlights, events, scores, victors)
 
             local updateNeeded = Adapters.CheckForUpdate(self)
             if updateNeeded then
@@ -592,6 +592,7 @@ local function newRound(gamemode): Types.Round
                                     weapon:Destroy()
                                 end
                             end
+                            return
                         end)
                     end
                 elseif v.Name == "Props" then

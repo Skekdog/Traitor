@@ -7,7 +7,7 @@ local getOwnInfo = ReplicatedStorage.RoundHandler.GetOwnInfo
 local API = require(ReplicatedFirst.API)
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 
-local UI = UIManager.WaitForUI("Equipment Shop", true).UI
+local UI = UIManager.WaitForUI("Equipment Shop", true).UI :: any
 local purchaseButton = UI.Purchase
 
 local radarCooldown = 5
@@ -44,7 +44,7 @@ local function radar()
 		stop = true
 	end)
 	while not stop do
-		scriptCons.PingRadarEvent:Fire()
+		(scriptCons :: any).PingRadarEvent:Fire()
 		task.wait(radarCooldown)
 	end
 end
@@ -100,7 +100,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	end)
 end)
 
-ReplicatedStorage:WaitForChild("ServerClient").InformClientSideEquipment.OnClientEvent:Connect(function(item)
+ReplicatedStorage.RoundHandler.InformClientSideEquipment.OnClientEvent:Connect(function(item)
 	if item == "Radar" then
 		radar()
 	end

@@ -41,7 +41,7 @@ export type UI = typeof(setmetatable({}, {})) & {
 
 if not _G.RegisteredUIs then _G.RegisteredUIs = {} end
 
-local UIRegistered = script:FindFirstChild("Event") or Instance.new("BindableEvent", script)
+local UIRegistered = (script:FindFirstChild("Event") :: BindableEvent) or Instance.new("BindableEvent", script)
 function UIManager.RegisterUI(name: string, uiType: UIType, ignoreInset: boolean, ui: Frame, displayName: string?, preventClose: boolean): UI
 	local self: UI = {} :: UI
 	
@@ -69,12 +69,11 @@ function UIManager.RegisterUI(name: string, uiType: UIType, ignoreInset: boolean
 	end
 	
 	if ui:GetAttribute("Sidebar") then
-		local sb = UIManager.GetUI("Sidebar")
+		local sb = UIManager.GetUI("Sidebar").UI :: any
 		local function add()
 			if not game:GetService("ReplicatedFirst"):GetAttribute("ControlsReady") then
 				game:GetService("ReplicatedFirst"):GetAttributeChangedSignal("ControlsReady"):Wait()
 			end
-			sb = sb.UI
 			local but = sb.Button:Clone()
 			local keybinding = requestSetting:Invoke(name)
 			local key = keybinding["Keycodes"][1][1]
@@ -92,20 +91,11 @@ function UIManager.RegisterUI(name: string, uiType: UIType, ignoreInset: boolean
 			but.Parent = sb
 			but.MouseButton1Click:Connect(function() self:ToggleVisible() end)
 		end
-		if not sb then
-			UIRegistered.Event:Connect(function(regName)
-				if regName == "Sidebar" then
-					sb = UIManager.GetUI("Sidebar")
-					add()
-				end
-			end)
-		else
-			task.delay(0.1, add) -- 1 second delay because it doesn't work otherwise. Don't ask me why.
-		end
+		task.delay(0.1, add) -- 1 second delay because it doesn't work otherwise. Don't ask me why.
 	end
 	
 	if not ui:GetAttribute("NoClose") then
-		local close = ui:FindFirstChild("CloseUI")
+		local close = ui:FindFirstChild("CloseUI") :: ObjectValue & {Value: TextButton}
 		if close then
 			close.Value.MouseButton1Click:Connect(function()
 				self:ToggleVisible(false)
@@ -166,8 +156,8 @@ function UIManager.UnregisterUI(name: string, uiType: UIType): nil
 		if reg.UI:GetAttribute("Sidebar") then
 			pcall(function()
 				reg.UI.Visible = false
-				reg.UI.Parent = script:FindFirstChild("UnregisteredUIs")[uiType]
-				local sb = (UIManager.GetUI("Sidebar") :: UI).UI
+				reg.UI.Parent = (script :: any):FindFirstChild("UnregisteredUIs")[uiType]
+				local sb = UIManager.GetUI("Sidebar").UI :: any
 				sb:FindFirstChild(name):Destroy()
 			end)
 		end
@@ -243,7 +233,7 @@ UIManager.Themes = {
 }
 
 local THEME_TRANSITION_TIME = 0.25
-function UIManager.UpdateThemeInstance(v, theme): nil
+function UIManager.UpdateThemeInstance(v: Instance, theme): ()
 	-- Updates the theme for one instance
 	-- Tag StyledUI means that a UI object will be updated to match the theme
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
@@ -340,7 +330,7 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 		
 		-- Now bgMenuMode == "Hidden"
 		if self.Visible then
-			for _, v in UIManager.GetUIs(self.UIType) do
+			for _, v in UIManager.GetUIs(self.UIType) :: any do
 				if v.Visible and (v ~= self) then
 					scrUI:SetAttribute("NextUI", v.Name..";"..scrUI:GetAttribute("NextUI"))
 					v:ToggleVisible(false, true)

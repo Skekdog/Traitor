@@ -8,7 +8,7 @@ local health = frame.HealthBar
 plr:GetPropertyChangedSignal("Character"):Connect(function()
 	local char = plr.Character
 	if char then
-		local hum = char:WaitForChild("Humanoid")
+		local hum = char:WaitForChild("Humanoid") :: Humanoid
 		health.Text = hum.Health
 		health.UIGradient.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.new(0.785, 0, 0)),

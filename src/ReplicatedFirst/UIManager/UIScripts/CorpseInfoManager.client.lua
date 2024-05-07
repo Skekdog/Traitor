@@ -1,3 +1,4 @@
+--!nocheck
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local uiManager = require(game:GetService("ReplicatedFirst").UIManager)
 

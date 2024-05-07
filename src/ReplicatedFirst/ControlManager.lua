@@ -48,10 +48,10 @@ end
 
 function module.getStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType): string
 	if keycode.EnumType == Enum.KeyCode then
-		local img = UIS:GetImageForKeyCode(keycode)
+		local img = UIS:GetImageForKeyCode(keycode :: any)
 		if img ~= "" then return img end
 
-		local str = UIS:GetStringForKeyCode(keycode)
+		local str = UIS:GetStringForKeyCode(keycode :: any)
 		if str ~= "" then return str end
 
 		if keycode == Enum.KeyCode.LeftControl then
@@ -81,7 +81,7 @@ function module.getStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType):
 end
 
 function module.SetupTouchButton(actionName)
-	local butt = CAS:GetButton(actionName)
+	local butt = CAS:GetButton(actionName) :: ImageButton & {ActionTitle: TextLabel}
 	if butt then
 		butt.Position = getSetting(actionName.." Position")
 		butt.Size = UDim2.fromScale(0.2, 0.2)
@@ -142,6 +142,7 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 				callback(action, state, input, toggled)
 			end
 		end
+		return
 	end, createTouchButton, table.unpack(triggers))
 	
 	module.SetupTouchButton(actionName)

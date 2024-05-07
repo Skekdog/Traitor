@@ -6,7 +6,7 @@ local controls = require(game:GetService("ReplicatedFirst").ControlManager)
 
 local camera = workspace.CurrentCamera
 local ui = uiManager.WaitForUI("Spectate")
-local uiO = ui.UI
+local uiO = ui.UI :: any
 
 local function spectateFunc(action, state)
 	local chars = {}
@@ -27,7 +27,7 @@ local function spectateFunc(action, state)
 
 	local lastKey = nil
 	for i, v in chars do
-		if v == camera.CameraSubject then
+		if v == (camera :: any).CameraSubject then
 			lastKey = i
 		end
 	end
@@ -41,7 +41,7 @@ local function spectateFunc(action, state)
 		camera.CameraSubject = chars[lastKey-1]
 	end
 	
-	uiO.Username.Text = camera.CameraSubject.Parent.Name
+	uiO.Username.Text = (camera :: any).CameraSubject.Parent.Name
 end
 
 local clientStorage = (game :: any).ClientStorage

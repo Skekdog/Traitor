@@ -1,17 +1,12 @@
+--!nonstrict
 local HTTPService = game:GetService("HttpService")
 
-local UIScript
-local UI
-local UIS
-local settingsUI
-local uiThemes
+local UIScript, UI, UIS, uiThemes
 
 if game:GetService("RunService"):IsClient() then
 	UIScript = game:GetService("ReplicatedFirst").UIManager
-	UI = require(UIScript)
+	UI = (require)(UIScript)
 	UIS = game:GetService("UserInputService")
-	settingsUI = UI.WaitForUI("Settings")
-	settingsFrame = settingsUI.UI
 	
 	uiThemes = {}
 	for i, _ in UI.Themes do table.insert(uiThemes, i) end
@@ -68,8 +63,8 @@ module["AvailableSettings"] = {
 			if mapConfig then
 				for _, prop in mapConfig:GetChildren() do
 					if prop:IsA("ValueBase") then
-						if game:GetService("Lighting")[prop.Name] then
-							game:GetService("Lighting")[prop.Name] = prop.Value
+						if (game :: any):GetService("Lighting")[prop.Name] then
+							(game :: any):GetService("Lighting")[prop.Name] = prop.Value
 						end
 					end
 				end
@@ -471,7 +466,7 @@ module["AvailableSettings"] = {
 		Callback = keybindCallback,
 	},
 
-}
+} :: {any}
 
 module["Settings"] = {}
 for _, v in module.AvailableSettings do
@@ -512,8 +507,8 @@ function module.JSONEncode(): string
 	return HTTPService:JSONEncode(toEncode)
 end
 
-function module.JSONDecode(options): {}
-	options = HTTPService:JSONDecode(options)
+function module.JSONDecode(optionsString): {}
+	local options = HTTPService:JSONDecode(optionsString)
 	for i, v in options do
 		local isKeybind, isTouchPosition
 		for _, p in module.AvailableSettings do

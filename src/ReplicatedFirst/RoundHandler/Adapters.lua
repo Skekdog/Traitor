@@ -10,10 +10,20 @@ local Types = require(script.Parent.RoundHandlerTypes)
 local getProfile = ServerScriptService.PlayerSetup.GetProfile
 local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile
 
-local remotes = ReplicatedStorage:FindFirstChild("RoundHandler")
+local remotes = ReplicatedStorage.RoundHandler
 local voteMap = remotes.VoteMap
 
 local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
+
+local deathsounds = {
+	"9125652432",
+	"9125651099",
+	"9125651607",
+	"9125652452",
+	"9125651373",
+	"9125652147",
+	"9125652675",
+}
 
 local module: Types.Adapter = {
     Configuration = {
@@ -30,7 +40,7 @@ local module: Types.Adapter = {
         local plr = participant.Player
 
         if type(item.Item) == "function" then
-            item.Item(participant, item.Name)
+            item.Item(item, participant)
             remotes.InformClientSideEquipment:FireClient(plr, item.Name)
             return
         end
@@ -157,8 +167,11 @@ local module: Types.Adapter = {
         return updateProfile:Fire(plr, "Karma", karma)
     end,
 
-    OnCharacterLoad = function(char)
-        ServerStorage.DeathSound:Clone().Parent = char
+    OnCharacterLoad = function(participant)
+        local sound = Instance.new("Sound")
+        sound.SoundId = "rbxassetid://"..deathsounds[math.random(1, #deathsounds)]
+        sound.Name = "DeathSound"
+        sound.Parent = participant.Character
     end,
 
     SendSlayVote = function(to, target)
@@ -179,9 +192,9 @@ local module: Types.Adapter = {
         char.Archivable = true
         local clone = char:Clone()
         
-        ServerStorage.RagdollJoints:Clone().Parent = clone
+        ServerStorage.RagdollJoints:Clone().Parent = clone :: any
 
-        local root = clone:FindFirstChild("HumanoidRootPart")
+        local root = clone:FindFirstChild("HumanoidRootPart") :: Part
         local hum = clone:FindFirstChildOfClass("Humanoid")
         if hum then
             hum:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
@@ -195,7 +208,7 @@ local module: Types.Adapter = {
 
         char:Destroy()
         clone.Parent = workspace
-        victim.Character = clone
+        victim.Player.Character = nil
     end,
 
     CalculateUserFacingEvents = function(events, winners)

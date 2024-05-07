@@ -20,7 +20,7 @@ local screenMessageFormats = {
 			AnchorPoint = Vector2.new(0.5, 0.5),
 		},
 		TweenProperties = {  -- time, easingStyle, easingDirection, repeatCount, reverses, delayTime
-			3,
+			3 :: any,
 			Enum.EasingStyle.Exponential,
 			Enum.EasingDirection.Out,
 			0,
@@ -121,7 +121,7 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {}?
 		
 		if formatTable.LabelProperties then
 			for i, v in formatTable.LabelProperties do
-				label[i] = v
+				(label :: any)[i] = v
 			end
 		end
 		
@@ -133,7 +133,7 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {}?
 	end
 	
 	label.Text = text
-	label.Parent = plr.PlayerGui.Special:WaitForChild("ScreenMessage")
+	label.Parent = (plr :: any).PlayerGui.Special:WaitForChild("ScreenMessage")
 	
 	local tween = TS:Create(label, TweenInfo.new(table.unpack(tweenParams)), {
 		Position = UDim2.fromScale(0.5, -0.5)
@@ -279,7 +279,7 @@ function module.TransitionUIState(frame: Frame, open: boolean)
 		frame.Visible = true
 	end
 	
-	local modalise = frame:FindFirstChild("Modalise")
+	local modalise = frame:FindFirstChild("Modalise") :: TextButton
 	if modalise then
 		modalise.Visible = open
 	end

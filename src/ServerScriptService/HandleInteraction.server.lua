@@ -4,8 +4,8 @@ local ServerStorage = game:GetService("ServerStorage")
 local TS = game:GetService("TweenService")
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 
-ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, part: BasePart)
-	local char = plr.Character
+ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, part: BasePart & {Parent: Instance})
+	local char = plr.Character :: Model & {Humanoid: Humanoid, PrimaryPart: BasePart}
 
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then return end
@@ -16,7 +16,7 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, p
 		local hum = char.Humanoid
 		if hum.Health > 0 and (char.PrimaryPart.Position-part.Position).Magnitude < 10 then
 			if round.Map.ActionItems:IsAncestorOf(part) then
-				require((part :: any).Parent:FindFirstChildOfClass("ModuleScript"))()
+				(require)(part.Parent:FindFirstChildOfClass("ModuleScript"))()
 			elseif round.Map.Doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
 				part:SetAttribute("Opening", true)
 				part:SetAttribute("Open", not part:GetAttribute("Open"))
@@ -39,25 +39,20 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, p
 				local prop = part.Parent
 				if prop.Name:sub(1, 10) ~= "Equipment_" then return end
 				
-				local data = prop:FindFirstChild("ToolData")
-				if not data then return end
-				
 				if prop.Name:sub(11) == "Health Station" or prop.Name:sub(11) == "Death Station" then
-					local curCharge = data:FindFirstChild("CurrentCharge")
-					if not curCharge then return end
-					if data.InUseBy.Value:match(plr.Name..";") then return end
+					if part:GetAttribute("InUseBy"):match(plr.Name..";") then return end
 					
-					data.InUseBy.Value = data.InUseBy.Value..plr.Name..";"
+					part:SetAttribute("InUseBy", `{part:GetAttribute("InUseBy")}{plr.Name};`)
 					while (hum.Health < hum.MaxHealth) and ((char.PrimaryPart.Position-part.Position).Magnitude < 6) and (part:FindFirstAncestorOfClass("Workspace")) and (hum.Health > 0) do
-						if curCharge.Value <= 0 then
-							data.CurrentCharge.Changed:Wait()
+						if part:GetAttribute("CurrentCharge") <= 0 then
+							part:GetAttributeChangedSignal("CurrentCharge"):Wait()
 						end
-						hum.Health += data:GetAttribute("Health")
-						curCharge.Value -= 1
-						task.wait(data:GetAttribute("Cooldown"))
+						hum.Health += 1
+						part:SetAttribute("CurrentCharge", part:GetAttribute("CurrentCharge") - 1)
+						task.wait(0.5)
 					end
-					if data:FindFirstChild("InUseBy") then
-						data.InUseBy.Value = data.InUseBy.Value:gsub(plr.Name..";", "")
+					if part:GetAttribute("InUseBy") then
+						part:SetAttribute("InUseBy", part:GetAttribute("InUseBy"):gsub(plr.Name..";", ""))
 					end
 				end
 			end

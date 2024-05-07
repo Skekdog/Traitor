@@ -6,14 +6,14 @@ end
 local manager = require(script.Parent.Parent)
 local controls = require(game:GetService("ReplicatedFirst").ControlManager)
 
-local event = script.Parent.Parent:FindFirstChild("UpdateThemeInstance")
+local event = script.Parent.Parent.UpdateThemeInstance
 event.Event:Connect(manager.UpdateThemeInstance)
 
 for _, uiType in script.Parent.Parent:FindFirstChild("UnregisteredUIs"):GetChildren() do
 	if uiType.ClassName ~= "Folder" then continue end
 	for _, ui in uiType:GetChildren() do
 		if ui:GetAttribute("DoNotRegister") then continue end
-		manager.RegisterUI(ui.Name, uiType.Name, ui:GetAttribute("IgnoreInset"), ui, ui:GetAttribute("DisplayName"), ui:GetAttribute("PreventClose"))
+		manager.RegisterUI(ui.Name, uiType.Name :: any, ui:GetAttribute("IgnoreInset"), ui :: any, ui:GetAttribute("DisplayName"), ui:GetAttribute("PreventClose"))
 	end
 end
 
@@ -43,7 +43,7 @@ ReplicatedStorage.ServerClient.OpenSettings.OnClientEvent:Connect(function()
 end)
 
 local CASui: ScreenGui = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge) :: any
-local CASFrame = CASui:WaitForChild("ContextButtonFrame")
+local CASFrame = CASui:WaitForChild("ContextButtonFrame") :: any
 CASFrame.Size = UDim2.fromScale(1, 1)
 CASFrame.Position = UDim2.fromScale(0, 0)
 CASui.DisplayOrder = 4

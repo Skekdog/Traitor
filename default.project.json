@@ -21,7 +21,10 @@
     "ServerStorage": {
       "$className": "ServerStorage",
       "$ignoreUnknownInstances": true,
-      "$path": "src/ServerStorage"
+      "$path": "src/ServerStorage",
+      "Maps": {
+        "$className": "Folder"
+      }
     },
     "StarterPlayer": {
       "$className": "StarterPlayer",

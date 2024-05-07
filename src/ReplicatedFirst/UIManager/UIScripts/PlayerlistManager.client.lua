@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 local UIManager = require(script.Parent.Parent)
 
-local ui = UIManager.WaitForUI("Playerlist").UI
+local ui = UIManager.WaitForUI("Playerlist").UI :: any
 local info = ui.Info
 local list = ui.List
 
@@ -39,7 +39,7 @@ local function createPlr(plr: Player)
 	clone.Score.Text = tostring(nil)
 
 	pcall(function()
-		clone.Avatar.Image, _ = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
 	end)
 
 	clone.Visible = true

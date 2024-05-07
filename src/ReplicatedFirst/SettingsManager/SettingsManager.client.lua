@@ -24,9 +24,9 @@ local keybindFrame = script:FindFirstChild("__SettingKeybind")
 local selectorFrame = script:FindFirstChild("__SettingSelector")
 local booleanFrame = script:FindFirstChild("__SettingBoolean")
 local touchFrame = script:FindFirstChild("__SettingTouch")
-local settingsFrame = UIManager.WaitForUI("Settings").UI:FindFirstChild("Main")
+local settingsFrame = (UIManager :: any).WaitForUI("Settings").UI.Main
 
-local tabsFrame: ScrollingFrame = settingsFrame:FindFirstChild("Tabs")
+local tabsFrame = settingsFrame.Tabs :: ScrollingFrame
 local tabUnderline: Frame = tabsFrame:FindFirstChild("Underline") :: Frame
 local createdTabs = {}
 for _, v in SM.AvailableSettings do
@@ -91,7 +91,7 @@ local function transitionSwitch(target: Frame, disabled: boolean)
 	-- Disabled if transitioning to green
 	disabled = not disabled
 	-- I confused myself and now I don't know what disabled actually means I just know that it does the wrong thing if you don't invert it
-	local switch = target:FindFirstChild("Switch")
+	local switch = target:FindFirstChild("Switch") :: TextLabel
 	TS:Create(switch,
 		TweenInfo.new(
 			SWITCH_TRANSITION_TIME,
@@ -119,7 +119,7 @@ for i, v in createdTabs do
 	tab.Position = UDim2.fromScale((i-1) / #createdTabs, 0)
 	tab.Visible = true
 	tab.LayoutOrder = i -- This is ordered more-or-less randomly, but the same random every time 
-	tab.Parent = tabsFrame
+	tab.Parent = tabsFrame :: any
 	
 	local page = pageBase:Clone()
 	page.Name = "Page_"..v
@@ -137,7 +137,7 @@ for i, v in createdTabs do
 		if settingsFrame:GetAttribute("CurrentTab") == v then
 			return
 		end
-		API.TransitionUIPage(currentPage, (tabsFrame:FindFirstChild(currentPage.Name:sub(6)) :: GuiButton).LayoutOrder, page, tab.LayoutOrder, UDim2.fromScale(0, 0.1))
+		API.TransitionUIPage(currentPage, (tabsFrame:FindFirstChild(currentPage.Name:sub(6)) :: GuiButton).LayoutOrder, page :: any, tab.LayoutOrder, UDim2.fromScale(0, 0.1))
 		settingsFrame:SetAttribute("CurrentTab", v)
 	end)
 	
@@ -171,13 +171,13 @@ local function done()
 	darken.Visible = false
 end
 
-UIS.TouchTap:Connect(function(pos, proc)
+UIS.TouchTap:Connect(function(posVectors, proc)
 	if proc then return end
 	if not darken.Visible then return end
 	if darken:GetAttribute("OpenedAt") > (os.time() - 0.001) then return end -- For some reason taps are sometimes detected immediately after
 	local name = darken:GetAttribute("DisplayName")
-	pos = pos[1]
-	pos = UDim2.fromOffset(pos.X+GUI:GetGuiInset().X, pos.Y+GUI:GetGuiInset().Y)
+	local posVector = posVectors[1]
+	local pos = UDim2.fromOffset(posVector.X+GUI:GetGuiInset().X, posVector.Y+GUI:GetGuiInset().Y)
 	CAS:GetButton(name).Position = pos
 end)
 
@@ -212,7 +212,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	local catLabel = page:FindFirstChild("Category_"..cat)
 	categories[catIndex] += 1
 	
-	local f
+	local f: any
 	if settingType == "Boolean" then
 		
 		f = booleanFrame:Clone()
@@ -268,7 +268,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		
 		local setBinds = SM.GetSetting(name) :: SM.KeybindSetting
 		
-		local function updateBinds(binds: {{SM.Keybind}})
+		local function updateBinds(binds: any)
 			local numBoundKeys = 0
 			for _, v in m:FindFirstChild("Keybinds"):GetChildren() do
 				if v:IsA("Frame") and (v.Name ~= "__KeybindFrame") then
@@ -312,9 +312,9 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 
 				local function removeBind()
 					local binds = SM.GetSetting(name)
-					table.remove(binds.Keycodes, table.find(binds.Keycodes, setBinds))
+					table.remove((binds :: any).Keycodes, table.find((binds :: any).Keycodes, setBinds))
 					SM.SetSetting(name, binds)
-					setting.Callback(binds, name)
+					setting.Callback(binds :: any, name)
 
 					bind:Destroy()
 					local sep
@@ -340,7 +340,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			toggleButton.Visible = true
 			toggleButton.Image = (SM.GetSetting(name)::any).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
 			toggleButton.MouseButton1Click:Connect(function()
-				local cur = SM.GetSetting(name)
+				local cur = SM.GetSetting(name) :: any
 				cur.Toggled = not cur.Toggled
 				SM.SetSetting(name, cur)
 				setting.Callback(cur, name)
@@ -350,7 +350,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		end
 		
 		f:FindFirstChild("ClickDetector").MouseButton1Click:Connect(function()
-			for _, v in keybindingCons do v:Disconnect() end
+			for _, v: any in keybindingCons do v:Disconnect() end
 			local msg = API.ScreenMessage("Info", "Press F5 to cancel keybinding.\nYou can also add a modifier key, such as Shift or Ctrl.")
 			CAS:BindActionAtPriority("SelectKeybind", function(_, state, input)
 				
@@ -368,7 +368,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 						break
 					end
 				end
-				local cur = SM.GetSetting(name)
+				local cur = SM.GetSetting(name) :: any
 				table.insert(cur.Keycodes, t)
 				SM.SetSetting(name, cur)
 				if msg then msg:Destroy() end
@@ -376,7 +376,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				API.ScreenMessage("Success", "Keybinding updated!")
 				setting.Callback(cur, name)
 				CAS:UnbindAction("SelectKeybind")
-				
+				return
 			end, false, 100000, Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Keyboard, Enum.UserInputType.Gamepad1, Enum.UserInputType.MouseButton3)
 		end)
 		
@@ -384,7 +384,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		
 		f = touchFrame:Clone()
 		f:FindFirstChild("Label").Text = name
-		f.MouseButton1Click:Connect(function()
+		f.MouseButton1Click:Connect(function(): any
 			if not UIS.TouchEnabled then
 				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
@@ -392,7 +392,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			darken:SetAttribute("OpenedAt", workspace:GetServerTimeNow())
 			local name = name:split(" Position")[1]
 			darken:SetAttribute("DisplayName", name)
-			CAS:BindAction(name, function()end, true)
+			CAS:BindAction(name, function() return end, true)
 			Controls.SetupTouchButton(name)
 			
 			settingsParent:FindFirstChild("Main").Visible = false
@@ -406,7 +406,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		
 		f = touchFrame:Clone()
 		f:FindFirstChild("Label").Text = name
-		f.MouseButton1Click:Connect(function()
+		f.MouseButton1Click:Connect(function(): any
 			if not UIS.TouchEnabled then
 				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
@@ -415,7 +415,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				SM.SetSetting(name, newScale)
 			end
 			local name = name:split(" Scale")[1]
-			CAS:BindAction(name, function()end, true)
+			CAS:BindAction(name, function() return end, true)
 			Controls.SetupTouchButton(name)
 			return
 		end)

@@ -5,7 +5,7 @@ local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes
 local uiManager = require(ReplicatedFirst.UIManager)
 
 local UI = uiManager.WaitForUI("Highlights")
-local page = UI.UI.Page
+local page = (UI :: any).UI.Page
 
 local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
 local eTemplate = eFrame.Template

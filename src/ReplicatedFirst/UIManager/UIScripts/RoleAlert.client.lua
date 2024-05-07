@@ -2,7 +2,7 @@ local UIManager = require(script.Parent.Parent)
 local RS = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
-local ui = UIManager.WaitForUI("RoleAlert")
+local ui = UIManager.WaitForUI("RoleAlert") :: any
 RS.RoundHandler.SendRoleAlert.OnClientEvent:Connect(function(name, colour, description, soundId)
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://"..tostring(soundId)

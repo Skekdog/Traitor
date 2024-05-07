@@ -11,13 +11,13 @@ local UIManager = require(ReplicatedFirst.UIManager)
 
 local remotes = ReplicatedStorage.RoundHandler
 
-local roundInfo = UIManager.WaitForUI("RoundInfo").UI
+local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: any
 local joinRound = UIManager.WaitForUI("JoinRound")
 
 local timeTarget = 0
 local paused = false
 local lastTime = ""
-local function updateTimer(time)
+local function updateTimer(time: number)
     if paused then
 		if time%2 == 1 then --Alternate every second
 			roundInfo.Timer.Text = "PAUSED"
@@ -41,7 +41,7 @@ local function updateTimer(time)
 	roundInfo.Timer.Text = minutes..":"..seconds
 end
 
-local vote = UIManager.WaitForUI("VotingScreen")
+local vote = UIManager.WaitForUI("VotingScreen") :: any
 for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
 	local clone = vote.UI:FindFirstChild("Sample"):Clone()
 	clone.Text = v
@@ -109,7 +109,7 @@ local function update(round: Types.PartialRound?)
     if round.RoundPhase == "Playing" then
         if ownRole then
             if #ownRole.EquipmentShop > 0 then
-                local shop = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI
+                local shop = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI :: any
                 shop.Reset:Fire()
 
                 local nameToObj = {}
@@ -170,8 +170,8 @@ local function update(round: Types.PartialRound?)
             if mapConfig then
                 for _, prop in mapConfig:GetChildren() do
                     if prop:IsA("ValueBase") then
-                        if Lighting[prop.Name] then
-                            Lighting[prop.Name] = prop.Value
+                        if (Lighting :: any)[prop.Name] then
+                            (Lighting :: any)[prop.Name] = (prop :: any).Value
                         end
                     end
                 end
@@ -181,15 +181,15 @@ local function update(round: Types.PartialRound?)
         end
     elseif round.RoundPhase == "Highlights" then
         assert(round.RoundEndInfo and round.RoundEndInfo.Winners.VictoryMusic)
-        local sound = Instance.new("Sound")
+        local sound = round.RoundEndInfo.Music
+        if not sound then
+            return
+        end
         sound.SoundGroup = SoundService.RoundEndMusic
         sound.Volume = 0
         
         local fadeIn = TweenService:Create(sound, TweenInfo.new(1), {Volume = 0.5})
         local fadeOut = TweenService:Create(sound, TweenInfo.new(1), {Volume = 0})
-        
-        sound.SoundId = round.RoundEndInfo.Winners.VictoryMusic[1].SoundId
-        sound.Name = round.RoundEndInfo.Winners.VictoryMusic[1].Name
 
         sound.Parent = SoundService.RoundEndMusic
         sound:Play()
@@ -211,7 +211,9 @@ local function update(round: Types.PartialRound?)
             if sound.TimeLength > 0 then
                 task.delay(sound.TimeLength-1, stopMusic :: any)
             else
-                sound:GetPropertyChangedSignal("TimeLength"):Connect(task.delay, sound.TimeLength-1, stopMusic)
+                sound:GetPropertyChangedSignal("TimeLength"):Connect(function()
+                    task.delay(sound.TimeLength-1, stopMusic :: any)
+                end)
             end
         end
     end

@@ -1,11 +1,14 @@
+--!nonstrict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = game:GetService("Players").LocalPlayer
 local UIManager = require(script.Parent.Parent)
 local controls = require(game:GetService("ReplicatedFirst").ControlManager)
-local screenUi = UIManager.WaitForUI("Backpack").UI
+
+type SampleType = TextButton & {TextLabel: TextLabel, Value: ObjectValue & {Value: Instance & {Equipped: BindableEvent}}}
+local screenUi = UIManager.WaitForUI("Backpack").UI :: Frame & {Sample: SampleType}
 
 local clientStorage = game:WaitForChild("ClientStorage")
-local scriptCons = clientStorage:WaitForChild("ScriptConnections")
+local scriptCons = clientStorage:WaitForChild("ScriptConnections") :: any
 
 local function invAdded(child: Instance)
 	if not screenUi:FindFirstChild(child.Name) then
@@ -19,7 +22,7 @@ local function invAdded(child: Instance)
 		sample.Parent = screenUi
 
 		sample.MouseButton1Click:Connect(function()
-			equip(not child:GetAttribute("Equipped"), child, sample)
+			equip(not child:GetAttribute("Equipped"), child, sample, false)
 		end)
 		
 		scriptCons.InventoryChangedEvent:Fire(child, true)
@@ -31,7 +34,7 @@ plr:GetPropertyChangedSignal("Character"):Connect(function()
 	if not char then
 		return
 	end
-	local hum = char:WaitForChild("Humanoid")
+	local hum = char:WaitForChild("Humanoid") :: Humanoid
 	hum.Died:Connect(function()
 		controls.Unregister("Primary Fire")
 		controls.Unregister("Drop")
@@ -40,14 +43,14 @@ plr:GetPropertyChangedSignal("Character"):Connect(function()
 end)
 
 local drop
-local anims = {}
+local anims: {AnimationTrack} = {}
 local ammoCons = {}
-function equip(toEquip, tool, label, isServer)
-	local char = plr.Character
+function equip(toEquip, tool, label: any, isServer)
+	local char = plr.Character :: Model & {Humanoid: Humanoid}
 	if not char then return end
 	if char.Humanoid.Health <= 0 then return end
 	ReplicatedStorage.ClientServer.AttachWeapon:FireServer(tool, toEquip)
-	for i, v in pairs(screenUi:GetChildren()) do
+	for i, v in screenUi:GetChildren() :: {SampleType} do
 		if v:IsA("TextButton") and v.Name ~= "Sample" then
 			v.TextTransparency = 0
 			v.BackgroundTransparency = 0.75
@@ -57,12 +60,12 @@ function equip(toEquip, tool, label, isServer)
 			end
 		end
 	end
-	for i, v in pairs(plr.Character:GetChildren()) do
+	for i, v in char:GetChildren() do
 		if v:GetAttribute("Weapon") and v ~= tool then v:Destroy() end
 	end
 	scriptCons.EquipEvent:Fire(tool, toEquip)
 	tool:SetAttribute("Equipped", toEquip)
-	local roundInfo = plr.PlayerGui:WaitForChild("HUD"):WaitForChild("RoundInfo")
+	local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: Frame & {Frame: any}
 	local ammoBar = roundInfo.Frame.AmmoBar
 	if toEquip then
 		local curAmmo = tool:FindFirstChild("CurrentAmmo")
@@ -104,7 +107,7 @@ function equip(toEquip, tool, label, isServer)
 			v:Destroy()
 		end
 		
-		local anim = plr.Character.Humanoid:LoadAnimation(tool.HoldAnimation)
+		local anim = (plr :: any).Character.Humanoid:LoadAnimation(tool.HoldAnimation)
 		table.insert(anims, anim)
 		anim:Play()
 	else
@@ -120,20 +123,20 @@ function equip(toEquip, tool, label, isServer)
 		tool.Equipped:Fire(false)
 		controls.Unregister("Drop")
 		if isServer then
-			screenUi:FindFirstChild(tostring(tool:GetAttribute("Slot"))..tool.Name):Destroy()
+			(screenUi:FindFirstChild(tostring(tool:GetAttribute("Slot"))..tool.Name) :: Instance):Destroy()
 		end
 	end
 end
 
 local function invRemoved(child: Instance)
-	equip(false, child)
+	equip(false, child, nil, nil)
 	local but = screenUi:FindFirstChild(tostring(child:GetAttribute("Slot"))..child.Name)
 	if but then but:Destroy() end
 	scriptCons.InventoryChangedEvent:Fire(child, false)
 end
 
 drop = function(name, state, object)
-	for i, v in plr.Inventory:GetChildren() do
+	for i, v in (plr :: any).Inventory:GetChildren() do
 		if v:GetAttribute("Equipped") and v:GetAttribute("CanBeDropped") then
 			invRemoved(v)
 			ReplicatedStorage.ClientServer.DropWeapon:FireServer(v.Name)

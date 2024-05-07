@@ -2,7 +2,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UIManager = require(game:GetService("ReplicatedFirst").UIManager)
-local ui = UIManager.WaitForUI("CornerNotification").UI
+local ui = UIManager.WaitForUI("CornerNotification").UI :: any
 
 local TS = game:GetService("TweenService")
 local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)

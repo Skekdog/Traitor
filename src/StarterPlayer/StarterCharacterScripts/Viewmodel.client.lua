@@ -1,3 +1,4 @@
+--!nocheck
 local TS = game:GetService("TweenService")
 local CAS = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
@@ -351,9 +352,9 @@ end
 
 humanoid.Died:Connect(onDied)
 
-while task.wait(0.01) do
-	ReplicatedStorage.ClientServer.RotateHead:FireServer(math.asin(camera.CFrame.LookVector.y))
-	if not renderStepped.Connected then
-		break
-	end
-end
+-- while task.wait(0.01) do
+-- 	ReplicatedStorage.ClientServer.RotateHead:FireServer(math.asin(camera.CFrame.LookVector.y))
+-- 	if not renderStepped.Connected then
+-- 		break
+-- 	end
+-- end

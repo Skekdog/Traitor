@@ -1,3 +1,4 @@
+--!nocheck
 -- http://www.ryanjuckett.com/programming/damped-springs/
 
 local EPSILON = 0.0001;

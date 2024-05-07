@@ -1,10 +1,13 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
+local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local ProfileService = require(script:FindFirstChild("ProfileService"))
 
 local profileTemplate = {
 	Karma = 1000,
-	Settings = require(game:GetService("ReplicatedFirst").SettingsManager).JSONEncode(),
+	Settings = SettingsManager.JSONEncode(),
 	TotalPoints = 0,
 	AvailablePoints = 0,
 	PurchasedAccessories = {},
@@ -18,10 +21,10 @@ type Profile = ProfileService.Profile & {Data: PlayerData}
 local profiles: {[Player]: Profile} = {}
 local ProfileStore = ProfileService.GetProfileStore("PlayerData_v2", profileTemplate)
 
-local ClientServer = ReplicatedStorage:FindFirstChild("ClientServer")
+local ClientServer = ReplicatedStorage.ClientServer
 
 Players.PlayerAdded:Connect(function(plr)
-	if script.Parent:FindFirstChild("RoundHandler"):GetAttribute("ServerLocked") then
+	if ServerStorage:GetAttribute("ServerLocked") then
 		return plr:Kick("This server is shutting down.")
 	end
 	Instance.new("Folder", plr).Name = "Inventory"
@@ -54,7 +57,7 @@ Players.PlayerRemoving:Connect(function(plr)
 	end
 end)
 
-ClientServer:FindFirstChild("SaveSettings").OnServerEvent:Connect(function(plr, options: string)
+ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: string)
 	if typeof(options) ~= "string" then
 		return
 	end

@@ -1,8 +1,9 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
-local RoundHandlerTypes = require(script.Parent.RoundHandlerTypes)
-local RoundHandler = require(script.Parent.RoundHandler)
+local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
+local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
 
 local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
@@ -34,7 +35,7 @@ getPartialParticipants.OnServerInvoke = function(plr)
 	if not roundId then return {} end
 
 	local round = RoundHandler.GetRound(roundId)
-	local self = round:TryGetParticipant(plr.Name)
+	local self = round:GetParticipant(plr.Name)
 
 	local participants = {}
 	if not self then
@@ -55,8 +56,8 @@ getPartialParticipant.OnServerInvoke = function(plr, targetName: string)
 	if not roundId then return end
 
 	local round = RoundHandler.GetRound(roundId)
-	local self = round:TryGetParticipant(plr.Name)
-	local target = round:TryGetParticipant(targetName)
+	local self = round:GetParticipant(plr.Name)
+	local target = round:GetParticipant(targetName)
 
 	if self and target then
 		return self:ViewPartialParticipant(target)
@@ -76,7 +77,7 @@ getOwnInfo.OnServerInvoke = function(plr): RoundHandlerTypes.PartialParticipant?
 		return
 	end
 
-	local a = p:ViewPartialParticipant(p)
+	local a: any = p:ViewPartialParticipant(p)
 	a.Credits = p.Credits
 	return a
 end
@@ -100,15 +101,15 @@ slayVote.OnServerEvent:Connect(function(plr, target: Player)
 	end
 
 	local round = RoundHandler.GetRound(roundId)
-	local voterParticipant = round:TryGetParticipant(plr.Name)
-	local targetParticipant = round:TryGetParticipant(target.Name)
+	local voterParticipant = round:GetParticipant(plr.Name)
+	local targetParticipant = round:GetParticipant(target.Name)
 	if voterParticipant and targetParticipant then
 		targetParticipant:TryAddSlayVote(voterParticipant)
 	end
 end)
 
 local gamemodes = {}
-for _, v in script.Parent.Gamemodes:GetChildren() do
+for _, v in ReplicatedFirst.RoundHandler.Gamemodes:GetChildren() do
 	if v.Name == "ThoseYouTrust" then
 		local gm = require(v) :: any
 		table.insert(gamemodes, gm)
@@ -127,7 +128,7 @@ joinRound.OnServerInvoke = function(plr)
 	end
 
 	if not roundId then
-		round = RoundHandler.CreateRound(ServerStorage.Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
+		round = RoundHandler.CreateRound((ServerStorage :: any).Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
 		ServerStorage:SetAttribute("RoundID", round.ID)
 		round.RoundPhaseChangeEvent.Event:Connect(function(phase)
 			roundPhaseChange:FireAllClients(phase)
