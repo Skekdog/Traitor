@@ -317,6 +317,18 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 	end
 	
 	local bgMenuMode = script:GetAttribute("BackgroundMenuMode")
+
+	if self.Visible then
+		local highestIndex = 1
+		for _, v in UIManager.GetUIs(self.UIType) do
+			if v.Visible and (v.UI.ZIndex > highestIndex) then
+				highestIndex = v.UI.ZIndex
+			end
+		end
+		frame.ZIndex = highestIndex + 1
+	else
+		frame.ZIndex = 1
+	end
 	
 	if bgMenuMode ~= "Stacked" then
 		if bgMenuMode == "Closed" then
@@ -347,18 +359,6 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 			end
 			ui:ToggleVisible(true, true)
 			scrUI:SetAttribute("NextUI", table.concat(nextUI, ";", 2, #nextUI))
-		end
-	else
-		if self.Visible then
-			local highestIndex = 1
-			for _, v in UIManager.GetUIs(self.UIType) do
-				if v.Visible and (v.UI.ZIndex > highestIndex) then
-					highestIndex = v.UI.ZIndex
-				end
-			end
-			frame.ZIndex = highestIndex + 1
-		else
-			frame.ZIndex = 1
 		end
 	end
 	return
