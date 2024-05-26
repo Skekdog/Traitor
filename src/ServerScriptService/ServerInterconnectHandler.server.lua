@@ -1,6 +1,7 @@
 --!nocheck
+--!nolint
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local wm = require(game.ServerScriptService.WeaponModule)
+--local wm = require(game.ServerScriptService.WeaponModule)
 
 local si = ReplicatedStorage.ServerInterconnect
 si.ExplosiveBarrel.Event:Connect(function(part: BasePart, plr: Player?)

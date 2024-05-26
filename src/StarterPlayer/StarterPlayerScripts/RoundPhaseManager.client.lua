@@ -5,7 +5,8 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local Types = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local API = require(ReplicatedFirst.API)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local UIManager = require(ReplicatedFirst.UIManager)
 
@@ -27,27 +28,16 @@ local function updateTimer(time: number)
 		return
 	end
 
-    local diffTime = math.max(math.round(timeTarget) - math.round(time), 0)
-	local minutes = tostring(diffTime // 60)
-	local seconds = tostring(math.fmod(diffTime, 60))
-
-	if string.len(minutes) < 2 then
-		minutes = "0"..minutes
-	end
-	if string.len(seconds) < 2 then
-		seconds = "0"..seconds
-	end
-
-	roundInfo.Timer.Text = minutes..":"..seconds
+	roundInfo.Timer.Text = API.ToRoundTime(time, timeTarget)
 end
 
-local vote = UIManager.WaitForUI("VotingScreen") :: any
+local vote: UIManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Popup.VotingScreen)} = UIManager.WaitForUI("VotingScreen")
 for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
-	local clone = vote.UI:FindFirstChild("Sample"):Clone()
+	local clone = vote.UI.Sample:Clone()
 	clone.Text = v
 	clone.Visible = true
 	clone.Name = v
-	clone.Parent = vote.UI:FindFirstChild("Choices")
+	clone.Parent = vote.UI.Choices :: any
 
     clone.MouseButton1Click:Connect(function()
         ReplicatedStorage.RoundHandler.VoteMap:FireServer(v)
@@ -70,7 +60,6 @@ local function update(round: Types.PartialRound?)
     end
 
     if not round then
-        print("nay round")
         -- Allow for creation of a new round
         joinRound:ToggleVisible(true)
 
@@ -90,7 +79,7 @@ local function update(round: Types.PartialRound?)
 
     (game :: any).ClientStorage.CurrentMapObject.Value = round.Map
 
-    if stopMusic then
+    if stopMusic and round.RoundPhase ~= "Intermission" then
         stopMusic()
     end
 
@@ -107,14 +96,23 @@ local function update(round: Types.PartialRound?)
     end)
 
     if round.RoundPhase == "Playing" then
+        (game :: any).ClientStorage:SetAttribute("RoundStartTime", workspace:GetServerTimeNow()) --todo: this can probably cause problems under big lag
         if ownRole then
-            if #ownRole.EquipmentShop > 0 then
-                local shop = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI :: any
+            if ownRole.EquipmentShop and #ownRole.EquipmentShop > 0 then
+                local shop: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"]) = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI
                 shop.Reset:Fire()
+                
+                for _, v in shop.ScrollingFrame:GetChildren() do
+                    if v.ClassName == "ImageButton" then
+                        v:Destroy()
+                    end
+                end
 
                 local nameToObj = {}
-                for _, e in round.Gamemode.AvailableEquipment do
-                    nameToObj[e.Name] = e
+                if round.Gamemode.AvailableEquipment then
+                    for _, e in round.Gamemode.AvailableEquipment do
+                        nameToObj[e.Name] = e
+                    end
                 end
 
                 for _, v in ownRole.EquipmentShop do
@@ -128,39 +126,41 @@ local function update(round: Types.PartialRound?)
                     entry.Image = equipment.Icon
                     entry.Name = equipment.Name
                     entry.Visible = true
-                    entry.Parent = shop.ScrollingFrame
+                    entry.Parent = shop.ScrollingFrame :: any
                 end
             end
 
             local participants: {Types.PartialParticipant} = remotes.GetPartialParticipants:InvokeServer()
 
-            local roleHighlights = {}
+            if ownRole.HighlightRules then
+                local roleHighlights = {}
 
-            for _, role in round.Gamemode.Roles do
-                local thisRelation = table.find(role.Allies, ownRole.Name) and "__Ally" or "__Enemy"
-                local verdict
-                for relation, highlight in ownRole.HighlightRules do
-                    if relation == role.Name then
-                        verdict = highlight
-                        break
-                    elseif verdict == nil then
-                        verdict = if relation == "__All" then highlight else thisRelation == relation
+                for _, role in round.Gamemode.Roles do
+                    local thisRelation = table.find(role.Allies or {}, ownRole.Name) and "__Ally" or "__Enemy"
+                    local verdict
+                    for relation, highlight in ownRole.HighlightRules do
+                        if relation == role.Name then
+                            verdict = highlight
+                            break
+                        elseif verdict == nil then
+                            verdict = if relation == "__All" then highlight else thisRelation == relation
+                        end
                     end
+                    roleHighlights[role.Name] = verdict
                 end
-                roleHighlights[role.Name] = verdict
-            end
 
-            for _, v in participants do
-                if not v.Role then
-                    continue
-                end
-                if roleHighlights[v.Role.Name] then
-                    local clone = Instance.new("Highlight")
-                    CollectionService:AddTag(clone, "AllyMarker")
-                    clone.FillTransparency = 1
-                    clone.OutlineColor = v.Role.Colour
-                    clone.OutlineTransparency = 0
-                    clone.Parent = v.Player.Character
+                for _, v in participants do
+                    if not v.Role then
+                        continue
+                    end
+                    if roleHighlights[v.Role.Name] then
+                        local clone = Instance.new("Highlight")
+                        CollectionService:AddTag(clone, "AllyMarker")
+                        clone.FillTransparency = 1
+                        clone.OutlineColor = v.Role.Colour
+                        clone.OutlineTransparency = 0
+                        clone.Parent = v.Player.Character
+                    end
                 end
             end
         end
@@ -208,11 +208,12 @@ local function update(round: Types.PartialRound?)
         end
         
         if not sound:GetAttribute("FullSong") then
+            assert(stopMusic)
             if sound.TimeLength > 0 then
-                task.delay(sound.TimeLength-1, stopMusic :: any)
+                task.delay(sound.TimeLength-1, stopMusic)
             else
                 sound:GetPropertyChangedSignal("TimeLength"):Connect(function()
-                    task.delay(sound.TimeLength-1, stopMusic :: any)
+                    task.delay(sound.TimeLength-1, stopMusic)
                 end)
             end
         end

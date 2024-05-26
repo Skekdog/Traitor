@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local plr = Players.LocalPlayer
 
 local scriptCons = (game :: any).ClientStorage.ScriptConnections
@@ -9,7 +9,7 @@ local scriptCons = (game :: any).ClientStorage.ScriptConnections
 scriptCons:WaitForChild("PingRadarEvent").Event:Connect(function()
 	(workspace :: any).RadarPoints:ClearAllChildren()
 	
-	local info: {RoundHandlerTypes.PartialParticipant}? = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
+	local info: {Types.PartialParticipant}? = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
 	if info then
 		for _, v in info do
 			local char = v.Player.Character :: any

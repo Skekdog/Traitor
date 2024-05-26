@@ -2,7 +2,7 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Types = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local common = require(script.Parent.Common)
 
 local items = ReplicatedStorage.Items
@@ -18,11 +18,8 @@ local module: Types.Gamemode = {
     RecommendedPlayers = 4,
     MaximumPlayers = 32,
     
-    TimeoutVictors = function(self)
-        return self.Roles[3]
-    end,
+    TimeoutVictors = "Traitor",
     PhyrricVictors = "Traitor",
-    Extras = {},
 
     CalculateRoundHighlights = function(self, round)
         local weaponList = common.GetWeaponHighlights(round.EventLog :: any)
@@ -76,10 +73,10 @@ local module: Types.Gamemode = {
                 end
             end
             if firstKill then
-                local aRole = firstKill.Attacker:GetAllegiance().Name
-                local vRole = firstKill.Victim:GetAllegiance().Name
+                local aRole = firstKill.Attacker.Role.Allegiance
+                local vRole = firstKill.Victim.Role.Allegiance
 
-                local attackerName = firstKill.Attacker:GetFormattedName()
+                local attackerName = firstKill.Attacker.FormattedName
                 if (aRole == "Traitor") and (vRole == "Traitor") then
                     table.insert(highlights, {
                         Name = "First Bloody Stupid Kill",
@@ -109,7 +106,7 @@ local module: Types.Gamemode = {
                 local allyKills = 0
                 local enemyKills = 0
                 for _, kill in participant.KillList do
-                    if (round:GetRoleRelationship(participant:GetRole(), kill:GetRole()) == "__Ally") then
+                    if round:IsRoleAlliedWith(participant.Role, kill.Role) then
                         if (not kill.KilledInSelfDefense) then
                             allyKills += 1
                         end
@@ -151,30 +148,21 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingCredits = 0,
     StartingEquipment = {"Crowbar"},
     AvailableEquipment = {
         {
             Name = "Crowbar",
             Description = "Become a Gordonite",
-            Cost = 0,
             Icon = "rbxassetid://",
-            MaxStock = 1,
             AttackType = "Blunt",
-            NoGuilt = false,
-            Extras = {},
 
             Item = items:FindFirstChild("Crowbar")
         },
         {
             Name = "Pistol",
             Description = "Reliable",
-            Cost = 0,
             Icon = "rbxassetid://",
-            MaxStock = 1,
             AttackType = "Firearm",
-            NoGuilt = false,
-            Extras = {},
 
             Item = items:FindFirstChild("Pistol")
         },
@@ -185,8 +173,6 @@ local module: Types.Gamemode = {
             Icon = "rbxassetid://",
             MaxStock = 1,
             AttackType = "Explosion",
-            NoGuilt = false,
-            Extras = {},
 
             Item = items:FindFirstChild("Grenade")
         },
@@ -196,15 +182,12 @@ local module: Types.Gamemode = {
             Cost = 1,
             Icon = "rbxassetid://",
             MaxStock = 1,
-            AttackType = "None",
-            NoGuilt = false,
-            Extras = {},
 
             Item = function(item, participant)
                 print(`{participant.Player.Name} got radar`)
             end,
         }
-    },
+    } :: {Types.Equipment},
 
     Roles = {
         {
@@ -219,7 +202,7 @@ local module: Types.Gamemode = {
 
             Allies = {"Traitor"},
             Allegiance = "Traitor",
-            VictoryMusic = game.ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
+            VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
             VictoryText = "The dastardly traitors have won the round!",
 
             AnnounceDisconnect = true,
@@ -227,17 +210,10 @@ local module: Types.Gamemode = {
             AwardOnDeath = {
                 Detective = 1,
             },
-            CorpseResultsPublicised = false,
 
             StartingCredits = 2,
-            StartingEquipment = {},
 			EquipmentShop = {"Grenade"},
 			CanSeeMissing = true,
-
-            Accessories = {},
-            Health = 100,
-            Speed = 16,
-            JumpPower = 18,
 
             HighlightRules = {
                 __Ally = true,
@@ -247,9 +223,6 @@ local module: Types.Gamemode = {
                 Detective = true,
             },
             TeamChat = true,
-
-            OnRoleAssigned = function() end,
-            OnRoleRemoved = function() end,
         },
         {
             Name = "Detective",
@@ -266,29 +239,17 @@ local module: Types.Gamemode = {
 
             AnnounceDisconnect = true,
 			CanStealCredits = true,
-			CanSeeMissing = false,
             AwardOnDeath = {
                 Traitor = 1,
             },
             CorpseResultsPublicised = true,
 
             StartingCredits = 2,
-            StartingEquipment = {},
             EquipmentShop = {"Radar"},
 
-            Accessories = {},
-            Health = 100,
-            Speed = 16,
-            JumpPower = 18,
-
-            HighlightRules = {},
             KnowsRoles = {
                 Detective = true,
             },
-            TeamChat = false,
-
-            OnRoleAssigned = function() end,
-            OnRoleRemoved = function() end,
         },
         {
             Name = "Innocent",
@@ -304,30 +265,9 @@ local module: Types.Gamemode = {
             Allegiance = "Innocent",
             VictoryMusic = game.ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
             VictoryText = "The loveable innocents have won the round!",
-
-            AnnounceDisconnect = false,
-            CanStealCredits = false,
-            AwardOnDeath = {},
-            CorpseResultsPublicised = false,
-
-            StartingCredits = 0,
-            StartingEquipment = {},
-            EquipmentShop = {},
-
-            Accessories = {},
-            Health = 100,
-            Speed = 16,
-			JumpPower = 18,
-			CanSeeMissing = false,
-
-            HighlightRules = {},
             KnowsRoles = {
                 Detective = true,
             },
-            TeamChat = false,
-
-            OnRoleAssigned = function() end,
-            OnRoleRemoved = function() end,
         }
     },
 

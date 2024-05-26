@@ -5,7 +5,7 @@ local UIManager = require(game:GetService("ReplicatedFirst").UIManager)
 local ui = UIManager.WaitForUI("CornerNotification").UI :: any
 
 local TS = game:GetService("TweenService")
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local global = ui.Global
 local priv = ui.Private
@@ -55,6 +55,6 @@ local function makeLabel(isTeam, text)
 	task.delay(2, function()fade(label, true)end)
 end
 
-ReplicatedStorage.RoundHandler.SendMessage.OnClientEvent:Connect(function(msg: string, msgType: RoundHandlerTypes.MessageType)
+ReplicatedStorage.RoundHandler.SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
 	makeLabel(table.find({"bodyFound", "timeToRoundStart", "karma"}, msgType) ~= nil, msg)
 end)

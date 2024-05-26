@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(script.Parent.Parent)
 
 local ui = UIManager.WaitForUI("Playerlist").UI :: any
@@ -20,7 +20,7 @@ local function findPlr(plr: Player)
 end
 
 function updatePlr(plr: Player, clone)
-	local participant: RoundHandlerTypes.PartialParticipant? = ReplicatedStorage.RoundHandler.GetPartialParticipant:InvokeServer(plr.Name)
+	local participant: Types.PartialParticipant? = ReplicatedStorage.RoundHandler.GetPartialParticipant:InvokeServer(plr.Name)
 	if participant and participant.Role then
 		clone.Username.TextColor3 = participant.Role.Colour
 		clone.Username:SetAttribute("StyleData", "KeepText")
@@ -101,8 +101,8 @@ Players.PlayerAdded:Connect(function(plr)
 	movePlr(plr, "Spectating")
 end)
 
-local participants: {RoundHandlerTypes.PartialParticipant} = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
-local plrToParticipant: {[Player]: RoundHandlerTypes.PartialParticipant} = {}
+local participants: {Types.PartialParticipant} = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
+local plrToParticipant: {[Player]: Types.PartialParticipant} = {}
 
 for _, v in participants do
 	plrToParticipant[v.Player] = v

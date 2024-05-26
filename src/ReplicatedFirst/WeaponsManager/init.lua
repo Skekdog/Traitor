@@ -2,13 +2,14 @@
 --todo: Look into FastCast
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local API = require(ReplicatedFirst.API)
-local Adapters = require(ReplicatedFirst.RoundHandler.Adapters)
+local Adapters = require(ServerScriptService.Adapters)
 
-type BeforeHitFunction = (attacker: RoundHandlerTypes.Participant?, target: RoundHandlerTypes.Participant, willDie: boolean) -> ()
+type BeforeHitFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean) -> ()
 type AimInfo = {
     FOV: number,
     HasScope: boolean?,
@@ -32,7 +33,7 @@ type ProjectileInfo = {
     Speed: number,
 }
 
-type Entity = RoundHandlerTypes.Participant | RoundHandlerTypes.Prop
+type Entity = Types.Participant | Types.Prop
 
 export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
 export type Weapon = {
@@ -78,7 +79,7 @@ export type ExplosionInfo = {
 
 local module = {}
 
-local function calculateDamage(attacker: RoundHandlerTypes.Participant?, weapon: Weapon, partName: string, distance: number): number
+local function calculateDamage(attacker: Types.Participant?, weapon: Weapon, partName: string, distance: number): number
     local damage: number
     if type(weapon.Damage) == "table" then
         if partName == "Head" then
@@ -103,19 +104,19 @@ local function calculateDamage(attacker: RoundHandlerTypes.Participant?, weapon:
     return damage
 end
 
-local function onEntityHit(round: RoundHandlerTypes.Round, weapon: Weapon, attacker: RoundHandlerTypes.Participant?, entity: Entity, partName: string, distance: number): ()
+local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.Participant?, entity: Entity, partName: string, distance: number): ()
     local damage = calculateDamage(attacker, weapon, partName, distance)
 
     local hum: Humanoid
     local sameTeam: boolean?
-    if type(entity) == "table" then
+    if entity.Kind == "Participant" then
         hum = entity.Character:FindFirstChildOfClass("Humanoid") :: any
         if not hum then
             return
         end
 
         if attacker then
-            sameTeam = round:CompareRoles(attacker:GetRole(), entity:GetRole(), "__Ally")
+            sameTeam = round:IsRoleAlliedWith(attacker.Role, entity.Role)
         end
     else
         hum = entity.Humanoid
@@ -124,7 +125,7 @@ local function onEntityHit(round: RoundHandlerTypes.Round, weapon: Weapon, attac
     local canDamage = if sameTeam then round.Gamemode.FriendlyFire else true
     if canDamage then
         local willDie = (hum.Health - damage) <= 0
-        if type(entity) == "table" then
+        if entity.Kind == "Participant" then
             if willDie then
                 local death = (entity.Character:FindFirstChild("HumanoidRootPart") :: any):FindFirstChild("DeathSound", true)
                 if death and partName == "Head" then
@@ -145,15 +146,15 @@ local function onEntityHit(round: RoundHandlerTypes.Round, weapon: Weapon, attac
             if weapon.BeforeHitParticipant then
                 weapon.BeforeHitParticipant(attacker, entity, willDie)
             end
-        elseif entity.OnBreak and willDie then
-            (require)(entity.OnBreak)(if attacker then attacker.Player else nil)
+        elseif willDie then
+            entity.OnBreak(entity)
         end
         
         hum.Health -= damage
     end
 end
 
-local function onPartHit(round: RoundHandlerTypes.Round, weapon: Weapon, attacker: RoundHandlerTypes.Participant?, rayResult: RaycastResult): ()
+local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Participant?, rayResult: RaycastResult): ()
     if round:IsRoundPreparing() then
         return
     end
@@ -202,14 +203,14 @@ local function onPartHit(round: RoundHandlerTypes.Round, weapon: Weapon, attacke
         impactHole.Parent = part
 
         if round.Map.Props:IsAncestorOf(part) then
-            local model: RoundHandlerTypes.Prop = part:FindFirstAncestorOfClass("Model") :: any
+            local model: Types.Prop = part:FindFirstAncestorOfClass("Model") :: any
             onEntityHit(round, weapon, attacker, model, part.Name, rayResult.Distance)
         end
     end
 end
 
 -- Weapon may be nil if it is e.g. an explosive barrel
-function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo, attacker: RoundHandlerTypes.Participant?, weapon: Weapon?): ()
+function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo, attacker: Types.Participant?, weapon: Weapon?): ()
     local explosion = Instance.new("Explosion")
     explosion.BlastRadius = explosionInfo.Radius
     explosion.BlastPressure = explosionInfo.Pressure

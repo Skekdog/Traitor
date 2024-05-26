@@ -36,13 +36,13 @@ export type UI = typeof(setmetatable({}, {})) & {
 	Visible: boolean, --Self-explanatory.
 	PreventClose: boolean, --Prevents the UI from being closed with the X key.
 	UIType: UIType, --UIType
-	UI: Frame, --A reference to the frame object.
+	UI: GuiObject, --A reference to the frame object.
 }
 
 if not _G.RegisteredUIs then _G.RegisteredUIs = {} end
 
 local UIRegistered = (script:FindFirstChild("Event") :: BindableEvent) or Instance.new("BindableEvent", script)
-function UIManager.RegisterUI(name: string, uiType: UIType, ignoreInset: boolean, ui: Frame, displayName: string?, preventClose: boolean): UI
+function UIManager.RegisterUI<T>(name: string, uiType: UIType, ignoreInset: boolean, ui: Frame, displayName: string?, preventClose: boolean): UI & {UI: T}
 	local self: UI = {} :: UI
 	
 	self.Name = name
@@ -69,7 +69,7 @@ function UIManager.RegisterUI(name: string, uiType: UIType, ignoreInset: boolean
 	end
 	
 	if ui:GetAttribute("Sidebar") then
-		local sb = UIManager.GetUI("Sidebar").UI :: any
+		local sb: typeof(script.UnregisteredUIs.Buttons.Sidebar) = UIManager.GetUI("Sidebar").UI
 		local function add()
 			if not game:GetService("ReplicatedFirst"):GetAttribute("ControlsReady") then
 				game:GetService("ReplicatedFirst"):GetAttributeChangedSignal("ControlsReady"):Wait()
@@ -134,10 +134,10 @@ function UIManager.RegisterUI(name: string, uiType: UIType, ignoreInset: boolean
 	end
 	
 	ui.Parent = uis[uiType]
-	self = setmetatable(self::any, UIManager)
+	self = setmetatable(self, UIManager)
 	table.insert(_G.RegisteredUIs, self)
 	UIRegistered:Fire(self.Name)
-	return self
+	return self :: any
 end
 
 function UIManager.UnregisterUI(name: string, uiType: UIType): nil
@@ -157,7 +157,7 @@ function UIManager.UnregisterUI(name: string, uiType: UIType): nil
 			pcall(function()
 				reg.UI.Visible = false
 				reg.UI.Parent = (script :: any):FindFirstChild("UnregisteredUIs")[uiType]
-				local sb = UIManager.GetUI("Sidebar").UI :: any
+				local sb: typeof(script.UnregisteredUIs.Buttons.Sidebar) = UIManager.GetUI("Sidebar").UI
 				sb:FindFirstChild(name):Destroy()
 			end)
 		end
@@ -174,7 +174,7 @@ function UIManager.TryGetUI(name: string): UI?
 	return
 end
 
-function UIManager.GetUI(name: string): UI
+function UIManager.GetUI<T>(name: string): UI & {UI: T}
 	for _, v in _G.RegisteredUIs do
 		if v.Name == name then
 			return v
@@ -193,7 +193,7 @@ function UIManager.GetUIs(uiType: UIType): {UI}
 	return uis
 end
 
-function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
+function UIManager.WaitForUI<T>(name: string, ignoreYield: boolean?): UI & {UI: T}
 	local start = os.time()
 	local warned = false
 	repeat
@@ -334,7 +334,7 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 		if bgMenuMode == "Closed" then
 			for _, v in scrUI:GetChildren() do
 				if v ~= frame then
-					(UIManager.GetUI(v.Name) :: UI):ToggleVisible(false, true)
+					UIManager.GetUI(v.Name):ToggleVisible(false, true)
 				end
 			end
 			return

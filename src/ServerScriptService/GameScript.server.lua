@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
 local slayVote = remotes.SlayVote
@@ -15,7 +15,7 @@ local getOwnInfo = remotes.GetOwnInfo
 local joinRound = remotes.JoinRound
 local getMaps = remotes.GetMaps
 
-local function getMinimalParticipant(participant: RoundHandlerTypes.Participant): RoundHandlerTypes.PartialParticipant
+local function getMinimalParticipant(participant: Types.Participant): Types.PartialParticipant
 	return {
 		Player = participant.Player,
 		Status = participant.Status
@@ -68,7 +68,7 @@ getPartialParticipant.OnServerInvoke = function(plr, targetName: string)
 	return getMinimalParticipant(target)
 end
 
-getOwnInfo.OnServerInvoke = function(plr): RoundHandlerTypes.PartialParticipant?
+getOwnInfo.OnServerInvoke = function(plr): Types.PartialParticipant?
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then return end
 
@@ -109,7 +109,7 @@ slayVote.OnServerEvent:Connect(function(plr, target: Player)
 end)
 
 local gamemodes = {}
-for _, v in ReplicatedFirst.RoundHandler.Gamemodes:GetChildren() do
+for _, v in script.Parent.Gamemodes:GetChildren() do
 	if v.Name == "ThoseYouTrust" then
 		local gm = require(v) :: any
 		table.insert(gamemodes, gm)
@@ -117,10 +117,10 @@ for _, v in ReplicatedFirst.RoundHandler.Gamemodes:GetChildren() do
 end
 
 local nextRoundReady = true
-local nextMap = "Mesa Monocraft"
+local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructure
 
 joinRound.OnServerInvoke = function(plr)
-	local round: RoundHandlerTypes.Round
+	local round: Types.Round
 	local roundId = ServerStorage:GetAttribute("RoundID")
 
 	if not nextRoundReady then
@@ -128,16 +128,51 @@ joinRound.OnServerInvoke = function(plr)
 	end
 
 	if not roundId then
-		round = RoundHandler.CreateRound((ServerStorage :: any).Maps[nextMap], gamemodes[math.random(1, #gamemodes)])
+		round = RoundHandler.CreateRound(nextMap, gamemodes[math.random(1, #gamemodes)])
 		ServerStorage:SetAttribute("RoundID", round.ID)
-		round.RoundPhaseChangeEvent.Event:Connect(function(phase)
+		local votes = {}
+		local voteCon: RBXScriptConnection?
+
+		nextRoundReady = false
+
+		local roundEventCon: RBXScriptConnection
+		roundEventCon = round.RoundPhaseChangeEvent.Event:Connect(function(phase)
 			roundPhaseChange:FireAllClients(phase)
-			if phase ~= "Intermission" then
+
+			if phase == "Intermission" then
+				ReplicatedStorage.RoundHandler.VoteMap:FireAllClients(true)
+				voteCon = ReplicatedStorage.RoundHandler.VoteMap.OnServerEvent:Connect(function(plr, map: string)
+					if not ServerStorage.Maps:FindFirstChild(map) then
+						return
+					end
+					if not votes[map] then
+						votes[map] = {plr}
+					elseif not table.find(votes[map], plr) then
+						table.insert(votes[map], plr)
+					end
+				end)
+			end
+
+			if phase ~= "Destroy" then
 				return
 			end
 
-			nextRoundReady = false
+			if voteCon then
+				ReplicatedStorage.RoundHandler.VoteMap:FireAllClients(false)
+				voteCon:Disconnect()
+				local bestMap, bestVotes = "", 0
+				for i, v in votes do
+					if #v > bestVotes then
+						bestMap = i
+						bestVotes = #v
+					end
+				end
+				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructure) or (ServerStorage.Maps:GetChildren()[math.random(1, #ServerStorage.Maps:GetChildren())] :: Types.MapStructure)
+			end
+
+			roundEventCon:Disconnect()
 			ServerStorage:SetAttribute("RoundID", nil)
+			nextRoundReady = true
 		end)
 	else
 		round = RoundHandler.GetRound(roundId)

@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local Controls = require(ReplicatedFirst.ControlManager)
 
 local plr = Players.LocalPlayer
@@ -17,7 +17,7 @@ clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
 		Controls.Unregister("Interact")
 	else
 		Controls.Register("Interact", true, function(action, state, input, toggled)
-			local map: RoundHandlerTypes.MapStructure? = (game :: any).ClientStorage.CurrentMapObject.Value
+			local map: Types.MapStructure? = (game :: any).ClientStorage.CurrentMapObject.Value
 	
 			local char = plr.Character
 			if not char or not map then return end

@@ -1,16 +1,16 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local API = require(ReplicatedFirst.API)
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local uiManager = require(ReplicatedFirst.UIManager)
 
-local UI = uiManager.WaitForUI("Highlights")
-local page = (UI :: any).UI.Page
+local UI: uiManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered.Highlights)} = uiManager.WaitForUI("Highlights")
+local page = UI.UI.Page
 
 local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
 local eTemplate = eFrame.Template
 
-ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {RoundHandlerTypes.RoundHighlight}, events: {RoundHandlerTypes.UserFacingRoundEvent}, scores: {[RoundHandlerTypes.Participant]: RoundHandlerTypes.ParticipantScoring}, victors: RoundHandlerTypes.Role)
+ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role)
 	print(highlights)
 	hFrame.Winners.Text = `THE {victors.Name:upper()} WIN`
 	hFrame.Winners.TextColor3 = victors.Colour
@@ -25,7 +25,7 @@ ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(hig
 			v:Destroy()
 		end
 	end
-	for _, v in hFrame.Highlights:GetChildren() do
+	for _, v in hFrame.Highlights:GetChildren() :: any do
 		if v.ClassName == "Frame" then
 			v.Description.Text = ""
 			v.Highlight.Text = ""
@@ -36,7 +36,7 @@ ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(hig
 		if i >= 5 then
 			break
 		end
-		local h = hFrame.Highlights:FindFirstChild("Highlight"..tostring(i))
+		local h = hFrame.Highlights:FindFirstChild("Highlight"..tostring(i)) :: any
 		h.Description.Text = v.Description
 		h.Highlight.Text = v.Name
 	end
@@ -45,8 +45,9 @@ ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(hig
 	for _, v in events do
 		local e = eTemplate:Clone()
 		e.TextLabel.Text = v.Text
-		e.Time.Text = v.Timestamp
+		e.Time.Text = API.ToRoundTime((game :: any).ClientStorage:GetAttribute("RoundStartTime"), v.Timestamp)
 		e.Visible = true
+		e.Name = "ActiveEvent"
 		e.Parent = eFrame
 	end
 	
@@ -65,22 +66,32 @@ local function showTab(tab)
 		return
 	end
 	script:SetAttribute("CurrentTab", tab)
-	API.TransitionUIPage(page:FindFirstChild(curPage), pageOrders[curPage], page:FindFirstChild(tab), pageOrders[tab], UDim2.fromScale(0.5, 0.5))
+	API.TransitionUIPage(page:FindFirstChild(curPage) :: any, pageOrders[curPage], page:FindFirstChild(tab) :: any, pageOrders[tab], UDim2.fromScale(0.5, 0.5))
 end
 
 local function _adjustEventFilter(filter, visible)
-	for _, v in eFrame:GetChildren() do if v:GetAttribute("Category") == filter then v.Visible = visible end end
+	for _, v in eFrame:GetChildren() :: any do
+		if v:GetAttribute("Category") == filter then
+			v.Visible = visible
+		end
+	end
 end
 
 page.Parent.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
 page.Parent.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
 page.Parent.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
 
-for _, v in eFrame.EventFilters:GetChildren() do
-	if v.ClassName == "UIGridLayout" then continue end
+for _, v in eFrame.EventFilters:GetChildren() :: any do
+	if v.ClassName == "UIGridLayout" then
+		continue
+	end
 	v.ImageLabel.MouseButton1Click:Connect(function()
 		local visible = not v:GetAttribute("Visible")
-		for _, k in eFrame:GetChildren() do if k:GetAttribute("Category") == v.Name then k.Visible = visible end end
+		for _, k in eFrame:GetChildren() :: any do
+			if k:GetAttribute("Category") == v.Name then
+				k.Visible = visible
+			end
+		end
 		v.ImageLabel.Image = (visible and "rbxassetid://9155626912") or "rbxassetid://9155599240"
 		v:SetAttribute("Visible", visible)
 	end)

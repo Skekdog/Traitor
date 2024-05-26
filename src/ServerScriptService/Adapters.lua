@@ -1,17 +1,30 @@
 -- Implementation-dependent functions that *should* be customised.
 
+local Lighting = game:GetService("Lighting")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
-local API = require(script.Parent.API)
-local Types = require(script.Parent.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local getProfile = ServerScriptService.PlayerSetup.GetProfile
 local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile
 
 local remotes = ReplicatedStorage.RoundHandler
 local voteMap = remotes.VoteMap
+
+local vowels = {"a", "e", "i", "o", "u"}
+local function stringWithDeterminer(str: string): string
+    local lowered = str:lower()
+
+    local determiner = "a "
+    if table.find(vowels, lowered:sub(1)) then
+        determiner = "an "
+    end
+
+    return determiner..str
+end
 
 local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
 
@@ -28,10 +41,39 @@ local deathsounds = {
 local module: Types.Adapter = {
     Configuration = {
         HIGHLIGHTS_TIME = 10, -- Time to spend after the round ends before destroying the round
-        MAP_VOTING_TIME = 10,
         PREPARING_TIME = 1, -- Time to spend after a round is created where players can join the round
         SLAY_VOTES = 2, -- Minimum number of votes to slay someone, at which point they will be slain
+        INTERMISSION_TIME = 10,
     },
+
+    SetDefaultLighting = function()
+        Lighting.Ambient = Color3.new(0.5, 0.5, 0.5)
+        Lighting.Brightness = 1
+        Lighting.ClockTime = 14
+        Lighting.ColorShift_Bottom = Color3.new()
+        Lighting.ColorShift_Top = Color3.new()
+        Lighting.EnvironmentDiffuseScale = 0
+        Lighting.EnvironmentSpecularScale = 0
+        Lighting.ExposureCompensation = 0
+        Lighting.FogColor = Color3.new(0.75, 0.75, 0.75)
+        Lighting.FogEnd = 100000
+        Lighting.FogStart = 0
+        Lighting.GeographicLatitude = 41.7332993
+        Lighting.GlobalShadows = false
+        Lighting.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
+        Lighting.ShadowSoftness = 0.5
+        Lighting.TimeOfDay = "14:00:00"
+    end,
+
+    DoIntermission = function()
+        local roundNumber = (ServerStorage:GetAttribute("RoundNumber") or -1) + 1 -- or -1, because +1, so then == 0, so % 5 == 0.
+        ServerStorage:SetAttribute("RoundNumber", roundNumber)
+        if roundNumber % 2 == 0 then
+            -- also enable map voting here, or whatever
+            return true
+        end
+        return false
+    end,
 
     GiveEquipment = function(participant, item)
         -- Gives an item to a player. If the item is a function, calls it. The standard implementation uses the Backpack.
@@ -120,7 +162,7 @@ local module: Types.Adapter = {
         -- Sends a private server message to each recipient.
         -- The message can be further processed here, such as using rich text to change text colour depending on severity.
 
-        local remote: RemoteEvent = remotes:FindFirstChild("SendMessage") :: RemoteEvent
+        local remote = remotes.SendMessage
         
         local fontColour = ""
         -- These colours suck
@@ -145,12 +187,12 @@ local module: Types.Adapter = {
     end,
 
     SendRoleAlert = function(recipient, role)
-        local remote = remotes:FindFirstChild("SendRoleAlert") :: RemoteEvent
+        local remote = remotes.SendRoleAlert
         remote:FireClient(recipient.Player, role.Name, role.Colour, role.Description, role.Extras.Sound)
     end,
 
     SendRoundHighlights = function(recipients, highlights, events, scores, victors)
-        local remote = remotes:FindFirstChild("SendHighlights") :: RemoteEvent
+        local remote = remotes.SendHighlights
         for _, v in recipients do
             remote:FireClient(v.Player, highlights, events, scores, victors)
         end
@@ -175,7 +217,7 @@ local module: Types.Adapter = {
     end,
 
     SendSlayVote = function(to, target)
-        local remote = remotes:FindFirstChild("SlayVote") :: RemoteEvent
+        local remote = remotes.SlayVote
         remote:FireClient(to.Player, target.Player)
     end,
 
@@ -211,17 +253,17 @@ local module: Types.Adapter = {
         victim.Player.Character = nil
     end,
 
-    CalculateUserFacingEvents = function(events, winners)
+    CalculateUserFacingEvents = function(events: Types.RoundEventLog, winners)
         local userFacingLog: {Types.UserFacingRoundEvent} = {}
 
-        local function getDeathEvent(data: {Attacker: Types.Participant?, Weapon: string | Types.Equipment, Victim: Types.Participant})
+        local function getDeathEvent(data: Types.RoundEvent_Death)
             local attacker = data.Attacker
             local weapon = data.Weapon
-            local text = data.Victim:GetFormattedName()
+            local text = data.Victim.FormattedName
 
             local attackerName
             if attacker then
-                attackerName = attacker:GetFormattedName()
+                attackerName = attacker.FormattedName
             end
             if weapon == "Fall" then
                 text ..= " was doomed to fall"
@@ -229,7 +271,7 @@ local module: Types.Adapter = {
                     text ..= ` at the hands of {attackerName}`
                 end
             elseif weapon == "Drown" then
-                text ..= " was doomed to fall"
+                text ..= " was doomed to drown"
                 if attacker then
                     text ..= ` at the hands of {attackerName}`
                 end
@@ -246,8 +288,8 @@ local module: Types.Adapter = {
                     text ..= ` by {attackerName}`
                 end
             elseif type(weapon) == "table" then
-                local attack: Types.WeaponAttackType | "None" = weapon.AttackType
-                local name = API.StringWithDeterminer(weapon.Name)
+                local attack = weapon.AttackType
+                local name = stringWithDeterminer(weapon.Name)
                 if attack == "Blade" then
                     text ..= `was stabbed by {name}`
                 elseif attack == "Blunt" then
@@ -267,54 +309,45 @@ local module: Types.Adapter = {
             return text
         end
 
-        for i: Types.RoundEventType, v in events do
-            if i == "Death" then
-                for _, event in v do
-                    local data: Types.RoundEvent_Death = event.Data :: any
-                    table.insert(userFacingLog, {
-                        Text = getDeathEvent(data),
-                        Icons = {},
-                        Category = "Death",
-                        Timestamp = event.Timestamp,
-                    })
-                end
-            elseif i == "EquipmentGiven" then
-                continue
-            elseif i == "EquipmentPurchased" then
-                for _, event in v do
-                    local data: Types.RoundEvent_Equipment = event.Data :: any
-                    table.insert(userFacingLog, {
-                        Text = `{data.Target} purchased a {data.Equipment.Name}`,
-                        Icons = {},
-                        Category = "Equipment",
-                        Timestamp = event.Timestamp,
-                    })
-                end
-            elseif i == "EquipmentRemoved" then
-                continue
-            elseif i == "Round" then
-                for _, event in v do
-                    local phase: Types.RoundPhaseEventType = event.Data :: any
-                    local text: string = ""
-                    if phase == "Start" then
-                        text = "The round begins."
-                    elseif phase == "Pause" then
-                        text = "The round is paused."
-                    elseif phase == "Resume" then
-                        text = "The round is resumed."
-                    elseif phase == "NewMapLoaded" then
-                        text = "A new map is loaded."
-                    elseif phase == "End" then
-                        text = winners.VictoryText :: string
-                    end
-                    table.insert(userFacingLog, {
-                        Text = text,
-                        Icons = {},
-                        Category = "Round",
-                        Timestamp = event.Timestamp,
-                    })
-                end
+        for _, v in events.MetaEvent do
+            local event = {
+                Text = "",
+                Icons = {},
+                Category = "MetaEvent" :: Types.RoundEventCategory,
+                Timestamp = v.Timestamp,
+            }
+            if v.Data.RoundPhase then
+                event.Text = "The round begins."
+            elseif v.Data.NewMap then
+                event.Text = `The map changes to {v.Data.NewMap}.`
+            elseif v.Data.Winners then
+                event.Text = v.Data.Winners.VictoryText :: string
             end
+            table.insert(userFacingLog, event)
+        end
+
+        for _, v in events.CorpseSearched do
+            local event = {
+                Text = "",
+                Icons = {},
+                Category = "CorpseSearched" :: Types.RoundEventCategory,
+                Timestamp = v.Timestamp,
+            }
+            if v.Data.CreditsFound then
+                event.Text = `{v.Data.Participant} found {v.Data.CreditsFound} credits on the body of {v.Data.Corpse}.`
+            else
+                event.Text = `{v.Data.Participant} found the body of {v.Data.Corpse}.`
+            end
+            table.insert(userFacingLog, event)
+        end
+
+        for _, v in events.Death do
+            table.insert(userFacingLog, {
+                Text = getDeathEvent(v.Data),
+                Icons = {},
+                Category = "Death",
+                Timestamp = v.Timestamp
+            })
         end
 
         table.sort(userFacingLog, function(a, b)

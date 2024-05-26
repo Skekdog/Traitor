@@ -5,7 +5,7 @@ local UIManager = require(ReplicatedFirst.UIManager)
 
 local getOwnInfo = ReplicatedStorage.RoundHandler.GetOwnInfo
 local API = require(ReplicatedFirst.API)
-local RoundHandlerTypes = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local UI = UIManager.WaitForUI("Equipment Shop", true).UI :: any
 local purchaseButton = UI.Purchase
@@ -70,7 +70,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	
 	local creditCost = UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost")
 
-	local participant: RoundHandlerTypes.Participant? = getOwnInfo:InvokeServer()
+	local participant: Types.Participant? = getOwnInfo:InvokeServer()
 
 	if not participant then return end
 

@@ -2,7 +2,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 -- Not a Gamemode, but contains some useful functions that are used by multiple Gamemodes.
 -- Not a part of the standard implementation, can be removed to your tastes.
 
-local Types = require(ReplicatedFirst.RoundHandler.RoundHandlerTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local module = {}
 
@@ -35,7 +35,7 @@ function module.TestForOneSurvivingRole(self: Types.Gamemode, round: Types.Round
     }
     for _, v in round.Participants do
         if checkAlive(v) then
-            rolesAlive[v:GetAllegiance().Name] = true
+            rolesAlive[v.Role.Allegiance] = true
         end
         if rolesAlive[allegiances[1]] and rolesAlive[allegiances[2]] then
             return nil -- Both roles are still alive, nobody wins yet

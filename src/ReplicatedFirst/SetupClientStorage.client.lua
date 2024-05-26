@@ -38,5 +38,6 @@ currentMapObject.Name = "CurrentMapObject"
 currentMapObject.Parent = store
 
 store:SetAttribute("IsSpectating", true)
+store:SetAttribute("RoundStartTime", 0)
 
 scriptConnections.Parent = store
