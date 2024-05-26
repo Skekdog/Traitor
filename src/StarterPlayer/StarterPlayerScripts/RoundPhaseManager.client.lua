@@ -77,7 +77,7 @@ local function update(round: Types.PartialRound?)
         return
     end
 
-    (game :: any).ClientStorage.CurrentMapObject.Value = round.Map
+    ReplicatedFirst.ClientStorage.CurrentMapObject.Value = round.Map
 
     if stopMusic and round.RoundPhase ~= "Intermission" then
         stopMusic()
@@ -96,7 +96,7 @@ local function update(round: Types.PartialRound?)
     end)
 
     if round.RoundPhase == "Playing" then
-        (game :: any).ClientStorage:SetAttribute("RoundStartTime", workspace:GetServerTimeNow()) --todo: this can probably cause problems under big lag
+        ReplicatedFirst.ClientStorage:SetAttribute("RoundStartTime", workspace:GetServerTimeNow()) --todo: this can probably cause problems under big lag
         if ownRole then
             if ownRole.EquipmentShop and #ownRole.EquipmentShop > 0 then
                 local shop: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"]) = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI

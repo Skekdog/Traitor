@@ -11,13 +11,13 @@ local cam = workspace.CurrentCamera
 local params = RaycastParams.new()
 params.IgnoreWater = true
 
-local clientStorage = (game :: any).ClientStorage
+local clientStorage = ReplicatedFirst.ClientStorage
 clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
 	if clientStorage:GetAttribute("IsSpectating") then
 		Controls.Unregister("Interact")
 	else
 		Controls.Register("Interact", true, function(action, state, input, toggled)
-			local map: Types.MapStructure? = (game :: any).ClientStorage.CurrentMapObject.Value
+			local map = ReplicatedFirst.ClientStorage.CurrentMapObject.Value :: Types.MapStructure?
 	
 			local char = plr.Character
 			if not char or not map then return end

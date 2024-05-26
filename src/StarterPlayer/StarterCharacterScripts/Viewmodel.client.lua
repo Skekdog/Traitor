@@ -299,7 +299,7 @@ Players.LocalPlayer.Inventory.ChildAdded:Connect(function(child)
 					controls.Register("Alternate Fire", true, aimDownSights)
 				end
 				local fireCon
-				fireCon = (game :: any):WaitForChild("ClientStorage"):WaitForChild("ScriptConnections").FireEvent.Event:Connect(function()
+				fireCon = ReplicatedFirst.ClientStorage.ScriptConnections.FireEvent.Event:Connect(function()
 					-- recoilmod is used for physical recoil, man rewriting this will be nice
 					local recoil = child.Configuration.OnUsed:GetAttribute("CameraRecoil")
 					recoilMod = isAiming and child.Configuration.OnUsed:GetAttribute("PhysicalRecoil")/3 or child.Configuration.OnUsed:GetAttribute("PhysicalRecoil")

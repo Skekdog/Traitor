@@ -5,11 +5,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = Players.LocalPlayer
 local API = require(ReplicatedFirst.API)
 local UI = require(ReplicatedFirst.UIManager)
-local roundInfo = UI.WaitForUI("RoundInfo").UI :: any
-local this = UI.WaitForUI("JoinRound") :: any
-
-local clientStorage = game:WaitForChild("ClientStorage")
-local scriptCons = clientStorage:WaitForChild("ScriptConnections")
+local roundInfo: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.RoundInfo) = UI.WaitForUI("RoundInfo").UI
+local this = UI.WaitForUI("JoinRound")
 
 this.UI.MouseButton1Click:Connect(function()
 	local success = ReplicatedStorage.RoundHandler.JoinRound:InvokeServer()
@@ -23,6 +20,6 @@ this.UI.MouseButton1Click:Connect(function()
 	roundInfo.Frame.Role.TextColor3 = Color3.new(1, 1, 1)
 	
 	for _, v in plr:WaitForChild("Inventory"):GetChildren() do
-		(scriptCons :: any).RemoteEquipEvent:Fire(false, v, nil, false)
+		ReplicatedFirst.ClientStorage.ScriptConnections.RemoteEquipEvent:Fire(false, v, nil, false)
 	end
 end)

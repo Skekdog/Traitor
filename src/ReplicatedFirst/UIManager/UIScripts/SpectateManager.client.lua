@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local plr = Players.LocalPlayer
 
 local uiManager = require(game:GetService("ReplicatedFirst").UIManager)
@@ -44,7 +45,7 @@ local function spectateFunc(action, state)
 	uiO.Username.Text = (camera :: any).CameraSubject.Parent.Name
 end
 
-local clientStorage = (game :: any).ClientStorage
+local clientStorage = ReplicatedFirst.ClientStorage
 clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
 	uiO.Username.Text = "Use buttons to spectate"
 	if clientStorage:GetAttribute("IsSpectating") then

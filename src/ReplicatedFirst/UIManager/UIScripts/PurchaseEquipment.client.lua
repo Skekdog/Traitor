@@ -36,15 +36,13 @@ UI.Reset.Event:Connect(function()
 	purchaseButton.TextColor3 = Color3.fromRGB(167, 0, 0)
 end)
 
-local clientStorage = game:WaitForChild("ClientStorage")
-local scriptCons = clientStorage:WaitForChild("ScriptConnections")
 local function radar()
 	local stop = false
-	clientStorage:GetAttributeChangedSignal("IsSpectating"):Once(function()
+	ReplicatedFirst.ClientStorage:GetAttributeChangedSignal("IsSpectating"):Once(function()
 		stop = true
 	end)
 	while not stop do
-		(scriptCons :: any).PingRadarEvent:Fire()
+		ReplicatedFirst.ClientStorage.ScriptConnections.PingRadarEvent:Fire()
 		task.wait(radarCooldown)
 	end
 end

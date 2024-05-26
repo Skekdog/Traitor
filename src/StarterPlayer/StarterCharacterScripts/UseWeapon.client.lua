@@ -7,10 +7,7 @@ local TS = game:GetService("TweenService")
 local plr = Players.LocalPlayer
 
 local controls = require(ReplicatedFirst.ControlManager)
---local settingsManager = require(plr.PlayerScripts.SettingsManager)
-
-local clientStorage = game:WaitForChild("ClientStorage")
-local scriptCons = clientStorage:WaitForChild("ScriptConnections")
+local scriptCons = ReplicatedFirst.ClientStorage.ScriptConnections
 
 local function reloadFunc(tool, config)
 	if tool.Parent == nil or tool.CurrentAmmo.Value == config.Reload:GetAttribute("MagCapacity") then
@@ -24,7 +21,6 @@ local function reloadFunc(tool, config)
 		animCon = anim.Stopped:Connect(function()
 			anim:Destroy()
 			animCon:Disconnect()
-			animCon = nil
 		end)
 		ReplicatedStorage:WaitForChild("ClientServer").ReloadWeapon:FireServer(tool)
 	end
@@ -32,7 +28,6 @@ local function reloadFunc(tool, config)
 	return true
 end
 
---local ammoCon
 scriptCons.EquipEvent.Event:Connect(function(tool, equip)
 	if equip then
 		local config = tool.Configuration

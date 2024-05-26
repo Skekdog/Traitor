@@ -1,10 +1,11 @@
 --!nocheck
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIS = game:GetService("UserInputService")
 
 local plr = Players.LocalPlayer
 
-local scriptCons = game:WaitForChild("ClientStorage"):WaitForChild("ScriptConnections")
+local scriptCons = ReplicatedFirst.ClientStorage.ScriptConnections
 
 local event = scriptCons.ClimbEvent
 local func = scriptCons.DisableActionFunction

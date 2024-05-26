@@ -1,5 +1,6 @@
 --!nonstrict
 local HTTPService = game:GetService("HttpService")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local UIScript, UI, UIS, uiThemes
 
@@ -55,7 +56,7 @@ module["AvailableSettings"] = {
 		PossibleValues = "Boolean",
 		Default = false,
 		Callback = function(val)
-			local map = (game :: any).ClientStorage.CurrentMapObject
+			local map = ReplicatedFirst.ClientStorage.CurrentMapObject.Value
 			if not map then
 				return
 			end

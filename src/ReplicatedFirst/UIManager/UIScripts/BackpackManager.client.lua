@@ -1,14 +1,14 @@
---!nonstrict
+local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local plr = game:GetService("Players").LocalPlayer
+local plr = Players.LocalPlayer
 local UIManager = require(script.Parent.Parent)
-local controls = require(game:GetService("ReplicatedFirst").ControlManager)
+local controls = require(ReplicatedFirst.ControlManager)
 
 type SampleType = TextButton & {TextLabel: TextLabel, Value: ObjectValue & {Value: Instance & {Equipped: BindableEvent}}}
-local screenUi = UIManager.WaitForUI("Backpack").UI :: Frame & {Sample: SampleType}
+local screenUi: typeof(script.Parent.Parent.UnregisteredUIs.Buttons.Backpack) = UIManager.WaitForUI("Backpack").UI
 
-local clientStorage = game:WaitForChild("ClientStorage")
-local scriptCons = clientStorage:WaitForChild("ScriptConnections") :: any
+local scriptCons = ReplicatedFirst.ClientStorage.ScriptConnections
 
 local function invAdded(child: Instance)
 	if not screenUi:FindFirstChild(child.Name) then
@@ -153,11 +153,11 @@ inv.ChildRemoved:Connect(invRemoved)
 local function selectItem(name: string)
 	local num = tonumber(name:split(" ")[2])
 	
-	for _, child in screenUi:GetChildren() do
+	for _, child in screenUi:GetChildren() :: {any} do
 		if (child.ClassName == "TextButton") and (child.Name ~= "Sample") then
 			local thisNum = tonumber(child.TextLabel.Text:sub(2, 2))
 			if thisNum == num then
-				equip(not child.Value.Value:GetAttribute("Equipped"), child.Value.Value, child)
+				equip(not child.Value.Value:GetAttribute("Equipped"), child.Value.Value, child, false)
 				break
 			end
 		end
@@ -205,6 +205,6 @@ controls.Register("Next Weapon", false, function(name: string)
 end)
 
 ReplicatedStorage.ServerClient.EquipWeapon.OnClientEvent:Connect(equip)
-scriptCons:WaitForChild("RemoteEquipEvent").Event:Connect(equip)
+scriptCons.RemoteEquipEvent.Event:Connect(equip)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)

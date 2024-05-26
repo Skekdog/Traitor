@@ -45,7 +45,7 @@ ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(hig
 	for _, v in events do
 		local e = eTemplate:Clone()
 		e.TextLabel.Text = v.Text
-		e.Time.Text = API.ToRoundTime((game :: any).ClientStorage:GetAttribute("RoundStartTime"), v.Timestamp)
+		e.Time.Text = API.ToRoundTime(ReplicatedFirst.ClientStorage:GetAttribute("RoundStartTime"), v.Timestamp)
 		e.Visible = true
 		e.Name = "ActiveEvent"
 		e.Parent = eFrame
