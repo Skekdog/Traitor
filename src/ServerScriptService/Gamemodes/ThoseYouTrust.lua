@@ -302,6 +302,9 @@ local module: Types.Gamemode = {
 
     OnDeath = function(self, victim)
         local round = victim.Round
+        if round:IsRoundOver() then
+            return
+        end
 
         local winner = common.TestForOneSurvivingRole(self, round)
         if winner then
