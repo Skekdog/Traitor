@@ -28,10 +28,6 @@ local function shuffleInPlace(t)
     end
 end
 
-local function color3ToHex(color: Color3): string
-	return string.format("#%02X%02X%02X", color.R*0xFF, color.G*0xFF, color.B*0xFF)
-end
-
 local PREPARING_TIME = Adapter.Configuration.PREPARING_TIME -- Duration of the preparing phase
 local HIGHLIGHTS_TIME = Adapter.Configuration.HIGHLIGHTS_TIME -- Duration of the highlights phase
 local INTERMISSION_TIME = Adapter.Configuration.INTERMISSION_TIME
@@ -170,7 +166,7 @@ local function newParticipant(round, plr): Types.Participant
         AssignRole = function(self, role)
             local previousRole = self.Role
             self.Role = role
-            self.FormattedName = `<font color='#{color3ToHex(role.Colour)}'>{self.Player.Name}</font>`
+            self.FormattedName = `<font color='#{role.Colour:ToHex()}'>{self.Player.Name}</font>`
             self.Credits += role.StartingCredits or 0
 
             if role.StartingEquipment then
@@ -445,9 +441,13 @@ local function newRound(gamemode): Types.Round
         
             local spawns = self.Map.Spawns:GetChildren()
             plr.CharacterAppearanceLoaded:Once(function(char)
-                local chosen = math.random(1, #spawns)
-                char:PivotTo((spawns[chosen]).CFrame)
-                local hum: Humanoid = char:WaitForChild("Humanoid") :: Humanoid
+                local hum = char:WaitForChild("Humanoid") :: Humanoid
+                if not char.Parent then
+                    char.AncestryChanged:Wait() -- There doesn't seem to be any documentation for "when should character be parented?". If we don't wait then we won't be at the correct spawn
+                    task.wait() -- Also appears that waiting a frame is also necessary. Very fun!
+                end
+                local chosen = spawns[math.random(1, #spawns)]
+                char:PivotTo(chosen.CFrame)
                 participant.Character = char
                 Adapter.OnCharacterLoad(participant)
 
@@ -575,7 +575,7 @@ local function newRound(gamemode): Types.Round
             for _, v in self.Participants do
                 scores[v.FormattedName] = v.Score
             end
-
+            
             local events = Adapter.CalculateUserFacingEvents(self.EventLog, victors)
             local highlights = self.Gamemode:CalculateRoundHighlights(self)
 
@@ -617,6 +617,13 @@ local function newRound(gamemode): Types.Round
             self.Map:Destroy()
             self.RoundPhase = "Destroy"
             self.RoundPhaseChangeEvent:Fire("Destroy")
+
+            for _, v in self.Participants do
+                if v.Character.Parent then
+                    v.Player.Character = nil
+                    v.Character:Destroy()
+                end
+            end
 
             module.Rounds[self.ID] = nil
         end,
@@ -705,7 +712,7 @@ local function newRound(gamemode): Types.Round
             return self.RoundPhase == "Playing"
         end,
         IsRoundOver = function(self)
-            return self.RoundPhase == "Intermission" or self.RoundPhase == "Highlights"
+            return self.RoundPhase == "Intermission" or self.RoundPhase == "Highlights" or self.RoundPhase == "Destroy"
         end,
 
         GetEquipment = function(self, name)

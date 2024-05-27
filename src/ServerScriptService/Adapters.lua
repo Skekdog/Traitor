@@ -250,6 +250,7 @@ local module: Types.Adapter = {
 
         char:Destroy()
         clone.Parent = workspace
+        victim.Character = clone
         victim.Player.Character = nil
     end,
 

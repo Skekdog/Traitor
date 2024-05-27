@@ -203,7 +203,7 @@ local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Par
         impactHole.Parent = part
 
         if round.Map.Props:IsAncestorOf(part) then
-            local model: Types.Prop = part:FindFirstAncestorOfClass("Model") :: any
+            local model = part:FindFirstAncestorOfClass("Model") :: Types.Prop
             onEntityHit(round, weapon, attacker, model, part.Name, rayResult.Distance)
         end
     end
@@ -217,19 +217,12 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo,
     explosion.DestroyJointRadiusPercent = 0
     explosion.ExplosionType = Enum.ExplosionType.NoCraters
 
-    local soundPart = Instance.new("Part")
-	soundPart.Transparency = 1
-	soundPart.CanTouch = false
-	soundPart.CanCollide = false
-	soundPart.CanQuery = false
-	soundPart.Anchored = true
-	soundPart.Position = position
-	soundPart.CastShadow = false
-	soundPart.Size = Vector3.zero
-	soundPart.Parent = (workspace :: any).Proj.ImpactHoles
+    local soundPart = Instance.new("Attachment")
+	soundPart.WorldPosition = position
+	soundPart.Parent = workspace.Proj.ImpactHoles
     
-	local sound = (ServerStorage :: any).ExplosionSound:Clone()
-	sound.Parent = soundPart
+	local sound = ServerStorage.Explosion:Clone()
+	sound.Parent = soundPart :: any
 	sound.Ended:Connect(function()
 		soundPart:Destroy()
 	end)
