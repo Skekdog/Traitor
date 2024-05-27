@@ -1,3 +1,6 @@
 [submodule "src/ReplicatedFirst/RoundHandler"]
 	path = src/ReplicatedFirst/RoundHandler
 	url = https://github.com/skekdog/RoundHandler
+[submodule "src/ServerScriptService/Cmdr"]
+	path = src/ServerScriptService/Cmdr
+	url = https://github.com/evaera/Cmdr

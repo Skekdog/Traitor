@@ -12,7 +12,6 @@ local getProfile = ServerScriptService.PlayerSetup.GetProfile
 local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile
 
 local remotes = ReplicatedStorage.RoundHandler
-local voteMap = remotes.VoteMap
 
 local vowels = {"a", "e", "i", "o", "u"}
 local function stringWithDeterminer(str: string): string
@@ -122,39 +121,6 @@ local module: Types.Adapter = {
             end
         end
         return false
-    end,
-    
-    ShouldStartMapVote = function()
-        return true
-    end,
-
-    TriggerMapVote = function()
-        local votes = {}
-        for _, map in ServerStorage.Maps:GetChildren() do
-            votes[map.Name] = {}
-        end
-        local voteCon = voteMap.OnServerEvent:Connect(function(plr, map)
-            if not table.find(votes[map], plr) then
-                table.insert(votes[map], plr)
-            end
-        end)
-        voteMap:FireAllClients(true)
-
-        task.delay(10, function()
-            voteMap:FireAllClients(false)
-            voteCon:Disconnect()
-
-            local chosenMap = "Mesa Monocraft"
-            local highestVotes = 0
-            for map, voters in votes do
-                if #voters > highestVotes then
-                    chosenMap = map
-                end
-            end
-
-            ServerStorage:SetAttribute("NextMap", chosenMap)
-            ServerStorage:SetAttribute("NextRoundReady", true)
-        end)
     end,
 
     SendMessage = function(message, severity, messageType, recipients)
