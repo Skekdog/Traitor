@@ -5,7 +5,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
-local remotes: any = ReplicatedStorage:FindFirstChild("RoundHandler")
+local remotes = ReplicatedStorage.RoundHandler
 local slayVote = remotes.SlayVote
 local getPartialParticipants = remotes.GetPartialParticipants
 local getPartialParticipant = remotes.GetPartialParticipant
