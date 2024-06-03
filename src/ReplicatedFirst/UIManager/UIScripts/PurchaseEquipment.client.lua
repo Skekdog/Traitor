@@ -1,11 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
+local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local getOwnInfo = ReplicatedStorage.RoundHandler.GetOwnInfo
 local API = require(ReplicatedFirst.API)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local UI = UIManager.WaitForUI("Equipment Shop", true).UI :: any
 local purchaseButton = UI.Purchase
@@ -68,7 +67,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	
 	local creditCost = UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost")
 
-	local participant: Types.Participant? = getOwnInfo:InvokeServer()
+	local participant = LocalRoundInfo.GetOwnParticipant()
 
 	if not participant then return end
 

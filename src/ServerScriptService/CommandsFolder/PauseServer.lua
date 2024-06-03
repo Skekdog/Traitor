@@ -1,4 +1,5 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 return function()
@@ -12,5 +13,11 @@ return function()
     end
 
     round:PauseRound()
+
+    if not round.Paused then
+        ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
+    end
+    ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
+
     return `Successfully {round.Paused and "paused" or "unpaused"} the current round.`
 end

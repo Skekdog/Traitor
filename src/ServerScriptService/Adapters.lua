@@ -1,10 +1,12 @@
 -- Implementation-dependent functions that *should* be customised.
 
 local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
@@ -40,7 +42,7 @@ local deathsounds = {
 local module: Types.Adapter = {
     Configuration = {
         HIGHLIGHTS_TIME = 10, -- Time to spend after the round ends before destroying the round
-        PREPARING_TIME = 1, -- Time to spend after a round is created where players can join the round
+        PREPARING_TIME = 5, -- Time to spend after a round is created where players can join the round
         SLAY_VOTES = 2, -- Minimum number of votes to slay someone, at which point they will be slain
         INTERMISSION_TIME = 10,
     },
@@ -218,6 +220,10 @@ local module: Types.Adapter = {
         clone.Parent = workspace
         victim.Character = clone
         victim.Player.Character = nil
+
+        for _, v in Players:GetPlayers() do
+            UpdateRoundInfo.SendUpdatedParticipants(victim.Round.Participants, victim, victim.Player)
+        end
     end,
 
     CalculateUserFacingEvents = function(events: Types.RoundEventLog, winners)

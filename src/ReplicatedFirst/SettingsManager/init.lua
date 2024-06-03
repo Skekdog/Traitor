@@ -1,6 +1,11 @@
---!nonstrict
 local HTTPService = game:GetService("HttpService")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local Lighting = game:GetService("Lighting")
+
+local LocalRoundInfo: typeof(require(script.Parent.LocalRoundInfo))
+if game:GetService("RunService"):IsClient() then
+	LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+end
+local Types = require(script.Parent.RoundHandler.Types)
 
 local UIScript, UI, UIS, uiThemes
 
@@ -56,17 +61,15 @@ module["AvailableSettings"] = {
 		PossibleValues = "Boolean",
 		Default = false,
 		Callback = function(val)
-			local map = ReplicatedFirst.ClientStorage.CurrentMapObject.Value
+			local map = LocalRoundInfo.GetMap()
 			if not map then
 				return
 			end
-			local mapConfig = map:FindFirstChild(val and "FIBLighting" or "Lighting")
+			local mapConfig = map:FindFirstChild(val and "FIBLighting" or "Lighting") :: Types.LightingStructure?
 			if mapConfig then
 				for _, prop in mapConfig:GetChildren() do
-					if prop:IsA("ValueBase") then
-						if (game :: any):GetService("Lighting")[prop.Name] then
-							(game :: any):GetService("Lighting")[prop.Name] = prop.Value
-						end
+					if (Lighting :: any)[prop.Name] then
+						(Lighting :: any)[prop.Name] = prop.Value
 					end
 				end
 			end
@@ -149,7 +152,7 @@ module["AvailableSettings"] = {
 		Tooltip = "For using weapons or planting equipment.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.UserInputType.MouseButton1, nil}}, Toggled=false},
+		Default = {Keycodes={{Enum.UserInputType.MouseButton1, nil :: any}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	{
@@ -159,7 +162,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Reloads the currently equipped weapon.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.R, nil}, {Enum.KeyCode.ButtonX, nil}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.R, nil :: any}, {Enum.KeyCode.ButtonX, nil :: any}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	{
@@ -169,7 +172,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Q, nil}, {Enum.KeyCode.DPadDown}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadDown}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	{
@@ -179,7 +182,7 @@ module["AvailableSettings"] = {
 		Tooltip = "For aiming weapons or using the alternate item function.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.UserInputType.MouseButton2, nil}, {Enum.KeyCode.ButtonL2, nil}}, Toggled=false},
+		Default = {Keycodes={{Enum.UserInputType.MouseButton2, nil :: any}, {Enum.KeyCode.ButtonL2 :: any, nil :: any}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	{
@@ -188,7 +191,7 @@ module["AvailableSettings"] = {
 		Category = "Gameplay",
 		Tooltip = "General interaction",
 		PossibleValues = "Keybind",
-		Default = {Keycodes={{Enum.KeyCode.E, nil}, {Enum.KeyCode.ButtonA, nil}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	{
@@ -198,7 +201,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Spectates the next player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.E, nil}, {Enum.KeyCode.DPadRight, nil}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.DPadRight, nil :: any}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	{
@@ -208,7 +211,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Spectates the previous player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Q, nil}, {Enum.KeyCode.DPadLeft, nil}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadLeft, nil :: any}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	--{
@@ -228,7 +231,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Closes the fore-most UI.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.X, nil}, {Enum.KeyCode.ButtonB, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.X, nil :: any}, {Enum.KeyCode.ButtonB, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	
@@ -239,7 +242,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Cycles to the next weapon. Primarily used for controllers.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.ButtonY, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.ButtonY, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -249,7 +252,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 1.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.One, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.One, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -259,7 +262,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 2.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Two, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Two, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -269,7 +272,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 3.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Three, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Three, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -279,7 +282,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 4.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Four, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Four, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -289,7 +292,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 5.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Five, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Five, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -299,7 +302,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 6.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Six, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Six, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -309,7 +312,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 7.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Seven, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Seven, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -319,7 +322,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 8.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Eight, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Eight, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -329,7 +332,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Equips the item in slot 9.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Nine, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.Nine, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	
@@ -340,7 +343,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Opens the equipment shop. Only available for certain roles.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.C, nil}, {Enum.KeyCode.DPadUp, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.C, nil :: any}, {Enum.KeyCode.DPadUp, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -350,7 +353,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Opens the playerlist.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.Tab, nil}, {Enum.KeyCode.ButtonL3, nil}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.Tab, nil :: any}, {Enum.KeyCode.ButtonL3, nil :: any}}, Toggled=false},
 		Callback = keybindCallback,
 	},
 	{
@@ -360,7 +363,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Opens the settings page. Can also be opened by typing !settings in chat.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.G, nil}, {Enum.KeyCode.ButtonR3, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.G, nil :: any}, {Enum.KeyCode.ButtonR3, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -370,7 +373,7 @@ module["AvailableSettings"] = {
 		Tooltip = "Opens the round highlights.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.B, nil}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.B, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	

@@ -50,7 +50,7 @@ end
 
 -- returns a table of EquipmentName = {Username, Kills}
 -- I don't like this
-function module.GetWeaponHighlights(roundEvents: {["Death"]: {Types.RoundEvent_Death}}): {[Types.EquipmentName]: {Types.Username | Types.PositiveInteger}}
+function module.GetWeaponHighlights(roundEvents: {["Death"]: {Types.RoundEvent<Types.RoundEvent_Death>}}): {[Types.EquipmentName]: {Types.Username | Types.PositiveInteger}}
     local deathEvents = roundEvents.Death
 
     if not deathEvents then

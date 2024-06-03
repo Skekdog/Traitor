@@ -3,6 +3,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(script.Parent.Parent)
+local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 
 local ui = UIManager.WaitForUI("Playerlist").UI :: any
 local info = ui.Info
@@ -15,12 +16,17 @@ local layoutOrders = {
 	["Spectating"] = 3000,
 }
 
-local function findPlr(plr: Player)
-	return list:FindFirstChild("Player-"..plr.Name)
+local function findPlr(plrName: string)
+	return list:FindFirstChild("Player-"..plrName)
 end
 
 function updatePlr(plr: Player, clone)
-	local participant: Types.PartialParticipant? = ReplicatedStorage.RoundHandler.GetPartialParticipant:InvokeServer(plr.Name)
+	local participant: Types.Participant? | Types.PartialParticipant?
+	if plr == Players.LocalPlayer then
+		participant = LocalRoundInfo.GetOwnParticipant()
+	else
+		participant = LocalRoundInfo.GetParticipantInfo(plr.Name)
+	end
 	if participant and participant.Role then
 		clone.Username.TextColor3 = participant.Role.Colour
 		clone.Username:SetAttribute("StyleData", "KeepText")
@@ -84,13 +90,20 @@ local function createPlr(plr: Player)
 end
 
 function movePlr(plr: Player, status: "Alive" | "Missing" | "Dead" | "Spectating")
-	local clone = findPlr(plr) or createPlr(plr)
+	local clone = findPlr(plr.Name) or createPlr(plr)
 	clone.LayoutOrder = layoutOrders[status]+1
 	clone.Marks.Visible = status == "Alive"
 end
 
-local function removePlr(plr: Player)
-	local f = findPlr(plr)
+local function removePlr(plr: Player | string)
+	local plrName: string
+	if typeof(plr) == "string" then
+		plrName = plr
+	else
+		plrName = plr.Name
+	end
+
+	local f = findPlr(plrName)
 	if f then
 		f:Destroy()
 	end
@@ -101,7 +114,7 @@ Players.PlayerAdded:Connect(function(plr)
 	movePlr(plr, "Spectating")
 end)
 
-local participants: {Types.PartialParticipant} = ReplicatedStorage.RoundHandler.GetPartialParticipants:InvokeServer()
+local participants = LocalRoundInfo.GetAllParticipants()
 local plrToParticipant: {[Player]: Types.PartialParticipant} = {}
 
 for _, v in participants do
@@ -116,23 +129,41 @@ for _, plr in Players:GetPlayers() do
 	end
 end
 
-ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(function()
-	for _, plr in Players:GetPlayers() do
-		updatePlr(plr, findPlr(plr))
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Participant?)
+	if not participant then
+		return
 	end
+	updatePlr(Players.LocalPlayer, findPlr(Players.LocalPlayer.Name))
+end)
+
+LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.PartialParticipant | string)
+	if type(participant) == "string" then
+		removePlr(participant)
+		return
+	end
+	updatePlr(participant.Player, findPlr(participant.Player.Name))
 end)
 
 ReplicatedStorage.RoundHandler.CorpseSearched.OnClientEvent:Connect(function(name)
 	local plr = Players:FindFirstChild(name)
-	if not plr then return end
+	if not plr then
+		return
+	end
 
 	plr:SetAttribute("Searched", true)
 end)
 
-ReplicatedStorage.RoundHandler.MapChanged.OnClientEvent:Connect(function(mapCreator, map: string, gamemode: string, gamemodeCreator)
-	info.RoundInfo.Info.Map.Text = "Map: "..map
-	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemode
+-- There is probably a better way to do this
+LocalRoundInfo.Listen("MapName", function(mapName)
+	info.RoundInfo.Info.Map.Text = "Map: "..mapName
+end)
+LocalRoundInfo.Listen("MapAuthors", function(mapCreator)
 	info.RoundInfo.Creators.Map.Text = mapCreator
+end)
+LocalRoundInfo.Listen("GamemodeName", function(gamemodeName)
+	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName
+end)
+LocalRoundInfo.Listen("GamemodeAuthors", function(gamemodeCreator)
 	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator
 end)
 

@@ -4,6 +4,6 @@ local definition: CmdrTypes.CommandDefinition = {
     Aliases = {},
     Description = "Pauses the current round timer, if possible.",
     Group = "Admin",
-    Args = {}
+    Args = {},
 }
 return definition

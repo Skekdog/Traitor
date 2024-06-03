@@ -39,7 +39,7 @@ export type UI = typeof(setmetatable({}, {})) & {
 	UI: GuiObject, --A reference to the frame object.
 }
 
-if not _G.RegisteredUIs then _G.RegisteredUIs = {} end
+local registeredUIs: {UI} = {}
 
 local UIRegistered = (script:FindFirstChild("Event") :: BindableEvent) or Instance.new("BindableEvent", script)
 function UIManager.RegisterUI<T>(name: string, uiType: UIType, ignoreInset: boolean, ui: Frame, displayName: string?, preventClose: boolean): UI & {UI: T}
@@ -135,17 +135,17 @@ function UIManager.RegisterUI<T>(name: string, uiType: UIType, ignoreInset: bool
 	
 	ui.Parent = uis[uiType]
 	self = setmetatable(self, UIManager)
-	table.insert(_G.RegisteredUIs, self)
+	table.insert(registeredUIs, self)
 	UIRegistered:Fire(self.Name)
 	return self :: any
 end
 
 function UIManager.UnregisterUI(name: string, uiType: UIType): nil
 	local reg
-	for i, v in _G.RegisteredUIs do
+	for i, v in registeredUIs do
 		if (v.UIType == (uiType or v.UIType)) and (v.Name == name) then -- que?
 			reg = v
-			table.remove(_G.RegisteredUIs, i)
+			table.remove(registeredUIs, i)
 			break
 		end
 	end
@@ -166,7 +166,7 @@ function UIManager.UnregisterUI(name: string, uiType: UIType): nil
 end
 
 function UIManager.TryGetUI(name: string): UI?
-	for _, v in _G.RegisteredUIs do
+	for _, v in registeredUIs do
 		if v.Name == name then
 			return v
 		end
@@ -175,9 +175,9 @@ function UIManager.TryGetUI(name: string): UI?
 end
 
 function UIManager.GetUI<T>(name: string): UI & {UI: T}
-	for _, v in _G.RegisteredUIs do
+	for _, v in registeredUIs do
 		if v.Name == name then
-			return v
+			return v :: any
 		end
 	end
 	error("Failed to find UI: "..name)
@@ -185,7 +185,7 @@ end
 
 function UIManager.GetUIs(uiType: UIType): {UI}
 	local uis = {}
-	for _, v in _G.RegisteredUIs do
+	for _, v in registeredUIs do
 		if v.UIType == uiType then
 			table.insert(uis, v)
 		end

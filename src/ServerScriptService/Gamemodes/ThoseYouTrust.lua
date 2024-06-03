@@ -10,6 +10,7 @@ local items = ReplicatedStorage.Items
 local module: Types.Gamemode = {
     Name = "Those You Trust",
     Description = "Spy HQ has been infiltrated by Traitor spies. Can you separate those you trust, from those you shouldn't?",
+    Authors = "@Scelly_Dog, Bad King Urgrain",
 
     EngineVersion = "0.0.1",
 
@@ -21,7 +22,7 @@ local module: Types.Gamemode = {
     PhyrricVictors = "Traitor",
 
     CalculateRoundHighlights = function(self, round)
-        local weaponList = common.GetWeaponHighlights(round.EventLog :: any)
+        local weaponList = common.GetWeaponHighlights(round.EventLog)
         local highlights: {Types.RoundHighlight} = {}
         
         for equipmentName, v in weaponList do

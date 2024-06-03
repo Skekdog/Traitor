@@ -1,26 +1,17 @@
+local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
+local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local remotes = ReplicatedStorage.RoundHandler
 local slayVote = remotes.SlayVote
-local getPartialParticipants = remotes.GetPartialParticipants
-local getPartialParticipant = remotes.GetPartialParticipant
-local roundPhaseChange = remotes.RoundPhaseChange
-local getPartialRound = remotes.GetPartialRound
-local getOwnInfo = remotes.GetOwnInfo
 local joinRound = remotes.JoinRound
 local getMaps = remotes.GetMaps
-
-local function getMinimalParticipant(participant: Types.Participant): Types.PartialParticipant
-	return {
-		Player = participant.Player,
-		Status = participant.Status
-	}
-end
+local voteMap = remotes.VoteMap
 
 getMaps.OnServerInvoke = function()
 	local names = {}
@@ -28,67 +19,6 @@ getMaps.OnServerInvoke = function()
 		table.insert(names, v.Name)
 	end
 	return names
-end
-
-getPartialParticipants.OnServerInvoke = function(plr)
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then return {} end
-
-	local round = RoundHandler.GetRound(roundId)
-	local self = round:GetParticipant(plr.Name)
-
-	local participants = {}
-	if not self then
-		for _, v in round.Participants do
-			table.insert(participants, getMinimalParticipant(v))
-		end
-	else
-		for _, v in round.Participants do
-			table.insert(participants, self:ViewPartialParticipant(v))
-		end
-	end
-
-	return participants
-end
-
-getPartialParticipant.OnServerInvoke = function(plr, targetName: string)
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then return end
-
-	local round = RoundHandler.GetRound(roundId)
-	local self = round:GetParticipant(plr.Name)
-	local target = round:GetParticipant(targetName)
-
-	if self and target then
-		return self:ViewPartialParticipant(target)
-	elseif not target then
-		return
-	end
-
-	return getMinimalParticipant(target)
-end
-
-getOwnInfo.OnServerInvoke = function(plr): Types.PartialParticipant?
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then return end
-
-	local p = RoundHandler.GetRound(roundId):GetParticipant(plr.Name)
-	if not p then
-		return
-	end
-
-	local a: any = p:ViewPartialParticipant(p)
-	a.Credits = p.Credits
-	return a
-end
-
-getPartialRound.OnServerInvoke = function(plr)
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
-		return
-	end
-
-	return RoundHandler.GetRound(roundId):GetPartialRound()
 end
 
 slayVote.OnServerEvent:Connect(function(plr, target: Player)
@@ -119,6 +49,25 @@ end
 local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructure
 
+local function sendRoundInfo(plr: Player?)
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return
+	end
+
+	local round = RoundHandler.GetRound(roundId)
+	local gm = round.Gamemode
+
+	if plr then
+		remotes.UpdateEquipment:FireClient(plr, gm.AvailableEquipment)
+		remotes.UpdateRoles:FireClient(plr, gm.Roles)
+		UpdateRoundInfo.SendUpdatedParticipants(round.Participants, round:GetParticipant(plr.Name) ,plr)
+		return
+	end
+	remotes.UpdateEquipment:FireAllClients(gm.AvailableEquipment)
+	remotes.UpdateRoles:FireAllClients(gm.Roles)
+end
+
 joinRound.OnServerInvoke = function(plr)
 	local round: Types.Round
 	local roundId = ServerStorage:GetAttribute("RoundID")
@@ -128,20 +77,35 @@ joinRound.OnServerInvoke = function(plr)
 	end
 
 	if not roundId then
-		round = RoundHandler.CreateRound(nextMap, gamemodes[math.random(1, #gamemodes)])
+		local gamemode = gamemodes[math.random(1, #gamemodes)]
+		round = RoundHandler.CreateRound(nextMap, gamemode)
 		ServerStorage:SetAttribute("RoundID", round.ID)
 		local votes = {}
 		local voteCon: RBXScriptConnection?
 
 		nextRoundReady = false
 
+		 -- Ordering of these 4 attributes matters, as MapAuthors is what the client listens to.
+		remotes:SetAttribute("MapName", nextMap.Name)
+		remotes:SetAttribute("MapAuthors", (nextMap:FindFirstChild("Authors") and nextMap.Authors or {Value = "unknown"}).Value)
+
+		remotes:SetAttribute("GamemodeName", gamemode.Name)
+		remotes:SetAttribute("GamemodeAuthors", gamemode.Authors or "unknown")
+		remotes:SetAttribute("TimeMilestone", round.TimeMilestone)
+		remotes.MapFolder.Value = round.Map
+
+		sendRoundInfo()
+
 		local roundEventCon: RBXScriptConnection
 		roundEventCon = round.RoundPhaseChangeEvent.Event:Connect(function(phase)
-			roundPhaseChange:FireAllClients(phase)
-
-			if phase == "Intermission" then
-				ReplicatedStorage.RoundHandler.VoteMap:FireAllClients(true)
-				voteCon = ReplicatedStorage.RoundHandler.VoteMap.OnServerEvent:Connect(function(plr, map: string)
+			if phase == "Playing" then
+				remotes:SetAttribute("RoundStartTime", workspace:GetServerTimeNow())
+				for _, v in Players:GetPlayers() do
+					UpdateRoundInfo.SendUpdatedParticipants(round.Participants, round:GetParticipant(v.Name), v)
+				end
+			elseif phase == "Intermission" then
+				voteMap:FireAllClients(true)
+				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: string)
 					if not ServerStorage.Maps:FindFirstChild(map) then
 						return
 					end
@@ -151,10 +115,30 @@ joinRound.OnServerInvoke = function(plr)
 						table.insert(votes[map], plr)
 					end
 				end)
+			elseif phase == "Highlights" then
+				remotes.UpdateRoundEndInfo:FireAllClients(round.RoundEndInfo)
 			end
+			remotes:SetAttribute("IsPaused", false)
+			remotes:SetAttribute("RoundPhase", phase)
+			remotes:SetAttribute("TimeMilestone", round.TimeMilestone)
 
 			if phase ~= "Destroy" then
 				return
+			end
+
+			for _, v in round.Participants do
+				v.Status = "Spectating" :: any
+			end
+
+			for _, v in Players:GetPlayers() do
+				local p = round:GetParticipant(v.Name)
+				if p then
+					p.Role = {
+						Name = "",
+						Colour = Color3.new()
+					}
+				end
+				UpdateRoundInfo.SendUpdatedParticipants(round.Participants, p, plr)
 			end
 
 			if voteCon then
@@ -179,8 +163,14 @@ joinRound.OnServerInvoke = function(plr)
 	end
 	
 	if not round:GetParticipant(plr.Name) then
-		round:JoinRound(plr)
+		local participant = round:JoinRound(plr)
+		-- stupid kludge to avoid cyclic references
+		participant.Round = nil :: any
+		remotes.UpdateOwnParticipant:FireClient(plr, participant)
+		participant.Round = round
 		return true
 	end
 	return
 end
+
+Players.PlayerAdded:Connect(sendRoundInfo)

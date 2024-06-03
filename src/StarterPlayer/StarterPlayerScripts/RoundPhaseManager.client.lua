@@ -5,31 +5,14 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local remotes = ReplicatedStorage.RoundHandler
-
 local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: any
 local joinRound = UIManager.WaitForUI("JoinRound")
-
-local timeTarget = 0
-local paused = false
-local lastTime = ""
-local function updateTimer(time: number)
-    if paused then
-		if time%2 == 1 then --Alternate every second
-			roundInfo.Timer.Text = "PAUSED"
-		else
-			roundInfo.Timer.Text = lastTime
-		end
-		return
-	end
-
-	roundInfo.Timer.Text = API.ToRoundTime(time, timeTarget)
-end
 
 local vote: UIManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Popup.VotingScreen)} = UIManager.WaitForUI("VotingScreen")
 for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
@@ -46,20 +29,15 @@ end
 
 local stopMusic: (() -> ())?
 
-local lastTimerThread: thread?
-local function update(round: Types.PartialRound?)
-    if lastTimerThread then
-        task.cancel(lastTimerThread)
-    end
-
-    round = round or ReplicatedStorage.RoundHandler.GetPartialRound:InvokeServer()
-    local participant: Types.Participant? = ReplicatedStorage.RoundHandler.GetOwnInfo:InvokeServer()
+local function update()
+    local roundPhase = LocalRoundInfo.GetRoundPhase()
+    local participant: Types.Participant? = LocalRoundInfo.GetOwnParticipant()
     local ownRole: Types.Role?
     if participant then
         ownRole = participant.Role
     end
 
-    if not round then
+    if roundPhase == "Destroy" then
         -- Allow for creation of a new round
         joinRound:ToggleVisible(true)
 
@@ -77,65 +55,22 @@ local function update(round: Types.PartialRound?)
         return
     end
 
-    ReplicatedFirst.ClientStorage.CurrentMapObject.Value = round.Map
-
-    if stopMusic and round.RoundPhase ~= "Intermission" then
+    if stopMusic and roundPhase ~= "Intermission" then
         stopMusic()
     end
 
-    joinRound:ToggleVisible((round.RoundPhase == "Waiting") or (round.RoundPhase == "Preparing"))
+    joinRound:ToggleVisible((roundPhase == "Waiting") or (roundPhase == "Preparing"))
 
-    timeTarget = round.TimeMilestone
-    lastTimerThread = task.spawn(function()
-        local t = workspace:GetServerTimeNow()
-        while t < round.TimeMilestone do
-            updateTimer(t)
-            task.wait(1)
-            t = workspace:GetServerTimeNow()
-        end
-    end)
-
-    if round.RoundPhase == "Playing" then
+    if roundPhase == "Playing" then
         ReplicatedFirst.ClientStorage:SetAttribute("RoundStartTime", workspace:GetServerTimeNow()) --todo: this can probably cause problems under big lag
         if ownRole then
-            if ownRole.EquipmentShop and #ownRole.EquipmentShop > 0 then
-                local shop: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"]) = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered["Equipment Shop"], "Shop", false).UI
-                shop.Reset:Fire()
-                
-                for _, v in shop.ScrollingFrame:GetChildren() do
-                    if v.ClassName == "ImageButton" then
-                        v:Destroy()
-                    end
-                end
-
-                local nameToObj = {}
-                if round.Gamemode.AvailableEquipment then
-                    for _, e in round.Gamemode.AvailableEquipment do
-                        nameToObj[e.Name] = e
-                    end
-                end
-
-                for _, v in ownRole.EquipmentShop do
-                    local equipment = nameToObj[v]
-                    
-                    local entry = shop.EquipmentEntry:Clone()
-                    entry:SetAttribute("CreditCost", equipment.Cost)
-                    entry:SetAttribute("Description", equipment.Description)
-                    
-                    entry.BackgroundTransparency = 0
-                    entry.Image = equipment.Icon
-                    entry.Name = equipment.Name
-                    entry.Visible = true
-                    entry.Parent = shop.ScrollingFrame :: any
-                end
-            end
-
-            local participants: {Types.PartialParticipant} = remotes.GetPartialParticipants:InvokeServer()
+            local participants: {Types.PartialParticipant} = LocalRoundInfo.GetAllParticipants()
 
             if ownRole.HighlightRules then
                 local roleHighlights = {}
 
-                for _, role in round.Gamemode.Roles do
+                local roles: {Types.Role} = LocalRoundInfo.GetAllRoles() or {}
+                for _, role in roles do
                     local thisRelation = table.find(role.Allies or {}, ownRole.Name) and "__Ally" or "__Enemy"
                     local verdict
                     for relation, highlight in ownRole.HighlightRules do
@@ -164,9 +99,13 @@ local function update(round: Types.PartialRound?)
                 end
             end
         end
-    elseif round.RoundPhase == "Waiting" then
+    elseif roundPhase == "Waiting" then
         if SettingsManager.GetSetting("Use FIB Lighting") then
-            local mapConfig = round.Map:WaitForChild("FIBLighting", 3)
+            local map = LocalRoundInfo.GetMap()
+            if not map then
+                return
+            end
+            local mapConfig = map:WaitForChild("FIBLighting", 3)
             if mapConfig then
                 for _, prop in mapConfig:GetChildren() do
                     if prop:IsA("ValueBase") then
@@ -179,9 +118,10 @@ local function update(round: Types.PartialRound?)
                 print("FIB Lighting settings were not found for "..roundInfo.MapName)
             end
         end
-    elseif round.RoundPhase == "Highlights" then
-        assert(round.RoundEndInfo and round.RoundEndInfo.Winners.VictoryMusic)
-        local sound = round.RoundEndInfo.Music
+    elseif roundPhase == "Highlights" then
+        local endInfo = LocalRoundInfo.GetRoundEndInfo()
+        assert(endInfo)
+        local sound = endInfo.Music
         if not sound then
             return
         end
@@ -224,17 +164,85 @@ ReplicatedStorage.RoundHandler.VoteMap.OnClientEvent:Connect(function(allow)
     vote:ToggleVisible(allow)
 end)
 
-ReplicatedStorage.RoundHandler.RoundPause.OnClientEvent:Connect(function(pausedOrResumeTime: true | number)
-    if pausedOrResumeTime == true then
-        lastTime = roundInfo.Timer.Text
-        paused = true
+local timeTarget = 0
+local paused = false
+local lastTime = ""
+local function updateTimer(time: number)
+    if paused then
+		if math.round(time) % 2 == 1 then --Alternate every second
+			roundInfo.Timer.Text = "PAUSED"
+		else
+			roundInfo.Timer.Text = lastTime
+		end
+		return
+	end
+
+	roundInfo.Timer.Text = API.ToRoundTime(time, timeTarget)
+end
+
+task.spawn(function()
+    while true do
+        updateTimer(workspace:GetServerTimeNow())
+        task.wait()
+    end
+end)
+
+LocalRoundInfo.Listen("TimeMilestone", function(time)
+    timeTarget = time
+end)
+
+LocalRoundInfo.Listen("IsPaused", function(isPaused)
+    lastTime = roundInfo.Timer.Text
+    paused = isPaused
+end)
+
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Participant?)
+    if not participant or participant.Role.Name == "" then
+        roundInfo.Frame.Role.TextColor3 = Color3.new(1, 1, 1)
+        roundInfo.Frame.Role.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
         return
     end
-    timeTarget = pausedOrResumeTime
+
+    local role = participant.Role
+    roundInfo.Frame.Role.Text = role.Name
+    roundInfo.Frame.Role.TextColor3 = role.Colour
+
+    local toRegister = ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered:FindFirstChild("Equipment Shop")
+    if not role.EquipmentShop or #role.EquipmentShop <= 0 or not toRegister then
+        return
+    end
+
+    local shop: typeof(toRegister) = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, toRegister, "Shop", false).UI
+    shop.Reset:Fire()
+    
+    for _, v in shop.ScrollingFrame:GetChildren() do
+        if v.ClassName == "ImageButton" then
+            v:Destroy()
+        end
+    end
+
+    local nameToObj = {}
+    local availableEquipment = LocalRoundInfo.GetAllEquipment()
+    if availableEquipment then
+        for _, e in availableEquipment do
+            nameToObj[e.Name] = e
+        end
+    end
+
+    for _, v in role.EquipmentShop do
+        local equipment = nameToObj[v]
+        
+        local entry = shop.EquipmentEntry:Clone()
+        entry:SetAttribute("CreditCost", equipment.Cost)
+        entry:SetAttribute("Description", equipment.Description)
+        
+        entry.BackgroundTransparency = 0
+        entry.Image = equipment.Icon
+        entry.Name = equipment.Name
+        entry.Visible = true
+        entry.Parent = shop.ScrollingFrame :: any
+    end
 end)
 
-ReplicatedStorage.RoundHandler.RoundPhaseChange.OnClientEvent:Connect(function()
-    update()
-end)
-
+LocalRoundInfo.Listen("RoundPhase", update)
 update()
