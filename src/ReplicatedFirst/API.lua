@@ -66,35 +66,8 @@ local screenMessageFormats = {
 
 local module = {}
 
-function module.ReverseList(list: {}): {} --Reverses the order of a list
-	local reversedList = {}
-	for i = #list, 1, -1 do
-		table.insert(reversedList, list[i])
-	end
-	return reversedList
-end
-
-function module.ShuffleList(list: {}): {} --Randomly shuffles a list using the Fisher-Yates algorithm
-	math.randomseed(workspace:GetServerTimeNow())
-	local shuffledList = {}
-	for _, v in ipairs(list) do
-		local pos = math.random(1, #shuffledList+1)
-		table.insert(shuffledList, pos, v)
-	end
-	return shuffledList
-end
-
 function module.LerpNumber(num1: number, num2: number, decimal: number): number --Linearly interpolates a number
 	return num1 + ((num2 - num1) * decimal)
-end
-
-function module.HexToColor3(hex: string):Color3 --Credit: @Blockzez
-	local r, g, b = string.match(hex, "^#?(%w%w)(%w%w)(%w%w)$")
-	return Color3.fromRGB(tonumber(r, 16), tonumber(g, 16), tonumber(b, 16))
-end
-
-function module.Color3ToHex(color: Color3):string --Credit: @Blockzez
-	return string.format("#%02X%02X%02X", color.R*0xFF, color.G*0xFF, color.B*0xFF)
 end
 
 function module.ScreenMessage(format: string, text: string, formatOverrides: {}?): TextLabel
@@ -145,37 +118,6 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {}?
 	
 	return label
 end
-
-function module.WaitForChildOfClass(instance: Instance, className: string, timeout: number?):Instance?
-	if typeof(instance) ~= "Instance" then error("Expected Instance in Instance of WaitForChildOfClass, got "..typeof(instance)) end
-	if typeof(className) ~= "string" then error("Expected string for className of WaitForChildOfClass, got "..typeof(className)) end
-	if not table.find({"number", "nil"}, typeof(timeout)) then error("Expected number or nil for timeout of WaitForChildOfClass, got "..typeof(timeout)) end
-	local start = os.time()
-	local endTime = start+(timeout or math.huge)
-	local warned = false
-	repeat
-		task.wait()
-		if not timeout and not warned then
-			if start+5 <= os.time() then
-				warned = true
-				warn("Infinite yield possible on "..instance.Name..":WaitForChildOfClass("..className..")")
-			end
-		end
-	until instance:FindFirstChildOfClass(className) or os.time()>=endTime
-	return instance:FindFirstChildOfClass(className)
-end
-
-function module.FindFirstChildSplit(instance: Instance, split: string, target: string, index: number): Instance?
-	if typeof(instance) ~= "Instance" then error("Expected Instance in Instance of MatchFirstChild, got "..typeof(instance)) end
-	if typeof(split) ~= "string" then error("Expected string for split of FindFirstChildSplit, got "..typeof(split)) end
-	if typeof(target) ~= "string" then error("Expected string for target of FindFirstChildSplit, got "..typeof(target)) end
-	if typeof(index) ~= "number" then error("Expected number for index of FindFirstChildSplit, got "..typeof(index)) end
-	for _, v in instance:GetChildren() do
-		if v.Name:split(split)[index] == target then return v end
-	end
-	return nil
-end
-
 
 function module.TransitionUIPage(currentPage: Frame, currentPageOrder: number, newPage: Frame, newPageOrder: number, targetPosition: UDim2)
 	local requestSetting = script.Parent.SettingsManager:FindFirstChild("RequestSetting")
@@ -324,4 +266,3 @@ function module.TransitionUIState(frame: Frame, open: boolean)
 end
 
 return module
-

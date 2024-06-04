@@ -65,11 +65,17 @@ module["AvailableSettings"] = {
 			if not map then
 				return
 			end
-			local mapConfig = map:FindFirstChild(val and "FIBLighting" or "Lighting") :: Types.LightingStructure?
+
+			local mapConfig: Types.LightingStructure?
+			if val then
+				mapConfig = map.Map:FindFirstChild("FIBLighting") :: Types.LightingStructure?
+			else
+				mapConfig = map:FindFirstChild("Lighting") :: Types.LightingStructure?
+			end
 			if mapConfig then
 				for _, prop in mapConfig:GetChildren() do
-					if (Lighting :: any)[prop.Name] then
-						(Lighting :: any)[prop.Name] = prop.Value
+					if prop:IsA("ValueBase") then
+						(Lighting :: any)[prop.Name] = (prop :: any).Value
 					end
 				end
 			end
