@@ -1,32 +1,33 @@
 local HTTPService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local UserInputService = game:GetService("UserInputService")
 
 local LocalRoundInfo: typeof(require(script.Parent.LocalRoundInfo))
-if game:GetService("RunService"):IsClient() then
-	LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-end
 local Types = require(script.Parent.RoundHandler.Types)
 
-local UIScript, UI, UIS, uiThemes
-
+-- This module also gets called from the server. Might be better to move the JSONEncode and Decode to elsewhere (like say, the server because THATS THE ONLY ONE THAT USES THOSE!)
+local UIScript, UI, uiThemes
 if game:GetService("RunService"):IsClient() then
-	UIScript = game:GetService("ReplicatedFirst").UIManager
+	LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+	UIScript = ReplicatedFirst.UIManager
 	UI = (require)(UIScript)
-	UIS = game:GetService("UserInputService")
 	
 	uiThemes = {}
-	for i, _ in UI.Themes do table.insert(uiThemes, i) end
+	for i, _ in UI.Themes do
+		table.insert(uiThemes, i)
+	end
 end
 
 export type SettingDefinition = {
 	Name: string,
-	Tab: "Display" | "Gameplay" | "Controls" | "Touch" | "General",
+	Tab: "Display" | "Gameplay" | "Controls" | "Touch" | "General" | "Keybinds",
 	Category: string,
 	Tooltip: string,
 	PossibleValues: {string} | "Boolean" | "Keybind" | "TouchPosition" | "TouchScale",
 	Default: Setting,
-	SpecifyToggle: boolean, -- Whether the user can change if this is toggled or not. Only for keybinds.
-	Callback: (val: string | boolean, name: string) -> nil,
+	SpecifyToggle: boolean?, -- Whether the user can change if this is toggled or not. Only for keybinds.
+	Callback: (val: string | boolean | nil, name: string?) -> nil,
 }
 
 export type Keybind = Enum.UserInputType | Enum.KeyCode
@@ -43,7 +44,7 @@ local function keybindCallback(val, name)
 	updated:Fire(name, val)
 end
 
-module["AvailableSettings"] = {
+module.AvailableSettings = {
 	{
 		Name = "Shadows",
 		Tab = "Display",
@@ -51,7 +52,9 @@ module["AvailableSettings"] = {
 		Tooltip = "Enable or disable global shadows.",
 		PossibleValues = "Boolean",
 		Default = true,
-		Callback = function(val) game:GetService("Lighting").GlobalShadows = val end,
+		Callback = function(val)
+			game:GetService("Lighting").GlobalShadows = val :: boolean
+		end,
 	},
 	{
 		Name = "Use FIB Lighting",
@@ -126,9 +129,13 @@ module["AvailableSettings"] = {
 		PossibleValues = "Boolean",
 		Default = true,
 		Callback = function(val)
-			if not UIS.KeyboardEnabled then return end
+			if not UserInputService.KeyboardEnabled then
+				return
+			end
 			local sidebar = UI.WaitForUI("Sidebar")
-			if sidebar then sidebar:ToggleVisible(val) end
+			if sidebar then
+				sidebar:ToggleVisible(val)
+			end
 		end
 	},
 	{
@@ -475,8 +482,7 @@ module["AvailableSettings"] = {
 		Default = 1,
 		Callback = keybindCallback,
 	},
-
-} :: {any}
+} :: {SettingDefinition}
 
 module["Settings"] = {}
 for _, v in module.AvailableSettings do
@@ -507,12 +513,13 @@ end
 function module.JSONEncode(): string
 	local toEncode = {}
 	for i, v in module.Settings do
+		local converted: any = v
 		if typeof(v) == "UDim2" then
-			v = {v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset}
-		elseif (typeof(v) == "table") and v["Keycodes"] then
-			v = keybindToJson(v)
+			converted = {v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset}
+		elseif (typeof(v) == "table") and v.Keycodes then
+			converted = keybindToJson(v)
 		end
-		toEncode[i] = v
+		toEncode[i] = converted
 	end
 	return HTTPService:JSONEncode(toEncode)
 end
