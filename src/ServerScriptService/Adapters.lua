@@ -48,22 +48,22 @@ local module: Types.Adapter = {
     },
 
     SetDefaultLighting = function()
-        Lighting.Ambient = Color3.new(0.5, 0.5, 0.5)
-        Lighting.Brightness = 1
-        Lighting.ClockTime = 14
+        Lighting.Ambient = Color3.fromRGB(70, 70, 70)
+        Lighting.Brightness = 3
+        Lighting.ClockTime = 14.5
         Lighting.ColorShift_Bottom = Color3.new()
         Lighting.ColorShift_Top = Color3.new()
-        Lighting.EnvironmentDiffuseScale = 0
-        Lighting.EnvironmentSpecularScale = 0
+        Lighting.EnvironmentDiffuseScale = 1
+        Lighting.EnvironmentSpecularScale = 1
         Lighting.ExposureCompensation = 0
-        Lighting.FogColor = Color3.new(0.75, 0.75, 0.75)
+        Lighting.FogColor = Color3.fromRGB(192, 192, 192)
         Lighting.FogEnd = 100000
         Lighting.FogStart = 0
-        Lighting.GeographicLatitude = 41.7332993
-        Lighting.GlobalShadows = false
-        Lighting.OutdoorAmbient = Color3.new(0.5, 0.5, 0.5)
-        Lighting.ShadowSoftness = 0.5
-        Lighting.TimeOfDay = "14:00:00"
+        Lighting.GeographicLatitude = 0
+        Lighting.GlobalShadows = true
+        Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
+
+        Lighting:ClearAllChildren()
     end,
 
     DoIntermission = function()
