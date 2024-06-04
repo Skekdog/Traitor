@@ -1,6 +1,6 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
+local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local UI = require(ReplicatedFirst.UIManager).WaitForUI("Credits")
 
 LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)

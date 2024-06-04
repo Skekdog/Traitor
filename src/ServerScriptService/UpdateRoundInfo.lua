@@ -13,17 +13,6 @@ local function minimalParticipant(participant: Types.Participant)
 	}
 end
 
-local function makeNonCyclicParticipant(participant: Types.Participant): Types.Participant -- actually Round is nil
-	local nonCyclic = {}
-	for k, v in participant do
-		if k == "Round" then
-			continue
-		end
-		nonCyclic[k] = v
-	end
-	return nonCyclic :: any
-end
-
 function module.SendUpdatedParticipants(participants: {Types.Participant}, thisParticipant: Types.Participant?, plr: Player)
 	if not thisParticipant then
 		for _, v in participants do
@@ -31,13 +20,15 @@ function module.SendUpdatedParticipants(participants: {Types.Participant}, thisP
 		end
 		return
 	end
+
 	for _, v in participants do
-		if v.Player == thisParticipant.Player then
-			remotes.UpdateOwnParticipant:FireClient(plr, makeNonCyclicParticipant(thisParticipant))
+		if v.Player ~= thisParticipant.Player then
+			remotes.UpdateParticipant:FireClient(plr, thisParticipant:ViewPartialParticipant(v))
 			continue
 		end
-        print("send other")
-		remotes.UpdateParticipant:FireClient(plr, thisParticipant:ViewPartialParticipant(v))
+		local p = table.clone(thisParticipant)
+		p.Round = nil
+		remotes.UpdateOwnParticipant:FireClient(plr, p)
 	end
 end
 

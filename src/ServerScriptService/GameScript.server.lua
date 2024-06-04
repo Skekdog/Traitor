@@ -163,11 +163,9 @@ joinRound.OnServerInvoke = function(plr)
 	end
 	
 	if not round:GetParticipant(plr.Name) then
-		local participant = round:JoinRound(plr)
-		-- stupid kludge to avoid cyclic references
-		participant.Round = nil :: any
+		local participant: any = table.clone(round:JoinRound(plr)) -- Might be worth doing a "client-safe" type for these sorts of things - no cyclic tables, no methods, no other "unsafe" fields
+		participant.Round = nil -- This is a shallow copy, all is fine
 		remotes.UpdateOwnParticipant:FireClient(plr, participant)
-		participant.Round = round
 		return true
 	end
 	return
