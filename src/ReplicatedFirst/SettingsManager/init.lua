@@ -27,7 +27,7 @@ export type SettingDefinition = {
 	PossibleValues: {string} | "Boolean" | "Keybind" | "TouchPosition" | "TouchScale",
 	Default: Setting,
 	SpecifyToggle: boolean?, -- Whether the user can change if this is toggled or not. Only for keybinds.
-	Callback: (val: string | boolean | nil, name: string?) -> nil,
+	Callback: (val: Setting?, name: string?) -> nil,
 }
 
 export type Keybind = Enum.UserInputType | Enum.KeyCode

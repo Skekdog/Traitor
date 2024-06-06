@@ -4,8 +4,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
-local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
+local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler) :: Types.ServerRoundHandler
 
 local remotes = ReplicatedStorage.RoundHandler
 local slayVote = remotes.SlayVote

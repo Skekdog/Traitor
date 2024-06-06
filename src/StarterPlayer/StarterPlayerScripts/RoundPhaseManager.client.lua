@@ -1,14 +1,13 @@
 local CollectionService = game:GetService("CollectionService")
-local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local Types = require(ReplicatedFirst.RoundHandler.Types)
+local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler) :: Types.ClientRoundHandler
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
-local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: any
@@ -29,8 +28,7 @@ end
 
 local stopMusic: (() -> ())?
 
-local function update()
-    local roundPhase = LocalRoundInfo.GetRoundPhase()
+local function update(roundPhase)
     local participant: Types.Participant? = LocalRoundInfo.GetOwnParticipant()
     local ownRole: Types.Role?
     if participant then
@@ -38,7 +36,6 @@ local function update()
     end
 
     if roundPhase == "Destroy" then
-        -- Allow for creation of a new round
         joinRound:ToggleVisible(true)
 
         for _, v in CollectionService:GetTagged("AllyMarker") do
@@ -56,66 +53,32 @@ local function update()
     end
 
     if stopMusic and roundPhase ~= "Intermission" then
+        print("stopping music")
         stopMusic()
     end
 
     joinRound:ToggleVisible((roundPhase == "Waiting") or (roundPhase == "Preparing"))
 
     if roundPhase == "Playing" then
-        ReplicatedFirst.ClientStorage:SetAttribute("RoundStartTime", workspace:GetServerTimeNow()) --todo: this can probably cause problems under big lag
-        if ownRole then
+        if ownRole and participant then
             local participants: {Types.PartialParticipant} = LocalRoundInfo.GetAllParticipants()
 
             if ownRole.HighlightRules then
-                local roleHighlights = {}
-
-                local roles: {Types.Role} = LocalRoundInfo.GetAllRoles() or {}
-                for _, role in roles do
-                    local thisRelation = table.find(role.Allies or {}, ownRole.Name) and "__Ally" or "__Enemy"
-                    local verdict
-                    for relation, highlight in ownRole.HighlightRules do
-                        if relation == role.Name then
-                            verdict = highlight
-                            break
-                        elseif verdict == nil then
-                            verdict = if relation == "__All" then highlight else thisRelation == relation
-                        end
-                    end
-                    roleHighlights[role.Name] = verdict
+                local highlightRoles = {}
+                for _, v in ownRole.HighlightRules do
+                    table.move(RoundHandler.GetRolesMatchingRelationship(LocalRoundInfo.GetAllRoles() or {}, ownRole, v), 1, #highlightRoles, #highlightRoles + 1, highlightRoles)
                 end
 
-                for _, v in participants do
-                    if not v.Role then
-                        continue
-                    end
-                    if roleHighlights[v.Role.Name] then
+                for _, role in highlightRoles do
+                    for _, p in RoundHandler.GetParticipantsWithRole(participants, role, participant) do
                         local clone = Instance.new("Highlight")
                         CollectionService:AddTag(clone, "AllyMarker")
                         clone.FillTransparency = 1
-                        clone.OutlineColor = v.Role.Colour
+                        clone.OutlineColor = role.Colour
                         clone.OutlineTransparency = 0
-                        clone.Parent = v.Player.Character
+                        clone.Parent = p.Player.Character
                     end
                 end
-            end
-        end
-    elseif roundPhase == "Waiting" then
-        if SettingsManager.GetSetting("Use FIB Lighting") then
-            local map = LocalRoundInfo.GetMap()
-            if not map then
-                return
-            end
-            local mapConfig = map:WaitForChild("FIBLighting", 3)
-            if mapConfig then
-                for _, prop in mapConfig:GetChildren() do
-                    if prop:IsA("ValueBase") then
-                        if (Lighting :: any)[prop.Name] then
-                            (Lighting :: any)[prop.Name] = (prop :: any).Value
-                        end
-                    end
-                end
-            else
-                print("FIB Lighting settings were not found for "..roundInfo.MapName)
             end
         end
     elseif roundPhase == "Highlights" then
@@ -144,6 +107,7 @@ local function update()
             task.delay(1, function()
                 sound:Stop()
                 sound:Destroy()
+                sound = nil
             end)
         end
         
@@ -245,4 +209,4 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Partic
 end)
 
 LocalRoundInfo.Listen("RoundPhase", update)
-update()
+update(LocalRoundInfo.GetRoundPhase())

@@ -1,5 +1,6 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local uiManager = require(ReplicatedFirst.UIManager)
@@ -42,10 +43,11 @@ ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(hig
 	end
 	-- todo: need something for syncing music
 
+	local startTime = LocalRoundInfo.GetStartTime()
 	for _, v in events do
 		local e = eTemplate:Clone()
 		e.TextLabel.Text = v.Text
-		e.Time.Text = API.ToRoundTime(ReplicatedFirst.ClientStorage:GetAttribute("RoundStartTime"), v.Timestamp)
+		e.Time.Text = API.ToRoundTime(startTime, v.Timestamp)
 		e.Visible = true
 		e.Name = "ActiveEvent"
 		e.Parent = eFrame

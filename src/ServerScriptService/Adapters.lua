@@ -190,7 +190,7 @@ local module: Types.Adapter = {
     end,
 
     CalculateDamageModifier = function(karma)
-        return 1-((1000 - karma) / 1000)
+        return ((0.00005 * (karma^2)) + 50) / 100
     end,
 
     OnDeath = function(victim)

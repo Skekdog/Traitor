@@ -22,7 +22,7 @@ local function spectateFunc(action, state)
 	end
 	
 	if #chars == 0 then
-		uiO.Username.Text = "Nobody to spectate :("
+		uiO.Username.Text = "Nobody to spectate!"
 		return
 	end
 

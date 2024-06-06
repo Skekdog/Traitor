@@ -27,7 +27,7 @@ function module.SendUpdatedParticipants(participants: {Types.Participant}, thisP
 			continue
 		end
 		local p = table.clone(thisParticipant)
-		p.Round = nil
+		p.Round = nil :: any
 		remotes.UpdateOwnParticipant:FireClient(plr, p)
 	end
 end

@@ -107,7 +107,7 @@ end
 local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.Participant?, entity: Entity, partName: string, distance: number): ()
     local damage = calculateDamage(attacker, weapon, partName, distance)
 
-    local hum: Humanoid
+    local hum: Humanoid?
     local sameTeam: boolean?
     if entity.Kind == "Participant" then
         hum = entity.Character:FindFirstChildOfClass("Humanoid") :: any
@@ -123,7 +123,7 @@ local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.P
     end
 
     local canDamage = if sameTeam then round.Gamemode.FriendlyFire else true
-    if canDamage then
+    if canDamage and hum then
         local willDie = (hum.Health - damage) <= 0
         if entity.Kind == "Participant" then
             if willDie then
