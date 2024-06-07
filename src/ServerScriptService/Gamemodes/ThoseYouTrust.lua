@@ -215,9 +215,7 @@ local module: Types.Gamemode = {
 			EquipmentShop = {"Grenade"},
 			CanSeeMissing = true,
 
-            HighlightRules = {
-                __Ally = true,
-            },
+            HighlightRoles = {"__Ally"},
             KnowsRoles = {
                 Traitor = true,
                 Detective = true,
