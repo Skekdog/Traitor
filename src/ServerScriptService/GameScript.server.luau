@@ -72,11 +72,10 @@ joinRound.OnServerInvoke = function(plr)
 	local round: Types.Round
 	local roundId = ServerStorage:GetAttribute("RoundID")
 
-	if not nextRoundReady then
-		return
-	end
-
 	if not roundId then
+		if not nextRoundReady then
+			return
+		end
 		local gamemode = gamemodes[math.random(1, #gamemodes)]
 		round = RoundHandler.CreateRound(nextMap, gamemode)
 		ServerStorage:SetAttribute("RoundID", round.ID)
