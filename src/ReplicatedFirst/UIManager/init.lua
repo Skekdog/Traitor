@@ -22,7 +22,7 @@ local uis = {
 	Special = plrUi:WaitForChild("Special", math.huge) -- The highest priority. Intended for special cases like ScreenMessage.
 }
 
-local requestSetting = (script :: any).Parent.SettingsManager.RequestSetting
+local requestSetting = script.Parent.SettingsManager.RequestSetting
 
 local UIManager = {}
 UIManager.__index = UIManager
@@ -156,7 +156,7 @@ function UIManager.UnregisterUI(name: string, uiType: UIType): nil
 		if reg.UI:GetAttribute("Sidebar") then
 			pcall(function()
 				reg.UI.Visible = false
-				reg.UI.Parent = (script :: any):FindFirstChild("UnregisteredUIs")[uiType]
+				reg.UI.Parent = (script :: any).UnregisteredUIs[uiType]
 				local sb: typeof(script.UnregisteredUIs.Buttons.Sidebar) = UIManager.GetUI("Sidebar").UI
 				sb:FindFirstChild(name):Destroy()
 			end)
@@ -342,7 +342,7 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 		
 		-- Now bgMenuMode == "Hidden"
 		if self.Visible then
-			for _, v in UIManager.GetUIs(self.UIType) :: any do
+			for _, v in UIManager.GetUIs(self.UIType) :: any  do
 				if v.Visible and (v ~= self) then
 					scrUI:SetAttribute("NextUI", v.Name..";"..scrUI:GetAttribute("NextUI"))
 					v:ToggleVisible(false, true)

@@ -5,7 +5,7 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(script.Parent.Parent)
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 
-local ui = UIManager.WaitForUI("Playerlist").UI :: any
+local ui = UIManager.WaitForUI("Playerlist").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered.Playerlist)
 local info = ui.Info
 local list = ui.List
 
@@ -17,10 +17,10 @@ local layoutOrders = {
 }
 
 local function findPlr(plrName: string)
-	return list:FindFirstChild("Player-"..plrName)
+	return list:FindFirstChild("Player-"..plrName) :: TextButton
 end
 
-function updatePlr(plr: Player, clone)
+function updatePlr(plr: Player, clone: any)
 	local participant: Types.Participant? | Types.PartialParticipant?
 	if plr == Players.LocalPlayer then
 		participant = LocalRoundInfo.GetOwnParticipant()
@@ -50,10 +50,10 @@ local function createPlr(plr: Player)
 
 	clone.Visible = true
 	clone.Name = "Player-"..plr.Name
-	clone.Parent = list
+	clone.Parent = list :: any
 
-	for _, v in clone.Marks:GetChildren() do
-		if v.ClassName ~= "TextButton" then
+	for _, v in clone.Marks:GetChildren() :: {any} do
+		if not v:IsA("TextButton") then
 			continue
 		end
 		v.MouseButton1Click:Connect(function()
@@ -63,7 +63,7 @@ local function createPlr(plr: Player)
 				return
 			end
 
-			for _, b in clone.Marks:GetChildren() do
+			for _, b in clone.Marks:GetChildren() :: {any} do
 				if b.ClassName ~= "TextButton" then
 					continue
 				end
@@ -90,7 +90,7 @@ local function createPlr(plr: Player)
 end
 
 function movePlr(plr: Player, status: "Alive" | "Missing" | "Dead" | "Spectating")
-	local clone = findPlr(plr.Name) or createPlr(plr)
+	local clone: any = findPlr(plr.Name) or createPlr(plr)
 	clone.LayoutOrder = layoutOrders[status]+1
 	clone.Marks.Visible = status == "Alive"
 end

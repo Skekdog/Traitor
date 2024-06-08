@@ -2,14 +2,14 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local plr = game:GetService("Players").LocalPlayer
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local frame = (UIManager.WaitForUI("RoundInfo").UI :: any).Frame
+local frame = (UIManager.WaitForUI("RoundInfo").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.RoundInfo)).Frame
 local health = frame.HealthBar
 
 plr:GetPropertyChangedSignal("Character"):Connect(function()
 	local char = plr.Character
 	if char then
 		local hum = char:WaitForChild("Humanoid") :: Humanoid
-		health.Text = hum.Health
+		health.Text = tostring(hum.Health)
 		health.UIGradient.Color = ColorSequence.new({
 			ColorSequenceKeypoint.new(0, Color3.new(0.785, 0, 0)),
 			ColorSequenceKeypoint.new(math.clamp(hum.Health/hum.MaxHealth, 0, 0.999), Color3.new(0.785, 0, 0)),
@@ -17,7 +17,7 @@ plr:GetPropertyChangedSignal("Character"):Connect(function()
 			ColorSequenceKeypoint.new(1, Color3.new(0.2, 0, 0)),
 		})
 		hum:GetPropertyChangedSignal("Health"):Connect(function()
-			health.Text = math.round(hum.Health)
+			health.Text = tostring(math.round(hum.Health))
 			health.UIGradient.Color = ColorSequence.new({
 				ColorSequenceKeypoint.new(0, Color3.new(0.785, 0, 0)),
 				ColorSequenceKeypoint.new(math.clamp(hum.Health/hum.MaxHealth, 0, 0.999), Color3.new(0.785, 0, 0)),

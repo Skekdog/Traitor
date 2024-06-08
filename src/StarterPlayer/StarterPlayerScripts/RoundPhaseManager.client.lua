@@ -10,7 +10,7 @@ local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: any
+local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.RoundInfo)
 local joinRound = UIManager.WaitForUI("JoinRound")
 
 local vote: UIManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Popup.VotingScreen)} = UIManager.WaitForUI("VotingScreen")

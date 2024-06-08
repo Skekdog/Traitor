@@ -2,12 +2,12 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local plr = Players.LocalPlayer
 
-local uiManager = require(game:GetService("ReplicatedFirst").UIManager)
-local controls = require(game:GetService("ReplicatedFirst").ControlManager)
+local uiManager = require(ReplicatedFirst.UIManager)
+local controls = require(ReplicatedFirst.ControlManager)
 
 local camera = workspace.CurrentCamera
 local ui = uiManager.WaitForUI("Spectate")
-local uiO = ui.UI :: any
+local uiO = ui.UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.Spectate)
 
 local function spectateFunc(action, state)
 	local chars = {}
@@ -28,7 +28,7 @@ local function spectateFunc(action, state)
 
 	local lastKey = nil
 	for i, v in chars do
-		if v == (camera :: any).CameraSubject then
+		if v == camera.CameraSubject :: Humanoid then
 			lastKey = i
 		end
 	end
@@ -42,7 +42,7 @@ local function spectateFunc(action, state)
 		camera.CameraSubject = chars[lastKey-1]
 	end
 	
-	uiO.Username.Text = (camera :: any).CameraSubject.Parent.Name
+	uiO.Username.Text = ((camera.CameraSubject :: Humanoid).Parent :: Instance).Name
 end
 
 local clientStorage = ReplicatedFirst.ClientStorage

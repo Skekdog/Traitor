@@ -2,7 +2,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UIManager = require(game:GetService("ReplicatedFirst").UIManager)
-local ui = UIManager.WaitForUI("CornerNotification").UI :: any
+local ui = UIManager.WaitForUI("CornerNotification").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.CornerNotification)
 
 local TS = game:GetService("TweenService")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -45,14 +45,15 @@ local function makeLabel(isTeam, text)
 
 	moveDown(isTeam and priv or global)
 
-	label.Parent = isTeam and priv or global
+	label.Parent = isTeam and priv or global :: any
 
-	label:TweenPosition(UDim2.fromScale(label.Position.X.Scale, 0), Enum.EasingDirection.InOut,
-		Enum.EasingStyle.Linear, 0.45, false)
-	task.delay(0.451, function()making=false end)
+	label:TweenPosition(UDim2.fromScale(label.Position.X.Scale, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.45, false)
+	task.delay(0.451, function()
+		making = false
+	end)
 
 	fade(label, false)
-	task.delay(2, function()fade(label, true)end)
+	task.delay(2, fade, label, true)
 end
 
 ReplicatedStorage.RoundHandler.SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)

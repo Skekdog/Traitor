@@ -13,7 +13,7 @@ for _, uiType in script.Parent.Parent:FindFirstChild("UnregisteredUIs"):GetChild
 	if uiType.ClassName ~= "Folder" then continue end
 	for _, ui in uiType:GetChildren() do
 		if ui:GetAttribute("DoNotRegister") then continue end
-		manager.RegisterUI(ui.Name, uiType.Name :: any, ui:GetAttribute("IgnoreInset"), ui :: any, ui:GetAttribute("DisplayName"), ui:GetAttribute("PreventClose"))
+		manager.RegisterUI(ui.Name, uiType.Name :: manager.UIType, ui:GetAttribute("IgnoreInset"), ui :: Frame, ui:GetAttribute("DisplayName"), ui:GetAttribute("PreventClose"))
 	end
 end
 
@@ -42,8 +42,8 @@ ReplicatedStorage.ServerClient.OpenSettings.OnClientEvent:Connect(function()
 	manager.WaitForUI("Settings"):ToggleVisible(true)
 end)
 
-local CASui: ScreenGui = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge) :: any
-local CASFrame = CASui:WaitForChild("ContextButtonFrame") :: any
+local CASui = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge) :: any
+local CASFrame = CASui:WaitForChild("ContextButtonFrame")
 CASFrame.Size = UDim2.fromScale(1, 1)
 CASFrame.Position = UDim2.fromScale(0, 0)
 CASui.DisplayOrder = 4

@@ -63,12 +63,12 @@ local module: Types.Gamemode = {
         local deathLog = round.EventLog["Death"]
 
         if deathLog then
-            local firstKill: (Types.RoundEvent_Death & {Attacker: Types.Participant})? = nil
+            local firstKill: (Types.RoundEvent_Death & {Attacker: Types.Participant})?
             local eventIndex = 1
             while (eventIndex < #deathLog) and (not firstKill) do
                 eventIndex += 1
-                firstKill = deathLog[eventIndex] :: any
-                if not firstKill or not firstKill.Attacker then -- weird type-check stuff means "not firstKill" is needed
+                firstKill = deathLog[eventIndex]
+                if not firstKill or not firstKill.Attacker then
                     firstKill = nil
                 end
             end

@@ -48,10 +48,10 @@ end
 
 function module.getStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType): string
 	if keycode.EnumType == Enum.KeyCode then
-		local img = UIS:GetImageForKeyCode(keycode :: any)
+		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
 		if img ~= "" then return img end
 
-		local str = UIS:GetStringForKeyCode(keycode :: any)
+		local str = UIS:GetStringForKeyCode(keycode :: Enum.KeyCode)
 		if str ~= "" then return str end
 
 		if keycode == Enum.KeyCode.LeftControl then

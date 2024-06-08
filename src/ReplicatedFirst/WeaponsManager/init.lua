@@ -109,7 +109,7 @@ local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.P
     local hum: Humanoid?
     local sameTeam: boolean?
     if entity.Kind == "Participant" then
-        hum = entity.Character:FindFirstChildOfClass("Humanoid") :: any
+        hum = entity.Character:FindFirstChildOfClass("Humanoid")
         if not hum then
             return
         end
@@ -126,7 +126,7 @@ local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.P
         local willDie = (hum.Health - damage) <= 0
         if entity.Kind == "Participant" then
             if willDie then
-                local death = (entity.Character:FindFirstChild("HumanoidRootPart") :: any):FindFirstChild("DeathSound", true)
+                local death = (entity.Character.PrimaryPart :: BasePart):FindFirstChild("DeathSound", true) :: Sound
                 if death and partName == "Head" then
                     death.Volume = 0
                 end

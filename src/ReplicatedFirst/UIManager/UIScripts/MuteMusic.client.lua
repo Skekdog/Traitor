@@ -1,14 +1,12 @@
-local UIManager = require(script.Parent.Parent) :: any
-local button = UIManager.WaitForUI("Highlights").UI.Page.Highlights.Music.Mute
+local UIManager = require(script.Parent.Parent)
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local SoundService = game:GetService("SoundService")
 
+local button = (UIManager.WaitForUI("Highlights").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered.Highlights)).Page.Highlights.Music.Mute 
+
+local pause = false
 button.MouseButton1Click:Connect(function()
-	local prev = SoundService.RoundEndMusic.Volume
-	if prev == 0 then
-		SoundService.RoundEndMusic.Volume = 1
-		button.Image = "rbxasset://textures/StudioToolbox/AssetPreview/pause_button.png"
-	else
-		SoundService.RoundEndMusic.Volume = 0
-		button.Image = "rbxasset://textures/StudioToolbox/AssetPreview/play_button.png"
-	end
+	pause = not pause
+	SoundService.RoundEndMusic.Volume = if pause then 0 else 1
+	button.Image = `"rbxasset://textures/StudioToolbox/AssetPreview/{if pause then "pause" else "play"}_button.png`
 end)

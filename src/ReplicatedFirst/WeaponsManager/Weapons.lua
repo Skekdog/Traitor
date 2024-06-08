@@ -225,7 +225,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
                 local char = target.Character
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
-                    local deathSound = root:FindFirstChild("DeathSound") :: any
+                    local deathSound = root:FindFirstChild("DeathSound") :: Sound
                     if deathSound then
                         deathSound.SoundId = "rbxassetid://0" --todo: golden sound here
                     end
@@ -438,7 +438,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
                 return
             end
 
-            local deathSound = root:FindFirstChild("DeathSound") :: any
+            local deathSound = root:FindFirstChild("DeathSound") :: Sound
             if deathSound then
                 deathSound.Volume = 0
             end

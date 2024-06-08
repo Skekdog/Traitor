@@ -66,9 +66,9 @@ end
 
 type Attribute = "MapAuthors" | "MapName" | "GamemodeAuthors" | "GamemodeName" | "TimeMilestone" | "RoundPhase" | "IsPaused" | "RoundStartTime"
 type AttributeValue = (string | number | boolean)?
-type ListenerCallback<T> = (newValue: T) -> ()
+type ListenerCallback<T> = (newValue: EventValue & T) -> ()
 type Event = Attribute | "UpdateParticipant" | "UpdateOwnParticipant" | "UpdateEquipment" | "UpdateRoles" | "UpdateRoundEndInfo"
-type EventValue = AttributeValue | Types.Participant | {Types.Equipment} | {Types.Role} | Types.RoundEndInfo | Types.PartialParticipant
+type EventValue = AttributeValue | Types.Participant | {Types.Equipment} | {Types.Role} | Types.RoundEndInfo | Types.PartialParticipant | nil
 
 local listeners: {[Event]: {ListenerCallback<EventValue>}} = {}
 for i in replicatedData:GetAttributes() do
@@ -81,7 +81,7 @@ end
 
 --- @returns A function to stop listening for changes
 function module.Listen<T>(event: Event, callback: ListenerCallback<T>): () -> ()
-    table.insert(listeners[event], callback :: any)
+    table.insert(listeners[event], callback :: ListenerCallback<EventValue>)
     local pos = #listeners[event]
     return function()
         listeners[event][pos] = nil

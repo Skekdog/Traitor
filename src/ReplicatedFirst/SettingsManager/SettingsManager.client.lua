@@ -1,7 +1,7 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local SM = require(script.Parent)
-local API = require(ReplicatedFirst:WaitForChild("API"))
+local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 local Controls = require(ReplicatedFirst.ControlManager)
 
@@ -24,7 +24,7 @@ local keybindFrame = script:FindFirstChild("__SettingKeybind")
 local selectorFrame = script:FindFirstChild("__SettingSelector")
 local booleanFrame = script:FindFirstChild("__SettingBoolean")
 local touchFrame = script:FindFirstChild("__SettingTouch")
-local settingsFrame = (UIManager :: any).WaitForUI("Settings").UI.Main
+local settingsFrame = UIManager.WaitForUI("Settings").UI.Main :: any
 
 local tabsFrame = settingsFrame.Tabs :: ScrollingFrame
 local tabUnderline: Frame = tabsFrame:FindFirstChild("Underline") :: Frame
@@ -137,7 +137,7 @@ for i, v in createdTabs do
 		if settingsFrame:GetAttribute("CurrentTab") == v then
 			return
 		end
-		API.TransitionUIPage(currentPage, (tabsFrame:FindFirstChild(currentPage.Name:sub(6)) :: GuiButton).LayoutOrder, page :: any, tab.LayoutOrder, UDim2.fromScale(0, 0.1))
+		API.TransitionUIPage(currentPage, (tabsFrame:FindFirstChild(currentPage.Name:sub(6)) :: GuiButton).LayoutOrder, page, tab.LayoutOrder, UDim2.fromScale(0, 0.1))
 		settingsFrame:SetAttribute("CurrentTab", v)
 	end)
 	
@@ -311,10 +311,10 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				end
 
 				local function removeBind()
-					local binds = SM.GetSetting(name)
-					table.remove((binds :: any).Keycodes, table.find((binds :: any).Keycodes, setBinds))
+					local binds = SM.GetSetting(name) :: any
+					table.remove(binds.Keycodes, table.find((binds :: any).Keycodes, setBinds))
 					SM.SetSetting(name, binds)
-					setting.Callback(binds :: any, name)
+					setting.Callback(binds, name)
 
 					bind:Destroy()
 					local sep

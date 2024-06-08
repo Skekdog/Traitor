@@ -119,7 +119,7 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {}?
 	return label
 end
 
-function module.TransitionUIPage(currentPage: Frame, currentPageOrder: number, newPage: Frame, newPageOrder: number, targetPosition: UDim2)
+function module.TransitionUIPage(currentPage: GuiObject, currentPageOrder: number, newPage: GuiObject, newPageOrder: number, targetPosition: UDim2)
 	local requestSetting = script.Parent.SettingsManager:FindFirstChild("RequestSetting")
 	-- If new page is to the right, then the new page should be positioned on the right
 	-- and current page should slide to the left
@@ -192,7 +192,7 @@ function module.TransitionUIState(frame: Frame, open: boolean)
 	local UI_TRANSITION_TIME: number
 	if requestSetting:Invoke("Animate UI Transitions") then
 		if not open then
-			UI_TRANSITION_TIME = tonumber(requestSetting:Invoke("Close Speed")) :: any
+			UI_TRANSITION_TIME = tonumber(requestSetting:Invoke("Close Speed")) :: number
 		else
 			UI_TRANSITION_TIME = 0.2
 		end
