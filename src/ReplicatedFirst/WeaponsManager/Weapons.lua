@@ -1,17 +1,19 @@
---!strict
-local ReplicatedStorage = game:GetService("ReplicatedStorage") :: any
-local ServerStorage = game:GetService("ServerStorage") :: any
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 local WeaponsManager = require(script.Parent)
 
-local projectiles = ServerStorage.Projectiles :: any
-local models = ReplicatedStorage:WaitForChild("WeaponModels") :: any
-local weapons: {WeaponsManager.Weapon} = {
-    {
+local projectiles = ServerStorage.Projectiles
+local models = ReplicatedStorage.WeaponModels
+
+local bullet = projectiles.Bullet :: PVInstance
+
+local weapons: {[string]: WeaponsManager.Weapon} = {
+    Grenade = {
         Name = "Grenade",
         Description = "Kaboom",
 
         ProjectileInfo = {
-            Base = projectiles.Grenade,
+            Base = projectiles.Grenade :: PVInstance,
             Speed = 500
         },
         Slot = 7,
@@ -37,7 +39,7 @@ local weapons: {WeaponsManager.Weapon} = {
 
         Model = models.Grenade
     },
-    {
+    Crowbar = {
         Name = "Crowbar",
         Description = "Make Freeman Proud",
 
@@ -63,7 +65,7 @@ local weapons: {WeaponsManager.Weapon} = {
 
         ProjectileInfo = false
     },
-    {
+    HUGE = {
         Name = "HUGE",
         Description = "Boolet",
 
@@ -96,13 +98,13 @@ local weapons: {WeaponsManager.Weapon} = {
         },
 
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 140
         },
 
         Model = models.HUGE
     },
-    {
+    Scout = {
         Name = "Scout",
         Description = "It's a good job",
 
@@ -129,7 +131,7 @@ local weapons: {WeaponsManager.Weapon} = {
         },
         
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 250
         },
 
@@ -143,7 +145,7 @@ local weapons: {WeaponsManager.Weapon} = {
 
         Model = models.Scout
     },
-    {
+    Pistol = {
         Name = "Pistol",
         Description = "Pew",
 
@@ -179,11 +181,11 @@ local weapons: {WeaponsManager.Weapon} = {
         Model = models.Pistol,
 
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 100
         }
     },
-    {
+    ["Golden Gun"] = {
         Name = "Golden Gun",
         Description = "One shot. Don't fumble it.",
 
@@ -206,7 +208,7 @@ local weapons: {WeaponsManager.Weapon} = {
 
         MultiUse = false,
         ProjectileInfo = {
-            Base = projectiles.GoldenBullet,
+            Base = projectiles.GoldenBullet :: PVInstance,
             Speed = 250
         },
 
@@ -237,7 +239,7 @@ local weapons: {WeaponsManager.Weapon} = {
             end
         end
     },
-    {
+    SMG = {
         Name = "SMG",
         Description = "pew pew pew",
 
@@ -267,7 +269,7 @@ local weapons: {WeaponsManager.Weapon} = {
 
         Model = models.SMG,
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 140
         },
 
@@ -276,7 +278,7 @@ local weapons: {WeaponsManager.Weapon} = {
             SpreadMultiplier = 0.3
         }
     },
-    {
+    AWP = {
         Name = "AWP",
         Description = "A high-powered sniper rifle. Must be scoped in to shoot.",
 
@@ -312,11 +314,11 @@ local weapons: {WeaponsManager.Weapon} = {
 
         Model = models.AWP,
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 300
         }
     },
-    {
+    ["Assault Rifle"] = {
         Name = "Assault Rifle",
         Description = "pew pew",
 
@@ -352,11 +354,11 @@ local weapons: {WeaponsManager.Weapon} = {
         FalloffMultiplier = 0.5,
 
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 150,
         }
     },
-    {
+    Flashbang = {
         Name = "Flashbang",
         Description = "Blinds and deafens anyone in its radius. Can be disarmed by shooting it.",
 
@@ -381,16 +383,16 @@ local weapons: {WeaponsManager.Weapon} = {
 
         MultiUse = false,
         ProjectileInfo = {
-            Base = projectiles.Flashbang,
+            Base = projectiles.Flashbang :: PVInstance,
             Speed = 80,
         },
 
         Model = models.Flashbang,
         BeforeHitParticipant = function(_, victim)
-            ReplicatedStorage.ServerClient.Flashbang:FireClient(victim)
+            ReplicatedStorage.ServerClient.Flashbang:FireClient(victim.Player)
         end
     },
-    {
+    ["Silenced Pistol"] ={
         Name = "Silenced Pistol",
         Description = "A Pistol that has been modified to make far less noise. People killed with silenced weapons will not scream.",
 
@@ -426,7 +428,7 @@ local weapons: {WeaponsManager.Weapon} = {
         Model = models["Silenced Pistol"],
 
         ProjectileInfo = {
-            Base = projectiles.SilencedBullet,
+            Base = projectiles.SilencedBullet :: PVInstance,
             Speed = 100
         },
 
@@ -442,7 +444,7 @@ local weapons: {WeaponsManager.Weapon} = {
             end
         end
     },
-    {
+    XM1014 = {
         Name = "XM1014",
         Description = "bang",
 
@@ -477,13 +479,13 @@ local weapons: {WeaponsManager.Weapon} = {
         BulletsPerShot = 6,
 
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 150
         },
 
-        Model = models.Shotgun
+        Model = models.XM1014
     },
-    {
+    Glock = {
         Name = "Glock",
         Description = "pew pew",
 
@@ -517,13 +519,13 @@ local weapons: {WeaponsManager.Weapon} = {
         },
 
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 190
         },
 
         Model = models.Glock,
     },
-    {
+    Deagle = {
         Name = "Deagle",
         Description = "Bang",
 
@@ -557,7 +559,7 @@ local weapons: {WeaponsManager.Weapon} = {
         },
 
         ProjectileInfo = {
-            Base = projectiles.Bullet,
+            Base = bullet,
             Speed = 190
         },
 

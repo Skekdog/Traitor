@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local common = require(script.Parent.Common)
 
-local items = ReplicatedStorage.Items
+local items = ReplicatedStorage.WeaponModels
 
 local module: Types.Gamemode = {
     Name = "Those You Trust",

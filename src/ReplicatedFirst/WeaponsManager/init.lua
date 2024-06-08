@@ -1,10 +1,9 @@
---!strict
---todo: Look into FastCast
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
+local RoundHandler = require(script.Parent.RoundHandler.RoundHandler)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
@@ -231,8 +230,40 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo,
     explosion.Parent = workspace
 end
 
+local rayParams = RaycastParams.new()
+rayParams.FilterType = Enum.RaycastFilterType.Include
+rayParams.IgnoreWater = true
+rayParams.RespectCanCollide = true
+rayParams.FilterDescendantsInstances = {workspace}
+
 function module.Shoot(player: Player, weapon: Weapon, cameraRayInfo: Ray): ()
-    
+    local char = player.Character
+    if not char then
+        return
+    end
+
+    local roundId = ServerStorage:GetAttribute("RoundID")
+    local round = RoundHandler.GetRound(roundId)
+    if not round then
+        return
+    end
+
+    local attacker = round:GetParticipant(player.Name)
+    if not attacker then
+        return
+    end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum or hum.Health <= 0 then
+        return
+    end
+
+    local result = workspace:Raycast(char:GetPivot().Position, cameraRayInfo.Direction * 10000, rayParams)
+    if not result then
+        return
+    end
+
+    onPartHit(round, weapon, attacker, result)
 end
 
 return module
