@@ -103,15 +103,7 @@ local module: Types.Adapter = {
     end,
 
     CheckForUpdate = function(round)
-        -- Return true if a server restart is needed, false if not.
-        -- This could be checking a key in a DataStore for example.
-        -- Updates will be checked for at the end of every round.
-    
-        -- The Round object is provided to allow decisions based on whether a Round is important enough for a restart.
-    
-        -- Additional processing, such as saving player data, can also be done here.
-    
-        if not game:GetService("RunService"):IsStudio() then
+        if not game:GetService("RunService"):IsStudio() and game.PlaceId ~= 9648179685 then
             local newVersion: ProfileService.Profile & {Data: {Version: string}} = ProfileStore:ViewProfileAsync("Version")
 
             if newVersion then
