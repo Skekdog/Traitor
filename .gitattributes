@@ -1,5 +1,4 @@
 * text=auto
-* .luau text eol=lf
-* .lua text eol=lf
 * eol=lf
+* .luau text eol=lf
 * .luau linguist-language=Lua
