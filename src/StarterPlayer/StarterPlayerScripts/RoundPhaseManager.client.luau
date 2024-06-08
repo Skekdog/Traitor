@@ -53,7 +53,6 @@ local function update(roundPhase)
     end
 
     if stopMusic and roundPhase ~= "Intermission" then
-        print("stopping music")
         stopMusic()
     end
 
