@@ -1,4 +1,3 @@
---!nocheck
 local UserInputService = game:GetService("UserInputService")
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local TweenService = game:GetService("TweenService")
@@ -58,9 +57,10 @@ local KeyCodeToTextMapping = {
 }
 
 local function getScreenGui()
-	local screenGui = PlayerGui:FindFirstChild("ProximityPrompts")
+	local screenGui = PlayerGui:FindFirstChild("ProximityPrompts") :: ScreenGui?
 	if screenGui == nil then
 		screenGui = Instance.new("ScreenGui")
+		assert(screenGui)
 		screenGui.Name = "ProximityPrompts"
 		screenGui.ResetOnSpawn = false
 		screenGui.Parent = PlayerGui
@@ -73,14 +73,14 @@ local function setUpCircularProgressBar(bar)
 	local rightGradient = bar.RightGradient.ProgressBarImage.UIGradient
 
 	local progress = bar.Progress
-	progress.Changed:Connect(function(value)
+	progress.Changed:Connect(function(value: number)
 		local angle = math.clamp(value * 360, 0, 360)
 		leftGradient.Rotation = math.clamp(angle, 180, 360)
 		rightGradient.Rotation = math.clamp(angle, 0, 180)
 	end)
 end
 
-local function createPrompt(prompt, inputType, gui)
+local function createPrompt(prompt: ProximityPrompt, inputType, gui)
 	local tweensForButtonHoldBegin = {}
 	local tweensForButtonHoldEnd = {}
 	local tweensForFadeOut = {}
@@ -110,7 +110,7 @@ local function createPrompt(prompt, inputType, gui)
 	table.insert(tweensForFadeOut, TweenService:Create(frame, tweenInfoFast, { Size = UDim2.fromScale(0.5, 1), BackgroundTransparency = 1, ImageTransparency = 1 }))
 	table.insert(tweensForFadeIn, TweenService:Create(frame, tweenInfoFast, { Size = UDim2.fromScale(1, 1), BackgroundTransparency = backgroundTransparency, ImageTransparency = imageTransparency }))
 
-	local function setupUIStrokeTweens(uiStroke)
+	local function setupUIStrokeTweens(uiStroke: UIStroke)
 		local transparency = uiStroke.Transparency
 		uiStroke.Transparency = 1
 		table.insert(tweensForButtonHoldBegin, TweenService:Create(uiStroke, tweenInfoFast, { Transparency = 1 }))
@@ -119,7 +119,7 @@ local function createPrompt(prompt, inputType, gui)
 		table.insert(tweensForFadeIn, TweenService:Create(uiStroke, tweenInfoFast, { Transparency = transparency }))
 	end
 
-	local function setupGUIObjectTweens(guiObject)
+	local function setupGUIObjectTweens(guiObject: GuiObject)
 		local guiObjectBackgroundTransparency = guiObject.BackgroundTransparency
 		guiObject.BackgroundTransparency = 1
 		table.insert(tweensForButtonHoldBegin, TweenService:Create(guiObject, tweenInfoFast, { BackgroundTransparency = 1 }))
@@ -128,7 +128,7 @@ local function createPrompt(prompt, inputType, gui)
 		table.insert(tweensForFadeIn, TweenService:Create(guiObject, tweenInfoFast, { BackgroundTransparency = guiObjectBackgroundTransparency }))
 	end
 
-	local function setupTextLabelTweens(textLabel)
+	local function setupTextLabelTweens(textLabel: TextLabel)
 		local textTransparency = textLabel.TextTransparency
 		local textStrokeTransparency = textLabel.TextStrokeTransparency
 		textLabel.TextTransparency = 1
@@ -139,7 +139,7 @@ local function createPrompt(prompt, inputType, gui)
 		table.insert(tweensForFadeIn, TweenService:Create(textLabel, tweenInfoFast, { TextTransparency = textTransparency, TextStrokeTransparency = textStrokeTransparency }))
 	end
 
-	local function setupImageLabelTweens(imageLabel)
+	local function setupImageLabelTweens(imageLabel: ImageLabel)
 		local imageTransparency = imageLabel.ImageTransparency
 		imageLabel.ImageTransparency = 1
 		table.insert(tweensForButtonHoldBegin, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = 1 }))
@@ -148,7 +148,7 @@ local function createPrompt(prompt, inputType, gui)
 		table.insert(tweensForFadeIn, TweenService:Create(imageLabel, tweenInfoFast, { ImageTransparency = imageTransparency }))
 	end
 
-	local function setupUnexpectedChildTweens(child)
+	local function setupUnexpectedChildTweens(child: Instance)
 		if child:IsA("UIStroke") then
 			setupUIStrokeTweens(child)
 		elseif child:IsA("UIGradient") then
@@ -163,7 +163,7 @@ local function createPrompt(prompt, inputType, gui)
 			end
 		end
 
-		for _, grandChild in pairs(child:GetChildren()) do
+		for _, grandChild in child:GetChildren() do
 			setupUnexpectedChildTweens(grandChild)
 		end
 	end
