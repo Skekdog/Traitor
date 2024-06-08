@@ -1,4 +1,3 @@
---!nocheck
 -- http://www.ryanjuckett.com/programming/damped-springs/
 
 local EPSILON = 0.0001;
@@ -21,7 +20,7 @@ function spring.new(p0, v0, target, angularFrequency, dampingRatio)
 	return setmetatable(self, spring_mt);
 end
 
-function spring:update(dt)
+function spring.update(self: typeof(spring.new(0, 0, 0, 0, 0)), dt)
 	local aF = self.angularFrequency;
 	local dR =  self.dampingRatio;
 	
