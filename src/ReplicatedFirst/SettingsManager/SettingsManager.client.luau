@@ -112,7 +112,7 @@ local function transitionSwitch(target: Frame, disabled: boolean)
 	switch.Text = disabled and "O" or "I"
 end
 for i, v in createdTabs do
-	local tab = tabBase:Clone()
+	local tab = tabBase:Clone() :: TextButton
 	tab.Name = v
 	tab.Text = v
 	tab.Size = UDim2.fromScale(1 / #createdTabs, 1)
@@ -121,7 +121,7 @@ for i, v in createdTabs do
 	tab.LayoutOrder = i -- This is ordered more-or-less randomly, but the same random every time 
 	tab.Parent = tabsFrame :: any
 	
-	local page = pageBase:Clone()
+	local page = pageBase:Clone() :: GuiObject
 	page.Name = "Page_"..v
 	page.Parent = settingsFrame
 	
@@ -201,7 +201,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	if not categories[catIndex] then
 		categories[catIndex] = 0
 		
-		local label = pageBase:FindFirstChild("CategoryLabel"):Clone()
+		local label = (pageBase:FindFirstChild("CategoryLabel") :: Instance):Clone() :: TextLabel
 		label.Text = cat
 		label.LayoutOrder = categories["__len"]*1000
 		label.Visible = true
