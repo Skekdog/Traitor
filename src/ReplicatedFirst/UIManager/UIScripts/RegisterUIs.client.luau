@@ -1,40 +1,42 @@
+local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-for _, v in script.Parent.Parent:FindFirstChild("UITypes"):GetChildren() do
-	v.Parent = game:GetService("Players").LocalPlayer.PlayerGui
-end
 
 local manager = require(script.Parent.Parent)
-local controls = require(game:GetService("ReplicatedFirst").ControlManager)
+local controls = require(ReplicatedFirst.ControlManager)
 
 local event = script.Parent.Parent.UpdateThemeInstance
 event.Event:Connect(manager.UpdateThemeInstance)
 
-for _, uiType in script.Parent.Parent:FindFirstChild("UnregisteredUIs"):GetChildren() do
-	if uiType.ClassName ~= "Folder" then continue end
-	for _, ui in uiType:GetChildren() do
-		if ui:GetAttribute("DoNotRegister") then continue end
-		manager.RegisterUI(ui.Name, uiType.Name :: manager.UIType, ui:GetAttribute("IgnoreInset"), ui :: Frame, ui:GetAttribute("DisplayName"), ui:GetAttribute("PreventClose"))
+local orders = {
+	Special = 4,
+	Popup = 3,
+	Buttons = 2,
+	HUD = 1,
+}
+
+for _, layer in {"Popup", "HUD", "Special", "Buttons"} do
+	local screenUi = Instance.new("ScreenGui")
+	screenUi.Name = layer
+	screenUi.IgnoreGuiInset = true
+	screenUi.DisplayOrder = orders[layer]
+	screenUi.Parent = Players.LocalPlayer.PlayerGui
+end
+
+manager.RegisterUI(script.Parent.Parent.UnregisteredUIs.Sidebar)
+for _, object in script.Parent.Parent.UnregisteredUIs:GetChildren() do
+	if object:GetAttribute("DoNotRegister") then
+		continue
 	end
+	manager.RegisterUI(object :: GuiObject)
 end
 
 controls.Register("Close UI", false, function()
-	local first
-	for _, v in manager.GetUIs("UserTriggered") do
-		if (v.Visible) and (not v.PreventClose) then
-			first = v
+	for _, v in manager.GetUIs("Popup") do
+		if v.Visible and not v.NoClose then
+			v:ToggleVisible(false)
 			break
 		end
-	end
-	if not first then
-		for _, v in manager.GetUIs("Popup") do
-			if (v.Visible) and (not v.PreventClose) then
-				first = v
-				break
-			end
-		end
-	end
-	if first then
-		first:ToggleVisible(false)
 	end
 end)
 

@@ -1,21 +1,36 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-
-local SM = require(script.Parent)
-local API = require(ReplicatedFirst.API)
-local UIManager = require(ReplicatedFirst.UIManager)
-local Controls = require(ReplicatedFirst.ControlManager)
-
 local UIS = game:GetService("UserInputService")
 local CAS = game:GetService("ContextActionService")
 local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local TS = game:GetService("TweenService")
+local SM = require(script.Parent)
 
-local requestSetting = script.Parent:FindFirstChild("RequestSetting")
+local requestSetting = script.Parent.RequestSetting
 requestSetting.OnInvoke = function(setting: string)
 	return SM.GetSetting(setting)
 end
+
+-- This must be run before anything yields, especially todo with ui
+local options = ReplicatedStorage.ServerClient.LoadSavedData.OnClientEvent:Wait()
+options = SM.JSONDecode(options)
+for i, v in options do
+	SM.SetSetting(i, v)
+	-- this sucks
+	for _, b in SM.AvailableSettings do
+		if b.Name == i then
+			task.spawn(b.Callback, v)
+			break
+		end
+	end
+end
+ReplicatedFirst:SetAttribute("ControlsReady", true)
+
+local API = require(ReplicatedFirst.API)
+local UIManager = require(ReplicatedFirst.UIManager)
+local Controls = require(ReplicatedFirst.ControlManager)
+
+local TS = game:GetService("TweenService")
 
 local pageBase = script:FindFirstChild("__TabPage")
 local tabBase = script:FindFirstChild("__Tab")
@@ -24,30 +39,16 @@ local keybindFrame = script:FindFirstChild("__SettingKeybind")
 local selectorFrame = script:FindFirstChild("__SettingSelector")
 local booleanFrame = script:FindFirstChild("__SettingBoolean")
 local touchFrame = script:FindFirstChild("__SettingTouch")
-local settingsFrame = UIManager.WaitForUI("Settings").UI.Main :: any
+local settingsFrame = (UIManager.WaitForUI("Settings").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Settings)).Main
 
-local tabsFrame = settingsFrame.Tabs :: ScrollingFrame
-local tabUnderline: Frame = tabsFrame:FindFirstChild("Underline") :: Frame
+local tabsFrame = settingsFrame.Tabs :: Frame
+local tabUnderline = tabsFrame:FindFirstChild("Underline") :: Frame
 local createdTabs = {}
 for _, v in SM.AvailableSettings do
 	if not table.find(createdTabs, v.Tab) then
 		table.insert(createdTabs, v.Tab)
 	end
 end
-
-local options = ReplicatedStorage.ServerClient.LoadSavedData.OnClientEvent:Wait()
-options = SM.JSONDecode(options)
-for i, v in options do
-	SM.SetSetting(i, v)
-	-- this sucks
-	for _, b in SM.AvailableSettings do
-		if b.Name == i then
-			b.Callback(v)
-			break
-		end
-	end
-end
-game:GetService("ReplicatedFirst"):SetAttribute("ControlsReady", true)
 
 local UNDERLINE_TRANSITION_SCALE = 0.125
 local function transitionUnderline(underline: Frame, target: TextButton)
@@ -130,7 +131,7 @@ for i, v in createdTabs do
 		local currentPage
 		for _, b in settingsFrame:GetChildren() do
 			if (b.Name == "Page_"..settingsFrame:GetAttribute("CurrentTab")) then
-				currentPage = b
+				currentPage = b :: GuiObject
 				break
 			end
 		end
@@ -209,7 +210,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		label.Parent = page
 		categories["__len"] += 1
 	end
-	local catLabel = page:FindFirstChild("Category_"..cat)
+	local catLabel = page:FindFirstChild("Category_"..cat) :: TextLabel
 	categories[catIndex] += 1
 	
 	local f: any

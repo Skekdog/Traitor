@@ -111,8 +111,8 @@ end
 
 -- Returns the Button if it was created
 function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> nil): ImageButton?
-	if not game:GetService("ReplicatedFirst"):GetAttribute("ControlsReady") then
-		game:GetService("ReplicatedFirst"):GetAttributeChangedSignal("ControlsReady"):Wait()
+	if not ReplicatedFirst:GetAttribute("ControlsReady") then
+		ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 	end
 	registered[actionName] =  {
 		actionName = actionName,

@@ -10,10 +10,10 @@ local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.RoundInfo)
+local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
 local joinRound = UIManager.WaitForUI("JoinRound")
 
-local vote: UIManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Popup.VotingScreen)} = UIManager.WaitForUI("VotingScreen")
+local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.VotingScreen)}
 for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
 	local clone = vote.UI.Sample:Clone()
 	clone.Text = v
@@ -28,6 +28,8 @@ end
 
 local stopMusic: (() -> ())?
 
+type EquipmentShopType = UIManager.UI & {Object: typeof(ReplicatedFirst.UIManager.UnregisteredUIs["Equipment Shop"])}
+local equipmentShop: EquipmentShopType?
 local function update(roundPhase)
     local participant: Types.Participant? = LocalRoundInfo.GetOwnParticipant()
     local ownRole: Types.Role?
@@ -47,7 +49,9 @@ local function update(roundPhase)
             v:SetAttribute("Searched", false)
         end
 
-        UIManager.UnregisterUI("Equipment Shop", "UserTriggered")
+        if equipmentShop then
+            equipmentShop:Unregister()
+        end
 
         return
     end
@@ -170,12 +174,19 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Partic
     roundInfo.Frame.Role.Text = role.Name
     roundInfo.Frame.Role.TextColor3 = role.Colour
 
-    local toRegister = ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered:FindFirstChild("Equipment Shop")
+    local toRegister = ReplicatedFirst.UIManager.UnregisteredUIs:FindFirstChild("Equipment Shop")
     if not role.EquipmentShop or #role.EquipmentShop <= 0 or not toRegister then
         return
     end
 
-    local shop: typeof(toRegister) = UIManager.RegisterUI("Equipment Shop", "UserTriggered", false, toRegister, "Shop", false).UI
+    local shop
+    if equipmentShop then
+        shop = equipmentShop.Object
+    else
+        equipmentShop = UIManager.RegisterUI(toRegister) :: EquipmentShopType
+        assert(equipmentShop)
+        shop = equipmentShop.Object
+    end
     shop.Reset:Fire()
     
     for _, v in shop.ScrollingFrame:GetChildren() do

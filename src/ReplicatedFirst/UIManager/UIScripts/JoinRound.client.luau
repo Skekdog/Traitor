@@ -5,16 +5,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = Players.LocalPlayer
 local API = require(ReplicatedFirst.API)
 local UI = require(ReplicatedFirst.UIManager)
-local roundInfo: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.RoundInfo) = UI.WaitForUI("RoundInfo").UI
-local this = UI.WaitForUI("JoinRound")
+local roundInfo = UI.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
+local this = UI.WaitForUI("JoinRound") :: UI.UI & {Object: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.JoinRound)}
 
-this.UI.MouseButton1Click:Connect(function()
+this.Object.MouseButton1Click:Connect(function()
 	local success = ReplicatedStorage.RoundHandler.JoinRound:InvokeServer()
 	if not success then
 		API.ScreenMessage("Error", "Failed to join round.")
 		return
 	end
-	plr:SetAttribute("IsSpectating", false)
 	this:ToggleVisible(false)
 	roundInfo.Frame.Role.Text = "PREPARING"
 	roundInfo.Frame.Role.TextColor3 = Color3.new(1, 1, 1)

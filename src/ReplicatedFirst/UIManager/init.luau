@@ -1,126 +1,157 @@
-local plr = game:GetService("Players").LocalPlayer
-local plrUi = plr.PlayerGui
-
-local ControlManager = require(game:GetService("ReplicatedFirst").ControlManager)
-
+local GuiService = game:GetService("GuiService")
+local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
-local inset = game:GetService("GuiService"):GetGuiInset()
+local ControlManager = require(ReplicatedFirst.ControlManager)
+local API = require(script.Parent.API)
+
+local plr = Players.LocalPlayer
+local plrUi = plr.PlayerGui
+
+-- Undocumented behaviour, but GetGuiInset() returns zero sometimes
+local inset = GuiService:GetGuiInset()
 while inset == Vector2.zero do
-	inset =  game:GetService("GuiService"):GetGuiInset()
+	inset =  GuiService:GetGuiInset()
 	task.wait()
 end
 
-local API = require(script.Parent.API)
+--[[ Principles:
+- Special is the highest layer
+- Popups are 2nd highest. All popups should appear on top of others when they are made visible
+- Buttons 3rd
+- HUD is lowest layer
 
-local uis = {
-	HUD = plrUi:WaitForChild("HUD", math.huge), --Lowest priority (RoundInfo) Always displayed below everything else
-	Popup = plrUi:WaitForChild("Popup", math.huge), --Low priority (ScreenMessage) Displayed above HUD
-	UserTriggered = plrUi:WaitForChild("UserTriggered", math.huge), --High priority (EquipmentShop, PlayerList) Displayed above nearly everything else
-	Buttons = plrUi:WaitForChild("Buttons", math.huge), --On-Screen buttons. Highest priority (Sidebar, Inventory, ContextActionService) Displayed above everything else
-	Special = plrUi:WaitForChild("Special", math.huge) -- The highest priority. Intended for special cases like ScreenMessage.
-}
+- All popups must have a close button and transition style
+]]
 
 local requestSetting = script.Parent.SettingsManager.RequestSetting
 
 local UIManager = {}
-UIManager.__index = UIManager
 
-export type UIType = "HUD"|"Popup"|"UserTriggered"|"Buttons"
+export type Layer = "Special" |"Popup" | "Button" | "HUD"
 
-export type UI = typeof(setmetatable({}, {})) & {
-	ToggleVisible:(self: UI, force: boolean?, ignoreOtherUIs: boolean?) -> nil,
-	Name: string, --An identifier of the UI. Must be unique in a UIType.
-	DisplayName: string, -- Name showed in sidebar
-	Visible: boolean, --Self-explanatory.
-	PreventClose: boolean, --Prevents the UI from being closed with the X key.
-	UIType: UIType, --UIType
-	UI: GuiObject, --A reference to the frame object.
+export type UI = {
+	Name: string, -- Unique identifier
+	Layer: Layer,
+	DisplayName: string, -- Name shown in sidebar
+	NoClose: boolean?, -- Prevents closing with the X key
+	Visible: boolean,
+	Sidebar: boolean?,
+	Object: GuiObject,
+
+	ToggleVisible: (self: UI, force: boolean?, ignoreOtherUIs: boolean?) -> (),
+	Unregister: (self: UI) -> (),
 }
 
 local registeredUIs: {UI} = {}
 
-local UIRegistered = (script:FindFirstChild("Event") :: BindableEvent) or Instance.new("BindableEvent", script)
-function UIManager.RegisterUI<T>(name: string, uiType: UIType, ignoreInset: boolean, ui: Frame, displayName: string?, preventClose: boolean): UI & {UI: T}
-	local self: UI = {} :: UI
+local UIRegistered = Instance.new("BindableEvent", script)
+function UIManager.RegisterUI(object: GuiObject): UI
+	local name = object.Name
+	local layer: Layer = object:GetAttribute("Layer")
+	local displayName: string? = object:GetAttribute("DisplayName")
+	local sidebar: boolean? = object:GetAttribute("Sidebar")
+	local preventClose: boolean? = object:GetAttribute("PreventClose")
+	local ignoreInset: boolean? = object:GetAttribute("IgnoreInset")
+	local modal: boolean? = object:GetAttribute("Modal")
+
+	local transitionStyle: "Position" | "Size" = object:GetAttribute("TransitionStyle")
+	local transitionTarget: UDim2 = object:GetAttribute("TransitionTarget")
+	local self: UI = {
+		Name = name,
+		Layer = layer,
+		DisplayName = displayName or name,
+		Visible = object.Visible,
+		NoClose = preventClose,
+		Sidebar = sidebar,
+		Object = object,
+
+		ToggleVisible = function(self: UI, force: boolean?, ignoreOtherUIs: boolean?)
+			
+		end,
+
+		Unregister = function(self: UI)
+			ControlManager.Unregister(name)
+			self:ToggleVisible(false, true)
+			self.Object.Parent = script.UnregisteredUIs
+			
+			if self.Sidebar then
+				local sb = UIManager.GetUI("Sidebar").Object; -- Ambiguous syntax means we need a semicolon here, day ruined
+				(sb :: any)[name]:Destroy()
+			end
+			
+			table.remove(registeredUIs, table.find(registeredUIs, self))
+		end
+	}
 	
-	self.Name = name
-	self.DisplayName = displayName or name
-	self.Visible = ui.Visible
-	self.PreventClose = preventClose
-	self.UIType = uiType
-	self.UI = ui
-	
-	if (uiType == "UserTriggered") and (not ui:GetAttribute("NoKeybind")) then
-		task.delay(0, function() -- We delay to avoid initialisation never happening. Kludge. But it works.
-			ControlManager.Register(name, false, function(act, state, input, toggled)
-				if not toggled then
-					if state == Enum.UserInputState.End then
-						self:ToggleVisible(false)
-					elseif state == Enum.UserInputState.Begin then
-						self:ToggleVisible(true)
-					end
-					return
+	if layer == "Popup" and not object:GetAttribute("NoKeybind") then
+		ControlManager.Register(name, false, function(act, state, input, toggled)
+			if not toggled then
+				if state == Enum.UserInputState.End then
+					self:ToggleVisible(false)
+				elseif state == Enum.UserInputState.Begin then
+					self:ToggleVisible(true)
 				end
-				self:ToggleVisible()
-			end)
+				return
+			end
+			self:ToggleVisible()
 		end)
 	end
 	
-	if ui:GetAttribute("Sidebar") then
-		local sb: typeof(script.UnregisteredUIs.Buttons.Sidebar) = UIManager.GetUI("Sidebar").UI
-		local function add()
-			if not game:GetService("ReplicatedFirst"):GetAttribute("ControlsReady") then
-				game:GetService("ReplicatedFirst"):GetAttributeChangedSignal("ControlsReady"):Wait()
-			end
-			local but = sb.Button:Clone()
-			local keybinding = requestSetting:Invoke(name)
-			local key = keybinding["Keycodes"][1][1]
-			local modifier = keybinding["Keycodes"][1][2]
-			local str = ""
-			if key then
-				str = ControlManager.getStringForKeyCode(key)
-				if modifier then
-					str = " + "..ControlManager.getStringForKeyCode(modifier)
-				end
-			end
-			but.Name = name
-			but.Text = self.DisplayName..(UIS.KeyboardEnabled and "<br/>["..str.."]" or "")
-			but.Visible = true
-			but.Parent = sb
-			but.MouseButton1Click:Connect(function() self:ToggleVisible() end)
+	if self.Sidebar then
+		local sb = UIManager.GetUI("Sidebar").Object :: typeof(script.UnregisteredUIs.Sidebar)
+		if not ReplicatedFirst:GetAttribute("ControlsReady") then
+			ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 		end
-		task.delay(0.1, add) -- 1 second delay because it doesn't work otherwise. Don't ask me why.
+		local but = sb.Button:Clone()
+		local keybinding = requestSetting:Invoke(name)
+		local key = keybinding["Keycodes"][1][1]
+		local modifier = keybinding["Keycodes"][1][2]
+		local str = ""
+		if key then
+			str = ControlManager.getStringForKeyCode(key)
+			if modifier then
+				str = " + "..ControlManager.getStringForKeyCode(modifier)
+			end
+		end
+		but.Name = name
+		but.Text = self.DisplayName..(UIS.KeyboardEnabled and "<br/>["..str.."]" or "")
+		but.Visible = true
+		but.Parent = sb
+		but.MouseButton1Click:Connect(function()
+			self:ToggleVisible()
+		end)
 	end
 	
-	if not ui:GetAttribute("NoClose") then
-		local close = ui:FindFirstChild("CloseUI") :: ObjectValue & {Value: TextButton}
+	if not self.NoClose then
+		local close = object:FindFirstChild("CloseUI") :: (ObjectValue & {Value: TextButton})?
 		if close then
 			close.Value.MouseButton1Click:Connect(function()
 				self:ToggleVisible(false)
 			end)
-		elseif uiType == "UserTriggered" then
+		elseif layer == "Popup" then
 			warn(name.." does not have a registered Close button!")
 		end
 	end
 	
-	if ignoreInset then
-		ui.Position -= UDim2.fromOffset(inset.X, inset.Y)
-		ui.Size += UDim2.fromOffset(inset.X, inset.Y)
+	if ignoreInset and not object:GetAttribute("InsetAdjusted") then
+		object:SetAttribute("InsetAdjusted", true)
+		object.Position -= UDim2.fromOffset(inset.X, inset.Y)
+		object.Size += UDim2.fromOffset(inset.X, inset.Y)
 	end
 	
-	local transitionStyle = ui:GetAttribute("TransitionStyle")
 	if transitionStyle then
-		if not ui:GetAttribute("TransitionTarget") then -- check to make sure transTarget is not already set, because uis like EquipmentShop are registered multiple times
-			ui:SetAttribute("TransitionTarget", transitionStyle == "Size" and ui.Size or ui.Position)
+		if not transitionTarget then -- check to make sure transTarget is not already set, because uis like EquipmentShop are registered multiple times
+			object:SetAttribute("TransitionTarget", transitionStyle == "Size" and object.Size or object.Position)
 		end
-	elseif ((self.UIType == "Popup") or (self.UIType == "UserTriggered")) and not ui:GetAttribute("NoTransition") then
-		warn(ui.Name.." does not have a transition style!")
+	elseif layer == "Popup" then
+		warn(name.." does not have a transition style!")
 	end
 	
 	-- Disabled when ui is closing but not fully closed yet
-	if ui:GetAttribute("Modal") then
+	if modal then
 		local modalise = Instance.new("TextButton")
 		modalise.Modal = true
 		modalise.Size = UDim2.new()
@@ -130,39 +161,13 @@ function UIManager.RegisterUI<T>(name: string, uiType: UIType, ignoreInset: bool
 		
 		modalise.Visible = true
 		
-		modalise.Parent = ui
+		modalise.Parent = object
 	end
 	
-	ui.Parent = uis[uiType]
-	self = setmetatable(self, UIManager)
+	object.Parent = plrUi:FindFirstChild(layer)
 	table.insert(registeredUIs, self)
 	UIRegistered:Fire(self.Name)
-	return self :: any
-end
-
-function UIManager.UnregisterUI(name: string, uiType: UIType): nil
-	local reg
-	for i, v in registeredUIs do
-		if (v.UIType == (uiType or v.UIType)) and (v.Name == name) then -- que?
-			reg = v
-			table.remove(registeredUIs, i)
-			break
-		end
-	end
-	
-	if reg then
-		ControlManager.Unregister(name)
-		
-		if reg.UI:GetAttribute("Sidebar") then
-			pcall(function()
-				reg.UI.Visible = false
-				reg.UI.Parent = (script :: any).UnregisteredUIs[uiType]
-				local sb: typeof(script.UnregisteredUIs.Buttons.Sidebar) = UIManager.GetUI("Sidebar").UI
-				sb:FindFirstChild(name):Destroy()
-			end)
-		end
-	end
-	return
+	return self
 end
 
 function UIManager.TryGetUI(name: string): UI?
@@ -174,26 +179,26 @@ function UIManager.TryGetUI(name: string): UI?
 	return
 end
 
-function UIManager.GetUI<T>(name: string): UI & {UI: T}
+function UIManager.GetUI(name: string): UI
 	for _, v in registeredUIs do
 		if v.Name == name then
-			return v :: any
+			return v
 		end
 	end
 	error("Failed to find UI: "..name)
 end
 
-function UIManager.GetUIs(uiType: UIType): {UI}
+function UIManager.GetUIs(layer: Layer): {UI}
 	local uis = {}
 	for _, v in registeredUIs do
-		if v.UIType == uiType then
+		if v.Layer == layer then
 			table.insert(uis, v)
 		end
 	end
 	return uis
 end
 
-function UIManager.WaitForUI<T>(name: string, ignoreYield: boolean?): UI & {UI: T}
+function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 	local start = os.time()
 	local warned = false
 	repeat
@@ -205,7 +210,7 @@ function UIManager.WaitForUI<T>(name: string, ignoreYield: boolean?): UI & {UI: 
 			end
 		end
 	until UIManager.TryGetUI(name)
-	return UIManager.TryGetUI(name) :: any
+	return UIManager.GetUI(name)
 end
 
 UIManager.Themes = {
@@ -310,7 +315,7 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 		frame.Visible = self.Visible
 	end
 	
-	local scrUI: ScreenGui = uis[self.UIType]
+	local scrUI: ScreenGui = (plrUi :: any)[self.UIType]
 	
 	if ignoreOtherUIs or (scrUI:GetAttribute("IgnoreStacking")) then
 		return
@@ -321,8 +326,8 @@ function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil
 	if self.Visible then
 		local highestIndex = 1
 		for _, v in UIManager.GetUIs(self.UIType) do
-			if v.Visible and (v.UI.ZIndex > highestIndex) then
-				highestIndex = v.UI.ZIndex
+			if v.Visible and (v.Object.ZIndex > highestIndex) then
+				highestIndex = v.Object.ZIndex
 			end
 		end
 		frame.ZIndex = highestIndex + 1

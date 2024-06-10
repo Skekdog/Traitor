@@ -6,7 +6,7 @@ local UIManager = require(script.Parent.Parent)
 local controls = require(ReplicatedFirst.ControlManager)
 
 type SampleType = TextButton & {TextLabel: TextLabel, Value: ObjectValue & {Value: Instance & {Equipped: BindableEvent}}}
-local screenUi: typeof(script.Parent.Parent.UnregisteredUIs.Buttons.Backpack) = UIManager.WaitForUI("Backpack").UI
+local screenUi = UIManager.WaitForUI("Backpack").Object :: typeof(script.Parent.Parent.UnregisteredUIs.Backpack)
 
 local scriptCons = ReplicatedFirst.ClientStorage.ScriptConnections
 
@@ -65,7 +65,7 @@ function equip(toEquip, tool, label: any, isServer)
 	end
 	scriptCons.EquipEvent:Fire(tool, toEquip)
 	tool:SetAttribute("Equipped", toEquip)
-	local roundInfo = UIManager.WaitForUI("RoundInfo").UI :: Frame & {Frame: any}
+	local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
 	local ammoBar = roundInfo.Frame.AmmoBar
 	if toEquip then
 		local curAmmo = tool:FindFirstChild("CurrentAmmo")

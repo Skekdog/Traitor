@@ -22,7 +22,7 @@ local karmaDefs = {
 }
 
 local mouse = Players.LocalPlayer:GetMouse()
-local ui = UIManager.WaitForUI("CrosshairInfo").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.CrosshairInfo)
+local ui = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.CrosshairInfo)
 
 game:GetService("RunService").Heartbeat:Connect(function() --cant do getpropertychangedsignal
 	ui.Visible = false

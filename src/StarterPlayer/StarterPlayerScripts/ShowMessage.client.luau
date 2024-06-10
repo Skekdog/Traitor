@@ -1,8 +1,8 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local UIManager = require(game:GetService("ReplicatedFirst").UIManager)
-local ui = UIManager.WaitForUI("CornerNotification").UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.CornerNotification)
+local UIManager = require(ReplicatedFirst.UIManager)
+local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.CornerNotification)
 
 local TS = game:GetService("TweenService")
 local Types = require(ReplicatedFirst.RoundHandler.Types)

@@ -5,7 +5,7 @@ local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local uiManager = require(ReplicatedFirst.UIManager)
 
-local UI: uiManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.UserTriggered.Highlights)} = uiManager.WaitForUI("Highlights")
+local UI = uiManager.WaitForUI("Highlights") :: uiManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Highlights)}
 local page = UI.UI.Page
 
 local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores

@@ -13,7 +13,7 @@ for _, v in SettingsManager.AvailableSettings do
 end
 
 LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)
-	(UI.UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.HUD.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage.RoundHandler:GetAttribute("MapName")} by {mapAuthors}`
+	(UI.Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage.RoundHandler:GetAttribute("MapName")} by {mapAuthors}`
 	UI:ToggleVisible(true)
 	task.delay(5, UI.ToggleVisible, UI, false)
 

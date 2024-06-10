@@ -484,9 +484,9 @@ module.AvailableSettings = {
 	},
 } :: {SettingDefinition}
 
-module["Settings"] = {}
+module.Settings = {}
 for _, v in module.AvailableSettings do
-	module["Settings"][v.Name] = v.Default
+	module.Settings[v.Name] = v.Default
 end
 
 function module.SetSetting(setting: string, settingValue: Setting)

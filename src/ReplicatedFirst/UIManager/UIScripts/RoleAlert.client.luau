@@ -4,7 +4,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local SoundService = game:GetService("SoundService")
 
 local ui = UIManager.WaitForUI("RoleAlert") 
-local UI = ui.UI :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Popup.RoleAlert)
+local UI = ui.Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoleAlert)
 RS.RoundHandler.SendRoleAlert.OnClientEvent:Connect(function(name, colour, description, soundId)
 	local sound = Instance.new("Sound")
 	sound.SoundId = "rbxassetid://"..tostring(soundId)
