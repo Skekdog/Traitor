@@ -13,7 +13,7 @@ local eTemplate = eFrame.Template
 
 ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role)
 	print(highlights)
-	hFrame.Winners.Text = `THE {victors.Name:upper()} WIN`
+	hFrame.Winners.Text = `THE {victors.Name:upper()}S WIN`
 	hFrame.Winners.TextColor3 = victors.Colour
 
 	for _, v in eFrame:GetChildren() do
@@ -50,6 +50,18 @@ ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(hig
 		e.Time.Text = API.ToRoundTime(startTime, v.Timestamp)
 		e.Visible = true
 		e.Name = "ActiveEvent"
+
+		local icons = v.Icons
+		if table.find(icons, "IncorrectKill") then
+			e.IncorrectDamage.Visible = true
+		end
+		if table.find(icons, "FreeKill") then
+			e.FreeKill.Visible = true
+		end
+		if table.find(icons, "SelfDefense") then
+			e.SelfDefense.Visible = true
+		end
+
 		e.Parent = eFrame
 	end
 	

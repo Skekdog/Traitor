@@ -307,9 +307,18 @@ local module: Types.Adapter = {
         end
 
         for _, v in events.Death do
+            local icons = {}
+            table.insert(icons, if v.Data.CorrectKill then "CorrectKill" else "IncorrectKill")
+            if v.Data.SelfDefense then
+                table.insert(icons, "SelfDefense")
+            end
+            if v.Data.FreeKill then
+                table.insert(icons, "FreeKill")
+            end
+
             table.insert(userFacingLog, {
                 Text = getDeathEvent(v.Data),
-                Icons = {},
+                Icons = icons,
                 Category = "Death",
                 Timestamp = v.Timestamp
             })
