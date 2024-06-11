@@ -256,15 +256,15 @@ local module: Types.Adapter = {
                 local attack = weapon.AttackType
                 local name = stringWithDeterminer(weapon.Name)
                 if attack == "Blade" then
-                    text ..= `was stabbed by {name}`
+                    text ..= ` was stabbed by {name}`
                 elseif attack == "Blunt" then
-                    text ..= `was bludgeoned by {name}`
+                    text ..= ` was bludgeoned by {name}`
                 elseif attack == "Explosion" then
-                    text ..= `was blown up by {name}`
+                    text ..= ` was blown up by {name}`
                 elseif attack == "Firearm" then
-                    text ..= `was shot by {name}`
+                    text ..= ` was shot by {name}`
                 elseif attack == "None" then
-                    text ..= `was murdered by magic`
+                    text ..= ` was murdered by magic`
                 end
                 if attacker then
                     text ..= ` used by {attackerName}`

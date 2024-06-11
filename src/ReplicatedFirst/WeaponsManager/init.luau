@@ -153,15 +153,27 @@ local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.P
     end
 end
 
+local function findPropAncestor(prop: Instance, propsFolder: Folder): Types.PropInstance?
+    if prop == propsFolder then
+        return
+    end
+    assert(prop.Parent)
+    if prop.Parent == propsFolder then
+        return prop :: Types.PropInstance
+    else
+        return findPropAncestor(prop.Parent, propsFolder)
+    end
+end
+
 local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Participant?, rayResult: RaycastResult): ()
     if round:IsRoundPreparing() then
         return
     end
     local part = rayResult.Instance
     local parent = part.Parent
-    assert(part:IsA("BasePart") and parent and parent:IsA("Model"))
+    assert(part:IsA("BasePart") and parent)
 
-    local plr = Players:GetPlayerFromCharacter(parent)
+    local plr = Players:GetPlayerFromCharacter(parent :: Model)
     if plr then
         local victim = round:GetParticipant(plr.Name)
         if not victim then
@@ -189,7 +201,7 @@ local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Par
         weld.Part0 = part
         weld.Part1 = impactHole
         weld.Parent = rayResult.Instance
-        
+
         task.delay(5, function()
             local tween = TweenService:Create(impactDecal, TweenInfo.new(5), {Transparency = 1})
             tween.Completed:Connect(function()
@@ -203,8 +215,8 @@ local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Par
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
         if mapProps and part:IsDescendantOf(mapProps) then
-            local model = part:FindFirstAncestorOfClass("Model") :: Types.Prop
-            onEntityHit(round, weapon, attacker, model, part.Name, rayResult.Distance)
+            local prop = round:GetProp(findPropAncestor(part, mapProps) :: Types.PropInstance)
+            onEntityHit(round, weapon, attacker, prop, part.Name, rayResult.Distance)
         end
     end
 end
