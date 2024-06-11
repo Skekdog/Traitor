@@ -15,9 +15,13 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, p
 	if char then
 		local hum = char.Humanoid
 		if hum.Health > 0 and (char.PrimaryPart.Position-part.Position).Magnitude < 10 then
-			if round.Map.ActionItems:IsAncestorOf(part) then
+			local map = round.Map
+			local actionItems = map.Map:FindFirstChild("__ActionItems")
+			local doors = map.Map:FindFirstChild("__Doors")
+			local props = map:FindFirstChild("Props")
+			if actionItems and actionItems:IsAncestorOf(part) then
 				(require)(part.Parent:FindFirstChildOfClass("ModuleScript"))()
-			elseif round.Map.Doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
+			elseif doors and doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
 				part:SetAttribute("Opening", true)
 				part:SetAttribute("Open", not part:GetAttribute("Open"))
 				local angle = math.rad(part:GetAttribute("Open") and -90 or 90)
@@ -35,7 +39,7 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, p
 					end
 				end
 				sounds[math.random(1, #sounds)]:Play()
-			elseif round.Map.Props:IsAncestorOf(part) then
+			elseif props and props:IsAncestorOf(part) then
 				local prop = part.Parent
 				if prop.Name:sub(1, 10) ~= "Equipment_" then return end
 				

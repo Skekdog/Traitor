@@ -25,8 +25,14 @@ clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
 			params.FilterDescendantsInstances = {char}
 			local ray = workspace:Raycast(cam.CFrame.Position, cam.CFrame.LookVector * 10, params)
 
-			if not ray or not ray.Instance then return end
-			if map.ActionItems:IsAncestorOf(ray.Instance) or map.Doors:IsAncestorOf(ray.Instance) or map.Props:IsAncestorOf(ray.Instance) then
+			if not ray or not ray.Instance then
+				return
+			end
+
+			local actionItems = map.Map:FindFirstChild("__ActionItems")
+			local doors = map.Map:FindFirstChild("__Doors")
+			local props = map:FindFirstChild("Props")
+			if (actionItems and actionItems:IsAncestorOf(ray.Instance)) or (doors and doors:IsAncestorOf(ray.Instance)) or (props and props:IsAncestorOf(ray.Instance)) then
 				RS.ClientServer.Interaction:FireServer(ray.Instance)
 			end
 		end)
