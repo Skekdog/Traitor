@@ -68,6 +68,8 @@ local function sendRoundInfo(plr: Player?)
 	remotes.UpdateRoles:FireAllClients(gm.Roles)
 end
 
+
+
 joinRound.OnServerInvoke = function(plr)
 	local round: Types.Round
 	local roundId = ServerStorage:GetAttribute("RoundID")
@@ -96,7 +98,8 @@ joinRound.OnServerInvoke = function(plr)
 		sendRoundInfo()
 
 		local roundEventCon: RBXScriptConnection
-		roundEventCon = round.RoundPhaseChangeEvent.Event:Connect(function(phase)
+
+		local function roundPhaseChange(phase: Types.RoundPhase)
 			if phase == "Playing" then
 				remotes:SetAttribute("RoundStartTime", workspace:GetServerTimeNow())
 				for _, v in Players:GetPlayers() do
@@ -120,15 +123,15 @@ joinRound.OnServerInvoke = function(plr)
 			remotes:SetAttribute("IsPaused", false)
 			remotes:SetAttribute("RoundPhase", phase)
 			remotes:SetAttribute("TimeMilestone", round.TimeMilestone)
-
+		
 			if phase ~= "Destroy" then
 				return
 			end
-
+		
 			for _, v in round.Participants do
 				v.Status = "Spectating" :: any
 			end
-
+		
 			for _, v in Players:GetPlayers() do
 				local p = round:GetParticipant(v.Name)
 				if p then
@@ -139,7 +142,7 @@ joinRound.OnServerInvoke = function(plr)
 				end
 				UpdateRoundInfo.SendUpdatedParticipants(round.Participants, p, plr)
 			end
-
+		
 			if voteCon then
 				ReplicatedStorage.RoundHandler.VoteMap:FireAllClients(false)
 				voteCon:Disconnect()
@@ -152,11 +155,14 @@ joinRound.OnServerInvoke = function(plr)
 				end
 				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructure) or (ServerStorage.Maps:GetChildren()[math.random(1, #ServerStorage.Maps:GetChildren())] :: Types.MapStructure)
 			end
-
+		
 			roundEventCon:Disconnect()
 			ServerStorage:SetAttribute("RoundID", nil)
 			nextRoundReady = true
-		end)
+		end
+
+		roundPhaseChange("Waiting")
+		roundEventCon = round.RoundPhaseChangeEvent.Event:Connect(roundPhaseChange)
 	else
 		round = RoundHandler.GetRound(roundId)
 	end

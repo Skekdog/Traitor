@@ -179,7 +179,7 @@ function module.ToRoundTime(time: number, target: number): string
 	return minutes..":"..seconds
 end
 
-function module.TransitionUIState(frame: Frame, open: boolean)
+function module.TransitionUIState(frame: GuiObject, open: boolean)
 	-- If open is true, open animation should play, otherwise close
 	local requestSetting = script.Parent.SettingsManager:FindFirstChild("RequestSetting")
 	

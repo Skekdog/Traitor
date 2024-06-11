@@ -20,6 +20,8 @@ for _, layer in {"Popup", "HUD", "Special", "Buttons"} do
 	screenUi.Name = layer
 	screenUi.IgnoreGuiInset = true
 	screenUi.DisplayOrder = orders[layer]
+	screenUi.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenUi.ResetOnSpawn = false
 	screenUi.Parent = Players.LocalPlayer.PlayerGui
 end
 

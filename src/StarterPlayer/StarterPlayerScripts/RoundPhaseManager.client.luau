@@ -13,13 +13,13 @@ local UIManager = require(ReplicatedFirst.UIManager)
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
 local joinRound = UIManager.WaitForUI("JoinRound")
 
-local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {UI: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.VotingScreen)}
+local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.VotingScreen)}
 for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
-	local clone = vote.UI.Sample:Clone()
+	local clone = vote.Object.Sample:Clone()
 	clone.Text = v
 	clone.Visible = true
 	clone.Name = v
-	clone.Parent = vote.UI.Choices :: any
+	clone.Parent = vote.Object.Choices :: any
 
     clone.MouseButton1Click:Connect(function()
         ReplicatedStorage.RoundHandler.VoteMap:FireServer(v)
@@ -51,6 +51,7 @@ local function update(roundPhase)
 
         if equipmentShop then
             equipmentShop:Unregister()
+            equipmentShop = nil
         end
 
         return
@@ -103,6 +104,7 @@ local function update(roundPhase)
         fadeIn:Play()
 
         stopMusic = function()
+            stopMusic = nil
             if not sound then
                 return
             end

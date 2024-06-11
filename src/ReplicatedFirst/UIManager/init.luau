@@ -31,6 +31,7 @@ local requestSetting = script.Parent.SettingsManager.RequestSetting
 local UIManager = {}
 
 export type Layer = "Special" |"Popup" | "Button" | "HUD"
+export type BackgroundMenuMode = "Closed" | "Hidden" | "Stacked"
 
 export type UI = {
 	Name: string, -- Unique identifier
@@ -46,48 +47,81 @@ export type UI = {
 }
 
 local registeredUIs: {UI} = {}
+local nextUI: UI
 
 local UIRegistered = Instance.new("BindableEvent", script)
 function UIManager.RegisterUI(object: GuiObject): UI
-	local name = object.Name
-	local layer: Layer = object:GetAttribute("Layer")
-	local displayName: string? = object:GetAttribute("DisplayName")
-	local sidebar: boolean? = object:GetAttribute("Sidebar")
-	local preventClose: boolean? = object:GetAttribute("PreventClose")
 	local ignoreInset: boolean? = object:GetAttribute("IgnoreInset")
 	local modal: boolean? = object:GetAttribute("Modal")
-
 	local transitionStyle: "Position" | "Size" = object:GetAttribute("TransitionStyle")
 	local transitionTarget: UDim2 = object:GetAttribute("TransitionTarget")
+
 	local self: UI = {
-		Name = name,
-		Layer = layer,
-		DisplayName = displayName or name,
+		Name = object.Name,
+		Layer = object:GetAttribute("Layer"),
+		DisplayName = object:GetAttribute("DisplayName") or object.Name,
 		Visible = object.Visible,
-		NoClose = preventClose,
-		Sidebar = sidebar,
+		NoClose = object:GetAttribute("PreventClose"),
+		Sidebar = object:GetAttribute("Sidebar"),
 		Object = object,
 
 		ToggleVisible = function(self: UI, force: boolean?, ignoreOtherUIs: boolean?)
-			
+			local newVisible = if force ~= nil then force else not self.Visible
+			self.Visible = newVisible
+
+			local object = self.Object
+			if transitionStyle then
+				API.TransitionUIState(object, newVisible)
+			else
+				object.Visible = newVisible
+			end
+
+			if ignoreOtherUIs or self.Layer ~= "Popup" or self.Object:GetAttribute("IgnoreStacking") then
+				return
+			end
+
+			if not newVisible then
+				object.ZIndex = 0
+				return
+			end
+
+			local mode: BackgroundMenuMode = script:GetAttribute("BackgroundMenuMode")
+			local highestIndex = 0
+			for _, ui in registeredUIs do
+				if ui.Layer == "Popup" and highestIndex < ui.Object.ZIndex and ui.Visible then
+					highestIndex = ui.Object.ZIndex
+					if ui ~= self and mode == "Closed" and not ui.Object:GetAttribute("IgnoreStacking") then
+						ui:ToggleVisible(false, true)
+					end
+				end
+			end
+			object.ZIndex = highestIndex + 1
+
+			if mode == "Hidden" then
+				if nextUI and nextUI ~= self then
+					nextUI:ToggleVisible(false, true)
+				end
+
+				nextUI = self
+			end
 		end,
 
 		Unregister = function(self: UI)
-			ControlManager.Unregister(name)
+			ControlManager.Unregister(self.Name)
 			self:ToggleVisible(false, true)
 			self.Object.Parent = script.UnregisteredUIs
 			
 			if self.Sidebar then
 				local sb = UIManager.GetUI("Sidebar").Object; -- Ambiguous syntax means we need a semicolon here, day ruined
-				(sb :: any)[name]:Destroy()
+				(sb :: any)[self.Name]:Destroy()
 			end
 			
 			table.remove(registeredUIs, table.find(registeredUIs, self))
 		end
 	}
 	
-	if layer == "Popup" and not object:GetAttribute("NoKeybind") then
-		ControlManager.Register(name, false, function(act, state, input, toggled)
+	if self.Layer == "Popup" and not object:GetAttribute("NoKeybind") then
+		ControlManager.Register(self.Name, false, function(act, state, input, toggled)
 			if not toggled then
 				if state == Enum.UserInputState.End then
 					self:ToggleVisible(false)
@@ -106,7 +140,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 		end
 		local but = sb.Button:Clone()
-		local keybinding = requestSetting:Invoke(name)
+		local keybinding = requestSetting:Invoke(self.Name)
 		local key = keybinding["Keycodes"][1][1]
 		local modifier = keybinding["Keycodes"][1][2]
 		local str = ""
@@ -116,7 +150,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				str = " + "..ControlManager.getStringForKeyCode(modifier)
 			end
 		end
-		but.Name = name
+		but.Name = self.Name
 		but.Text = self.DisplayName..(UIS.KeyboardEnabled and "<br/>["..str.."]" or "")
 		but.Visible = true
 		but.Parent = sb
@@ -131,14 +165,13 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			close.Value.MouseButton1Click:Connect(function()
 				self:ToggleVisible(false)
 			end)
-		elseif layer == "Popup" then
-			warn(name.." does not have a registered Close button!")
+		elseif self.Layer == "Popup" then
+			warn(self.Name.." does not have a registered Close button!")
 		end
 	end
 	
 	if ignoreInset and not object:GetAttribute("InsetAdjusted") then
 		object:SetAttribute("InsetAdjusted", true)
-		object.Position -= UDim2.fromOffset(inset.X, inset.Y)
 		object.Size += UDim2.fromOffset(inset.X, inset.Y)
 	end
 	
@@ -146,8 +179,8 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		if not transitionTarget then -- check to make sure transTarget is not already set, because uis like EquipmentShop are registered multiple times
 			object:SetAttribute("TransitionTarget", transitionStyle == "Size" and object.Size or object.Position)
 		end
-	elseif layer == "Popup" then
-		warn(name.." does not have a transition style!")
+	elseif self.Layer == "Popup" then
+		warn(self.Name.." does not have a transition style!")
 	end
 	
 	-- Disabled when ui is closing but not fully closed yet
@@ -164,7 +197,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		modalise.Parent = object
 	end
 	
-	object.Parent = plrUi:FindFirstChild(layer)
+	object.Parent = plrUi:FindFirstChild(self.Layer)
 	table.insert(registeredUIs, self)
 	UIRegistered:Fire(self.Name)
 	return self
@@ -282,91 +315,15 @@ function UIManager.UpdateThemeInstance(v: Instance, theme): ()
 	return
 end
 
-function UIManager.UpdateTheme(themeName: string): nil
+function UIManager.UpdateTheme(themeName: string): ()
 	local theme = UIManager.Themes[themeName]
-	if not theme then return error("Theme "..tostring(themeName).." not found!") end
+	if not theme then
+		error("Theme "..tostring(themeName).." not found!")
+	end
 
 	for _, v in game:GetService("CollectionService"):GetTagged("StyledUI") do
 		UIManager.UpdateThemeInstance(v, theme)
 	end
-	return
-end
-
-function UIManager:ToggleVisible(force: boolean?, ignoreOtherUIs: boolean?): nil --Shows/hides a UI
-	if force == true then
-		if self.Visible then
-			return
-		end
-		self.Visible = true
-	elseif force == false then
-		if not self.Visible then
-			return
-		end
-		self.Visible = false
-	elseif not force then
-		self.Visible = not self.Visible
-	end
-	
-	local frame: Frame = self.UI
-	
-	if frame:GetAttribute("TransitionStyle") then
-		API.TransitionUIState(frame, self.Visible)
-	else
-		frame.Visible = self.Visible
-	end
-	
-	local scrUI: ScreenGui = (plrUi :: any)[self.UIType]
-	
-	if ignoreOtherUIs or (scrUI:GetAttribute("IgnoreStacking")) then
-		return
-	end
-	
-	local bgMenuMode = script:GetAttribute("BackgroundMenuMode")
-
-	if self.Visible then
-		local highestIndex = 1
-		for _, v in UIManager.GetUIs(self.UIType) do
-			if v.Visible and (v.Object.ZIndex > highestIndex) then
-				highestIndex = v.Object.ZIndex
-			end
-		end
-		frame.ZIndex = highestIndex + 1
-	else
-		frame.ZIndex = 1
-	end
-	
-	if bgMenuMode ~= "Stacked" then
-		if bgMenuMode == "Closed" then
-			for _, v in scrUI:GetChildren() do
-				if v ~= frame then
-					UIManager.GetUI(v.Name):ToggleVisible(false, true)
-				end
-			end
-			return
-		end
-		
-		-- Now bgMenuMode == "Hidden"
-		if self.Visible then
-			for _, v in UIManager.GetUIs(self.UIType) :: any  do
-				if v.Visible and (v ~= self) then
-					scrUI:SetAttribute("NextUI", v.Name..";"..scrUI:GetAttribute("NextUI"))
-					v:ToggleVisible(false, true)
-				end
-			end
-		else
-			local nextUI = scrUI:GetAttribute("NextUI"):split(";")
-			if not nextUI[1] or nextUI[1] == "" then
-				return
-			end
-			local ui = UIManager.GetUI(nextUI[1])
-			if not ui then
-				return
-			end
-			ui:ToggleVisible(true, true)
-			scrUI:SetAttribute("NextUI", table.concat(nextUI, ";", 2, #nextUI))
-		end
-	end
-	return
 end
 
 return UIManager
