@@ -201,7 +201,8 @@ local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Par
         
         impactHole.Parent = part
 
-        if round.Map.Props:IsAncestorOf(part) then
+        local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
+        if mapProps and part:IsDescendantOf(mapProps) then
             local model = part:FindFirstAncestorOfClass("Model") :: Types.Prop
             onEntityHit(round, weapon, attacker, model, part.Name, rayResult.Distance)
         end
