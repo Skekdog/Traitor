@@ -32,17 +32,17 @@ local Controls = require(ReplicatedFirst.ControlManager)
 
 local TS = game:GetService("TweenService")
 
-local pageBase = script:FindFirstChild("__TabPage")
-local tabBase = script:FindFirstChild("__Tab")
+local pageBase = script.__TabPage
+local tabBase = script.__Tab
 
-local keybindFrame = script:FindFirstChild("__SettingKeybind")
-local selectorFrame = script:FindFirstChild("__SettingSelector")
-local booleanFrame = script:FindFirstChild("__SettingBoolean")
-local touchFrame = script:FindFirstChild("__SettingTouch")
+local keybindFrame = script.__SettingKeybind
+local selectorFrame = script.__SettingSelector
+local booleanFrame = script.__SettingBoolean
+local touchFrame = script.__SettingTouch
 local settingsFrame = (UIManager.WaitForUI("Settings").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Settings)).Main
 
-local tabsFrame = settingsFrame.Tabs :: Frame
-local tabUnderline = tabsFrame:FindFirstChild("Underline") :: Frame
+local tabsFrame = settingsFrame.Tabs
+local tabUnderline = tabsFrame.Underline
 local createdTabs = {}
 for _, v in SM.AvailableSettings do
 	if not table.find(createdTabs, v.Tab) then
@@ -149,7 +149,7 @@ for i, v in createdTabs do
 	end
 end
 
-local tt = settingsFrame.Parent:FindFirstChild("Tooltip")
+local tt = settingsFrame.Parent.Tooltip
 local function tooltip(text: string, pos: UDim2)
 	tt.Position = pos
 	tt.Text = text
@@ -159,16 +159,16 @@ end
 local categories = {__len = 0}
 
 local settingsParent = settingsFrame.Parent
-local darken = settingsParent:FindFirstChild("LayoutDarken")
+local darken = settingsParent.LayoutDarken
 
 local function done()
 	local name = darken:GetAttribute("Setting")
 	local displayName = darken:GetAttribute("DisplayName")
 	SM.SetSetting(name, CAS:GetButton(displayName).Position)
 	CAS:UnbindAction(displayName)
-	settingsParent:FindFirstChild("Main").Visible = true
-	settingsParent:FindFirstChild("Close").Visible = true
-	settingsParent:FindFirstChild("Tooltip").Visible = true
+	settingsParent.Main.Visible = true
+	settingsParent.Close.Visible = true
+	settingsParent.Tooltip.Visible = true
 	darken.Visible = false
 end
 
@@ -182,7 +182,7 @@ UIS.TouchTap:Connect(function(posVectors, proc)
 	CAS:GetButton(name).Position = pos
 end)
 
-darken:FindFirstChild("Done").MouseButton1Click:Connect(done)
+darken.Done.MouseButton1Click:Connect(done)
 
 settingsFrame.Parent:GetPropertyChangedSignal("Visible"):Connect(function()
 	if not settingsFrame.Parent.Visible then
@@ -202,7 +202,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	if not categories[catIndex] then
 		categories[catIndex] = 0
 		
-		local label = (pageBase:FindFirstChild("CategoryLabel") :: Instance):Clone() :: TextLabel
+		local label = pageBase.CategoryLabel:Clone() :: TextLabel
 		label.Text = cat
 		label.LayoutOrder = categories["__len"]*1000
 		label.Visible = true
@@ -213,42 +213,41 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	local catLabel = page:FindFirstChild("Category_"..cat) :: TextLabel
 	categories[catIndex] += 1
 	
-	local f: any
+	local f: GuiObject
 	if settingType == "Boolean" then
-		
-		f = booleanFrame:Clone()
-		local val = f:FindFirstChild("Value")
+		local frame = booleanFrame:Clone() :: typeof(booleanFrame)
+		local val = frame.Value
 		transitionSwitch(val, SM.GetSetting(name) :: boolean)
 		
-		f:FindFirstChild("Label").Text = name..":"
+		frame.Label.Text = name..":"
 		
-		f.MouseButton1Click:Connect(function()
+		frame.MouseButton1Click:Connect(function()
 			local newVal = not SM.GetSetting(name)
 			SM.SetSetting(name, newVal)
-			transitionSwitch(f:FindFirstChild("Value"), newVal)
+			transitionSwitch(frame.Value, newVal)
 			setting.Callback(newVal, name)
 		end)
-		
+		f = frame
 	elseif type(settingType) == "table" then
-		f = selectorFrame:Clone()
-		f:FindFirstChild("Label").Text = name..":"
+		local frame = selectorFrame:Clone() :: typeof(selectorFrame)
+		frame.Label.Text = name..":"
 		
 		local opts = {}
 		for i, v in settingType do
-			local selections = f:FindFirstChild("Selections")
+			local selections = frame.Selections
 			
-			local opt = selections:FindFirstChild("__Option"):Clone()
+			local opt = selections.__Option:Clone()
 			opt.Name = v
 			opt.Text = v
 			opt.Visible = true
 			opt.Position = UDim2.fromScale((i-1) / #settingType, 0)
 			
-			local selectionUnderline = selections:FindFirstChild("Underline")
+			local selectionUnderline = selections.Underline
 			if SM.GetSetting(setting.Name) == v then
 				transitionUnderline(selectionUnderline, opt)
 			end
 			
-			opt.Parent = f:FindFirstChild("Selections")
+			opt.Parent = selections
 			
 			table.insert(opts, opt)
 			opt.MouseButton1Click:Connect(function()
@@ -261,23 +260,23 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				opt.Text = v
 			end)
 		end
-		
+		f = frame
 	elseif settingType == "Keybind" then
-		f = keybindFrame:Clone()
-		local m = f:FindFirstChild("Frame")
-		m:FindFirstChild("Label").Text = name..":"
+		local frame = keybindFrame:Clone()
+		local m = frame.Frame
+		m.Label.Text = name..":"
 		
 		local setBinds = SM.GetSetting(name) :: SM.KeybindSetting
 		
 		local function updateBinds(binds: any)
 			local numBoundKeys = 0
-			for _, v in m:FindFirstChild("Keybinds"):GetChildren() do
+			for _, v in m.Keybinds:GetChildren() do
 				if v:IsA("Frame") and (v.Name ~= "__KeybindFrame") then
 					numBoundKeys += 1
 				end
 			end
 			for i, v: {SM.Keybind} in binds do
-				local bind = m:FindFirstChild("Keybinds"):FindFirstChild("__KeybindFrame"):Clone()
+				local bind = m.Keybinds.__KeybindFrame:Clone()
 				
 				bind.LayoutOrder = (i + numBoundKeys)*2 -- Separator in between, hence *2
 
@@ -285,30 +284,30 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				
 				local result = Controls.getStringForKeyCode(v[1])
 				if result:sub(1, 11) == "rbxasset://" then
-					local img = bind:FindFirstChild("KeycodeImage")
+					local img = bind.KeycodeImage
 					img.Image = result
 					img.Visible = true
-					bind:FindFirstChild("Keycode").Visible = false
+					bind.Keycode.Visible = false
 				else
-					bind:FindFirstChild("Keycode").Text = result
+					bind.Keycode.Text = result
 				end
 
 				if v[2] then
-					bind:FindFirstChild("Modifier").Text = Controls.getStringForKeyCode(v[2])
-					bind:FindFirstChild("Modifier").Visible = true
-					bind:FindFirstChild("Plus").Visible = true
+					bind.Modifier.Text = Controls.getStringForKeyCode(v[2])
+					bind.Modifier.Visible = true
+					bind.Plus.Visible = true
 				end
 
 				bind.Visible = true
-				bind.Parent = m:FindFirstChild("Keybinds")
+				bind.Parent = m.Keybinds
 
 				if (numBoundKeys+i) > 1 then
-					local sep = m:FindFirstChild("Keybinds"):FindFirstChild("__Separator"):Clone()
+					local sep = m.Keybinds.__Separator:Clone()
 					sep.Name = "Separator"
 					sep.Visible = true
 					sep.LayoutOrder = bind.LayoutOrder-1
 					sep.Name = "Separator"..tostring(sep.LayoutOrder)
-					sep.Parent = m:FindFirstChild("Keybinds")
+					sep.Parent = m.Keybinds
 				end
 
 				local function removeBind()
@@ -320,24 +319,24 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 					bind:Destroy()
 					local sep
 					if bind.Name:split(name)[2] == "1" then
-						sep = m:FindFirstChild("Keybinds"):FindFirstChild("Separator"..tostring(bind.LayoutOrder+1))
+						sep = m.Keybinds:FindFirstChild("Separator"..tostring(bind.LayoutOrder+1))
 					else
-						sep = m:FindFirstChild("Keybinds"):FindFirstChild("Separator"..tostring(bind.LayoutOrder-1))
+						sep = m.Keybinds:FindFirstChild("Separator"..tostring(bind.LayoutOrder-1))
 					end
 					
 					if sep then sep:Destroy() end
 				end
 				
-				bind:FindFirstChild("KeycodeImage").MouseButton1Click:Connect(removeBind)
-				bind:FindFirstChild("Keycode").MouseButton1Click:Connect(removeBind)
-				bind:FindFirstChild("Modifier").MouseButton1Click:Connect(removeBind)
+				bind.KeycodeImage.MouseButton1Click:Connect(removeBind)
+				bind.Keycode.MouseButton1Click:Connect(removeBind)
+				bind.Modifier.MouseButton1Click:Connect(removeBind)
 			end
 		end
 		
 		updateBinds(setBinds.Keycodes)
 		
 		if setting.SpecifyToggle then
-			local toggleButton = m:FindFirstChild("Toggled")
+			local toggleButton = m.Toggled
 			toggleButton.Visible = true
 			toggleButton.Image = (SM.GetSetting(name)::any).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
 			toggleButton.MouseButton1Click:Connect(function()
@@ -350,7 +349,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			end)
 		end
 		
-		f:FindFirstChild("ClickDetector").MouseButton1Click:Connect(function()
+		frame.ClickDetector.MouseButton1Click:Connect(function()
 			for _, v: any in keybindingCons do v:Disconnect() end
 			local msg = API.ScreenMessage("Info", "Press F5 to cancel keybinding.\nYou can also add a modifier key, such as Shift or Ctrl.")
 			CAS:BindActionAtPriority("SelectKeybind", function(_, state, input)
@@ -380,12 +379,11 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				return
 			end, false, 100000, Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Keyboard, Enum.UserInputType.Gamepad1, Enum.UserInputType.MouseButton3)
 		end)
-		
+		f = frame
 	elseif settingType == "TouchPosition" then
-		
-		f = touchFrame:Clone()
-		f:FindFirstChild("Label").Text = name
-		f.MouseButton1Click:Connect(function(): any
+		local frame = touchFrame:Clone()
+		frame.Label.Text = name
+		frame.MouseButton1Click:Connect(function(): any
 			if not UIS.TouchEnabled then
 				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
@@ -396,22 +394,21 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			CAS:BindAction(name, function() return end, true)
 			Controls.SetupTouchButton(name)
 			
-			settingsParent:FindFirstChild("Main").Visible = false
-			settingsParent:FindFirstChild("Close").Visible = false
-			settingsParent:FindFirstChild("Tooltip").Visible = false
+			settingsParent.Main.Visible = false
+			settingsParent.Close.Visible = false
+			settingsParent.Tooltip.Visible = false
 			darken.Visible = true
 			return
 		end)
-		
+		f = frame
 	elseif settingType == "TouchScale" then
-		
-		f = touchFrame:Clone()
-		f:FindFirstChild("Label").Text = name
-		f.MouseButton1Click:Connect(function(): any
+		local frame = touchFrame:Clone()
+		frame.Label.Text = name
+		frame.MouseButton1Click:Connect(function(): any
 			if not UIS.TouchEnabled then
 				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
-			local newScale = require(game:GetService("ReplicatedFirst"):FindFirstChild("TextInput")).Create(name, "Number", "0.1-10", "TouchScale")
+			local newScale = require(ReplicatedFirst.TextInput).Create(name, "Number", "0.1-10", "TouchScale")
 			if newScale then
 				SM.SetSetting(name, newScale)
 			end
@@ -420,6 +417,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			Controls.SetupTouchButton(name)
 			return
 		end)
+		f = frame
 	end
 	
 	if not f then
@@ -431,7 +429,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	f.Name = name
 	f.Parent = settingsFrame:FindFirstChild("Page_"..tab)
 	
-	local help = f:FindFirstChild("Help")
+	local help = f:FindFirstChild("Help") :: TextButton
 	help.MouseButton1Click:Connect(function()
 		local newPos = UDim2.new(0.05, help.AbsolutePosition.X, 0, help.AbsolutePosition.Y)
 		if (newPos == tt.Position) and (tt.Visible) then
