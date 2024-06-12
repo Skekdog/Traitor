@@ -3,8 +3,8 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
-local RoundHandler = require(script.Parent.RoundHandler.RoundHandler)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
+local RoundHandler = require(script.Parent.RoundHandler.RoundHandler) :: Types.ServerRoundHandler
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
 

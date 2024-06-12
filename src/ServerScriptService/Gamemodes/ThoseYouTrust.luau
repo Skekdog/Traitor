@@ -60,85 +60,85 @@ local module: Types.Gamemode = {
             })
         end
 
-        local deathLog = round.EventLog["Death"]
+        local deathLog = round.EventLog.Death
 
-        if deathLog then
-            local firstKill: (Types.RoundEvent_Death & {Attacker: Types.Participant})?
-            local eventIndex = 1
-            while (eventIndex < #deathLog) and (not firstKill) do
-                eventIndex += 1
-                firstKill = deathLog[eventIndex]
-                if not firstKill or not firstKill.Attacker then
-                    firstKill = nil
-                end
+        local firstKill: Types.RoundEvent_Death?
+        local eventIndex = 0
+        while (eventIndex < #deathLog) and (not firstKill) do
+            eventIndex += 1
+            firstKill = deathLog[eventIndex]
+            if not firstKill or not firstKill.Attacker then
+                firstKill = nil
             end
-            if firstKill then
-                local aRole = firstKill.Attacker.Role.Allegiance
-                local vRole = firstKill.Victim.Role.Allegiance
+        end
+        print(firstKill)
+        if firstKill then
+            assert(firstKill.Attacker)
+            local aRole = firstKill.Attacker.Role.Allegiance
+            local vRole = firstKill.Victim.Role.Allegiance
 
-                local attackerName = firstKill.Attacker.FormattedName
-                if (aRole == "Traitor") and (vRole == "Traitor") then
-                    table.insert(highlights, {
-                        Name = "First Bloody Stupid Kill",
-                        Description = `{attackerName} scored the first kill by shooting a fellow traitor. Good job.`
-                    })
-                elseif (aRole == "Innocent") and (vRole == "Traitor") then
-                    table.insert(highlights, {
-                        Name = "First Blow",
-                        Description = `{attackerName} struck the first blow for the innocents by making the first death a traitor's.`
-                    })
-                elseif ((aRole == "Innocent") and (vRole == "Innocent")) and ((not firstKill.SelfDefense) and (not firstKill.FreeKill)) then
-                    table.insert(highlights, {
-                        Name = "First Blooper",
-                        Description = `{attackerName} was the first to kill. Too bad it was an innocent comrade.`
-                    })
-                elseif (aRole == "Traitor") and (vRole == "Innocent") then
-                    table.insert(highlights, {
-                        Name = "First Blood",
-                        Description = `{attackerName} delivered the first innocent death at a traitor's hands.`
-                    })
-                end
+            local attackerName = firstKill.Attacker.FormattedName
+            if (aRole == "Traitor") and (vRole == "Traitor") then
+                table.insert(highlights, {
+                    Name = "First Bloody Stupid Kill",
+                    Description = `{attackerName} scored the first kill by shooting a fellow traitor. Good job.`
+                })
+            elseif (aRole == "Innocent") and (vRole == "Traitor") then
+                table.insert(highlights, {
+                    Name = "First Blow",
+                    Description = `{attackerName} struck the first blow for the innocents by making the first death a traitor's.`
+                })
+            elseif ((aRole == "Innocent") and (vRole == "Innocent")) and ((not firstKill.SelfDefense) and (not firstKill.FreeKill)) then
+                table.insert(highlights, {
+                    Name = "First Blooper",
+                    Description = `{attackerName} was the first to kill. Too bad it was an innocent comrade.`
+                })
+            elseif (aRole == "Traitor") and (vRole == "Innocent") then
+                table.insert(highlights, {
+                    Name = "First Blood",
+                    Description = `{attackerName} delivered the first innocent death at a traitor's hands.`
+                })
             end
+        end
 
-            local mostAllyKills: {any} = {"", 0} -- username, amount
-            local mostEnemyKills: {any} = {"", 0} -- username, amount
-            for _, participant in round.Participants do
-                local allyKills = 0
-                local enemyKills = 0
-                for _, kill in participant.KillList do
-                    if round:IsRoleAlliedWith(participant.Role, kill.Role) then
-                        if (not kill.KilledInSelfDefense) then
-                            allyKills += 1
-                        end
-                    else
-                        enemyKills += 1
+        local mostAllyKills: {any} = {"", 0} -- username, amount
+        local mostEnemyKills: {any} = {"", 0} -- username, amount
+        for _, participant in round.Participants do
+            local allyKills = 0
+            local enemyKills = 0
+            for _, kill in participant.KillList do
+                if round:IsRoleAlliedWith(participant.Role, kill.Role) then
+                    if (not kill.KilledInSelfDefense) then
+                        allyKills += 1
                     end
-                end
-
-                if allyKills > mostAllyKills[2] then
-                    mostAllyKills = {participant.Player.Name, allyKills}
-                end
-                if enemyKills > mostEnemyKills[2] then
-                    mostEnemyKills = {participant.Player.Name, enemyKills}
+                else
+                    enemyKills += 1
                 end
             end
 
-            if mostAllyKills[2] > 3 then
-                table.insert(highlights, {
-                    Name = "Roleplayer",
-                    Description = `{mostAllyKills[1]} was role-playing a madman, honest. That's why they killed most of their team.`
-                })
-            elseif mostAllyKills[2] == 2 then
-                table.insert(highlights, {
-                    Name = "Double Oops",
-                    Description = `{mostAllyKills[1]} had their finger "slip" twice when they were just aiming at a "buddy".`
-                })
-            elseif mostAllyKills[2] == 1 then
-                table.insert(highlights, {
-                    Name = "Butterfingers",
-                    Description = `{mostAllyKills[1]} had their finger slip when they were just aiming at a buddy.`
-                })
+            if allyKills > mostAllyKills[2] then
+                mostAllyKills = {participant.Player.Name, allyKills}
             end
+            if enemyKills > mostEnemyKills[2] then
+                mostEnemyKills = {participant.Player.Name, enemyKills}
+            end
+        end
+
+        if mostAllyKills[2] > 3 then
+            table.insert(highlights, {
+                Name = "Roleplayer",
+                Description = `{mostAllyKills[1]} was role-playing a madman, honest. That's why they killed most of their team.`
+            })
+        elseif mostAllyKills[2] == 2 then
+            table.insert(highlights, {
+                Name = "Double Oops",
+                Description = `{mostAllyKills[1]} had their finger "slip" twice when they were just aiming at a "buddy".`
+            })
+        elseif mostAllyKills[2] == 1 then
+            table.insert(highlights, {
+                Name = "Butterfingers",
+                Description = `{mostAllyKills[1]} had their finger slip when they were just aiming at a buddy.`
+            })
         end
 
         return highlights

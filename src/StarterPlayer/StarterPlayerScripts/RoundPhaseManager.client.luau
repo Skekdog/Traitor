@@ -67,9 +67,9 @@ local function update(roundPhase)
         if ownRole and participant then
             local participants: {Types.PartialParticipant} = LocalRoundInfo.GetAllParticipants()
 
-            if ownRole.HighlightRules then
+            if ownRole.HighlightRoles then
                 local highlightRoles = {}
-                for _, v in ownRole.HighlightRules do
+                for _, v in ownRole.HighlightRoles do
                     table.move(RoundHandler.GetRolesMatchingRelationship(LocalRoundInfo.GetAllRoles() or {}, ownRole, v), 1, #highlightRoles, #highlightRoles + 1, highlightRoles)
                 end
 
