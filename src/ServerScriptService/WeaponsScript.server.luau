@@ -17,5 +17,5 @@ ReplicatedStorage.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr, ca
         return
     end
 
-    WeaponsManager.Shoot(plr, Weapons[char:GetAttribute("Weapon") or "Golden Gun"], cameraRayInfo)
+    WeaponsManager.Shoot(plr, Weapons[char:GetAttribute("Weapon") or "Crowbar"], cameraRayInfo)
 end)

@@ -137,7 +137,6 @@ local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.P
                 if death and partName == "Head" then
                     death.Volume = 0
                 end
-
                 entity:Kill(attacker, round:GetEquipment(weapon.Name), partName == "Head", false)
             elseif attacker and not attacker:HasSelfDefenseAgainst(entity) then
                 entity:AddSelfDefense(attacker, 15)

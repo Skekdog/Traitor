@@ -59,8 +59,8 @@ function module.GetWeaponHighlights(roundEvents: {["Death"]: {Types.RoundEvent<T
     
     local counter: {[Types.EquipmentName]: {[Types.Participant]: Types.Integer}} = {} -- yeah i'm not giving this a nice name
     for _, v in deathEvents do
-        local attacker = v.Attacker
-        local weapon = v.Weapon
+        local attacker = v.Data.Attacker
+        local weapon = v.Data.Weapon
         if (not attacker) or (type(weapon) ~= "table") then
             continue
         end

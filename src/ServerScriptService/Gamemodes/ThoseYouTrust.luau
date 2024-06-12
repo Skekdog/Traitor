@@ -18,7 +18,7 @@ local module: Types.Gamemode = {
     RecommendedPlayers = 4,
     MaximumPlayers = 32,
     
-    TimeoutVictors = "Traitor",
+    TimeoutVictors = "Innocent",
     PhyrricVictors = "Traitor",
 
     CalculateRoundHighlights = function(self, round)
@@ -61,17 +61,17 @@ local module: Types.Gamemode = {
         end
 
         local deathLog = round.EventLog.Death
-
         local firstKill: Types.RoundEvent_Death?
         local eventIndex = 0
+
         while (eventIndex < #deathLog) and (not firstKill) do
             eventIndex += 1
-            firstKill = deathLog[eventIndex]
-            if not firstKill or not firstKill.Attacker then
-                firstKill = nil
+            if deathLog[eventIndex] and deathLog[eventIndex].Data.Attacker then
+                firstKill = deathLog[eventIndex].Data
+                break
             end
         end
-        print(firstKill)
+        
         if firstKill then
             assert(firstKill.Attacker)
             local aRole = firstKill.Attacker.Role.Allegiance
@@ -107,20 +107,18 @@ local module: Types.Gamemode = {
             local allyKills = 0
             local enemyKills = 0
             for _, kill in participant.KillList do
-                if round:IsRoleAlliedWith(participant.Role, kill.Role) then
-                    if (not kill.KilledInSelfDefense) then
-                        allyKills += 1
-                    end
+                if not kill.KilledInSelfDefense and round:IsRoleAlliedWith(participant.Role, kill.Role) then
+                    allyKills += 1
                 else
                     enemyKills += 1
                 end
             end
 
             if allyKills > mostAllyKills[2] then
-                mostAllyKills = {participant.Player.Name, allyKills}
+                mostAllyKills = {participant.FormattedName, allyKills}
             end
             if enemyKills > mostEnemyKills[2] then
-                mostEnemyKills = {participant.Player.Name, enemyKills}
+                mostEnemyKills = {participant.FormattedName, enemyKills}
             end
         end
 
@@ -156,7 +154,7 @@ local module: Types.Gamemode = {
             Icon = "rbxassetid://",
             AttackType = "Blunt",
 
-            Item = items:FindFirstChild("Crowbar")
+            Item = items.Crowbar
         },
         {
             Name = "Pistol",
@@ -164,7 +162,15 @@ local module: Types.Gamemode = {
             Icon = "rbxassetid://",
             AttackType = "Firearm",
 
-            Item = items:FindFirstChild("Pistol")
+            Item = items.Pistol
+        },
+        {
+            Name = "Golden Gun",
+            Description = "One shot. Don't fumble it.",
+            Icon = "rbxassetid://",
+            AttackType = "Firearm",
+
+            Item = items["Golden Gun"]
         },
         {
             Name = "Grenade",
@@ -174,7 +180,7 @@ local module: Types.Gamemode = {
             MaxStock = 1,
             AttackType = "Explosion",
 
-            Item = items:FindFirstChild("Grenade")
+            Item = items.Grenade
         },
         {
             Name = "Radar",
@@ -294,7 +300,7 @@ local module: Types.Gamemode = {
                 roleToAssign = roles[roleToAssignIndex] -- Go to the next role
                 subtractFromI = i - 1 -- Start counting for how many people to assign from where we start assigning. -1 because lua is 1-indexed
             end
-            v:AssignRole(roleToAssign) -- Hand it over to the module to assign the role
+            v:AssignRole(self.Roles[1]) -- Hand it over to the module to assign the role
         end
     end,
 

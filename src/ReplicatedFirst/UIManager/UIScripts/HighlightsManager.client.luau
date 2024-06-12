@@ -12,7 +12,6 @@ local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
 local eTemplate = eFrame.Template
 
 ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role)
-	print(highlights)
 	hFrame.Winners.Text = `THE {victors.Name:upper()}S WIN`
 	hFrame.Winners.TextColor3 = victors.Colour
 

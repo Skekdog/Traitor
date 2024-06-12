@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local WeaponsManager = require(script.Parent)
+local Types = require(script.Parent.Parent.RoundHandler.Types)
 
 local projectiles = ServerStorage.Projectiles
 local models = ReplicatedStorage.WeaponModels
@@ -229,45 +230,50 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
                 return
             end
 
-            if not attacker:IsDamageJustifiedAgainst(target) then
-                return attacker:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head", true)
-            end
-
-            local char = target.Character
-            local root = char:FindFirstChild("HumanoidRootPart")
-            local bodyColors = char:FindFirstChildOfClass("BodyColors")
-            if bodyColors then
-                bodyColors:Destroy()
-            end
-
-            if root then
-                local deathSound = root:FindFirstChild("DeathSound") :: Sound?
-                if deathSound then
-                    deathSound:Destroy()
+            local function makeGolden(victim: Types.Participant)
+                local char = victim.Character
+                local root = char:FindFirstChild("HumanoidRootPart")
+                local bodyColors = char:FindFirstChildOfClass("BodyColors")
+                if bodyColors then
+                    bodyColors:Destroy()
                 end
 
-                local sound = ReplicatedStorage.WeaponSounds.GoldenGunHit:Clone()
-                sound.Name = "DeathSound"
-                sound.Parent = root :: any
-            end
-            for _, v in char:GetChildren() do
-                if v:IsA("BasePart") then
-                    v.Material = Enum.Material.Metal
-                    v.BrickColor = BrickColor.new("Gold")
+                if root then
+                    local deathSound = root:FindFirstChild("DeathSound") :: Sound?
+                    if deathSound then
+                        deathSound:Destroy()
+                    end
+
+                    local sound = ReplicatedStorage.WeaponSounds.GoldenGunHit:Clone()
+                    sound.Name = "DeathSound"
+                    sound.Parent = root :: any
+                end
+                for _, v in char:GetChildren() do
+                    if v:IsA("BasePart") then
+                        v.Material = Enum.Material.Metal
+                        v.BrickColor = BrickColor.new("Gold")
+                    end
+                end
+
+                local shirt = char:FindFirstChildOfClass("Shirt")
+                if shirt then
+                    shirt:Destroy()
+                end
+
+                local pants = char:FindFirstChildOfClass("Pants")
+                if pants then
+                    pants:Destroy()
                 end
             end
 
-            local shirt = char:FindFirstChildOfClass("Shirt")
-            if shirt then
-                shirt:Destroy()
+            if attacker:IsDamageJustifiedAgainst(target) then
+                makeGolden(target)
+                target:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head")
+            else
+                makeGolden(attacker)
+                attacker:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head", true)
             end
 
-            local pants = char:FindFirstChildOfClass("Pants")
-            if pants then
-                pants:Destroy()
-            end
-
-            target:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head")
             return true
         end
     },
