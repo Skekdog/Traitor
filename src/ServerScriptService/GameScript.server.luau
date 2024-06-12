@@ -47,7 +47,7 @@ for _, v in script.Parent.Gamemodes:GetChildren() do
 end
 
 local nextRoundReady = true
-local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructure
+local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructure
 
 local function sendRoundInfo(plr: Player?)
 	local roundId = ServerStorage:GetAttribute("RoundID")

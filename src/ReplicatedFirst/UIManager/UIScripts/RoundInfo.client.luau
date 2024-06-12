@@ -1,4 +1,5 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local TweenService = game:GetService("TweenService")
 local plr = game:GetService("Players").LocalPlayer
 local UIManager = require(ReplicatedFirst.UIManager)
 

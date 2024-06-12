@@ -8,7 +8,7 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
 
-type BeforeHitFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean) -> ()
+type BeforeHitFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> ()
 type AimInfo = {
     FOV: number,
     HasScope: boolean?,
@@ -127,8 +127,13 @@ local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.P
     if canDamage and hum then
         local willDie = (hum.Health - damage) <= 0
         if entity.Kind == "Participant" then
+            if weapon.BeforeHitParticipant then
+                if weapon.BeforeHitParticipant(attacker, entity, willDie, partName) then
+                    return
+                end
+            end
             if willDie then
-                local death = (entity.Character.PrimaryPart :: BasePart):FindFirstChild("DeathSound", true) :: Sound
+                local death = (entity.Character.PrimaryPart :: BasePart):FindFirstChild("DeathSound", true) :: Sound?
                 if death and partName == "Head" then
                     death.Volume = 0
                 end
@@ -142,10 +147,6 @@ local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.P
                 local karmaDiff = damage * 1.5
                 karmaDiff *= if attacker:IsDamageJustifiedAgainst(entity) then 1 else -1
                 attacker.Karma += karmaDiff
-            end
-
-            if weapon.BeforeHitParticipant then
-                weapon.BeforeHitParticipant(attacker, entity, willDie)
             end
         elseif willDie then
             entity.OnBreak(entity)
@@ -272,7 +273,16 @@ function module.Shoot(player: Player, weapon: Weapon, cameraRayInfo: Ray): ()
     firedSound:Destroy()
 
     local origin = char:GetPivot().Position
-    local target = cameraRayInfo.Direction * 10000
+
+    local random = Random.new()
+    local spread = math.rad(weapon.Spread)
+
+    local function nextSpread(): number
+        return random:NextNumber(-spread, spread)
+    end
+    local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
+
+    local target = (cameraRayInfo.Direction + spreadVector) * 10000
 
     --todo: should this be on the client instead?
     local function tweenProjectile(targetPosition: Vector3): ()

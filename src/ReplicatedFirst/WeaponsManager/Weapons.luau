@@ -37,7 +37,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         AimInfo = false,
 
         Recoil = 10,
-        Spread = 5,
+        Spread = 0.25,
 
         Model = models.Grenade,
         FiredSound = firedSounds.Grenade,
@@ -77,7 +77,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         CanDrop = true,
 
         Recoil = 0.6,
-        Spread = 30,
+        Spread = 1.5,
 
         Damage = {
             Head = 25,
@@ -117,7 +117,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         CanDrop = true,
 
         Recoil = 1.5,
-        Spread = 30,
+        Spread = 0.25,
 
         FalloffStart = 178,
         FalloffEnd = 300,
@@ -165,7 +165,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             Limb = 20,
         },
 
-        Spread = 6,
+        Spread = 0.25,
         Recoil = 0.5,
 
         FalloffStart = 55,
@@ -201,7 +201,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         Slot = 7,
         CanDrop = true,
 
-        Damage = 1000,
+        Damage = 0,
 
         FalloffStart = 0,
         FalloffEnd = 0,
@@ -224,29 +224,51 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         Model = models["Golden Gun"],
         FiredSound = firedSounds["Golden Gun"],
 
-        BeforeHitParticipant = function(attacker, target, dead)
-            if not dead or not attacker then
+        BeforeHitParticipant = function(attacker, target, dead, hitPartName)
+            if not attacker then
                 return
             end
 
             if not attacker:IsDamageJustifiedAgainst(target) then
-                attacker:Kill(nil, attacker.Round:GetEquipment("Golden Gun"))
-            else
-                local char = target.Character
-                local root = char:FindFirstChild("HumanoidRootPart")
-                if root then
-                    local deathSound = root:FindFirstChild("DeathSound") :: Sound
-                    if deathSound then
-                        deathSound.SoundId = "rbxassetid://0" --todo: golden sound here
-                    end
+                return attacker:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head", true)
+            end
+
+            local char = target.Character
+            local root = char:FindFirstChild("HumanoidRootPart")
+            local bodyColors = char:FindFirstChildOfClass("BodyColors")
+            if bodyColors then
+                bodyColors:Destroy()
+            end
+
+            if root then
+                local deathSound = root:FindFirstChild("DeathSound") :: Sound?
+                if deathSound then
+                    deathSound:Destroy()
                 end
-                for _, v in char:GetChildren() do
-                    if v:IsA("BasePart") then
-                        v.Material = Enum.Material.Metal
-                        v.BrickColor = BrickColor.new("Gold")
-                    end
+
+                local sound = ReplicatedStorage.WeaponSounds.GoldenGunHit:Clone()
+                sound.Name = "DeathSound"
+                sound.Parent = root :: any
+            end
+            for _, v in char:GetChildren() do
+                if v:IsA("BasePart") then
+                    v.Material = Enum.Material.Metal
+                    v.BrickColor = BrickColor.new("Gold")
                 end
             end
+
+            local shirt = char:FindFirstChildOfClass("Shirt")
+            if shirt then
+                shirt:Destroy()
+            end
+
+            local pants = char:FindFirstChildOfClass("Pants")
+            if pants then
+                pants:Destroy()
+            end
+
+            target:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head")
+            return true
         end
     },
     SMG = {
@@ -266,7 +288,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         FalloffEnd = 80,
         FalloffMultiplier = 0.5,
 
-        Spread = 20,
+        Spread = 1,
         Recoil = 0.3,
 
         MultiUse = {
@@ -315,7 +337,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             SpreadMultiplier = 0.05
         },
 
-        Spread = 30,
+        Spread = 0.25,
         Recoil = 2,
 
         MultiUse = {
@@ -340,7 +362,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         Slot = 3,
         CanDrop = true,
 
-        Spread = 10,
+        Spread = 0.5,
         Recoil = 0.3,
 
         Damage = {
@@ -424,7 +446,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             Limb = 20,
         },
 
-        Spread = 6,
+        Spread = 0.25,
         Recoil = 0.5,
 
         FalloffStart = 55,
@@ -487,7 +509,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             SpreadMultiplier = 0.7
         },
 
-        Spread = 16,
+        Spread = 1.5,
         Recoil = 1.2,
 
         MultiUse = {
@@ -531,7 +553,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Recoil = 0.5,
-        Spread = 8,
+        Spread = 0.35,
 
         MultiUse = {
             FireTime = 0.1,
@@ -573,7 +595,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Recoil = 0.5,
-        Spread = 3,
+        Spread = 0.25,
 
         MultiUse = {
             FireTime = 0.5,

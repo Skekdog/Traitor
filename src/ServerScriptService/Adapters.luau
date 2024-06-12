@@ -173,7 +173,7 @@ local module: Types.Adapter = {
         local sound = Instance.new("Sound")
         sound.SoundId = "rbxassetid://"..deathsounds[math.random(1, #deathsounds)]
         sound.Name = "DeathSound"
-        sound.Parent = participant.Character
+        sound.Parent = participant.Character.PrimaryPart
     end,
 
     SendSlayVote = function(to, target)
@@ -193,11 +193,10 @@ local module: Types.Adapter = {
 
         char.Archivable = true
         local clone = char:Clone()
-        
-        ServerStorage.RagdollJoints:Clone().Parent = clone :: any
 
-        local root = clone:FindFirstChild("HumanoidRootPart") :: Part
+        local root = clone:FindFirstChild("HumanoidRootPart") :: Part?
         local hum = clone:FindFirstChildOfClass("Humanoid")
+
         if hum then
             hum:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
             hum.EvaluateStateMachine = false
@@ -210,8 +209,39 @@ local module: Types.Adapter = {
 
         char:Destroy()
         clone.Parent = workspace
+
         victim.Character = clone
         victim.Player.Character = nil
+
+        local joints = ServerStorage.RagdollJoints:Clone()
+        for _, v in joints:GetChildren() do
+            assert(v:IsA("Constraint"))
+
+            local bodyPart = clone:FindFirstChild(v.Name)
+            if not bodyPart then
+                continue
+            end
+            
+            local motor = bodyPart:FindFirstChildOfClass("Motor6D")
+            if not motor or not motor.Part0 then
+                continue
+            end
+            v.Attachment0 = motor.Part0:FindFirstChild(motor.Name.."RigAttachment") :: Attachment
+            v.Attachment1 = bodyPart:FindFirstChild(motor.Name.."RigAttachment") :: Attachment
+        end
+        joints.Parent = clone :: any
+
+        -- This has to be after parenting because motor6ds don't exist?
+        for _, v in clone:GetDescendants() do
+            if v:IsA("JointInstance") or v:IsA("BaseScript") or v:IsA("Motor6D") then
+                v:Destroy()
+            elseif v:IsA("BasePart") then
+                v.CanCollide = v.Name ~= "HumanoidRootPart"
+                v:SetNetworkOwner()
+            elseif v.Name == "DeathSound" and v:IsA("Sound") then
+                v:Play()
+            end
+        end
 
         for _, v in Players:GetPlayers() do
             UpdateRoundInfo.SendUpdatedParticipants(victim.Round.Participants, victim, victim.Player)

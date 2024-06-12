@@ -2,6 +2,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WeaponsManager = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager)
 local Weapons = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager.Weapons)
 
+ReplicatedStorage.ClientServer.AimWeapon.OnServerEvent:Connect(function(plr, isAiming)
+    local char = plr.Character :: any
+    char:SetAttribute("Weapon", isAiming)
+end)
+
 ReplicatedStorage.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
     if not cameraRayInfo then
         return
@@ -12,6 +17,5 @@ ReplicatedStorage.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr, ca
         return
     end
 
-    char:SetAttribute("Weapon", "Pistol")
     WeaponsManager.Shoot(plr, Weapons[char:GetAttribute("Weapon")], cameraRayInfo)
 end)
