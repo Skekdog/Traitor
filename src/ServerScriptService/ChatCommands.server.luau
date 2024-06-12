@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 
@@ -35,6 +36,14 @@ Players.PlayerAdded:Connect(function(plr)
                 ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
             end
             ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
+        elseif msg == "!restart" and plr.UserId == meId then
+            ServerScriptService.PlayerSetup.ReleaseAllProfiles:Fire()
+            task.wait(5)
+            local acc, _ = TeleportService:ReserveServer(game.PlaceId)
+            TeleportService:TeleportToPrivateServer(game.PlaceId, acc, Players:GetPlayers())
+            Players.PlayerAdded:Connect(function(plr)
+                plr:Kick("This server is shutting down for an update.")
+            end)
         end
     end)
 end)

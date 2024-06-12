@@ -89,6 +89,7 @@ end)
 local releaseAllProfiles = script:FindFirstChild("ReleaseAllProfiles")
 releaseAllProfiles.Event:Once(function()
 	for _, v in profiles do
+		v:Save()
 		v:Release()
 	end
 end)

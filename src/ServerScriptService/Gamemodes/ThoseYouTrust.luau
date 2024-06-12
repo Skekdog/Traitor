@@ -26,13 +26,17 @@ local module: Types.Gamemode = {
         local highlights: {Types.RoundHighlight} = {}
         
         for equipmentName, v in weaponList do
+            if true then continue end
+            if not v then
+                continue
+            end
             local username = v[1]
             local amount = v[2]
 
             local name = ""
             local description = ""
 
-            if amount < 2 then
+            if not amount or amount < 2 then
                 continue
             end
 
@@ -300,7 +304,7 @@ local module: Types.Gamemode = {
                 roleToAssign = roles[roleToAssignIndex] -- Go to the next role
                 subtractFromI = i - 1 -- Start counting for how many people to assign from where we start assigning. -1 because lua is 1-indexed
             end
-            v:AssignRole(self.Roles[1]) -- Hand it over to the module to assign the role
+            v:AssignRole(roleToAssign) -- Hand it over to the module to assign the role
         end
     end,
 
