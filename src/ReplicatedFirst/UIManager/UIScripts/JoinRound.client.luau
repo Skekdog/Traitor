@@ -15,8 +15,8 @@ this.Object.MouseButton1Click:Connect(function()
 		return
 	end
 	this:ToggleVisible(false)
-	roundInfo.Frame.Role.Text = "PREPARING"
-	roundInfo.Frame.Role.TextColor3 = Color3.new(1, 1, 1)
+	roundInfo.TopBar.Role.Text = "PREPARING"
+	roundInfo.TopBar.Role.TextColor3 = Color3.new(1, 1, 1)
 	
 	for _, v in plr:WaitForChild("Inventory"):GetChildren() do
 		ReplicatedFirst.ClientStorage.ScriptConnections.RemoteEquipEvent:Fire(false, v, nil, false)

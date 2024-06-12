@@ -68,29 +68,29 @@ function equip(toEquip, tool, label: any, isServer)
 	local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
 	local ammoBar = roundInfo.Frame.AmmoBar
 	if toEquip then
-		local curAmmo = tool:FindFirstChild("CurrentAmmo")
-		local reload = tool.Configuration:FindFirstChild("Reload")
-		local maxAmmo, infiniteAmmo
-		if reload then
-			maxAmmo, infiniteAmmo = reload:GetAttribute("MagCapacity"), reload:GetAttribute("InfiniteAmmo")
-		end 
-		if curAmmo and not infiniteAmmo then
-			local function updateAmmo()
-				local ammo = curAmmo.Value
-				ammoBar.Text = tostring(ammo).."/"..tostring(maxAmmo)
-				ammoBar.UIGradient.Color = ColorSequence.new({
-					ColorSequenceKeypoint.new(0, Color3.new(1, 0.733, 0.12)),
-					ColorSequenceKeypoint.new(math.clamp(ammo/maxAmmo, 0, 0.999), Color3.new(1, 0.733, 0.12)),
-					ColorSequenceKeypoint.new(math.clamp((ammo/maxAmmo)+0.001, 0.001, 1), Color3.new(0.4, 0.4, 0)),
-					ColorSequenceKeypoint.new(1, Color3.new(0.4, 0.4, 0)),
-				})
-			end
-			updateAmmo()
-			ammoBar.Visible = true
-			table.insert(ammoCons, curAmmo.Changed:Connect(updateAmmo))
-		else
-			ammoBar.Visible = false
-		end
+		-- local curAmmo = tool:FindFirstChild("CurrentAmmo")
+		-- local reload = tool.Configuration:FindFirstChild("Reload")
+		-- --local maxAmmo, infiniteAmmo
+		-- if reload then
+		-- 	maxAmmo, infiniteAmmo = reload:GetAttribute("MagCapacity"), reload:GetAttribute("InfiniteAmmo")
+		-- end 
+		-- if curAmmo and not infiniteAmmo then
+		-- 	local function updateAmmo()
+		-- 		-- local ammo = curAmmo.Value
+		-- 		-- ammoBar.Text = tostring(ammo).."/"..tostring(maxAmmo)
+		-- 		-- ammoBar.UIGradient.Color = ColorSequence.new({
+		-- 		-- 	ColorSequenceKeypoint.new(0, Color3.new(1, 0.733, 0.12)),
+		-- 		-- 	ColorSequenceKeypoint.new(math.clamp(ammo/maxAmmo, 0, 0.999), Color3.new(1, 0.733, 0.12)),
+		-- 		-- 	ColorSequenceKeypoint.new(math.clamp((ammo/maxAmmo)+0.001, 0.001, 1), Color3.new(0.4, 0.4, 0)),
+		-- 		-- 	ColorSequenceKeypoint.new(1, Color3.new(0.4, 0.4, 0)),
+		-- 		-- })
+		-- 	end
+		-- 	updateAmmo()
+		-- 	ammoBar.Visible = true
+		-- 	table.insert(ammoCons, curAmmo.Changed:Connect(updateAmmo))
+		-- else
+		-- 	ammoBar.Visible = false
+		-- end
 		
 		label.TextTransparency = 0
 		label.BackgroundTransparency = 0.5
@@ -118,7 +118,7 @@ function equip(toEquip, tool, label: any, isServer)
 		anims = {}
 		for _, v in ammoCons do
 			ammoBar.Visible = false
-			v:Disconnect()
+			--v:Disconnect()
 		end
 		tool.Equipped:Fire(false)
 		controls.Unregister("Drop")

@@ -6,19 +6,19 @@ local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 
 -- These are percentages of MaxHealth
 local healthDefs = {
-	[20] = "Near Death",
-	[40] = "Badly Wounded",
-	[60] = "Wounded",
-	[80] = "Hurt",
-	[100] = "Healthy",
+	[0] = "Near Death",
+	[20] = "Badly Wounded",
+	[40] = "Wounded",
+	[60] = "Hurt",
+	[80] = "Healthy",
 }
 
 local karmaDefs = {
-	[1000] = "Reputable",
-	[900] = "Crude",
-	[800] = "Trigger-Happy",
-	[700] = "Dangerous",
-	[600] = "Liability",
+	[500] = "Liability",
+	[600] = "Dangerous",
+	[700] = "Trigger-Happy",
+	[800] = "Crude",
+	[900] = "Reputable",
 }
 
 local mouse = Players.LocalPlayer:GetMouse()

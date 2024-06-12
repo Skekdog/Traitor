@@ -139,14 +139,14 @@ local lastTime = ""
 local function updateTimer(time: number)
     if paused then
 		if math.round(time) % 2 == 1 then --Alternate every second
-			roundInfo.Timer.Text = "PAUSED"
+			roundInfo.TopBar.Timer.Text = "PAUSED"
 		else
-			roundInfo.Timer.Text = lastTime
+			roundInfo.TopBar.Timer.Text = lastTime
 		end
 		return
 	end
 
-	roundInfo.Timer.Text = API.ToRoundTime(time, timeTarget)
+	roundInfo.TopBar.Timer.Text = API.ToRoundTime(time, timeTarget)
 end
 
 task.spawn(function()
@@ -161,20 +161,20 @@ LocalRoundInfo.Listen("TimeMilestone", function(time)
 end)
 
 LocalRoundInfo.Listen("IsPaused", function(isPaused)
-    lastTime = roundInfo.Timer.Text
+    lastTime = roundInfo.TopBar.Timer.Text
     paused = isPaused
 end)
 
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Participant?)
     if not participant or participant.Role.Name == "" then
-        roundInfo.Frame.Role.TextColor3 = Color3.new(1, 1, 1)
-        roundInfo.Frame.Role.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
+        roundInfo.TopBar.Role.TextColor3 = Color3.new(1, 1, 1)
+        roundInfo.TopBar.Role.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
         return
     end
 
     local role = participant.Role
-    roundInfo.Frame.Role.Text = role.Name
-    roundInfo.Frame.Role.TextColor3 = role.Colour
+    roundInfo.TopBar.Role.Text = role.Name
+    roundInfo.TopBar.Role.TextColor3 = role.Colour
 
     local toRegister = ReplicatedFirst.UIManager.UnregisteredUIs:FindFirstChild("Equipment Shop")
     if not role.EquipmentShop or #role.EquipmentShop <= 0 or not toRegister then
