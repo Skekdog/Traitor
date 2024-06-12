@@ -4,6 +4,8 @@ local WeaponsManager = require(script.Parent)
 
 local projectiles = ServerStorage.Projectiles
 local models = ReplicatedStorage.WeaponModels
+local firedSounds = ReplicatedStorage.WeaponSounds.Fired
+local reloadSounds = ReplicatedStorage.WeaponSounds.Reload
 
 local bullet = projectiles.Bullet :: PVInstance
 
@@ -37,7 +39,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         Recoil = 10,
         Spread = 5,
 
-        Model = models.Grenade
+        Model = models.Grenade,
+        FiredSound = firedSounds.Grenade,
     },
     Crowbar = {
         Name = "Crowbar",
@@ -62,6 +65,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             MagazineSize = math.huge,
         },
         Model = models.Crowbar,
+        FiredSound = firedSounds.Crowbar,
 
         ProjectileInfo = false
     },
@@ -102,7 +106,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             Speed = 140
         },
 
-        Model = models.HUGE
+        Model = models.HUGE,
+        FiredSound = firedSounds.HUGE,
     },
     Scout = {
         Name = "Scout",
@@ -143,7 +148,9 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             AmmoType = "Scout"
         },
 
-        Model = models.Scout
+        Model = models.Scout,
+        FiredSound = firedSounds.Scout,
+        ReloadSound = reloadSounds.Scout,
     },
     Pistol = {
         Name = "Pistol",
@@ -179,6 +186,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models.Pistol,
+        FiredSound = firedSounds.Pistol,
+        ReloadSound = reloadSounds.Pistol,
 
         ProjectileInfo = {
             Base = bullet,
@@ -213,6 +222,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models["Golden Gun"],
+        FiredSound = firedSounds["Golden Gun"],
 
         BeforeHitParticipant = function(attacker, target, dead)
             if not dead or not attacker then
@@ -268,6 +278,9 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models.SMG,
+        FiredSound = firedSounds.SMG,
+        ReloadSound = reloadSounds.SMG,
+
         ProjectileInfo = {
             Base = bullet,
             Speed = 140
@@ -313,6 +326,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models.AWP,
+        FiredSound = firedSounds.AWP,
+
         ProjectileInfo = {
             Base = bullet,
             Speed = 300
@@ -348,6 +363,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models["Assault Rifle"],
+        FiredSound = firedSounds["Assault Rifle"],
+        ReloadSound = reloadSounds["Assault Rifle"],
 
         FalloffStart = 75,
         FalloffEnd = 125,
@@ -388,6 +405,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models.Flashbang,
+        FiredSound = firedSounds.Flashbang,
+
         BeforeHitParticipant = function(_, victim)
             ReplicatedStorage.ServerClient.Flashbang:FireClient(victim.Player)
         end
@@ -426,6 +445,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models["Silenced Pistol"],
+        FiredSound = firedSounds["Silenced Pistol"],
+        ReloadSound = reloadSounds["Silenced Pistol"],
 
         ProjectileInfo = {
             Base = projectiles.SilencedBullet :: PVInstance,
@@ -483,7 +504,9 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             Speed = 150
         },
 
-        Model = models.XM1014
+        Model = models.XM1014,
+        FiredSound = firedSounds.XM1014,
+        ReloadSound = reloadSounds.XM1014,
     },
     Glock = {
         Name = "Glock",
@@ -524,6 +547,8 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         },
 
         Model = models.Glock,
+        FiredSound = firedSounds.Glock,
+        ReloadSound = reloadSounds.Glock,
     },
     Deagle = {
         Name = "Deagle",
@@ -563,7 +588,9 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             Speed = 190
         },
 
-        Model = models.Deagle
+        Model = models.Deagle,
+        FiredSound = firedSounds.Deagle,
+        ReloadSound = reloadSounds.Deagle,
     }
 }
 

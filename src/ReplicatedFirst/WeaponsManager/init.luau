@@ -51,7 +51,7 @@ export type Weapon = {
     ExplosionInfo: ExplosionInfo?,
     FuseTime: number?,
 
-    AimInfo: AimInfo | false, -- nil if aiming should be disabled
+    AimInfo: AimInfo | false,
 
     Recoil: number,
     Spread: number,
@@ -62,6 +62,8 @@ export type Weapon = {
     ProjectileInfo: ProjectileInfo | false,
 
     Model: Model,
+    FiredSound: Sound,
+    ReloadSound: Sound?,
 
     BeforeHitParticipant: BeforeHitFunction?,
 }
@@ -231,7 +233,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo,
 
     local soundPart = Instance.new("Attachment")
 	soundPart.WorldPosition = position
-	soundPart.Parent = workspace.Proj.ImpactHoles
+	soundPart.Parent = workspace.Projectiles
     
 	local sound = ServerStorage.Explosion:Clone()
 	sound.Parent = soundPart :: any
@@ -242,12 +244,6 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo,
 
     explosion.Parent = workspace
 end
-
-local rayParams = RaycastParams.new()
-rayParams.FilterType = Enum.RaycastFilterType.Include
-rayParams.IgnoreWater = true
-rayParams.RespectCanCollide = true
-rayParams.FilterDescendantsInstances = {workspace}
 
 function module.Shoot(player: Player, weapon: Weapon, cameraRayInfo: Ray): ()
     local char = player.Character
@@ -271,10 +267,46 @@ function module.Shoot(player: Player, weapon: Weapon, cameraRayInfo: Ray): ()
         return
     end
 
-    local result = workspace:Raycast(char:GetPivot().Position, cameraRayInfo.Direction * 10000, rayParams)
-    if not result then
-        return
+    local firedSound = weapon.FiredSound:Clone()
+    firedSound.Parent = char
+    firedSound:Destroy()
+
+    local origin = char:GetPivot().Position
+    local target = cameraRayInfo.Direction * 10000
+
+    --todo: should this be on the client instead?
+    local function tweenProjectile(targetPosition: Vector3): ()
+        local projectileInfo = weapon.ProjectileInfo
+        if projectileInfo then
+            assert(typeof(projectileInfo) ~= "boolean") -- projectileInfo gets reduced to true... from a type of false | ProjectileInfo...
+
+            local projectile = projectileInfo.Base:Clone()
+            projectile:PivotTo(CFrame.lookAt(origin, target))
+
+            local tween = TweenService:Create(projectile, TweenInfo.new((origin - targetPosition).Magnitude / projectileInfo.Speed), {Position = targetPosition})
+
+            tween.Completed:Once(function()
+                projectile:Destroy()
+            end)
+
+            tween:Play()
+
+            projectile.Parent = workspace.Projectiles
+        end
     end
+
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+    rayParams.IgnoreWater = true
+    rayParams.RespectCanCollide = true
+    rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
+
+    local result = workspace:Raycast(origin, target, rayParams)
+    if not result then
+        return tweenProjectile(target)
+    end
+
+    tweenProjectile(result.Position)
 
     onPartHit(round, weapon, attacker, result)
 end

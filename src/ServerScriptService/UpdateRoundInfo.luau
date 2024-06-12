@@ -26,31 +26,11 @@ function module.SendUpdatedParticipants(participants: {Types.Participant}, thisP
 			remotes.UpdateParticipant:FireClient(plr, thisParticipant:ViewPartialParticipant(v))
 			continue
 		end
-		local p = table.clone(thisParticipant)
-		p.Round = nil :: any
-
-		-- Edge cases, cause a cyclic table - not good!
-		if p.KilledByParticipant and p.KilledByParticipant.Player == p.Player then
-			p.KilledByParticipant = nil
-		end
-		for i, v in p.KillList do
-			if v.Player == p.Player then
-				p.KillList[i] = nil
-			end
-		end
-		for i, v in p.SearchedBy do
-			if v.Player == p.Player then
-				p.SearchedBy[i] = nil
-			end
-		end
-		for i, v in p.SelfDefenseList do
-			if v.Against.Player == p.Player then
-				p.SelfDefenseList[i] = nil
-			end
-		end
-
-		print(p)
-		remotes.UpdateOwnParticipant:FireClient(plr, p)
+		remotes.UpdateOwnParticipant:FireClient(plr, {
+			Status = v.Status,
+			Role = v.Role,
+			Credits = v.Credits,
+		})
 	end
 end
 
