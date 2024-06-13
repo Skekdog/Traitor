@@ -45,6 +45,8 @@ local module: Types.Adapter = {
         PREPARING_TIME = 5, -- Time to spend after a round is created where players can join the round
         SLAY_VOTES = 2, -- Minimum number of votes to slay someone, at which point they will be slain
         INTERMISSION_TIME = 10,
+        LOAD_LIGHTING_SETTINGS = true,
+        LOAD_TERRAIN_SETTINGS = true,
     },
 
     SetDefaultLighting = function()
