@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local ControlManager = require(script.Parent.ControlManager)
 local UIManager = require(script.Parent.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(script.Parent.UIManager.UnregisteredUIs.RoundInfo)
@@ -20,6 +21,9 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
     local hum = char:WaitForChild("Humanoid") :: Humanoid
     hum.Died:Once(function()
         script.Parent.ClientStorage:SetAttribute("IsSpectating", true)
+        ControlManager.Unregister("Primary Fire")
+		ControlManager.Unregister("Drop")
+		ControlManager.Unregister("Reload Weapon")
     end)
 
     roundInfo.Frame.HealthBar.Visible = true

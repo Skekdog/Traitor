@@ -6,6 +6,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -90,18 +91,17 @@ local module: Types.Adapter = {
             return
         end
 
-        local slot = item.Item:GetAttribute("Slot")
-        for _,v in plr:WaitForChild("Inventory"):GetChildren() do
-            if v:GetAttribute("Slot") == slot then
-                return "SlotError"
-            end
-        end
-        item.Item:Clone().Parent = plr:WaitForChild("Inventory", 0.001)
+        InventoryManager.AddEquipment(plr, item)
 
         return
     end,
 
     RemoveEquipment = function(participant, item)
+        InventoryManager.RemoveEquipment(participant.Player, item)
+    end,
+
+    ClearAllEquipment = function(participant)
+        InventoryManager.ClearInventory(participant.Player)
     end,
 
     CheckForUpdate = function(round)
