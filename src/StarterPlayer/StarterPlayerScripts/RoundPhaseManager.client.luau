@@ -100,12 +100,15 @@ local function update(roundPhase)
 
         sound.Parent = SoundService.RoundEndMusic
         sound:Play()
+
+        local highlights = UIManager.WaitForUI("Highlights").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Highlights)
+        highlights.Page.Highlights.Music.Text.Text = sound.Name
         
         fadeIn:Play()
 
         stopMusic = function()
             stopMusic = nil
-            if not sound then
+            if not sound or not sound.Parent then
                 return
             end
             fadeOut:Play()
