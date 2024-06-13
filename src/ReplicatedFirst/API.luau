@@ -10,22 +10,9 @@ local screenMessageFormats = {
 			TextScaled = true,
 			TextColor3 = Color3.new(1, 1, 1),
 			TextStrokeColor3 = Color3.new(0, 0, 0),
-			TextStrokeTransparency = 0.5,
-			FontFace = Font.fromName("SourceSansPro", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
-			BackgroundTransparency = 0.5,
-			RichText = true,
-
-			Size = UDim2.fromScale(0.2, 0.1),
-			Position = UDim2.fromScale(0.5, 0),
-			AnchorPoint = Vector2.new(0.5, 0.5),
-		},
-		TweenProperties = {  -- time, easingStyle, easingDirection, repeatCount, reverses, delayTime
-			3 :: any,
-			Enum.EasingStyle.Exponential,
-			Enum.EasingDirection.Out,
-			0,
-			false,
-			5
+			FontFace = Font.fromName("Ubuntu"),
+			BackgroundTransparency = 1,
+			RichText = false, -- If enabled, UIStroke does not apply
 		}
 	},
 	Error = {
@@ -33,8 +20,7 @@ local screenMessageFormats = {
 		InheritsFrom = "Standard",
 		LabelProperties = {
 			Text = "Error Message",
-			TextColor3 = Color3.new(1, 0, 0),
-			TextStrokeColor3 = Color3.new(0.9, 0.9, 0.9)
+			TextColor3 = Color3.new(1, 0, 0)
 		},
 	},
 	Info = {
@@ -50,8 +36,7 @@ local screenMessageFormats = {
 		InheritsFrom = "Standard",
 		LabelProperties = {
 			Text = "Success Message",
-			TextColor3 = Color3.new(0, 0.71, 0),
-			TextStrokeColor3 = Color3.new(0.5, 0.5, 0.5)
+			TextColor3 = Color3.new(0, 0.71, 0)
 		}
 	},
 	Warn = {
@@ -70,7 +55,7 @@ function module.LerpNumber(num1: number, num2: number, decimal: number): number 
 	return num1 + ((num2 - num1) * decimal)
 end
 
-function module.ScreenMessage(format: string, text: string, formatOverrides: {}?): TextLabel
+function module.ScreenMessage(format: string, text: string, formatOverrides: {[string]: any}?): TextLabel
 	local label = Instance.new("TextLabel")
 	
 	local inheritanceOrder = {}
@@ -87,8 +72,6 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {}?
 		end
 	end
 	
-	local tweenParams = {}
-	
 	for _, formatName in inheritanceOrder do
 		local formatTable = formatName == "__formatOverride" and formatOverrides or screenMessageFormats[formatName]
 		
@@ -97,21 +80,38 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {}?
 				(label :: any)[i] = v
 			end
 		end
-		
-		if formatTable.TweenProperties then
-			for i, v in formatTable.TweenProperties do
-				tweenParams[i] = v
-			end
-		end
 	end
 	
 	label.Text = text
-	label.Parent = (plr :: any).PlayerGui.Special:WaitForChild("ScreenMessage")
+
+	local gui: Frame = (plr :: any).PlayerGui.Special.ScreenMessage
+	label.Size = UDim2.fromScale(0.8, 0.05)
+	label.AnchorPoint = Vector2.new(0.5, 0)
+	label.Position = UDim2.fromScale(0.5, 0.05 * (#gui:GetChildren() + 1))
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 2
+	stroke.Parent = label
+
+	label.Parent = gui
 	
-	local tween = TS:Create(label, TweenInfo.new(table.unpack(tweenParams)), {
-		Position = UDim2.fromScale(0.5, -0.5)
+	local tween = TS:Create(label, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 3), {
+		BackgroundTransparency = 1,
+		TextTransparency = 1,
 	})
 	tween.Completed:Once(function()
+		for _, v: any in gui:GetChildren() do
+			local foundTween = v:FindFirstChildOfClass("Tween")
+			if foundTween then
+				foundTween:Cancel()
+				foundTween:Destroy()
+			end
+			local tween = TS:Create(v, TweenInfo.new(0.5), {
+				Position = UDim2.fromScale(0.5, v.Position.Y.Scale - 0.05)
+			})
+			tween.Parent = v
+			tween:Play()
+		end
 		label:Destroy()
 	end)
 	tween:Play()
