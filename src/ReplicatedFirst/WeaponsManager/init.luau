@@ -8,7 +8,8 @@ local RoundHandler = require(script.Parent.RoundHandler.RoundHandler) :: Types.S
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
 
-type BeforeHitFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> ()
+type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> ()
+type BeforeHitPartFunction = (attacker: Types.Participant?, hitPart: BasePart) -> ()
 type AimInfo = {
     FOV: number,
     HasScope: boolean?,
@@ -65,14 +66,16 @@ export type Weapon = {
     FiredSound: Sound,
     ReloadSound: Sound?,
 
-    BeforeHitParticipant: BeforeHitFunction?,
+    BeforeHitParticipant: BeforeHitParticipantFunction?,
+    BeforeHitPart: BeforeHitPartFunction?,
 }
 
 export type ExplosionInfo = {
     Radius: number,
     Pressure: number,
     Damage: number?,
-    BeforeHitParticipant: BeforeHitFunction?,
+    BeforeHitParticipant: BeforeHitParticipantFunction?,
+    BeforeHitPart: BeforeHitPartFunction?,
     FalloffStart: number?,
     FalloffEnd: number?,
     FalloffMultiplier: number?,
@@ -219,6 +222,8 @@ local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Par
         if mapProps and part:IsDescendantOf(mapProps) then
             local prop = round:GetProp(findPropAncestor(part, mapProps) :: Types.PropInstance)
             onEntityHit(round, weapon, attacker, prop, part.Name, rayResult.Distance)
+        elseif weapon.BeforeHitPart then
+            weapon.BeforeHitPart(attacker, part)
         end
     end
 end

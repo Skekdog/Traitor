@@ -10,6 +10,21 @@ local reloadSounds = ReplicatedStorage.WeaponSounds.Reload
 
 local bullet = projectiles.Bullet :: PVInstance
 
+local function burn(attacker: Types.Participant?, part: BasePart, callback: (fire: Fire, burnSound: Sound) -> ()): ()
+    if not attacker then
+        return
+    end
+
+    local fire = Instance.new("Fire")
+    fire.Size = 10
+    fire.Parent = part
+
+    local burnSound = ReplicatedStorage.WeaponSounds.FlareBurn:Clone()
+    burnSound.Parent = part :: any
+
+    callback(fire, burnSound)
+end
+
 local weapons: {[string]: WeaponsManager.Weapon} = {
     Grenade = {
         Name = "Grenade",
@@ -275,6 +290,84 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             end
 
             return true
+        end
+    },
+    ["Flare Gun"] = {
+        Name = "Flare Gun",
+        Description = "Ouch fire hot.",
+
+        Slot = 8,
+        CanDrop = true,
+
+        Damage = {
+            Head = 15,
+            Body = 10,
+            Limb = 5,
+        },
+
+        FalloffStart = 35,
+        FalloffEnd = 80,
+        FalloffMultiplier = 0.5,
+
+        Spread = 1,
+        Recoil = 0.3,
+
+        MultiUse = {
+            FireTime = 0.25,
+            ReloadTime = 1,
+            MaxReserve = 0,
+            MagazineSize = 6,
+        },
+
+        Model = models["Flare Gun"],
+        FiredSound = firedSounds["Flare Gun"],
+
+        ProjectileInfo = {
+            Base = bullet,
+            Speed = 140
+        },
+
+        AimInfo = {
+            FOV = 60,
+            SpreadMultiplier = 0.3
+        },
+
+        BeforeHitPart = function(attacker, part)
+            assert(part.Parent)
+            if part.Parent:IsA("Model") and part.Parent.Parent == workspace then
+                burn(attacker, part.Parent.PrimaryPart :: BasePart, function(fire, burnSound)
+                    local endTime = workspace:GetServerTimeNow() + 10
+                    task.spawn(function()
+                        while endTime > workspace:GetServerTimeNow() do
+                            burnSound:Play()
+                            task.wait(0.25)
+                        end
+                        burnSound:Destroy()
+                        fire:Destroy()
+                        part.Parent:Destroy()
+                    end)
+                end)
+            end
+        end,
+
+        BeforeHitParticipant = function(attacker, target, dead, hitPartName)
+            local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
+            if not humanoid then
+                return
+            end
+
+            burn(attacker, target.Character.PrimaryPart :: BasePart, function(fire, burnSound)
+                local endTime = workspace:GetServerTimeNow() + 10
+                task.spawn(function()
+                    while (endTime > workspace:GetServerTimeNow()) and (humanoid.Health > 0) do
+                        burnSound:Play()
+                        humanoid.Health -= 1
+                        task.wait(0.25)
+                    end
+                    burnSound:Destroy()
+                    fire:Destroy()
+                end)
+            end)
         end
     },
     SMG = {

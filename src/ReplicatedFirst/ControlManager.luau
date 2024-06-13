@@ -110,7 +110,7 @@ function module.SetupTouchButton(actionName)
 end
 
 -- Returns the Button if it was created
-function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> nil): ImageButton?
+function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> ()): ImageButton?
 	if not ReplicatedFirst:GetAttribute("ControlsReady") then
 		ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 	end

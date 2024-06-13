@@ -175,7 +175,7 @@ module.AvailableSettings = {
 		Tooltip = "Reloads the currently equipped weapon.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.R, nil :: any}, {Enum.KeyCode.ButtonX, nil :: any}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.R, nil :: any}, {Enum.KeyCode.ButtonX, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -185,7 +185,7 @@ module.AvailableSettings = {
 		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadDown}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadDown}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -204,7 +204,7 @@ module.AvailableSettings = {
 		Category = "Gameplay",
 		Tooltip = "General interaction",
 		PossibleValues = "Keybind",
-		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -214,7 +214,7 @@ module.AvailableSettings = {
 		Tooltip = "Spectates the next player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.DPadRight, nil :: any}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.DPadRight, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -224,7 +224,7 @@ module.AvailableSettings = {
 		Tooltip = "Spectates the previous player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadLeft, nil :: any}}, Toggled=false},
+		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadLeft, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	--{
