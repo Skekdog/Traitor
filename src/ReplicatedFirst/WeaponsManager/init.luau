@@ -176,7 +176,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.E
     explosion.Parent = workspace
 end
 
-function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo: Ray): ()
+function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo: Ray, noMultiShot: boolean?): ()
     local char = player.Character
     if not char then
         return
@@ -196,6 +196,12 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
     local hum = char:FindFirstChildOfClass("Humanoid")
     if not hum or hum.Health <= 0 then
         return
+    end
+
+    if not noMultiShot and weapon.BulletsPerShot and weapon.BulletsPerShot > 1 then
+        for _ = 1, weapon.BulletsPerShot do
+            module.Shoot(player, weapon, cameraRayInfo, true)
+        end
     end
 
     local firedSound = weapon.FiredSound:Clone()
