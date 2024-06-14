@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
+local Weapons = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager.Weapons)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -91,13 +92,13 @@ local module: Types.Adapter = {
             return
         end
 
-        InventoryManager.AddEquipment(plr, item)
+        InventoryManager.AddEquipment(plr, Weapons[item.Name])
 
         return
     end,
 
     RemoveEquipment = function(participant, item)
-        InventoryManager.RemoveEquipment(participant.Player, item)
+        InventoryManager.RemoveEquipment(participant.Player, Weapons[item.Name])
     end,
 
     ClearAllEquipment = function(participant)

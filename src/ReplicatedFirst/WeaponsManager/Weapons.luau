@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local WeaponsManager = require(script.Parent)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
+local WeaponsTypes = require(script.Parent.WeaponsTypes)
 
 local projectiles = ServerStorage.Projectiles
 local models = ReplicatedStorage.WeaponModels
@@ -25,7 +25,7 @@ local function burn(attacker: Types.Participant?, part: BasePart, callback: (fir
     task.spawn(callback, fire, burnSound)
 end
 
-local weapons: {[string]: WeaponsManager.Weapon} = {
+local weapons: {[string]: WeaponsTypes.Weapon} = {
     Grenade = {
         Name = "Grenade",
         Description = "Kaboom",

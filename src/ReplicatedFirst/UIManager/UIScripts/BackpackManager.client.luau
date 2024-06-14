@@ -4,15 +4,15 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(script.Parent.Parent.Parent.ControlManager)
 local InventoryManager = require(script.Parent.Parent.Parent.InventoryManager)
-local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
+local WeaponsTypes = require(ReplicatedFirst.WeaponsManager.WeaponsTypes)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local plr = Players.LocalPlayer
 local backpack = UIManager.WaitForUI("Backpack").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Backpack)
 
-local selectedEquipment: Types.Equipment?
+local selectedEquipment: WeaponsTypes.Weapon?
 
-local function unequip(equipment: Types.Equipment): ()
+local function unequip(equipment: WeaponsTypes.Weapon): ()
 	print("Unequipping", equipment.Name)
 	local found = backpack:FindFirstChild(equipment.Name) :: TextButton
 	if found then
@@ -23,7 +23,7 @@ local function unequip(equipment: Types.Equipment): ()
 end
 
 -- Surely there is a better way to do this
-local function switchToEquipment(equipment: Types.Equipment?)
+local function switchToEquipment(equipment: WeaponsTypes.Weapon?)
 	if equipment then
 		if equipment == selectedEquipment then
 			return unequip(equipment)
@@ -44,19 +44,19 @@ local function switchToEquipment(equipment: Types.Equipment?)
 	selectedEquipment = equipment
 end
 
-local slots: {[number]: Types.Equipment} = {}
-(ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: Types.Equipment)
+local slots: {[number]: WeaponsTypes.Weapon} = {}
+(ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: WeaponsTypes.Weapon)
 	if event == "Add" then
 		InventoryManager.AddEquipment(plr, equipment)
 		local clone = backpack.Sample:Clone()
 		clone.Text = equipment.Name
-		clone.TextLabel.Text = `[{equipment.Extras.Slot}]`
+		clone.TextLabel.Text = `[{equipment.Slot}]`
 		clone.Visible = true
 
-		clone.LayoutOrder = equipment.Extras.Slot
+		clone.LayoutOrder = equipment.Slot
 		clone.Name = equipment.Name
 
-		slots[equipment.Extras.Slot] = equipment
+		slots[equipment.Slot] = equipment
 		clone.MouseButton1Click:Connect(function()
 			switchToEquipment(equipment)
 		end)
@@ -66,7 +66,7 @@ local slots: {[number]: Types.Equipment} = {}
 		InventoryManager.RemoveEquipment(plr, equipment)
 		local found = backpack:FindFirstChild(equipment.Name)
 		if found then
-			slots[equipment.Extras.Slot] = nil
+			slots[equipment.Slot] = nil
 			found:Destroy()
 		end
 	end
@@ -106,7 +106,7 @@ do
 			return selectLowest()
 		end
 
-		local selectedSlot = selectedEquipment.Extras.Slot
+		local selectedSlot = selectedEquipment.Slot
 
 		if selectedSlot + 1 > table.maxn(slots) then
 			return selectLowest()

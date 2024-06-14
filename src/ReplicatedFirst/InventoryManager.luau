@@ -1,45 +1,45 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
+local WeaponsTypes = require(script.Parent.WeaponsManager.WeaponsTypes)
 local module = {}
 
 -- This can be used from both the client and the server.
 
-export type Inventory = {Types.Equipment}
+export type Inventory = {WeaponsTypes.Weapon}
 local inventories: {[Player]: Inventory} = {}
-local equipped: {[Player]: Types.Equipment?} = {}
+local equipped: {[Player]: WeaponsTypes.Weapon?} = {}
 
 export type InventoryEvent = "Add" | "Remove" | "Equip" | "Unequip"
-local listeners: {[InventoryEvent]: {((Player, Types.Equipment) -> ())}} = {Add = {}, Remove = {}, Equip = {}, Unequip = {}}
+local listeners: {[InventoryEvent]: {((Player, WeaponsTypes.Weapon) -> ())}} = {Add = {}, Remove = {}, Equip = {}, Unequip = {}}
 
 local IS_SERVER = RunService:IsServer()
 local IS_CLIENT = RunService:IsClient()
 
 type InventoryRemote = {
-    FireServer: (self: any, InventoryEvent, Types.EquipmentName) -> (),
-    FireClient: (self: any, Player, InventoryEvent, Types.Equipment) -> (),
-    OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, Types.EquipmentName?) -> ()) -> ()},
+    FireServer: (self: any, InventoryEvent, WeaponsTypes.WeaponName) -> (),
+    FireClient: (self: any, Player, InventoryEvent, WeaponsTypes.Weapon) -> (),
+    OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, WeaponsTypes.WeaponName?) -> ()) -> ()},
 }
 
 local invEvent = (ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent :: InventoryRemote
 
-local function runCallback(plr: Player, event: InventoryEvent, equipment: Types.Equipment)
+local function runCallback(plr: Player, event: InventoryEvent, equipment: WeaponsTypes.Weapon)
     for _, v in listeners[event] do
         v(plr, equipment)
     end
 end
 
-function module.HasEquipment(plr: Player, equipment: Types.Equipment): boolean
+function module.HasEquipment(plr: Player, equipment: WeaponsTypes.Weapon): boolean
     return table.find(inventories[plr], equipment) ~= nil
 end
 
-function module.AddEquipment(plr: Player, equipment: Types.Equipment)
+function module.AddEquipment(plr: Player, equipment: WeaponsTypes.Weapon)
     table.insert(inventories[plr], equipment)
     runCallback(plr, "Add", equipment)
 end
 
-function module.RemoveEquipment(plr: Player, equipment: Types.Equipment)
+function module.RemoveEquipment(plr: Player, equipment: WeaponsTypes.Weapon)
     table.remove(inventories[plr], table.find(inventories[plr], equipment))
     runCallback(plr, "Remove", equipment)
 end
@@ -48,11 +48,11 @@ function module.GetInventory(plr: Player): Inventory
     return inventories[plr]
 end
 
-function module.GetEquipped(plr: Player): Types.Equipment?
+function module.GetEquipped(plr: Player): WeaponsTypes.Weapon?
     return equipped[plr]
 end
 
-function module.Equip(plr: Player, equipment: Types.Equipment)
+function module.Equip(plr: Player, equipment: WeaponsTypes.Weapon)
     if IS_CLIENT then
        invEvent:FireServer("Equip", equipment.Name)
     else
@@ -71,7 +71,7 @@ function module.Equip(plr: Player, equipment: Types.Equipment)
     runCallback(plr, "Equip", equipment)
 end
 
-function module.Unequip(plr: Player, equipment: Types.Equipment)
+function module.Unequip(plr: Player, equipment: WeaponsTypes.Weapon)
     if IS_CLIENT then
         invEvent:FireServer("Unequip", equipment.Name)
     else
@@ -88,7 +88,7 @@ function module.Unequip(plr: Player, equipment: Types.Equipment)
     runCallback(plr, "Unequip", equipment)
 end
 
-function module.Drop(plr: Player, equipment: Types.Equipment)
+function module.Drop(plr: Player, equipment: WeaponsTypes.Weapon)
     module.RemoveEquipment(plr, equipment)
 end
 
@@ -99,7 +99,7 @@ function module.ClearInventory(plr: Player)
     table.clear(inventories[plr])
 end
 
-function module.Listen(event: InventoryEvent, callback: (Player, Types.Equipment) -> ()): () -> ()
+function module.Listen(event: InventoryEvent, callback: (Player, WeaponsTypes.Weapon) -> ()): () -> ()
     table.insert(listeners[event], callback)
     return function()
         table.remove(listeners[event], table.find(listeners[event], callback))
@@ -118,7 +118,7 @@ if IS_SERVER then
         equipped[plr] = nil
     end)
 
-    local function fireClient(plr: Player, event: InventoryEvent, equipment: Types.Equipment)
+    local function fireClient(plr: Player, event: InventoryEvent, equipment: WeaponsTypes.Weapon)
         invEvent:FireClient(plr, event, equipment)
     end
 
@@ -129,13 +129,13 @@ if IS_SERVER then
         fireClient(plr, "Remove", equipment)
     end)
 
-    invEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryEvent?, equipmentName: Types.EquipmentName?)
+    invEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryEvent?, equipmentName: WeaponsTypes.WeaponName?)
         if typeof(equipmentName) ~= "string" then
             return
         end
 
         local inventory = inventories[plr]
-        local foundEquipment: Types.Equipment?
+        local foundEquipment: WeaponsTypes.Weapon?
         for _, v in inventory do
             if v.Name == equipmentName then
                 foundEquipment = v

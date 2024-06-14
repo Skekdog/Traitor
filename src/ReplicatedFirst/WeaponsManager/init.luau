@@ -5,82 +5,13 @@ local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(script.Parent.RoundHandler.RoundHandler) :: Types.ServerRoundHandler
+local WeaponsTypes = require(script.WeaponsTypes)
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
 
-type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> boolean?
-type AimInfo = {
-    FOV: number,
-    HasScope: boolean?,
-    ScopeRequired: boolean?,
-    SpreadMultiplier: number,
-}
-type DamageInfo = number | {
-    Head: number,
-    Body: number,
-    Limb: number,
-}
-type MultiUseInfo = {
-    FireTime: number, -- Delay between firing
-    ReloadTime: number,
-    MaxReserve: number,
-    MagazineSize: number,
-    AmmoType: AmmoType?,
-}
-type ProjectileInfo = {
-    Base: PVInstance,
-    Speed: number,
-}
-
-type Entity = Types.Participant | Types.Prop
-
-export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
-export type Weapon = {
-    Name: string,
-    Description: string,
-
-    Slot: number,
-    CanDrop: boolean,
-
-    Damage: DamageInfo,
-
-    FalloffStart: number,
-    FalloffEnd: number,
-    FalloffMultiplier: number,
-
-    ExplosionInfo: ExplosionInfo?,
-    FuseTime: number?,
-
-    AimInfo: AimInfo | false,
-
-    Recoil: number,
-    Spread: number,
-    
-    MultiUse: MultiUseInfo | false,
-    BulletsPerShot: number?,
-
-    ProjectileInfo: ProjectileInfo | false,
-
-    Model: Model,
-    FiredSound: Sound,
-    ReloadSound: Sound?,
-
-    BeforeHitParticipant: BeforeHitParticipantFunction?,
-}
-
-export type ExplosionInfo = {
-    Radius: number,
-    Pressure: number,
-    Damage: number?,
-    BeforeHitParticipant: BeforeHitParticipantFunction?,
-    FalloffStart: number?,
-    FalloffEnd: number?,
-    FalloffMultiplier: number?,
-}
-
 local module = {}
 
-local function calculateDamage(attacker: Types.Participant?, weapon: Weapon, partName: string, distance: number): number
+local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsTypes.Weapon, partName: string, distance: number): number
     local damage: number
     if type(weapon.Damage) == "table" then
         if partName == "Head" then
@@ -105,7 +36,7 @@ local function calculateDamage(attacker: Types.Participant?, weapon: Weapon, par
     return damage
 end
 
-local function onEntityHit(round: Types.Round, weapon: Weapon, attacker: Types.Participant?, entity: Entity, partName: string, distance: number): ()
+local function onEntityHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attacker: Types.Participant?, entity: WeaponsTypes.Entity, partName: string, distance: number): ()
     local damage = calculateDamage(attacker, weapon, partName, distance)
 
     local hum: Humanoid?
@@ -167,7 +98,7 @@ local function findPropAncestor(prop: Instance, propsFolder: Folder): Types.Prop
     end
 end
 
-local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Participant?, rayResult: RaycastResult): ()
+local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attacker: Types.Participant?, rayResult: RaycastResult): ()
     if round:IsRoundPreparing() then
         return
     end
@@ -223,8 +154,8 @@ local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Par
     end
 end
 
--- Weapon may be nil if it is e.g. an explosive barrel
-function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo, attacker: Types.Participant?, weapon: Weapon?): ()
+-- WeaponsTypes.Weapon may be nil if it is e.g. an explosive barrel
+function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.ExplosionInfo, attacker: Types.Participant?, weapon: WeaponsTypes.Weapon?): ()
     local explosion = Instance.new("Explosion")
     explosion.BlastRadius = explosionInfo.Radius
     explosion.BlastPressure = explosionInfo.Pressure
@@ -245,7 +176,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ExplosionInfo,
     explosion.Parent = workspace
 end
 
-function module.Shoot(player: Player, weapon: Weapon, cameraRayInfo: Ray): ()
+function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo: Ray): ()
     local char = player.Character
     if not char then
         return

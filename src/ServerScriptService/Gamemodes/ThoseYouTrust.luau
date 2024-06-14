@@ -157,9 +157,6 @@ local module: Types.Gamemode = {
             Description = "Become a Gordonite",
             Icon = "rbxassetid://",
             AttackType = "Blunt",
-            Extras = {
-                Slot = 1,
-            },
 
             Item = items.Crowbar
         },
@@ -168,9 +165,6 @@ local module: Types.Gamemode = {
             Description = "Reliable",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
-            Extras = {
-                Slot = 2,
-            },
 
             Item = items.Pistol
         },
@@ -179,9 +173,6 @@ local module: Types.Gamemode = {
             Description = "pewpewpew",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
-            Extras = {
-                Slot = 3,
-            },
 
             Item = items.Pistol
         },
@@ -190,9 +181,6 @@ local module: Types.Gamemode = {
             Description = "One shot. Don't fumble it.",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
-            Extras = {
-                Slot = 7,
-            },
 
             Item = items["Golden Gun"]
         },
@@ -201,9 +189,6 @@ local module: Types.Gamemode = {
             Description = "Ouch fire hot.",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
-            Extras = {
-                Slot = 8,
-            },
 
             Item = items["Flare Gun"]
         },
@@ -214,9 +199,6 @@ local module: Types.Gamemode = {
             Icon = "rbxassetid://",
             MaxStock = 1,
             AttackType = "Explosion",
-            Extras = {
-                Slot = 7,
-            },
 
             Item = items.Grenade
         },
