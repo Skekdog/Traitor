@@ -172,7 +172,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         Name = "Pistol",
         Description = "Pew",
 
-        Slot = 3,
+        Slot = 2,
         CanDrop = true,
 
         Damage = {

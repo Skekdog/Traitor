@@ -93,10 +93,10 @@ function module.Drop(plr: Player, equipment: WeaponsTypes.Weapon)
 end
 
 function module.ClearInventory(plr: Player)
-    for _, v in inventories[plr] do
-        runCallback(plr, "Remove", v)
+    local equipment = inventories[plr]
+    for i = #equipment, 1, -1 do
+        module.RemoveEquipment(plr, equipment[i])
     end
-    table.clear(inventories[plr])
 end
 
 function module.Listen(event: InventoryEvent, callback: (Player, WeaponsTypes.Weapon) -> ()): () -> ()

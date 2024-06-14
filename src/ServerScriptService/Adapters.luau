@@ -190,6 +190,7 @@ local module: Types.Adapter = {
 
     OnDeath = function(victim)
         local char = victim.Character
+        local plr = victim.Player
         if not char:IsDescendantOf(workspace) then
             return
         end
@@ -199,6 +200,15 @@ local module: Types.Adapter = {
 
         local root = clone:FindFirstChild("HumanoidRootPart") :: Part?
         local hum = clone:FindFirstChildOfClass("Humanoid")
+
+        local equipment = InventoryManager.GetInventory(plr)
+        for i = #equipment, 1, -1 do
+            if equipment[i].CanDrop then
+                InventoryManager.Drop(plr, equipment[i])
+            else
+                InventoryManager.RemoveEquipment(plr, equipment[i])
+            end
+        end
 
         if hum then
             hum:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
