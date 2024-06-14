@@ -200,6 +200,9 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
 
     local firedSound = weapon.FiredSound:Clone()
     firedSound.Parent = char.PrimaryPart
+    firedSound.Ended:Once(function()
+        firedSound:Destroy()
+    end)
     firedSound:Play()
 
     local origin = char:GetPivot().Position

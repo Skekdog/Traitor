@@ -69,6 +69,14 @@ local slots: {[number]: WeaponsTypes.Weapon} = {}
 			slots[equipment.Slot] = nil
 			found:Destroy()
 		end
+
+		if selectedEquipment and equipment.Name == selectedEquipment.Name then
+			selectedEquipment = nil
+		end
+	elseif event == "Unequip" then
+		if selectedEquipment and equipment.Name == selectedEquipment.Name then
+			selectedEquipment = nil
+		end
 	end
 end)
 

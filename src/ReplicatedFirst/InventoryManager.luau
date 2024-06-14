@@ -40,6 +40,7 @@ function module.AddEquipment(plr: Player, equipment: WeaponsTypes.Weapon)
 end
 
 function module.RemoveEquipment(plr: Player, equipment: WeaponsTypes.Weapon)
+    module.Unequip(plr, equipment)
     table.remove(inventories[plr], table.find(inventories[plr], equipment))
     runCallback(plr, "Remove", equipment)
 end
@@ -76,7 +77,7 @@ function module.Unequip(plr: Player, equipment: WeaponsTypes.Weapon)
         invEvent:FireServer("Unequip", equipment.Name)
     else
         local old = equipped[plr]
-        if old ~= equipment or not old then
+        if old ~= equipment then
             return
         end
 
