@@ -37,13 +37,14 @@ Players.PlayerAdded:Connect(function(plr)
             end
             ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
         elseif msg == "!restart" and plr.UserId == meId then
-            ServerScriptService.PlayerSetup.ReleaseAllProfiles:Fire()
-            task.wait(5)
-            local acc, _ = TeleportService:ReserveServer(game.PlaceId)
-            TeleportService:TeleportToPrivateServer(game.PlaceId, acc, Players:GetPlayers())
+            pcall(function()
+                ServerScriptService.PlayerSetup.ReleaseAllProfiles:Fire()
+                task.wait(5)
+            end)
             Players.PlayerAdded:Connect(function(plr)
                 plr:Kick("This server is shutting down for an update.")
             end)
+            TeleportService:TeleportPartyAsync(game.PlaceId, Players:GetPlayers())
         end
     end)
 end)

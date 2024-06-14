@@ -8,8 +8,7 @@ local RoundHandler = require(script.Parent.RoundHandler.RoundHandler) :: Types.S
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
 
-type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> ()
-type BeforeHitPartFunction = (attacker: Types.Participant?, hitPart: BasePart) -> ()
+type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> boolean?
 type AimInfo = {
     FOV: number,
     HasScope: boolean?,
@@ -67,7 +66,6 @@ export type Weapon = {
     ReloadSound: Sound?,
 
     BeforeHitParticipant: BeforeHitParticipantFunction?,
-    BeforeHitPart: BeforeHitPartFunction?,
 }
 
 export type ExplosionInfo = {
@@ -75,7 +73,6 @@ export type ExplosionInfo = {
     Pressure: number,
     Damage: number?,
     BeforeHitParticipant: BeforeHitParticipantFunction?,
-    BeforeHitPart: BeforeHitPartFunction?,
     FalloffStart: number?,
     FalloffEnd: number?,
     FalloffMultiplier: number?,
@@ -222,8 +219,6 @@ local function onPartHit(round: Types.Round, weapon: Weapon, attacker: Types.Par
         if mapProps and part:IsDescendantOf(mapProps) then
             local prop = round:GetProp(findPropAncestor(part, mapProps) :: Types.PropInstance)
             onEntityHit(round, weapon, attacker, prop, part.Name, rayResult.Distance)
-        elseif weapon.BeforeHitPart then
-            weapon.BeforeHitPart(attacker, part)
         end
     end
 end
@@ -273,8 +268,8 @@ function module.Shoot(player: Player, weapon: Weapon, cameraRayInfo: Ray): ()
     end
 
     local firedSound = weapon.FiredSound:Clone()
-    firedSound.Parent = char
-    firedSound:Destroy()
+    firedSound.Parent = char.PrimaryPart
+    firedSound:Play()
 
     local origin = char:GetPivot().Position
 

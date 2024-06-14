@@ -94,8 +94,9 @@ end
 
 function module.ClearInventory(plr: Player)
     for _, v in inventories[plr] do
-        module.RemoveEquipment(plr, v)
+        runCallback(plr, "Remove", v)
     end
+    table.clear(inventories[plr])
 end
 
 function module.Listen(event: InventoryEvent, callback: (Player, Types.Equipment) -> ()): () -> ()

@@ -22,7 +22,7 @@ local function burn(attacker: Types.Participant?, part: BasePart, callback: (fir
     local burnSound = ReplicatedStorage.WeaponSounds.FlareBurn:Clone()
     burnSound.Parent = part :: any
 
-    callback(fire, burnSound)
+    task.spawn(callback, fire, burnSound)
 end
 
 local weapons: {[string]: WeaponsManager.Weapon} = {
@@ -332,42 +332,23 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             SpreadMultiplier = 0.3
         },
 
-        BeforeHitPart = function(attacker, part)
-            assert(part.Parent)
-            if part.Parent:IsA("Model") and part.Parent.Parent == workspace then
-                burn(attacker, part.Parent.PrimaryPart :: BasePart, function(fire, burnSound)
-                    local endTime = workspace:GetServerTimeNow() + 10
-                    task.spawn(function()
-                        while endTime > workspace:GetServerTimeNow() do
-                            burnSound:Play()
-                            task.wait(0.25)
-                        end
-                        burnSound:Destroy()
-                        fire:Destroy()
-                        part.Parent:Destroy()
-                    end)
-                end)
-            end
-        end,
-
         BeforeHitParticipant = function(attacker, target, dead, hitPartName)
             local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
             if not humanoid then
                 return
             end
 
-            burn(attacker, target.Character.PrimaryPart :: BasePart, function(fire, burnSound)
-                local endTime = workspace:GetServerTimeNow() + 10
-                task.spawn(function()
-                    while (endTime > workspace:GetServerTimeNow()) and (humanoid.Health > 0) do
-                        burnSound:Play()
-                        humanoid.Health -= 1
-                        task.wait(0.25)
-                    end
-                    burnSound:Destroy()
-                    fire:Destroy()
-                end)
+            local endTime = workspace:GetServerTimeNow() + 10
+            burn(attacker, target.Character.PrimaryPart :: BasePart,function(fire, burnSound)
+                while (endTime > workspace:GetServerTimeNow()) and (humanoid.Health > 0) and humanoid.Parent do
+                    burnSound:Play()
+                    humanoid.Health -= 1
+                    task.wait(0.25)
+                end
+                burnSound:Destroy()
+                fire:Destroy()
             end)
+            return
         end
     },
     SMG = {
@@ -529,7 +510,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
         FiredSound = firedSounds.Flashbang,
 
         BeforeHitParticipant = function(_, victim)
-            ReplicatedStorage.ServerClient.Flashbang:FireClient(victim.Player)
+            return ReplicatedStorage.ServerClient.Flashbang:FireClient(victim.Player)
         end
     },
     ["Silenced Pistol"] ={
@@ -584,6 +565,7 @@ local weapons: {[string]: WeaponsManager.Weapon} = {
             if deathSound then
                 deathSound.Volume = 0
             end
+            return
         end
     },
     XM1014 = {
