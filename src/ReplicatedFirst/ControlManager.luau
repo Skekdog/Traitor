@@ -104,8 +104,8 @@ function module.SetupTouchButton(actionName)
 		butt:SetAttribute("Style", "Primary")
 		butt:SetAttribute("StyleData", "UpdateImage")
 
-		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(butt)
-		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(actionText)
+		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(butt, nil, true)
+		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(actionText, nil, true)
 	end
 end
 

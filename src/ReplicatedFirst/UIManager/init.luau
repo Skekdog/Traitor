@@ -271,12 +271,12 @@ UIManager.Themes = {
 }
 
 local THEME_TRANSITION_TIME = 0.25
-function UIManager.UpdateThemeInstance(v: Instance, theme): ()
+function UIManager.UpdateThemeInstance(v: Instance, theme, noTransition: boolean?): ()
 	-- Updates the theme for one instance
 	-- Tag StyledUI means that a UI object will be updated to match the theme
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
 	
-	local tweenInfo = TweenInfo.new(requestSetting:Invoke("Animate UI Transitions") and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+	local tweenInfo = TweenInfo.new((requestSetting:Invoke("Animate UI Transitions") and not noTransition) and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
 	theme = theme or UIManager.Themes.Dark
 	
 	local styleData = (v:GetAttribute("StyleData") or ""):split(";")
