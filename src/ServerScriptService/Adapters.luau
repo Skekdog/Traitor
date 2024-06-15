@@ -190,6 +190,7 @@ local module: Types.Adapter = {
     OnDeath = function(victim)
         local char = victim.Character
         local plr = victim.Player
+        local round = victim.Round
         if not char:IsDescendantOf(workspace) then
             return
         end
@@ -220,6 +221,28 @@ local module: Types.Adapter = {
         end
 
         char:Destroy()
+
+        local corpseInfo = victim:ViewCorpse()
+        local function sendCorpseInfo(plr: Player)
+            remotes.SendCorpseInfo:FireClient(plr, corpseInfo)
+        end
+
+        local searchPrompt = ServerStorage.SearchCorpse:Clone() :: ProximityPrompt
+        searchPrompt.Parent = clone
+        searchPrompt.Triggered:Connect(function(plr)
+            local participant = round:GetParticipant(plr.Name)
+            if not participant or not plr.Character or not root then
+                return sendCorpseInfo(plr)
+            end
+
+            if plr:DistanceFromCharacter(root.Position) > 5 then
+                return
+            end
+
+            participant:SearchCorpse(victim)
+            sendCorpseInfo(plr)
+        end)
+
         clone.Parent = workspace
 
         victim.Character = clone
