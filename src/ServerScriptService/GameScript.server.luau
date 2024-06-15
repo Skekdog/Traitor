@@ -54,19 +54,13 @@ remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: string?)
 
 	local round = RoundHandler.GetRound(roundId)
 	local targetParticipant = round:GetParticipant(target)
+	local participant = round:GetParticipant(plr.Name)
 
-	if not targetParticipant then
+	if not targetParticipant or not participant then
 		return
 	end
 
-	local root = targetParticipant.Character:FindFirstChild("HumanoidRootPart") :: BasePart?
-
-	local participant = round:GetParticipant(plr.Name)
-	if not participant or not plr.Character or not root then
-		return remotes.SendCorpseInfo:FireClient(plr, targetParticipant:ViewCorpse())
-	end
-
-	if plr:DistanceFromCharacter(root.Position) > 5 then
+	if not table.find(targetParticipant.SearchedBy, participant) then
 		return
 	end
 
