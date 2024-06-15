@@ -153,7 +153,7 @@ joinRound.OnServerInvoke = function(plr)
 						bestVotes = #v
 					end
 				end
-				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructure) or (ServerStorage.Maps:GetChildren()[math.random(1, #ServerStorage.Maps:GetChildren())] :: Types.MapStructure)
+				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructureCast) or (ServerStorage.Maps:GetChildren()[math.random(1, #ServerStorage.Maps:GetChildren())] :: Types.MapStructureCast)
 			end
 		
 			roundEventCon:Disconnect()
