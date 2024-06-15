@@ -4,7 +4,7 @@ local textInput = {}
 local index = 0
 function textInput.Create(text: string, inputType: "Number", range: string, context: string): any?
 	index = index + 1
-	local clone = script:FindFirstChild("TextInput"):Clone()
+	local clone = script.TextInput:Clone()
 	local can = clone.Darken.CancelButton
 	local but = clone.Darken.TextButton
 	local box = clone.Darken.TextBox

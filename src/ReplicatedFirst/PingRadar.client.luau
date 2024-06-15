@@ -12,13 +12,23 @@ ReplicatedFirst.ClientStorage.ScriptConnections.PingRadarEvent.Event:Connect(fun
 		if v.Player == plr then
 			continue
 		end
-		local char: any = v.Player.Character
-		if char and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
-			local clone = ReplicatedStorage.RadarPoint:Clone()
-			clone:PivotTo(char.HumanoidRootPart.CFrame)
-			clone.RadarPoint.TextLabel.Text = tostring(math.round(plr:DistanceFromCharacter(char.HumanoidRootPart.Position)))
-			clone.RadarPoint.Enabled = true
-			clone.Parent = workspace.RadarPoints :: any
+
+		local char = v.Player.Character
+		if not char then
+			continue
 		end
+
+		local root = char:FindFirstChild("HumanoidRootPart") :: BasePart
+		local hum = char:FindFirstChildOfClass("Humanoid")
+
+		if not root or not hum or hum.Health <= 0 then
+			continue
+		end
+
+		local clone = ReplicatedStorage.RadarPoint:Clone()
+		clone:PivotTo(root.CFrame)
+		clone.RadarPoint.TextLabel.Text = tostring(math.round(plr:DistanceFromCharacter(root.Position)))
+		clone.RadarPoint.Enabled = true
+		clone.Parent = workspace.RadarPoints :: any
 	end
 end)
