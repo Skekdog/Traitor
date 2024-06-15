@@ -86,7 +86,7 @@ local function createPlr(plr: Player)
 	clone.SearchedIcon.Visible = plr:GetAttribute("Searched")
 	clone.MouseButton1Click:Connect(function()
 		if (clone.LayoutOrder // 1000) == layoutOrders["Dead"] or (clone.LayoutOrder // 1000) == layoutOrders["Missing"] then
-			ReplicatedStorage.ClientServer.GetCorpseInfo:FireServer(plr.Name)
+			ReplicatedStorage.RoundHandler.GetCorpseInfo:FireServer(plr.Name)
 		end
 	end)
 

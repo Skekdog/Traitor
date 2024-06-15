@@ -46,6 +46,33 @@ for _, v in script.Parent.Gamemodes:GetChildren() do
 	end
 end
 
+remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: string?)
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId or not target then
+		return
+	end
+
+	local round = RoundHandler.GetRound(roundId)
+	local targetParticipant = round:GetParticipant(target)
+
+	if not targetParticipant then
+		return
+	end
+
+	local root = targetParticipant.Character:FindFirstChild("HumanoidRootPart") :: BasePart?
+
+	local participant = round:GetParticipant(plr.Name)
+	if not participant or not plr.Character or not root then
+		return remotes.SendCorpseInfo:FireClient(plr, targetParticipant:ViewCorpse())
+	end
+
+	if plr:DistanceFromCharacter(root.Position) > 5 then
+		return
+	end
+
+	remotes.SendCorpseInfo:FireClient(plr, targetParticipant:ViewCorpse())
+end)
+
 local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructure
 
