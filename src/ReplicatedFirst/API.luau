@@ -55,6 +55,18 @@ function module.LerpNumber(num1: number, num2: number, decimal: number): number 
 	return num1 + ((num2 - num1) * decimal)
 end
 
+local vowels = {"a", "e", "i", "o", "u"}
+function module.StringWithDeterminer(str: string): string
+	local lowered = str:lower()
+
+	local determiner = "a "
+	if table.find(vowels, lowered:sub(1)) then
+		determiner = "an "
+	end
+
+	return determiner..str
+end
+
 function module.ScreenMessage(format: string, text: string, formatOverrides: {[string]: any}?): TextLabel
 	local label = Instance.new("TextLabel")
 	
@@ -120,7 +132,7 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {[s
 end
 
 function module.TransitionUIPage(currentPage: GuiObject, currentPageOrder: number, newPage: GuiObject, newPageOrder: number, targetPosition: UDim2)
-	local requestSetting = script.Parent.SettingsManager:FindFirstChild("RequestSetting")
+	local requestSetting = script.Parent.SettingsManager.RequestSetting
 	-- If new page is to the right, then the new page should be positioned on the right
 	-- and current page should slide to the left
 	local goRight = newPageOrder > currentPageOrder
@@ -181,9 +193,9 @@ end
 
 function module.TransitionUIState(frame: GuiObject, open: boolean)
 	-- If open is true, open animation should play, otherwise close
-	local requestSetting = script.Parent.SettingsManager:FindFirstChild("RequestSetting")
+	local requestSetting = script.Parent.SettingsManager.RequestSetting
 	
-	local oldTween: Tween = frame:FindFirstChild("StateTransitionTween") :: Tween
+	local oldTween = frame:FindFirstChild("StateTransitionTween") :: Tween
 	if oldTween then
 		oldTween:Cancel()
 		oldTween:Destroy()

@@ -44,20 +44,6 @@ for _, v in ReplicatedStorage.Items:GetChildren() do
 end
 weapons["Explosion"] = true
 
-flavourText = {
-	Crush = "Many of their bones are broken. It seems the impact of a heavy object killed them.",
-	Bullet = "It is obvious that they were shot to death. Moreover, it appears a%s was used.",
-	Fall = "Their injuries indicate a fatal fall.",
-	Explosion = "Their wounds and singed clothes indicate that an explosion brought about their demise.",
-	Blunt = "The body is bruised and battered. Evidently some blunt-force trauma was at hand.",
-	Drown = "Their drenched clothes and lack of struggle indicates a watery fate.",
-	Stab = "They were stabbed and cut before quickly bleeding to death.",
-	Burn = "Smells of burnt spy around here...",
-	Teleporter = "It seems their DNA was mutated by teleporter emissions.",
-	Other = "It is unclear what caused this spy's demise.",
-	Suicide = "This spy couldn't take it anymore and took their own life.",
-}
-
 local function showCorpse(info)
 	avatar.Image = game:GetService("Players"):GetUserThumbnailAsync(info.UserID, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 

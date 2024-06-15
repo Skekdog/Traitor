@@ -6,6 +6,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local API = require(script.Parent.Parent.ReplicatedFirst.API)
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local Weapons = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager.Weapons)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
@@ -16,18 +17,6 @@ local getProfile = ServerScriptService.PlayerSetup.GetProfile
 local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile
 
 local remotes = ReplicatedStorage.RoundHandler
-
-local vowels = {"a", "e", "i", "o", "u"}
-local function stringWithDeterminer(str: string): string
-    local lowered = str:lower()
-
-    local determiner = "a "
-    if table.find(vowels, lowered:sub(1)) then
-        determiner = "an "
-    end
-
-    return determiner..str
-end
 
 local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
 
@@ -223,24 +212,24 @@ local module: Types.Adapter = {
         char:Destroy()
 
         local corpseInfo = victim:ViewCorpse()
-        local function sendCorpseInfo(plr: Player)
-            remotes.SendCorpseInfo:FireClient(plr, corpseInfo)
+        local function sendCorpseInfo(to: Player)
+            remotes.SendCorpseInfo:FireClient(to, corpseInfo)
         end
 
         local searchPrompt = ServerStorage.SearchCorpse:Clone() :: ProximityPrompt
         searchPrompt.Parent = clone
-        searchPrompt.Triggered:Connect(function(plr)
-            local participant = round:GetParticipant(plr.Name)
-            if not participant or not plr.Character or not root then
-                return sendCorpseInfo(plr)
+        searchPrompt.Triggered:Connect(function(to)
+            local participant = round:GetParticipant(to.Name)
+            if not participant or not to.Character or not root then
+                return sendCorpseInfo(to)
             end
 
-            if plr:DistanceFromCharacter(root.Position) > 5 then
+            if to:DistanceFromCharacter(root.Position) > 5 then
                 return
             end
 
             participant:SearchCorpse(victim)
-            sendCorpseInfo(plr)
+            sendCorpseInfo(to)
         end)
 
         clone.Parent = workspace
@@ -319,7 +308,7 @@ local module: Types.Adapter = {
                 end
             elseif type(weapon) == "table" then
                 local attack = weapon.AttackType
-                local name = stringWithDeterminer(weapon.Name)
+                local name = API.StringWithDeterminer(weapon.Name)
                 if attack == "Blade" then
                     text ..= ` was stabbed by {name}`
                 elseif attack == "Blunt" then
