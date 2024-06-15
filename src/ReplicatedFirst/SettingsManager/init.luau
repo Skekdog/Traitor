@@ -40,7 +40,7 @@ export type Setting = KeybindSetting | string | boolean | UDim2 | number -- Sele
 local module = {}
 
 local function keybindCallback(val, name)
-	local updated = script:FindFirstChild("SettingUpdated")
+	local updated = script.SettingUpdated
 	updated:Fire(name, val)
 end
 

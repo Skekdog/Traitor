@@ -5,7 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
-local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler) :: Types.ClientRoundHandler
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
@@ -31,10 +30,10 @@ local stopMusic: (() -> ())?
 type EquipmentShopType = UIManager.UI & {Object: typeof(ReplicatedFirst.UIManager.UnregisteredUIs["Equipment Shop"])}
 local equipmentShop: EquipmentShopType?
 local function update(roundPhase)
-    local participant: Types.Participant? = LocalRoundInfo.GetOwnParticipant()
+    local participant: Types.ClientOwnParticipant? = LocalRoundInfo.GetOwnParticipant()
     local ownRole: Types.Role?
     if participant then
-        ownRole = participant.Role
+        ownRole = LocalRoundInfo.GetRole(participant.Role)
     end
 
     if roundPhase == "Destroy" then
@@ -65,25 +64,25 @@ local function update(roundPhase)
 
     if roundPhase == "Playing" then
         if ownRole and participant then
-            local participants: {Types.PartialParticipant} = LocalRoundInfo.GetAllParticipants()
+            -- local participants = LocalRoundInfo.GetAllParticipants()
 
-            if ownRole.HighlightRoles then
-                local highlightRoles = {}
-                for _, v in ownRole.HighlightRoles do
-                    table.move(RoundHandler.GetRolesMatchingRelationship(LocalRoundInfo.GetAllRoles() or {}, ownRole, v), 1, #highlightRoles, #highlightRoles + 1, highlightRoles)
-                end
+            -- if ownRole.HighlightRoles then
+            --     local highlightRoles = {}
+            --     for _, v in ownRole.HighlightRoles do
+            --         table.move(RoundHandler.GetRolesMatchingRelationship(LocalRoundInfo.GetAllRoles() or {}, ownRole, v), 1, #highlightRoles, #highlightRoles + 1, highlightRoles)
+            --     end
 
-                for _, role in highlightRoles do
-                    for _, p in RoundHandler.GetParticipantsWithRole(participants, role, participant) do
-                        local clone = Instance.new("Highlight")
-                        CollectionService:AddTag(clone, "AllyMarker")
-                        clone.FillTransparency = 1
-                        clone.OutlineColor = role.Colour
-                        clone.OutlineTransparency = 0
-                        clone.Parent = p.Player.Character
-                    end
-                end
-            end
+            --     for _, role in highlightRoles do
+            --         for _, p in RoundHandler.GetParticipantsWithRole(participants, role, participant) do
+            --             local clone = Instance.new("Highlight")
+            --             CollectionService:AddTag(clone, "AllyMarker")
+            --             clone.FillTransparency = 1
+            --             clone.OutlineColor = role.Colour
+            --             clone.OutlineTransparency = 0
+            --             clone.Parent = p.Player.Character
+            --         end
+            --     end
+            -- end
         end
     elseif roundPhase == "Highlights" then
         local endInfo = LocalRoundInfo.GetRoundEndInfo()
@@ -160,22 +159,27 @@ task.spawn(function()
 end)
 
 LocalRoundInfo.Listen("TimeMilestone", function(time)
-    timeTarget = time
+    timeTarget = time :: number
 end)
 
 LocalRoundInfo.Listen("IsPaused", function(isPaused)
     lastTime = roundInfo.TopBar.Timer.Text
-    paused = isPaused
+    paused = isPaused :: boolean
 end)
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Participant?)
-    if not participant or participant.Role.Name == "" then
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
+    local participant = p :: Types.ClientOwnParticipant
+
+    local role
+    if participant then
+        role = LocalRoundInfo.GetRole(participant.Role)
+    end
+    if not participant or role.Name == "" then
         roundInfo.TopBar.Role.TextColor3 = Color3.new(1, 1, 1)
         roundInfo.TopBar.Role.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
         return
     end
 
-    local role = participant.Role
     roundInfo.TopBar.Role.Text = role.Name
     roundInfo.TopBar.Role.TextColor3 = role.Colour
 

@@ -43,7 +43,7 @@ game:GetService("RunService").Heartbeat:Connect(function() --cant do getproperty
 	local participant = LocalRoundInfo.GetParticipantInfo(plr.Name)
 	if not participant then return end
 
-	local role = participant.Role
+	local role = LocalRoundInfo.GetRole(participant.Role)
 	ui:FindFirstChild("Name").Text = plr.Name
 
 	local healthPercent = health / hum.MaxHealth * 100

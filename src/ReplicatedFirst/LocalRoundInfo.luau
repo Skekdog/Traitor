@@ -20,20 +20,25 @@ function module.GetStartTime(): number
     return get("RoundStartTime")
 end
 
-local participants: {[string]: Types.PartialParticipant?} = {}
-function module.GetParticipantInfo(name: string): Types.PartialParticipant?
+local participants: {[string]: Types.ClientParticipant?} = {}
+function module.GetParticipantInfo(name: string): Types.ClientParticipant?
     return participants[name]
 end
 
-local ownParticipant: Types.Participant?
-function module.GetOwnParticipant(): Types.Participant?
+local ownParticipant: Types.ClientOwnParticipant?
+function module.GetOwnParticipant(): Types.ClientOwnParticipant?
     return ownParticipant
 end
 
-function module.GetAllParticipants(): {Types.PartialParticipant}
+local roles: {[Types.GamemodeRoleString]: Types.Role} = {}
+function module.GetRole(name: Types.GamemodeRoleString): Types.Role
+    return roles[name]
+end
+
+function module.GetAllParticipants(): {Types.ClientParticipant}
     local list = {}
     for _, v in participants do
-        if not v then
+        if not v then -- what?
             continue
         end
         table.insert(list, v)
@@ -54,9 +59,12 @@ function module.GetAllEquipment(): {Types.Equipment}?
     return equipment
 end
 
-local roles
-function module.GetAllRoles(): {Types.Role}?
-    return roles
+function module.GetAllRoles(): {Types.Role}
+    local returnRoles = {}
+    for _, v in roles do
+        table.insert(returnRoles, v)
+    end
+    return returnRoles
 end
 
 local roundEndInfo
@@ -66,11 +74,13 @@ end
 
 type Attribute = "MapAuthors" | "MapName" | "GamemodeAuthors" | "GamemodeName" | "TimeMilestone" | "RoundPhase" | "IsPaused" | "RoundStartTime"
 type AttributeValue = (string | number | boolean)?
-type ListenerCallback<T> = (newValue: EventValue & T) -> ()
+type ListenerCallback = (newValue: EventValue) -> ()
 type Event = Attribute | "UpdateParticipant" | "UpdateOwnParticipant" | "UpdateEquipment" | "UpdateRoles" | "UpdateRoundEndInfo"
-type EventValue = AttributeValue | Types.Participant | {Types.Equipment} | {Types.Role} | Types.RoundEndInfo | Types.PartialParticipant | nil
+type EventValue = AttributeValue | Types.ClientParticipant | {Types.Equipment} | {Types.Role} | Types.RoundEndInfo | Types.ClientOwnParticipant | nil
 
-local listeners: {[Event]: {ListenerCallback<EventValue>}} = {}
+
+
+local listeners: {[Event]: {ListenerCallback}} = {}
 for i in replicatedData:GetAttributes() do
     listeners[i :: Attribute] = {}
 end
@@ -80,8 +90,8 @@ for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "Up
 end
 
 --- @returns A function to stop listening for changes
-function module.Listen<T>(event: Event, callback: ListenerCallback<T>): () -> ()
-    table.insert(listeners[event], callback :: ListenerCallback<EventValue>)
+function module.Listen(event: Event, callback: ListenerCallback): () -> ()
+    table.insert(listeners[event], callback :: ListenerCallback)
     local pos = #listeners[event]
     return function()
         listeners[event][pos] = nil
@@ -98,7 +108,7 @@ replicatedData.AttributeChanged:Connect(function(attr)
     runCallbacks(attr :: Attribute, get(attr :: Attribute))
 end)
 
-replicatedData.UpdateParticipant.OnClientEvent:Connect(function(participant: Types.PartialParticipant | string)
+replicatedData.UpdateParticipant.OnClientEvent:Connect(function(participant: Types.ClientParticipant | string)
     if type(participant) == "string" then
         participants[participant] = nil
         runCallbacks("UpdateParticipant", participant)
@@ -108,7 +118,7 @@ replicatedData.UpdateParticipant.OnClientEvent:Connect(function(participant: Typ
     runCallbacks("UpdateParticipant", participant)
 end)
 
-replicatedData.UpdateOwnParticipant.OnClientEvent:Connect(function(participant: Types.Participant?)
+replicatedData.UpdateOwnParticipant.OnClientEvent:Connect(function(participant: Types.ClientOwnParticipant?)
     ownParticipant = participant
     runCallbacks("UpdateOwnParticipant", participant)
 end)
@@ -118,8 +128,14 @@ replicatedData.UpdateEquipment.OnClientEvent:Connect(function(newEquipment: {Typ
     runCallbacks("UpdateEquipment", newEquipment)
 end)
 
-replicatedData.UpdateRoles.OnClientEvent:Connect(function(newRoles: {Types.Role}?)
-    roles = newRoles
+replicatedData.UpdateRoles.OnClientEvent:Connect(function(gamemodeName: string?, newRoles: {Types.Role}?)
+    if not newRoles or not gamemodeName then
+        roles = {}
+    else
+        for _, v in newRoles do
+            roles[gamemodeName.."__"..v.Name] = v
+        end
+    end
     runCallbacks("UpdateRoles", newRoles)
 end)
 

@@ -5,7 +5,7 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
-local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler) :: Types.ServerRoundHandler
+local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 
 local remotes = ReplicatedStorage.RoundHandler
 local slayVote = remotes.SlayVote
@@ -67,8 +67,6 @@ local function sendRoundInfo(plr: Player?)
 	remotes.UpdateEquipment:FireAllClients(gm.AvailableEquipment)
 	remotes.UpdateRoles:FireAllClients(gm.Roles)
 end
-
-
 
 joinRound.OnServerInvoke = function(plr)
 	local round: Types.Round

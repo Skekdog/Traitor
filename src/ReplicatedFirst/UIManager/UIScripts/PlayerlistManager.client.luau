@@ -21,14 +21,20 @@ local function findPlr(plrName: string)
 end
 
 function updatePlr(plr: Player, clone: any)
-	local participant: Types.Participant? | Types.PartialParticipant?
+	local participant: Types.ClientOwnParticipant? | Types.ClientParticipant?
 	if plr == Players.LocalPlayer then
 		participant = LocalRoundInfo.GetOwnParticipant()
 	else
 		participant = LocalRoundInfo.GetParticipantInfo(plr.Name)
 	end
-	if participant and participant.Role then
-		clone.Username.TextColor3 = participant.Role.Colour
+
+	if not participant then
+		return
+	end
+
+	local role = LocalRoundInfo.GetRole(participant.Role)
+	if participant and role.Name ~= "" then
+		clone.Username.TextColor3 = role.Colour
 		clone.Username:SetAttribute("StyleData", "KeepText")
 		movePlr(plr, participant.Status)
 	end
@@ -115,7 +121,7 @@ Players.PlayerAdded:Connect(function(plr)
 end)
 
 local participants = LocalRoundInfo.GetAllParticipants()
-local plrToParticipant: {[Player]: Types.PartialParticipant} = {}
+local plrToParticipant: {[Player]: Types.ClientParticipant} = {}
 
 for _, v in participants do
 	plrToParticipant[v.Player] = v
@@ -129,14 +135,16 @@ for _, plr in Players:GetPlayers() do
 	end
 end
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Participant?)
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
+	local participant = p :: Types.ClientOwnParticipant
 	if not participant then
 		return
 	end
 	updatePlr(Players.LocalPlayer, findPlr(Players.LocalPlayer.Name))
 end)
 
-LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.PartialParticipant | string)
+LocalRoundInfo.Listen("UpdateParticipant", function(p)
+	local participant = p :: Types.ClientParticipant | string
 	if type(participant) == "string" then
 		removePlr(participant)
 		return
@@ -155,13 +163,13 @@ end)
 
 -- There is probably a better way to do this
 LocalRoundInfo.Listen("MapName", function(mapName)
-	info.RoundInfo.Info.Map.Text = "Map: "..mapName
+	info.RoundInfo.Info.Map.Text = "Map: "..mapName :: string
 end)
 LocalRoundInfo.Listen("MapAuthors", function(mapCreator)
 	info.RoundInfo.Creators.Map.Text = mapCreator
 end)
 LocalRoundInfo.Listen("GamemodeName", function(gamemodeName)
-	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName
+	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName :: string
 end)
 LocalRoundInfo.Listen("GamemodeAuthors", function(gamemodeCreator)
 	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator
