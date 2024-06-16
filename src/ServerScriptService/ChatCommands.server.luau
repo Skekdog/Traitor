@@ -1,11 +1,11 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
-local RoundHandler = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.RoundHandler) :: Types.ServerRoundHandler
+local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
+local RestartServer = require(script.Parent.RestartServer)
 
 local meId = 965735486
 local testPlace = 9648179685
@@ -37,14 +37,7 @@ Players.PlayerAdded:Connect(function(plr)
             end
             ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
         elseif msg == "!restart" and plr.UserId == meId then
-            pcall(function()
-                ServerScriptService.PlayerSetup.ReleaseAllProfiles:Fire()
-                task.wait(5)
-            end)
-            Players.PlayerAdded:Connect(function(plr)
-                plr:Kick("This server is shutting down for an update.")
-            end)
-            TeleportService:TeleportPartyAsync(game.PlaceId, Players:GetPlayers())
+            RestartServer(5)
         end
     end)
 end)

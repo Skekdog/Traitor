@@ -9,6 +9,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local API = require(script.Parent.Parent.ReplicatedFirst.API)
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local Weapons = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager.Weapons)
+local RestartServer = require(script.Parent.RestartServer)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -93,14 +94,13 @@ local module: Types.Adapter = {
         InventoryManager.ClearInventory(participant.Player)
     end,
 
-    CheckForUpdate = function(round)
+    CheckForUpdate = function(round, timeDelay)
         if not game:GetService("RunService"):IsStudio() and game.PlaceId ~= 9648179685 then
             local newVersion: ProfileService.Profile & {Data: {Version: string}} = ProfileStore:ViewProfileAsync("Version")
 
             if newVersion then
                 if newVersion.Data.Version ~= script:GetAttribute("Version") then
-                    ServerStorage:SetAttribute("ServerLocked", true)
-                    ServerScriptService.PlayerSetup.ReleaseAllProfiles:Fire()
+                    RestartServer(timeDelay)
                     return true
                 end
             end
