@@ -41,7 +41,7 @@ end)
 local gamemodes = {}
 for _, v in script.Parent.Gamemodes:GetChildren() do
 	if v.Name == "ThoseYouTrust" then
-		local gm = require(v) :: any
+		local gm = require(v) :: Types.Gamemode
 		table.insert(gamemodes, gm)
 	end
 end
@@ -187,8 +187,7 @@ joinRound.OnServerInvoke = function(plr)
 	end
 	
 	if not round:GetParticipant(plr.Name) then
-		local participant: any = table.clone(round:JoinRound(plr)) -- Might be worth doing a "client-safe" type for these sorts of things - no cyclic tables, no methods, no other "unsafe" fields
-		participant.Round = nil -- This is a shallow copy, all is fine
+		local participant = round:JoinRound(plr):ViewPartialSelf()
 		remotes.UpdateOwnParticipant:FireClient(plr, participant)
 		return true
 	end

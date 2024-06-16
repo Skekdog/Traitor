@@ -6,17 +6,10 @@ local remotes = ReplicatedStorage.RoundHandler
 
 local module = {}
 
-local function minimalParticipant(participant: Types.Participant)
-	return {
-		Player = participant.Player,
-		Status = participant.Status,
-	}
-end
-
 function module.SendUpdatedParticipants(participants: {Types.Participant}, thisParticipant: Types.Participant?, plr: Player)
 	if not thisParticipant then
 		for _, v in participants do
-			remotes.UpdateParticipant:FireClient(plr, minimalParticipant(v))
+			remotes.UpdateParticipant:FireClient(plr, v:ViewPartialParticipant())
 		end
 		return
 	end
@@ -26,11 +19,7 @@ function module.SendUpdatedParticipants(participants: {Types.Participant}, thisP
 			remotes.UpdateParticipant:FireClient(plr, thisParticipant:ViewPartialParticipant(v))
 			continue
 		end
-		remotes.UpdateOwnParticipant:FireClient(plr, {
-			Status = v.Status,
-			Role = v.Role,
-			Credits = v.Credits,
-		})
+		remotes.UpdateOwnParticipant:FireClient(plr, v:ViewPartialSelf())
 	end
 end
 
