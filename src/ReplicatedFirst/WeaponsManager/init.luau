@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
-local RoundHandler = require(script.Parent.RoundHandler.RoundHandler) :: Types.ServerRoundHandler
+local RoundHandler = require(script.Parent.RoundHandler.RoundHandler)
 local WeaponsTypes = require(script.WeaponsTypes)
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
@@ -176,7 +176,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.E
     explosion.Parent = workspace
 end
 
-function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo: Ray, noMultiShot: boolean?): ()
+function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo: Ray): ()
     local char = player.Character
     if not char then
         return
@@ -198,12 +198,6 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
         return
     end
 
-    if not noMultiShot and weapon.BulletsPerShot and weapon.BulletsPerShot > 1 then
-        for _ = 1, weapon.BulletsPerShot do
-            module.Shoot(player, weapon, cameraRayInfo, true)
-        end
-    end
-
     local firedSound = weapon.FiredSound:Clone()
     firedSound.Parent = char.PrimaryPart
     firedSound.Ended:Once(function()
@@ -219,10 +213,7 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
     local function nextSpread(): number
         return random:NextNumber(-spread, spread)
     end
-    local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
-
-    local target = (cameraRayInfo.Direction + spreadVector) * 10000
-
+    
     --todo: should this be on the client instead?
     local function tweenProjectile(targetPosition: Vector3): ()
         local projectileInfo = weapon.ProjectileInfo
@@ -230,7 +221,7 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
             assert(typeof(projectileInfo) ~= "boolean") -- projectileInfo gets reduced to true... from a type of false | ProjectileInfo...
 
             local projectile = projectileInfo.Base:Clone()
-            projectile:PivotTo(CFrame.lookAt(origin, target))
+            projectile:PivotTo(CFrame.lookAt(origin, targetPosition))
 
             local tween = TweenService:Create(projectile, TweenInfo.new((origin - targetPosition).Magnitude / projectileInfo.Speed), {Position = targetPosition})
 
@@ -250,14 +241,19 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
     rayParams.RespectCanCollide = true
     rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
 
-    local result = workspace:Raycast(origin, target, rayParams)
-    if not result then
-        return tweenProjectile(target)
+    for _ = 1, weapon.BulletsPerShot or 1 do
+        local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
+        local target = (cameraRayInfo.Direction + spreadVector) * 10000
+
+        local result = workspace:Raycast(origin, target, rayParams)
+        if not result then
+            return tweenProjectile(target)
+        end
+
+        tweenProjectile(result.Position)
+
+        onPartHit(round, weapon, attacker, result)
     end
-
-    tweenProjectile(result.Position)
-
-    onPartHit(round, weapon, attacker, result)
 end
 
 return module

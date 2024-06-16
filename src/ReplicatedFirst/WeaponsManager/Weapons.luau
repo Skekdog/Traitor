@@ -5,8 +5,9 @@ local WeaponsTypes = require(script.Parent.WeaponsTypes)
 
 local projectiles = ServerStorage.Projectiles
 local models = ReplicatedStorage.WeaponModels
-local firedSounds = ReplicatedStorage.WeaponSounds.Fired
-local reloadSounds = ReplicatedStorage.WeaponSounds.Reload
+local weaponSounds = ReplicatedStorage.WeaponSounds
+local firedSounds = weaponSounds.Fired
+local reloadSounds = weaponSounds.Reload
 
 local bullet = projectiles.Bullet :: PVInstance
 
@@ -19,7 +20,7 @@ local function burn(attacker: Types.Participant?, part: BasePart, callback: (fir
     fire.Size = 10
     fire.Parent = part
 
-    local burnSound = ReplicatedStorage.WeaponSounds.FlareBurn:Clone()
+    local burnSound = weaponSounds.FlareBurn:Clone()
     burnSound.Parent = part :: any
 
     task.spawn(callback, fire, burnSound)
@@ -259,7 +260,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
                         deathSound:Destroy()
                     end
 
-                    local sound = ReplicatedStorage.WeaponSounds.GoldenGunHit:Clone()
+                    local sound = weaponSounds.GoldenGunHit:Clone()
                     sound.Name = "DeathSound"
                     sound.Parent = root :: any
                 end
