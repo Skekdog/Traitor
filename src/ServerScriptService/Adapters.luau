@@ -9,13 +9,11 @@ local ServerStorage = game:GetService("ServerStorage")
 local API = require(script.Parent.Parent.ReplicatedFirst.API)
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local Weapons = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager.Weapons)
+local ProfileManager = require(script.Parent.ProfileManager)
 local RestartServer = require(script.Parent.RestartServer)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
-local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
+local ProfileService = require(ServerScriptService.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
-
-local getProfile = ServerScriptService.PlayerSetup.GetProfile
-local updateProfile = ServerScriptService.PlayerSetup.UpdateProfile
 
 local remotes = ReplicatedStorage.RoundHandler
 
@@ -153,11 +151,16 @@ local module: Types.Adapter = {
         -- This is only used when first adding the Participant to the round, Participant.Karma is used for the duration of the round.
         -- SetKarma() is used when the round ends.
 
-        return getProfile:Invoke(plr).Karma
+        local profile = ProfileManager.GetProfile(plr)
+
+        if not profile then
+            return 1000
+        end
+        return profile.Karma
     end,
 
     SetKarma = function(plr, karma)
-        return updateProfile:Fire(plr, "Karma", karma)
+        ProfileManager.UpdateProfile(plr, "Karma", karma)
     end,
 
     OnCharacterLoad = function(participant)
