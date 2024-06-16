@@ -8,12 +8,10 @@ options.ShouldReserveServer = false
 options.ServerInstanceId = ""
 
 return function(timeDelay: number)
+    if ServerStorage:GetAttribute("ServerLocked") then
+        return
+    end
     ServerStorage:SetAttribute("ServerLocked", true)
     ProfileManager.ReleaseAllProfiles()
-    task.delay(timeDelay, function()
-        TeleportService:TeleportAsync(game.PlaceId, Players:GetPlayers(), options)
-        Players.PlayerAdded:Connect(function(plr)
-            plr:Kick("This server is shutting down for an update.")
-        end)
-    end)
+    task.delay(timeDelay, TeleportService.TeleportAsync, TeleportService, game.PlaceId, Players:GetPlayers(), options)
 end
