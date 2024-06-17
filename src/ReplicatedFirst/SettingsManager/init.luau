@@ -204,7 +204,7 @@ module.AvailableSettings = {
 		Category = "Gameplay",
 		Tooltip = "General interaction",
 		PossibleValues = "Keybind",
-		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=true},
+		Default = {Keycodes={{Enum.KeyCode.F, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{

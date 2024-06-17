@@ -1,11 +1,11 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UIManager = require(script.Parent.Parent)
 local API = require(script.Parent.Parent.Parent.API)
-local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo")
-local object = corpseUi.Object :: typeof(UIManager.UnregisteredUIs.CorpseInfo)
+local object = (corpseUi.Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.CorpseInfo)).CorpseInfo
 
 local flavourTexts: {[Types.MurderWeapon]: string} = {
 	Crush = "Many of their bones are broken. It seems the impact of a heavy object killed them.",
@@ -20,7 +20,8 @@ local flavourTexts: {[Types.MurderWeapon]: string} = {
 	Suicide = "This spy couldn't take it anymore and took their own life.",
 }
 
-ReplicatedStorage:WaitForChild("RoundHandler").SendCorpseInfo.OnClientEvent:Connect(function(corpseInfo: Types.CorpseInfo)
+local rh = ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)
+rh.SendCorpseInfo.OnClientEvent:Connect(function(corpseInfo: Types.CorpseInfo)
     local weapon
     local deathType: Types.MurderWeapon
     if typeof(corpseInfo.MurderWeapon) == "table" then
@@ -32,13 +33,19 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendCorpseInfo.OnClientEvent:Conn
     end
     object.MurderWeapon.TextLabel.Text = weapon
 
+    object.Parent.Information.Text = "Click on an icon to reveal detailed information."
+
     local flavourText = flavourTexts[deathType]
     if deathType == "Firearm" and weapon ~= "Firearm" then
         flavourText = flavourText:format(API.StringWithDeterminer(weapon))
     end
-    object.MurderWeapon:SetAttribute("Description", flavourTexts[deathType])
+    object.MurderWeapon:SetAttribute("Description", flavourText)
 
-    API.ToRoundTime(LocalRoundInfo.GetStartTime(), corpseInfo.DeathTime)
+    object.MurderWeapon.Image = if deathType == "Explosion" then "rbxassetid://1789477853" else "rbxassetid://700497561"
+
+    object.DeathTime.TextLabel.Text = API.ToRoundTime(corpseInfo.DeathTime, workspace:GetServerTimeNow())
+    object.DeathTime:SetAttribute("Description", `Their watch stopped, indicating that they died {math.round(workspace:GetServerTimeNow() - corpseInfo.DeathTime)} seconds ago.`)
+
     object.FreeKill.Visible = corpseInfo.FreeKill
     object.Headshot.Visible = corpseInfo.Headshot
     object.SD.Visible = corpseInfo.SelfDefense
@@ -57,6 +64,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendCorpseInfo.OnClientEvent:Conn
         end
         equipmentText ..= " on their corpse."
         object.EquipmentList:SetAttribute("Description", equipmentText)
+        object.EquipmentList.Visible = true
     else
         object.EquipmentList.Visible = false
     end
@@ -65,6 +73,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendCorpseInfo.OnClientEvent:Conn
     local killText = `They had a list of kills, confirming the death{if #kills == 1 then "" else "s"} of: `
 
     if #kills > 0 then
+        print(kills)
         for i, v in kills do
             if i == 1 then
                 killText ..= v
@@ -76,11 +85,12 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendCorpseInfo.OnClientEvent:Conn
         end
         killText ..= "."
         object.KillList:SetAttribute("Description", killText)
+        object.KillList.Visible = true
     else
         object.KillList.Visible = false
     end
 
-    object.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
+    object.Parent.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
 
     local determinerRole = API.StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
     object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)
@@ -90,3 +100,11 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendCorpseInfo.OnClientEvent:Conn
 
     corpseUi:ToggleVisible(true)
 end)
+
+for _, v in object:GetChildren() do
+    if v:IsA("ImageButton") then
+        v.MouseButton1Click:Connect(function()
+            object.Parent.Information.Text = v:GetAttribute("Description")
+        end)
+    end
+end

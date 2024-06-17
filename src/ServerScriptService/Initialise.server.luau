@@ -5,7 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 
-local RoundHandler = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.RoundHandler)
+local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local WeaponsTypes = require(ReplicatedFirst.WeaponsManager.WeaponsTypes)
 local ProfileManager = require(script.Parent.ProfileManager)
@@ -65,6 +65,10 @@ Players.PlayerAdded:Connect(function(plr)
 			TeleportService:TeleportAsync(testPlace, targets)
         elseif msg == "!pause" and plr.UserId == meId then
             local id = ServerStorage:GetAttribute("RoundID")
+			if not id then
+				return
+			end
+
             local round = RoundHandler.GetRound(id)
             if not round:IsRoundInProgress() then
                 return

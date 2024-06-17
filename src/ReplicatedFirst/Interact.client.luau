@@ -11,30 +11,38 @@ local cam = workspace.CurrentCamera
 local params = RaycastParams.new()
 params.IgnoreWater = true
 
-local clientStorage = ReplicatedFirst.ClientStorage
-clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
-	if clientStorage:GetAttribute("IsSpectating") then
-		Controls.Unregister("Interact")
-	else
-		Controls.Register("Interact", true, function(action, state, input, toggled)
-			local map = LocalRoundInfo.GetMap()
-	
-			local char = plr.Character
-			if not char or not map then return end
-	
-			params.FilterDescendantsInstances = {char}
-			local ray = workspace:Raycast(cam.CFrame.Position, cam.CFrame.LookVector * 10, params)
+Controls.Register("Interact", true, function(action, state, input, toggled)
+	if state ~= Enum.UserInputState.End then
+		return
+	end
+	local map = LocalRoundInfo.GetMap()
 
-			if not ray or not ray.Instance then
-				return
-			end
+	if not map then
+		return
+	end
 
-			local actionItems = map.Map:FindFirstChild("__ActionItems")
-			local doors = map.Map:FindFirstChild("__Doors")
-			local props = map:FindFirstChild("Props")
-			if (actionItems and actionItems:IsAncestorOf(ray.Instance)) or (doors and doors:IsAncestorOf(ray.Instance)) or (props and props:IsAncestorOf(ray.Instance)) then
-				RS.ClientServer.Interaction:FireServer(ray.Instance)
-			end
-		end)
+	local char = plr.Character
+	if char then
+		params.FilterDescendantsInstances = {char}
+	end
+
+	local ray = workspace:Raycast(cam.CFrame.Position, cam.CFrame.LookVector * 10, params)
+	if not ray or not ray.Instance or not ray.Instance.Parent then
+		return
+	end
+
+	if ray.Instance.Parent:GetAttribute("IsCorpse") then
+		return (ray :: any).Instance.Parent.SearchCorpse:FireServer()
+	end
+
+	if not char or not map then
+		return
+	end
+
+	local actionItems = map.Map:FindFirstChild("__ActionItems")
+	local doors = map.Map:FindFirstChild("__Doors")
+	local props = map:FindFirstChild("Props")
+	if (actionItems and actionItems:IsAncestorOf(ray.Instance)) or (doors and doors:IsAncestorOf(ray.Instance)) or (props and props:IsAncestorOf(ray.Instance)) then
+		RS.ClientServer.Interaction:FireServer(ray.Instance)
 	end
 end)

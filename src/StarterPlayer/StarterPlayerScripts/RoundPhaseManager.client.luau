@@ -91,6 +91,7 @@ local function update(roundPhase)
         if not sound then
             return
         end
+        sound = sound:Clone()
         sound.SoundGroup = SoundService.RoundEndMusic
         sound.Volume = 0
         

@@ -10,7 +10,8 @@ local UIS = game:GetService("UserInputService")
 
 local module = {}
 
-local function getSetting(name)
+
+local function getSetting(name: string)
 	return ReplicatedFirst.SettingsManager.RequestSetting:Invoke(name)
 end
 
@@ -23,30 +24,7 @@ local function onSettingUpdate(name, val)
 	end
 end
 
-function module.getKeyCodeForString(keycode: string): Enum.KeyCode | Enum.UserInputType
-	if keycode == "Ctrl" then
-		return Enum.KeyCode.LeftControl
-	elseif keycode == "Shift" then
-		return Enum.KeyCode.LeftShift
-	elseif keycode == "Alt" then
-		return Enum.KeyCode.LeftAlt
-	elseif keycode == "RCtrl" then
-		return Enum.KeyCode.RightControl
-	elseif keycode == "RShift" then
-		return Enum.KeyCode.RightShift
-	elseif keycode == "RAlt" then
-		return Enum.KeyCode.RightAlt
-	elseif keycode == "Tab" then
-		return Enum.KeyCode.Tab
-	elseif keycode == "LMB" then
-		return Enum.UserInputType.MouseButton1
-	elseif keycode == "RMB" then
-		return Enum.UserInputType.MouseButton2
-	end
-	error("Failed to get keycode for string: "..keycode)
-end
-
-function module.getStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType): string
+function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType): string
 	if keycode.EnumType == Enum.KeyCode then
 		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
 		if img ~= "" then return img end
@@ -75,6 +53,7 @@ function module.getStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType):
 		if keycode == Enum.UserInputType.MouseButton1 then return "LMB"
 		elseif keycode == Enum.UserInputType.MouseButton2 then return "RMB"
 		elseif keycode == Enum.UserInputType.MouseButton3 then return "MMB"
+		elseif keycode == Enum.UserInputType.None then return "NONE"
 		end
 	end
 	return keycode.Name
@@ -109,11 +88,21 @@ function module.SetupTouchButton(actionName)
 	end
 end
 
+function module.GetFirstKeyCode(actionName: string): string
+	local keybindSetting = getSetting(actionName)
+	local keybinds = keybindSetting.Keycodes
+	if keybinds then
+		return module.GetStringForKeyCode(keybinds[1][1])
+	end
+	return ""
+end
+
 -- Returns the Button if it was created
 function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> ()): ImageButton?
 	if not ReplicatedFirst:GetAttribute("ControlsReady") then
 		ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 	end
+
 	registered[actionName] =  {
 		actionName = actionName,
 		createTouchButton = createTouchButton,

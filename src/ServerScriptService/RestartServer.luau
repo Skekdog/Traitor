@@ -4,8 +4,7 @@ local TeleportService = game:GetService("TeleportService")
 local ProfileManager = require(script.Parent.ProfileManager)
 
 local options = Instance.new("TeleportOptions")
-options.ShouldReserveServer = false
-options.ServerInstanceId = ""
+options.ShouldReserveServer = true
 
 return function(timeDelay: number)
     if ServerStorage:GetAttribute("ServerLocked") then

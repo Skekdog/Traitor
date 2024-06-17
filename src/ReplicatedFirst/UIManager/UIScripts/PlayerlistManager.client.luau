@@ -166,13 +166,13 @@ LocalRoundInfo.Listen("MapName", function(mapName)
 	info.RoundInfo.Info.Map.Text = "Map: "..mapName :: string
 end)
 LocalRoundInfo.Listen("MapAuthors", function(mapCreator)
-	info.RoundInfo.Creators.Map.Text = mapCreator
+	info.RoundInfo.Creators.Map.Text = mapCreator :: string
 end)
 LocalRoundInfo.Listen("GamemodeName", function(gamemodeName)
 	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName :: string
 end)
 LocalRoundInfo.Listen("GamemodeAuthors", function(gamemodeCreator)
-	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator
+	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator :: string
 end)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)

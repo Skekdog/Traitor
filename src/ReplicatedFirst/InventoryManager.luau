@@ -94,6 +94,9 @@ end
 
 function module.ClearInventory(plr: Player)
     local equipment = inventories[plr]
+    if not equipment then
+        return
+    end
     for i = #equipment, 1, -1 do
         module.RemoveEquipment(plr, equipment[i])
     end

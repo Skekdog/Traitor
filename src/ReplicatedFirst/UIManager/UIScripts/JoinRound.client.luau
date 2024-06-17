@@ -1,8 +1,6 @@
-local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local plr = Players.LocalPlayer
 local API = require(ReplicatedFirst.API)
 local UI = require(ReplicatedFirst.UIManager)
 local roundInfo = UI.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
@@ -17,8 +15,4 @@ this.Object.MouseButton1Click:Connect(function()
 	this:ToggleVisible(false)
 	roundInfo.TopBar.Role.Text = "PREPARING"
 	roundInfo.TopBar.Role.TextColor3 = Color3.new(1, 1, 1)
-	
-	for _, v in plr:WaitForChild("Inventory"):GetChildren() do
-		ReplicatedFirst.ClientStorage.ScriptConnections.RemoteEquipEvent:Fire(false, v, nil, false)
-	end
 end)

@@ -145,9 +145,9 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		local modifier = keybinding["Keycodes"][1][2]
 		local str = ""
 		if key then
-			str = ControlManager.getStringForKeyCode(key)
+			str = ControlManager.GetStringForKeyCode(key)
 			if modifier then
-				str = " + "..ControlManager.getStringForKeyCode(modifier)
+				str = " + "..ControlManager.GetStringForKeyCode(modifier)
 			end
 		end
 		but.Name = self.Name

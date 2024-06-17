@@ -1,6 +1,6 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
-local ProfileService = require(ServerScriptService.PlayerSetup.ProfileService)
+local ProfileService = require(ServerScriptService.ProfileService)
 
 local newVersion = "0.9.0"
 ServerStorage:SetAttribute("Version", newVersion)

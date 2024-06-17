@@ -282,7 +282,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 
 				bind.Name = name..tostring(i + numBoundKeys)
 				
-				local result = Controls.getStringForKeyCode(v[1])
+				local result = Controls.GetStringForKeyCode(v[1])
 				if result:sub(1, 11) == "rbxasset://" then
 					local img = bind.KeycodeImage
 					img.Image = result
@@ -293,7 +293,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				end
 
 				if v[2] then
-					bind.Modifier.Text = Controls.getStringForKeyCode(v[2])
+					bind.Modifier.Text = Controls.GetStringForKeyCode(v[2])
 					bind.Modifier.Visible = true
 					bind.Plus.Visible = true
 				end

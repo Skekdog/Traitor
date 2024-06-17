@@ -68,7 +68,7 @@ remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: string?)
 end)
 
 local nextRoundReady = true
-local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructure
+local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructureCast
 
 local function sendRoundInfo(plr: Player?)
 	local roundId = ServerStorage:GetAttribute("RoundID")
@@ -81,12 +81,12 @@ local function sendRoundInfo(plr: Player?)
 
 	if plr then
 		remotes.UpdateEquipment:FireClient(plr, gm.AvailableEquipment)
-		remotes.UpdateRoles:FireClient(plr, gm.Roles)
+		remotes.UpdateRoles:FireClient(plr, gm.Name, gm.Roles)
 		UpdateRoundInfo.SendUpdatedParticipants(round.Participants, round:GetParticipant(plr.Name) ,plr)
 		return
 	end
 	remotes.UpdateEquipment:FireAllClients(gm.AvailableEquipment)
-	remotes.UpdateRoles:FireAllClients(gm.Roles)
+	remotes.UpdateRoles:FireAllClients(gm.Name, gm.Roles)
 end
 
 joinRound.OnServerInvoke = function(plr)
@@ -112,7 +112,7 @@ joinRound.OnServerInvoke = function(plr)
 		remotes:SetAttribute("GamemodeName", gamemode.Name)
 		remotes:SetAttribute("GamemodeAuthors", gamemode.Authors or "unknown")
 		remotes:SetAttribute("TimeMilestone", round.TimeMilestone)
-		remotes.MapFolder.Value = round.Map
+		remotes.MapFolder.Value = round.Map :: Types.MapStructureCast
 
 		sendRoundInfo()
 
@@ -126,8 +126,8 @@ joinRound.OnServerInvoke = function(plr)
 				end
 			elseif phase == "Intermission" then
 				voteMap:FireAllClients(true)
-				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: string)
-					if not ServerStorage.Maps:FindFirstChild(map) then
+				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: string?)
+					if not map or not ServerStorage.Maps:FindFirstChild(map) then
 						return
 					end
 					if not votes[map] then
@@ -154,12 +154,9 @@ joinRound.OnServerInvoke = function(plr)
 			for _, v in Players:GetPlayers() do
 				local p = round:GetParticipant(v.Name)
 				if p then
-					p.Role = {
-						Name = "",
-						Colour = Color3.new()
-					}
+					p.Role = RoundHandler.NoRole
 				end
-				UpdateRoundInfo.SendUpdatedParticipants(round.Participants, p, plr)
+				UpdateRoundInfo.SendUpdatedParticipants(round.Participants, nil, plr)
 			end
 		
 			if voteCon then
@@ -172,7 +169,9 @@ joinRound.OnServerInvoke = function(plr)
 						bestVotes = #v
 					end
 				end
-				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructureCast) or (ServerStorage.Maps:GetChildren()[math.random(1, #ServerStorage.Maps:GetChildren())] :: Types.MapStructureCast)
+				local maps = ServerStorage.Maps:GetChildren()
+				Random.new():Shuffle(maps)
+				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructureCast) or (maps[1] :: Types.MapStructureCast)
 			end
 		
 			roundEventCon:Disconnect()

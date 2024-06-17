@@ -80,6 +80,7 @@ local function onEntityHit(round: Types.Round, weapon: WeaponsTypes.Weapon, atta
             end
         elseif willDie then
             entity.OnBreak(entity)
+            entity.PropInstance:Destroy()
         end
         
         hum.Health -= damage
@@ -136,11 +137,21 @@ local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attack
         weld.Parent = rayResult.Instance
 
         task.delay(5, function()
+            if not impactHole.Parent then
+                return
+            end
             local tween = TweenService:Create(impactDecal, TweenInfo.new(5), {Transparency = 1})
             tween.Completed:Connect(function()
                 weld:Destroy()
                 impactHole:Destroy()
             end)
+
+            impactHole.Destroying:Once(function()
+                if tween.PlaybackState == Enum.PlaybackState.Playing then
+                    tween:Cancel()
+                end
+            end)
+
             tween:Play()
         end)
         
@@ -162,8 +173,13 @@ function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.E
     explosion.DestroyJointRadiusPercent = 0
     explosion.ExplosionType = Enum.ExplosionType.NoCraters
 
-    local soundPart = Instance.new("Attachment")
-	soundPart.WorldPosition = position
+    local soundPart = Instance.new("Part")
+    soundPart.Transparency = 1
+    soundPart.Anchored = true
+    soundPart.CanCollide = false
+    soundPart.CanTouch = false
+    soundPart.CanQuery = false
+	soundPart.Position = position
 	soundPart.Parent = workspace.Projectiles
     
 	local sound = ServerStorage.Explosion:Clone()

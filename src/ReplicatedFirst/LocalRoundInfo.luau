@@ -51,7 +51,7 @@ function module.GetRoundPhase(): Types.RoundPhase
 end
 
 function module.GetMap(): Types.MapStructure?
-    return replicatedData.MapFolder.Value :: Types.MapStructure?
+    return replicatedData.MapFolder.Value :: Types.MapStructureCast?
 end
 
 local equipment
@@ -77,8 +77,6 @@ type AttributeValue = (string | number | boolean)?
 type ListenerCallback = (newValue: EventValue) -> ()
 type Event = Attribute | "UpdateParticipant" | "UpdateOwnParticipant" | "UpdateEquipment" | "UpdateRoles" | "UpdateRoundEndInfo"
 type EventValue = AttributeValue | Types.ClientParticipant | {Types.Equipment} | {Types.Role} | Types.RoundEndInfo | Types.ClientOwnParticipant | nil
-
-
 
 local listeners: {[Event]: {ListenerCallback}} = {}
 for i in replicatedData:GetAttributes() do
@@ -135,6 +133,10 @@ replicatedData.UpdateRoles.OnClientEvent:Connect(function(gamemodeName: string?,
         for _, v in newRoles do
             roles[gamemodeName.."__"..v.Name] = v
         end
+        roles[gamemodeName.."__"] = {
+            Name = "",
+            Colour = Color3.new(),
+        }
     end
     runCallbacks("UpdateRoles", newRoles)
 end)

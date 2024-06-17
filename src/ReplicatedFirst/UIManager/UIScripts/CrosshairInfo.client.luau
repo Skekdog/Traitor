@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(script.Parent.Parent)
+local ControlManager = require(script.Parent.Parent.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 --this script could do with a clean up
 
@@ -23,14 +24,9 @@ local karmaDefs = {
 
 local mouse = Players.LocalPlayer:GetMouse()
 local ui = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.CrosshairInfo)
+local playerInfo = ui.PlayerInfo
 
-game:GetService("RunService").Heartbeat:Connect(function() --cant do getpropertychangedsignal
-	ui.Visible = false
-	if not mouse.Target then return end
-	
-	local char = mouse.Target.Parent :: Model
-	if not char then return end
-
+local function showPlayerInfo(char: Model)
 	local plr = Players:GetPlayerFromCharacter(char)
 	if not plr then return end
 
@@ -44,7 +40,7 @@ game:GetService("RunService").Heartbeat:Connect(function() --cant do getproperty
 	if not participant then return end
 
 	local role = LocalRoundInfo.GetRole(participant.Role)
-	ui:FindFirstChild("Name").Text = plr.Name
+	playerInfo:FindFirstChild("Name").Text = plr.Name
 
 	local healthPercent = health / hum.MaxHealth * 100
 	local healthText = ""
@@ -56,8 +52,8 @@ game:GetService("RunService").Heartbeat:Connect(function() --cant do getproperty
 		end
 	end
 
-	ui.Health.Text = healthText
-	ui.Health.TextColor3 = Color3.new(1, 0, 0):Lerp(Color3.new(1, 1, 1), healthPercent/100)
+	playerInfo.Health.Text = healthText
+	playerInfo.Health.TextColor3 = Color3.new(1, 0, 0):Lerp(Color3.new(1, 1, 1), healthPercent/100)
 
 	local karma = 1000
 	local karmaText = ""
@@ -68,18 +64,65 @@ game:GetService("RunService").Heartbeat:Connect(function() --cant do getproperty
 		end
 	end
 
-	ui.Karma.Text = karmaText	
-	ui.Karma.TextColor3 = Color3.new(1, 0, 0):Lerp(Color3.new(1, 1, 1), karma / 1000)
+	playerInfo.Karma.Text = karmaText	
+	playerInfo.Karma.TextColor3 = Color3.new(1, 0, 0):Lerp(Color3.new(1, 1, 1), karma / 1000)
 
 	if role then
-		ui.Role.TextColor3 = role.Colour
-		ui.Role.Text = role.Name
+		playerInfo.Role.TextColor3 = role.Colour
+		playerInfo.Role.Text = role.Name
 	else
-		ui.Role.Text = ""
+		playerInfo.Role.Text = ""
 	end
 
-	ui.Mark.Text = plr:GetAttribute("Mark") or ""
-	ui.Mark.TextColor3 = plr:GetAttribute("MarkColour") or Color3.new(0, 0, 0)
+	playerInfo.Mark.Text = plr:GetAttribute("Mark") or ""
+	playerInfo.Mark.TextColor3 = plr:GetAttribute("MarkColour") or Color3.new(0, 0, 0)
 
-	ui.Visible = true
+	playerInfo.Visible = true
+	return true
+end
+
+local corpseHint = ui.SearchCorpseHint
+local function showCorpseHint(char: Model)
+	local plr = Players.LocalPlayer
+
+	if plr:DistanceFromCharacter(char:GetPivot().Position) > 10 then
+		return
+	end
+
+	local key = ControlManager.GetFirstKeyCode("Interact")
+
+	if char.Name == "__Unidentified" then
+		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body\nPress {key} to Search`
+	else
+		local info = LocalRoundInfo.GetParticipantInfo(char.Name)
+		assert(info)
+		corpseHint.Text = `{info.FormattedName}'s Body\nPress {key} to Search`
+	end
+	corpseHint.Visible = true
+end
+
+local lastInstance: BasePart
+game:GetService("RunService").Heartbeat:Connect(function() --cant do getpropertychangedsignal
+	if mouse.Target == lastInstance then
+		return
+	end
+
+	playerInfo.Visible = false
+	corpseHint.Visible = false
+	if not mouse.Target then
+		return
+	end
+
+	lastInstance = mouse.Target
+	
+	local char = mouse.Target.Parent
+	if not char or char.Parent ~= workspace or not char:IsA("Model") then
+		return
+	end
+
+	if char:GetAttribute("IsCorpse") then
+		showCorpseHint(char)
+	else
+		showPlayerInfo(char)
+	end
 end)

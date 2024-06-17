@@ -29,6 +29,29 @@ local deathsounds = {
 	"9125652675",
 }
 
+local ragdollConstraints: {[string]: string} = {
+    Neck = "Head",
+
+    LeftAnkle = "LeftFoot",
+	LeftKnee = "LeftLowerLeg",
+	LeftHip = "LeftUpperLeg",
+
+	RightAnkle = "RightFoot",
+	RightKnee = "RightLowerLeg",
+	RightHip = "RightUpperLeg",
+
+	Root = "LowerTorso",
+	Waist = "UpperTorso",
+
+	LeftWrist = "LeftHand",
+	LeftElbow = "LeftLowerArm",
+	LeftShoulder = "LeftUpperArm",
+
+	RightWrist = "RightHand",
+	RightElbow = "RightLowerArm",
+	RightShoulder = "RightUpperArm",
+}
+
 local module: Types.Adapter = {
     HIGHLIGHTS_TIME = 10, -- Time to spend after the round ends before destroying the round
     PREPARING_TIME = 5, -- Time to spend after a round is created where players can join the round
@@ -55,6 +78,42 @@ local module: Types.Adapter = {
         Lighting.OutdoorAmbient = Color3.fromRGB(70, 70, 70)
 
         Lighting:ClearAllChildren()
+    end,
+
+    SetDefaultTerrain = function()
+        local terrain = workspace.Terrain
+        terrain.WaterReflectance = 1
+        terrain.WaterTransparency = 0.3
+        terrain.WaterWaveSize = 0.15
+        terrain.WaterWaveSpeed = 10
+        terrain.WaterColor = Color3.fromRGB(12, 84, 92)
+
+        local function s(material: Enum.Material, r: number, g: number, b: number)
+            terrain:SetMaterialColor(material, Color3.fromRGB(r, g, b))
+        end
+
+        local m = Enum.Material
+        s(m.Asphalt, 115, 123, 107)
+        s(m.Basalt, 30, 30, 37)
+        s(m.Brick, 138, 86, 62)
+        s(m.Cobblestone, 132, 123, 90)
+        s(m.Concrete, 127, 102, 63)
+        s(m.CrackedLava, 232, 156, 74)
+        s(m.Glacier, 101, 176, 234)
+        s(m.Grass, 106, 127, 63)
+        s(m.Ground, 102, 92, 59)
+        s(m.Ice, 129, 194, 224)
+        s(m.LeafyGrass, 115, 132, 74)
+        s(m.Limestone, 206, 173, 148)
+        s(m.Mud, 58, 46, 36)
+        s(m.Pavement, 148, 148, 140)
+        s(m.Rock, 102, 108, 111)
+        s(m.Salt, 198, 189, 181)
+        s(m.Sand, 143, 126, 95)
+        s(m.Sandstone, 137, 90, 71)
+        s(m.Slate, 63, 127, 107)
+        s(m.Snow, 195, 199, 218)
+        s(m.WoodPlanks, 139, 109, 79)
     end,
 
     DoIntermission = function()
@@ -219,56 +278,60 @@ local module: Types.Adapter = {
             remotes.SendCorpseInfo:FireClient(to, corpseInfo)
         end
 
-        local searchPrompt = ServerStorage.SearchCorpse:Clone() :: ProximityPrompt
-        searchPrompt.Parent = clone
-        searchPrompt.Triggered:Connect(function(to)
+        local searchEvent = Instance.new("RemoteEvent")
+        searchEvent.Name = "SearchCorpse"
+        searchEvent.Parent = clone
+
+        searchEvent.OnServerEvent:Connect(function(to)
             local participant = round:GetParticipant(to.Name)
             if not participant or not to.Character or not root then
                 return sendCorpseInfo(to)
             end
 
-            if to:DistanceFromCharacter(root.Position) > 5 then
+            if to:DistanceFromCharacter(root.Position) > 10 then
                 return
             end
 
             participant:SearchCorpse(victim)
+            clone.Name = victim.Player.Name
             sendCorpseInfo(to)
         end)
 
-        clone.Parent = workspace
-
-        victim.Character = clone
-        victim.Player.Character = nil
+        clone:SetAttribute("IsCorpse", true)
+        clone.Name = "__Unidentified"
 
         local joints = ServerStorage.RagdollJoints:Clone()
         for _, v in joints:GetChildren() do
             assert(v:IsA("Constraint"))
 
-            local bodyPart = clone:FindFirstChild(v.Name)
-            if not bodyPart then
-                continue
-            end
-            
-            local motor = bodyPart:FindFirstChildOfClass("Motor6D")
-            if not motor or not motor.Part0 then
-                continue
-            end
-            v.Attachment0 = motor.Part0:FindFirstChild(motor.Name.."RigAttachment") :: Attachment
-            v.Attachment1 = bodyPart:FindFirstChild(motor.Name.."RigAttachment") :: Attachment
+            local part = clone:FindFirstChild(ragdollConstraints[v.Name]) :: BasePart
+            v.Attachment1 = part:FindFirstChild(v.Name.."RigAttachment", true) :: Attachment
+
+            local att = v.Attachment1 :: Attachment
+            att.Name = v.Name.."RigAttach" -- If an attachment ends with "RigAttachment", roblox automatically creates Motor6Ds. Not good.
+
+            v.Attachment0 = clone:FindFirstChild(v.Name.."RigAttachment", true) :: Attachment
+            att = v.Attachment0 :: Attachment
+            att.Name = v.Name.."RigAttach"
+
+            v.Parent = part
         end
         joints.Parent = clone :: any
 
-        -- This has to be after parenting because motor6ds don't exist?
+        clone.Parent = workspace
         for _, v in clone:GetDescendants() do
-            if v:IsA("JointInstance") or v:IsA("BaseScript") or v:IsA("Motor6D") then
+            if v:IsA("JointInstance") or v:IsA("BaseScript") then
                 v:Destroy()
             elseif v:IsA("BasePart") then
                 v.CanCollide = v.Name ~= "HumanoidRootPart"
-                v:SetNetworkOwner()
+                --v:SetNetworkOwner()
             elseif v.Name == "DeathSound" and v:IsA("Sound") then
                 v:Play()
             end
         end
+
+        victim.Character = clone
+        victim.Player.Character = nil
 
         for _, v in Players:GetPlayers() do
             UpdateRoundInfo.SendUpdatedParticipants(victim.Round.Participants, victim, victim.Player)
