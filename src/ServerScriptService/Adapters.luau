@@ -201,8 +201,13 @@ local module: Types.Adapter = {
 
     SendRoundHighlights = function(recipients, highlights, events, scores, victors)
         local remote = remotes.SendHighlights
+
+        local sendVictors: Types.Victor | Types.ClientParticipant = victors
+        if victors.Kind == "Participant" then
+            sendVictors = victors:ViewPartialParticipant()
+        end
         for _, v in recipients do
-            remote:FireClient(v.Player, highlights, events, scores, victors)
+            remote:FireClient(v.Player, highlights, events, scores, sendVictors)
         end
     end,
 
@@ -432,7 +437,11 @@ local module: Types.Adapter = {
             elseif v.Data.NewMap then
                 event.Text = `The map changes to {v.Data.NewMap}.`
             elseif v.Data.Winners then
-                event.Text = v.Data.Winners.VictoryText :: string
+                if v.Data.Winners.Kind == "Participant" then
+                    event.Text = v.Data.Winners.Role.VictoryText :: string
+                else
+                    event.Text = v.Data.Winners.VictoryText :: string
+                end
             end
             table.insert(userFacingLog, event)
         end

@@ -7,7 +7,8 @@ local LocalRoundInfo: typeof(require(script.Parent.LocalRoundInfo))
 local Types = require(script.Parent.RoundHandler.Types)
 
 -- This module also gets called from the server. Might be better to move the JSONEncode and Decode to elsewhere (like say, the server because THATS THE ONLY ONE THAT USES THOSE!)
-local UIScript, UI, uiThemes
+local UIScript, uiThemes
+local UI: typeof(require(ReplicatedFirst.UIManager))
 if game:GetService("RunService"):IsClient() then
 	LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 	UIScript = ReplicatedFirst.UIManager
@@ -17,6 +18,8 @@ if game:GetService("RunService"):IsClient() then
 	for i, _ in UI.Themes do
 		table.insert(uiThemes, i)
 	end
+
+	table.insert(uiThemes, "SEIZURE")
 end
 
 export type SettingDefinition = {
@@ -90,9 +93,15 @@ module.AvailableSettings = {
 		Tab = "Display",
 		Category = "User Interface",
 		Tooltip = "Select a theme for the UI.",
-		PossibleValues = uiThemes,
+		PossibleValues = uiThemes :: {string},
 		Default = "Dark",
-		Callback = function(val) UI.UpdateTheme(val) end,
+		Callback = function(val)
+			if val == "SEIZURE" then
+				--UI.UpdateTheme()
+			else
+				UI.UpdateTheme(val :: string)
+			end
+		end,
 	},
 	{
 		Name = "Close Scale",
@@ -134,7 +143,7 @@ module.AvailableSettings = {
 			end
 			local sidebar = UI.WaitForUI("Sidebar")
 			if sidebar then
-				sidebar:ToggleVisible(val)
+				sidebar:ToggleVisible(val :: boolean)
 			end
 		end
 	},

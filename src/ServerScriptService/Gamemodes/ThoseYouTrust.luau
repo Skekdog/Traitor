@@ -225,6 +225,7 @@ local module: Types.Gamemode = {
 
     Roles = {
         {
+            Kind = "Role",
             Name = "Traitor",
             FormattedName = "<font color='#ff0000'>Traitor</font>",
             Description = "Work with the other Traitors to defeat all the Innocents. Keep your role secret.",
@@ -258,6 +259,7 @@ local module: Types.Gamemode = {
             TeamChat = true,
         },
         {
+            Kind = "Role",
             Name = "Detective",
             FormattedName = "<font color='#0000ff'>Detective</font>",
             Description = "Work with the Innocents to identify the Traitors.",
@@ -286,6 +288,7 @@ local module: Types.Gamemode = {
             },
         },
         {
+            Kind = "Role",
             Name = "Innocent",
             FormattedName = "<font color='#00ff00'>Innocent</font>",
             Description = "Survive the Traitors.",
@@ -343,7 +346,8 @@ local module: Types.Gamemode = {
 
         local winner = common.TestForOneSurvivingRole(self, round)
         if winner then
-            round:EndRound(round:GetRoleFromName(winner))
+            round:EndRound(round.Participants[1])
+            --round:EndRound(round:GetRoleFromName(winner))
         end
     end,
     

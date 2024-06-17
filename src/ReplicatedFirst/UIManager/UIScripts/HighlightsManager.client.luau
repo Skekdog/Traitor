@@ -11,9 +11,15 @@ local page = UI.Object.Page
 local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
 local eTemplate = eFrame.Template
 
-ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role)
-	hFrame.Winners.Text = `THE {victors.Name:upper()}S WIN`
-	hFrame.Winners.TextColor3 = victors.Colour
+ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role | Types.ClientParticipant)
+	if victors.Kind == "ClientParticipant" then
+		hFrame.Winners.Text = victors.Player.Name:upper().." WINS"
+		print(LocalRoundInfo.GetRole(victors.Role), victors.Role)
+		hFrame.Winners.TextColor3 = LocalRoundInfo.GetRole(victors.Role).Colour
+	else
+		hFrame.Winners.Text = `THE {victors.Name:upper()}S WIN`
+		hFrame.Winners.TextColor3 = victors.Colour
+	end
 
 	for _, v in eFrame:GetChildren() do
 		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.Name ~= "EventFilters" then
