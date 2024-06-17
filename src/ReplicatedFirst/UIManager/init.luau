@@ -248,6 +248,13 @@ function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 	return UIManager.GetUI(name)
 end
 
+type Theme = {
+	Primary: Color3,
+	Secondary: Color3,
+	Text: Color3,
+	TextStroke: Color3,
+	UIStroke: Color3
+}
 UIManager.Themes = {
 	Light = {
 		Primary = Color3.fromRGB(250, 250, 250),
@@ -270,10 +277,10 @@ UIManager.Themes = {
 		TextStroke = Color3.fromRGB(0, 0, 0),
 		UIStroke = Color3.fromRGB(255, 255, 255),
 	},
-}
+} :: {[string]: Theme}
 
 local THEME_TRANSITION_TIME = 0.25
-function UIManager.UpdateThemeInstance(v: Instance, theme, noTransition: boolean?): ()
+function UIManager.UpdateThemeInstance(v: Instance, theme: Theme, noTransition: boolean?): ()
 	-- Updates the theme for one instance
 	-- Tag StyledUI means that a UI object will be updated to match the theme
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
@@ -317,12 +324,11 @@ function UIManager.UpdateThemeInstance(v: Instance, theme, noTransition: boolean
 	return
 end
 
-function UIManager.UpdateTheme(themeName: string): ()
-	local theme = UIManager.Themes[themeName]
-	if not theme then
-		error("Theme "..tostring(themeName).." not found!")
+function UIManager.UpdateTheme(theme: string | Theme): ()
+	if typeof(theme) == "string" then
+		theme = UIManager.Themes[theme]
 	end
-
+	assert(typeof(theme) == "table")
 	for _, v in game:GetService("CollectionService"):GetTagged("StyledUI") do
 		UIManager.UpdateThemeInstance(v, theme)
 	end

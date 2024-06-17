@@ -40,6 +40,8 @@ export type KeybindSetting = {
 }
 export type Setting = KeybindSetting | string | boolean | UDim2 | number -- SelectionChoice, Boolean, TouchPosition, TouchScale
 
+local seizureThread: thread
+
 local module = {}
 
 local function keybindCallback(val, name)
@@ -47,6 +49,7 @@ local function keybindCallback(val, name)
 	updated:Fire(name, val)
 end
 
+module.Settings = {}
 module.AvailableSettings = {
 	{
 		Name = "Shadows",
@@ -97,7 +100,21 @@ module.AvailableSettings = {
 		Default = "Dark",
 		Callback = function(val)
 			if val == "SEIZURE" then
-				--UI.UpdateTheme()
+				if seizureThread then
+					task.cancel(seizureThread)
+				end
+				seizureThread = task.spawn(function()
+					while module.Settings["UI Theme"] == "SEIZURE" do
+						UI.UpdateTheme({
+							Primary = Color3.new(math.random(), math.random(), math.random()),
+							Secondary = Color3.new(math.random(), math.random(), math.random()),
+							Text = Color3.new(math.random(), math.random(), math.random()),
+							TextStroke = Color3.new(math.random(), math.random(), math.random()),
+							UIStroke = Color3.new(math.random(), math.random(), math.random()),
+						})
+						task.wait(0.25)
+					end
+				end)
 			else
 				UI.UpdateTheme(val :: string)
 			end
@@ -493,7 +510,7 @@ module.AvailableSettings = {
 	},
 } :: {SettingDefinition}
 
-module.Settings = {}
+
 for _, v in module.AvailableSettings do
 	module.Settings[v.Name] = v.Default
 end
