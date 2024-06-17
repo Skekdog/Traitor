@@ -122,7 +122,7 @@ local function shatterGlass(glass: BasePart)
         fragment.CanTouch = false
         fragment.CastShadow = false
         
-        fragment.Parent = workspace
+        fragment.Parent = workspace.Projectiles
 
         table.insert(fragments, fragment)
     end
