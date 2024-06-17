@@ -238,6 +238,25 @@ local module: Types.Adapter = {
         return ((0.00005 * (karma^2)) + 50) / 100
     end,
 
+    LoadBound = function(round, bound)
+        if bound.Name == "KillBound" then
+            bound.CanTouch = true
+            bound.CanCollide = false
+            bound.Touched:Connect(function(part)
+                local char = part.Parent :: Model
+                if not Players:GetPlayerFromCharacter(char) then
+                    return
+                end
+
+                local participant = round:GetParticipant(char.Name)
+                if not participant then
+                    return
+                end
+                participant:Kill(nil, bound:GetAttribute("KillMethod") or "Suicide", nil, true)
+            end)
+        end
+    end,
+
     OnDeath = function(victim)
         local char = victim.Character
         local plr = victim.Player
@@ -262,8 +281,7 @@ local module: Types.Adapter = {
         end
 
         if hum then
-            hum:SetStateEnabled(Enum.HumanoidStateType.Physics, true)
-            hum.EvaluateStateMachine = false
+            hum:Destroy()
         end
         if root then
             root.CanCollide = false
@@ -324,10 +342,13 @@ local module: Types.Adapter = {
                 v:Destroy()
             elseif v:IsA("BasePart") then
                 v.CanCollide = v.Name ~= "HumanoidRootPart"
-                --v:SetNetworkOwner()
             elseif v.Name == "DeathSound" and v:IsA("Sound") then
                 v:Play()
             end
+        end
+
+        if root then
+            root:SetNetworkOwner()
         end
 
         victim.Character = clone

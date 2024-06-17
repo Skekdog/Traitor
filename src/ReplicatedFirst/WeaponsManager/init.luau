@@ -99,6 +99,60 @@ local function findPropAncestor(prop: Instance, propsFolder: Folder): Types.Prop
     end
 end
 
+local function shatterGlass(glass: BasePart)
+    local fragmentSize = 1
+    local fragments = {}
+
+    local glassCFrame = glass.CFrame
+    local glassSize = glass.Size
+    local glassColor = glass.Color
+
+    local random = Random.new()
+
+    local function createFragment(position, size)
+        local fragment = Instance.new("WedgePart")
+        fragment.Size = size
+        fragment.Anchored = false
+        fragment.Color = glassColor
+        fragment.Position = position
+        fragment.Orientation = Vector3.new(math.random() * 360, math.random() * 360, math.random() * 360)
+        fragment.Transparency = 0.8
+        
+        fragment.CanQuery = false
+        fragment.CanTouch = false
+        fragment.CastShadow = false
+        
+        fragment.Parent = workspace
+
+        table.insert(fragments, fragment)
+    end
+
+    local halfSizeX = glassSize.X / 2
+    local halfSizeZ = glassSize.Z / 2
+
+    for x = -halfSizeX, halfSizeX, fragmentSize do
+        for z = -halfSizeZ, halfSizeZ, fragmentSize do
+            local localPosition = Vector3.new(x, 0, z)
+            local worldPosition = glassCFrame:PointToWorldSpace(localPosition)
+            local fragmentDimensions = Vector3.new(
+                random:NextNumber(fragmentSize / 2, fragmentSize),
+                glassSize.Y,
+                glassSize.Z
+            )
+            createFragment(worldPosition, fragmentDimensions)
+        end
+    end
+
+    glass:Destroy()
+
+    task.delay(5, function()
+        for _, v in fragments do
+            v:Destroy()
+        end
+        table.clear(fragments)
+    end)
+end
+
 local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attacker: Types.Participant?, rayResult: RaycastResult): ()
     if round:IsRoundPreparing() then
         return
@@ -115,7 +169,15 @@ local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attack
         end
 
         onEntityHit(round, weapon, attacker, victim, part.Name, rayResult.Distance)
-    else
+    elseif not parent:GetAttribute("IsCorpse") then
+        local windows = round.Map:FindFirstChild("Windows")
+        if windows then
+            if part:IsDescendantOf(windows) then
+                shatterGlass(part)
+                return
+            end
+        end
+
         local impactHole = Instance.new("Part")
         impactHole.Anchored = false
         impactHole.Transparency = 1
@@ -142,6 +204,9 @@ local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attack
             end
             local tween = TweenService:Create(impactDecal, TweenInfo.new(5), {Transparency = 1})
             tween.Completed:Connect(function()
+                if not impactHole.Parent then
+                    return
+                end
                 weld:Destroy()
                 impactHole:Destroy()
             end)
@@ -162,6 +227,8 @@ local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attack
             local prop = round:GetProp(findPropAncestor(part, mapProps) :: Types.PropInstance)
             onEntityHit(round, weapon, attacker, prop, part.Name, rayResult.Distance)
         end
+    elseif weapon.BeforeHitCorpse then
+        weapon.BeforeHitCorpse(attacker, part)
     end
 end
 
@@ -256,6 +323,7 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
     rayParams.IgnoreWater = true
     rayParams.RespectCanCollide = true
     rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
+    rayParams.CollisionGroup = "Bounds"
 
     for _ = 1, weapon.BulletsPerShot or 1 do
         local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())

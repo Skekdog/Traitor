@@ -1,6 +1,9 @@
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
 type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> boolean?
+type BeforeHitPropFunction = (attacker: Types.Participant?, target: Types.Prop, willDestroy: boolean?, hitPartName: string) -> boolean?
+type BeforeHitCorpseFunction = (attacker: Types.Participant?, part: BasePart) -> ()
+
 type AimInfo = {
     FOV: number,
     HasScope: boolean?,
@@ -59,6 +62,7 @@ export type Weapon = {
     ReloadSound: Sound?,
 
     BeforeHitParticipant: BeforeHitParticipantFunction?,
+    BeforeHitCorpse: BeforeHitCorpseFunction?,
 }
 
 export type ExplosionInfo = {
@@ -66,6 +70,7 @@ export type ExplosionInfo = {
     Pressure: number,
     Damage: number?,
     BeforeHitParticipant: BeforeHitParticipantFunction?,
+    BeforeHitCorpse: BeforeHitCorpseFunction?,
     FalloffStart: number?,
     FalloffEnd: number?,
     FalloffMultiplier: number?,

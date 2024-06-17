@@ -324,7 +324,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         FiredSound = firedSounds["Flare Gun"],
 
         ProjectileInfo = {
-            Base = bullet,
+            Base = projectiles.Flare :: PVInstance,
             Speed = 140
         },
 
@@ -350,6 +350,26 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
                 fire:Destroy()
             end)
             return
+        end,
+
+        BeforeHitCorpse = function(attacker, part)
+            local endTime = workspace:GetServerTimeNow() + 10
+            if not part.Parent then
+                return
+            end
+            local root = part.Parent:FindFirstChild("HumanoidRootPart") :: BasePart
+            burn(attacker, root or part, function(fire, burnSound)
+                while (endTime > workspace:GetServerTimeNow()) and part.Parent do
+                    burnSound:Play()
+                    task.wait(0.25)
+                end
+                burnSound:Destroy()
+                fire:Destroy()
+
+                if part.Parent then
+                    part.Parent:Destroy()
+                end
+            end)
         end
     },
     SMG = {
