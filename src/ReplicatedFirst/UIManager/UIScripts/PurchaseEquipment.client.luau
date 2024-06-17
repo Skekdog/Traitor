@@ -6,7 +6,7 @@ local UIManager = require(ReplicatedFirst.UIManager)
 
 local API = require(ReplicatedFirst.API)
 
-local UI = UIManager.WaitForUI("Equipment Shop", true).Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs["Equipment Shop"])
+local UI = UIManager.WaitForUI("Equipment Shop", true).Object :: typeof(UIManager.UnregisteredUIs["Equipment Shop"])
 local purchaseButton = UI.Purchase
 
 local radarCooldown = 5

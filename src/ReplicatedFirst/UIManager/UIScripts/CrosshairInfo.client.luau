@@ -1,5 +1,4 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(script.Parent.Parent)
 local ControlManager = require(script.Parent.Parent.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
@@ -23,7 +22,7 @@ local karmaDefs = {
 }
 
 local mouse = Players.LocalPlayer:GetMouse()
-local ui = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.CrosshairInfo)
+local ui = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(UIManager.UnregisteredUIs.CrosshairInfo)
 local playerInfo = ui.PlayerInfo
 
 local function showPlayerInfo(char: Model)

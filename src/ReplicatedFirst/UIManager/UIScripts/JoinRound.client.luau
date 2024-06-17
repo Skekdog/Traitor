@@ -2,9 +2,9 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local API = require(ReplicatedFirst.API)
-local UI = require(ReplicatedFirst.UIManager)
-local roundInfo = UI.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
-local this = UI.WaitForUI("JoinRound") :: UI.UI & {Object: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.JoinRound)}
+local UIManager = require(ReplicatedFirst.UIManager)
+local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
+local this = UIManager.WaitForUI("JoinRound") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.JoinRound)}
 
 this.Object.MouseButton1Click:Connect(function()
 	local success = ReplicatedStorage.RoundHandler.JoinRound:InvokeServer()

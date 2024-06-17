@@ -9,10 +9,10 @@ local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.RoundInfo)
+local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 local joinRound = UIManager.WaitForUI("JoinRound")
 
-local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.VotingScreen)}
+local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
 for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
 	local clone = vote.Object.Sample:Clone()
 	clone.Text = v
@@ -27,7 +27,7 @@ end
 
 local stopMusic: (() -> ())?
 
-type EquipmentShopType = UIManager.UI & {Object: typeof(ReplicatedFirst.UIManager.UnregisteredUIs["Equipment Shop"])}
+type EquipmentShopType = UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])}
 local equipmentShop: EquipmentShopType?
 local function update(roundPhase)
     local participant: Types.ClientOwnParticipant? = LocalRoundInfo.GetOwnParticipant()
@@ -101,7 +101,7 @@ local function update(roundPhase)
         sound.Parent = SoundService.RoundEndMusic
         sound:Play()
 
-        local highlights = UIManager.WaitForUI("Highlights").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Highlights)
+        local highlights = UIManager.WaitForUI("Highlights").Object :: typeof(UIManager.UnregisteredUIs.Highlights)
         highlights.Page.Highlights.Music.Text.Text = sound.Name
         
         fadeIn:Play()
@@ -184,7 +184,7 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
     roundInfo.TopBar.Role.Text = role.Name
     roundInfo.TopBar.Role.TextColor3 = role.Colour
 
-    local toRegister = ReplicatedFirst.UIManager.UnregisteredUIs:FindFirstChild("Equipment Shop")
+    local toRegister = UIManager.UnregisteredUIs:FindFirstChild("Equipment Shop")
     if not role.EquipmentShop or #role.EquipmentShop <= 0 or not toRegister then
         return
     end

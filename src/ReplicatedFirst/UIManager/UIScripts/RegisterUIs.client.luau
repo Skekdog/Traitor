@@ -25,8 +25,8 @@ for _, layer in {"Popup", "HUD", "Special", "Buttons"} do
 	screenUi.Parent = Players.LocalPlayer.PlayerGui
 end
 
-manager.RegisterUI(script.Parent.Parent.UnregisteredUIs.Sidebar)
-for _, object in script.Parent.Parent.UnregisteredUIs:GetChildren() do
+manager.RegisterUI(manager.UnregisteredUIs.Sidebar)
+for _, object in manager.UnregisteredUIs:GetChildren() do
 	if object:GetAttribute("DoNotRegister") then
 		continue
 	end

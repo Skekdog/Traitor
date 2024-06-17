@@ -39,7 +39,7 @@ local keybindFrame = script.__SettingKeybind
 local selectorFrame = script.__SettingSelector
 local booleanFrame = script.__SettingBoolean
 local touchFrame = script.__SettingTouch
-local settingsFrame = (UIManager.WaitForUI("Settings").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Settings)).Main
+local settingsFrame = (UIManager.WaitForUI("Settings").Object :: typeof(UIManager.UnregisteredUIs.Settings)).Main
 
 local tabsFrame = settingsFrame.Tabs
 local tabUnderline = tabsFrame.Underline

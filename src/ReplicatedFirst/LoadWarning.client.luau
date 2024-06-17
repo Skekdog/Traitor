@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local UIManager = require(script.Parent.UIManager)
 
-local unregisteredUIs = script.Parent.UIManager.UnregisteredUIs
+local unregisteredUIs = UIManager.UnregisteredUIs
 local plr = Players.LocalPlayer
 
 local start = os.time()

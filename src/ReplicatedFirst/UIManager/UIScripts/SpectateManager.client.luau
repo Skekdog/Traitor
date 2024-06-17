@@ -7,7 +7,7 @@ local controls = require(ReplicatedFirst.ControlManager)
 
 local camera = workspace.CurrentCamera
 local ui = uiManager.WaitForUI("Spectate")
-local uiO = ui.Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Spectate)
+local uiO = ui.Object :: typeof(uiManager.UnregisteredUIs.Spectate)
 
 local function spectateFunc(action, state)
 	local chars = {}

@@ -1,11 +1,10 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UIManager = require(script.Parent.Parent)
 local API = require(script.Parent.Parent.Parent.API)
 local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo")
-local object = (corpseUi.Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.CorpseInfo)).CorpseInfo
+local object = (corpseUi.Object :: typeof(UIManager.UnregisteredUIs.CorpseInfo)).CorpseInfo
 
 local flavourTexts: {[Types.MurderWeapon]: string} = {
 	Crush = "Many of their bones are broken. It seems the impact of a heavy object killed them.",

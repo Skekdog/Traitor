@@ -1,8 +1,7 @@
 local UIManager = require(script.Parent.Parent)
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local SoundService = game:GetService("SoundService")
 
-local button = (UIManager.WaitForUI("Highlights").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Highlights)).Page.Highlights.Music.Mute 
+local button = (UIManager.WaitForUI("Highlights").Object :: typeof(UIManager.UnregisteredUIs.Highlights)).Page.Highlights.Music.Mute 
 
 local pause = false
 button.MouseButton1Click:Connect(function()

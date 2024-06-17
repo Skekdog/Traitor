@@ -2,7 +2,8 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SettingsManager = require(script.Parent.Parent.Parent.SettingsManager)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
-local UI = require(ReplicatedFirst.UIManager).WaitForUI("Credits")
+local UIManager = require(ReplicatedFirst.UIManager)
+local UI = UIManager.WaitForUI("Credits")
 
 local fibSettingDefinition
 for _, v in SettingsManager.AvailableSettings do
@@ -13,7 +14,7 @@ for _, v in SettingsManager.AvailableSettings do
 end
 
 LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)
-	(UI.Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage.RoundHandler:GetAttribute("MapName")} by {mapAuthors}`
+	(UI.Object :: typeof(UIManager.UnregisteredUIs.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage.RoundHandler:GetAttribute("MapName")} by {mapAuthors}`
 	UI:ToggleVisible(true)
 	task.delay(5, UI.ToggleVisible, UI, false)
 

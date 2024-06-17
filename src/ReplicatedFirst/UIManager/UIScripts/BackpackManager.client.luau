@@ -8,7 +8,7 @@ local WeaponsTypes = require(ReplicatedFirst.WeaponsManager.WeaponsTypes)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local plr = Players.LocalPlayer
-local backpack = UIManager.WaitForUI("Backpack").Object :: typeof(ReplicatedFirst.UIManager.UnregisteredUIs.Backpack)
+local backpack = UIManager.WaitForUI("Backpack").Object :: typeof(UIManager.UnregisteredUIs.Backpack)
 
 local selectedEquipment: WeaponsTypes.Weapon?
 

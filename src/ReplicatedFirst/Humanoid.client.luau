@@ -3,7 +3,7 @@ local TweenService = game:GetService("TweenService")
 local ControlManager = require(script.Parent.ControlManager)
 local UIManager = require(script.Parent.UIManager)
 
-local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(script.Parent.UIManager.UnregisteredUIs.RoundInfo)
+local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
 local activeTween: Tween
 local function setHealth(hum: Humanoid)

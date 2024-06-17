@@ -49,6 +49,8 @@ export type UI = {
 local registeredUIs: {UI} = {}
 local nextUI: UI
 
+UIManager.UnregisteredUIs = script.UnregisteredUIs
+
 local UIRegistered = Instance.new("BindableEvent", script)
 function UIManager.RegisterUI(object: GuiObject): UI
 	local ignoreInset: boolean? = object:GetAttribute("IgnoreInset")
@@ -109,7 +111,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		Unregister = function(self: UI)
 			ControlManager.Unregister(self.Name)
 			self:ToggleVisible(false, true)
-			self.Object.Parent = script.UnregisteredUIs
+			self.Object.Parent = UIManager.UnregisteredUIs
 			
 			if self.Sidebar then
 				local sb = UIManager.GetUI("Sidebar").Object; -- Ambiguous syntax means we need a semicolon here, day ruined
@@ -135,7 +137,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	end
 	
 	if self.Sidebar then
-		local sb = UIManager.GetUI("Sidebar").Object :: typeof(script.UnregisteredUIs.Sidebar)
+		local sb = UIManager.GetUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
 		if not ReplicatedFirst:GetAttribute("ControlsReady") then
 			ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 		end
