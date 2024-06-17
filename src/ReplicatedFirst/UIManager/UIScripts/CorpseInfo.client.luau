@@ -19,6 +19,19 @@ local flavourTexts: {[Types.MurderWeapon]: string} = {
 	Suicide = "This spy couldn't take it anymore and took their own life.",
 }
 
+local flavourImages: {[Types.MurderWeapon]: string} = {
+    Fall = "rbxassetid://27225585",
+    Firearm = "rbxassetid://700497561",
+    Explosion = "rbxassetid://1789477853",
+    Crush = "rbxassetid://953809995",
+    Blunt = "rbxassetid://15819411457",
+    Drown = "rbxassetid://1094356207",
+    Blade = "rbxassetid://949752421",
+    Burn = "rbxassetid://5664716195",
+    Mutation = "rbxassetid://2890327",
+    Suicide = "rbxassetid://17079244437"
+}
+
 local rh = ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)
 rh.SendCorpseInfo.OnClientEvent:Connect(function(corpseInfo: Types.CorpseInfo)
     local weapon
@@ -40,10 +53,11 @@ rh.SendCorpseInfo.OnClientEvent:Connect(function(corpseInfo: Types.CorpseInfo)
     end
     object.MurderWeapon:SetAttribute("Description", flavourText)
 
-    object.MurderWeapon.Image = if deathType == "Explosion" then "rbxassetid://1789477853" else "rbxassetid://700497561"
+    object.MurderWeapon.Image = flavourImages[deathType]
 
-    object.DeathTime.TextLabel.Text = API.ToRoundTime(corpseInfo.DeathTime, workspace:GetServerTimeNow())
-    object.DeathTime:SetAttribute("Description", `Their watch stopped, indicating that they died {math.round(workspace:GetServerTimeNow() - corpseInfo.DeathTime)} seconds ago.`)
+    local timeNow = workspace:GetServerTimeNow()
+    object.DeathTime.TextLabel.Text = API.ToRoundTime(corpseInfo.DeathTime, timeNow)
+    object.DeathTime:SetAttribute("Description", `Their watch stopped, indicating that they died {math.round(timeNow - corpseInfo.DeathTime)} seconds ago.`)
 
     object.FreeKill.Visible = corpseInfo.FreeKill
     object.Headshot.Visible = corpseInfo.Headshot

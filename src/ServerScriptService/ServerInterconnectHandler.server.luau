@@ -16,8 +16,10 @@ si.ExplosiveBarrel.Event:Connect(function(part: BasePart, plr: Player?)
 	end
 	if part then
 		WeaponsManager.CreateExplosion(part.Position, {
-			Radius = 15,
-			Pressure = 50
+			Kind = "Explosion",
+			Radius = 25,
+			Pressure = 50,
+			Damage = 150,
 		}, participant)
 	end
 end)

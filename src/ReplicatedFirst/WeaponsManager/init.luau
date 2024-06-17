@@ -11,7 +11,7 @@ local Adapters = require(ServerScriptService.Adapters)
 
 local module = {}
 
-local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsTypes.Weapon, partName: string, distance: number): number
+local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsTypes.Weapon | WeaponsTypes.ExplosionInfo, partName: string, distance: number): number
     local damage: number
     if type(weapon.Damage) == "table" then
         if partName == "Head" then
@@ -25,8 +25,9 @@ local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsType
         damage = weapon.Damage
     end
 
-    if distance >= weapon.FalloffStart then
-        damage *= API.LerpNumber(1, weapon.FalloffMultiplier, (distance - weapon.FalloffStart) / weapon.FalloffEnd)
+    local start = weapon.FalloffStart or 0
+    if distance >= start then
+        damage *= API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: WeaponsTypes.ExplosionInfo).Radius))
     end
 
     if attacker then
@@ -36,7 +37,7 @@ local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsType
     return damage
 end
 
-local function onEntityHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attacker: Types.Participant?, entity: WeaponsTypes.Entity, partName: string, distance: number): ()
+local function onEntityHit(round: Types.Round, weapon: WeaponsTypes.Weapon | WeaponsTypes.ExplosionInfo, attacker: Types.Participant?, entity: WeaponsTypes.Entity, partName: string, distance: number): ()
     local damage = calculateDamage(attacker, weapon, partName, distance)
 
     local hum: Humanoid?
@@ -68,7 +69,11 @@ local function onEntityHit(round: Types.Round, weapon: WeaponsTypes.Weapon, atta
                 if death and partName == "Head" then
                     death.Volume = 0
                 end
-                entity:Kill(attacker, round:GetEquipment(weapon.Name), partName == "Head", false)
+                if weapon.Kind == "Explosion" then
+                    entity:Kill(attacker, "Explosion", false, false)
+                else
+                    entity:Kill(attacker, round:GetEquipment(weapon.Name), partName == "Head", false)
+                end
             elseif attacker and not attacker:HasSelfDefenseAgainst(entity) then
                 entity:AddSelfDefense(attacker, 15)
             end
@@ -78,8 +83,9 @@ local function onEntityHit(round: Types.Round, weapon: WeaponsTypes.Weapon, atta
                 karmaDiff *= if attacker:IsDamageJustifiedAgainst(entity) then 1 else -1
                 attacker.Karma += karmaDiff
             end
-        elseif willDie then
-            entity.OnBreak(entity)
+        elseif willDie and not entity.PropInstance:GetAttribute("Destroyed") then
+            entity.PropInstance:SetAttribute("Destroyed", true)
+            entity:OnBreak()
             entity.PropInstance:Destroy()
         end
         
@@ -199,12 +205,12 @@ local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attack
         weld.Parent = rayResult.Instance
 
         task.delay(5, function()
-            if not impactHole.Parent then
+            if impactHole:IsDescendantOf(workspace) then
                 return
             end
             local tween = TweenService:Create(impactDecal, TweenInfo.new(5), {Transparency = 1})
             tween.Completed:Connect(function()
-                if not impactHole.Parent then
+                if not impactHole:IsDescendantOf(workspace) then
                     return
                 end
                 weld:Destroy()
@@ -224,7 +230,10 @@ local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attack
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
         if mapProps and part:IsDescendantOf(mapProps) then
-            local prop = round:GetProp(findPropAncestor(part, mapProps) :: Types.PropInstance)
+            local prop = round._props[findPropAncestor(part, mapProps) :: Types.PropInstance]
+            if not prop then
+                return
+            end
             onEntityHit(round, weapon, attacker, prop, part.Name, rayResult.Distance)
         end
     elseif weapon.BeforeHitCorpse then
@@ -239,6 +248,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.E
     explosion.BlastPressure = explosionInfo.Pressure
     explosion.DestroyJointRadiusPercent = 0
     explosion.ExplosionType = Enum.ExplosionType.NoCraters
+    explosion.Position = position
 
     local soundPart = Instance.new("Part")
     soundPart.Transparency = 1
@@ -256,7 +266,55 @@ function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.E
 	end)
     sound:Play()
 
-    explosion.Parent = workspace
+    local round
+    if attacker then
+        round = attacker.Round
+    else
+        local roundId = ServerStorage:GetAttribute("RoundID")
+        if not roundId then
+            return
+        end
+        round = RoundHandler.GetRound(roundId)
+    end
+
+    local overlapParams = OverlapParams.new()
+    overlapParams.FilterType = Enum.RaycastFilterType.Include
+    overlapParams.FilterDescendantsInstances = {workspace}
+
+    local props = round.Map:FindFirstChild("Props")
+    local windows = round.Map:FindFirstChild("Windows")
+
+    local propsHit = {}
+    local participantsHit = {}
+    for _, v in workspace:GetPartBoundsInRadius(position, explosionInfo.Radius, overlapParams) do
+        local entity: WeaponsTypes.Entity
+        if props and v:IsDescendantOf(props) then
+            local prop = findPropAncestor(v, props)
+            if not prop then
+                continue
+            end
+            entity = round:GetProp(prop)
+            if table.find(propsHit, entity) then
+                continue
+            end
+            table.insert(propsHit, entity)
+        elseif windows and v:IsDescendantOf(windows) then
+            shatterGlass(v)
+            continue
+        elseif v.Parent and v.Parent:IsA("Model") and v.Parent:FindFirstChildOfClass("Humanoid") then
+            local participant = round:GetParticipant(v.Parent.Name)
+            if not participant or table.find(participantsHit, participant) then
+                continue
+            end
+            entity = participant
+            table.insert(participantsHit, participant)
+        else
+            continue
+        end
+        onEntityHit(round, explosionInfo, attacker, entity, v.Name, (v.Position - position).Magnitude)
+    end
+
+    explosion.Parent = workspace.Projectiles
 end
 
 function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo: Ray): ()

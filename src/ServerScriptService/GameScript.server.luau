@@ -21,7 +21,7 @@ getMaps.OnServerInvoke = function()
 	return names
 end
 
-slayVote.OnServerEvent:Connect(function(plr, target: Player)
+slayVote.OnServerEvent:Connect(function(plr, target: Player?)
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if (not roundId) or (typeof(target) ~= "Instance")  then
 		return

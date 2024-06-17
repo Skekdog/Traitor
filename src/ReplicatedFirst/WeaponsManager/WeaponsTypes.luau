@@ -32,6 +32,7 @@ export type Entity = Types.Participant | Types.Prop
 export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
 export type WeaponName = string
 export type Weapon = {
+    Kind: "Weapon",
     Name: string,
     Description: string,
 
@@ -66,9 +67,10 @@ export type Weapon = {
 }
 
 export type ExplosionInfo = {
+    Kind: "Explosion",
     Radius: number,
     Pressure: number,
-    Damage: number?,
+    Damage: number,
     BeforeHitParticipant: BeforeHitParticipantFunction?,
     BeforeHitCorpse: BeforeHitCorpseFunction?,
     FalloffStart: number?,

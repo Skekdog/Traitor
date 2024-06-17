@@ -227,6 +227,11 @@ local module: Types.Adapter = {
         sound.SoundId = "rbxassetid://"..deathsounds[math.random(1, #deathsounds)]
         sound.Name = "DeathSound"
         sound.Parent = participant.Character.PrimaryPart
+
+        local scale = participant.Round.Map:FindFirstChild("Scale") :: NumberValue
+        if scale then
+            participant.Character:ScaleTo(scale.Value)
+        end
     end,
 
     SendSlayVote = function(to, target)
