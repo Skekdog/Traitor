@@ -150,7 +150,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Pistol", "Golden Gun", "Flare Gun", "XM1014"},
+    StartingEquipment = {"Crowbar", "Pistol", "Golden Gun", "Flare Gun", "BAR"},
     AvailableEquipment = {
         {
             Name = "Crowbar",
@@ -167,6 +167,14 @@ local module: Types.Gamemode = {
             AttackType = "Firearm",
 
             Item = items.Pistol
+        },
+        {
+            Name = "BAR",
+            Description = "Reliable",
+            Icon = "rbxassetid://",
+            AttackType = "Firearm",
+
+            Item = items.BAR
         },
         {
             Name = "Assault Rifle",

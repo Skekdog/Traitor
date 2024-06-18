@@ -28,6 +28,7 @@ end
 
 local weapons: {[string]: WeaponsTypes.Weapon} = {
     Grenade = {
+        Kind = "Weapon",
         Name = "Grenade",
         Description = "Kaboom",
 
@@ -45,8 +46,10 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         FalloffMultiplier = 0.1,
 
         ExplosionInfo = {
+            Kind = "Explosion",
             Radius = 17,
             Pressure = 1000,
+            Damage = 0,
         },
         FuseTime = 5,
 
@@ -60,6 +63,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         FiredSound = firedSounds.Grenade,
     },
     Crowbar = {
+        Kind = "Weapon",
         Name = "Crowbar",
         Description = "Make Freeman Proud",
 
@@ -87,6 +91,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         ProjectileInfo = false
     },
     HUGE = {
+        Kind = "Weapon",
         Name = "HUGE",
         Description = "Boolet",
 
@@ -127,6 +132,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         FiredSound = firedSounds.HUGE,
     },
     Scout = {
+        Kind = "Weapon",
         Name = "Scout",
         Description = "It's a good job",
 
@@ -170,6 +176,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         ReloadSound = reloadSounds.Scout,
     },
     Pistol = {
+        Kind = "Weapon",
         Name = "Pistol",
         Description = "Pew",
 
@@ -212,6 +219,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         }
     },
     ["Golden Gun"] = {
+        Kind = "Weapon",
         Name = "Golden Gun",
         Description = "One shot. Don't fumble it.",
 
@@ -294,6 +302,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         end
     },
     ["Flare Gun"] = {
+        Kind = "Weapon",
         Name = "Flare Gun",
         Description = "Ouch fire hot.",
 
@@ -373,6 +382,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         end
     },
     SMG = {
+        Kind = "Weapon",
         Name = "SMG",
         Description = "pew pew pew",
 
@@ -415,6 +425,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         }
     },
     AWP = {
+        Kind = "Weapon",
         Name = "AWP",
         Description = "A high-powered sniper rifle. Must be scoped in to shoot.",
 
@@ -457,6 +468,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         }
     },
     ["Assault Rifle"] = {
+        Kind = "Weapon",
         Name = "Assault Rifle",
         Description = "pew pew",
 
@@ -499,6 +511,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         }
     },
     Flashbang = {
+        Kind = "Weapon",
         Name = "Flashbang",
         Description = "Blinds and deafens anyone in its radius. Can be disarmed by shooting it.",
 
@@ -512,8 +525,10 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         FalloffMultiplier = 1,
 
         ExplosionInfo = {
+            Kind = "Explosion",
             Radius = 17,
             Pressure = 0,
+            Damage = 0,
         },
         FuseTime = 3,
 
@@ -535,6 +550,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         end
     },
     ["Silenced Pistol"] ={
+        Kind = "Weapon",
         Name = "Silenced Pistol",
         Description = "A Pistol that has been modified to make far less noise. People killed with silenced weapons will not scream.",
 
@@ -590,6 +606,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         end
     },
     XM1014 = {
+        Kind = "Weapon",
         Name = "XM1014",
         Description = "bang",
 
@@ -633,6 +650,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         ReloadSound = reloadSounds.XM1014,
     },
     Glock = {
+        Kind = "Weapon",
         Name = "Glock",
         Description = "pew pew",
 
@@ -675,6 +693,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         ReloadSound = reloadSounds.Glock,
     },
     Deagle = {
+        Kind = "Weapon",
         Name = "Deagle",
         Description = "Bang",
 
@@ -715,6 +734,49 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         Model = models.Deagle,
         FiredSound = firedSounds.Deagle,
         ReloadSound = reloadSounds.Deagle,
+    },
+    BAR = {
+        Kind = "Weapon",
+        Name = "BAR",
+        Description = "Heavy automatic rifle",
+
+        Slot = 3,
+        CanDrop = true,
+
+        Damage = {
+            Head = 75,
+            Body = 40,
+            Limb = 25
+        },
+
+        Spread = 0.75,
+        Recoil = 0.7,
+
+        FalloffStart = 50,
+        FalloffEnd = 120,
+        FalloffMultiplier = 0.3,
+
+        AimInfo = {
+            FOV = 65,
+            SpreadMultiplier = 0.2
+        },
+
+        MultiUse = {
+            FireTime = 0.1,
+            ReloadTime = 2.5,
+            MagazineSize = 20,
+            MaxReserve = 100,
+            AmmoType = "Assault Rifle"
+        },
+
+        Model = models.BAR,
+        FiredSound = firedSounds.BAR,
+        ReloadSound = reloadSounds.BAR,
+
+        ProjectileInfo = {
+            Base = bullet,
+            Speed = 120
+        }
     }
 }
 

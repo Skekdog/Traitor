@@ -134,6 +134,7 @@ replicatedData.UpdateRoles.OnClientEvent:Connect(function(gamemodeName: string?,
             roles[gamemodeName.."__"..v.Name] = v
         end
         roles[gamemodeName.."__"] = {
+            Kind = "Role",
             Name = "",
             Colour = Color3.new(),
         }
