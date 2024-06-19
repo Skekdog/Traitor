@@ -71,6 +71,7 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
                     death.Volume = 0
                 end
                 if weapon.Kind == "Explosion" then
+                    print(attacker)
                     entity:Kill(attacker, "Explosion", false, false)
                 else
                     entity:Kill(attacker, round:GetEquipment(weapon.Name), partName == "Head", false)
@@ -86,6 +87,7 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
             end
         elseif willDie and not entity.PropInstance:GetAttribute("Destroyed") then
             entity.PropInstance:SetAttribute("Destroyed", true)
+            entity.Attacker = attacker
             entity:OnBreak()
             entity.PropInstance:Destroy()
         end
@@ -106,49 +108,62 @@ local function findPropAncestor(prop: Instance, propsFolder: Folder): Types.Prop
     end
 end
 
+local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePart)
+    local wedge = Instance.new("WedgePart")
+    wedge.Size = size
+    wedge.CFrame = cframe
+    wedge.Anchored = false
+    --wedge.Material = parent.Material
+    wedge.Color = parent.Color
+    wedge.Transparency = parent.Transparency
+    wedge.Parent = workspace.Projectiles
+
+    wedge:ApplyImpulse((if math.random() >= 0.5 then 1 else -1) * Vector3.one)
+
+    return wedge
+end
+
+-- Function to shatter the glass part into a grid of wedge fragments
 local function shatterGlass(glass: BasePart)
-    local fragmentSize = 1
+    local cols = math.max(1, math.floor(glass.Size.X / 3))
+    local rows = math.max(1, math.floor(glass.Size.Y / 3))
+
+    local glassSize = glass.Size
+    local glassCFrame = glass.CFrame
+
+    -- Calculate the size of each fragment
+    local fragmentWidth = glassSize.X / cols
+    local fragmentHeight = glassSize.Y / rows
+    local fragmentDepth = glassSize.Z / 2  -- Depth of the wedge (half of glass thickness)
+
     local fragments = {}
 
-    local glassCFrame = glass.CFrame
-    local glassSize = glass.Size
-    local glassColor = glass.Color
+    -- Loop through the grid and create fragments
+    for row = 0, rows - 1 do
+        for col = 0, cols - 1 do
+            -- Calculate the position for the fragment
+            local posX = (col * fragmentWidth) - (glassSize.X / 2) + (fragmentWidth / 2)
+            local posY = (row * fragmentHeight) - (glassSize.Y / 2) + (fragmentHeight / 2)
+            local posZ = 0
 
-    local random = Random.new()
+            -- Create the first fragment
+            local fragmentCFrame1 = glassCFrame * CFrame.new(posX, posY, posZ) * CFrame.Angles(0, math.rad(-90), 0)
 
-    local function createFragment(position, size)
-        local fragment = Instance.new("WedgePart")
-        fragment.Size = size
-        fragment.Anchored = false
-        fragment.Color = glassColor
-        fragment.Position = position
-        fragment.Orientation = Vector3.new(math.random() * 360, math.random() * 360, math.random() * 360)
-        fragment.Transparency = 0.8
-        
-        fragment.CanQuery = false
-        fragment.CanTouch = false
-        fragment.CastShadow = false
-        
-        fragment.Parent = workspace.Projectiles
+            -- Create the second fragment
+            local fragmentCFrame2 = fragmentCFrame1 * CFrame.Angles(0, math.rad(180), math.rad(180))
 
-        table.insert(fragments, fragment)
-    end
-
-    local halfSizeX = glassSize.X / 2
-    local halfSizeZ = glassSize.Z / 2
-
-    for x = -halfSizeX, halfSizeX, fragmentSize do
-        for z = -halfSizeZ, halfSizeZ, fragmentSize do
-            local localPosition = Vector3.new(x, 0, z)
-            local worldPosition = glassCFrame:PointToWorldSpace(localPosition)
-            local fragmentDimensions = Vector3.new(
-                random:NextNumber(fragmentSize / 2, fragmentSize),
-                glassSize.Y,
-                glassSize.Z
-            )
-            createFragment(worldPosition, fragmentDimensions)
+            -- Create the wedge fragments
+            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame1, glass))
+            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame2, glass))
         end
     end
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://2978605361"
+    sound.PlayOnRemove = true
+    sound.RollOffMaxDistance = 200
+    sound.RollOffMinDistance = 10
+    sound.Parent = glass
 
     glass:Destroy()
 
@@ -278,42 +293,39 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
         round = RoundHandler.GetRound(roundId)
     end
 
-    local overlapParams = OverlapParams.new()
-    overlapParams.FilterType = Enum.RaycastFilterType.Include
-    overlapParams.FilterDescendantsInstances = {workspace}
-
     local props = round.Map:FindFirstChild("Props")
     local windows = round.Map:FindFirstChild("Windows")
 
     local propsHit = {}
     local participantsHit = {}
-    for _, v in workspace:GetPartBoundsInRadius(position, explosionInfo.Radius, overlapParams) do
+
+    explosion.Hit:Connect(function(hit, distance)
         local entity: Entity
-        if props and v:IsDescendantOf(props) then
-            local prop = findPropAncestor(v, props)
+        if props and hit:IsDescendantOf(props) then
+            local prop = findPropAncestor(hit, props)
             if not prop then
-                continue
+                return
             end
             entity = round:GetProp(prop)
             if table.find(propsHit, entity) then
-                continue
+                return
             end
             table.insert(propsHit, entity)
-        elseif windows and v:IsDescendantOf(windows) then
-            shatterGlass(v)
-            continue
-        elseif v.Parent and v.Parent:IsA("Model") and v.Parent:FindFirstChildOfClass("Humanoid") then
-            local participant = round:GetParticipant(v.Parent.Name)
+        elseif windows and hit:IsDescendantOf(windows) then
+            shatterGlass(hit)
+            return
+        elseif hit.Parent and hit.Parent:IsA("Model") and hit.Parent:FindFirstChildOfClass("Humanoid") then
+            local participant = round:GetParticipant(hit.Parent.Name)
             if not participant or table.find(participantsHit, participant) then
-                continue
+                return
             end
             entity = participant
             table.insert(participantsHit, participant)
         else
-            continue
+            return
         end
-        onEntityHit(round, explosionInfo, attacker, entity, v.Name, (v.Position - position).Magnitude)
-    end
+        onEntityHit(round, explosionInfo, attacker, entity, hit.Name, (hit.Position - position).Magnitude)
+    end)
 
     explosion.Parent = workspace.Projectiles
 end

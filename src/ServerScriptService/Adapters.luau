@@ -468,6 +468,11 @@ local module: Types.Adapter = {
                 if attacker then
                     text ..= ` used by {attackerName}`
                 end
+            elseif weapon == "Explosion" then
+                text ..= " was blown up"
+                if attacker then
+                    text ..= ` by {attackerName}`
+                end
             end
             text ..= "."
             return text

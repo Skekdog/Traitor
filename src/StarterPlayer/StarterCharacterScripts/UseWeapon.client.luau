@@ -16,5 +16,5 @@ ControlManager.Register("Drop", true, function()
     if not equipped then
         return
     end
-    InventoryManager.Drop(Players.LocalPlayer, equipped, workspace)
+    InventoryManager.Drop(Players.LocalPlayer, equipped, Vector3.zero)
 end)
