@@ -86,7 +86,6 @@ rh.SendCorpseInfo.OnClientEvent:Connect(function(corpseInfo: Types.CorpseInfo)
     local killText = `They had a list of kills, confirming the death{if #kills == 1 then "" else "s"} of: `
 
     if #kills > 0 then
-        print(kills)
         for i, v in kills do
             if i == 1 then
                 killText ..= v

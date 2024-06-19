@@ -71,7 +71,6 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
                     death.Volume = 0
                 end
                 if weapon.Kind == "Explosion" then
-                    print(attacker)
                     entity:Kill(attacker, "Explosion", false, false)
                 else
                     entity:Kill(attacker, round:GetEquipment(weapon.Name), partName == "Head", false)
@@ -113,9 +112,10 @@ local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePa
     wedge.Size = size
     wedge.CFrame = cframe
     wedge.Anchored = false
-    --wedge.Material = parent.Material
     wedge.Color = parent.Color
     wedge.Transparency = parent.Transparency
+    wedge.CanTouch = false
+    wedge.CanQuery = false
     wedge.Parent = workspace.Projectiles
 
     wedge:ApplyImpulse((if math.random() >= 0.5 then 1 else -1) * Vector3.one)

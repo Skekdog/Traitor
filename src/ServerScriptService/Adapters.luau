@@ -339,7 +339,7 @@ local module: Types.Adapter = {
         end
 
         if hum then
-            hum:Destroy()
+            hum:ChangeState(Enum.HumanoidStateType.Physics)
         end
         if root then
             root.CanCollide = false
@@ -402,6 +402,8 @@ local module: Types.Adapter = {
                 v.CanCollide = v.Name ~= "HumanoidRootPart"
             elseif v.Name == "DeathSound" and v:IsA("Sound") then
                 v:Play()
+            elseif v:IsA("Fire") then
+                v:Destroy()
             end
         end
 
