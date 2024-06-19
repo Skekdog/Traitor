@@ -396,14 +396,12 @@ local module: Types.Adapter = {
 
         clone.Parent = workspace
         for _, v in clone:GetDescendants() do
-            if v:IsA("JointInstance") or v:IsA("BaseScript") then
+            if v:IsA("JointInstance") or v:IsA("BaseScript") or v:IsA("Fire") then
                 v:Destroy()
             elseif v:IsA("BasePart") then
                 v.CanCollide = v.Name ~= "HumanoidRootPart"
             elseif v.Name == "DeathSound" and v:IsA("Sound") then
                 v:Play()
-            elseif v:IsA("Fire") then
-                v:Destroy()
             end
         end
 

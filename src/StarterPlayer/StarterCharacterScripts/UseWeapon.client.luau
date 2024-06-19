@@ -6,7 +6,7 @@ local ControlManager = require(ReplicatedFirst.ControlManager)
 
 ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
     while input.UserInputState == Enum.UserInputState.Begin do
-        ReplicatedStorage.ClientServer.FireWeapon:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+        ReplicatedStorage.ClientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
         task.wait()
     end
 end)

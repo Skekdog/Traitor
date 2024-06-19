@@ -14,12 +14,11 @@ function module.SendUpdatedParticipants(participants: {Types.Participant}, thisP
 		return
 	end
 
+	remotes.UpdateOwnParticipant:FireClient(plr, thisParticipant:ViewPartialSelf())
 	for _, v in participants do
 		if v.Player ~= thisParticipant.Player then
 			remotes.UpdateParticipant:FireClient(plr, v:ViewPartialParticipant(thisParticipant))
-			continue
 		end
-		remotes.UpdateOwnParticipant:FireClient(plr, v:ViewPartialSelf())
 	end
 end
 

@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local ControlManager = require(script.Parent.ControlManager)
 local UIManager = require(script.Parent.UIManager)
@@ -41,7 +42,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
         if not neck then
             continue
         end
-        neck.C0 = CFrame.new(neck.C0.Position) * CFrame.Angles(y, 0, 0)
+        ReplicatedStorage.ClientServer.RotateHead:FireServer(y)
     end
 end)
 

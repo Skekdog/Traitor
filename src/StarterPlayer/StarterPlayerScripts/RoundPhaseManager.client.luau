@@ -26,16 +26,55 @@ for _, v in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
 end
 
 local stopMusic: (() -> ())?
+local ownParticipant: Types.ClientOwnParticipant?
+local ownRole: Types.Role?
+
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
+    local participant = p :: Types.ClientOwnParticipant?
+    ownParticipant = participant
+    if ownParticipant then
+        ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
+    else
+        ownRole = nil
+    end
+end)
+
+local function highlight(participant)
+    local clone = Instance.new("Highlight")
+    CollectionService:AddTag(clone, "AllyMarker")
+    clone.FillTransparency = 1
+    clone.OutlineColor = LocalRoundInfo.GetRole(participant.Role).Colour
+    clone.OutlineTransparency = 0
+    clone.Parent = participant.Player.Character
+end
+
+LocalRoundInfo.Listen("UpdateParticipant", function(p)
+    local participant = p :: Types.ClientParticipant?
+    if not participant then
+        return
+    end
+
+    print(ownRole, p)
+
+    if ownRole and ownRole.HighlightRoles then
+        local allRoles = table.find(ownRole.HighlightRoles, "__All")
+        if allRoles then
+            highlight(participant)
+        else
+            if table.find(ownRole.HighlightRoles, participant.Role:split("__")[2]) then
+                highlight(participant)
+            elseif table.find(ownRole.HighlightRoles, "__Ally") and table.find(ownRole.Allies or {}, participant.Role:split("__")[2]) then
+                highlight(participant)
+            elseif table.find(ownRole.HighlightRoles, "__Enemy") and not table.find(ownRole.Allies or {}, participant.Role:split("__")[2]) then
+                highlight(participant)
+            end
+        end
+    end
+end)
 
 type EquipmentShopType = UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])}
 local equipmentShop: EquipmentShopType?
 local function update(roundPhase)
-    local participant: Types.ClientOwnParticipant? = LocalRoundInfo.GetOwnParticipant()
-    local ownRole: Types.Role?
-    if participant then
-        ownRole = LocalRoundInfo.GetRole(participant.Role)
-    end
-
     if roundPhase == "Destroy" then
         joinRound:ToggleVisible(true)
 
@@ -58,7 +97,7 @@ local function update(roundPhase)
         return
     end
 
-    if not participant or not Players.LocalPlayer.Character then
+    if not ownParticipant or not Players.LocalPlayer.Character then
         ReplicatedFirst.ClientStorage:SetAttribute("IsSpectating", true)
     end
 
@@ -67,19 +106,8 @@ local function update(roundPhase)
     end
 
     joinRound:ToggleVisible((roundPhase == "Waiting") or (roundPhase == "Preparing"))
-
-    if roundPhase == "Playing" then
-        if ownRole and participant then
-            -- local participants = LocalRoundInfo.GetAllParticipants()
-            -- for _, v in participants do
-            --     for _, ally in LocalRoundInfo.GetRole(v.Role).Allies or ({} :: any) do
-            --         if ally == ownRole.Name then
-            --             v:SetAttribute("Mark", "Ally")
-            --         end
-            --     end
-            -- end
-        end
-    elseif roundPhase == "Highlights" then
+    
+    if roundPhase == "Highlights" then
         local endInfo = LocalRoundInfo.GetRoundEndInfo()
         assert(endInfo)
         local sound = endInfo.Music

@@ -1,4 +1,4 @@
--- Based off of GMod TTT.
+--!strict
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -259,11 +259,8 @@ local module: Types.Gamemode = {
 			EquipmentShop = {"Grenade"},
 			CanSeeMissing = true,
 
-            HighlightRoles = {"__Ally"},
-            KnowsRoles = {
-                Traitor = true,
-                Detective = true,
-            },
+            HighlightRoles = {"Traitor"},
+            KnowsRoles = {"Traitor", "Detective"},
             TeamChat = true,
         },
         {
@@ -291,9 +288,7 @@ local module: Types.Gamemode = {
             StartingCredits = 2,
             EquipmentShop = {"Radar"},
 
-            KnowsRoles = {
-                Detective = true,
-            },
+            KnowsRoles = {"Detective"},
         },
         {
             Kind = "Role",
@@ -309,11 +304,9 @@ local module: Types.Gamemode = {
 
             Allies = {"Detective", "Innocent"},
             Allegiance = "Innocent",
-            VictoryMusic = game.ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
+            VictoryMusic = ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
             VictoryText = "The loveable innocents have won the round!",
-            KnowsRoles = {
-                Detective = true,
-            },
+            KnowsRoles = {"Detective"},
         }
     },
 

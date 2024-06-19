@@ -150,3 +150,23 @@ InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: Inv
 		InventoryManager.Drop(plr, foundEquipment, char:GetPivot().Position + char.PrimaryPart.CFrame.LookVector * 10)
 	end
 end)
+
+ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: number)
+	local char = plr.Character
+	if not char then
+		return
+	end
+
+	local neck = char:FindFirstChild("Neck", true) :: Motor6D
+	if not neck then
+		return
+	end
+
+	y = math.clamp(y, -1.4, 1.4)
+	neck.C0 = CFrame.new(neck.C0.Position) * CFrame.Angles(y, 0, 0)
+end)
+
+ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target)
+	local profile = ProfileManager.GetProfile(plr)
+	return profile and profile.Karma or 1000
+end

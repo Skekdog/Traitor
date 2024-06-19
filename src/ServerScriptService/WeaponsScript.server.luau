@@ -3,12 +3,7 @@ local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryM
 local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
 local WeaponsManager = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager)
 
-ReplicatedStorage.ClientServer.AimWeapon.OnServerEvent:Connect(function(plr, isAiming)
-    local char = plr.Character :: any
-    char:SetAttribute("Weapon", isAiming)
-end)
-
-ReplicatedStorage.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
+ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
     if not cameraRayInfo then
         return
     end
@@ -18,10 +13,15 @@ ReplicatedStorage.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr, ca
         return
     end
 
-    local weapon = InventoryManager.GetEquipped(plr) :: ItemTypes.Weapon
+    local weapon = InventoryManager.GetEquipped(plr) :: ItemTypes.Item | ItemTypes.Weapon
     if not weapon then
         return
     end
 
-    WeaponsManager.Shoot(plr, weapon, cameraRayInfo)
+    if weapon.Base.Kind == "Item" then
+        assert(weapon.Base.PrimaryFire)
+        weapon.Base.PrimaryFire()
+    else
+        WeaponsManager.Shoot(plr, weapon :: ItemTypes.Weapon, cameraRayInfo)
+    end
 end)
