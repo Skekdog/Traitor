@@ -53,7 +53,13 @@ local function update(roundPhase)
             equipmentShop = nil
         end
 
+        ReplicatedFirst.ClientStorage:SetAttribute("IsSpectating", false)
+
         return
+    end
+
+    if not participant or not Players.LocalPlayer.Character then
+        ReplicatedFirst.ClientStorage:SetAttribute("IsSpectating", true)
     end
 
     if stopMusic and roundPhase ~= "Intermission" then
@@ -65,21 +71,10 @@ local function update(roundPhase)
     if roundPhase == "Playing" then
         if ownRole and participant then
             -- local participants = LocalRoundInfo.GetAllParticipants()
-
-            -- if ownRole.HighlightRoles then
-            --     local highlightRoles = {}
-            --     for _, v in ownRole.HighlightRoles do
-            --         table.move(RoundHandler.GetRolesMatchingRelationship(LocalRoundInfo.GetAllRoles() or {}, ownRole, v), 1, #highlightRoles, #highlightRoles + 1, highlightRoles)
-            --     end
-
-            --     for _, role in highlightRoles do
-            --         for _, p in RoundHandler.GetParticipantsWithRole(participants, role, participant) do
-            --             local clone = Instance.new("Highlight")
-            --             CollectionService:AddTag(clone, "AllyMarker")
-            --             clone.FillTransparency = 1
-            --             clone.OutlineColor = role.Colour
-            --             clone.OutlineTransparency = 0
-            --             clone.Parent = p.Player.Character
+            -- for _, v in participants do
+            --     for _, ally in LocalRoundInfo.GetRole(v.Role).Allies or ({} :: any) do
+            --         if ally == ownRole.Name then
+            --             v:SetAttribute("Mark", "Ally")
             --         end
             --     end
             -- end

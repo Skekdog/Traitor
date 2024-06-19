@@ -32,6 +32,17 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
     hum:GetPropertyChangedSignal("Health"):Connect(function()
         setHealth(hum)
     end)
+
+    local camera = workspace.CurrentCamera
+    while char.Parent do
+        task.wait(1 / 60)
+        local y, _, _ = camera.CFrame:ToOrientation()
+        local neck = char:FindFirstChild("Neck", true) :: Motor6D
+        if not neck then
+            continue
+        end
+        neck.C0 = CFrame.new(neck.C0.Position) * CFrame.Angles(y, 0, 0)
+    end
 end)
 
 Players.LocalPlayer.CharacterRemoving:Connect(function()
