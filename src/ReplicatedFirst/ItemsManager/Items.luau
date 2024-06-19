@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local ItemTypes = require(script.Parent.ItemTypes)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
-local WeaponsTypes = require(script.Parent.WeaponsTypes)
 
 local projectiles = ServerStorage.Projectiles
 local models = ReplicatedStorage.WeaponModels
@@ -26,7 +26,7 @@ local function burn(attacker: Types.Participant?, part: BasePart, callback: (fir
     task.spawn(callback, fire, burnSound)
 end
 
-local weapons: {[string]: WeaponsTypes.Weapon} = {
+return ({
     Grenade = {
         Kind = "Weapon",
         Name = "Grenade",
@@ -367,7 +367,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
                 return
             end
             local root = part.Parent:FindFirstChild("HumanoidRootPart") :: BasePart
-            burn(attacker, root or part, function(fire, burnSound)
+            burn(attacker, (root or part :: any), function(fire, burnSound)
                 while (endTime > workspace:GetServerTimeNow()) and part.Parent do
                     burnSound:Play()
                     task.wait(0.25)
@@ -382,7 +382,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         end
     },
     SMG = {
-        Kind = "Weapon",
+        Kind = "Weapon" :: any,
         Name = "SMG",
         Description = "pew pew pew",
 
@@ -407,7 +407,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
             ReloadTime = 1,
             MagazineSize = 30,
             MaxReserve = 60,
-            AmmoType = "SMG"
+            AmmoType = "SMG" :: any
         },
 
         Model = models.SMG,
@@ -606,8 +606,8 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
         end
     },
     XM1014 = {
-        Kind = "Weapon",
-        Name = "XM1014",
+        Kind = "Weapon" :: any,
+        Name = "XM1014" :: any,
         Description = "bang",
 
         Slot = 3,
@@ -635,7 +635,7 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
             FireTime = 0.8,
             ReloadTime = 1.5,
             MaxReserve = 16,
-            AmmoType = "Shotgun",
+            AmmoType = "Shotgun" :: any,
             MagazineSize = 8
         },
         BulletsPerShot = 6,
@@ -777,7 +777,13 @@ local weapons: {[string]: WeaponsTypes.Weapon} = {
             Base = bullet,
             Speed = 120
         }
-    }
-}
+    },
+    ["Magneto Stick"] = {
+        Name = "Magneto Stick",
+        Description = "Haha props",
+        Slot = 5,
+        CanDrop = false,
 
-return weapons
+        Model = models["Magneto Stick"],
+    }
+} :: any) :: {[string]: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition}

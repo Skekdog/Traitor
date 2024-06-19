@@ -1,5 +1,33 @@
 local Types = require(script.Parent.Parent.RoundHandler.Types)
+export type ItemDefinition = {
+    Kind: "Item",
+    Name: string,
+    Description: string,
+    Icon: string?,
 
+    Slot: number,
+    CanDrop: boolean,
+
+    Model: Model?,
+
+    PrimaryFire: (() -> ())?,
+    AlternateFire: (() -> ())?,
+}
+
+export type Item = {
+    Base: ItemDefinition,
+    Instance: PVInstance,
+}
+
+export type Weapon = {
+    Base: WeaponDefinition,
+    Instance: PVInstance,
+    CurrentAmmo: number,
+    ReserveAmmo: number,
+    LastFireTime: number,
+}
+
+export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
 type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> boolean?
 type BeforeHitPropFunction = (attacker: Types.Participant?, target: Types.Prop, willDestroy: boolean?, hitPartName: string) -> boolean?
 type BeforeHitCorpseFunction = (attacker: Types.Participant?, part: BasePart) -> ()
@@ -27,18 +55,20 @@ type ProjectileInfo = {
     Speed: number,
 }
 
-export type Entity = Types.Participant | Types.Prop
+export type ExplosionInfo = {
+    Kind: "Explosion",
+    Radius: number,
+    Pressure: number,
+    Damage: number,
+    BeforeHitParticipant: BeforeHitParticipantFunction?,
+    BeforeHitCorpse: BeforeHitCorpseFunction?,
+    FalloffStart: number?,
+    FalloffEnd: number?,
+    FalloffMultiplier: number?,
+}
 
-export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
-export type WeaponName = string
-export type Weapon = {
+export type WeaponDefinition = ItemDefinition & {
     Kind: "Weapon",
-    Name: string,
-    Description: string,
-
-    Slot: number,
-    CanDrop: boolean,
-
     Damage: DamageInfo,
 
     FalloffStart: number,
@@ -58,24 +88,11 @@ export type Weapon = {
 
     ProjectileInfo: ProjectileInfo | false,
 
-    Model: Model,
     FiredSound: Sound,
     ReloadSound: Sound?,
 
     BeforeHitParticipant: BeforeHitParticipantFunction?,
     BeforeHitCorpse: BeforeHitCorpseFunction?,
-}
-
-export type ExplosionInfo = {
-    Kind: "Explosion",
-    Radius: number,
-    Pressure: number,
-    Damage: number,
-    BeforeHitParticipant: BeforeHitParticipantFunction?,
-    BeforeHitCorpse: BeforeHitCorpseFunction?,
-    FalloffStart: number?,
-    FalloffEnd: number?,
-    FalloffMultiplier: number?,
 }
 
 return {}

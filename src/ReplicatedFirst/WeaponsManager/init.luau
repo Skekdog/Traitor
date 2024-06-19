@@ -3,15 +3,15 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TweenService = game:GetService("TweenService")
+local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(script.Parent.RoundHandler.RoundHandler)
-local WeaponsTypes = require(script.WeaponsTypes)
 local API = require(ReplicatedFirst.API)
 local Adapters = require(ServerScriptService.Adapters)
 
 local module = {}
 
-local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsTypes.Weapon | WeaponsTypes.ExplosionInfo, partName: string, distance: number): number
+local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, partName: string, distance: number): number
     local damage: number
     if type(weapon.Damage) == "table" then
         if partName == "Head" then
@@ -27,7 +27,7 @@ local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsType
 
     local start = weapon.FalloffStart or 0
     if distance >= start then
-        damage *= API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: WeaponsTypes.ExplosionInfo).Radius))
+        damage *= API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: ItemTypes.ExplosionInfo).Radius))
     end
 
     if attacker then
@@ -37,7 +37,8 @@ local function calculateDamage(attacker: Types.Participant?, weapon: WeaponsType
     return damage
 end
 
-local function onEntityHit(round: Types.Round, weapon: WeaponsTypes.Weapon | WeaponsTypes.ExplosionInfo, attacker: Types.Participant?, entity: WeaponsTypes.Entity, partName: string, distance: number): ()
+type Entity = Types.Participant | Types.Prop
+local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, partName: string, distance: number): ()
     local damage = calculateDamage(attacker, weapon, partName, distance)
 
     local hum: Humanoid?
@@ -159,7 +160,7 @@ local function shatterGlass(glass: BasePart)
     end)
 end
 
-local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attacker: Types.Participant?, rayResult: RaycastResult): ()
+local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition, attacker: Types.Participant?, rayResult: RaycastResult): ()
     if round:IsRoundPreparing() then
         return
     end
@@ -241,8 +242,8 @@ local function onPartHit(round: Types.Round, weapon: WeaponsTypes.Weapon, attack
     end
 end
 
--- WeaponsTypes.Weapon may be nil if it is e.g. an explosive barrel
-function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.ExplosionInfo, attacker: Types.Participant?, weapon: WeaponsTypes.Weapon?): ()
+-- WeaponTypes.WeaponDefinition may be nil if it is e.g. an explosive barrel
+function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.ExplosionInfo, attacker: Types.Participant?, weapon: ItemTypes.WeaponDefinition?): ()
     local explosion = Instance.new("Explosion")
     explosion.BlastRadius = explosionInfo.Radius
     explosion.BlastPressure = explosionInfo.Pressure
@@ -287,7 +288,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.E
     local propsHit = {}
     local participantsHit = {}
     for _, v in workspace:GetPartBoundsInRadius(position, explosionInfo.Radius, overlapParams) do
-        local entity: WeaponsTypes.Entity
+        local entity: Entity
         if props and v:IsDescendantOf(props) then
             local prop = findPropAncestor(v, props)
             if not prop then
@@ -317,9 +318,17 @@ function module.CreateExplosion(position: Vector3, explosionInfo: WeaponsTypes.E
     explosion.Parent = workspace.Projectiles
 end
 
-function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo: Ray): ()
+function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: Ray): ()
     local char = player.Character
     if not char then
+        return
+    end
+
+    if weapon.CurrentAmmo <= 0 then
+        return
+    end
+
+    if weapon.LastFireTime + (if weapon.Base.MultiUse then weapon.Base.MultiUse.FireTime else 0) > workspace:GetServerTimeNow() then
         return
     end
 
@@ -339,7 +348,10 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
         return
     end
 
-    local firedSound = weapon.FiredSound:Clone()
+    weapon.CurrentAmmo -= 1
+    weapon.LastFireTime = workspace:GetServerTimeNow()
+
+    local firedSound = weapon.Base.FiredSound:Clone()
     firedSound.Parent = char.PrimaryPart
     firedSound.Ended:Once(function()
         firedSound:Destroy()
@@ -349,7 +361,7 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
     local origin = char:GetPivot().Position
 
     local random = Random.new()
-    local spread = math.rad(weapon.Spread)
+    local spread = math.rad(weapon.Base.Spread)
 
     local function nextSpread(): number
         return random:NextNumber(-spread, spread)
@@ -357,7 +369,7 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
     
     --todo: should this be on the client instead?
     local function tweenProjectile(targetPosition: Vector3): ()
-        local projectileInfo = weapon.ProjectileInfo
+        local projectileInfo = weapon.Base.ProjectileInfo
         if projectileInfo then
             assert(typeof(projectileInfo) ~= "boolean") -- projectileInfo gets reduced to true... from a type of false | ProjectileInfo...
 
@@ -383,7 +395,7 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
     rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
     rayParams.CollisionGroup = "Bounds"
 
-    for _ = 1, weapon.BulletsPerShot or 1 do
+    for _ = 1, weapon.Base.BulletsPerShot or 1 do
         local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
         local target = (cameraRayInfo.Direction + spreadVector) * 10000
 
@@ -394,7 +406,7 @@ function module.Shoot(player: Player, weapon: WeaponsTypes.Weapon, cameraRayInfo
 
         tweenProjectile(result.Position)
 
-        onPartHit(round, weapon, attacker, result)
+        onPartHit(round, weapon.Base, attacker, result)
     end
 end
 

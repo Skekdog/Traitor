@@ -3,6 +3,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
+local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
@@ -146,6 +147,8 @@ joinRound.OnServerInvoke = function(plr)
 			if phase ~= "Destroy" then
 				return
 			end
+
+			InventoryManager.ClearAllItems()
 		
 			for _, v in round.Participants do
 				v.Status = "Spectating" :: any

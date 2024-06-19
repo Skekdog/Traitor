@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
+local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
 local WeaponsManager = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager)
-local Weapons = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager.Weapons)
 
 ReplicatedStorage.ClientServer.AimWeapon.OnServerEvent:Connect(function(plr, isAiming)
     local char = plr.Character :: any
@@ -18,9 +18,10 @@ ReplicatedStorage.ClientServer.FireWeapon.OnServerEvent:Connect(function(plr, ca
         return
     end
 
-    local weapon = InventoryManager.GetEquipped(plr)
+    local weapon = InventoryManager.GetEquipped(plr) :: ItemTypes.Weapon
     if not weapon then
         return
     end
-    WeaponsManager.Shoot(plr, Weapons[weapon.Name], cameraRayInfo)
+
+    WeaponsManager.Shoot(plr, weapon, cameraRayInfo)
 end)

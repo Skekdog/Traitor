@@ -8,7 +8,8 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local API = require(script.Parent.Parent.ReplicatedFirst.API)
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
-local Weapons = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager.Weapons)
+local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
+local Items = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.Items)
 local ProfileManager = require(script.Parent.ProfileManager)
 local RestartServer = require(script.Parent.RestartServer)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
@@ -16,6 +17,32 @@ local ProfileService = require(ServerScriptService.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local remotes = ReplicatedStorage.RoundHandler
+
+local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BasePart)
+    local char = part.Parent :: Model
+    if not Players:GetPlayerFromCharacter(char) then
+        return
+    end
+    local participant = round:GetParticipant(char.Name)
+    if not participant then
+        return
+    end
+
+    local item = InventoryManager.Items[weapon] :: ItemTypes.Weapon
+    if not item then
+        local base = Items[weapon.Name] :: ItemTypes.WeaponDefinition
+        InventoryManager.Items[weapon] = {
+            Base = base,
+            Instance = weapon,
+            LastFireTime = 0,
+            ReserveAmmo = 0,
+            CurrentAmmo = if base.MultiUse then base.MultiUse.MagazineSize else 1,
+        } :: ItemTypes.Weapon
+    end
+
+    InventoryManager.AddEquipment(participant.Player, InventoryManager.Items[weapon])
+    weapon.Parent = nil
+end
 
 local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
 
@@ -138,13 +165,21 @@ local module: Types.Adapter = {
             return
         end
 
-        InventoryManager.AddEquipment(plr, Weapons[item.Name])
+        local base = Items[item.Name]
+        local itemInstance = {Base = base, Instance = item.Item:Clone()}
+        if base.Kind ~= "Item" then -- You may think that an equality check would work. It does not.
+            itemInstance.CurrentAmmo = if base.MultiUse then base.MultiUse.MagazineSize else 1
+            itemInstance.ReserveAmmo = 0
+            itemInstance.LastFireTime = 0
+            (itemInstance.Instance :: BasePart).Touched:Connect(function(part)
+                onWeaponTouched(itemInstance.Instance :: BasePart, participant.Round, part)
+            end)
+        end
+        InventoryManager.Items[itemInstance.Instance] = itemInstance
+        
+        InventoryManager.AddEquipment(plr, itemInstance)
 
         return
-    end,
-
-    RemoveEquipment = function(participant, item)
-        InventoryManager.RemoveEquipment(participant.Player, Weapons[item.Name])
     end,
 
     ClearAllEquipment = function(participant)
@@ -267,6 +302,19 @@ local module: Types.Adapter = {
         end
     end,
 
+    LoadWeaponSpawn = function(round, weaponSpawn)
+        local item = InventoryManager.Items[weaponSpawn] :: ItemTypes.Weapon
+        if item then -- If we don't check this we end up connecting to the touched event multiple times. Looks odd but checking here is correct.
+            return
+        end
+        if not Items[weaponSpawn.Name] then
+            return
+        end
+        weaponSpawn.Touched:Connect(function(part)
+            onWeaponTouched(weaponSpawn, round, part)
+        end)
+    end,
+
     OnDeath = function(victim)
         local char = victim.Character
         local plr = victim.Player
@@ -283,8 +331,8 @@ local module: Types.Adapter = {
 
         local equipment = InventoryManager.GetInventory(plr)
         for i = #equipment, 1, -1 do
-            if equipment[i].CanDrop then
-                InventoryManager.Drop(plr, equipment[i])
+            if equipment[i].Base.CanDrop then
+                InventoryManager.Drop(plr, equipment[i], char:GetPivot().Position)
             else
                 InventoryManager.RemoveEquipment(plr, equipment[i])
             end

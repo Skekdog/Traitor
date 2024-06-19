@@ -5,9 +5,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 
+local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
-local WeaponsTypes = require(ReplicatedFirst.WeaponsManager.WeaponsTypes)
 local ProfileManager = require(script.Parent.ProfileManager)
 local RestartServer = require(script.Parent.RestartServer)
 
@@ -111,7 +111,7 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
     ProfileManager.UpdateProfile(plr, "Settings", options)
 end)
 
-local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: WeaponsTypes.Weapon)
+local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item)
 	InventoryManager.InvEvent:FireClient(plr, event, equipment)
 end
 
@@ -123,21 +123,22 @@ InventoryManager.Listen("Remove", function(plr, equipment)
 	fireInventoryClient(plr, "Remove", equipment)
 end)
 
-InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: WeaponsTypes.WeaponName?)
+InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: string?)
 	if typeof(equipmentName) ~= "string" then
 		return
 	end
 
 	local inventory = InventoryManager.GetInventory(plr)
-	local foundEquipment: WeaponsTypes.Weapon?
+	local foundEquipment: ItemTypes.Item?
 	for _, v in inventory do
-		if v.Name == equipmentName then
+		if v.Base.Name == equipmentName then
 			foundEquipment = v
 			break
 		end
 	end
 
-	if not foundEquipment then
+	local char = plr.Character
+	if not foundEquipment or not char or not char.PrimaryPart then
 		return
 	end
 
@@ -145,5 +146,7 @@ InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: Inv
 		InventoryManager.Equip(plr, foundEquipment)
 	elseif event == "Unequip" then
 		InventoryManager.Unequip(plr, foundEquipment)
+	elseif event == "Drop" then
+		InventoryManager.Drop(plr, foundEquipment, char:GetPivot().Position + char.PrimaryPart.CFrame.LookVector * 10)
 	end
 end)
