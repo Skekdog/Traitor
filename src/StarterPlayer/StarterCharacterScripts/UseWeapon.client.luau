@@ -4,11 +4,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local InventoryManager = require(script.Parent.Parent.Parent.ReplicatedFirst.InventoryManager)
 local ControlManager = require(ReplicatedFirst.ControlManager)
 
-ControlManager.Register("Primary Fire", true, function(action, state)
-    if state ~= Enum.UserInputState.End then
-        return
+ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
+    while input.UserInputState == Enum.UserInputState.Begin do
+        ReplicatedStorage.ClientServer.FireWeapon:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+        task.wait()
     end
-    ReplicatedStorage.ClientServer.FireWeapon:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
 end)
 
 ControlManager.Register("Drop", true, function()
