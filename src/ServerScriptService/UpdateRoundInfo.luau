@@ -8,6 +8,7 @@ local module = {}
 
 function module.SendUpdatedParticipants(participants: {Types.Participant}, thisParticipant: Types.Participant?, plr: Player)
 	if not thisParticipant then
+		remotes.UpdateOwnParticipant:FireClient(plr, nil)
 		for _, v in participants do
 			remotes.UpdateParticipant:FireClient(plr, v:ViewPartialParticipant())
 		end

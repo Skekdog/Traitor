@@ -371,6 +371,10 @@ local module: Types.Adapter = {
             participant:SearchCorpse(victim)
             clone.Name = victim.Player.Name
             sendCorpseInfo(to)
+
+            for _, v in Players:GetPlayers() do
+                UpdateRoundInfo.SendUpdatedParticipants({victim}, victim.Round:GetParticipant(v.Name), v)
+            end
         end)
 
         clone:SetAttribute("IsCorpse", true)
@@ -413,7 +417,7 @@ local module: Types.Adapter = {
         victim.Player.Character = nil
 
         for _, v in Players:GetPlayers() do
-            UpdateRoundInfo.SendUpdatedParticipants(victim.Round.Participants, victim, victim.Player)
+            UpdateRoundInfo.SendUpdatedParticipants({victim}, victim.Round:GetParticipant(v.Name), v)
         end
     end,
 

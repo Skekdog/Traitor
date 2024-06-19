@@ -21,22 +21,27 @@ local function findPlr(plrName: string)
 end
 
 function updatePlr(plr: Player, clone: any)
-	local participant: Types.ClientOwnParticipant? | Types.ClientParticipant?
+	local participant: Types.ClientOwnParticipant | Types.ClientParticipant?
 	if plr == Players.LocalPlayer then
 		participant = LocalRoundInfo.GetOwnParticipant()
 	else
 		participant = LocalRoundInfo.GetParticipantInfo(plr.Name)
 	end
 
+	movePlr(plr, if participant then participant.Status else "Spectating")
+
 	if not participant then
+		UIManager.UpdateThemeInstance(clone.Username)
 		return
 	end
 
 	local role = LocalRoundInfo.GetRole(participant.Role)
-	if participant and role.Name ~= "" then
-		clone.Username.TextColor3 = role.Colour
+	if role.Name == "" or LocalRoundInfo.GetRoundPhase() == "Destroy" then
+		clone.Username:SetAttribute("StyleData")
+		UIManager.UpdateThemeInstance(clone.Username)
+	else
 		clone.Username:SetAttribute("StyleData", "KeepText")
-		movePlr(plr, participant.Status)
+		clone.Username.TextColor3 = role.Colour
 	end
 end
 
@@ -136,10 +141,6 @@ for _, plr in Players:GetPlayers() do
 end
 
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
-	local participant = p :: Types.ClientOwnParticipant
-	if not participant then
-		return
-	end
 	updatePlr(Players.LocalPlayer, findPlr(Players.LocalPlayer.Name))
 end)
 

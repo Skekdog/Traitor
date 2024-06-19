@@ -93,7 +93,7 @@ local function showCorpseHint(char: Model)
 	if char.Name == "__Unidentified" then
 		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body\nPress {key} to Search`
 	else
-		local info = LocalRoundInfo.GetParticipantInfo(char.Name)
+		local info = LocalRoundInfo.GetParticipantInfo(char.Name) or LocalRoundInfo.GetOwnParticipant()
 		assert(info)
 		corpseHint.Text = `{info.FormattedName}'s Body\nPress {key} to Search`
 	end

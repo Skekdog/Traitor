@@ -49,12 +49,10 @@ local function highlight(participant)
 end
 
 LocalRoundInfo.Listen("UpdateParticipant", function(p)
-    local participant = p :: Types.ClientParticipant?
-    if not participant then
+    local participant = p :: Types.ClientParticipant | string
+    if type(participant) == "string" then
         return
     end
-
-    print(ownRole, p)
 
     if ownRole and ownRole.HighlightRoles then
         local allRoles = table.find(ownRole.HighlightRoles, "__All")
