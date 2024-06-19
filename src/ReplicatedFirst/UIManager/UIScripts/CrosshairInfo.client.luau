@@ -2,24 +2,6 @@ local Players = game:GetService("Players")
 local UIManager = require(script.Parent.Parent)
 local ControlManager = require(script.Parent.Parent.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
---this script could do with a clean up
-
--- These are percentages of MaxHealth
-local healthDefs = {
-	[0] = "Near Death",
-	[20] = "Badly Wounded",
-	[40] = "Wounded",
-	[60] = "Hurt",
-	[80] = "Healthy",
-}
-
-local karmaDefs = {
-	[500] = "Liability",
-	[600] = "Dangerous",
-	[700] = "Trigger-Happy",
-	[800] = "Crude",
-	[900] = "Reputable",
-}
 
 local mouse = Players.LocalPlayer:GetMouse()
 local ui = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(UIManager.UnregisteredUIs.CrosshairInfo)
@@ -44,11 +26,16 @@ local function showPlayerInfo(char: Model)
 	local healthPercent = health / hum.MaxHealth * 100
 	local healthText = ""
 
-	for i, v in healthDefs do
-		if i <= health then
-			healthText = v
-			break
-		end
+	if healthPercent >= 80 then
+		healthText = "Healthy"
+	elseif healthPercent >= 60 then
+		healthText = "Hurt"
+	elseif healthPercent >= 40 then
+		healthText = "Wounded"
+	elseif healthPercent >= 20 then
+		healthText = "Badly Wounded"
+	else
+		healthText = "Near Death"
 	end
 
 	playerInfo.Health.Text = healthText
@@ -56,11 +43,16 @@ local function showPlayerInfo(char: Model)
 
 	local karma = 1000
 	local karmaText = ""
-	for i, v in karmaDefs do
-		if i <= karma then
-			karmaText = v
-			break
-		end
+	if karma >= 900 then
+		karmaText = "Reputable"
+	elseif karma >= 800 then
+		karmaText = "Crude"
+	elseif karma >= 700 then
+		karmaText = "Trigger-Happy"
+	elseif karma >= 600 then
+		karmaText = "Dangerous"
+	elseif karma >= 500 then
+		karmaText = "Liability"
 	end
 
 	playerInfo.Karma.Text = karmaText	
@@ -100,19 +92,12 @@ local function showCorpseHint(char: Model)
 	corpseHint.Visible = true
 end
 
-local lastInstance: BasePart
-game:GetService("RunService").Heartbeat:Connect(function() --cant do getpropertychangedsignal
-	if mouse.Target == lastInstance then
-		return
-	end
-
+game:GetService("RunService").Heartbeat:Connect(function()
 	playerInfo.Visible = false
 	corpseHint.Visible = false
 	if not mouse.Target then
 		return
 	end
-
-	lastInstance = mouse.Target
 	
 	local char = mouse.Target.Parent
 	if not char or char.Parent ~= workspace or not char:IsA("Model") then

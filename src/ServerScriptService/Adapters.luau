@@ -20,7 +20,8 @@ local remotes = ReplicatedStorage.RoundHandler
 
 local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BasePart)
     local char = part.Parent :: Model
-    if not Players:GetPlayerFromCharacter(char) then
+    local plr = Players:GetPlayerFromCharacter(char)
+    if not plr then
         return
     end
     local participant = round:GetParticipant(char.Name)
@@ -29,8 +30,15 @@ local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BaseP
     end
 
     local item = InventoryManager.Items[weapon] :: ItemTypes.Weapon
+    local base = if item then item.Base else Items[weapon.Name] :: ItemTypes.WeaponDefinition
+
+    for _, v in InventoryManager.GetInventory(plr) do
+        if v.Base.Slot == base.Slot then
+            return
+        end
+    end
+    
     if not item then
-        local base = Items[weapon.Name] :: ItemTypes.WeaponDefinition
         InventoryManager.Items[weapon] = {
             Base = base,
             Instance = weapon,
