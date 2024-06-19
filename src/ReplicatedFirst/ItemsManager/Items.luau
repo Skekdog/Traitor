@@ -342,7 +342,7 @@ return ({
             SpreadMultiplier = 0.3
         },
 
-        BeforeHitParticipant = function(attacker, target, dead, hitPartName)
+        BeforeHitParticipant = function(attacker: Types.Participant?, target: Types.Participant, dead: boolean?, hitPartName: string)
             local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
             if not humanoid then
                 return
@@ -352,6 +352,10 @@ return ({
             burn(attacker, target.Character.PrimaryPart :: BasePart,function(fire, burnSound)
                 while (endTime > workspace:GetServerTimeNow()) and (humanoid.Health > 0) and humanoid.Parent do
                     burnSound:Play()
+                    if (humanoid.Health - 1 <= 0) then
+                        target:Kill(attacker, "Burn", false, true)
+                        break
+                    end
                     humanoid.Health -= 1
                     task.wait(0.25)
                 end

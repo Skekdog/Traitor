@@ -475,6 +475,11 @@ local module: Types.Adapter = {
                 if attacker then
                     text ..= ` by {attackerName}`
                 end
+            elseif weapon == "Burn" then
+                text ..= " was burned"
+                if attacker then
+                    text ..= ` by {attackerName}`
+                end
             end
             text ..= "."
             return text
