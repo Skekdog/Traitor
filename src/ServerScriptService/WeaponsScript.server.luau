@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
-local WeaponsManager = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager)
+local WeaponsManager = require(script.Parent.WeaponsManager)
 
 ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
     if not cameraRayInfo then

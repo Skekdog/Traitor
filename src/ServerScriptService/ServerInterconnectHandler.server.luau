@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local RoundHandler = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.RoundHandler)
 local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
-local WeaponsManager = require(script.Parent.Parent.ReplicatedFirst.WeaponsManager)
+local WeaponsManager = require(script.Parent.WeaponsManager)
 
 local si = ReplicatedStorage.ServerInterconnect
 si.ExplosiveBarrel.Event:Connect(function(part: BasePart, participant: Types.ClientOwnParticipant?)
