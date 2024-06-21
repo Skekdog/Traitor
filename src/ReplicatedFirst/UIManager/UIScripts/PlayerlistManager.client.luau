@@ -151,9 +151,9 @@ LocalRoundInfo.Listen("UpdateParticipant", function(p)
 		return
 	end
 	updatePlr(participant.Player, findPlr(participant.Player.Name))
-end)
+end);
 
-ReplicatedStorage.RoundHandler.CorpseSearched.OnClientEvent:Connect(function(name)
+(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).CorpseSearched.OnClientEvent:Connect(function(name)
 	local plr = Players:FindFirstChild(name)
 	if not plr then
 		return

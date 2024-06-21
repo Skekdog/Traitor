@@ -1,0 +1,73 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local IS_SERVER = game:GetService("RunService"):IsServer()
+
+local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePart, direction: Vector3)
+    local wedge = Instance.new("WedgePart")
+    wedge.Size = size
+    wedge.CFrame = cframe
+    wedge.Anchored = false
+    wedge.Color = parent.Color
+    wedge.Transparency = parent.Transparency
+    wedge.CanTouch = false
+    wedge.CanQuery = false
+    wedge.Parent = workspace.Projectiles
+
+    wedge:ApplyImpulse(direction)
+
+    return wedge
+end
+
+return function(glass: BasePart, direction: Vector3?): ()
+    if IS_SERVER then
+        ReplicatedStorage.ServerClient.ShatterGlass:FireAllClients(glass, direction)
+        return glass:Destroy()
+    end
+    local cols = math.max(1, math.floor(glass.Size.X / 3))
+    local rows = math.max(1, math.floor(glass.Size.Y / 3))
+
+    local glassSize = glass.Size
+    local glassCFrame = glass.CFrame
+
+    -- Calculate the size of each fragment
+    local fragmentWidth = glassSize.X / cols
+    local fragmentHeight = glassSize.Y / rows
+    local fragmentDepth = glassSize.Z / 2  -- Depth of the wedge (half of glass thickness)
+
+    local fragments = {}
+
+    -- Loop through the grid and create fragments
+    for row = 0, rows - 1 do
+        for col = 0, cols - 1 do
+            -- Calculate the position for the fragment
+            local posX = (col * fragmentWidth) - (glassSize.X / 2) + (fragmentWidth / 2)
+            local posY = (row * fragmentHeight) - (glassSize.Y / 2) + (fragmentHeight / 2)
+            local posZ = 0
+
+            -- Create the first fragment
+            local fragmentCFrame1 = glassCFrame * CFrame.new(posX, posY, posZ) * CFrame.Angles(0, math.rad(-90), 0)
+
+            -- Create the second fragment
+            local fragmentCFrame2 = fragmentCFrame1 * CFrame.Angles(0, math.rad(180), math.rad(180))
+
+            -- Create the wedge fragments
+            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame1, glass, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one))
+            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame2, glass, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one))
+        end
+    end
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://2978605361"
+    sound.PlayOnRemove = true
+    sound.RollOffMaxDistance = 200
+    sound.RollOffMinDistance = 10
+    sound.Parent = glass
+
+    glass:Destroy()
+
+    task.delay(5, function()
+        for _, v in fragments do
+            v:Destroy()
+        end
+        table.clear(fragments)
+    end)
+end

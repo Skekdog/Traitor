@@ -40,9 +40,9 @@ controls.Register("Close UI", false, function()
 			break
 		end
 	end
-end)
+end);
 
-ReplicatedStorage.ServerClient.OpenSettings.OnClientEvent:Connect(function()
+(ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).OpenSettings.OnClientEvent:Connect(function()
 	manager.WaitForUI("Settings"):ToggleVisible(true)
 end)
 

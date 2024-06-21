@@ -56,6 +56,6 @@ local function makeLabel(isTeam, text)
 	task.delay(2, fade, label, true)
 end
 
-ReplicatedStorage.RoundHandler.SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
+(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
 	makeLabel(table.find({"bodyFound", "timeToRoundStart", "karma"}, msgType) ~= nil, msg)
 end)

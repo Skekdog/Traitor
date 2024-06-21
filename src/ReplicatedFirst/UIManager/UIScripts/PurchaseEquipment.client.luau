@@ -95,9 +95,9 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 		end
 		update(item, participant.Credits)
 	end)
-end)
+end);
 
-ReplicatedStorage.RoundHandler.InformClientSideEquipment.OnClientEvent:Connect(function(item)
+(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).InformClientSideEquipment.OnClientEvent:Connect(function(item)
 	if item == "Radar" then
 		radar()
 	end

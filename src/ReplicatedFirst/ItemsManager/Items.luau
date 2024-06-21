@@ -1,9 +1,10 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local ItemTypes = require(script.Parent.ItemTypes)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
-local projectiles = ServerStorage.Projectiles
+local projectiles = ReplicatedStorage.Projectiles
 local models = ReplicatedStorage.WeaponModels
 local weaponSounds = ReplicatedStorage.WeaponSounds
 local firedSounds = weaponSounds.Fired
@@ -24,6 +25,42 @@ local function burn(attacker: Types.Participant?, part: BasePart, callback: (fir
     burnSound.Parent = part :: any
 
     task.spawn(callback, fire, burnSound)
+end
+
+local controlledProps: {[number]: BasePart} = {}
+
+local function stopControllingProp(prop: BasePart, userId: number)
+    if not prop:IsDescendantOf(workspace) then
+        return
+    end
+    local alignPos = prop:FindFirstChildOfClass("AlignPosition") :: AlignPosition
+    local activeHolder = prop:FindFirstChild("ActiveHolder") :: NumberValue
+
+    alignPos.Attachment1 = nil
+    alignPos.Enabled = false
+    activeHolder.Value = 0
+
+    local lastHolder = prop:FindFirstChild("LastHolder") :: NumberValue
+    local con: RBXScriptConnection
+    local resetHolderThread = task.delay(5, function()
+        if con.Connected then
+            con:Disconnect()
+        end
+        if not prop:IsDescendantOf(workspace) then
+            return
+        end
+        prop:SetNetworkOwnershipAuto()
+        lastHolder.Value = 0
+    end)
+
+    lastHolder.Value = userId
+
+    con = lastHolder.Changed:Once(function(newId)
+        task.cancel(resetHolderThread)
+    end)
+
+    controlledProps[userId] = nil
+    print("stopped controlling prop")
 end
 
 return ({
@@ -292,10 +329,10 @@ return ({
 
             if attacker:IsDamageJustifiedAgainst(target) then
                 makeGolden(target)
-                target:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head")
+                target:TakeDamage(math.huge, attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head")
             else
                 makeGolden(attacker)
-                attacker:Kill(attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head", true)
+                attacker:TakeDamage(math.huge, attacker, attacker.Round:GetEquipment("Golden Gun"), hitPartName == "Head", true)
             end
 
             return true
@@ -352,11 +389,7 @@ return ({
             burn(attacker, target.Character.PrimaryPart :: BasePart,function(fire, burnSound)
                 while (endTime > workspace:GetServerTimeNow()) and (humanoid.Health > 0) and humanoid.Parent do
                     burnSound:Play()
-                    if (humanoid.Health - 1 <= 0) then
-                        target:Kill(attacker, "Burn", false, true)
-                        break
-                    end
-                    humanoid.Health -= 1
+                    target:TakeDamage(1, attacker, "Burn", false, true)
                     task.wait(0.25)
                 end
                 burnSound:Destroy()
@@ -783,11 +816,179 @@ return ({
         }
     },
     ["Magneto Stick"] = {
+        Kind = "Item",
         Name = "Magneto Stick",
         Description = "Haha props",
         Slot = 5,
         CanDrop = false,
 
         Model = models["Magneto Stick"],
+        AlternateFire = function(participant: Types.Participant, cameraRayInfo: Ray)
+            local char = participant.Character
+            if not char then
+                return
+            end
+
+            local head = char:FindFirstChild("Head")
+            if not head or not head:IsA("BasePart") then
+                return
+            end
+
+            local root = char.PrimaryPart
+            if not root then
+                return
+            end
+
+            local map = ReplicatedStorage.RoundHandler.MapFolder.Value
+            if not map then
+                return
+            end
+
+            local props = map:FindFirstChild("Props")
+            local weaponSpawns = map:FindFirstChild("WeaponSpawns")
+            if not props and not weaponSpawns then
+                return
+            end
+
+            local userId = participant.Player.UserId
+            local alreadyControlled = controlledProps[userId]
+            if alreadyControlled then
+                if alreadyControlled.Parent then
+                    stopControllingProp(alreadyControlled, userId)
+                else
+                    controlledProps[userId] = nil
+                end
+            end
+
+            local rayParams = RaycastParams.new()
+            rayParams.IgnoreWater = true
+            rayParams.RespectCanCollide = true
+            rayParams.CollisionGroup = "Bounds"
+
+            local result = workspace:Raycast(head.Position, cameraRayInfo.Direction * 10, rayParams)
+            if not result then
+                return
+            end
+
+            local object = result.Instance :: BasePart
+
+            if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) then
+                return print("not a prop")
+            end
+
+            if object:GetAttribute("NoGrab") then
+                return print("no grab")
+            end
+
+            if alreadyControlled == object then
+                return print("already controlled")
+            end
+
+            if object.AssemblyMass == math.huge then -- anchored props have inf assemblymass
+                return print("anchored")
+            end
+
+            if (object.AssemblyMass > 50) or (object.Size.X * object.Size.Y * object.Size.Z > 50) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
+                return print("too big")
+            end
+
+            local alignPos = object:FindFirstChildOfClass("AlignPosition") or Instance.new("AlignPosition")
+            if not alignPos.Parent then
+                alignPos.Responsiveness = 200
+                alignPos.MaxVelocity = 40
+                alignPos.MaxForce = 10000
+                alignPos.ApplyAtCenterOfMass = true
+                alignPos.Mode = Enum.PositionAlignmentMode.TwoAttachment
+
+                local attachPoint = Instance.new("Attachment")
+                attachPoint.Name = "AttachPoint"
+
+                alignPos.Attachment0 = attachPoint
+
+                attachPoint.Parent = object
+                alignPos.Parent = object
+            end
+
+            local activeHolder = object:FindFirstChild("ActiveHolder") :: NumberValue or Instance.new("NumberValue")
+            if activeHolder.Parent and Players:GetPlayerByUserId(activeHolder.Value) then
+                if activeHolder.Value == userId then
+                    stopControllingProp(object, userId)
+                end
+                return print("Already controlling prop")
+            elseif not activeHolder.Parent then
+                activeHolder.Name = "ActiveHolder"
+                activeHolder.Parent = object
+            end
+
+            activeHolder.Value = userId
+
+            local lastHolder = object:FindFirstChild("LastHolder") :: NumberValue or Instance.new("NumberValue")
+            if not lastHolder.Parent then
+                lastHolder.Name = "LastHolder"
+                lastHolder.Parent = object
+            end
+
+            controlledProps[userId] = object
+            object:SetNetworkOwner(participant.Player)
+            alignPos.Attachment1 = head:FindFirstChild("MagnetoAttachment") :: Attachment?
+            alignPos.Enabled = true
+        end,
+        PrimaryFire = function(plr: Types.Participant, cameraRayInfo: Ray)
+            print("primary fire", plr, cameraRayInfo)
+        end,
+        OnUnequip = function(plr: Player)
+            local userId = plr.UserId
+            local prop = controlledProps[userId]
+            if prop then
+                stopControllingProp(prop, userId)
+            end
+        end
+    },
+    ["Newton Launcher"] = {
+        Kind = "Item",
+        Slot = 8,
+        Name = "Newton Launcher",
+        Description = "Haha props",
+        CanDrop = true,
+        Model = models["Newton Launcher"],
+        PrimaryFire = function(participant: Types.Participant, cameraRayInfo: Ray)
+            local char = participant.Character
+
+            local roundId = ServerStorage:GetAttribute("RoundID")
+            if not roundId then
+                return
+            end
+
+            local rayParams = RaycastParams.new()
+            rayParams.CollisionGroup = "Bounds"
+            rayParams.IgnoreWater = true
+            rayParams.RespectCanCollide = true
+            rayParams.FilterType = Enum.RaycastFilterType.Exclude
+            rayParams.FilterDescendantsInstances = {char}
+            local result = workspace:Raycast(char:GetPivot().Position, cameraRayInfo.Direction * 1000, rayParams)
+
+            if not result then
+                return
+            end
+
+            local object = result.Instance
+            local model = object:FindFirstAncestorOfClass("Model")
+            
+            local map = participant.Round.Map
+            local weaponSpawns = map:FindFirstChild("WeaponSpawns")
+            local props = map:FindFirstChild("Props")
+
+            if not ((weaponSpawns and object:IsDescendantOf(weaponSpawns)) or (props and object:IsDescendantOf(props)) or (model and Players:GetPlayerFromCharacter(model))) then
+                return
+            end
+
+            local force = Instance.new("BodyForce")
+            force.Force = cameraRayInfo.Direction * 10000 + Vector3.new(0, 5000, 0)
+            force.Parent = object
+
+            task.delay(0.5, function()
+                force:Destroy()
+            end)
+        end
     }
 } :: any) :: {[string]: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition}

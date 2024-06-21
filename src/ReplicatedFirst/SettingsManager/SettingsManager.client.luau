@@ -12,7 +12,7 @@ requestSetting.OnInvoke = function(setting: string)
 end
 
 -- This must be run before anything yields, especially todo with ui
-local options = ReplicatedStorage.ServerClient.LoadSavedData.OnClientEvent:Wait()
+local options = (ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).LoadSavedData.OnClientEvent:Wait()
 options = SM.JSONDecode(options)
 for i, v in options do
 	SM.SetSetting(i, v)

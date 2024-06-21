@@ -101,7 +101,7 @@ joinRound.OnServerInvoke = function(plr)
 		local gamemode = gamemodes[math.random(1, #gamemodes)]
 		round = RoundHandler.CreateRound(nextMap, gamemode)
 		ServerStorage:SetAttribute("RoundID", round.ID)
-		local votes = {}
+		local votes: {[string]: {number}} = {}
 		local voteCon: RBXScriptConnection?
 
 		nextRoundReady = false
@@ -131,10 +131,18 @@ joinRound.OnServerInvoke = function(plr)
 					if not map or not ServerStorage.Maps:FindFirstChild(map) then
 						return
 					end
+
+					for _, v in votes do
+						if table.find(v, plr.UserId) then
+							table.remove(v, table.find(v, plr.UserId))
+							break
+						end
+					end
+
 					if not votes[map] then
-						votes[map] = {plr}
-					elseif not table.find(votes[map], plr) then
-						table.insert(votes[map], plr)
+						votes[map] = {plr.UserId}
+					else
+						table.insert(votes[map], plr.UserId)
 					end
 				end)
 			elseif phase == "Highlights" then

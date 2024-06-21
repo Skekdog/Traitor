@@ -10,6 +10,7 @@ local API = require(script.Parent.Parent.ReplicatedFirst.API)
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
 local Items = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.Items)
+local ShatterGlass = require(script.Parent.Parent.ReplicatedFirst.ShatterGlass)
 local ProfileManager = require(script.Parent.ProfileManager)
 local RestartServer = require(script.Parent.RestartServer)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
@@ -94,6 +95,8 @@ local module: Types.Adapter = {
     INTERMISSION_TIME = 10,
     LOAD_LIGHTING_SETTINGS = true,
     LOAD_TERRAIN_SETTINGS = true,
+    LOAD_GRAVITY_SETTING = true,
+    DEFAULT_GRAVITY = 80,
     BOUNDS_COLLISION_GROUP = "Bounds",
 
     SetDefaultLighting = function()
@@ -271,15 +274,46 @@ local module: Types.Adapter = {
     end,
 
     OnCharacterLoad = function(participant)
+        local root = participant.Character.PrimaryPart
+        if not root then
+            return
+        end
+
         local sound = Instance.new("Sound")
         sound.SoundId = "rbxassetid://"..deathsounds[math.random(1, #deathsounds)]
         sound.Name = "DeathSound"
-        sound.Parent = participant.Character.PrimaryPart
+        sound.Parent = root
 
         local scale = participant.Round.Map:FindFirstChild("Scale") :: NumberValue
         if scale then
             participant.Character:ScaleTo(scale.Value)
         end
+
+        local magnetoAttachment = Instance.new("Attachment")
+        magnetoAttachment.Name = "MagnetoAttachment"
+        magnetoAttachment.CFrame = CFrame.new(0, 0, -6)
+        magnetoAttachment.Parent = participant.Character:FindFirstChild("Head")
+
+        local hum = participant.Character:FindFirstChildOfClass("Humanoid")
+        if not hum then
+            return
+        end
+
+        -- local startHeight = nil
+        -- hum.StateChanged:Connect(function(oldState, newState)
+        --     if newState == Enum.HumanoidStateType.Freefall then
+        --         startHeight = root.Position.Y
+        --     elseif oldState == Enum.HumanoidStateType.Freefall and startHeight then
+        --         local magnitude = startHeight - root.Position.Y
+
+        --         if magnitude <= 15 then
+        --             return
+        --         end
+
+        --         local damage = (0.5 * (magnitude - 15) ^ 1.5) * 80 / workspace.Gravity
+        --         participant:TakeDamage(damage, nil, "Fall")
+        --     end
+        -- end)
     end,
 
     SendSlayVote = function(to, target)
@@ -305,7 +339,7 @@ local module: Types.Adapter = {
                 if not participant then
                     return
                 end
-                participant:Kill(nil, bound:GetAttribute("KillMethod") or "Suicide", nil, true)
+                participant:TakeDamage(math.huge, nil, bound:GetAttribute("KillMethod") or "Suicide", nil, true)
             end)
         end
     end,
@@ -320,6 +354,71 @@ local module: Types.Adapter = {
         end
         weaponSpawn.Touched:Connect(function(part)
             onWeaponTouched(weaponSpawn, round, part)
+        end)
+    end,
+
+    LoadProp = function(round, prop)
+        local object = prop.PropInstance
+        if not object:IsA("BasePart") or object.Anchored then
+            return
+        end
+        
+        object.Touched:Connect(function(part)
+            if not part.Parent then -- I would rather assert() here but actually this can fail in legitimate cases
+                return
+            end
+            local energy = 0.5 * object.AssemblyMass * (object.AssemblyLinearVelocity.Magnitude ^ 2)
+            if energy < 2000 then
+                return
+            end
+
+            local activeHolder = object:FindFirstChild("ActiveHolder") :: NumberValue?
+            if activeHolder and Players:GetPlayerByUserId(activeHolder.Value) then
+                return
+            end
+
+            local lastHolder = object:FindFirstChild("LastHolder") :: NumberValue?
+            local char = part:FindFirstAncestorOfClass("Model")
+            local lastHolderPlr
+            local lastHolderParticipant
+            if lastHolder then
+                lastHolderPlr = Players:GetPlayerByUserId(lastHolder.Value)
+                if lastHolderPlr then
+                    lastHolderParticipant = round:GetParticipant(lastHolderPlr.Name)
+                end
+            end
+
+            if lastHolder and (lastHolderPlr == Players:GetPlayerFromCharacter(char :: Model)) then
+                return
+            end
+
+            local damage = (energy - 2000) / 1000
+            if prop:HasHealth() then
+                prop:TakeDamage(damage, lastHolderParticipant)
+            end
+
+            local windows = round.Map:FindFirstChild("Windows")
+            if windows and windows:IsAncestorOf(part) then
+                return ShatterGlass(part, object.AssemblyLinearVelocity / 100)
+            end
+            
+            if not char then
+                return
+            end
+            
+            local participant = round:GetParticipant(char.Name)
+            if not participant then
+                return
+            end
+
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if not hum then
+                return
+            end
+
+            if lastHolder and lastHolder.Value ~= nil then
+                participant:TakeDamage(damage, lastHolderParticipant, "Crush") -- only do damage if the prop was flung by someone
+            end
         end)
     end,
 

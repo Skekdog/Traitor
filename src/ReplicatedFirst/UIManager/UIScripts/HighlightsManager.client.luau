@@ -9,9 +9,9 @@ local UI = uiManager.WaitForUI("Highlights") :: uiManager.UI & {Object: typeof(u
 local page = UI.Object.Page
 
 local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
-local eTemplate = eFrame.Template
+local eTemplate = eFrame.Template;
 
-ReplicatedStorage.RoundHandler.SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role | Types.ClientParticipant)
+(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role | Types.ClientParticipant)
 	if victors.Kind == "ClientParticipant" then
 		hFrame.Winners.Text = victors.Player.Name:upper().." WINS"
 		print(LocalRoundInfo.GetRole(victors.Role), victors.Role)

@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local Types = require(script.Parent.RoundHandler.Types)
 local module = {}
 
 -- This can be used from both the client and the server.
@@ -81,6 +82,9 @@ function module.Unequip(plr: Player, equipment: ItemTypes.Item)
         if (old :: any) ~= equipment then
             return
         end
+        if old and old.Base.OnUnequip then
+            old.Base.OnUnequip(plr)
+        end
         equipped[plr] = nil
     end
     runCallback(plr, "Unequip", equipment)
@@ -93,7 +97,7 @@ function module.Drop(plr: Player, equipment: ItemTypes.Item, position: Vector3)
     if IS_CLIENT then
         module.InvEvent:FireServer("Drop", equipment.Base.Name)
     else
-        local spawns = (ReplicatedStorage :: any).RoundHandler.MapFolder.Value:FindFirstChild("WeaponSpawns")
+        local spawns = (ReplicatedStorage.RoundHandler.MapFolder.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
         equipment.Instance.Parent = spawns
         equipment.Instance:PivotTo(CFrame.new(position))
         module.RemoveEquipment(plr, equipment)

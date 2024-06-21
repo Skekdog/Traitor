@@ -10,8 +10,9 @@ export type ItemDefinition = {
 
     Model: Model?,
 
-    PrimaryFire: (() -> ())?,
-    AlternateFire: (() -> ())?,
+    PrimaryFire: ((Types.Participant, cameraRay: Ray) -> ())?,
+    AlternateFire: ((Types.Participant, cameraRay: Ray) -> ())?,
+    OnUnequip: ((Player) -> ())?,
 }
 
 export type Item = {

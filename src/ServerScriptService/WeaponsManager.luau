@@ -1,8 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
-local TweenService = game:GetService("TweenService")
+local ShatterGlass = require(script.Parent.Parent.ReplicatedFirst.ShatterGlass)
 local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
@@ -41,57 +42,37 @@ type Entity = Types.Participant | Types.Prop
 local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, partName: string, distance: number): ()
     local damage = calculateDamage(attacker, weapon, partName, distance)
 
-    local hum: Humanoid?
     local sameTeam: boolean?
     if entity.Kind == "Participant" then
-        hum = entity.Character:FindFirstChildOfClass("Humanoid")
-        if not hum then
-            return
-        end
-
         if attacker then
             sameTeam = round:IsRoleAlliedWith(attacker.Role, entity.Role)
         end
-    else
-        hum = entity.Humanoid
+    elseif not entity:HasHealth() then
+        return
     end
 
     local canDamage = if sameTeam then round.Gamemode.FriendlyFire else true
-    if canDamage and hum then
-        local willDie = (hum.Health - damage) <= 0
+    if canDamage then
         if entity.Kind == "Participant" then
+            local health = (entity :: any):GetHealth() :: number
+            local willDie = health - damage <= 0
             if weapon.BeforeHitParticipant then
                 if weapon.BeforeHitParticipant(attacker, entity, willDie, partName) then
                     return
                 end
             end
-            if willDie then
-                local death = (entity.Character.PrimaryPart :: BasePart):FindFirstChild("DeathSound", true) :: Sound?
-                if death and partName == "Head" then
-                    death.Volume = 0
-                end
-                if weapon.Kind == "Explosion" then
-                    entity:Kill(attacker, "Explosion", false, false)
-                else
-                    entity:Kill(attacker, round:GetEquipment(weapon.Name), partName == "Head", false)
-                end
-            elseif attacker and not attacker:HasSelfDefenseAgainst(entity) then
-                entity:AddSelfDefense(attacker, 15)
-            end
+            
+            -- Would be nicer to use a local for weapon.Kind == "Explosion" but type checker does not reduce correctly then. Here I am writing it out a third time instead :)
+            entity:TakeDamage(damage, attacker, if weapon.Kind == "Explosion" then "Explosion" else round:GetEquipment(weapon.Name), partName == "Head" and weapon.Kind ~= "Explosion")
 
             if attacker then
                 local karmaDiff = damage * 1.5
                 karmaDiff *= if attacker:IsDamageJustifiedAgainst(entity) then 1 else -1
                 attacker.Karma += karmaDiff
             end
-        elseif willDie and not entity.PropInstance:GetAttribute("Destroyed") then
-            entity.PropInstance:SetAttribute("Destroyed", true)
-            entity.Attacker = attacker
-            entity:OnBreak()
-            entity.PropInstance:Destroy()
+        else
+            entity:TakeDamage(damage, attacker)
         end
-        
-        hum.Health -= damage
     end
 end
 
@@ -107,79 +88,20 @@ local function findPropAncestor(prop: Instance, propsFolder: Folder): Types.Prop
     end
 end
 
-local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePart)
-    local wedge = Instance.new("WedgePart")
-    wedge.Size = size
-    wedge.CFrame = cframe
-    wedge.Anchored = false
-    wedge.Color = parent.Color
-    wedge.Transparency = parent.Transparency
-    wedge.CanTouch = false
-    wedge.CanQuery = false
-    wedge.Parent = workspace.Projectiles
+local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition, attacker: Types.Participant?, rayResult: RaycastResult, origin: Vector3): ()
+    local part = rayResult.Instance :: BasePart
+    local windows = round.Map:FindFirstChild("Windows")
 
-    wedge:ApplyImpulse((if math.random() >= 0.5 then 1 else -1) * Vector3.one)
-
-    return wedge
-end
-
--- Function to shatter the glass part into a grid of wedge fragments
-local function shatterGlass(glass: BasePart)
-    local cols = math.max(1, math.floor(glass.Size.X / 3))
-    local rows = math.max(1, math.floor(glass.Size.Y / 3))
-
-    local glassSize = glass.Size
-    local glassCFrame = glass.CFrame
-
-    -- Calculate the size of each fragment
-    local fragmentWidth = glassSize.X / cols
-    local fragmentHeight = glassSize.Y / rows
-    local fragmentDepth = glassSize.Z / 2  -- Depth of the wedge (half of glass thickness)
-
-    local fragments = {}
-
-    -- Loop through the grid and create fragments
-    for row = 0, rows - 1 do
-        for col = 0, cols - 1 do
-            -- Calculate the position for the fragment
-            local posX = (col * fragmentWidth) - (glassSize.X / 2) + (fragmentWidth / 2)
-            local posY = (row * fragmentHeight) - (glassSize.Y / 2) + (fragmentHeight / 2)
-            local posZ = 0
-
-            -- Create the first fragment
-            local fragmentCFrame1 = glassCFrame * CFrame.new(posX, posY, posZ) * CFrame.Angles(0, math.rad(-90), 0)
-
-            -- Create the second fragment
-            local fragmentCFrame2 = fragmentCFrame1 * CFrame.Angles(0, math.rad(180), math.rad(180))
-
-            -- Create the wedge fragments
-            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame1, glass))
-            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame2, glass))
+    if windows then
+        if part:IsDescendantOf(windows) then
+            return ShatterGlass(part, (rayResult.Position - origin).Unit * if weapon.ProjectileInfo then math.max(weapon.ProjectileInfo.Speed / 50, 3) else 3)
         end
     end
 
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://2978605361"
-    sound.PlayOnRemove = true
-    sound.RollOffMaxDistance = 200
-    sound.RollOffMinDistance = 10
-    sound.Parent = glass
-
-    glass:Destroy()
-
-    task.delay(5, function()
-        for _, v in fragments do
-            v:Destroy()
-        end
-        table.clear(fragments)
-    end)
-end
-
-local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition, attacker: Types.Participant?, rayResult: RaycastResult): ()
     if round:IsRoundPreparing() then
         return
     end
-    local part = rayResult.Instance
+    
     local parent = part.Parent
     assert(part:IsA("BasePart") and parent)
 
@@ -192,57 +114,7 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
 
         onEntityHit(round, weapon, attacker, victim, part.Name, rayResult.Distance)
     elseif not parent:GetAttribute("IsCorpse") then
-        local windows = round.Map:FindFirstChild("Windows")
-        if windows then
-            if part:IsDescendantOf(windows) then
-                shatterGlass(part)
-                return
-            end
-        end
-
-        local impactHole = Instance.new("Part")
-        impactHole.Anchored = false
-        impactHole.Transparency = 1
-        impactHole.Size = Vector3.new(0.5, 0.5, 0.1)
-        impactHole.CFrame = CFrame.lookAt(rayResult.Position, rayResult.Position + rayResult.Normal)
-        
-        impactHole.CanCollide = false
-        impactHole.CanTouch = false
-        impactHole.CanQuery = false
-        
-        local impactDecal = Instance.new("Decal")
-        impactDecal.Texture = "rbxassetid://130624105"
-        impactDecal.Color3 = part.Color
-        impactDecal.Parent = impactHole
-        
-        local weld = Instance.new("WeldConstraint")
-        weld.Part0 = part
-        weld.Part1 = impactHole
-        weld.Parent = rayResult.Instance
-
-        task.delay(5, function()
-            if impactHole:IsDescendantOf(workspace) then
-                return
-            end
-            local tween = TweenService:Create(impactDecal, TweenInfo.new(5), {Transparency = 1})
-            tween.Completed:Connect(function()
-                if not impactHole:IsDescendantOf(workspace) then
-                    return
-                end
-                weld:Destroy()
-                impactHole:Destroy()
-            end)
-
-            impactHole.Destroying:Once(function()
-                if tween.PlaybackState == Enum.PlaybackState.Playing then
-                    tween:Cancel()
-                end
-            end)
-
-            tween:Play()
-        end)
-        
-        impactHole.Parent = part
+        ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
         if mapProps and part:IsDescendantOf(mapProps) then
@@ -312,8 +184,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
             end
             table.insert(propsHit, entity)
         elseif windows and hit:IsDescendantOf(windows) then
-            shatterGlass(hit)
-            return
+            return ShatterGlass(hit, (hit.Position - position).Unit * explosionInfo.Pressure / distance)
         elseif hit.Parent and hit.Parent:IsA("Model") and hit.Parent:FindFirstChildOfClass("Humanoid") then
             local participant = round:GetParticipant(hit.Parent.Name)
             if not participant or table.find(participantsHit, participant) then
@@ -370,7 +241,11 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     end)
     firedSound:Play()
 
-    local origin = char:GetPivot().Position
+    local head = char:FindFirstChild("Head")
+    if not head or not head:IsA("BasePart") then
+        return
+    end
+    local origin = head.Position
 
     local random = Random.new()
     local spread = math.rad(weapon.Base.Spread)
@@ -385,18 +260,8 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         if projectileInfo then
             assert(typeof(projectileInfo) ~= "boolean") -- projectileInfo gets reduced to true... from a type of false | ProjectileInfo...
 
-            local projectile = projectileInfo.Base:Clone()
-            projectile:PivotTo(CFrame.lookAt(origin, targetPosition))
-
-            local tween = TweenService:Create(projectile, TweenInfo.new((origin - targetPosition).Magnitude / projectileInfo.Speed), {Position = targetPosition})
-
-            tween.Completed:Once(function()
-                projectile:Destroy()
-            end)
-
-            tween:Play()
-
-            projectile.Parent = workspace.Projectiles
+            local projectile = projectileInfo.Base
+            ReplicatedStorage.ServerClient.TweenProjectile:FireAllClients(projectile, origin, targetPosition, projectileInfo.Speed)
         end
     end
 
@@ -418,7 +283,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
 
         tweenProjectile(result.Position)
 
-        onPartHit(round, weapon.Base, attacker, result)
+        onPartHit(round, weapon.Base, attacker, result, origin)
     end
 end
 

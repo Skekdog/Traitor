@@ -150,7 +150,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Pistol", "Golden Gun", "Flare Gun", "BAR"},
+    StartingEquipment = {"Crowbar", "Pistol", "Golden Gun", "Flare Gun", "BAR", "Magneto Stick"},
     AvailableEquipment = {
         {
             Name = "Crowbar",
@@ -159,6 +159,20 @@ local module: Types.Gamemode = {
             AttackType = "Blunt",
 
             Item = items.Crowbar
+        },
+        {
+            Name = "Magneto Stick",
+            Description = "Haha props",
+            Icon = "rbxassetid://",
+
+            Item = items["Magneto Stick"]
+        },
+        {
+            Name = "Newton Launcher",
+            Description = "Haha props",
+            Icon = "rbxassetid://",
+
+            Item = items["Newton Launcher"]
         },
         {
             Name = "Pistol",

@@ -38,6 +38,10 @@ local _earlyTesters = { -- These players should be awarded the badge whenever th
 local meId = 965735486
 local testPlace = 9648179685
 
+local function isAdmin(plr: Player)
+	return plr.UserId == meId or plr.UserId < 0
+end
+
 Players.PlayerAdded:Connect(function(plr)
 	if ServerStorage:GetAttribute("ServerLocked") then
 		return plr:Kick("This server is shutting down.")
@@ -59,11 +63,11 @@ Players.PlayerAdded:Connect(function(plr)
 
         if msg == "!testplace" and game.PlaceId ~= testPlace then
             local targets = {plr}
-			if plr.UserId == meId then
+			if isAdmin(plr) then
 				targets = Players:GetPlayers()
 			end
 			TeleportService:TeleportAsync(testPlace, targets)
-        elseif msg == "!pause" and plr.UserId == meId then
+        elseif msg == "!pause" and isAdmin(plr) then
             local id = ServerStorage:GetAttribute("RoundID")
 			if not id then
 				return

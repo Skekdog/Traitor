@@ -13,7 +13,7 @@ equaliser.LowGain = 10
 equaliser.MidGain = -20
 equaliser.Enabled = true
 
-ReplicatedStorage.ServerClient.Flashbang.OnClientEvent:Connect(function()
+(ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).Flashbang.OnClientEvent:Connect(function()
 	local correction = Instance.new("ColorCorrectionEffect")
 	local blur = Instance.new("BlurEffect")
 	
