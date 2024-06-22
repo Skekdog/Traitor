@@ -60,7 +60,6 @@ local function stopControllingProp(prop: BasePart, userId: number)
     end)
 
     controlledProps[userId] = nil
-    print("stopped controlling prop")
 end
 
 return ({
@@ -873,23 +872,23 @@ return ({
             local object = result.Instance :: BasePart
 
             if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) then
-                return print("not a prop")
+                return
             end
 
             if object:GetAttribute("NoGrab") then
-                return print("no grab")
+                return
             end
 
             if alreadyControlled == object then
-                return print("already controlled")
+                return
             end
 
             if object.AssemblyMass == math.huge then -- anchored props have inf assemblymass
-                return print("anchored")
+                return
             end
 
             if (object.AssemblyMass > 50) or (object.Size.X * object.Size.Y * object.Size.Z > 50) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
-                return print("too big")
+                return
             end
 
             local alignPos = object:FindFirstChildOfClass("AlignPosition") or Instance.new("AlignPosition")
@@ -914,7 +913,7 @@ return ({
                 if activeHolder.Value == userId then
                     stopControllingProp(object, userId)
                 end
-                return print("Already controlling prop")
+                return
             elseif not activeHolder.Parent then
                 activeHolder.Name = "ActiveHolder"
                 activeHolder.Parent = object
@@ -934,7 +933,7 @@ return ({
             alignPos.Enabled = true
         end,
         PrimaryFire = function(plr: Types.Participant, cameraRayInfo: Ray)
-            print("primary fire", plr, cameraRayInfo)
+            
         end,
         OnUnequip = function(plr: Player)
             local userId = plr.UserId

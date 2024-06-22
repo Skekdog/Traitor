@@ -231,7 +231,18 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
-    weapon.CurrentAmmo -= 1
+    local magSize = 1
+	if weapon.Base.MultiUse and type(weapon.Base.MultiUse) == "table" then
+		magSize = weapon.Base.MultiUse.MagazineSize
+	end
+
+    local isInf = weapon.CurrentAmmo == math.huge
+
+    if not isInf then
+        weapon.CurrentAmmo -= 1
+        ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(player, weapon.CurrentAmmo, magSize, weapon.ReserveAmmo)
+    end
+    
     weapon.LastFireTime = workspace:GetServerTimeNow()
 
     local firedSound = weapon.Base.FiredSound:Clone()

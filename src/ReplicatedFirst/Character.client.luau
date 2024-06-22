@@ -4,17 +4,20 @@ local TweenService = game:GetService("TweenService")
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(script.Parent.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
 local activeTween: Tween
 local function setHealth(hum: Humanoid)
+    local noTransition = SettingsManager.GetSetting("Animate UI Transitions") :: boolean
+
     roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.round(hum.Health))
     if activeTween then
         activeTween:Cancel()
     end
-    activeTween = TweenService:Create(roundInfo.Frame.HealthBar.Background, TweenInfo.new(0.1), {Size = UDim2.new(hum.Health/hum.MaxHealth, 0, 1, 0)})
+    activeTween = TweenService:Create(roundInfo.Frame.HealthBar.Background, TweenInfo.new(if noTransition then 0 else 0.1), {Size = UDim2.new(hum.Health/hum.MaxHealth, 0, 1, 0)})
     activeTween:Play()
 end
 
@@ -48,8 +51,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
     end
 end)
 
-InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
-    print("equipped", item)
+InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
     ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
         while input.UserInputState == Enum.UserInputState.Begin do
             ReplicatedStorage.ClientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
@@ -80,11 +82,12 @@ InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)
     if InventoryManager.GetEquipped(plr) then
         return
     end
-    print("unquequierped")
     ControlManager.Unregister("Primary Fire")
     ControlManager.Unregister("Alternate Fire")
     ControlManager.Unregister("Drop")
     ControlManager.Unregister("Reload Weapon")
+
+    roundInfo.Frame.AmmoBar.Visible = false
 end)
 
 Players.LocalPlayer.CharacterRemoving:Connect(onDeath)

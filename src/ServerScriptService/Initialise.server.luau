@@ -1,4 +1,5 @@
 local BadgeService = game:GetService("BadgeService")
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -127,6 +128,26 @@ InventoryManager.Listen("Remove", function(plr, equipment)
 	fireInventoryClient(plr, "Remove", equipment)
 end)
 
+InventoryManager.Listen("Equip", function(plr, equipment)
+	if equipment.Base.Kind == "Item" then
+		return
+	end
+
+	local weapon = equipment :: ItemTypes.Weapon
+
+	local isInf = weapon.CurrentAmmo == math.huge
+	if isInf then
+		return
+	end
+
+	local magSize = 1
+	if weapon.Base.MultiUse and type(weapon.Base.MultiUse) == "table" then
+		magSize = weapon.Base.MultiUse.MagazineSize
+	end
+
+	ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(plr, weapon.CurrentAmmo, magSize, weapon.ReserveAmmo, true)
+end)
+
 InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: string?, switching: boolean?)
 	if typeof(equipmentName) ~= "string" then
 		return
@@ -173,4 +194,11 @@ end)
 ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target)
 	local profile = ProfileManager.GetProfile(plr)
 	return profile and profile.Karma or 1000
+end
+
+while true do
+	for _, v in CollectionService:GetTagged("HealthStationRechargeable") do
+        v:SetAttribute("CurrentCharge", math.min(200, v:GetAttribute("CurrentCharge")+1))
+    end
+	task.wait(1)
 end

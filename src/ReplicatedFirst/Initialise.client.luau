@@ -1,6 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local InventoryManager = require(script.Parent.InventoryManager)
+local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
+local UIManager = require(script.Parent.UIManager)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)
 
@@ -63,3 +67,38 @@ serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, posit
     
     impactHole.Parent = part
 end)
+
+local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
+local ammoBar = roundInfo.Frame.AmmoBar
+local activeTween: Tween
+local function setAmmo(current: number, magazineSize: number, reserve: number, noTransition: boolean?)
+    if noTransition == nil then
+        noTransition = SettingsManager.GetSetting("Animate UI Transitions") :: boolean
+    end
+
+    ammoBar.AmmoLabel.Text = `{current} / {magazineSize} + {reserve}`
+    if activeTween then
+        activeTween:Cancel()
+    end
+    activeTween = TweenService:Create(ammoBar.Background, TweenInfo.new(if noTransition then 0 else 0.1), {Size = UDim2.new(current / magazineSize, 0, 1, 0)})
+    activeTween:Play()
+end
+
+InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
+    if item.Base.Kind == "Item" then
+        ammoBar.Visible = false
+        return
+    end
+
+    local weapon = item :: ItemTypes.Weapon
+
+    local isInf = weapon.CurrentAmmo == math.huge
+	if isInf then
+        ammoBar.Visible = false
+		return
+	end
+
+    ammoBar.Visible = true
+end)
+
+serverClient.AmmoUpdate.OnClientEvent:Connect(setAmmo)

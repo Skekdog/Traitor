@@ -13,12 +13,12 @@ params.IgnoreWater = true
 
 Controls.Register("Interact", true, function(action, state, input, toggled)
 	if state ~= Enum.UserInputState.End then
-		return
+		return Enum.ContextActionResult.Pass
 	end
 	local map = LocalRoundInfo.GetMap()
 
 	if not map then
-		return
+		return Enum.ContextActionResult.Pass
 	end
 
 	local char = plr.Character
@@ -28,7 +28,7 @@ Controls.Register("Interact", true, function(action, state, input, toggled)
 
 	local ray = workspace:Raycast(cam.CFrame.Position, cam.CFrame.LookVector * 10, params)
 	if not ray or not ray.Instance or not ray.Instance.Parent then
-		return
+		return Enum.ContextActionResult.Pass
 	end
 
 	if ray.Instance.Parent:GetAttribute("IsCorpse") then
@@ -36,7 +36,7 @@ Controls.Register("Interact", true, function(action, state, input, toggled)
 	end
 
 	if not char or not map then
-		return
+		return Enum.ContextActionResult.Pass
 	end
 
 	local actionItems = map.Map:FindFirstChild("__ActionItems")
@@ -44,5 +44,8 @@ Controls.Register("Interact", true, function(action, state, input, toggled)
 	local props = map:FindFirstChild("Props")
 	if (actionItems and actionItems:IsAncestorOf(ray.Instance)) or (doors and doors:IsAncestorOf(ray.Instance)) or (props and props:IsAncestorOf(ray.Instance)) then
 		RS.ClientServer.Interaction:FireServer(ray.Instance)
+		return Enum.ContextActionResult.Sink
 	end
+
+	return Enum.ContextActionResult.Pass
 end)
