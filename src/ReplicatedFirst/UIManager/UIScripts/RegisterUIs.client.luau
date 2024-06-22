@@ -37,9 +37,10 @@ controls.Register("Close UI", false, function()
 	for _, v in manager.GetUIs("Popup") do
 		if v.Visible and not v.NoClose then
 			v:ToggleVisible(false)
-			break
+			return Enum.ContextActionResult.Sink
 		end
 	end
+	return Enum.ContextActionResult.Pass
 end);
 
 (ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).OpenSettings.OnClientEvent:Connect(function()

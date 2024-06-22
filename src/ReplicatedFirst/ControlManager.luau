@@ -98,9 +98,13 @@ function module.GetFirstKeyCode(actionName: string): string
 end
 
 -- Returns the Button if it was created
-function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> ()): ImageButton?
+function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> Enum.ContextActionResult): ImageButton?
 	if not ReplicatedFirst:GetAttribute("ControlsReady") then
 		ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
+	end
+
+	if registered[actionName] then
+		CAS:UnbindAction(actionName)
 	end
 
 	registered[actionName] =  {

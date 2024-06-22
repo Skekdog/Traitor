@@ -127,7 +127,7 @@ InventoryManager.Listen("Remove", function(plr, equipment)
 	fireInventoryClient(plr, "Remove", equipment)
 end)
 
-InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: string?)
+InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: string?, switching: boolean?)
 	if typeof(equipmentName) ~= "string" then
 		return
 	end
@@ -149,7 +149,7 @@ InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: Inv
 	if event == "Equip" then
 		InventoryManager.Equip(plr, foundEquipment)
 	elseif event == "Unequip" then
-		InventoryManager.Unequip(plr, foundEquipment)
+		InventoryManager.Unequip(plr, foundEquipment, switching)
 	elseif event == "Drop" then
 		InventoryManager.Drop(plr, foundEquipment, char:GetPivot().Position + char.PrimaryPart.CFrame.LookVector * 10)
 	end

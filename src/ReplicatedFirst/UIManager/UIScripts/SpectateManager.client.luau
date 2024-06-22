@@ -23,7 +23,7 @@ local function spectateFunc(action, state)
 	
 	if #chars == 0 then
 		uiO.Username.Text = "Nobody to spectate!"
-		return
+		return Enum.ContextActionResult.Pass
 	end
 
 	local lastKey = nil
@@ -43,6 +43,7 @@ local function spectateFunc(action, state)
 	end
 	
 	uiO.Username.Text = ((camera.CameraSubject :: Humanoid).Parent :: Instance).Name
+	return Enum.ContextActionResult.Sink
 end
 
 local clientStorage = ReplicatedFirst.ClientStorage

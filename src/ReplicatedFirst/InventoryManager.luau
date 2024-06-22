@@ -12,21 +12,21 @@ local inventories: {[Player]: Inventory} = {}
 local equipped: {[Player]: ItemTypes.Item?} = {}
 
 export type InventoryEvent = "Add" | "Remove" | "Equip" | "Unequip" | "Drop"
-local listeners: {[InventoryEvent]: {((Player, ItemTypes.Item) -> ())}} = {Add = {}, Remove = {}, Equip = {}, Unequip = {}, Drop = {}}
+local listeners: {[InventoryEvent]: {((Player, ItemTypes.Item, boolean?) -> ())}} = {Add = {}, Remove = {}, Equip = {}, Unequip = {}, Drop = {}}
 
 local IS_CLIENT = RunService:IsClient()
 
 type InventoryRemote = {
-    FireServer: (self: any, InventoryEvent, string) -> (),
+    FireServer: (self: any, InventoryEvent, string, boolean?) -> (),
     FireClient: (self: any, Player, InventoryEvent, ItemTypes.Item) -> (),
-    OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, string?) -> ()) -> ()},
+    OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, string?, boolean?) -> ()) -> ()},
 }
 
 module.InvEvent = (ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent :: InventoryRemote
 
-local function runCallback(plr: Player, event: InventoryEvent, equipment: ItemTypes.Item)
+local function runCallback(plr: Player, event: InventoryEvent, equipment: ItemTypes.Item, switching: boolean?)
     for _, v in listeners[event] do
-        v(plr, equipment)
+        v(plr, equipment, switching)
     end
 end
 
@@ -65,7 +65,7 @@ function module.Equip(plr: Player, equipment: ItemTypes.Item)
             return
         end
         if old then
-            module.Unequip(plr, old)
+            module.Unequip(plr, old, true)
         end
 
         equipped[plr] = equipment
@@ -74,9 +74,13 @@ function module.Equip(plr: Player, equipment: ItemTypes.Item)
     runCallback(plr, "Equip", equipment)
 end
 
-function module.Unequip(plr: Player, equipment: ItemTypes.Item)
+function module.Unequip(plr: Player, equipment: ItemTypes.Item, switching: boolean?)
     if IS_CLIENT then
-        module.InvEvent:FireServer("Unequip", equipment.Base.Name)
+        module.InvEvent:FireServer("Unequip", equipment.Base.Name, switching)
+        local old = equipped[plr]
+        if old and old.Base.Name == equipment.Base.Name then
+            equipped[plr] = nil
+        end
     else
         local old = equipped[plr]
         if (old :: any) ~= equipment then
@@ -87,7 +91,7 @@ function module.Unequip(plr: Player, equipment: ItemTypes.Item)
         end
         equipped[plr] = nil
     end
-    runCallback(plr, "Unequip", equipment)
+    runCallback(plr, "Unequip", equipment, switching)
 end
 
 function module.Drop(plr: Player, equipment: ItemTypes.Item, position: Vector3)

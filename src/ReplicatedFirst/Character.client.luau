@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local ControlManager = require(script.Parent.ControlManager)
+local InventoryManager = require(script.Parent.InventoryManager)
+local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local UIManager = require(script.Parent.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
@@ -16,17 +18,16 @@ local function setHealth(hum: Humanoid)
     activeTween:Play()
 end
 
+local function onDeath()
+    script.Parent.ClientStorage:SetAttribute("IsSpectating", true)
+    roundInfo.Frame.HealthBar.Visible = false
+end
+
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     script.Parent.ClientStorage:SetAttribute("IsSpectating", false)
 
     local hum = char:WaitForChild("Humanoid") :: Humanoid
-    hum.Died:Once(function()
-        script.Parent.ClientStorage:SetAttribute("IsSpectating", true)
-        ControlManager.Unregister("Primary Fire")
-        ControlManager.Unregister("Alternate Fire")
-		ControlManager.Unregister("Drop")
-		ControlManager.Unregister("Reload Weapon")
-    end)
+    hum.Died:Once(onDeath)
 
     roundInfo.Frame.HealthBar.Visible = true
 
@@ -47,6 +48,43 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
     end
 end)
 
-Players.LocalPlayer.CharacterRemoving:Connect(function()
-    roundInfo.Frame.HealthBar.Visible = false
+InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
+    print("equipped", item)
+    ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
+        while input.UserInputState == Enum.UserInputState.Begin do
+            ReplicatedStorage.ClientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+            task.wait()
+        end
+        return Enum.ContextActionResult.Sink
+    end)
+    
+    ControlManager.Register("Alternate Fire", true, function(action, state, input, toggled)
+        if state ~= Enum.UserInputState.End then
+            return Enum.ContextActionResult.Pass
+        end
+        ReplicatedStorage.ClientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+        return Enum.ContextActionResult.Sink
+    end)
+    
+    ControlManager.Register("Drop", true, function()
+        local equipped = InventoryManager.GetEquipped(Players.LocalPlayer)
+        if not equipped then
+            return Enum.ContextActionResult.Pass
+        end
+        InventoryManager.Drop(Players.LocalPlayer, equipped, Vector3.zero)
+        return Enum.ContextActionResult.Sink
+    end)
 end)
+
+InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)
+    if InventoryManager.GetEquipped(plr) then
+        return
+    end
+    print("unquequierped")
+    ControlManager.Unregister("Primary Fire")
+    ControlManager.Unregister("Alternate Fire")
+    ControlManager.Unregister("Drop")
+    ControlManager.Unregister("Reload Weapon")
+end)
+
+Players.LocalPlayer.CharacterRemoving:Connect(onDeath)

@@ -25,7 +25,8 @@ end
 local function switchToEquipment(equipment: ItemTypes.Item?)
 	if equipment then
 		if (equipment :: any) == selectedEquipment then
-			return unequip(equipment)
+			unequip(equipment)
+			return Enum.ContextActionResult.Sink
 		else
 			InventoryManager.Equip(plr, equipment)
 			local found = backpack:FindFirstChild(equipment.Base.Name) :: TextButton
@@ -41,6 +42,7 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 		unequip(selectedEquipment)
 	end
 	selectedEquipment = equipment
+	return Enum.ContextActionResult.Sink
 end
 
 local slots: {[number]: ItemTypes.Item} = {}
@@ -86,7 +88,9 @@ for i = 1, MAX_SLOT do
 		local equipment = slots[i]
 		if equipment then
 			switchToEquipment(equipment)
+			return Enum.ContextActionResult.Sink
 		end
+		return Enum.ContextActionResult.Pass
 	end)
 end
 
@@ -103,9 +107,10 @@ do
 	local function selectLowest()
 		local lowest = minN(slots)
 		if not lowest then
-			return
+			return Enum.ContextActionResult.Pass
 		end
-		return switchToEquipment(slots[lowest])
+		switchToEquipment(slots[lowest])
+		return Enum.ContextActionResult.Sink
 	end
 
 	ControlManager.Register("Next Weapon", false, function()
@@ -128,6 +133,7 @@ do
 				return switchToEquipment(slots[i])
 			end
 		end
+		return Enum.ContextActionResult.Pass
 	end)
 end
 

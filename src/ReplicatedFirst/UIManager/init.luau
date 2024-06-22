@@ -130,9 +130,10 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				elseif state == Enum.UserInputState.Begin then
 					self:ToggleVisible(true)
 				end
-				return
+				return Enum.ContextActionResult.Sink
 			end
 			self:ToggleVisible()
+			return Enum.ContextActionResult.Sink
 		end)
 	end
 	
