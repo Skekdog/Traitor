@@ -47,14 +47,17 @@ local function radar()
 end
 
 UI.ScrollingFrame.ChildAdded:Connect(function(v)
-	if v:IsA("ImageButton") then
-		v.MouseButton1Click:Connect(function()
-			purchaseButton:SetAttribute("Item", v.Name)
-			UI.CreditCost.Text = "This costs "..tostring(v:GetAttribute("CreditCost")).." credit(s)."
-			UI.Description.Text = v:GetAttribute("Description")
-			UI:FindFirstChild("Name").Text = v.Name
-		end)
+	print(v)
+	if not v:IsA("ImageButton") then
+		return
 	end
+
+	v.MouseButton1Click:Connect(function()
+		purchaseButton:SetAttribute("Item", v.Name)
+		UI.CreditCost.Text = "This costs "..tostring(v:GetAttribute("CreditCost")).." credit(s)."
+		UI.Description.Text = v:GetAttribute("Description")
+		UI:FindFirstChild("Name").Text = v.Name
+	end)
 end)
 
 local purchaseCon
@@ -69,7 +72,9 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 
 	local participant = LocalRoundInfo.GetOwnParticipant()
 
-	if not participant then return end
+	if not participant then
+		return
+	end
 
 	local credits = participant.Credits
 	
@@ -78,7 +83,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	if purchaseCon then purchaseCon:Disconnect() end
 	purchaseCon = purchaseButton.MouseButton1Click:Connect(function()
 		if credits >= creditCost then
-			local response = ReplicatedStorage.ClientServer.PurchaseEquipment:InvokeServer(item)
+			local response = ReplicatedStorage.RoundHandler.PurchaseEquipment:InvokeServer(item)
 			if response == "ItemError" then
 				API.ScreenMessage("Error", "Equipment not found on server")
 			elseif response == "CreditError" then

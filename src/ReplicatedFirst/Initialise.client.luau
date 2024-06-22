@@ -73,7 +73,7 @@ local ammoBar = roundInfo.Frame.AmmoBar
 local activeTween: Tween
 local function setAmmo(current: number, magazineSize: number, reserve: number, noTransition: boolean?)
     if noTransition == nil then
-        noTransition = SettingsManager.GetSetting("Animate UI Transitions") :: boolean
+        noTransition = not SettingsManager.GetSetting("Animate UI Transitions") :: boolean
     end
 
     ammoBar.AmmoLabel.Text = `{current} / {magazineSize} + {reserve}`

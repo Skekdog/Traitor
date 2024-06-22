@@ -11,13 +11,13 @@ local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.Un
 
 local activeTween: Tween
 local function setHealth(hum: Humanoid)
-    local noTransition = SettingsManager.GetSetting("Animate UI Transitions") :: boolean
+    local noTransition = not SettingsManager.GetSetting("Animate UI Transitions") :: boolean
 
     roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.round(hum.Health))
     if activeTween then
         activeTween:Cancel()
     end
-    activeTween = TweenService:Create(roundInfo.Frame.HealthBar.Background, TweenInfo.new(if noTransition then 0 else 0.1), {Size = UDim2.new(hum.Health/hum.MaxHealth, 0, 1, 0)})
+    activeTween = TweenService:Create(roundInfo.Frame.HealthBar.Background, TweenInfo.new(if noTransition then 0 else 0.1), {Size = UDim2.new(hum.Health / hum.MaxHealth, 0, 1, 0)})
     activeTween:Play()
 end
 

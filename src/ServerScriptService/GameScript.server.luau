@@ -68,6 +68,30 @@ remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: string?)
 	remotes.SendCorpseInfo:FireClient(plr, targetParticipant:ViewCorpse())
 end)
 
+remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: string?)
+	if not equipmentName then
+		return
+	end
+
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return
+	end
+
+	local round = RoundHandler.GetRound(roundId)
+	local participant = round:GetParticipant(plr.Name)
+	if not participant then
+		return
+	end
+
+	local equipment = round:GetEquipment(equipmentName)
+	if not equipment then
+		return
+	end
+	
+	return participant:PurchaseEquipment(equipment)
+end
+
 local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructureCast
 
