@@ -67,7 +67,7 @@ for _, v in UI.ScrollingFrame:GetChildren() do
 end
 
 local purchaseCon
-type PurchaseResponse = "NoRound" | "NotInRound" | "NotFound" | "NotEnoughCredits" | "NotInStock"?
+type PurchaseResponse = "NoRound" | "NotInRound" | "NotFound" | "NotEnoughCredits" | "NotInStock" | "Dead"?
 purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	local item = purchaseButton:GetAttribute("Item")
 	
@@ -91,6 +91,11 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 		purchaseCon:Disconnect()
 	end
 	purchaseCon = purchaseButton.MouseButton1Click:Connect(function()
+		participant = LocalRoundInfo.GetOwnParticipant()
+		if not participant then
+			return
+		end
+		credits = participant.Credits
 		if credits >= creditCost then
 			local response: PurchaseResponse = ReplicatedStorage.RoundHandler.PurchaseEquipment:InvokeServer(item)
 			if response == "NoRound" then
@@ -103,6 +108,10 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 				API.ScreenMessage("Error", "You do not have enough credits to purchase this.")
 			elseif response == "NotInStock" then
 				API.ScreenMessage("Error", "You have purchased the maximum amount of this item.")
+			elseif response == "Dead" then
+				API.ScreenMessage("Error", "You are dead.")
+			elseif response == "SlotInUse" then
+				API.ScreenMessage("Error", "This slot is already being used.")
 			end
 		end
 	end)

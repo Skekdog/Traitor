@@ -176,6 +176,12 @@ local module: Types.Adapter = {
         end
 
         local base = Items[item.Name]
+        for _, v in InventoryManager.GetInventory(plr) do
+            if v.Base.Slot == base.Slot then
+                return "SlotInUse"
+            end
+        end
+        
         local itemInstance = {Base = base, Instance = item.Item:Clone()}
         if base.Kind ~= "Item" then -- You may think that an equality check would work. It does not.
             itemInstance.CurrentAmmo = if base.MultiUse then base.MultiUse.MagazineSize else 1
@@ -446,6 +452,7 @@ local module: Types.Adapter = {
 
         if hum then
             hum:ChangeState(Enum.HumanoidStateType.Physics)
+            hum.EvaluateStateMachine = false
         end
         if root then
             root.CanCollide = false
