@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SettingsManager = require(script.Parent.SettingsManager)
 local IS_SERVER = game:GetService("RunService"):IsServer()
 
 local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePart, direction: Vector3)
@@ -10,6 +11,7 @@ local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePa
     wedge.Transparency = parent.Transparency
     wedge.CanTouch = false
     wedge.CanQuery = false
+    wedge.Name = "GlassFragment"
     wedge.Parent = workspace.Projectiles
 
     wedge:ApplyImpulse(direction)
@@ -63,6 +65,10 @@ return function(glass: BasePart, direction: Vector3?): ()
     sound.Parent = glass
 
     glass:Destroy()
+
+    if SettingsManager.GetSetting("Keep Shattered Glass") then
+        return
+    end
 
     task.delay(5, function()
         for _, v in fragments do

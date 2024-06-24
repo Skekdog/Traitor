@@ -18,8 +18,6 @@ if game:GetService("RunService"):IsClient() then
 	for i, _ in UI.Themes do
 		table.insert(uiThemes, i)
 	end
-
-	table.insert(uiThemes, "SEIZURE")
 end
 
 export type SettingDefinition = {
@@ -40,8 +38,6 @@ export type KeybindSetting = {
 }
 export type Setting = KeybindSetting | string | boolean | UDim2 | number -- SelectionChoice, Boolean, TouchPosition, TouchScale
 
-local seizureThread: thread
-
 local module = {}
 
 local function keybindCallback(val, name)
@@ -54,7 +50,7 @@ module.AvailableSettings = {
 	{
 		Name = "Shadows",
 		Tab = "Display",
-		Category = "Lighting",
+		Category = "Environment",
 		Tooltip = "Enable or disable global shadows.",
 		PossibleValues = "Boolean",
 		Default = true,
@@ -65,7 +61,7 @@ module.AvailableSettings = {
 	{
 		Name = "Use FIB Lighting",
 		Tab = "Display",
-		Category = "Lighting",
+		Category = "Environment",
 		Tooltip = "If you have modified your client to use Future lighting, enable this for better map compatibility.",
 		PossibleValues = "Boolean",
 		Default = false,
@@ -90,6 +86,26 @@ module.AvailableSettings = {
 			end
 		end,
 	},
+
+	{
+		Name = "Keep Shattered Glass",
+		Tab = "Display",
+		Category = "Environment",
+		Tooltip = "Prevents shattered glass from despawning until the round is over.",
+		PossibleValues = "Boolean",
+		Default = false,
+		Callback = function(val)
+			if val then
+				return
+			end
+
+			for _, v in workspace.Projectiles:GetChildren() do
+				if v.Name == "GlassFragment" then
+					v:Destroy()
+				end
+			end
+		end
+	},
 	
 	{
 		Name = "UI Theme",
@@ -99,25 +115,7 @@ module.AvailableSettings = {
 		PossibleValues = uiThemes :: {string},
 		Default = "Dark",
 		Callback = function(val)
-			if val == "SEIZURE" then
-				if seizureThread then
-					task.cancel(seizureThread)
-				end
-				seizureThread = task.spawn(function()
-					while module.Settings["UI Theme"] == "SEIZURE" do
-						UI.UpdateTheme({
-							Primary = Color3.new(math.random(), math.random(), math.random()),
-							Secondary = Color3.new(math.random(), math.random(), math.random()),
-							Text = Color3.new(math.random(), math.random(), math.random()),
-							TextStroke = Color3.new(math.random(), math.random(), math.random()),
-							UIStroke = Color3.new(math.random(), math.random(), math.random()),
-						})
-						task.wait(0.25)
-					end
-				end)
-			else
-				UI.UpdateTheme(val :: string)
-			end
+			UI.UpdateTheme(val :: string)
 		end,
 	},
 	{

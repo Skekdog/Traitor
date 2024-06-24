@@ -208,7 +208,7 @@ local module: Types.Gamemode = {
         },
         {
             Name = "Golden Gun",
-            Description = "One shot. Don't fumble it.",
+            Description = "Instant kills if the death is justified. Otherwise - bad luck.",
             Icon = "rbxassetid://10282780102",
             AttackType = "Firearm",
             MaxStock = 1,
@@ -221,13 +221,14 @@ local module: Types.Gamemode = {
             Icon = "rbxassetid://",
             AttackType = "Firearm",
             MaxStock = 1,
+            Cost = 1,
 
             Item = items["Flare Gun"]
         },
         {
             Name = "Grenade",
-            Description = "Boom",
-            Cost = 1,
+            Description = "Explodes in a decent radius after a few seconds. Can be disarmed by being shot.",
+            Cost = 2,
             Icon = "rbxassetid://8096856961",
             MaxStock = 1,
             AttackType = "Explosion",
@@ -236,7 +237,7 @@ local module: Types.Gamemode = {
         },
         {
             Name = "Radar",
-            Description = "Beep... beep... beep",
+            Description = "Reveals the location of all living players every 30 seconds.",
             Cost = 1,
             Icon = "rbxassetid://62159372",
             MaxStock = 1,
