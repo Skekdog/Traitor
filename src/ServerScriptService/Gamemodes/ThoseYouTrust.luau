@@ -210,6 +210,7 @@ local module: Types.Gamemode = {
             Name = "Golden Gun",
             Description = "Instant kills if the death is justified. Otherwise - bad luck.",
             Icon = "rbxassetid://10282780102",
+            Cost = 1,
             AttackType = "Firearm",
             MaxStock = 1,
 

@@ -114,9 +114,7 @@ module.AvailableSettings = {
 		Tooltip = "Select a theme for the UI.",
 		PossibleValues = uiThemes :: {string},
 		Default = "Dark",
-		Callback = function(val)
-			UI.UpdateTheme(val :: string)
-		end,
+		Callback = UI.UpdateTheme :: any,
 	},
 	{
 		Name = "Close Scale",
