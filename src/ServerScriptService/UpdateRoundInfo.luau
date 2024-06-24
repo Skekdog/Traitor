@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -6,21 +7,22 @@ local remotes = ReplicatedStorage.RoundHandler
 
 local module = {}
 
-function module.SendUpdatedParticipants(participants: {Types.Participant}, thisParticipant: Types.Participant?, plr: Player)
-	if not thisParticipant then
-		remotes.UpdateOwnParticipant:FireClient(plr, nil)
-		for _, v in participants do
-			remotes.UpdateParticipant:FireClient(plr, v:ViewPartialParticipant())
+function module.UpdateParticipant(participant: Types.Participant)
+	for _, v in Players:GetPlayers() do
+		if v.Name == participant.Player.Name then
+			remotes.UpdateOwnParticipant:FireClient(v, participant:ViewPartialSelf())
+		else
+			remotes.UpdateParticipant:FireClient(v, participant:ViewPartialParticipant(participant.Round:GetParticipant(v.Name)))
 		end
-		return
 	end
+end
 
-	remotes.UpdateOwnParticipant:FireClient(plr, thisParticipant:ViewPartialSelf())
-	for _, v in participants do
-		if v.Player ~= thisParticipant.Player then
-			remotes.UpdateParticipant:FireClient(plr, v:ViewPartialParticipant(thisParticipant))
-		end
-	end
+function module.UpdateOwnParticipant(participant: Types.Participant | Types.ClientOwnParticipant)
+	remotes.UpdateOwnParticipant:FireClient(participant.Player, if participant.Kind == "Participant" then participant:ViewPartialSelf() else participant)
+end
+
+function module.UpdateParticipantForPlayer(participant: Types.Participant, player: Player)
+	
 end
 
 return module

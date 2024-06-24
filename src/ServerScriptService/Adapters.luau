@@ -13,7 +13,6 @@ local Items = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.Items)
 local ShatterGlass = require(script.Parent.Parent.ReplicatedFirst.ShatterGlass)
 local ProfileManager = require(script.Parent.ProfileManager)
 local RestartServer = require(script.Parent.RestartServer)
-local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local ProfileService = require(ServerScriptService.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
@@ -211,7 +210,7 @@ local module: Types.Adapter = {
         return false
     end,
 
-    SendMessage = function(message, severity, messageType, recipients)
+    SendMessage = function(message, severity, messageType, recipients: true | {Types.Participant})
         -- If isGlobal = true, then recipients is empty. The adapter is expected to send this message to all connected players (Players:GetPlayers()).
         -- Sends a private server message to each recipient.
         -- The message can be further processed here, such as using rich text to change text colour depending on severity.
@@ -229,7 +228,7 @@ local module: Types.Adapter = {
         end
         message = `<font color='{fontColour}'>{message}</font>`
 
-        if recipients == true then
+        if recipients == true or (recipients[1] and recipients[1].Round.Participants == recipients) then
             return remote:FireAllClients(message, messageType)
         end
         for _, v in recipients do
@@ -478,10 +477,6 @@ local module: Types.Adapter = {
             participant:SearchCorpse(victim)
             clone.Name = victim.Player.Name
             sendCorpseInfo(to)
-
-            for _, v in Players:GetPlayers() do
-                UpdateRoundInfo.SendUpdatedParticipants({victim}, victim.Round:GetParticipant(v.Name), v)
-            end
         end)
 
         clone:SetAttribute("IsCorpse", true)
@@ -522,10 +517,6 @@ local module: Types.Adapter = {
 
         victim.Character = clone
         victim.Player.Character = nil
-
-        for _, v in Players:GetPlayers() do
-            UpdateRoundInfo.SendUpdatedParticipants({victim}, victim.Round:GetParticipant(v.Name), v)
-        end
     end,
 
     CalculateUserFacingEvents = function(events: Types.RoundEventLog, winners)
@@ -541,7 +532,7 @@ local module: Types.Adapter = {
                 attackerName = attacker.FormattedName
             end
             if weapon == "Fall" then
-                text ..= " was doomed to fall"
+                text ..= " fell to their death"
                 if attacker then
                     text ..= ` at the hands of {attackerName}`
                 end
@@ -623,9 +614,9 @@ local module: Types.Adapter = {
                 Timestamp = v.Timestamp,
             }
             if v.Data.CreditsFound then
-                event.Text = `{v.Data.Participant} found {v.Data.CreditsFound} credits on the body of {v.Data.Corpse}.`
+                event.Text = `{v.Data.Participant.FormattedName} found {v.Data.CreditsFound} credits on the body of {v.Data.Corpse.FormattedName}.`
             else
-                event.Text = `{v.Data.Participant} found the body of {v.Data.Corpse}.`
+                event.Text = `{v.Data.Participant.FormattedName} found the body of {v.Data.Corpse.FormattedName}.`
             end
             table.insert(userFacingLog, event)
         end

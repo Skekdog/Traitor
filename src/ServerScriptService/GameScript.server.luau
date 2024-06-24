@@ -107,7 +107,9 @@ local function sendRoundInfo(plr: Player?)
 	if plr then
 		remotes.UpdateEquipment:FireClient(plr, gm.AvailableEquipment)
 		remotes.UpdateRoles:FireClient(plr, gm.Name, gm.Roles)
-		UpdateRoundInfo.SendUpdatedParticipants(round.Participants, round:GetParticipant(plr.Name) ,plr)
+		for _, v in round.Participants do
+			UpdateRoundInfo.UpdateParticipantForPlayer(v, plr)
+		end
 		return
 	end
 	remotes.UpdateEquipment:FireAllClients(gm.AvailableEquipment)
@@ -146,8 +148,8 @@ joinRound.OnServerInvoke = function(plr)
 		local function roundPhaseChange(phase: Types.RoundPhase)
 			if phase == "Playing" then
 				remotes:SetAttribute("RoundStartTime", workspace:GetServerTimeNow())
-				for _, v in Players:GetPlayers() do
-					UpdateRoundInfo.SendUpdatedParticipants(round.Participants, round:GetParticipant(v.Name), v)
+				for _, v in round.Participants do
+					UpdateRoundInfo.UpdateParticipant(v)
 				end
 			elseif phase == "Intermission" then
 				voteMap:FireAllClients(true)
@@ -181,17 +183,11 @@ joinRound.OnServerInvoke = function(plr)
 			end
 
 			InventoryManager.ClearAllItems()
-		
+
 			for _, v in round.Participants do
-				v.Status = "Spectating" :: any
-			end
-		
-			for _, v in Players:GetPlayers() do
-				local p = round:GetParticipant(v.Name)
-				if p then
-					p.Role = RoundHandler.NoRole
-				end
-				UpdateRoundInfo.SendUpdatedParticipants(round.Participants, nil, plr)
+				v._status = "Spectating" :: any
+				v.Role = RoundHandler.NoRole
+				UpdateRoundInfo.UpdateParticipant(v)
 			end
 		
 			if voteCon then
@@ -221,8 +217,12 @@ joinRound.OnServerInvoke = function(plr)
 	end
 	
 	if not round:GetParticipant(plr.Name) then
-		local participant = round:JoinRound(plr):ViewPartialSelf()
-		remotes.UpdateOwnParticipant:FireClient(plr, participant)
+		local participant = round:JoinRound(plr)
+		participant.CreditsChanged.Event:Connect(UpdateRoundInfo.UpdateOwnParticipant)
+		participant.StatusChanged.Event:Connect(function()
+			UpdateRoundInfo.UpdateParticipant(participant)
+		end)
+		UpdateRoundInfo.UpdateParticipant(participant)
 		return true
 	end
 	return

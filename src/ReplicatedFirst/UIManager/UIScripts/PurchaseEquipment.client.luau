@@ -46,8 +46,7 @@ local function radar()
 	end
 end
 
-UI.ScrollingFrame.ChildAdded:Connect(function(v)
-	print(v)
+local function childAdded(v: Instance)
 	if not v:IsA("ImageButton") then
 		return
 	end
@@ -58,7 +57,12 @@ UI.ScrollingFrame.ChildAdded:Connect(function(v)
 		UI.Description.Text = v:GetAttribute("Description")
 		UI:FindFirstChild("Name").Text = v.Name
 	end)
-end)
+end
+
+UI.ScrollingFrame.ChildAdded:Connect(childAdded)
+for _, v in UI.ScrollingFrame:GetChildren() do
+	childAdded(v)
+end
 
 local purchaseCon
 purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
