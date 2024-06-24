@@ -1,4 +1,3 @@
---!strict
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -26,10 +25,6 @@ local module: Types.Gamemode = {
         local highlights: {Types.RoundHighlight} = {}
         
         for equipmentName, v in weaponList do
-            if true then continue end
-            if not v then
-                continue
-            end
             local username = v[1]
             local amount = v[2]
 

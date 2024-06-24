@@ -114,7 +114,9 @@ module.AvailableSettings = {
 		Tooltip = "Select a theme for the UI.",
 		PossibleValues = uiThemes :: {string},
 		Default = "Dark",
-		Callback = UI.UpdateTheme :: any,
+		Callback = function(val) -- Can't directly reference UI.UpdateTheme because this module gets called from the server blah blah blah this sucks
+			UI.UpdateTheme(val :: string)
+		end,
 	},
 	{
 		Name = "Close Scale",

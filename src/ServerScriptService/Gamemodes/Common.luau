@@ -81,7 +81,7 @@ function module.GetWeaponHighlights(roundEvents: {["Death"]: {Types.RoundEvent<T
     for weapon, v in counter do
         for participant, amount in v do
             if (not bestPerWeapon[weapon]) or (bestPerWeapon[weapon][2] < amount) then
-                bestPerWeapon = {participant.Player.Name, amount :: any} :: any
+                bestPerWeapon[weapon] = {participant.Player.Name, amount :: any} :: any
             end
         end
     end

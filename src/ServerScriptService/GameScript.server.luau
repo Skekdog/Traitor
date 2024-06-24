@@ -93,7 +93,7 @@ remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: 
 end
 
 local nextRoundReady = true
-local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructureCast
+local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
 
 local function sendRoundInfo(plr: Player?)
 	local roundId = ServerStorage:GetAttribute("RoundID")
