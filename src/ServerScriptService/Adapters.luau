@@ -18,6 +18,42 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local remotes = ReplicatedStorage.RoundHandler
 
+local plasticSounds = {5682538842, 9114858163, 9114857307, 9114626534}
+local metalSounds = {7842407959, 4072627278, 2303101209}
+local woodSounds = {8542226017, 8542224235, 8542224819, 8542225504, 8542223682}
+local fabricSounds = {6636232274, 2706199011, 9118771226}
+local glassSounds = {3207457473, 9113290528, 9119937112, 9119596406}
+local groundSounds = {6876730610, 6876735204, 6877211005, 6877211445}
+local hitSounds = {
+    Fruit = {9114540315, 9114539908, 9114542474, 9114540327, 9114541282},
+
+    -- Carpet stuff
+    Fabric = fabricSounds,
+    Carpet = fabricSounds,
+    Sand = fabricSounds,
+    
+    -- Wood stuff
+    Wood = woodSounds,
+    WoodPlanks = woodSounds,
+
+    -- Metal stuff
+    Metal = metalSounds,
+    CorrodedMetal = metalSounds,
+    DiamondPlate = metalSounds,
+
+    -- Glass stuff
+    Glass = glassSounds,
+    Glacier = glassSounds,
+    Ice = glassSounds,
+
+    -- Ground stuff
+    Ground = groundSounds,
+    Grass = groundSounds,
+    LeafyGrass = groundSounds,
+    Mud = groundSounds,
+
+}
+
 local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BasePart)
     local char = part.Parent :: Model
     local plr = Players:GetPlayerFromCharacter(char)
@@ -364,7 +400,38 @@ local module: Types.Adapter = {
 
     LoadProp = function(round, prop)
         local object = prop.PropInstance
-        if not object:IsA("BasePart") or object.Anchored then
+        if not object:IsA("BasePart") then
+            return
+        end
+
+        local oldOnBreak = prop.OnBreak
+        prop.OnBreak = function(self)
+            if self.PropInstance:IsA("BasePart") then
+                local material = self.PropInstance:GetAttribute("MaterialOverride") or self.PropInstance.Material.Name
+                local soundPart = Instance.new("Part")
+                soundPart.CanCollide = false
+                soundPart.CanTouch = false
+                soundPart.CanQuery = false
+                soundPart.Anchored = true
+                soundPart.Transparency = 1
+                soundPart.Position = self.PropInstance.Position
+
+                local sound = Instance.new("Sound")
+                Random.new():Shuffle(hitSounds[material] or plasticSounds)
+                sound.SoundId = "rbxassetid://"..(hitSounds[material] or plasticSounds)[1]
+                sound.Volume = 1
+                sound.Parent = soundPart
+                soundPart.Parent = workspace.Projectiles
+
+                sound.Ended:Once(function()
+                    soundPart:Destroy()
+                end)
+                sound:Play()
+            end
+            oldOnBreak(self)
+        end
+
+        if object.Anchored then
             return
         end
         
