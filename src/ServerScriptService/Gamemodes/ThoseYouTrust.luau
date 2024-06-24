@@ -150,7 +150,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Pistol", "Golden Gun", "Flare Gun", "BAR", "Magneto Stick"},
+    StartingEquipment = {"Crowbar", "Pistol", "BAR", "Magneto Stick"},
     AvailableEquipment = {
         {
             Name = "Crowbar",
@@ -209,8 +209,9 @@ local module: Types.Gamemode = {
         {
             Name = "Golden Gun",
             Description = "One shot. Don't fumble it.",
-            Icon = "rbxassetid://",
+            Icon = "rbxassetid://10282780102",
             AttackType = "Firearm",
+            MaxStock = 1,
 
             Item = items["Golden Gun"]
         },
@@ -219,6 +220,7 @@ local module: Types.Gamemode = {
             Description = "Ouch fire hot.",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
+            MaxStock = 1,
 
             Item = items["Flare Gun"]
         },
@@ -226,7 +228,7 @@ local module: Types.Gamemode = {
             Name = "Grenade",
             Description = "Boom",
             Cost = 1,
-            Icon = "rbxassetid://",
+            Icon = "rbxassetid://8096856961",
             MaxStock = 1,
             AttackType = "Explosion",
 
@@ -236,12 +238,10 @@ local module: Types.Gamemode = {
             Name = "Radar",
             Description = "Beep... beep... beep",
             Cost = 1,
-            Icon = "rbxassetid://",
+            Icon = "rbxassetid://62159372",
             MaxStock = 1,
 
-            Item = function(item, participant)
-                print(`{participant.Player.Name} got radar`)
-            end,
+            Item = function() end,
         }
     } :: {Types.Equipment},
 
@@ -270,7 +270,7 @@ local module: Types.Gamemode = {
             },
 
             StartingCredits = 2,
-			EquipmentShop = {"Grenade", "Radar"},
+			EquipmentShop = {"Grenade", "Radar", "Flare Gun"},
 			CanSeeMissing = true,
 
             HighlightRoles = {"Traitor"},
@@ -300,7 +300,7 @@ local module: Types.Gamemode = {
             CorpseResultsPublicised = true,
 
             StartingCredits = 2,
-            EquipmentShop = {"Radar"},
+            EquipmentShop = {"Radar", "Golden Gun"},
 
             KnowsRoles = {"Detective"},
         },
