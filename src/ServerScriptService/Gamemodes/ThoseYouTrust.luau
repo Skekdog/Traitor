@@ -217,8 +217,8 @@ local module: Types.Gamemode = {
         },
         {
             Name = "Flare Gun",
-            Description = "Ouch fire hot.",
-            Icon = "rbxassetid://",
+            Description = "Sets fire to anyone it hits. Can be used to incinerate corpses, hiding evidence.",
+            Icon = "rbxassetid://444145395",
             AttackType = "Firearm",
             MaxStock = 1,
             Cost = 1,
