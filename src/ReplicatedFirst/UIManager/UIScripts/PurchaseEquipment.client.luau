@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
+local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local API = require(ReplicatedFirst.API)
@@ -12,7 +13,7 @@ local purchaseButton = UI.Purchase
 local radarCooldown = 5
 
 local function update(item, credits)
-	UI.CurrentCredits.Text = "You have "..tostring(credits).." credit(s)."
+	UI.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
 	if credits >= UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost") then
 		UI.CreditCost.TextColor3 = Color3.new(0.294118, 1, 0.243137)
 		UI.CurrentCredits.TextColor3 = Color3.new(0.294118, 1, 0.243137)
@@ -53,7 +54,8 @@ local function childAdded(v: Instance)
 
 	v.MouseButton1Click:Connect(function()
 		purchaseButton:SetAttribute("Item", v.Name)
-		UI.CreditCost.Text = "This costs "..tostring(v:GetAttribute("CreditCost")).." credit(s)."
+		local cost = v:GetAttribute("CreditCost")
+		UI.CreditCost.Text = `This costs {cost} {if cost == 1 then "credit" else "credits"}.`
 		UI.Description.Text = v:GetAttribute("Description")
 		UI:FindFirstChild("Name").Text = v.Name
 	end)
@@ -65,6 +67,7 @@ for _, v in UI.ScrollingFrame:GetChildren() do
 end
 
 local purchaseCon
+type PurchaseResponse = "NoRound" | "NotInRound" | "NotFound" | "NotEnoughCredits" | "NotInStock"?
 purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	local item = purchaseButton:GetAttribute("Item")
 	
@@ -84,26 +87,34 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	
 	update(item, credits)
 	
-	if purchaseCon then purchaseCon:Disconnect() end
+	if purchaseCon then
+		purchaseCon:Disconnect()
+	end
 	purchaseCon = purchaseButton.MouseButton1Click:Connect(function()
 		if credits >= creditCost then
-			local response = ReplicatedStorage.RoundHandler.PurchaseEquipment:InvokeServer(item)
-			if response == "ItemError" then
-				API.ScreenMessage("Error", "Equipment not found on server")
-			elseif response == "CreditError" then
-				API.ScreenMessage("Error", "You don't have enough credits for this")
-			elseif response == "MaxOwnedError" then
-				API.ScreenMessage("Error", "You already have the maximum amount of this")
-			elseif response == "SlotError" then
-				API.ScreenMessage("Error", "Required slot is in use")
-			elseif response == "Success" then
-				if item == "Radar" then
-					radar()
-				end
+			local response: PurchaseResponse = ReplicatedStorage.RoundHandler.PurchaseEquipment:InvokeServer(item)
+			if response == "NoRound" then
+				API.ScreenMessage("Error", "Round is not loaded.")
+			elseif response == "NotInRound" then
+				API.ScreenMessage("Error", "Not in round.")
+			elseif response == "NotFound" then
+				API.ScreenMessage("Error", "Item not found.")
+			elseif response == "NotEnoughCredits" then
+				API.ScreenMessage("Error", "You do not have enough credits to purchase this.")
+			elseif response == "NotInStock" then
+				API.ScreenMessage("Error", "You have purchased the maximum amount of this item.")
 			end
 		end
-		update(item, participant.Credits)
 	end)
+end);
+
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
+	local participant = p :: Types.ClientOwnParticipant
+	local item = purchaseButton:GetAttribute("Item")
+	if item == "" then
+		return
+	end
+	update(item, participant.Credits)
 end);
 
 (ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).InformClientSideEquipment.OnClientEvent:Connect(function(item)

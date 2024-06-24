@@ -75,18 +75,18 @@ remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: 
 
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then
-		return
+		return "NoRound"
 	end
 
 	local round = RoundHandler.GetRound(roundId)
 	local participant = round:GetParticipant(plr.Name)
 	if not participant then
-		return
+		return "NotInRound"
 	end
 
 	local equipment = round:GetEquipment(equipmentName)
 	if not equipment then
-		return
+		return "NotFound"
 	end
 	
 	return participant:PurchaseEquipment(equipment)
