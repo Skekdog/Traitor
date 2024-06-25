@@ -2,6 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local Types = require(script.Parent.RoundHandler.Types)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local UIManager = require(script.Parent.UIManager)
@@ -99,6 +101,27 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
 	end
 
     ammoBar.Visible = true
+end)
+
+-- shitty problems require shitty solutions - Sun Tzu, the art of war
+workspace.ChildAdded:Connect(function(child)
+    if child:GetAttribute("IsCorpse") then
+        while child.Parent do
+            for _, v in child:GetDescendants() do
+                if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+                    v.CanCollide = true
+                end
+            end
+            task.wait()
+        end
+    end
+end)
+
+LocalRoundInfo.Listen("RoundPhase", function(p)
+    local phase: Types.RoundPhase = p :: Types.RoundPhase
+    if phase == "Destroy" then
+        workspace.Projectiles:ClearAllChildren()
+    end
 end)
 
 serverClient.AmmoUpdate.OnClientEvent:Connect(setAmmo)

@@ -99,8 +99,8 @@ game:GetService("RunService").Heartbeat:Connect(function()
 		return
 	end
 	
-	local char = mouse.Target.Parent
-	if not char or char.Parent ~= workspace or not char:IsA("Model") then
+	local char = mouse.Target:FindFirstAncestorOfClass("Model")
+	if not char or char.Parent ~= workspace then
 		return
 	end
 

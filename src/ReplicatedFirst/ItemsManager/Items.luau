@@ -858,8 +858,8 @@ return ({
 
             local rayParams = RaycastParams.new()
             rayParams.IgnoreWater = true
-            rayParams.RespectCanCollide = true
-            rayParams.CollisionGroup = "Bounds"
+            rayParams.RespectCanCollide = false
+            rayParams.CollisionGroup = "Raycasts"
 
             local result = workspace:Raycast(head.Position, cameraRayInfo.Direction * 10, rayParams)
             if not result then

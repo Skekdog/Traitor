@@ -12,12 +12,16 @@ local Adapters = require(ServerScriptService.Adapters)
 
 local module = {}
 
-local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, partName: string, distance: number): number
+local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, part: BasePart, distance: number): number
+    local function isOf(name: string, match: boolean?): boolean?
+        return part.Name == name or part:FindFirstAncestor(name) ~= nil or (match and part.Name:match(name) ~= nil)
+    end
+
     local damage: number
     if type(weapon.Damage) == "table" then
-        if partName == "Head" then
+        if isOf("Head") then
             damage = weapon.Damage.Head
-        elseif partName == "HumanoidRootPart" or partName:match("Torso") then
+        elseif isOf("HumanoidRootPart") or isOf("Torso", true) then
             damage = weapon.Damage.Body
         else
             damage = weapon.Damage.Limb
@@ -39,8 +43,8 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
 end
 
 type Entity = Types.Participant | Types.Prop
-local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, partName: string, distance: number): ()
-    local damage = calculateDamage(attacker, weapon, partName, distance)
+local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, part: BasePart, distance: number, direction: Vector3): ()
+    local damage = calculateDamage(attacker, weapon, part, distance)
 
     local sameTeam: boolean?
     if entity.Kind == "Participant" then
@@ -56,14 +60,26 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
         if entity.Kind == "Participant" then
             local health = (entity :: any):GetHealth() :: number
             local willDie = health - damage <= 0
+
+            if willDie then
+                local force
+                if weapon.Kind ~= "Explosion" and weapon.ProjectileInfo then
+                    force = weapon.ProjectileInfo.Speed
+                elseif weapon.Kind == "Explosion" then
+                    force = (weapon :: ItemTypes.ExplosionInfo).Pressure
+                end
+                part:ApplyImpulse(-direction * force)
+            end
+
+
             if weapon.BeforeHitParticipant then
-                if weapon.BeforeHitParticipant(attacker, entity, willDie, partName) then
+                if weapon.BeforeHitParticipant(attacker, entity, willDie, part.Name) then
                     return
                 end
             end
             
             -- Would be nicer to use a local for weapon.Kind == "Explosion" but type checker does not reduce correctly then. Here I am writing it out a third time instead :)
-            entity:TakeDamage(damage, attacker, if weapon.Kind == "Explosion" then "Explosion" else round:GetEquipment(weapon.Name), partName == "Head" and weapon.Kind ~= "Explosion")
+            entity:TakeDamage(damage, attacker, if weapon.Kind == "Explosion" then "Explosion" else round:GetEquipment(weapon.Name), part.Name == "Head" and weapon.Kind ~= "Explosion")
 
             if attacker then
                 local karmaDiff = damage * 1.5
@@ -102,18 +118,17 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
         return
     end
     
-    local parent = part.Parent
-    assert(part:IsA("BasePart") and parent)
+    local model = part:FindFirstAncestorOfClass("Model")
 
-    local plr = Players:GetPlayerFromCharacter(parent :: Model)
+    local plr = Players:GetPlayerFromCharacter(model :: Model)
     if plr then
         local victim = round:GetParticipant(plr.Name)
         if not victim then
             return
         end
 
-        onEntityHit(round, weapon, attacker, victim, part.Name, rayResult.Distance)
-    elseif not parent:GetAttribute("IsCorpse") then
+        onEntityHit(round, weapon, attacker, victim, part, rayResult.Distance, (rayResult.Position - origin).Unit)
+    elseif model and not model:GetAttribute("IsCorpse") then
         ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
@@ -122,9 +137,9 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
             if not prop then
                 return
             end
-            onEntityHit(round, weapon, attacker, prop, part.Name, rayResult.Distance)
+            onEntityHit(round, weapon, attacker, prop, part, rayResult.Distance, (rayResult.Position - origin).Unit)
         end
-    elseif weapon.BeforeHitCorpse then
+    elseif model and weapon.BeforeHitCorpse then
         weapon.BeforeHitCorpse(attacker, part)
     end
 end
@@ -195,7 +210,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
         else
             return
         end
-        onEntityHit(round, explosionInfo, attacker, entity, hit.Name, (hit.Position - position).Magnitude)
+        onEntityHit(round, explosionInfo, attacker, entity, hit, (hit.Position - position).Magnitude, (hit.Position - position).Unit)
     end)
 
     explosion.Parent = workspace.Projectiles
@@ -281,7 +296,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     rayParams.IgnoreWater = true
     rayParams.RespectCanCollide = false
     rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
-    rayParams.CollisionGroup = "Bounds"
+    rayParams.CollisionGroup = "Raycasts"
 
     for _ = 1, weapon.Base.BulletsPerShot or 1 do
         local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())

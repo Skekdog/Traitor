@@ -329,6 +329,12 @@ local module: Types.Adapter = {
             participant.Character:ScaleTo(scale.Value)
         end
 
+        for _, v in participant.Character:GetDescendants() do
+            if v:IsA("BasePart") then
+                v.CollisionGroup = "PlayerCharacterParts"
+            end
+        end
+
         local magnetoAttachment = Instance.new("Attachment")
         magnetoAttachment.Name = "MagnetoAttachment"
         magnetoAttachment.CFrame = CFrame.new(0, 0, -6)
@@ -556,12 +562,22 @@ local module: Types.Adapter = {
             if v:IsA("JointInstance") or v:IsA("BaseScript") or v:IsA("Fire") then
                 v:Destroy()
             elseif v:IsA("BasePart") then
-                v.CanCollide = v.Name ~= "HumanoidRootPart"
-                v.Name = "!"..v.Name -- Humanoids are weird, this is a fix to stop collisions being sucky
+                v.CollisionGroup = "Corpses"
             elseif v.Name == "DeathSound" and v:IsA("Sound") then
                 v:Play()
             end
         end
+
+        task.spawn(function()
+            while clone.Parent do
+                for _, v in clone:GetDescendants() do
+                    if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+                        v.CanCollide = true
+                    end
+                end
+                task.wait()
+            end
+        end)
 
         if root then
             root:SetNetworkOwner()
