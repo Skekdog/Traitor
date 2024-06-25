@@ -14,16 +14,25 @@ local module = {}
 
 local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, part: BasePart, distance: number): number
     local function isOf(name: string, match: boolean?): boolean?
-        return part.Name == name or part:FindFirstAncestor(name) ~= nil or (match and part.Name:match(name) ~= nil)
+        local accessoryWeld = part:FindFirstChild("AccessoryWeld") :: Weld
+        if accessoryWeld and accessoryWeld.Part1 and accessoryWeld.Part1.Name == name then
+            if accessoryWeld.Part1.Name == name or (match and (accessoryWeld.Part1.Name:match(name) ~= nil)) then
+                return true
+            end
+        end
+        return (part.Name == name) or (part:FindFirstAncestor(name) ~= nil) or (match and (part.Name:match(name) ~= nil))
     end
 
     local damage: number
     if type(weapon.Damage) == "table" then
         if isOf("Head") then
+            print("dealing head damage")
             damage = weapon.Damage.Head
         elseif isOf("HumanoidRootPart") or isOf("Torso", true) then
+            print("dealing body damage")
             damage = weapon.Damage.Body
         else
+            print(part:GetFullName(), part.Name == "Head", part:FindFirstAncestor("Head") ~= nil)
             damage = weapon.Damage.Limb
         end
     else
@@ -128,7 +137,7 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
         end
 
         onEntityHit(round, weapon, attacker, victim, part, rayResult.Distance, (rayResult.Position - origin).Unit)
-    elseif model and not model:GetAttribute("IsCorpse") then
+    elseif not model or not model:GetAttribute("IsCorpse") then
         ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
