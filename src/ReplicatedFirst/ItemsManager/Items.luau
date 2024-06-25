@@ -824,9 +824,6 @@ return ({
         Model = models["Magneto Stick"],
         AlternateFire = function(participant: Types.Participant, cameraRayInfo: Ray)
             local char = participant.Character
-            if not char then
-                return
-            end
 
             local head = char:FindFirstChild("Head")
             if not head or not head:IsA("BasePart") then
@@ -870,8 +867,9 @@ return ({
             end
 
             local object = result.Instance :: BasePart
+            local model = object:FindFirstAncestorOfClass("Model")
 
-            if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) then
+            if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (model and not model:GetAttribute("IsCorpse")) then
                 return
             end
 
