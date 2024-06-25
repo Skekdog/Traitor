@@ -10,10 +10,10 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 local global = ui.Global
 local priv = ui.Private
 
-local function fade(label: TextLabel, out--[[stinky 'in']]:boolean)
+local function fade(label: TextLabel, out: boolean)
 	if out then
 		TS:Create(label, TweenInfo.new(5), {TextTransparency=1, BackgroundTransparency=1}):Play()
-		task.delay(5, function()label:Destroy()end)
+		task.delay(5, label.Destroy, label)
 	else
 		TS:Create(label, TweenInfo.new(0.25), {TextTransparency=0, BackgroundTransparency=0.4}):Play()
 	end
@@ -29,7 +29,7 @@ local function moveDown(frame: Frame)
 end
 
 local making = false
-local function makeLabel(isTeam, text)
+local function makeLabel(isTeam: boolean, text: string)
 	if making then
 		repeat
 			task.wait()
@@ -43,9 +43,9 @@ local function makeLabel(isTeam, text)
 	label.TextTransparency = 1
 	label.Visible = true
 
-	moveDown(isTeam and priv or global)
+	moveDown(if isTeam then priv else global)
 
-	label.Parent = isTeam and priv or global :: any
+	label.Parent = if isTeam then priv else global :: any
 
 	label:TweenPosition(UDim2.fromScale(label.Position.X.Scale, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.45, false)
 	task.delay(0.451, function()
@@ -56,6 +56,8 @@ local function makeLabel(isTeam, text)
 	task.delay(2, fade, label, true)
 end
 
+local teamMessages: {Types.MessageType?} = {"creditsEarned"}
+
 (ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
-	makeLabel(table.find({"bodyFound", "timeToRoundStart", "karma"}, msgType) ~= nil, msg)
+	makeLabel(table.find(teamMessages, msgType) ~= nil, msg)
 end)

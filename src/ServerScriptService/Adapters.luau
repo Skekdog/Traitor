@@ -259,16 +259,15 @@ local module: Types.Adapter = {
 
         local remote = remotes.SendMessage
         
-        local fontColour = ""
-        -- These colours suck
-        if severity == "error" then
-            fontColour = "#ff0000"
-        elseif severity == "warn" then
-            fontColour = "#ffff00"
-        elseif severity == "info" then
-            fontColour = "#0000ff"
+        if severity ~= "info" then
+            local fontColour = ""
+            if severity == "error" then
+                fontColour = "#ff0000"
+            elseif severity == "warn" then
+                fontColour = "#ffff00"
+            end
+            message = `<font color='{fontColour}'>{message}</font>`
         end
-        message = `<font color='{fontColour}'>{message}</font>`
 
         if recipients == true or (recipients[1] and recipients[1].Round.Participants == recipients) then
             return remote:FireAllClients(message, messageType)
@@ -572,7 +571,6 @@ local module: Types.Adapter = {
 
             v.Parent = part
         end
-        joints.Parent = clone :: any
 
         clone.Parent = workspace
         for _, v in clone:GetDescendants() do
@@ -580,6 +578,7 @@ local module: Types.Adapter = {
                 v:Destroy()
             elseif v:IsA("BasePart") then
                 v.CanCollide = v.Name ~= "HumanoidRootPart"
+                v.Name = "!"..v.Name -- Humanoids are weird, this is a fix to stop collisions being sucky
             elseif v.Name == "DeathSound" and v:IsA("Sound") then
                 v:Play()
             end

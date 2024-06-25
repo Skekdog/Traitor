@@ -92,6 +92,14 @@ remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: 
 	return participant:PurchaseEquipment(equipment)
 end
 
+remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: Instance?)
+	if typeof(corpse) ~= "Instance" then
+		return
+	end
+
+	
+end
+
 local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructureCast
 
