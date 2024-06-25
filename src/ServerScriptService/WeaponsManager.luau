@@ -279,7 +279,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     local rayParams = RaycastParams.new()
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
     rayParams.IgnoreWater = true
-    rayParams.RespectCanCollide = true
+    rayParams.RespectCanCollide = false
     rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
     rayParams.CollisionGroup = "Bounds"
 
