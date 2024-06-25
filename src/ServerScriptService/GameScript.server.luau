@@ -99,7 +99,7 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 
 	local roundId = ServerStorage:GetAttribute("RoundID")
 	if not roundId then
-		return print("NoRound")
+		return
 	end
 
 	local round = RoundHandler.GetRound(roundId)
@@ -114,11 +114,10 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 	end
 
 	if not corpseParticipant then
-		return print("corpse not found")
+		return
 	end
 
 	if not participant or not plr.Character then
-		print("success")
 		return corpseParticipant:ViewCorpse()
 	end
 
@@ -126,17 +125,15 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 		if not table.find(corpseParticipant.SearchedBy, participant) then
 			return
 		end
-		print("view success")
 		return corpseParticipant:ViewCorpse()
 	end
 
 	if plr:DistanceFromCharacter(corpse:GetPivot().Position) > 10 then
-		return print("too far")
+		return
 	end
 
 	participant:SearchCorpse(corpseParticipant)
 	corpse.Name = corpseParticipant.Player.Name
-	print("success 2")
 	return corpseParticipant:ViewCorpse()
 end
 
