@@ -1,4 +1,5 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(script.Parent.Parent)
 local API = require(script.Parent.Parent.Parent.API)
 local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
@@ -32,8 +33,10 @@ local flavourImages: {[Types.MurderWeapon]: string} = {
     Suicide = "rbxassetid://17079244437"
 }
 
-local rh = ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)
-rh.SendCorpseInfo.OnClientEvent:Connect(function(corpseInfo: Types.CorpseInfo)
+ReplicatedFirst.ClientStorage.ScriptConnections.ShowCorpseEvent.Event:Connect(function(corpseInfo: Types.CorpseInfo?)
+    if not corpseInfo then
+        return
+    end
     local weapon
     local deathType: Types.MurderWeapon
     if typeof(corpseInfo.MurderWeapon) == "table" then
@@ -107,8 +110,7 @@ rh.SendCorpseInfo.OnClientEvent:Connect(function(corpseInfo: Types.CorpseInfo)
     local determinerRole = API.StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
     object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)
 
-    --todo: is this blocking?
-    object.Avatar.Image = game:GetService("Players"):GetUserThumbnailAsync(corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    task.defer(Players.GetUserThumbnailAsync, Players, corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
     corpseUi:ToggleVisible(true)
 end)

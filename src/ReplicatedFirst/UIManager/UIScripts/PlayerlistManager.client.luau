@@ -16,8 +16,9 @@ local layoutOrders = {
 	["Spectating"] = 3000,
 }
 
+type PlayerElement = typeof(ui.PlayerFrame)
 local function findPlr(plrName: string)
-	return list:FindFirstChild("Player-"..plrName) :: TextButton
+	return list:FindFirstChild("Player-"..plrName) :: PlayerElement
 end
 
 function updatePlr(plr: Player, clone: any)
@@ -85,25 +86,66 @@ local function createPlr(plr: Player)
 		end)
 	end
 
-	plr:GetAttributeChangedSignal("Searched"):Once(function()
-		clone.SearchedIcon.Visible = true
-	end)
-	clone.SearchedIcon.Visible = plr:GetAttribute("Searched")
 	clone.MouseButton1Click:Connect(function()
-		if (clone.LayoutOrder // 1000) == layoutOrders["Dead"] or (clone.LayoutOrder // 1000) == layoutOrders["Missing"] then
-			ReplicatedStorage.RoundHandler.GetCorpseInfo:FireServer(plr.Name)
+		local order = (clone.LayoutOrder // 1000) * 1000
+		if order == layoutOrders["Dead"] or order == layoutOrders["Missing"] then
+			ReplicatedFirst.ClientStorage.ScriptConnections.ShowCorpseEvent:Fire(ReplicatedStorage.RoundHandler.SearchCorpse:InvokeServer(plr.Name))
 		end
 	end)
 
 	updatePlr(plr, clone)
 
-	return clone
+	return clone :: PlayerElement
 end
 
-function movePlr(plr: Player, status: "Alive" | "Missing" | "Dead" | "Spectating")
-	local clone: any = findPlr(plr.Name) or createPlr(plr)
-	clone.LayoutOrder = layoutOrders[status]+1
+type Status = "Alive" | "Missing" | "Dead" | "Spectating"
+local function recalculateCount(status: Status)
+	local count = -1 -- Because this also counts the header
+	for _, v in list:GetChildren() do
+		if not v:IsA("GuiObject") then
+			continue
+		end
+
+		if v.LayoutOrder // 1000 == (layoutOrders[status] / 1000) then
+			count += 1
+		end
+	end
+
+	local label = list:FindFirstChild(status) :: TextLabel
+	label.Visible = count > 0
+
+	if status == "Dead" then
+		status = "Confirmed Dead" :: any
+	end
+	label.Text = `{status} ({count})`
+end
+
+function movePlr(plr: Player, status: Status)
+	local clone = findPlr(plr.Name) or createPlr(plr)
+	local oldOrder = (clone.LayoutOrder // 1000) * 1000
+	clone.LayoutOrder = layoutOrders[status] + 1
 	clone.Marks.Visible = status == "Alive"
+
+	for _, v in list:GetChildren() do
+		if not v:IsA("TextLabel") then
+			continue
+		end
+
+		if v.LayoutOrder == oldOrder then
+			local oldStatus = v.Text:split(" ")[1]
+			if oldStatus == "Confirmed" then
+				oldStatus = "Dead"
+			end
+			recalculateCount(oldStatus :: Status)
+			break
+		end
+	end
+
+	if status == "Alive" or status == "Spectating" then
+		clone.SearchedIcon.Visible = false
+	end
+
+	recalculateCount(status)
 end
 
 local function removePlr(plr: Player | string)
@@ -153,13 +195,8 @@ LocalRoundInfo.Listen("UpdateParticipant", function(p)
 	updatePlr(participant.Player, findPlr(participant.Player.Name))
 end);
 
-(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).CorpseSearched.OnClientEvent:Connect(function(name)
-	local plr = Players:FindFirstChild(name)
-	if not plr then
-		return
-	end
-
-	plr:SetAttribute("Searched", true)
+(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).CorpseSearched.OnClientEvent:Connect(function(name: string)
+	findPlr(name).SearchedIcon.Visible = true
 end)
 
 -- There is probably a better way to do this

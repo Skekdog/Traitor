@@ -92,12 +92,52 @@ remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: 
 	return participant:PurchaseEquipment(equipment)
 end
 
-remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: Instance?)
-	if typeof(corpse) ~= "Instance" then
+remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
+	if (typeof(corpse) ~= "Instance" or not corpse:IsA("Model") or not corpse:GetAttribute("IsCorpse")) and (typeof(corpse) ~= "string") then
 		return
 	end
 
-	
+	local roundId = ServerStorage:GetAttribute("RoundID")
+	if not roundId then
+		return print("NoRound")
+	end
+
+	local round = RoundHandler.GetRound(roundId)
+	local participant = round:GetParticipant(plr.Name)
+
+	local corpseParticipant: Types.Participant?
+	for _, v in round.Participants do
+		if v.Player.Name == corpse or v.Character == corpse then
+			corpseParticipant = v
+			break
+		end
+	end
+
+	if not corpseParticipant then
+		return print("corpse not found")
+	end
+
+	if not participant or not plr.Character then
+		print("success")
+		return corpseParticipant:ViewCorpse()
+	end
+
+	if typeof(corpse) == "string" then
+		if not table.find(corpseParticipant.SearchedBy, participant) then
+			return
+		end
+		print("view success")
+		return corpseParticipant:ViewCorpse()
+	end
+
+	if plr:DistanceFromCharacter(corpse:GetPivot().Position) > 10 then
+		return print("too far")
+	end
+
+	participant:SearchCorpse(corpseParticipant)
+	corpse.Name = corpseParticipant.Player.Name
+	print("success 2")
+	return corpseParticipant:ViewCorpse()
 end
 
 local nextRoundReady = true

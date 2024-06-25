@@ -493,10 +493,13 @@ local module: Types.Adapter = {
         end)
     end,
 
+    OnCorpseResult = function(searcher, corpse)
+        remotes.CorpseSearched:FireClient(searcher.Player, corpse.Player.Name)
+    end,
+
     OnDeath = function(victim)
         local char = victim.Character
         local plr = victim.Player
-        local round = victim.Round
         if not char:IsDescendantOf(workspace) then
             return
         end
@@ -527,30 +530,6 @@ local module: Types.Adapter = {
         end
 
         char:Destroy()
-
-        local corpseInfo = victim:ViewCorpse()
-        local function sendCorpseInfo(to: Player)
-            remotes.SendCorpseInfo:FireClient(to, corpseInfo)
-        end
-
-        local searchEvent = Instance.new("RemoteEvent")
-        searchEvent.Name = "SearchCorpse"
-        searchEvent.Parent = clone
-
-        searchEvent.OnServerEvent:Connect(function(to)
-            local participant = round:GetParticipant(to.Name)
-            if not participant or not to.Character or not root then
-                return sendCorpseInfo(to)
-            end
-
-            if to:DistanceFromCharacter(root.Position) > 10 then
-                return
-            end
-
-            participant:SearchCorpse(victim)
-            clone.Name = victim.Player.Name
-            sendCorpseInfo(to)
-        end)
 
         clone:SetAttribute("IsCorpse", true)
         clone.Name = "__Unidentified"

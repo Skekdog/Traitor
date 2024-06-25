@@ -82,7 +82,6 @@ local function update(roundPhase)
 
         for _, v in Players:GetPlayers() do
             v:SetAttribute("Mark", "")
-            v:SetAttribute("Searched", false)
         end
 
         if equipmentShop then

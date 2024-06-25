@@ -31,8 +31,12 @@ Controls.Register("Interact", true, function(action, state, input, toggled)
 		return Enum.ContextActionResult.Pass
 	end
 
-	if ray.Instance.Parent:GetAttribute("IsCorpse") then
-		return (ray :: any).Instance.Parent.SearchCorpse:FireServer()
+	local model = ray.Instance:FindFirstAncestorOfClass("Model")
+	if model then
+		if model:GetAttribute("IsCorpse") then
+			ReplicatedFirst.ClientStorage.ScriptConnections.ShowCorpseEvent:Fire(RS.RoundHandler.SearchCorpse:InvokeServer(model))
+			return Enum.ContextActionResult.Sink
+		end
 	end
 
 	if not char or not map then
