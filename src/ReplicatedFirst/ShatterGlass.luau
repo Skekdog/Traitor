@@ -19,6 +19,8 @@ local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePa
     return wedge
 end
 
+local sounds = {2612674531, 9103909576, 9116264426, 9113850847, 9119918457}
+
 return function(glass: BasePart, direction: Vector3?): ()
     if IS_SERVER then
         ReplicatedStorage.ServerClient.ShatterGlass:FireAllClients(glass, direction)
@@ -58,7 +60,7 @@ return function(glass: BasePart, direction: Vector3?): ()
     end
 
     local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://2978605361"
+    sound.SoundId = "rbxassetid://"..tostring(sounds[math.random(1, #sounds)])
     sound.PlayOnRemove = true
     sound.RollOffMaxDistance = 200
     sound.RollOffMinDistance = 10
