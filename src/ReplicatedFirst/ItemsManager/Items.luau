@@ -118,8 +118,6 @@ return ({
         MultiUse = {
             FireTime = 0.35,
             ReloadTime = 0,
-            MaxReserve = 0,
-            MagazineSize = math.huge,
         },
         Model = models.Crowbar,
         FiredSound = firedSounds.Crowbar,
@@ -155,7 +153,6 @@ return ({
         MultiUse = {
             FireTime = 0.01,
             ReloadTime = 0,
-            MaxReserve = 0,
             MagazineSize = 250,
         },
 
@@ -202,8 +199,6 @@ return ({
         MultiUse = {
             FireTime = 1,
             ReloadTime = 1.5,
-            MaxReserve = 10,
-            MagazineSize = 5,
             AmmoType = "Scout"
         },
 
@@ -240,8 +235,6 @@ return ({
         MultiUse = {
             FireTime = 0.6,
             ReloadTime = 1,
-            MaxReserve = 60,
-            MagazineSize = 20,
             AmmoType = "Assault Rifle"
         },
 
@@ -361,7 +354,6 @@ return ({
         MultiUse = {
             FireTime = 0.25,
             ReloadTime = 1,
-            MaxReserve = 0,
             MagazineSize = 6,
         },
 
@@ -441,9 +433,7 @@ return ({
         MultiUse = {
             FireTime = 0.05,
             ReloadTime = 1,
-            MagazineSize = 30,
-            MaxReserve = 60,
-            AmmoType = "SMG" :: any
+            AmmoType = "SMG"
         },
 
         Model = models.SMG,
@@ -491,7 +481,6 @@ return ({
         MultiUse = {
             FireTime = 2,
             ReloadTime = 0,
-            MaxReserve = 0,
             MagazineSize = 4,
         },
 
@@ -523,8 +512,6 @@ return ({
         MultiUse = {
             FireTime = 0.15,
             ReloadTime = 1.5,
-            MaxReserve = 60,
-            MagazineSize = 20,
             AmmoType = "Assault Rifle"
         },
 
@@ -614,8 +601,6 @@ return ({
         MultiUse = {
             FireTime = 0.6,
             ReloadTime = 1,
-            MaxReserve = 60,
-            MagazineSize = 20,
             AmmoType = "Assault Rifle"
         },
 
@@ -670,9 +655,7 @@ return ({
         MultiUse = {
             FireTime = 0.8,
             ReloadTime = 1.5,
-            MaxReserve = 16,
-            AmmoType = "Shotgun" :: any,
-            MagazineSize = 8
+            AmmoType = "Shotgun",
         },
         BulletsPerShot = 6,
 
@@ -714,8 +697,6 @@ return ({
         MultiUse = {
             FireTime = 0.1,
             ReloadTime = 1,
-            MaxReserve = 60,
-            MagazineSize = 20,
             AmmoType = "Assault Rifle"
         },
 
@@ -757,8 +738,6 @@ return ({
         MultiUse = {
             FireTime = 0.5,
             ReloadTime = 1.2,
-            MaxReserve = 32,
-            MagazineSize = 8,
             AmmoType = "Deagle"
         },
 
@@ -800,8 +779,6 @@ return ({
         MultiUse = {
             FireTime = 0.1,
             ReloadTime = 2.5,
-            MagazineSize = 20,
-            MaxReserve = 100,
             AmmoType = "Assault Rifle"
         },
 

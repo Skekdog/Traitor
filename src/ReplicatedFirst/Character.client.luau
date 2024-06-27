@@ -76,6 +76,15 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
         InventoryManager.Drop(Players.LocalPlayer, equipped, Vector3.zero)
         return Enum.ContextActionResult.Sink
     end)
+
+    ControlManager.Register("Reload Weapon", true, function()
+        local equipped = InventoryManager.GetEquipped(Players.LocalPlayer)
+        if not equipped then
+            return Enum.ContextActionResult.Pass
+        end
+        ReplicatedStorage.ClientServer.ReloadWeapon:FireServer()
+        return Enum.ContextActionResult.Sink
+    end)
 end)
 
 InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)

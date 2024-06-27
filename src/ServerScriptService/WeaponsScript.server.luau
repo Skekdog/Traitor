@@ -6,8 +6,8 @@ local RoundHandler = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.R
 local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
 local WeaponsManager = require(script.Parent.WeaponsManager)
 
-local function allow(plr: Player, cameraRayInfo: Ray?): (ItemTypes.Item?, Types.Participant?)
-    if not cameraRayInfo then
+local function allow(plr: Player, cameraRayInfo: Ray?, requireRayInfo: boolean?): (ItemTypes.Item?, Types.Participant?)
+    if not cameraRayInfo and requireRayInfo then
         return
     end
 
@@ -16,7 +16,7 @@ local function allow(plr: Player, cameraRayInfo: Ray?): (ItemTypes.Item?, Types.
         return
     end
 
-    local weapon = InventoryManager.GetEquipped(plr) :: ItemTypes.Item | ItemTypes.Weapon
+    local weapon = InventoryManager.GetEquipped(plr)
     if not weapon then
         return
     end
@@ -31,7 +31,7 @@ local function allow(plr: Player, cameraRayInfo: Ray?): (ItemTypes.Item?, Types.
 end
 
 ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
-    local weapon, participant = allow(plr, cameraRayInfo)
+    local weapon, participant = allow(plr, cameraRayInfo, true)
     if not weapon or not participant then
         return
     end
@@ -41,12 +41,13 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, c
         assert(weapon.Base.PrimaryFire)
         weapon.Base.PrimaryFire(participant, cameraRayInfo)
     else
+        print(weapon)
         WeaponsManager.Shoot(plr, weapon :: ItemTypes.Weapon, cameraRayInfo)
     end
 end)
 
 ReplicatedStorage.ClientServer.AlternateFire.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
-    local weapon, participant = allow(plr, cameraRayInfo)
+    local weapon, participant = allow(plr, cameraRayInfo, true)
     if not weapon or not participant then
         return
     end
@@ -55,4 +56,15 @@ ReplicatedStorage.ClientServer.AlternateFire.OnServerEvent:Connect(function(plr,
     if weapon.Base.Kind == "Item" and weapon.Base.AlternateFire then
         weapon.Base.AlternateFire(participant, cameraRayInfo)
     end
+end)
+
+ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr)
+    local weapon, participant = allow(plr)
+    if not weapon or not participant or weapon.Base.Kind == "Item" then
+        return
+    end
+
+    print(weapon)
+
+    InventoryManager.Reload(plr, weapon :: ItemTypes.Weapon)
 end)

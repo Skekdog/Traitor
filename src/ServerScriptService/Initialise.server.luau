@@ -141,11 +141,15 @@ InventoryManager.Listen("Equip", function(plr, equipment)
 	end
 
 	local magSize = 1
+    local ammoType: ItemTypes.AmmoType?
 	if weapon.Base.MultiUse and type(weapon.Base.MultiUse) == "table" then
-		magSize = weapon.Base.MultiUse.MagazineSize
+        ammoType = weapon.Base.MultiUse.AmmoType
+        if ammoType then
+            magSize = weapon.Base.MultiUse.MagazineSize or InventoryManager.AmmoData[ammoType][1]
+        end
 	end
 
-	ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(plr, weapon.CurrentAmmo, magSize, weapon.ReserveAmmo, true)
+	ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(plr, weapon.CurrentAmmo, magSize, InventoryManager.GetReserve(plr, ammoType), true)
 end)
 
 InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: string?, switching: boolean?)

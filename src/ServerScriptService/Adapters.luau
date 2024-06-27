@@ -60,12 +60,25 @@ local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BaseP
     if not plr then
         return
     end
-    local participant = round:GetParticipant(char.Name)
+    local participant = round:GetParticipant(plr.Name)
     if not participant then
         return
     end
 
+    if weapon.Name:split("_")[2] == "Ammo" then
+        local ammoType: ItemTypes.AmmoType = weapon.Name:split("_")[1] :: ItemTypes.AmmoType
+        local ammoData = InventoryManager.AmmoData[ammoType]
+
+        if InventoryManager.HasWeaponOfAmmoType(plr, ammoType) and InventoryManager.GetReserve(plr, ammoType) < ammoData[2] then
+            InventoryManager.SetReserve(plr, ammoType, math.min(InventoryManager.GetReserve(plr, ammoType) + ammoData[1], ammoData[2]))
+        end
+        return weapon:Destroy()
+    end
+
     local item = InventoryManager.Items[weapon] :: ItemTypes.Weapon
+    if not item then
+        return
+    end
     local base = if item then item.Base else Items[weapon.Name] :: ItemTypes.WeaponDefinition
 
     for _, v in InventoryManager.GetInventory(plr) do
@@ -79,9 +92,8 @@ local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BaseP
             Base = base,
             Instance = weapon,
             LastFireTime = 0,
-            ReserveAmmo = 0,
             CurrentAmmo = if base.MultiUse then base.MultiUse.MagazineSize else 1,
-        } :: ItemTypes.Weapon
+        }
     end
 
     InventoryManager.AddEquipment(participant.Player, InventoryManager.Items[weapon])
@@ -218,15 +230,7 @@ local module: Types.Adapter = {
             end
         end
         
-        local itemInstance = {Base = base, Instance = item.Item:Clone()}
-        if base.Kind ~= "Item" then -- You may think that an equality check would work. It does not.
-            itemInstance.CurrentAmmo = if base.MultiUse then base.MultiUse.MagazineSize else 1
-            itemInstance.ReserveAmmo = 0
-            itemInstance.LastFireTime = 0
-            (itemInstance.Instance :: BasePart).Touched:Connect(function(part)
-                onWeaponTouched(itemInstance.Instance :: BasePart, participant.Round, part)
-            end)
-        end
+        local itemInstance = InventoryManager.NewItem(base, item.Item, participant, onWeaponTouched)
         InventoryManager.Items[itemInstance.Instance] = itemInstance
         
         InventoryManager.AddEquipment(plr, itemInstance)
@@ -391,11 +395,8 @@ local module: Types.Adapter = {
     end,
 
     LoadWeaponSpawn = function(round, weaponSpawn)
-        local item = InventoryManager.Items[weaponSpawn] :: ItemTypes.Weapon
+        local item = InventoryManager.Items[weaponSpawn]
         if item then -- If we don't check this we end up connecting to the touched event multiple times. Looks odd but checking here is correct.
-            return
-        end
-        if not Items[weaponSpawn.Name] then
             return
         end
         weaponSpawn.Touched:Connect(function(part)

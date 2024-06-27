@@ -1,14 +1,13 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local ShatterGlass = require(script.Parent.Parent.ReplicatedFirst.ShatterGlass)
 local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 local API = require(ReplicatedFirst.API)
-local Adapters = require(ServerScriptService.Adapters)
 
 local module = {}
 
@@ -26,13 +25,10 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
     local damage: number
     if type(weapon.Damage) == "table" then
         if isOf("Head") then
-            print("dealing head damage")
             damage = weapon.Damage.Head
         elseif isOf("HumanoidRootPart") or isOf("Torso", true) then
-            print("dealing body damage")
             damage = weapon.Damage.Body
         else
-            print(part:GetFullName(), part.Name == "Head", part:FindFirstAncestor("Head") ~= nil)
             damage = weapon.Damage.Limb
         end
     else
@@ -45,11 +41,13 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
     end
 
     if attacker then
-        damage *= Adapters.CalculateDamageModifier(attacker.Karma)
+        damage *= 1--Adapters.CalculateDamageModifier(attacker.Karma)
     end
 
     return damage
 end
+
+
 
 type Entity = Types.Participant | Types.Prop
 local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, part: BasePart, distance: number, direction: Vector3): ()
@@ -226,6 +224,10 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
 end
 
 function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: Ray): ()
+    if weapon.Reloading then
+        return
+    end
+
     local char = player.Character
     if not char then
         return
@@ -256,15 +258,19 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     end
 
     local magSize = 1
+    local ammoType: ItemTypes.AmmoType?
 	if weapon.Base.MultiUse and type(weapon.Base.MultiUse) == "table" then
-		magSize = weapon.Base.MultiUse.MagazineSize
+        ammoType = weapon.Base.MultiUse.AmmoType
+        if ammoType then
+            magSize = weapon.Base.MultiUse.MagazineSize or InventoryManager.AmmoData[ammoType][1]
+        end
 	end
 
     local isInf = weapon.CurrentAmmo == math.huge
 
     if not isInf then
         weapon.CurrentAmmo -= 1
-        ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(player, weapon.CurrentAmmo, magSize, weapon.ReserveAmmo)
+        ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(player, weapon.CurrentAmmo, magSize, InventoryManager.GetReserve(player, ammoType))
     end
     
     weapon.LastFireTime = workspace:GetServerTimeNow()

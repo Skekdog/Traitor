@@ -24,8 +24,8 @@ export type Weapon = {
     Base: WeaponDefinition,
     Instance: PVInstance,
     CurrentAmmo: number,
-    ReserveAmmo: number,
     LastFireTime: number,
+    Reloading: thread?,
 }
 
 export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
@@ -47,8 +47,7 @@ type DamageInfo = number | {
 type MultiUseInfo = {
     FireTime: number, -- Delay between firing
     ReloadTime: number,
-    MaxReserve: number,
-    MagazineSize: number,
+    MagazineSize: number?,
     AmmoType: AmmoType?,
 }
 type ProjectileInfo = {

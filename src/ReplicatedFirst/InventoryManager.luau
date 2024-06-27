@@ -36,6 +36,86 @@ function module.HasEquipment(plr: Player, equipment: ItemTypes.Item): boolean
     return table.find(inventories[plr], equipment) ~= nil
 end
 
+module.AmmoData = { -- magazine, max
+    ["Assault Rifle"] = {Magazine = 20, Max = 60},
+    Shotgun = {Magazine = 8, Max = 16},
+    Deagle = {Magazine = 8, Max = 32},
+    SMG = {Magazine = 30, Max = 60},
+    Scout = {Magazine = 5, Max = 10},
+} :: {[ItemTypes.AmmoType]: {Magazine: number, Max: number}}
+
+local reserveAmmo: {[Player]: {[ItemTypes.AmmoType]: number?}?} = {}
+function module.GetReserve(player: Player, ammoType: ItemTypes.AmmoType?): number
+    local plrStore = reserveAmmo[player]
+    if not plrStore or not ammoType then
+        return 0
+    end
+    return plrStore[ammoType] or 0
+end
+
+function module.SetReserve(player: Player, ammoType: ItemTypes.AmmoType, reserve: number): ()
+    local plrStore = reserveAmmo[player]
+    if not plrStore then
+        reserveAmmo[player] = {[ammoType] = reserve}
+        return
+    end
+    plrStore[ammoType] = reserve
+end
+
+function module.ClearAllReserves(): ()
+    reserveAmmo = {}
+end
+
+function module.Reload(player: Player, weapon: ItemTypes.Weapon): ()
+    local multiUse = weapon.Base.MultiUse
+    if not multiUse then
+        return
+    end
+    assert(typeof(multiUse) ~= "boolean")
+
+    local ammoType: ItemTypes.AmmoType? = multiUse.AmmoType
+    local reserve = module.GetReserve(player, ammoType)
+    local char = player.Character
+
+    if reserve <= 0 or not ammoType or not char or weapon.Reloading or weapon.CurrentAmmo == multiUse.MagazineSize or weapon.CurrentAmmo == math.huge then
+        return
+    end
+
+    local reloadSound = weapon.Base.ReloadSound
+    if reloadSound then
+        reloadSound = reloadSound:Clone()
+        reloadSound.Parent = char.PrimaryPart
+        reloadSound.Ended:Once(function()
+            reloadSound:Destroy()
+        end)
+        reloadSound:Play()
+    end
+
+    print("reloading")
+    weapon.Reloading = task.delay(multiUse.ReloadTime, function()
+        print("reloading done")
+        weapon.Reloading = nil
+
+        local prevAmmo = weapon.CurrentAmmo
+        weapon.CurrentAmmo = math.min(weapon.CurrentAmmo + reserve, multiUse.MagazineSize or module.AmmoData[ammoType][1])
+
+        module.SetReserve(player, ammoType, reserve - (weapon.CurrentAmmo - prevAmmo))
+        ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(player, weapon.CurrentAmmo, multiUse.MagazineSize, module.GetReserve(player, ammoType))
+    end)
+end
+
+function module.HasWeaponOfAmmoType(plr: Player, ammoType: ItemTypes.AmmoType): boolean
+    for _, v in inventories[plr] do
+        local weapon = v.Base :: ItemTypes.WeaponDefinition
+        if (weapon :: any).Kind == "Weapon" then
+            if weapon.MultiUse and weapon.MultiUse.AmmoType == ammoType then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function module.AddEquipment(plr: Player, equipment: ItemTypes.Item)
     table.insert(inventories[plr], equipment)
     runCallback(plr, "Add", equipment)
@@ -140,6 +220,26 @@ end
 function module.DeInitInventory(plr: Player): ()
     inventories[plr] = nil
     equipped[plr] = nil
+end
+
+function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: Instance, participant: Types.Participant, onTouch: (BasePart, Types.Round, BasePart) -> ()): ItemTypes.Item | ItemTypes.Weapon
+    local itemInstance = {Base = base, Instance = instance:Clone()}
+    if base.Kind ~= "Item" then -- You may think that an equality check would work. It does not.
+        if base.MultiUse then
+            if base.MultiUse.MagazineSize then
+                itemInstance.CurrentAmmo = base.MultiUse.MagazineSize
+            elseif base.MultiUse.AmmoType then
+                itemInstance.CurrentAmmo = module.AmmoData[base.MultiUse.AmmoType][1]
+            else
+                itemInstance.CurrentAmmo = 1
+            end
+        end
+        itemInstance.LastFireTime = 0
+        (itemInstance.Instance :: BasePart).Touched:Connect(function(part)
+            onTouch(itemInstance.Instance :: BasePart, participant.Round, part)
+        end)
+    end
+    return itemInstance :: any
 end
 
 if IS_CLIENT then
