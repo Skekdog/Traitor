@@ -74,6 +74,8 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
                     force = weapon.ProjectileInfo.Speed
                 elseif weapon.Kind == "Explosion" then
                     force = (weapon :: ItemTypes.ExplosionInfo).Pressure
+                else
+                    force = 1
                 end
                 part:ApplyImpulse(-direction * force)
             end

@@ -267,7 +267,7 @@ local module: Types.Gamemode = {
             },
 
             StartingCredits = 2,
-			EquipmentShop = {"Grenade", "Radar", "Flare Gun"},
+			EquipmentShop = {"Radar", "Flare Gun"},
 			CanSeeMissing = true,
 
             HighlightRoles = {"Traitor"},

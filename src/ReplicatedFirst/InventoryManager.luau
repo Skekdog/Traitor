@@ -248,6 +248,8 @@ module.UpdateAmmo = function(plr: Player)
         if weapon.Base.MultiUse.MagazineSize then
             size = weapon.Base.MultiUse.MagazineSize
         end
+    else
+        size = 1
     end
 
     if not reserve then
@@ -270,6 +272,8 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
             else
                 itemInstance.CurrentAmmo = math.huge
             end
+        else
+            itemInstance.CurrentAmmo = 1
         end
         itemInstance.LastFireTime = 0
         (itemInstance.Instance :: BasePart).Touched:Connect(function(part)

@@ -79,6 +79,10 @@ local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BaseP
     local item = InventoryManager.Items[weapon] :: ItemTypes.Weapon
     local base = if item then item.Base else Items[weapon.Name] :: ItemTypes.WeaponDefinition
 
+    if not base then
+        return
+    end
+
     for _, v in InventoryManager.GetInventory(plr) do
         if v.Base.Slot == base.Slot then
             return

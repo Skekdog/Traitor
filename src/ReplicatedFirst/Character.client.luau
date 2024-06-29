@@ -87,7 +87,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     end)
 end)
 
-InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)
+InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
     if InventoryManager.GetEquipped(plr) then
         return
     end
