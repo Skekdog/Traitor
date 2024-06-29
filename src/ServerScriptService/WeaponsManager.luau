@@ -257,21 +257,8 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
-    local magSize = 1
-    local ammoType: ItemTypes.AmmoType?
-	if weapon.Base.MultiUse and type(weapon.Base.MultiUse) == "table" then
-        ammoType = weapon.Base.MultiUse.AmmoType
-        if ammoType then
-            magSize = weapon.Base.MultiUse.MagazineSize or InventoryManager.AmmoData[ammoType][1]
-        end
-	end
-
-    local isInf = weapon.CurrentAmmo == math.huge
-
-    if not isInf then
-        weapon.CurrentAmmo -= 1
-        ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(player, weapon.CurrentAmmo, magSize, InventoryManager.GetReserve(player, ammoType))
-    end
+    weapon.CurrentAmmo -= 1
+    InventoryManager.UpdateAmmo(player)
     
     weapon.LastFireTime = workspace:GetServerTimeNow()
 

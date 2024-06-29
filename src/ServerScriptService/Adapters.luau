@@ -51,7 +51,6 @@ local hitSounds = {
     Grass = groundSounds,
     LeafyGrass = groundSounds,
     Mud = groundSounds,
-
 }
 
 local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BasePart)
@@ -69,16 +68,15 @@ local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BaseP
         local ammoType: ItemTypes.AmmoType = weapon.Name:split("_")[1] :: ItemTypes.AmmoType
         local ammoData = InventoryManager.AmmoData[ammoType]
 
-        if InventoryManager.HasWeaponOfAmmoType(plr, ammoType) and InventoryManager.GetReserve(plr, ammoType) < ammoData[2] then
-            InventoryManager.SetReserve(plr, ammoType, math.min(InventoryManager.GetReserve(plr, ammoType) + ammoData[1], ammoData[2]))
+        if InventoryManager.HasWeaponOfAmmoType(plr, ammoType) and InventoryManager.GetReserve(plr, ammoType) < ammoData.Max then
+            InventoryManager.SetReserve(plr, ammoType, math.min(InventoryManager.GetReserve(plr, ammoType) + ammoData.Magazine, ammoData.Max))
+            InventoryManager.UpdateAmmo(plr)
+            weapon:Destroy()
         end
-        return weapon:Destroy()
+        return
     end
 
     local item = InventoryManager.Items[weapon] :: ItemTypes.Weapon
-    if not item then
-        return
-    end
     local base = if item then item.Base else Items[weapon.Name] :: ItemTypes.WeaponDefinition
 
     for _, v in InventoryManager.GetInventory(plr) do
@@ -88,12 +86,7 @@ local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BaseP
     end
     
     if not item then
-        InventoryManager.Items[weapon] = {
-            Base = base,
-            Instance = weapon,
-            LastFireTime = 0,
-            CurrentAmmo = if base.MultiUse then base.MultiUse.MagazineSize else 1,
-        }
+        InventoryManager.Items[weapon] = InventoryManager.NewItem(base, weapon, participant, onWeaponTouched)
     end
 
     InventoryManager.AddEquipment(participant.Player, InventoryManager.Items[weapon])

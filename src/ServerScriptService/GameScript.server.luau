@@ -228,6 +228,7 @@ joinRound.OnServerInvoke = function(plr)
 			end
 
 			InventoryManager.ClearAllItems()
+			InventoryManager.ClearAllReserves()
 
 			for _, v in round.Participants do
 				v._status = "Spectating" :: any

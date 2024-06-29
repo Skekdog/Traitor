@@ -116,7 +116,7 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
     ProfileManager.UpdateProfile(plr, "Settings", options)
 end)
 
-local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item)
+local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item | ItemTypes.Weapon)
 	InventoryManager.InvEvent:FireClient(plr, event, equipment)
 end
 
@@ -128,28 +128,24 @@ InventoryManager.Listen("Remove", function(plr, equipment)
 	fireInventoryClient(plr, "Remove", equipment)
 end)
 
-InventoryManager.Listen("Equip", function(plr, equipment)
-	if equipment.Base.Kind == "Item" then
+InventoryManager.Listen("Equip", InventoryManager.UpdateAmmo)
+
+InventoryManager.Listen("Unequip", function(plr, equipment)
+	if equipment.Kind ~= "Weapon" then
 		return
 	end
 
-	local weapon = equipment :: ItemTypes.Weapon
+	if equipment.Reloading then
+		task.cancel(equipment.Reloading)
+		equipment.Reloading = nil
 
-	local isInf = weapon.CurrentAmmo == math.huge
-	if isInf then
-		return
+		if plr.Character and plr.Character.PrimaryPart then
+			local sound = plr.Character.PrimaryPart:FindFirstChild("ReloadSound") :: Sound
+			if sound then
+				sound:Stop()
+			end
+		end
 	end
-
-	local magSize = 1
-    local ammoType: ItemTypes.AmmoType?
-	if weapon.Base.MultiUse and type(weapon.Base.MultiUse) == "table" then
-        ammoType = weapon.Base.MultiUse.AmmoType
-        if ammoType then
-            magSize = weapon.Base.MultiUse.MagazineSize or InventoryManager.AmmoData[ammoType][1]
-        end
-	end
-
-	ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(plr, weapon.CurrentAmmo, magSize, InventoryManager.GetReserve(plr, ammoType), true)
 end)
 
 InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: string?, switching: boolean?)
@@ -158,7 +154,7 @@ InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: Inv
 	end
 
 	local inventory = InventoryManager.GetInventory(plr)
-	local foundEquipment: ItemTypes.Item?
+	local foundEquipment: ItemTypes.Item? | ItemTypes.Weapon?
 	for _, v in inventory do
 		if v.Base.Name == equipmentName then
 			foundEquipment = v

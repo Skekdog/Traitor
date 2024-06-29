@@ -7,34 +7,25 @@ local module = {}
 
 -- This can be used from both the client and the server.
 
-export type Inventory = {ItemTypes.Item}
+type Item = ItemTypes.Item | ItemTypes.Weapon
+
+export type Inventory = {Item}
 local inventories: {[Player]: Inventory} = {}
-local equipped: {[Player]: ItemTypes.Item?} = {}
+local equipped: {[Player]: Item?} = {}
 
 export type InventoryEvent = "Add" | "Remove" | "Equip" | "Unequip" | "Drop"
-local listeners: {[InventoryEvent]: {((Player, ItemTypes.Item, boolean?) -> ())}} = {Add = {}, Remove = {}, Equip = {}, Unequip = {}, Drop = {}}
+local listeners: {[InventoryEvent]: {((Player, Item, boolean?) -> ())}} = {Add = {}, Remove = {}, Equip = {}, Unequip = {}, Drop = {}}
 
 local IS_CLIENT = RunService:IsClient()
 
 type InventoryRemote = {
     FireServer: (self: any, InventoryEvent, string, boolean?) -> (),
-    FireClient: (self: any, Player, InventoryEvent, ItemTypes.Item) -> (),
+    FireClient: (self: any, Player, InventoryEvent, Item) -> (),
     OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, string?, boolean?) -> ()) -> ()},
 }
 
-module.InvEvent = (ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent :: InventoryRemote
-
-local function runCallback(plr: Player, event: InventoryEvent, equipment: ItemTypes.Item, switching: boolean?)
-    for _, v in listeners[event] do
-        v(plr, equipment, switching)
-    end
-end
-
-module.Items = {} :: {[Instance]: ItemTypes.Item}
-
-function module.HasEquipment(plr: Player, equipment: ItemTypes.Item): boolean
-    return table.find(inventories[plr], equipment) ~= nil
-end
+local serverClient = ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)
+module.InvEvent = (serverClient.InventoryEvent :: any) :: InventoryRemote
 
 module.AmmoData = { -- magazine, max
     ["Assault Rifle"] = {Magazine = 20, Max = 60},
@@ -42,7 +33,19 @@ module.AmmoData = { -- magazine, max
     Deagle = {Magazine = 8, Max = 32},
     SMG = {Magazine = 30, Max = 60},
     Scout = {Magazine = 5, Max = 10},
-} :: {[ItemTypes.AmmoType]: {Magazine: number, Max: number}}
+} :: {[ItemTypes.AmmoType]: {Magazine: number, Max: number, [number]: nil}}
+
+local function runCallback(plr: Player, event: InventoryEvent, equipment: Item, switching: boolean?)
+    for _, v in listeners[event] do
+        v(plr, equipment, switching)
+    end
+end
+
+module.Items = {} :: {[Instance]: Item | ItemTypes.Weapon}
+
+function module.HasEquipment(plr: Player, equipment: Item): boolean
+    return table.find(inventories[plr], equipment) ~= nil
+end
 
 local reserveAmmo: {[Player]: {[ItemTypes.AmmoType]: number?}?} = {}
 function module.GetReserve(player: Player, ammoType: ItemTypes.AmmoType?): number
@@ -84,6 +87,7 @@ function module.Reload(player: Player, weapon: ItemTypes.Weapon): ()
     local reloadSound = weapon.Base.ReloadSound
     if reloadSound then
         reloadSound = reloadSound:Clone()
+        reloadSound.Name = "ReloadSound"
         reloadSound.Parent = char.PrimaryPart
         reloadSound.Ended:Once(function()
             reloadSound:Destroy()
@@ -91,23 +95,22 @@ function module.Reload(player: Player, weapon: ItemTypes.Weapon): ()
         reloadSound:Play()
     end
 
-    print("reloading")
     weapon.Reloading = task.delay(multiUse.ReloadTime, function()
-        print("reloading done")
         weapon.Reloading = nil
 
         local prevAmmo = weapon.CurrentAmmo
-        weapon.CurrentAmmo = math.min(weapon.CurrentAmmo + reserve, multiUse.MagazineSize or module.AmmoData[ammoType][1])
+        weapon.CurrentAmmo = math.min(weapon.CurrentAmmo + reserve, multiUse.MagazineSize or module.AmmoData[ammoType].Magazine)
 
-        module.SetReserve(player, ammoType, reserve - (weapon.CurrentAmmo - prevAmmo))
-        ReplicatedStorage.ServerClient.AmmoUpdate:FireClient(player, weapon.CurrentAmmo, multiUse.MagazineSize, module.GetReserve(player, ammoType))
+        -- We need to GetReserve() again because they may have picked up more ammo whilst reloading
+        module.SetReserve(player, ammoType, module.GetReserve(player, ammoType) - (weapon.CurrentAmmo - prevAmmo))
+        module.UpdateAmmo(player)
     end)
 end
 
 function module.HasWeaponOfAmmoType(plr: Player, ammoType: ItemTypes.AmmoType): boolean
     for _, v in inventories[plr] do
-        local weapon = v.Base :: ItemTypes.WeaponDefinition
-        if (weapon :: any).Kind == "Weapon" then
+        local weapon = v.Base
+        if weapon.Kind == "Weapon" then
             if weapon.MultiUse and weapon.MultiUse.AmmoType == ammoType then
                 return true
             end
@@ -116,12 +119,12 @@ function module.HasWeaponOfAmmoType(plr: Player, ammoType: ItemTypes.AmmoType): 
     return false
 end
 
-function module.AddEquipment(plr: Player, equipment: ItemTypes.Item)
+function module.AddEquipment(plr: Player, equipment: Item)
     table.insert(inventories[plr], equipment)
     runCallback(plr, "Add", equipment)
 end
 
-function module.RemoveEquipment(plr: Player, equipment: ItemTypes.Item)
+function module.RemoveEquipment(plr: Player, equipment: Item)
     module.Unequip(plr, equipment)
     table.remove(inventories[plr], table.find(inventories[plr], equipment))
     runCallback(plr, "Remove", equipment)
@@ -131,11 +134,11 @@ function module.GetInventory(plr: Player): Inventory
     return inventories[plr]
 end
 
-function module.GetEquipped(plr: Player): ItemTypes.Item?
+function module.GetEquipped(plr: Player): Item?
     return equipped[plr]
 end
 
-function module.Equip(plr: Player, equipment: ItemTypes.Item)
+function module.Equip(plr: Player, equipment: Item)
     if IS_CLIENT then
        module.InvEvent:FireServer("Equip", equipment.Base.Name)
        equipped[plr] = equipment
@@ -154,7 +157,7 @@ function module.Equip(plr: Player, equipment: ItemTypes.Item)
     runCallback(plr, "Equip", equipment)
 end
 
-function module.Unequip(plr: Player, equipment: ItemTypes.Item, switching: boolean?)
+function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
     if IS_CLIENT then
         module.InvEvent:FireServer("Unequip", equipment.Base.Name, switching)
         local old = equipped[plr]
@@ -174,7 +177,7 @@ function module.Unequip(plr: Player, equipment: ItemTypes.Item, switching: boole
     runCallback(plr, "Unequip", equipment, switching)
 end
 
-function module.Drop(plr: Player, equipment: ItemTypes.Item, position: Vector3)
+function module.Drop(plr: Player, equipment: Item, position: Vector3)
     if not equipment.Base.CanDrop then
         return
     end
@@ -206,7 +209,7 @@ function module.ClearAllItems()
     table.clear(module.Items)
 end
 
-function module.Listen(event: InventoryEvent, callback: (Player, ItemTypes.Item) -> ()): () -> ()
+function module.Listen(event: InventoryEvent, callback: (Player, Item) -> ()): () -> ()
     table.insert(listeners[event], callback)
     return function()
         table.remove(listeners[event], table.find(listeners[event], callback))
@@ -222,16 +225,50 @@ function module.DeInitInventory(plr: Player): ()
     equipped[plr] = nil
 end
 
-function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: Instance, participant: Types.Participant, onTouch: (BasePart, Types.Round, BasePart) -> ()): ItemTypes.Item | ItemTypes.Weapon
-    local itemInstance = {Base = base, Instance = instance:Clone()}
+module.UpdateAmmo = function(plr: Player)
+    local weapon = equipped[plr]
+    if not weapon or weapon.Kind ~= "Weapon" then
+        return
+    end
+
+    local current = weapon.CurrentAmmo
+    if current == math.huge then
+        return
+    end
+
+    local size: number
+    local reserve: number
+
+    if weapon.Base.MultiUse then
+        local ammoType = weapon.Base.MultiUse.AmmoType
+        if ammoType then
+            size = module.AmmoData[ammoType :: ItemTypes.AmmoType].Magazine
+            reserve = module.GetReserve(plr, weapon.Base.MultiUse.AmmoType)
+        end
+        if weapon.Base.MultiUse.MagazineSize then
+            size = weapon.Base.MultiUse.MagazineSize
+        end
+    end
+
+    if not reserve then
+        reserve = 0
+    end
+
+    serverClient.AmmoUpdate:FireClient(plr, current, size, reserve)
+end
+
+function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: Instance, participant: Types.Participant, onTouch: (BasePart, Types.Round, BasePart) -> ()): Item
+    local itemInstance = {Base = base, Instance = instance:Clone(), Kind = base.Kind}
     if base.Kind ~= "Item" then -- You may think that an equality check would work. It does not.
-        if base.MultiUse then
-            if base.MultiUse.MagazineSize then
-                itemInstance.CurrentAmmo = base.MultiUse.MagazineSize
-            elseif base.MultiUse.AmmoType then
-                itemInstance.CurrentAmmo = module.AmmoData[base.MultiUse.AmmoType][1]
+        local multiUse = base.MultiUse
+        if multiUse then
+            assert(typeof(multiUse) ~= "boolean")
+            if multiUse.MagazineSize then
+                itemInstance.CurrentAmmo = multiUse.MagazineSize
+            elseif multiUse.AmmoType then
+                itemInstance.CurrentAmmo = module.AmmoData[multiUse.AmmoType].Magazine
             else
-                itemInstance.CurrentAmmo = 1
+                itemInstance.CurrentAmmo = math.huge
             end
         end
         itemInstance.LastFireTime = 0

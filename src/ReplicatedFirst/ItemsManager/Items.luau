@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
 local ItemTypes = require(script.Parent.ItemTypes)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
@@ -62,7 +61,7 @@ local function stopControllingProp(prop: BasePart, userId: number)
     controlledProps[userId] = nil
 end
 
-return ({
+local weapons: {[string]: ItemTypes.WeaponDefinition} = {
     Grenade = {
         Kind = "Weapon",
         Name = "Grenade",
@@ -791,6 +790,9 @@ return ({
             Speed = 120
         }
     },
+}
+
+local items: {[string]: ItemTypes.ItemDefinition} = {
     ["Magneto Stick"] = {
         Kind = "Item",
         Name = "Magneto Stick",
@@ -918,51 +920,14 @@ return ({
             end
         end
     },
-    ["Newton Launcher"] = {
-        Kind = "Item",
-        Slot = 8,
-        Name = "Newton Launcher",
-        Description = "Haha props",
-        CanDrop = true,
-        Model = models["Newton Launcher"],
-        PrimaryFire = function(participant: Types.Participant, cameraRayInfo: Ray)
-            local char = participant.Character
+}
 
-            local roundId = ServerStorage:GetAttribute("RoundID")
-            if not roundId then
-                return
-            end
+local combinedItems: {[string]: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition} = {}
+for _, v in items do
+    combinedItems[v.Name] = v
+end
+for _, v in weapons do
+    combinedItems[v.Name] = v
+end
 
-            local rayParams = RaycastParams.new()
-            rayParams.CollisionGroup = "Bounds"
-            rayParams.IgnoreWater = true
-            rayParams.RespectCanCollide = true
-            rayParams.FilterType = Enum.RaycastFilterType.Exclude
-            rayParams.FilterDescendantsInstances = {char}
-            local result = workspace:Raycast(char:GetPivot().Position, cameraRayInfo.Direction * 1000, rayParams)
-
-            if not result then
-                return
-            end
-
-            local object = result.Instance
-            local model = object:FindFirstAncestorOfClass("Model")
-            
-            local map = participant.Round.Map
-            local weaponSpawns = map:FindFirstChild("WeaponSpawns")
-            local props = map:FindFirstChild("Props")
-
-            if not ((weaponSpawns and object:IsDescendantOf(weaponSpawns)) or (props and object:IsDescendantOf(props)) or (model and Players:GetPlayerFromCharacter(model))) then
-                return
-            end
-
-            local force = Instance.new("BodyForce")
-            force.Force = cameraRayInfo.Direction * 10000 + Vector3.new(0, 5000, 0)
-            force.Parent = object
-
-            task.delay(0.5, function()
-                force:Destroy()
-            end)
-        end
-    }
-} :: any) :: {[string]: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition}
+return combinedItems

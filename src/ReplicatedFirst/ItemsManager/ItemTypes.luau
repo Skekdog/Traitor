@@ -1,4 +1,6 @@
 local Types = require(script.Parent.Parent.RoundHandler.Types)
+
+type OnUnequipFunction = (player: Player) -> ()
 export type ItemDefinition = {
     Kind: "Item",
     Name: string,
@@ -8,19 +10,21 @@ export type ItemDefinition = {
     Slot: number,
     CanDrop: boolean,
 
-    Model: Model?,
+    Model: MeshPart?,
 
     PrimaryFire: ((Types.Participant, cameraRay: Ray) -> ())?,
     AlternateFire: ((Types.Participant, cameraRay: Ray) -> ())?,
-    OnUnequip: ((Player) -> ())?,
+    OnUnequip: OnUnequipFunction?,
 }
 
 export type Item = {
+    Kind: "Item",
     Base: ItemDefinition,
     Instance: PVInstance,
 }
 
 export type Weapon = {
+    Kind: "Weapon",
     Base: WeaponDefinition,
     Instance: PVInstance,
     CurrentAmmo: number,
@@ -67,7 +71,20 @@ export type ExplosionInfo = {
     FalloffMultiplier: number?,
 }
 
-export type WeaponDefinition = ItemDefinition & {
+export type WeaponDefinition = {
+    Name: string,
+    Description: string,
+    Icon: string?,
+
+    Slot: number,
+    CanDrop: boolean,
+
+    Model: MeshPart?,
+
+    PrimaryFire: ((Types.Participant, cameraRay: Ray) -> ())?,
+    AlternateFire: ((Types.Participant, cameraRay: Ray) -> ())?,
+    OnUnequip: OnUnequipFunction?,
+
     Kind: "Weapon",
     Damage: DamageInfo,
 
