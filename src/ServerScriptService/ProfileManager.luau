@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerStorage = game:GetService("ServerStorage")
-local SettingsManager = require(script.Parent.Parent.ReplicatedFirst.SettingsManager)
+local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local ProfileService = require(script.Parent.ProfileService)
 
 local module = {}

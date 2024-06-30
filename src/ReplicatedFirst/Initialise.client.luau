@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local API = require(script.Parent.API)
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
-local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local UIManager = require(script.Parent.UIManager)
 
@@ -72,18 +72,13 @@ end)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 local ammoBar = roundInfo.Frame.AmmoBar
-local activeTween: Tween
+local activeTween: Tween?
 local function setAmmo(current: number, magazineSize: number, reserve: number, noTransition: boolean?)
-    if noTransition == nil then
-        noTransition = not SettingsManager.GetSetting("Animate UI Transitions") :: boolean
-    end
-
     ammoBar.AmmoLabel.Text = `{current} / {magazineSize} + {reserve}`
     if activeTween then
         activeTween:Cancel()
     end
-    activeTween = TweenService:Create(ammoBar.Background, TweenInfo.new(if noTransition then 0 else 0.1), {Size = UDim2.new(current / magazineSize, 0, 1, 0)})
-    activeTween:Play()
+    activeTween = API.Animate(ammoBar.Background, TweenInfo.new(0.1), {Size = UDim2.new(current / magazineSize, 0, 1, 0)}, noTransition)
 end
 
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)

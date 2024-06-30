@@ -1,6 +1,6 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ServerStorage = game:GetService("ServerStorage")
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 
 return function(): Types.Round?

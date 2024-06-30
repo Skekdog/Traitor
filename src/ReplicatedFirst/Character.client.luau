@@ -1,24 +1,20 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
+local API = require(script.Parent.API)
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
-local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(script.Parent.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
-local activeTween: Tween
+local activeTween: Tween?
 local function setHealth(hum: Humanoid)
-    local noTransition = not SettingsManager.GetSetting("Animate UI Transitions") :: boolean
-
     roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.round(hum.Health))
     if activeTween then
         activeTween:Cancel()
     end
-    activeTween = TweenService:Create(roundInfo.Frame.HealthBar.Background, TweenInfo.new(if noTransition then 0 else 0.1), {Size = UDim2.new(hum.Health / hum.MaxHealth, 0, 1, 0)})
-    activeTween:Play()
+    activeTween = API.Animate(roundInfo.Frame.HealthBar.Background, TweenInfo.new(0.1),  {Size = UDim2.new(hum.Health / hum.MaxHealth, 0, 1, 0)})
 end
 
 local function onDeath()

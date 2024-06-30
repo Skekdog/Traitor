@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local GetRound = require(script.Parent.GetRound)
-local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
+local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)

@@ -7,7 +7,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 
 local GetRound = require(script.Parent.GetRound)
-local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
+local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local ProfileManager = require(script.Parent.ProfileManager)
 local RestartServer = require(script.Parent.RestartServer)

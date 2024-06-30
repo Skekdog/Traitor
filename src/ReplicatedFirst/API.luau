@@ -131,10 +131,10 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {[s
 	return label
 end
 
-function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[string]: any}): Tween?
+function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[string]: any}, noAnimate: boolean?): Tween?
 	local animate = script.Parent.SettingsManager.RequestSetting:Invoke("Animate UI Transitions")
 
-	if not animate then
+	if not animate or noAnimate then
 		for i, v in properties do
 			(object :: any)[i] = v
 		end
