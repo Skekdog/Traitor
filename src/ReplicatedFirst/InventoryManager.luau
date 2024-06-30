@@ -71,6 +71,7 @@ end
 
 function module.ClearAllReserves(): ()
     reserveAmmo = {}
+    module.AmmoBoxes = {}
 end
 
 function module.Reload(player: Player, weapon: ItemTypes.Weapon): ()

@@ -413,7 +413,7 @@ local module: Types.Adapter = {
         end
 
         local ammo = InventoryManager.AmmoBoxes[weaponSpawn]
-        if not ammo then
+        if not ammo and weaponSpawn.Name:split("_")[2] == "Ammo" then
             InventoryManager.NewAmmoBox(weaponSpawn)
         end
 

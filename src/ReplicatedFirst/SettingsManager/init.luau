@@ -526,7 +526,7 @@ module.AvailableSettings = {
 		Callback = keybindCallback,
 	},
 	{
-		Name = "Drop Ammo",
+		Name = "Drop Ammo Scale",
 		Tab = "Touch",
 		Category = "Button Scale",
 		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
