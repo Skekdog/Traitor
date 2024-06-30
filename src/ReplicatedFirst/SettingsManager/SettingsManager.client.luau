@@ -93,22 +93,22 @@ local function transitionSwitch(target: Frame, disabled: boolean)
 	disabled = not disabled
 	-- I confused myself and now I don't know what disabled actually means I just know that it does the wrong thing if you don't invert it
 	local switch = target:FindFirstChild("Switch") :: TextLabel
-	TS:Create(switch,
+	API.Animate(switch,
 		TweenInfo.new(
 			SWITCH_TRANSITION_TIME,
 			Enum.EasingStyle.Quad
 		), {
 			Position = UDim2.fromScale(disabled and 0.9 or 0.1, 0.5)
 		}
-	):Play()
-	TS:Create(target,
+	)
+	API.Animate(target,
 		TweenInfo.new(
 			SWITCH_TRANSITION_TIME,
 			Enum.EasingStyle.Quad
 		), {
 			BackgroundColor3 = disabled and Color3.fromRGB(189, 0, 0) or Color3.fromRGB(47, 189, 47)
 		}
-	):Play()
+	)
 	
 	switch.Text = disabled and "O" or "I"
 end

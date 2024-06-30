@@ -1,4 +1,4 @@
-local TS = game:GetService("TweenService")
+local TweenService = game:GetService("TweenService")
 
 local plr = game:GetService("Players").LocalPlayer
 
@@ -107,7 +107,7 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {[s
 
 	label.Parent = gui
 	
-	local tween = TS:Create(label, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 3), {
+	local tween = TweenService:Create(label, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 3), {
 		BackgroundTransparency = 1,
 		TextTransparency = 1,
 	})
@@ -118,7 +118,7 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {[s
 				foundTween:Cancel()
 				foundTween:Destroy()
 			end
-			local tween = TS:Create(v, TweenInfo.new(0.5), {
+			local tween = TweenService:Create(v, TweenInfo.new(0.5), {
 				Position = UDim2.fromScale(0.5, v.Position.Y.Scale - 0.05)
 			})
 			tween.Parent = v
@@ -131,8 +131,21 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {[s
 	return label
 end
 
+function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[string]: any}): Tween?
+	local animate = script.Parent.SettingsManager.RequestSetting:Invoke("Animate UI Transitions")
+
+	if not animate then
+		for i, v in properties do
+			(object :: any)[i] = v
+		end
+		return
+	end
+	local tween = TweenService:Create(object, tweenInfo, properties)
+	tween:Play()
+	return tween
+end
+
 function module.TransitionUIPage(currentPage: GuiObject, currentPageOrder: number, newPage: GuiObject, newPageOrder: number, targetPosition: UDim2)
-	local requestSetting = script.Parent.SettingsManager.RequestSetting
 	-- If new page is to the right, then the new page should be positioned on the right
 	-- and current page should slide to the left
 	local goRight = newPageOrder > currentPageOrder
@@ -148,17 +161,15 @@ function module.TransitionUIPage(currentPage: GuiObject, currentPageOrder: numbe
 	end
 	
 	newPage.Visible = true
-	
-	local UI_PAGE_TRANSITION_TIME = requestSetting:Invoke("Animate UI Transitions") and 0.2 or 0 
-	TS:Create(newPage, TweenInfo.new(UI_PAGE_TRANSITION_TIME,
+	module.Animate(newPage, TweenInfo.new(0.2,
 		Enum.EasingStyle.Exponential,
 		Enum.EasingDirection.In
 		),
 		{
 			Position = currentPage.Position
 		}
-	):Play()
-	local animTween = TS:Create(currentPage, TweenInfo.new(UI_PAGE_TRANSITION_TIME,
+	)
+	local animTween = module.Animate(currentPage, TweenInfo.new(0.2,
 		Enum.EasingStyle.Exponential,
 		Enum.EasingDirection.In
 		),
@@ -166,14 +177,15 @@ function module.TransitionUIPage(currentPage: GuiObject, currentPageOrder: numbe
 			Position = targetPositionForCurrent
 		}
 	)
-	animTween:GetPropertyChangedSignal("PlaybackState"):Connect(function()
-		if animTween.PlaybackState ~= Enum.PlaybackState.Playing then
-			currentPage.Position = targetPositionForCurrent
-			newPage.Position = targetPosition
-			animTween:Destroy()
-		end
-	end)
-	animTween:Play()
+	if animTween then
+		animTween:GetPropertyChangedSignal("PlaybackState"):Connect(function()
+			if animTween.PlaybackState ~= Enum.PlaybackState.Playing then
+				currentPage.Position = targetPositionForCurrent
+				newPage.Position = targetPosition
+				animTween:Destroy()
+			end
+		end)	
+	end
 end
 
 function module.ToRoundTime(time: number, target: number): string
@@ -200,61 +212,12 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 		oldTween:Cancel()
 		oldTween:Destroy()
 	end
-	
-	local UI_TRANSITION_TIME: number
-	if requestSetting:Invoke("Animate UI Transitions") then
-		if not open then
-			UI_TRANSITION_TIME = tonumber(requestSetting:Invoke("Close Speed")) :: number
-		else
-			UI_TRANSITION_TIME = 0.2
-		end
-	else
-		UI_TRANSITION_TIME = 0
-	end
-	local UI_SCALE_FACTOR = tonumber(requestSetting:Invoke("Close Scale"))
-	
+
 	local isSize = frame:GetAttribute("TransitionStyle") == "Size"
-	
 	local targetUDim = frame:GetAttribute("TransitionTarget")
-	local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
-	
-	local info = TweenInfo.new(
-		UI_TRANSITION_TIME,
-		Enum.EasingStyle.Exponential,
-		Enum.EasingDirection.Out
-	)
-	
 	local offScreenPosition = UDim2.fromScale(targetUDim.X.Scale, -frame.Size.Y.Scale)
-	
-	local properties
-	if isSize then
-		properties = {
-			Size = open and targetUDim or startSize
-		}
-	else
-		properties = {
-			Position = open and targetUDim or offScreenPosition
-		}
-	end
-	
-	local tween = TS:Create(frame, info, properties)
-	
-	if open then
-		if isSize then
-			frame.Size = startSize
-		else
-			frame.Position = offScreenPosition
-		end
-		frame.Visible = true
-	end
-	
-	local modalise = frame:FindFirstChild("Modalise") :: TextButton
-	if modalise then
-		modalise.Visible = open
-	end
-	
-	tween.Completed:Once(function()
-		tween:Destroy()
+
+	local function onFinish()
 		if open then
 			if isSize then
 				frame.Size = targetUDim
@@ -269,12 +232,61 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 				frame.Position = offScreenPosition
 			end
 		end
-	end)
+	end
+
+	if not requestSetting then
+		return onFinish()
+	end
 	
-	tween.Name = "StateTransitionTween"
-	tween.Parent = frame
+	local UI_TRANSITION_TIME = if open then 0.2 else tonumber(requestSetting:Invoke("Close Speed")) :: number
+	local UI_SCALE_FACTOR = tonumber(requestSetting:Invoke("Close Scale"))
 	
-	tween:Play()
+	
+	local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
+	
+	local info = TweenInfo.new(
+		UI_TRANSITION_TIME,
+		Enum.EasingStyle.Exponential,
+		Enum.EasingDirection.Out
+	)
+	
+	local properties
+	if isSize then
+		properties = {
+			Size = open and targetUDim or startSize
+		}
+	else
+		properties = {
+			Position = open and targetUDim or offScreenPosition
+		}
+	end
+	
+	local tween = module.Animate(frame, info, properties)
+	
+	if open then
+		if isSize then
+			frame.Size = startSize
+		else
+			frame.Position = offScreenPosition
+		end
+		frame.Visible = true
+	end
+	
+	local modalise = frame:FindFirstChild("Modalise") :: TextButton
+	if modalise then
+		modalise.Visible = open
+	end
+
+	if tween then
+		tween.Completed:Once(function()
+			tween:Destroy()
+			onFinish()
+		end)
+		tween.Name = "StateTransitionTween"
+		tween.Parent = frame
+	else
+		onFinish()
+	end
 end
 
 return module

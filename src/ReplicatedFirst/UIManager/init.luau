@@ -1,7 +1,6 @@
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local TS = game:GetService("TweenService")
 local UIS = game:GetService("UserInputService")
 
 local ControlManager = require(ReplicatedFirst.ControlManager)
@@ -298,25 +297,25 @@ function UIManager.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition:
 	local style = v:GetAttribute("Style")
 	
 	if v.ClassName == "UIStroke" then
-		TS:Create(v, tweenInfo, {Color = theme["UIStroke"]}):Play()
+		API.Animate(v, tweenInfo, {Color = theme["UIStroke"]})
 	elseif (v.ClassName == "TextButton") or (v.ClassName == "TextLabel") then
 		if not keepText then
-			TS:Create(v, tweenInfo, {
+			API.Animate(v, tweenInfo, {
 				TextColor3 = (not inverse) and theme.Text or theme[style or "Primary"],
 				TextStrokeColor3 = (not inverse) and theme.TextStroke or theme[style or "Text"]
-			}):Play()
+			})
 		end
 	elseif (v.ClassName == "ImageButton") or (v.ClassName == "ImageLabel") then
 		if updateImage then
-			TS:Create(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]}):Play()
+			API.Animate(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]})
 		end
 	end
 	
 	if v.ClassName ~= "UIStroke" then
-		TS:Create(v, tweenInfo, {
+		API.Animate(v, tweenInfo, {
 			BackgroundColor3 = (not inverse) and theme[style or "Primary"] or theme.Text,
 			BorderColor3 = (not inverse) and theme.UIStroke or theme[style or "Primary"]
-		}):Play()
+		})
 	end
 	
 	if v:GetAttribute("DefaultTextColour") then
