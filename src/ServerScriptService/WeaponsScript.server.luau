@@ -35,11 +35,11 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, c
     end
     assert(cameraRayInfo)
 
-    if weapon.Base.Kind == "Item" then
+    if weapon.Kind == "Item" then
         assert(weapon.Base.PrimaryFire)
         weapon.Base.PrimaryFire(participant, cameraRayInfo)
     else
-        WeaponsManager.Shoot(plr, weapon :: ItemTypes.Weapon, cameraRayInfo)
+        WeaponsManager.Shoot(plr, weapon, cameraRayInfo)
     end
 end)
 
@@ -57,9 +57,18 @@ end)
 
 ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr)
     local weapon, participant = allow(plr)
-    if not weapon or not participant or weapon.Base.Kind == "Item" then
+    if not weapon or not participant or weapon.Kind == "Item" then
         return
     end
 
-    InventoryManager.Reload(plr, weapon :: ItemTypes.Weapon)
+    InventoryManager.Reload(plr, weapon)
+end)
+
+ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr)
+    local weapon, participant = allow(plr)
+    if not weapon or not participant or weapon.Kind == "Item" then
+        return
+    end
+
+    InventoryManager.DropAmmo(plr, weapon)
 end)

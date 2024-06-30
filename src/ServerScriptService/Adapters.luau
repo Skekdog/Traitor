@@ -67,11 +67,26 @@ local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BaseP
     if weapon.Name:split("_")[2] == "Ammo" then
         local ammoType: ItemTypes.AmmoType = weapon.Name:split("_")[1] :: ItemTypes.AmmoType
         local ammoData = InventoryManager.AmmoData[ammoType]
+        local ammo = InventoryManager.AmmoBoxes[weapon]
 
-        if InventoryManager.HasWeaponOfAmmoType(plr, ammoType) and InventoryManager.GetReserve(plr, ammoType) < ammoData.Max then
-            InventoryManager.SetReserve(plr, ammoType, math.min(InventoryManager.GetReserve(plr, ammoType) + ammoData.Magazine, ammoData.Max))
+        if not ammo then
+            return
+        end
+
+        if ammo <= 0 then
+            return weapon:Destroy()
+        end
+
+        local currentReserve = InventoryManager.GetReserve(plr, ammoType)
+        if InventoryManager.HasWeaponOfAmmoType(plr, ammoType) and currentReserve < ammoData.Max then
+            local diff = math.min(ammo, ammoData.Magazine, ammoData.Max - currentReserve)
+            InventoryManager.AmmoBoxes[weapon] -= diff
+            InventoryManager.SetReserve(plr, ammoType, InventoryManager.GetReserve(plr, ammoType) + diff)
             InventoryManager.UpdateAmmo(plr)
-            weapon:Destroy()
+
+            if ammo - diff <= 0 then
+                weapon:Destroy()
+            end
         end
         return
     end
@@ -396,6 +411,12 @@ local module: Types.Adapter = {
         if item then -- If we don't check this we end up connecting to the touched event multiple times. Looks odd but checking here is correct.
             return
         end
+
+        local ammo = InventoryManager.AmmoBoxes[weaponSpawn]
+        if not ammo then
+            InventoryManager.NewAmmoBox(weaponSpawn)
+        end
+
         weaponSpawn.Touched:Connect(function(part)
             onWeaponTouched(weaponSpawn, round, part)
         end)

@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local Types = require(script.Parent.RoundHandler.Types)
 local module = {}
@@ -27,13 +28,15 @@ type InventoryRemote = {
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)
 module.InvEvent = (serverClient.InventoryEvent :: any) :: InventoryRemote
 
-module.AmmoData = { -- magazine, max
+local ammoData: {[string]: {Magazine: number, Max: number, [number]: nil}} = {
     ["Assault Rifle"] = {Magazine = 20, Max = 60},
     Shotgun = {Magazine = 8, Max = 16},
     Deagle = {Magazine = 8, Max = 32},
     SMG = {Magazine = 30, Max = 60},
     Scout = {Magazine = 5, Max = 10},
-} :: {[ItemTypes.AmmoType]: {Magazine: number, Max: number, [number]: nil}}
+}
+
+module.AmmoData = ammoData
 
 local function runCallback(plr: Player, event: InventoryEvent, equipment: Item, switching: boolean?)
     for _, v in listeners[event] do
@@ -47,6 +50,7 @@ function module.HasEquipment(plr: Player, equipment: Item): boolean
     return table.find(inventories[plr], equipment) ~= nil
 end
 
+module.AmmoBoxes = {} :: {[Instance]: number}
 local reserveAmmo: {[Player]: {[ItemTypes.AmmoType]: number?}?} = {}
 function module.GetReserve(player: Player, ammoType: ItemTypes.AmmoType?): number
     local plrStore = reserveAmmo[player]
@@ -192,6 +196,34 @@ function module.Drop(plr: Player, equipment: Item, position: Vector3)
     runCallback(plr, "Drop", equipment)
 end
 
+function module.DropAmmo(plr: Player, weapon: ItemTypes.Weapon)
+    local multiUse = weapon.Base.MultiUse
+    if not multiUse then
+        return
+    end
+    assert(typeof(multiUse) ~= "boolean")
+
+    local ammoType: ItemTypes.AmmoType = multiUse.AmmoType :: ItemTypes.AmmoType
+    if not ammoType then
+        return
+    end
+
+    local char = plr.Character
+    if not char then
+        return
+    end
+
+    local reserve = module.GetReserve(plr, ammoType)
+    if reserve <= 0 then
+        return
+    end
+
+    local box = ServerStorage.AmmoBoxes:FindFirstChild(ammoType.."_Ammo"):Clone()
+    module.NewAmmoBox(box, math.min(ammoData[ammoType].Magazine, reserve))
+    box:PivotTo(char:GetPivot().Position + char:GetPivot().LookVector * 10)
+    box.Parent = (ReplicatedStorage.RoundHandler.MapFolder.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
+end
+
 function module.ClearInventory(plr: Player)
     local equipment = inventories[plr]
     if not equipment then
@@ -281,6 +313,11 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
         end)
     end
     return itemInstance :: any
+end
+
+function module.NewAmmoBox(box: Instance, amount: number?): number
+    module.AmmoBoxes[box] = amount or ammoData[box.Name:split("_")[1]].Magazine
+    return module.AmmoBoxes[box]
 end
 
 if IS_CLIENT then
