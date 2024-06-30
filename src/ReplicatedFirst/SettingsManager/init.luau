@@ -196,7 +196,7 @@ module.AvailableSettings = {
 		Name = "Drop Ammo",
 		Tab = "Keybinds",
 		Category = "Items - Enable the checkbox to make a keybind toggled",
-		Tooltip = "Empties the currently equipped weapon's ammo into a box. Not all weapons can be emptied.",
+		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Z, nil :: any}}, Toggled=true},
@@ -470,6 +470,15 @@ module.AvailableSettings = {
 		Default = UDim2.fromScale(0.1, 0.5),
 		Callback = keybindCallback,
 	},
+	{
+		Name = "Drop Ammo Position",
+		Tab = "Touch",
+		Category = "Button Positions",
+		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
+		PossibleValues = "TouchPosition",
+		Default = UDim2.fromScale(0.1, 0.6),
+		Callback = keybindCallback,
+	},
 	
 	{
 		Name = "Primary Fire Scale",
@@ -516,6 +525,15 @@ module.AvailableSettings = {
 		Default = 1,
 		Callback = keybindCallback,
 	},
+	{
+		Name = "Drop Ammo",
+		Tab = "Touch",
+		Category = "Button Scale",
+		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
+		PossibleValues = "TouchScale",
+		Default = 1,
+		Callback = keybindCallback
+	}
 } :: {SettingDefinition}
 
 

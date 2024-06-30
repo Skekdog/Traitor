@@ -69,20 +69,32 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     end)
     
     ControlManager.Register("Drop", true, function()
-        local equipped = InventoryManager.GetEquipped(Players.LocalPlayer)
+        local equipped = InventoryManager.GetEquipped(plr)
         if not equipped then
             return Enum.ContextActionResult.Pass
         end
-        InventoryManager.Drop(Players.LocalPlayer, equipped, Vector3.zero)
+        InventoryManager.Drop(plr, equipped, Vector3.zero)
         return Enum.ContextActionResult.Sink
     end)
 
     ControlManager.Register("Reload Weapon", true, function()
-        local equipped = InventoryManager.GetEquipped(Players.LocalPlayer)
+        local equipped = InventoryManager.GetEquipped(plr)
         if not equipped then
             return Enum.ContextActionResult.Pass
         end
         ReplicatedStorage.ClientServer.ReloadWeapon:FireServer()
+        return Enum.ContextActionResult.Sink
+    end)
+
+    ControlManager.Register("Drop Ammo", true, function(action, state, input, toggled)
+        if state ~= Enum.UserInputState.End then
+            return Enum.ContextActionResult.Pass
+        end
+        local equipped = InventoryManager.GetEquipped(plr)
+        if not equipped then
+            return Enum.ContextActionResult.Pass
+        end
+        ReplicatedStorage.ClientServer.DropAmmo:FireServer()
         return Enum.ContextActionResult.Sink
     end)
 end)
@@ -95,6 +107,7 @@ InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item | 
     ControlManager.Unregister("Alternate Fire")
     ControlManager.Unregister("Drop")
     ControlManager.Unregister("Reload Weapon")
+    ControlManager.Unregister("Drop Ammo")
 
     roundInfo.Frame.AmmoBar.Visible = false
 end)
