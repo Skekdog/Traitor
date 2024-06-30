@@ -26,7 +26,7 @@ local function onDeath()
     roundInfo.Frame.HealthBar.Visible = false
 end
 
-Players.LocalPlayer.CharacterAdded:Connect(function(char)
+Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     script.Parent.ClientStorage:SetAttribute("IsSpectating", false)
 
     local hum = char:WaitForChild("Humanoid") :: Humanoid
@@ -38,6 +38,30 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
     hum:GetPropertyChangedSignal("Health"):Connect(function()
         setHealth(hum)
     end)
+
+    hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Flying, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false)
+    hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
+    
+    local root = char:WaitForChild("HumanoidRootPart", 2)
+    if root then
+        local run = root:WaitForChild("Running", 1)
+        local death = root:WaitForChild("Died", 1)
+        
+        if run then
+            run:Destroy()
+        end
+        if death then
+            death:Destroy()
+        end
+    end
 
     local camera = workspace.CurrentCamera
     while char.Parent do
