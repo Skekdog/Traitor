@@ -9,11 +9,12 @@ local camera = workspace.CurrentCamera
 local ui = uiManager.WaitForUI("Spectate")
 local uiO = ui.Object :: typeof(uiManager.UnregisteredUIs.Spectate)
 
+local lastKey = 0
 local function spectateFunc(action, state)
 	local chars = {}
 	for _, v in Players:GetPlayers() do
 		local char = v.Character
-		if char then
+		if char and v ~= plr then
 			local hum = char:FindFirstChildOfClass("Humanoid")
 			if hum and hum.Health > 0 then
 				table.insert(chars, hum)
@@ -25,22 +26,15 @@ local function spectateFunc(action, state)
 		uiO.Username.Text = "Nobody to spectate!"
 		return Enum.ContextActionResult.Pass
 	end
-
-	local lastKey = nil
-	for i, v in chars do
-		if v == camera.CameraSubject :: Humanoid then
-			lastKey = i
-		end
-	end
 	
+	local index: number
 	if action == "Spectate Next" then
-		if lastKey == #chars or not lastKey then lastKey = 0 end
-		camera.CameraSubject = chars[lastKey+1]
+		index = if chars[lastKey + 1] then lastKey + 1 else 1
 	elseif action == "Spectate Previous" then
-		if not lastKey then lastKey = 2 end
-		if lastKey == 1 then lastKey = #chars + 1 end
-		camera.CameraSubject = chars[lastKey-1]
+		index = if chars[lastKey - 1] then lastKey - 1 else #chars
 	end
+	lastKey = index
+	camera.CameraSubject = chars[index]
 	
 	uiO.Username.Text = ((camera.CameraSubject :: Humanoid).Parent :: Instance).Name
 	return Enum.ContextActionResult.Sink
@@ -49,6 +43,7 @@ end
 local clientStorage = ReplicatedFirst.ClientStorage
 clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
 	uiO.Username.Text = "Use buttons to spectate"
+	lastKey = 0
 	if clientStorage:GetAttribute("IsSpectating") then
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
