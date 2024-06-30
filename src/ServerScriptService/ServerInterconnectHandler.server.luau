@@ -1,19 +1,17 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
-local RoundHandler = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.RoundHandler)
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
+local GetRound = require(script.Parent.GetRound)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local WeaponsManager = require(script.Parent.WeaponsManager)
 
 local si = ReplicatedStorage.ServerInterconnect
 si.ExplosiveBarrel.Event:Connect(function(part: BasePart, participant: Types.ClientOwnParticipant?)
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
-		return
-	end
-
 	local plr
 	if participant then
-		plr = RoundHandler.GetRound(roundId):GetParticipant(participant.Player.Name)
+		local round = GetRound()
+		if round then
+			plr = round:GetParticipant(participant.Player.Name)
+		end
 	end
 	if part then
 		WeaponsManager.CreateExplosion(part.Position, {

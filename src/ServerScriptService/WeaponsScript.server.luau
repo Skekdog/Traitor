@@ -1,9 +1,9 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
-local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
-local ItemTypes = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.ItemTypes)
-local RoundHandler = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.RoundHandler)
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
+local GetRound = require(script.Parent.GetRound)
+local InventoryManager = require(ReplicatedFirst.InventoryManager)
+local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local WeaponsManager = require(script.Parent.WeaponsManager)
 
 local function allow(plr: Player, cameraRayInfo: Ray?, requireRayInfo: boolean?): (ItemTypes.Item? | ItemTypes.Weapon, Types.Participant?)
@@ -21,12 +21,10 @@ local function allow(plr: Player, cameraRayInfo: Ray?, requireRayInfo: boolean?)
         return
     end
 
-    local roundId = ServerStorage:GetAttribute("RoundID")
-    if not roundId then
+    local round = GetRound()
+    if not round then
         return
     end
-
-    local round = RoundHandler.GetRound(roundId)
     return weapon, round:GetParticipant(plr.Name)
 end
 

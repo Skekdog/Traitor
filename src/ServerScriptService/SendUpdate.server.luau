@@ -12,6 +12,4 @@ profile:Release()
 
 --todo in future update:
 -- new maps (siberia and remake nuketown)
--- fix primary fire not respecting settings
--- roundhandler v2
 -- ladders

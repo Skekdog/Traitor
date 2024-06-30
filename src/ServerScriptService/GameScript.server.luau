@@ -3,6 +3,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
+local GetRound = require(script.Parent.GetRound)
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -23,15 +24,18 @@ getMaps.OnServerInvoke = function()
 end
 
 slayVote.OnServerEvent:Connect(function(plr, target: Player?)
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if (not roundId) or (typeof(target) ~= "Instance")  then
+	if typeof(target) ~= "Instance" then
 		return
 	end
 	if target.ClassName ~= "Player" then
 		return
 	end
 
-	local round = RoundHandler.GetRound(roundId)
+	local round = GetRound()
+	if not round then
+		return
+	end
+	
 	local voterParticipant = round:GetParticipant(plr.Name)
 	local targetParticipant = round:GetParticipant(target.Name)
 	if voterParticipant and targetParticipant then
@@ -48,12 +52,11 @@ for _, v in script.Parent.Gamemodes:GetChildren() do
 end
 
 remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: string?)
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId or not target then
+	local round = GetRound()
+	if not round or typeof(target) ~= "string" then
 		return
 	end
 
-	local round = RoundHandler.GetRound(roundId)
 	local targetParticipant = round:GetParticipant(target)
 	local participant = round:GetParticipant(plr.Name)
 
@@ -73,12 +76,11 @@ remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: 
 		return
 	end
 
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
+	local round = GetRound()
+	if not round then
 		return "NoRound"
 	end
 
-	local round = RoundHandler.GetRound(roundId)
 	local participant = round:GetParticipant(plr.Name)
 	if not participant then
 		return "NotInRound"
@@ -97,12 +99,10 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 		return
 	end
 
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
+	local round = GetRound()
+	if not round then
 		return
 	end
-
-	local round = RoundHandler.GetRound(roundId)
 	local participant = round:GetParticipant(plr.Name)
 
 	local corpseParticipant: Types.Participant?
@@ -141,12 +141,11 @@ local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
 
 local function sendRoundInfo(plr: Player?)
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then
+	local round = GetRound()
+	if not round then
 		return
 	end
 
-	local round = RoundHandler.GetRound(roundId)
 	local gm = round.Gamemode
 
 	if plr then
@@ -162,15 +161,15 @@ local function sendRoundInfo(plr: Player?)
 end
 
 joinRound.OnServerInvoke = function(plr)
-	local round: Types.Round
-	local roundId = ServerStorage:GetAttribute("RoundID")
+	local round = GetRound()
 
-	if not roundId then
+	if not round then
 		if not nextRoundReady then
 			return
 		end
 		local gamemode = gamemodes[math.random(1, #gamemodes)]
 		round = RoundHandler.CreateRound(nextMap, gamemode)
+		assert(round)
 		ServerStorage:SetAttribute("RoundID", round.ID)
 		local votes: {[string]: {number}} = {}
 		local voteCon: RBXScriptConnection?
@@ -258,9 +257,9 @@ joinRound.OnServerInvoke = function(plr)
 
 		roundPhaseChange("Waiting")
 		roundEventCon = round.RoundPhaseChangeEvent.Event:Connect(roundPhaseChange)
-	else
-		round = RoundHandler.GetRound(roundId)
 	end
+
+	assert(round)
 	
 	if not round:GetParticipant(plr.Name) then
 		local participant = round:JoinRound(plr)

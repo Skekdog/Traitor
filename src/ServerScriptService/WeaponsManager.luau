@@ -2,11 +2,11 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
-local ShatterGlass = require(script.Parent.Parent.ReplicatedFirst.ShatterGlass)
+local GetRound = require(script.Parent.GetRound)
+local InventoryManager = require(ReplicatedFirst.InventoryManager)
+local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
 local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
-local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 local API = require(ReplicatedFirst.API)
 
 local module = {}
@@ -175,15 +175,15 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
 	end)
     sound:Play()
 
-    local round
+    local round: Types.Round?
     if attacker then
         round = attacker.Round
     else
-        local roundId = ServerStorage:GetAttribute("RoundID")
-        if not roundId then
-            return
-        end
-        round = RoundHandler.GetRound(roundId)
+        round = GetRound()
+    end
+
+    if not round then
+        return
     end
 
     local props = round.Map:FindFirstChild("Props")
@@ -240,8 +240,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
-    local roundId = ServerStorage:GetAttribute("RoundID")
-    local round = RoundHandler.GetRound(roundId)
+    local round = GetRound()
     if not round then
         return
     end

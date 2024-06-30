@@ -1,16 +1,14 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerStorage = game:GetService("ServerStorage")
 local TS = game:GetService("TweenService")
-local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
+local GetRound = require(script.Parent.GetRound)
 
 ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: BasePart & {Parent: Instance})
 	local char = plr.Character :: Model & {Humanoid: Humanoid, PrimaryPart: BasePart}
 
-	local roundId = ServerStorage:GetAttribute("RoundID")
-	if not roundId then return end
-
-	local round = RoundHandler.GetRound(roundId)
+	local round = GetRound()
+	if not round then
+		return
+	end
 	
 	if char then
 		local hum = char.Humanoid
