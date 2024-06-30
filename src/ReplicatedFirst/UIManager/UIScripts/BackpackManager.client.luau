@@ -2,9 +2,9 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
-local ControlManager = require(script.Parent.Parent.Parent.ControlManager)
-local InventoryManager = require(script.Parent.Parent.Parent.InventoryManager)
-local ItemTypes = require(script.Parent.Parent.Parent.ItemsManager.ItemTypes)
+local ControlManager = require(ReplicatedFirst.ControlManager)
+local InventoryManager = require(ReplicatedFirst.InventoryManager)
+local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local plr = Players.LocalPlayer

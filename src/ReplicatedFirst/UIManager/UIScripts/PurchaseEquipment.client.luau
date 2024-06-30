@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
-local PingRadar = require(script.Parent.Parent.Parent.PingRadar)
-local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
+local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
+local PingRadar = require(ReplicatedFirst.PingRadar)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local API = require(ReplicatedFirst.API)

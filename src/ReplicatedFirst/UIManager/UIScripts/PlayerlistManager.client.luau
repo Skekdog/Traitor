@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CorpseInfo = require(script.Parent.CorpseInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(script.Parent.Parent)
-local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
+local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local info = ui.Info

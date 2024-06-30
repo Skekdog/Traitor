@@ -1,7 +1,8 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(script.Parent.Parent)
-local API = require(script.Parent.Parent.Parent.API)
-local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
+local API = require(ReplicatedFirst.API)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo")
 local object = (corpseUi.Object :: typeof(UIManager.UnregisteredUIs.CorpseInfo)).CorpseInfo

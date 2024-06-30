@@ -1,6 +1,6 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SettingsManager = require(script.Parent.Parent.Parent.SettingsManager)
+local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local UIManager = require(ReplicatedFirst.UIManager)
 local UI = UIManager.WaitForUI("Credits")

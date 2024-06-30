@@ -1,6 +1,6 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
+local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local uiManager = require(ReplicatedFirst.UIManager)
