@@ -116,7 +116,7 @@ params.CollisionGroup = "Raycasts"
 
 local interactTarget: Instance?
 RunService.PostSimulation:Connect(function()
-    params.FilterDescendantsInstances = {plr.Character}
+    params.FilterDescendantsInstances = {plr.Character :: Model}
     local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10, params)
 
     if result then

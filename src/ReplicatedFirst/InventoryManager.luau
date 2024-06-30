@@ -219,9 +219,12 @@ function module.DropAmmo(plr: Player, weapon: ItemTypes.Weapon)
         return
     end
 
-    local box = ServerStorage.AmmoBoxes:FindFirstChild(ammoType.."_Ammo"):Clone()
-    module.NewAmmoBox(box, math.min(ammoData[ammoType].Magazine, reserve))
-    box:PivotTo(char:GetPivot().Position + char:GetPivot().LookVector * 10)
+    local amount = math.min(ammoData[ammoType].Magazine, reserve)
+    module.SetReserve(plr, ammoType, reserve - amount)
+
+    local box = ServerStorage.AmmoBoxes:FindFirstChild(ammoType.."_Ammo"):Clone() :: PVInstance
+    module.NewAmmoBox(box, amount)
+    box:PivotTo(CFrame.new(char:GetPivot().Position + char:GetPivot().LookVector * 10))
     box.Parent = (ReplicatedStorage.RoundHandler.MapFolder.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
 end
 
