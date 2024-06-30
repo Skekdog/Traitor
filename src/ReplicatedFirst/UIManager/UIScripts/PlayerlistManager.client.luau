@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CorpseInfo = require(script.Parent.CorpseInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(script.Parent.Parent)
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
@@ -89,7 +90,7 @@ local function createPlr(plr: Player)
 	clone.MouseButton1Click:Connect(function()
 		local order = (clone.LayoutOrder // 1000) * 1000
 		if order == layoutOrders["Dead"] or order == layoutOrders["Missing"] then
-			ReplicatedFirst.ClientStorage.ScriptConnections.ShowCorpseEvent:Fire(ReplicatedStorage.RoundHandler.SearchCorpse:InvokeServer(plr.Name))
+			CorpseInfo(ReplicatedStorage.RoundHandler.SearchCorpse:InvokeServer(plr.Name))
 		end
 	end)
 

@@ -1,11 +1,10 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local plr = Players.LocalPlayer
 
-ReplicatedFirst.ClientStorage.ScriptConnections.PingRadarEvent.Event:Connect(function()
-	workspace.RadarPoints:ClearAllChildren()
+return function()
+    workspace.RadarPoints:ClearAllChildren()
 	
 	local info = LocalRoundInfo.GetAllParticipants()
 	for _, v in info do
@@ -18,7 +17,7 @@ ReplicatedFirst.ClientStorage.ScriptConnections.PingRadarEvent.Event:Connect(fun
 			continue
 		end
 
-		local root = char:FindFirstChild("HumanoidRootPart") :: BasePart
+		local root = char.PrimaryPart
 		local hum = char:FindFirstChildOfClass("Humanoid")
 
 		if not root or not hum or hum.Health <= 0 then
@@ -31,4 +30,4 @@ ReplicatedFirst.ClientStorage.ScriptConnections.PingRadarEvent.Event:Connect(fun
 		clone.RadarPoint.Enabled = true
 		clone.Parent = workspace.RadarPoints :: any
 	end
-end)
+end

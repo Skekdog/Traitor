@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
+local PingRadar = require(script.Parent.Parent.Parent.PingRadar)
 local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
 local UIManager = require(ReplicatedFirst.UIManager)
 
@@ -42,7 +43,7 @@ local function radar()
 		stop = true
 	end)
 	while not stop do
-		ReplicatedFirst.ClientStorage.ScriptConnections.PingRadarEvent:Fire()
+		PingRadar()
 		task.wait(radarCooldown)
 	end
 end

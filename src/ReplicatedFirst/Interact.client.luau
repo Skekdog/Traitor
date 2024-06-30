@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
+local CorpseInfo = require(script.Parent.UIManager.UIScripts.CorpseInfo)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local Controls = require(ReplicatedFirst.ControlManager)
 
@@ -34,7 +35,7 @@ Controls.Register("Interact", true, function(action, state, input, toggled)
 	local model = ray.Instance:FindFirstAncestorOfClass("Model")
 	if model then
 		if model:GetAttribute("IsCorpse") then
-			ReplicatedFirst.ClientStorage.ScriptConnections.ShowCorpseEvent:Fire(RS.RoundHandler.SearchCorpse:InvokeServer(model))
+			CorpseInfo(RS.RoundHandler.SearchCorpse:InvokeServer(model))
 			return Enum.ContextActionResult.Sink
 		end
 	end

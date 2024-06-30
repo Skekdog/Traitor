@@ -1,5 +1,4 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(script.Parent.Parent)
 local API = require(script.Parent.Parent.Parent.API)
 local Types = require(script.Parent.Parent.Parent.RoundHandler.Types)
@@ -33,7 +32,15 @@ local flavourImages: {[Types.MurderWeapon]: string} = {
     Suicide = "rbxassetid://17079244437"
 }
 
-ReplicatedFirst.ClientStorage.ScriptConnections.ShowCorpseEvent.Event:Connect(function(corpseInfo: Types.CorpseInfo?)
+for _, v in object:GetChildren() do
+    if v:IsA("ImageButton") then
+        v.MouseButton1Click:Connect(function()
+            object.Parent.Information.Text = v:GetAttribute("Description")
+        end)
+    end
+end
+
+return function(corpseInfo: Types.CorpseInfo?)
     if not corpseInfo then
         return
     end
@@ -113,12 +120,4 @@ ReplicatedFirst.ClientStorage.ScriptConnections.ShowCorpseEvent.Event:Connect(fu
     task.defer(Players.GetUserThumbnailAsync, Players, corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
 
     corpseUi:ToggleVisible(true)
-end)
-
-for _, v in object:GetChildren() do
-    if v:IsA("ImageButton") then
-        v.MouseButton1Click:Connect(function()
-            object.Parent.Information.Text = v:GetAttribute("Description")
-        end)
-    end
 end
