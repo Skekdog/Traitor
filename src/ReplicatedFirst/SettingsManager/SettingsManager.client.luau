@@ -30,8 +30,6 @@ local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 local Controls = require(ReplicatedFirst.ControlManager)
 
-local TS = game:GetService("TweenService")
-
 local pageBase = script.__TabPage
 local tabBase = script.__Tab
 
@@ -52,6 +50,7 @@ end
 
 local UNDERLINE_TRANSITION_SCALE = 0.125
 local function transitionUnderline(underline: Frame, target: TextButton)
+	local shouldAnimate = SM.GetSetting("Animate UI Transitions")
 	local UNDERLINE_TRANSITION_TIME = SM.GetSetting("Animate UI Transitions") and 0.5 or 0
 	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, 0, 3)
 	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, 0, 3)
@@ -59,43 +58,44 @@ local function transitionUnderline(underline: Frame, target: TextButton)
 	local newPosition = UDim2.fromScale(target.Position.X.Scale + (target.Size.X.Scale / 2), 1)
 	
 	-- Tween size to be smaller
-	local halfSizeTween = TS:Create(underline, TweenInfo.new(
-		UNDERLINE_TRANSITION_TIME / 2,
-		Enum.EasingStyle.Exponential,
-		Enum.EasingDirection.Out
-	),
-		{ Size = halfSize }
-	)
-	halfSizeTween.Completed:Once(function()
-		-- Return to original size
-		TS:Create(underline, TweenInfo.new(
+	if shouldAnimate then
+		local halfSizeTween = API.Animate(underline, TweenInfo.new(
 			UNDERLINE_TRANSITION_TIME / 2,
 			Enum.EasingStyle.Exponential,
 			Enum.EasingDirection.Out
-			),
-			{ Size = fullSize }
-		):Play()
-	end)
-	halfSizeTween:Play()
+		),
+			{ Size = halfSize }
+		)
+		assert(halfSizeTween)
+		halfSizeTween.Completed:Once(function()
+			-- Return to original size
+			API.Animate(underline, TweenInfo.new(
+				UNDERLINE_TRANSITION_TIME / 2,
+				Enum.EasingStyle.Exponential,
+				Enum.EasingDirection.Out
+				),
+				{ Size = fullSize }
+			)
+		end)
+	end
 	
 	-- Tween position
-	TS:Create(underline, TweenInfo.new(
+	API.Animate(underline, TweenInfo.new(
 		UNDERLINE_TRANSITION_TIME,
 		Enum.EasingStyle.Exponential,
 		Enum.EasingDirection.Out
 		),
-	{ Position = newPosition }):Play()
+	{ Position = newPosition })
 end
 
 local function transitionSwitch(target: Frame, disabled: boolean)
-	local SWITCH_TRANSITION_TIME = SM.GetSetting("Animate UI Transitions") and 0.25 or 0
 	-- Disabled if transitioning to green
 	disabled = not disabled
 	-- I confused myself and now I don't know what disabled actually means I just know that it does the wrong thing if you don't invert it
 	local switch = target:FindFirstChild("Switch") :: TextLabel
 	API.Animate(switch,
 		TweenInfo.new(
-			SWITCH_TRANSITION_TIME,
+			0.25,
 			Enum.EasingStyle.Quad
 		), {
 			Position = UDim2.fromScale(disabled and 0.9 or 0.1, 0.5)
@@ -103,7 +103,7 @@ local function transitionSwitch(target: Frame, disabled: boolean)
 	)
 	API.Animate(target,
 		TweenInfo.new(
-			SWITCH_TRANSITION_TIME,
+			0.25,
 			Enum.EasingStyle.Quad
 		), {
 			BackgroundColor3 = disabled and Color3.fromRGB(189, 0, 0) or Color3.fromRGB(47, 189, 47)
