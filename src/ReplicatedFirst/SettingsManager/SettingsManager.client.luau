@@ -177,8 +177,10 @@ UIS.TouchTap:Connect(function(posVectors, proc)
 	if not darken.Visible then return end
 	if darken:GetAttribute("OpenedAt") > (os.time() - 0.001) then return end -- For some reason taps are sometimes detected immediately after
 	local name = darken:GetAttribute("DisplayName")
-	local posVector = posVectors[1]
-	local pos = UDim2.fromOffset(posVector.X+GUI:GetGuiInset().X, posVector.Y+GUI:GetGuiInset().Y)
+	local posVector: Vector2 = posVectors[1]
+
+	local inset = GUI:GetGuiInset()
+	local pos = UDim2.fromOffset(posVector.X + inset.X, posVector.Y + inset.Y)
 	CAS:GetButton(name).Position = pos
 end)
 

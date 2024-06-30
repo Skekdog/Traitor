@@ -121,6 +121,7 @@ LocalRoundInfo.Listen("RoundPhase", function(p)
     local phase: Types.RoundPhase = p :: Types.RoundPhase
     if phase == "Destroy" then
         workspace.Projectiles:ClearAllChildren()
+        workspace.RadarPoints:ClearAllChildren()
     end
 end)
 

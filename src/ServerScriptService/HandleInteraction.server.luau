@@ -4,7 +4,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local TS = game:GetService("TweenService")
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 
-ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr, part: BasePart & {Parent: Instance})
+ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: BasePart & {Parent: Instance})
 	local char = plr.Character :: Model & {Humanoid: Humanoid, PrimaryPart: BasePart}
 
 	local roundId = ServerStorage:GetAttribute("RoundID")

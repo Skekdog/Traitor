@@ -47,8 +47,6 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
     return damage
 end
 
-
-
 type Entity = Types.Participant | Types.Prop
 local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, part: BasePart, distance: number, direction: Vector3): ()
     local damage = calculateDamage(attacker, weapon, part, distance)
@@ -79,7 +77,6 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
                 end
                 part:ApplyImpulse(-direction * force)
             end
-
 
             if weapon.BeforeHitParticipant then
                 if weapon.BeforeHitParticipant(attacker, entity, willDie, part.Name) then

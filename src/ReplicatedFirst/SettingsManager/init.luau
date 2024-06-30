@@ -40,7 +40,7 @@ export type Setting = KeybindSetting | string | boolean | UDim2 | number -- Sele
 
 local module = {}
 
-local function keybindCallback(val, name)
+local function keybindCallback(val: any, name: any) -- annoying luau does not let me assert that val is a keybind
 	local updated = script.SettingUpdated
 	updated:Fire(name, val)
 end
@@ -190,6 +190,16 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.UserInputType.MouseButton1, nil :: any}}, Toggled=false},
+		Callback = keybindCallback,
+	},
+	{
+		Name = "Drop Ammo",
+		Tab = "Keybinds",
+		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Empties the currently equipped weapon's ammo into a box. Not all weapons can be emptied.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes={{Enum.KeyCode.Z, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{

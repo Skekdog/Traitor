@@ -1,5 +1,5 @@
 local Players = game:GetService("Players")
-Players.LocalPlayer.CharacterAdded:Connect(function(char)
+Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     local hum = char:WaitForChild("Humanoid") :: Humanoid
     hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)

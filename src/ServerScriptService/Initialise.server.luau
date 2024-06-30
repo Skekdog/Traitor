@@ -43,7 +43,7 @@ local function isAdmin(plr: Player)
 	return plr.UserId == meId or plr.UserId < 0
 end
 
-Players.PlayerAdded:Connect(function(plr)
+Players.PlayerAdded:Connect(function(plr): ()
 	if ServerStorage:GetAttribute("ServerLocked") then
 		return plr:Kick("This server is shutting down.")
 	end
