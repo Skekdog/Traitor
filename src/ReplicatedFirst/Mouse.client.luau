@@ -120,6 +120,9 @@ RunService.PostSimulation:Connect(function()
     params.FilterDescendantsInstances = {plr.Character :: Model}
     local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10, params)
 
+	playerInfo.Visible = false
+	corpseHint.Visible = false
+	
     if result then
         interactTarget = result.Instance
         assert(interactTarget)
