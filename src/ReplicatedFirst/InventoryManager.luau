@@ -214,13 +214,22 @@ function module.DropAmmo(plr: Player, weapon: ItemTypes.Weapon)
         return
     end
 
-    local reserve = module.GetReserve(plr, ammoType)
-    if reserve <= 0 then
+    -- this is if we want to use reserve ammo
+
+    -- local reserve = module.GetReserve(plr, ammoType)
+    -- if reserve <= 0 then
+    --     return
+    -- end
+    -- local amount = math.min(ammoData[ammoType].Magazine, reserve)
+    -- module.SetReserve(plr, ammoType, reserve - amount)
+
+    local amount = weapon.CurrentAmmo
+    if amount <= 0 then
         return
     end
 
-    local amount = math.min(ammoData[ammoType].Magazine, reserve)
-    module.SetReserve(plr, ammoType, reserve - amount)
+    weapon.CurrentAmmo = 0
+    module.UpdateAmmo(plr)
 
     local box = ServerStorage.AmmoBoxes:FindFirstChild(ammoType.."_Ammo"):Clone() :: PVInstance
     module.NewAmmoBox(box, amount)
