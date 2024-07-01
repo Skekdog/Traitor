@@ -35,6 +35,7 @@ serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, posit
     impactHole.CanCollide = false
     impactHole.CanTouch = false
     impactHole.CanQuery = false
+    impactHole.Massless = true
     
     local impactDecal = Instance.new("Decal")
     impactDecal.Texture = "rbxassetid://130624105"

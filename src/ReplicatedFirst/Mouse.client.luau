@@ -5,6 +5,7 @@ local UserInputService = game:GetService("UserInputService")
 local ControlManager = require(script.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
+local CorpseInfo = require(script.Parent.UIManager.UIScripts.CorpseInfo)
 
 local plr = Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -145,8 +146,18 @@ ControlManager.Register("Interact", true, function(action, state, input, toggled
     end
 	local map = LocalRoundInfo.GetMap()
 
+	if not map then
+		return Enum.ContextActionResult.Pass
+	end
+
+	local model = interactTarget:FindFirstAncestorOfClass("Model")
+	if model and model:GetAttribute("IsCorpse") then
+		CorpseInfo(ReplicatedStorage.RoundHandler.SearchCorpse:InvokeServer(model))
+		return Enum.ContextActionResult.Sink
+	end
+
 	local char = plr.Character
-	if not char or not map then
+	if not char then
 		return Enum.ContextActionResult.Pass
 	end
 

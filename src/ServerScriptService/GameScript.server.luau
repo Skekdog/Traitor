@@ -23,7 +23,7 @@ getMaps.OnServerInvoke = function()
 	return names
 end
 
-slayVote.OnServerEvent:Connect(function(plr, target: Player?)
+slayVote.OnServerEvent:Connect(function(plr, target: any?)
 	if typeof(target) ~= "Instance" then
 		return
 	end
@@ -51,7 +51,7 @@ for _, v in script.Parent.Gamemodes:GetChildren() do
 	end
 end
 
-remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: string?)
+remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: any?)
 	local round = GetRound()
 	if not round or typeof(target) ~= "string" then
 		return
@@ -71,7 +71,7 @@ remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: string?)
 	remotes.SendCorpseInfo:FireClient(plr, targetParticipant:ViewCorpse())
 end)
 
-remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: string?)
+remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: any?)
 	if not equipmentName then
 		return
 	end
