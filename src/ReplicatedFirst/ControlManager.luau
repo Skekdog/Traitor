@@ -132,10 +132,10 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 			if (not toggled) and ((state == Enum.UserInputState.Begin) or (state == Enum.UserInputState.End)) then show = true end
 
 			if show then
-				callback(action, state, input, toggled)
+				return callback(action, state, input, toggled)
 			end
 		end
-		return
+		return Enum.ContextActionResult.Pass
 	end, createTouchButton, table.unpack(triggers))
 	
 	module.SetupTouchButton(actionName)

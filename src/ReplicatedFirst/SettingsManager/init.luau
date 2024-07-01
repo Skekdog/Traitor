@@ -229,7 +229,7 @@ module.AvailableSettings = {
 		Tooltip = "For aiming weapons or using the alternate item function.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.UserInputType.MouseButton2, nil :: any}, {Enum.KeyCode.ButtonL2 :: any, nil :: any}}, Toggled=false},
+		Default = {Keycodes={{Enum.UserInputType.MouseButton2, nil :: any}, {Enum.KeyCode.ButtonL2 :: any, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
 	{
@@ -238,6 +238,7 @@ module.AvailableSettings = {
 		Category = "Gameplay",
 		Tooltip = "General interaction",
 		PossibleValues = "Keybind",
+		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.F, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=true},
 		Callback = keybindCallback,
 	},
@@ -538,15 +539,16 @@ module.AvailableSettings = {
 
 
 for _, v in module.AvailableSettings do
-	module.Settings[v.Name] = v.Default
+	module.Settings[v.Name] = {Value = v.Default, Definition = v}
 end
 
 function module.SetSetting(setting: string, settingValue: Setting)
-	module.Settings[setting] = settingValue
+	module.Settings[setting].Value = settingValue
+	module.Settings[setting].Definition.Callback(settingValue, setting)
 end
 
 function module.GetSetting(settingName: string): Setting
-	return module.Settings[settingName]
+	return module.Settings[settingName].Value
 end
 
 -- This whole section of serialisation is horrid but it works
@@ -565,11 +567,12 @@ end
 function module.JSONEncode(): string
 	local toEncode = {}
 	for i, v in module.Settings do
-		local converted: any = v
-		if typeof(v) == "UDim2" then
-			converted = {v.X.Scale, v.X.Offset, v.Y.Scale, v.Y.Offset}
-		elseif (typeof(v) == "table") and v.Keycodes then
-			converted = keybindToJson(v)
+		local value = v.Value
+		local converted: any = value
+		if typeof(value) == "UDim2" then
+			converted = {value.X.Scale, value.X.Offset, value.Y.Scale, value.Y.Offset}
+		elseif (typeof(value) == "table") and value.Keycodes then
+			converted = keybindToJson(value)
 		end
 		toEncode[i] = converted
 	end

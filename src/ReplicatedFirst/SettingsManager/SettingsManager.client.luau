@@ -15,15 +15,13 @@ end
 local options = (ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).LoadSavedData.OnClientEvent:Wait()
 options = SM.JSONDecode(options)
 for i, v in options do
-	SM.SetSetting(i, v)
-	-- this sucks
-	for _, b in SM.AvailableSettings do
-		if b.Name == i then
-			task.spawn(b.Callback, v)
-			break
-		end
+	local definition = SM.Settings[i].Definition
+	if definition.SpecifyToggle == false then
+		v.Toggled = (definition.Default :: SM.KeybindSetting).Toggled
 	end
+	SM.SetSetting(i, v)
 end
+
 ReplicatedFirst:SetAttribute("ControlsReady", true)
 
 local API = require(ReplicatedFirst.API)
@@ -227,7 +225,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			local newVal = not SM.GetSetting(name)
 			SM.SetSetting(name, newVal)
 			transitionSwitch(frame.Value, newVal)
-			setting.Callback(newVal, name)
 		end)
 		f = frame
 	elseif type(settingType) == "table" then
@@ -254,7 +251,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			table.insert(opts, opt)
 			opt.MouseButton1Click:Connect(function()
 				SM.SetSetting(name, v)
-				setting.Callback(v, name)
 				for _, p in opts do
 					p.Text = p.Name
 				end
@@ -316,7 +312,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 					local binds = SM.GetSetting(name) :: any
 					table.remove(binds.Keycodes, table.find((binds :: any).Keycodes, setBinds))
 					SM.SetSetting(name, binds)
-					setting.Callback(binds, name)
 
 					bind:Destroy()
 					local sep
@@ -345,7 +340,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				local cur = SM.GetSetting(name) :: any
 				cur.Toggled = not cur.Toggled
 				SM.SetSetting(name, cur)
-				setting.Callback(cur, name)
 				
 				toggleButton.Image = cur.Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
 			end)
@@ -376,7 +370,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				if msg then msg:Destroy() end
 				updateBinds({t})
 				API.ScreenMessage("Success", "Keybinding updated!")
-				setting.Callback(cur, name)
 				CAS:UnbindAction("SelectKeybind")
 				return
 			end, false, 100000, Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Keyboard, Enum.UserInputType.Gamepad1, Enum.UserInputType.MouseButton3)

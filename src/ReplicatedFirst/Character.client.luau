@@ -81,9 +81,6 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     end)
     
     ControlManager.Register("Alternate Fire", true, function(action, state, input, toggled)
-        if state ~= Enum.UserInputState.End then
-            return Enum.ContextActionResult.Pass
-        end
         ReplicatedStorage.ClientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
         return Enum.ContextActionResult.Sink
     end)
@@ -107,9 +104,6 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     end)
 
     ControlManager.Register("Drop Ammo", true, function(action, state, input, toggled)
-        if state ~= Enum.UserInputState.End then
-            return Enum.ContextActionResult.Pass
-        end
         local equipped = InventoryManager.GetEquipped(plr)
         if not equipped then
             return Enum.ContextActionResult.Pass
