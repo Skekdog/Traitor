@@ -268,7 +268,7 @@ local module: Types.Adapter = {
         return false
     end,
 
-    SendMessage = function(message, severity, messageType, recipients: true | {Types.Participant})
+    SendMessage = function(message: string, severity: Types.MessageSeverity, messageType: Types.MessageType, recipients: true | {Types.Participant})
         -- If isGlobal = true, then recipients is empty. The adapter is expected to send this message to all connected players (Players:GetPlayers()).
         -- Sends a private server message to each recipient.
         -- The message can be further processed here, such as using rich text to change text colour depending on severity.

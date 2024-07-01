@@ -122,7 +122,6 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 		table.insert(triggers, v[1])
 		modifiers[v[1]] = v[2]
 	end
-	
 	CAS:BindAction(actionName, function(action, state, input: InputObject)
 		local inp = input.KeyCode or input.UserInputType
 		
