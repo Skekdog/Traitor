@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local ServerStorage = game:GetService("ServerStorage")
 local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local ProfileService = require(script.Parent.ProfileService)
 
@@ -12,8 +11,6 @@ module.ProfileTemplate = {
 	TotalPoints = 0,
 	AvailablePoints = 0,
 	PurchasedAccessories = {},
-	BannedUntil = 0,
-	BanReason = "",
 }
 
 type PlayerData = typeof(module.ProfileTemplate)
@@ -66,9 +63,6 @@ function module.UpdateProfile(plr: Player, key: string, value: string | number):
 end
 
 function module.ReleaseAllProfiles(): ()
-    if ServerStorage:GetAttribute("ServerLocked") then
-        return
-    end
     for _, v in profiles do
 		v:Save()
 		v:Release()

@@ -1,24 +1,8 @@
 local HTTPService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UserInputService = game:GetService("UserInputService")
 
-local LocalRoundInfo: typeof(require(script.Parent.LocalRoundInfo))
 local Types = require(script.Parent.RoundHandler.Types)
-
--- This module also gets called from the server. Might be better to move the JSONEncode and Decode to elsewhere (like say, the server because THATS THE ONLY ONE THAT USES THOSE!)
-local UIScript, uiThemes
-local UI: typeof(require(ReplicatedFirst.UIManager))
-if game:GetService("RunService"):IsClient() then
-	LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-	UIScript = ReplicatedFirst.UIManager
-	UI = (require)(UIScript)
-	
-	uiThemes = {}
-	for i, _ in UI.Themes do
-		table.insert(uiThemes, i)
-	end
-end
 
 export type SettingDefinition = {
 	Name: string,
@@ -28,7 +12,7 @@ export type SettingDefinition = {
 	PossibleValues: {string} | "Boolean" | "Keybind" | "TouchPosition" | "TouchScale",
 	Default: Setting,
 	SpecifyToggle: boolean?, -- Whether the user can change if this is toggled or not. Only for keybinds.
-	Callback: (val: Setting?, name: string?) -> nil,
+	Callback: ((val: Setting?, name: string?) -> ())?,
 }
 
 export type Keybind = Enum.UserInputType | Enum.KeyCode
@@ -66,7 +50,7 @@ module.AvailableSettings = {
 		PossibleValues = "Boolean",
 		Default = false,
 		Callback = function(val)
-			local map = LocalRoundInfo.GetMap()
+			local map = require(script.Parent.LocalRoundInfo).GetMap()
 			if not map then
 				return
 			end
@@ -112,10 +96,10 @@ module.AvailableSettings = {
 		Tab = "Display",
 		Category = "User Interface",
 		Tooltip = "Select a theme for the UI.",
-		PossibleValues = uiThemes :: {string},
+		PossibleValues = {"Dark", "Light", "Blue"},
 		Default = "Dark",
 		Callback = function(val) -- Can't directly reference UI.UpdateTheme because this module gets called from the server blah blah blah this sucks
-			UI.UpdateTheme(val :: string)
+			require(script.Parent.UIManager).UpdateTheme(val :: string)
 		end,
 	},
 	{
@@ -125,7 +109,6 @@ module.AvailableSettings = {
 		Tooltip = "",
 		PossibleValues = {"0", "0.25", "0.5", "0.75"},
 		Default = "0.75",
-		Callback = function() end,
 	},
 	{
 		Name = "Close Speed",
@@ -134,7 +117,6 @@ module.AvailableSettings = {
 		Tooltip = "",
 		PossibleValues = {"0.2", "0.3", "0.4", "0.5"},
 		Default = "0.75",
-		Callback = function() end,
 	},
 	{
 		Name = "Animate UI Transitions",
@@ -143,7 +125,6 @@ module.AvailableSettings = {
 		Tooltip = "Enables animated transitions for all UI.",
 		PossibleValues = "Boolean",
 		Default = true,
-		Callback = function() end,
 	},
 	{
 		Name = "Always Show Sidebar",
@@ -156,7 +137,7 @@ module.AvailableSettings = {
 			if not UserInputService.KeyboardEnabled then
 				return
 			end
-			local sidebar = UI.WaitForUI("Sidebar")
+			local sidebar = require(script.Parent.UIManager).WaitForUI("Sidebar")
 			if sidebar then
 				sidebar:ToggleVisible(val :: boolean)
 			end
@@ -169,7 +150,9 @@ module.AvailableSettings = {
 		Tooltip = "Hidden - Menus are not visible behind other menus, but are shown again when the menu is closed.\nClosed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
 		PossibleValues = {"Hidden", "Closed", "Stacked"},
 		Default = "Hidden",
-		Callback = function(val) UIScript:SetAttribute("BackgroundMenuMode", val) end,
+		Callback = function(val)
+			script.Parent.UIManager:SetAttribute("BackgroundMenuMode", val)
+		end,
 	},
 	
 	{
@@ -179,7 +162,6 @@ module.AvailableSettings = {
 		Tooltip = "Toggles automatic snapping to ladders. Ladders can still be manually used.",
 		PossibleValues = "Boolean",
 		Default = true,
-		Callback = function() end,
 	},
 	
 	{
@@ -543,8 +525,11 @@ for _, v in module.AvailableSettings do
 end
 
 function module.SetSetting(setting: string, settingValue: Setting)
-	module.Settings[setting].Value = settingValue
-	module.Settings[setting].Definition.Callback(settingValue, setting)
+	local ref = module.Settings[setting]
+	ref.Value = settingValue
+	if ref.Definition.Callback then
+		ref.Definition.Callback(settingValue, setting)
+	end
 end
 
 function module.GetSetting(settingName: string): Setting
