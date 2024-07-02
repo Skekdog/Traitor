@@ -6,8 +6,12 @@ local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local WeaponsManager = require(script.Parent.WeaponsManager)
 
-local function allow(plr: Player, cameraRayInfo: Ray?, requireRayInfo: boolean?): (ItemTypes.Item? | ItemTypes.Weapon, Types.Participant?)
+local function allow(plr: Player, cameraRayInfo: unknown, requireRayInfo: boolean?): (ItemTypes.Item? | ItemTypes.Weapon, Types.Participant?)
     if not cameraRayInfo and requireRayInfo then
+        return
+    end
+
+    if requireRayInfo and typeof(cameraRayInfo) ~= "Ray" then
         return
     end
 
@@ -28,12 +32,12 @@ local function allow(plr: Player, cameraRayInfo: Ray?, requireRayInfo: boolean?)
     return weapon, round:GetParticipant(plr.Name)
 end
 
-ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
+ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, cameraRayInfo: unknown)
     local weapon, participant = allow(plr, cameraRayInfo, true)
     if not weapon or not participant then
         return
     end
-    assert(cameraRayInfo)
+    assert(typeof(cameraRayInfo) == "Ray")
 
     if weapon.Kind == "Item" then
         assert(weapon.Base.PrimaryFire)
@@ -43,12 +47,12 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, c
     end
 end)
 
-ReplicatedStorage.ClientServer.AlternateFire.OnServerEvent:Connect(function(plr, cameraRayInfo: Ray?)
+ReplicatedStorage.ClientServer.AlternateFire.OnServerEvent:Connect(function(plr, cameraRayInfo: unknown)
     local weapon, participant = allow(plr, cameraRayInfo, true)
     if not weapon or not participant then
         return
     end
-    assert(cameraRayInfo)
+    assert(typeof(cameraRayInfo) == "Ray")
 
     if weapon.Base.Kind == "Item" and weapon.Base.AlternateFire then
         weapon.Base.AlternateFire(participant, cameraRayInfo)

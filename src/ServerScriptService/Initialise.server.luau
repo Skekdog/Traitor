@@ -100,7 +100,7 @@ Players.PlayerRemoving:Connect(function(plr)
 	InventoryManager.DeInitInventory(plr)
 end)
 
-ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: string?)
+ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: unknown)
 	if typeof(options) ~= "string" then
 		return
 	end
@@ -143,7 +143,7 @@ InventoryManager.Listen("Unequip", function(plr, equipment)
 	end
 end)
 
-InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: InventoryManager.InventoryEvent?, equipmentName: string?, switching: boolean?)
+InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: unknown, equipmentName: unknown, switching: unknown)
 	if typeof(equipmentName) ~= "string" then
 		return
 	end
@@ -165,15 +165,19 @@ InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: Inv
 	if event == "Equip" then
 		InventoryManager.Equip(plr, foundEquipment)
 	elseif event == "Unequip" then
-		InventoryManager.Unequip(plr, foundEquipment, switching)
+		InventoryManager.Unequip(plr, foundEquipment, switching :: boolean?)
 	elseif event == "Drop" then
 		InventoryManager.Drop(plr, foundEquipment, char:GetPivot().Position + char.PrimaryPart.CFrame.LookVector * 10)
 	end
 end)
 
-ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: number)
+ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)
 	local char = plr.Character
 	if not char then
+		return
+	end
+
+	if typeof(y) ~= "number" then
 		return
 	end
 
@@ -186,7 +190,10 @@ ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y:
 	neck.C0 = CFrame.new(neck.C0.Position) * CFrame.Angles(y, 0, 0)
 end)
 
-ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target)
+ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target: unknown)
+	if typeof(target) ~= "Instance" or not target:IsA("Player") then
+		return
+	end
 	local profile = ProfileManager.GetProfile(plr)
 	return profile and profile.Karma or 1000
 end

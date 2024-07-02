@@ -23,7 +23,7 @@ getMaps.OnServerInvoke = function()
 	return names
 end
 
-slayVote.OnServerEvent:Connect(function(plr, target: any?)
+slayVote.OnServerEvent:Connect(function(plr, target: unknown)
 	if typeof(target) ~= "Instance" then
 		return
 	end
@@ -51,7 +51,7 @@ for _, v in script.Parent.Gamemodes:GetChildren() do
 	end
 end
 
-remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: any?)
+remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: unknown)
 	local round = GetRound()
 	if not round or typeof(target) ~= "string" then
 		return
@@ -197,8 +197,8 @@ joinRound.OnServerInvoke = function(plr)
 				end
 			elseif phase == "Intermission" then
 				voteMap:FireAllClients(true)
-				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: string?)
-					if not map or not ServerStorage.Maps:FindFirstChild(map) then
+				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: unknown)
+					if typeof(map) ~= "string" or not ServerStorage.Maps:FindFirstChild(map) then
 						return
 					end
 
