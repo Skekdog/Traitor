@@ -83,7 +83,7 @@ for i in replicatedData:GetAttributes() do
     listeners[i :: Attribute] = {}
 end
 
-for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "UpdateRoles", "UpdateRoundEndInfo"} do
+for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "UpdateRoles", "UpdateRoundEndInfo", "IsSpectating"} do
     listeners[v :: Event] = {}
 end
 
