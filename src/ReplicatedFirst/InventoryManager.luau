@@ -69,9 +69,14 @@ function module.SetReserve(player: Player, ammoType: ItemTypes.AmmoType, reserve
     plrStore[ammoType] = reserve
 end
 
-function module.ClearAllReserves(): ()
+function module.Reset(): ()
     reserveAmmo = {}
     module.AmmoBoxes = {}
+
+    for i, _ in module.Items do
+        i:Destroy()
+    end
+    table.clear(module.Items)
 end
 
 function module.Reload(player: Player, weapon: ItemTypes.Weapon): ()
@@ -245,13 +250,6 @@ function module.ClearInventory(plr: Player)
     for i = #equipment, 1, -1 do
         module.RemoveEquipment(plr, equipment[i])
     end
-end
-
-function module.ClearAllItems()
-    for i, _ in module.Items do
-        i:Destroy()
-    end
-    table.clear(module.Items)
 end
 
 function module.Listen(event: InventoryEvent, callback: (Player, Item) -> ()): () -> ()
