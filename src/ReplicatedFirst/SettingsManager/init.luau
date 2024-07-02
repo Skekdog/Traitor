@@ -24,11 +24,6 @@ export type Setting = KeybindSetting | string | boolean | UDim2 | number -- Sele
 
 local module = {}
 
-local function keybindCallback(val: any, name: any) -- annoying luau does not let me assert that val is a keybind
-	local updated = script.SettingUpdated
-	updated:Fire(name, val)
-end
-
 module.Settings = {}
 module.AvailableSettings = {
 	{
@@ -98,8 +93,8 @@ module.AvailableSettings = {
 		Tooltip = "Select a theme for the UI.",
 		PossibleValues = {"Dark", "Light", "Blue"},
 		Default = "Dark",
-		Callback = function(val) -- Can't directly reference UI.UpdateTheme because this module gets called from the server blah blah blah this sucks
-			require(script.Parent.UIManager).UpdateTheme(val :: string)
+		Callback = function(val) -- Can't directly reference this because cyclic dependency!
+			require(script.Parent.ThemesManager).UpdateTheme(val)
 		end,
 	},
 	{
@@ -172,7 +167,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.UserInputType.MouseButton1, nil :: any}}, Toggled=false},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Drop Ammo",
@@ -182,7 +176,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Z, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Reload Weapon",
@@ -192,7 +185,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.R, nil :: any}, {Enum.KeyCode.ButtonX, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Drop",
@@ -202,7 +194,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadDown}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Alternate Fire",
@@ -212,7 +203,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
 		Default = {Keycodes={{Enum.UserInputType.MouseButton2, nil :: any}, {Enum.KeyCode.ButtonL2 :: any, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Interact",
@@ -222,7 +212,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.F, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Spectate Next",
@@ -232,7 +221,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.DPadRight, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Spectate Previous",
@@ -242,7 +230,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadLeft, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	--{
 	--	Name = "Crouch",
@@ -262,7 +249,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.X, nil :: any}, {Enum.KeyCode.ButtonB, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	
 	{
@@ -273,7 +259,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.ButtonY, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 1",
@@ -283,7 +268,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.One, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 2",
@@ -293,7 +277,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Two, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 3",
@@ -303,7 +286,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Three, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 4",
@@ -313,7 +295,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Four, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 5",
@@ -323,7 +304,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Five, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 6",
@@ -333,7 +313,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Six, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 7",
@@ -343,7 +322,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Seven, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 8",
@@ -353,7 +331,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Eight, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Slot 9",
@@ -363,7 +340,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
 		Default = {Keycodes={{Enum.KeyCode.Nine, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	
 	{
@@ -374,7 +350,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
 		Default = {Keycodes={{Enum.KeyCode.C, nil :: any}, {Enum.KeyCode.DPadUp, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Playerlist",
@@ -384,7 +359,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
 		Default = {Keycodes={{Enum.KeyCode.Tab, nil :: any}, {Enum.KeyCode.ButtonL3, nil :: any}}, Toggled=false},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Settings",
@@ -394,7 +368,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
 		Default = {Keycodes={{Enum.KeyCode.G, nil :: any}, {Enum.KeyCode.ButtonR3, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Highlights",
@@ -404,7 +377,6 @@ module.AvailableSettings = {
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
 		Default = {Keycodes={{Enum.KeyCode.B, nil :: any}}, Toggled=true},
-		Callback = keybindCallback,
 	},
 	
 	
@@ -415,7 +387,6 @@ module.AvailableSettings = {
 		Tooltip = "Primary fire is used to shoot a weapon or plant equipment.",
 		PossibleValues = "TouchPosition",
 		Default = UDim2.fromScale(0.1, 0.1),
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Reload Weapon Position",
@@ -424,7 +395,6 @@ module.AvailableSettings = {
 		Tooltip = "Reloads the currently equipped weapon.",
 		PossibleValues = "TouchPosition",
 		Default = UDim2.fromScale(0.1, 0.2),
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Drop Position",
@@ -433,7 +403,6 @@ module.AvailableSettings = {
 		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
 		PossibleValues = "TouchPosition",
 		Default = UDim2.fromScale(0.1, 0.3),
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Alternate Fire Position",
@@ -442,7 +411,6 @@ module.AvailableSettings = {
 		Tooltip = "Alternate fire is used to aim a weapon or use the alternate function of equipment.",
 		PossibleValues = "TouchPosition",
 		Default = UDim2.fromScale(0.1, 0.4),
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Interact Position",
@@ -451,7 +419,6 @@ module.AvailableSettings = {
 		Tooltip = "Used for general interaction, such as climbing ladders or using Health Stations.",
 		PossibleValues = "TouchPosition",
 		Default = UDim2.fromScale(0.1, 0.5),
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Drop Ammo Position",
@@ -460,7 +427,6 @@ module.AvailableSettings = {
 		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
 		PossibleValues = "TouchPosition",
 		Default = UDim2.fromScale(0.1, 0.6),
-		Callback = keybindCallback,
 	},
 	
 	{
@@ -470,7 +436,6 @@ module.AvailableSettings = {
 		Tooltip = "Primary fire is used to shoot a weapon or plant equipment.",
 		PossibleValues = "TouchScale",
 		Default = 1,
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Reload Weapon Scale",
@@ -479,7 +444,6 @@ module.AvailableSettings = {
 		Tooltip = "Reloads the currently equipped weapon.",
 		PossibleValues = "TouchScale",
 		Default = 1,
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Drop Scale",
@@ -488,7 +452,6 @@ module.AvailableSettings = {
 		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
 		PossibleValues = "TouchScale",
 		Default = 1,
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Alternate Fire Scale",
@@ -497,7 +460,6 @@ module.AvailableSettings = {
 		Tooltip = "Alternate fire is used to aim a weapon or use the alternate function of equipment.",
 		PossibleValues = "TouchScale",
 		Default = 1,
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Interact Scale",
@@ -506,7 +468,6 @@ module.AvailableSettings = {
 		Tooltip = "Used for general interaction, such as climbing ladders or using Health Stations.",
 		PossibleValues = "TouchScale",
 		Default = 1,
-		Callback = keybindCallback,
 	},
 	{
 		Name = "Drop Ammo Scale",
@@ -515,7 +476,6 @@ module.AvailableSettings = {
 		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
 		PossibleValues = "TouchScale",
 		Default = 1,
-		Callback = keybindCallback
 	}
 } :: {SettingDefinition}
 

@@ -8,6 +8,7 @@ local CAS = game:GetService("ContextActionService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIS = game:GetService("UserInputService")
 local SettingsManager = require(script.Parent.SettingsManager)
+local ThemesManager = require(script.Parent.ThemesManager)
 
 local module = {}
 
@@ -86,8 +87,8 @@ function module.SetupTouchButton(actionName)
 		butt:SetAttribute("Style", "Primary")
 		butt:SetAttribute("StyleData", "UpdateImage")
 
-		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(butt, nil, true)
-		ReplicatedFirst.UIManager.UpdateThemeInstance:Fire(actionText, nil, true)
+		ThemesManager.UpdateThemeInstance(butt, nil, true)
+		ThemesManager.UpdateThemeInstance(actionText, nil, true)
 	end
 end
 

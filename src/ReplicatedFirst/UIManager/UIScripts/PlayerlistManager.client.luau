@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CorpseInfo = require(script.Parent.CorpseInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(script.Parent.Parent)
+local ThemesManager = require(script.Parent.Parent.Parent.ThemesManager)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
@@ -33,14 +34,14 @@ function updatePlr(plr: Player, clone: any)
 	movePlr(plr, if participant then participant.Status else "Spectating")
 
 	if not participant then
-		UIManager.UpdateThemeInstance(clone.Username)
+		ThemesManager.UpdateThemeInstance(clone.Username)
 		return
 	end
 
 	local role = LocalRoundInfo.GetRole(participant.Role)
 	if role.Name == "" or LocalRoundInfo.GetRoundPhase() == "Destroy" then
 		clone.Username:SetAttribute("StyleData")
-		UIManager.UpdateThemeInstance(clone.Username)
+		ThemesManager.UpdateThemeInstance(clone.Username)
 	else
 		clone.Username:SetAttribute("StyleData", "KeepText")
 		clone.Username.TextColor3 = role.Colour

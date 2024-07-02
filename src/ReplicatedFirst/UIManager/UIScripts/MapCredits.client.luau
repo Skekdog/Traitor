@@ -5,13 +5,7 @@ local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local UIManager = require(ReplicatedFirst.UIManager)
 local UI = UIManager.WaitForUI("Credits")
 
-local fibSettingDefinition
-for _, v in SettingsManager.AvailableSettings do
-	if v.Name == "Use FIB Lighting" then
-		fibSettingDefinition = v
-		break
-	end
-end
+local fibSettingDefinition = SettingsManager.Settings["Use FIB Lighting"].Definition
 
 LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)
 	(UI.Object :: typeof(UIManager.UnregisteredUIs.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage.RoundHandler:GetAttribute("MapName")} by {mapAuthors}`
@@ -22,5 +16,6 @@ LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)
 	repeat
 		task.wait()
 	until LocalRoundInfo.GetMap()
+	assert(fibSettingDefinition.Callback)
 	fibSettingDefinition.Callback(SettingsManager.GetSetting(fibSettingDefinition.Name), fibSettingDefinition.Name)
 end)

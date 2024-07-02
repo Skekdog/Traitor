@@ -5,9 +5,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local manager = require(script.Parent.Parent)
 local controls = require(ReplicatedFirst.ControlManager)
 
-local event = script.Parent.Parent.UpdateThemeInstance
-event.Event:Connect(manager.UpdateThemeInstance)
-
 local orders = {
 	Special = 4,
 	Popup = 3,
