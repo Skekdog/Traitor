@@ -39,8 +39,10 @@ end)
 
 local function radar()
 	local stop = false
-	ReplicatedFirst.ClientStorage:GetAttributeChangedSignal("IsSpectating"):Once(function()
+	local con
+	con = LocalRoundInfo.Listen("IsSpectating", function()
 		stop = true
+		con()
 	end)
 	while not stop do
 		PingRadar()

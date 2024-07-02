@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local plr = Players.LocalPlayer
 
+local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 local uiManager = require(ReplicatedFirst.UIManager)
 local controls = require(ReplicatedFirst.ControlManager)
 
@@ -40,11 +41,10 @@ local function spectateFunc(action, state)
 	return Enum.ContextActionResult.Sink
 end
 
-local clientStorage = ReplicatedFirst.ClientStorage
-clientStorage:GetAttributeChangedSignal("IsSpectating"):Connect(function()
+LocalRoundInfo.Listen("IsSpectating", function(val)
 	uiO.Username.Text = "Use buttons to spectate"
 	lastKey = 0
-	if clientStorage:GetAttribute("IsSpectating") then
+	if val then
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
 		plr.CameraMode = Enum.CameraMode.Classic

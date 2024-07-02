@@ -4,6 +4,7 @@ local API = require(script.Parent.API)
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
@@ -18,12 +19,12 @@ local function setHealth(hum: Humanoid)
 end
 
 local function onDeath()
-    script.Parent.ClientStorage:SetAttribute("IsSpectating", true)
+    LocalRoundInfo.SetSpectating(true)
     roundInfo.Frame.HealthBar.Visible = false
 end
 
 Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
-    script.Parent.ClientStorage:SetAttribute("IsSpectating", false)
+    LocalRoundInfo.SetSpectating(false)
 
     local hum = char:WaitForChild("Humanoid") :: Humanoid
     hum.Died:Once(onDeath)

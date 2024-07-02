@@ -89,13 +89,13 @@ local function update(roundPhase)
             equipmentShop = nil
         end
 
-        ReplicatedFirst.ClientStorage:SetAttribute("IsSpectating", false)
+        LocalRoundInfo.SetSpectating(false)
 
         return
     end
 
     if not ownParticipant or not Players.LocalPlayer.Character then
-        ReplicatedFirst.ClientStorage:SetAttribute("IsSpectating", true)
+        LocalRoundInfo.SetSpectating(true)
     end
 
     if stopMusic and roundPhase ~= "Intermission" then
