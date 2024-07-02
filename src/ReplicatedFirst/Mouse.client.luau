@@ -164,9 +164,10 @@ ControlManager.Register("Interact", true, function(action, state, input, toggled
 		return Enum.ContextActionResult.Pass
 	end
 
-	local actionItems = map.Map:FindFirstChild("__ActionItems")
-	local doors = map.Map:FindFirstChild("__Doors")
+	local actionItems = map:FindFirstChild("ActionItems")
+	local doors = map:FindFirstChild("Doors")
 	local props = map:FindFirstChild("Props")
+
 	if (actionItems and actionItems:IsAncestorOf(interactTarget)) or (doors and doors:IsAncestorOf(interactTarget)) or (props and props:IsAncestorOf(interactTarget)) then
 		ReplicatedStorage.ClientServer.Interaction:FireServer(interactTarget)
 		return Enum.ContextActionResult.Sink

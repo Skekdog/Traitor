@@ -1,63 +1,57 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TS = game:GetService("TweenService")
+local TweenService = game:GetService("TweenService")
 local GetRound = require(script.Parent.GetRound)
 
-ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: BasePart & {Parent: Instance})
-	local char = plr.Character :: Model & {Humanoid: Humanoid, PrimaryPart: BasePart}
+ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: unknown)
+	local char = plr.Character
+	if not char then
+		return
+	end
+
+	if typeof(part) ~= "Instance" or not part:IsA("BasePart") then
+		return
+	end
+
+	if not part.Parent then
+		return
+	end
 
 	local round = GetRound()
 	if not round then
 		return
 	end
 	
-	if char then
-		local hum = char.Humanoid
-		if hum.Health > 0 and (char.PrimaryPart.Position-part.Position).Magnitude < 10 then
-			local map = round.Map
-			local actionItems = map.Map:FindFirstChild("__ActionItems")
-			local doors = map.Map:FindFirstChild("__Doors")
-			local props = map:FindFirstChild("Props")
-			if actionItems and actionItems:IsAncestorOf(part) then
-				(require)(part.Parent:FindFirstChildOfClass("ModuleScript"))()
-			elseif doors and doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
-				part:SetAttribute("Opening", true)
-				part:SetAttribute("Open", not part:GetAttribute("Open"))
-				local angle = math.rad(part:GetAttribute("Open") and -90 or 90)
-				
-				local hinge = part.CFrame * CFrame.new((part.Size.X/2)*-1, 0, 0)
-				local newCFrame = (hinge*CFrame.Angles(0, angle, 0)):ToWorldSpace(hinge:ToObjectSpace(part.CFrame))
-				
-				TS:Create(part, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {CFrame = newCFrame}):Play()
-				task.delay(1.02, function()part:SetAttribute("Opening", false)end)
-				
-				local sounds = {}
-				for _, v in part:GetChildren() do
-					if v:IsA("Sound") and v.Name == (part:GetAttribute("Open") and "OpenSound" or "CloseSound") then
-						table.insert(sounds, v)
-					end
-				end
-				sounds[math.random(1, #sounds)]:Play()
-			elseif props and props:IsAncestorOf(part) then
-				local prop = part.Parent
-				if prop.Name:sub(1, 10) ~= "Equipment_" then return end
-				
-				if prop.Name:sub(11) == "Health Station" or prop.Name:sub(11) == "Death Station" then
-					if part:GetAttribute("InUseBy"):match(plr.Name..";") then return end
-					
-					part:SetAttribute("InUseBy", `{part:GetAttribute("InUseBy")}{plr.Name};`)
-					while (hum.Health < hum.MaxHealth) and ((char.PrimaryPart.Position-part.Position).Magnitude < 6) and (part:FindFirstAncestorOfClass("Workspace")) and (hum.Health > 0) do
-						if part:GetAttribute("CurrentCharge") <= 0 then
-							part:GetAttributeChangedSignal("CurrentCharge"):Wait()
-						end
-						hum.Health += 1
-						part:SetAttribute("CurrentCharge", part:GetAttribute("CurrentCharge") - 1)
-						task.wait(0.5)
-					end
-					if part:GetAttribute("InUseBy") then
-						part:SetAttribute("InUseBy", part:GetAttribute("InUseBy"):gsub(plr.Name..";", ""))
-					end
-				end
+	local hum = char:FindFirstChild("Humanoid") :: Humanoid?
+	if not hum or hum.Health <= 0 then
+		return
+	end
+
+	local root = hum.RootPart
+	if not root or (root.Position - part.Position).Magnitude > 10 then
+		return
+	end
+
+	local map = round.Map
+	local actionItems = map:FindFirstChild("ActionItems")
+	local doors = map:FindFirstChild("Doors")
+	local props = map:FindFirstChild("Props")
+
+	if actionItems and actionItems:IsAncestorOf(part) then
+		(require)(part.Parent:FindFirstChildOfClass("ModuleScript"))()
+	elseif doors and doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
+		part:SetAttribute("Opening", true)
+		part:SetAttribute("Open", not part:GetAttribute("Open"))
+
+		TweenService:Create(part, TweenInfo.new(1), {CFrame = part.CFrame * CFrame.Angles(0, math.rad(if part:GetAttribute("Open") then -90 else 90), 0)}):Play()
+		
+		local sounds = {}
+		for _, v in part:GetChildren() do
+			if v:IsA("Sound") and v.Name == (part:GetAttribute("Open") and "OpenSound" or "CloseSound") then
+				table.insert(sounds, v)
 			end
 		end
+		sounds[math.random(1, #sounds)]:Play()
+	elseif props and props:IsAncestorOf(part) then
+
 	end
 end)
