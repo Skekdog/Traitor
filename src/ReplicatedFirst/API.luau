@@ -1,4 +1,5 @@
 local TweenService = game:GetService("TweenService")
+local SettingsManager = require(script.Parent.SettingsManager)
 
 local plr = game:GetService("Players").LocalPlayer
 
@@ -132,7 +133,7 @@ function module.ScreenMessage(format: string, text: string, formatOverrides: {[s
 end
 
 function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[string]: any}, noAnimate: boolean?): Tween?
-	local animate = script.Parent.SettingsManager.RequestSetting:Invoke("Animate UI Transitions")
+	local animate = SettingsManager.GetSetting("Animate UI Transitions")
 
 	if not animate or noAnimate then
 		for i, v in properties do
@@ -205,7 +206,6 @@ end
 
 function module.TransitionUIState(frame: GuiObject, open: boolean)
 	-- If open is true, open animation should play, otherwise close
-	local requestSetting = script.Parent.SettingsManager.RequestSetting
 	
 	local oldTween = frame:FindFirstChild("StateTransitionTween") :: Tween
 	if oldTween then
@@ -233,13 +233,9 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 			end
 		end
 	end
-
-	if not requestSetting then
-		return onFinish()
-	end
 	
-	local UI_TRANSITION_TIME = if open then 0.2 else tonumber(requestSetting:Invoke("Close Speed")) :: number
-	local UI_SCALE_FACTOR = tonumber(requestSetting:Invoke("Close Scale"))
+	local UI_TRANSITION_TIME = if open then 0.2 else tonumber(SettingsManager.GetSetting("Close Speed")) :: number
+	local UI_SCALE_FACTOR = tonumber(SettingsManager.GetSetting("Close Scale"))
 	
 	
 	local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)

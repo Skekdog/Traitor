@@ -5,6 +5,7 @@ local UIS = game:GetService("UserInputService")
 
 local ControlManager = require(ReplicatedFirst.ControlManager)
 local API = require(script.Parent.API)
+local SettingsManager = require(script.Parent.SettingsManager)
 
 local plr = Players.LocalPlayer
 local plrUi = plr.PlayerGui
@@ -24,8 +25,6 @@ end
 
 - All popups must have a close button and transition style
 ]]
-
-local requestSetting = script.Parent.SettingsManager.RequestSetting
 
 local UIManager = {}
 
@@ -142,7 +141,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 		end
 		local but = sb.Button:Clone()
-		local keybinding = requestSetting:Invoke(self.Name)
+		local keybinding = SettingsManager.GetSetting(self.Name) :: SettingsManager.KeybindSetting
 		local key = keybinding["Keycodes"][1][1]
 		local modifier = keybinding["Keycodes"][1][2]
 		local str = ""
@@ -285,7 +284,7 @@ function UIManager.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition:
 	-- Tag StyledUI means that a UI object will be updated to match the theme
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
 	
-	local tweenInfo = TweenInfo.new((requestSetting:Invoke("Animate UI Transitions") and not noTransition) and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+	local tweenInfo = TweenInfo.new((SettingsManager.GetSetting("Animate UI Transitions") and not noTransition) and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
 	theme = theme or UIManager.Themes.Dark
 	assert(theme)
 	

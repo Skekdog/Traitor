@@ -6,11 +6,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local SM = require(script.Parent)
 
-local requestSetting = script.Parent.RequestSetting
-requestSetting.OnInvoke = function(setting: string)
-	return SM.GetSetting(setting)
-end
-
 -- This must be run before anything yields, especially todo with ui
 local options = (ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).LoadSavedData.OnClientEvent:Wait()
 options = SM.JSONDecode(options)

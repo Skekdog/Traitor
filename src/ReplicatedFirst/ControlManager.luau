@@ -7,24 +7,27 @@ local CS = game:GetService("CollectionService")
 local CAS = game:GetService("ContextActionService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIS = game:GetService("UserInputService")
+local SettingsManager = require(script.Parent.SettingsManager)
 
 local module = {}
 
-
-local function getSetting(name: string)
-	return ReplicatedFirst.SettingsManager.RequestSetting:Invoke(name)
-end
-
-type params = any
+type params = {
+	ActionName: string,
+	CreateTouchButton: boolean,
+	Callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> Enum.ContextActionResult,
+}
 local registered: {[string]: params} = {}
-local function onSettingUpdate(name, val)
+function module.OnSettingUpdate(name, val)
 	local setting = registered[name]
 	if setting then
-		module.Register(setting.actionName, setting.createTouchButton, setting.callback)
+		module.Register(setting.ActionName, setting.CreateTouchButton, setting.Callback)
 	end
 end
 
-function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType): string
+function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?): string
+	if not keycode then
+		return ""
+	end
 	if keycode.EnumType == Enum.KeyCode then
 		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
 		if img ~= "" then return img end
@@ -62,13 +65,13 @@ end
 function module.SetupTouchButton(actionName)
 	local butt = CAS:GetButton(actionName) :: ImageButton & {ActionTitle: TextLabel}
 	if butt then
-		butt.Position = getSetting(actionName.." Position")
+		butt.Position = SettingsManager.GetSetting(actionName.." Position") :: UDim2
 		butt.Size = UDim2.fromScale(0.2, 0.2)
 		butt.AnchorPoint = Vector2.one/2
 
 		Instance.new("UIAspectRatioConstraint", butt)
 		local scale = Instance.new("UIScale")
-		scale.Scale = getSetting(actionName.." Scale")
+		scale.Scale = SettingsManager.GetSetting(actionName.." Scale") :: number
 		scale.Parent = butt
 
 		local actionText = butt.ActionTitle
@@ -89,7 +92,7 @@ function module.SetupTouchButton(actionName)
 end
 
 function module.GetFirstKeyCode(actionName: string): string
-	local keybindSetting = getSetting(actionName)
+	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
 	local keybinds = keybindSetting.Keycodes
 	if keybinds then
 		return module.GetStringForKeyCode(keybinds[1][1])
@@ -108,11 +111,11 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 	end
 
 	registered[actionName] =  {
-		actionName = actionName,
-		createTouchButton = createTouchButton,
-		callback = callback
+		ActionName = actionName,
+		CreateTouchButton = createTouchButton,
+		Callback = callback
 	}
-	local keybindSetting = getSetting(actionName)
+	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
 	local toggled = keybindSetting.Toggled
 	local keybinds = keybindSetting.Keycodes
 	
@@ -124,8 +127,9 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 	end
 	CAS:BindAction(actionName, function(action, state, input: InputObject)
 		local inp = input.KeyCode or input.UserInputType
+		local modifier = modifiers[inp] :: Enum.KeyCode
 		
-		if (not modifiers[inp]) or (UIS:IsKeyDown(modifiers[inp])) then
+		if not modifier or UIS:IsKeyDown(modifier) then
 			local show = false
 			if (toggled) and (state == Enum.UserInputState.End) then show = true end
 			if (not toggled) and ((state == Enum.UserInputState.Begin) or (state == Enum.UserInputState.End)) then show = true end
@@ -135,7 +139,7 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 			end
 		end
 		return Enum.ContextActionResult.Pass
-	end, createTouchButton, table.unpack(triggers))
+	end, createTouchButton, table.unpack(triggers) :: Enum.KeyCode | Enum.UserInputType)
 	
 	module.SetupTouchButton(actionName)
 	
@@ -146,7 +150,5 @@ function module.Unregister(actionName: string)
 	CAS:UnbindAction(actionName)
 	registered[actionName] = nil
 end
-
-ReplicatedFirst.SettingsManager.SettingUpdated.Event:Connect(onSettingUpdate)
 
 return module
