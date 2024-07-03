@@ -9,7 +9,7 @@ local module = {}
 
 function module.UpdateParticipant(participant: Types.Participant)
 	for _, v in Players:GetPlayers() do
-		if v.Name == participant.Player.Name then
+		if v == participant.Player then
 			remotes.UpdateOwnParticipant:FireClient(v, participant:ViewPartialSelf())
 		else
 			remotes.UpdateParticipant:FireClient(v, participant:ViewPartialParticipant(participant.Round:GetParticipant(v.Name)))
@@ -22,7 +22,11 @@ function module.UpdateOwnParticipant(participant: Types.Participant | Types.Clie
 end
 
 function module.UpdateParticipantForPlayer(participant: Types.Participant, player: Player)
-	
+	if player == participant.Player then
+		module.UpdateOwnParticipant(participant)
+	else
+		remotes.UpdateParticipant:FireClient(player, participant:ViewPartialParticipant(participant.Round:GetParticipant(player.Name)))
+	end
 end
 
 return module
