@@ -9,6 +9,10 @@ local UI = ui.Object :: typeof(UIManager.UnregisteredUIs.RoleAlert)
 	sound.SoundId = "rbxassetid://"..tostring(soundId)
 	sound.SoundGroup = SoundService.RoleReveals
 	sound.Parent = SoundService.RoleReveals
+
+	sound.Ended:Connect(function()
+		sound:Destroy()
+	end)
 	sound:Play()
 	
 	UI:FindFirstChild("HintLabel").Text = description

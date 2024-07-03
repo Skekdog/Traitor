@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
 
 local GetRound = require(script.Parent.GetRound)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
@@ -160,16 +162,27 @@ local function sendRoundInfo(plr: Player?)
 	remotes.UpdateRoles:FireAllClients(gm.Name, gm.Roles)
 end
 
+local stopMusic: (() -> ())?
 joinRound.OnServerInvoke = function(plr)
 	local round = GetRound()
 
+	local initialise, gamemode
 	if not round then
 		if not nextRoundReady then
 			return
 		end
-		local gamemode = gamemodes[math.random(1, #gamemodes)]
+		gamemode = gamemodes[math.random(1, #gamemodes)]
 		round = RoundHandler.CreateRound(nextMap, gamemode)
-		assert(round)
+		initialise = true
+	end
+
+	assert(round)
+
+	if initialise then
+		if stopMusic then
+			stopMusic()
+		end
+		
 		ServerStorage:SetAttribute("RoundID", round.ID)
 		local votes: {[string]: {number}} = {}
 		local voteCon: RBXScriptConnection?
@@ -216,7 +229,45 @@ joinRound.OnServerInvoke = function(plr)
 					end
 				end)
 			elseif phase == "Highlights" then
+				assert(round.RoundEndInfo)
 				remotes.UpdateRoundEndInfo:FireAllClients(round.RoundEndInfo)
+				local sound = round.RoundEndInfo.Music
+				if not sound then
+					return
+				end
+				sound = sound:Clone()
+				sound.SoundGroup = SoundService.RoundEndMusic
+				sound.PlayOnRemove = false
+
+				local targetVolume = sound.Volume
+				sound.Volume = 0
+				
+				local fadeIn = TweenService:Create(sound, TweenInfo.new(1), {Volume = targetVolume})
+				local fadeOut = TweenService:Create(sound, TweenInfo.new(1), {Volume = 0})
+
+				stopMusic = function()
+					fadeOut.Completed:Once(function()
+						sound:Destroy()
+					end)
+					fadeOut:Play()
+				end
+
+				assert(stopMusic)
+				if not sound:GetAttribute("FullSong") then
+					if sound.TimeLength <= 0 then
+						sound:GetPropertyChangedSignal("TimeLength"):Once(function()
+							task.delay(sound.TimeLength - 1, stopMusic)
+						end)
+					else
+						task.delay(sound.TimeLength - 1, stopMusic)
+					end
+				else
+					sound.Ended:Once(stopMusic)
+				end
+
+				sound.Parent = sound.SoundGroup
+				sound:Play()
+				fadeIn:Play()
 			end
 			remotes:SetAttribute("IsPaused", false)
 			remotes:SetAttribute("RoundPhase", phase)
@@ -235,7 +286,7 @@ joinRound.OnServerInvoke = function(plr)
 			end
 		
 			if voteCon then
-				ReplicatedStorage.RoundHandler.VoteMap:FireAllClients(false)
+				remotes.VoteMap:FireAllClients(false)
 				voteCon:Disconnect()
 				local bestMap, bestVotes = "", 0
 				for i, v in votes do

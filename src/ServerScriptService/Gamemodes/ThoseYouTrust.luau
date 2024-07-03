@@ -1,5 +1,6 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local common = require(script.Parent.Common)
@@ -257,7 +258,7 @@ local module: Types.Gamemode = {
 
             Allies = {"Traitor"},
             Allegiance = "Traitor",
-            VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
+            VictoryMusic = ServerStorage.VictoryMusic.Traitor:GetChildren() :: any,
             VictoryText = "The dastardly traitors have won the round!",
 
             AnnounceDisconnect = true,
@@ -315,7 +316,7 @@ local module: Types.Gamemode = {
 
             Allies = {"Detective", "Innocent"},
             Allegiance = "Innocent",
-            VictoryMusic = ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
+            VictoryMusic = ServerStorage.VictoryMusic.Innocent:GetChildren() :: any,
             VictoryText = "The loveable innocents have won the round!",
             KnowsRoles = {"Detective"},
         }

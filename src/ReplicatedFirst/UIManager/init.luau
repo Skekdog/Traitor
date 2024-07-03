@@ -106,6 +106,9 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		end,
 
 		Unregister = function(self: UI)
+			if not table.find(registeredUIs, self) then
+				return warn(self.Name.." is not registered!")
+			end
 			ControlManager.Unregister(self.Name)
 			self:ToggleVisible(false, true)
 			self.Object.Parent = UIManager.UnregisteredUIs
@@ -238,7 +241,7 @@ function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 		if not warned and not ignoreYield then
 			if start + 5 <= os.clock() then
 				warned = true
-				warn("Infinite yield possible on WaitForUI("..name..")\n"..debug.traceback())
+				warn(debug.traceback(`Infinite yield possible on WaitForUI("{name}")`, 1))
 			end
 		end
 	until UIManager.TryGetUI(name)

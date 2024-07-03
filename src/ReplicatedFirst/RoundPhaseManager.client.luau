@@ -2,8 +2,6 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
-local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
@@ -25,7 +23,6 @@ for _, v in (ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(Replicated
     end)
 end
 
-local stopMusic: (() -> ())?
 local ownParticipant: Types.ClientOwnParticipant?
 local ownRole: Types.Role?
 
@@ -70,8 +67,6 @@ LocalRoundInfo.Listen("UpdateParticipant", function(p)
     end
 end)
 
-type EquipmentShopType = UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])}
-local equipmentShop: EquipmentShopType?
 local function update(roundPhase)
     if roundPhase == "Destroy" then
         joinRound:ToggleVisible(true)
@@ -84,11 +79,6 @@ local function update(roundPhase)
             v:SetAttribute("Mark", "")
         end
 
-        if equipmentShop then
-            equipmentShop:Unregister()
-            equipmentShop = nil
-        end
-
         LocalRoundInfo.SetSpectating(false)
 
         return
@@ -98,57 +88,16 @@ local function update(roundPhase)
         LocalRoundInfo.SetSpectating(true)
     end
 
-    if stopMusic and roundPhase ~= "Intermission" then
-        stopMusic()
-    end
-
     joinRound:ToggleVisible((roundPhase == "Waiting") or (roundPhase == "Preparing"))
     
     if roundPhase == "Highlights" then
         local endInfo = LocalRoundInfo.GetRoundEndInfo()
         assert(endInfo)
-        local sound = endInfo.Music
-        if not sound then
+        if not endInfo.Music then
             return
         end
-        sound = sound:Clone()
-        sound.SoundGroup = SoundService.RoundEndMusic
-        sound.Volume = 0
-        
-        local fadeIn = TweenService:Create(sound, TweenInfo.new(1), {Volume = 0.5})
-        local fadeOut = TweenService:Create(sound, TweenInfo.new(1), {Volume = 0})
-
-        sound.Parent = SoundService.RoundEndMusic
-        sound:Play()
-
         local highlights = UIManager.WaitForUI("Highlights").Object :: typeof(UIManager.UnregisteredUIs.Highlights)
-        highlights.Page.Highlights.Music.Text.Text = sound.Name
-        
-        fadeIn:Play()
-
-        stopMusic = function()
-            stopMusic = nil
-            if not sound or not sound.Parent then
-                return
-            end
-            fadeOut:Play()
-            task.delay(1, function()
-                sound:Stop()
-                sound:Destroy()
-                sound = nil
-            end)
-        end
-        
-        if not sound:GetAttribute("FullSong") then
-            assert(stopMusic)
-            if sound.TimeLength > 0 then
-                task.delay(sound.TimeLength-1, stopMusic)
-            else
-                sound:GetPropertyChangedSignal("TimeLength"):Connect(function()
-                    task.delay(sound.TimeLength-1, stopMusic)
-                end)
-            end
-        end
+        highlights.Page.Highlights.Music.Text.Text = endInfo.Music.Name
     end
 end
 
@@ -188,14 +137,20 @@ LocalRoundInfo.Listen("IsPaused", function(isPaused)
     paused = isPaused :: boolean
 end)
 
+local equipmentShop: UIManager.UI?
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
     local participant = p :: Types.ClientOwnParticipant
 
     local role
     if participant then
         role = LocalRoundInfo.GetRole(participant.Role)
+
     end
     if not participant or role.Name == "" then
+        if equipmentShop then
+            equipmentShop:Unregister()
+            equipmentShop = nil
+        end
         roundInfo.TopBar.Role.TextColor3 = Color3.new(1, 1, 1)
         roundInfo.TopBar.Role.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
         return
@@ -204,22 +159,23 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
     roundInfo.TopBar.Role.Text = role.Name
     roundInfo.TopBar.Role.TextColor3 = role.Colour
 
-    local toRegister = UIManager.UnregisteredUIs:FindFirstChild("Equipment Shop")
-    if not role.EquipmentShop or #role.EquipmentShop <= 0 or not toRegister then
+    if not role.EquipmentShop or #role.EquipmentShop <= 0 then
+        if equipmentShop then
+            equipmentShop:Unregister()
+            equipmentShop = nil
+        end
         return
     end
 
-    local shop
-    if equipmentShop then
-        shop = equipmentShop.Object
-    else
-        equipmentShop = UIManager.RegisterUI(toRegister) :: EquipmentShopType
-        assert(equipmentShop)
-        shop = equipmentShop.Object
+    local shopObject = UIManager.UnregisteredUIs:FindFirstChild("Equipment Shop")
+    if not shopObject then
+        return
     end
-    shop.Reset:Fire()
+
+    equipmentShop = UIManager.RegisterUI(shopObject)
+    shopObject.Reset:Fire()
     
-    for _, v in shop.ScrollingFrame:GetChildren() do
+    for _, v in shopObject.ScrollingFrame:GetChildren() do
         if v.ClassName == "ImageButton" then
             v:Destroy()
         end
@@ -236,7 +192,7 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
     for _, v in role.EquipmentShop do
         local equipment = nameToObj[v]
         
-        local entry = shop.EquipmentEntry:Clone()
+        local entry = shopObject.EquipmentEntry:Clone()
         entry:SetAttribute("CreditCost", equipment.Cost)
         entry:SetAttribute("Description", equipment.Description)
         
@@ -244,7 +200,7 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
         entry.Image = equipment.Icon
         entry.Name = equipment.Name
         entry.Visible = true
-        entry.Parent = shop.ScrollingFrame :: any
+        entry.Parent = shopObject.ScrollingFrame :: any
     end
 end)
 
