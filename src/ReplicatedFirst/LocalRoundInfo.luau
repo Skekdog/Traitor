@@ -75,7 +75,7 @@ end
 type Attribute = "MapAuthors" | "MapName" | "GamemodeAuthors" | "GamemodeName" | "TimeMilestone" | "RoundPhase" | "IsPaused" | "RoundStartTime"
 type AttributeValue = (string | number | boolean)?
 type ListenerCallback = (newValue: EventValue) -> ()
-type Event = Attribute | "UpdateParticipant" | "UpdateOwnParticipant" | "UpdateEquipment" | "UpdateRoles" | "UpdateRoundEndInfo" | "IsSpectating"
+type Event = Attribute | "UpdateParticipant" | "UpdateOwnParticipant" | "UpdateEquipment" | "UpdateRoles" | "UpdateRoundEndInfo" | "IsSpectating" | "IsInRound"
 type EventValue = AttributeValue | Types.ClientParticipant | {Types.Equipment} | {Types.Role} | Types.RoundEndInfo | Types.ClientOwnParticipant | nil
 
 local listeners: {[Event]: {ListenerCallback}} = {}
@@ -83,7 +83,7 @@ for i in replicatedData:GetAttributes() do
     listeners[i :: Attribute] = {}
 end
 
-for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "UpdateRoles", "UpdateRoundEndInfo", "IsSpectating"} do
+for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "UpdateRoles", "UpdateRoundEndInfo", "IsSpectating", "IsInRound"} do
     listeners[v :: Event] = {}
 end
 
@@ -110,6 +110,16 @@ end
 function module.SetSpectating(value: boolean): ()
     isSpectating = value
     runCallbacks("IsSpectating", value)
+end
+
+local isInRound = false
+function module.IsInRound(): boolean
+    return isInRound
+end
+
+function module.SetInRound(value: boolean): ()
+    isInRound = value
+    runCallbacks("IsInRound", value)
 end
 
 replicatedData.AttributeChanged:Connect(function(attr)

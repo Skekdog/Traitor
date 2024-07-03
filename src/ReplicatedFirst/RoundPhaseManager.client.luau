@@ -8,7 +8,6 @@ local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
-local joinRound = UIManager.WaitForUI("JoinRound")
 
 local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
 for _, v in (ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).GetMaps:InvokeServer() do
@@ -69,8 +68,6 @@ end)
 
 local function update(roundPhase)
     if roundPhase == "Destroy" then
-        joinRound:ToggleVisible(true)
-
         for _, v in CollectionService:GetTagged("AllyMarker") do
             v:Destroy()
         end
@@ -87,8 +84,6 @@ local function update(roundPhase)
     if not ownParticipant or not Players.LocalPlayer.Character then
         LocalRoundInfo.SetSpectating(true)
     end
-
-    joinRound:ToggleVisible((roundPhase == "Waiting") or (roundPhase == "Preparing"))
     
     if roundPhase == "Highlights" then
         local endInfo = LocalRoundInfo.GetRoundEndInfo()

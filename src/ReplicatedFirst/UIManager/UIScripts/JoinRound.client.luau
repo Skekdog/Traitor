@@ -8,11 +8,16 @@ local this = UIManager.WaitForUI("JoinRound") :: UIManager.UI & {Object: typeof(
 
 this.Object.MouseButton1Click:Connect(function()
 	this:ToggleVisible(false)
+	LocalRoundInfo.SetInRound(true)
 	local success = ReplicatedStorage.RoundHandler.JoinRound:InvokeServer()
 	if not success then
+		LocalRoundInfo.SetInRound(false)
 		this:ToggleVisible(table.find({"Waiting", "Preparing"}, LocalRoundInfo.GetRoundPhase()) ~= nil)
 		API.ScreenMessage("Error", "Failed to join round.")
 		return
 	end
-	this:ToggleVisible(false)
+end)
+
+LocalRoundInfo.Listen("RoundPhase", function(phase)
+	this:ToggleVisible(not LocalRoundInfo.IsInRound() and (phase == "Waiting" or phase == "Preparing" or phase == "Destroy"))
 end)
