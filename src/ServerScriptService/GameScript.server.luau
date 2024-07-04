@@ -282,7 +282,7 @@ joinRound.OnServerInvoke = function(plr)
 			for _, v in round.Participants do
 				v._status = "Spectating" :: any
 				v.Role = RoundHandler.NoRole
-				UpdateRoundInfo.UpdateParticipant(v)
+				UpdateRoundInfo.UpdateParticipant(v, true)
 			end
 		
 			if voteCon then

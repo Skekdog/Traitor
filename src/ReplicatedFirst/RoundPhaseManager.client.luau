@@ -88,11 +88,13 @@ local function update(roundPhase)
     if roundPhase == "Highlights" then
         local endInfo = LocalRoundInfo.GetRoundEndInfo()
         assert(endInfo)
-        if not endInfo.Music then
+
+        local music = endInfo.Music
+        if not music then
             return
         end
         local highlights = UIManager.WaitForUI("Highlights").Object :: typeof(UIManager.UnregisteredUIs.Highlights)
-        highlights.Page.Highlights.Music.Text.Text = endInfo.Music.Name
+        highlights.Page.Highlights.Music.Text.Text = music.Name
     end
 end
 

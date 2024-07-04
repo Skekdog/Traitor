@@ -19,7 +19,6 @@ local function setHealth(hum: Humanoid)
 end
 
 local function onDeath()
-    LocalRoundInfo.SetInRound(false)
     LocalRoundInfo.SetSpectating(true)
     roundInfo.Frame.HealthBar.Visible = false
 end

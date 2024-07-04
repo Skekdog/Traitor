@@ -6,18 +6,26 @@ local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 local this = UIManager.WaitForUI("JoinRound") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.JoinRound)}
 
+local validPhases = {"Waiting", "Preparing", "Destroy"}
+local isInRound = false
 this.Object.MouseButton1Click:Connect(function()
+	isInRound = true
 	this:ToggleVisible(false)
-	LocalRoundInfo.SetInRound(true)
 	local success = ReplicatedStorage.RoundHandler.JoinRound:InvokeServer()
 	if not success then
-		LocalRoundInfo.SetInRound(false)
-		this:ToggleVisible(table.find({"Waiting", "Preparing"}, LocalRoundInfo.GetRoundPhase()) ~= nil)
+		isInRound = false
+		this:ToggleVisible(table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil)
 		API.ScreenMessage("Error", "Failed to join round.")
 		return
 	end
 end)
 
 LocalRoundInfo.Listen("RoundPhase", function(phase)
-	this:ToggleVisible(not LocalRoundInfo.IsInRound() and (phase == "Waiting" or phase == "Preparing" or phase == "Destroy"))
+	isInRound = LocalRoundInfo.GetOwnParticipant() ~= nil
+	this:ToggleVisible(not isInRound and table.find(validPhases, phase :: string) ~= nil)
+end)
+
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
+	isInRound = p ~= nil
+	this:ToggleVisible(not isInRound and table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil)
 end)

@@ -7,12 +7,12 @@ local remotes = ReplicatedStorage.RoundHandler
 
 local module = {}
 
-function module.UpdateParticipant(participant: Types.Participant)
+function module.UpdateParticipant(participant: Types.Participant, nillify: boolean?)
 	for _, v in Players:GetPlayers() do
 		if v == participant.Player then
-			remotes.UpdateOwnParticipant:FireClient(v, participant:ViewPartialSelf())
+			remotes.UpdateOwnParticipant:FireClient(v, if nillify then nil else participant:ViewPartialSelf())
 		else
-			remotes.UpdateParticipant:FireClient(v, participant:ViewPartialParticipant(participant.Round:GetParticipant(v.Name)))
+			remotes.UpdateParticipant:FireClient(v, if nillify then nil else participant:ViewPartialParticipant(participant.Round:GetParticipant(v.Name)))
 		end
 	end
 end
