@@ -99,20 +99,4 @@ page.Parent.EventsButton.MouseButton1Click:Connect(function() showTab("Events") 
 page.Parent.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
 page.Parent.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
 
-for _, v in eFrame.EventFilters:GetChildren() :: any do
-	if v.ClassName == "UIGridLayout" then
-		continue
-	end
-	v.ImageLabel.MouseButton1Click:Connect(function()
-		local visible = not v:GetAttribute("Visible")
-		for _, k in eFrame:GetChildren() :: any do
-			if k:GetAttribute("Category") == v.Name then
-				k.Visible = visible
-			end
-		end
-		v.ImageLabel.Image = (visible and "rbxassetid://9155626912") or "rbxassetid://9155599240"
-		v:SetAttribute("Visible", visible)
-	end)
-end
-
 script:SetAttribute("CurrentTab", "Highlights")

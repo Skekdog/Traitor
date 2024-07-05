@@ -2,7 +2,7 @@ local API = require(script.Parent.API)
 
 local module = {}
 
-type Theme = {
+export type Theme = {
 	Primary: Color3,
 	Secondary: Color3,
 	Text: Color3,
