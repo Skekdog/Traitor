@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local Items = require(script.Parent.ItemsManager.Items)
 local Types = require(script.Parent.RoundHandler.Types)
 local module = {}
 
@@ -302,7 +303,70 @@ module.UpdateAmmo = function(plr: Player)
     serverClient.AmmoUpdate:FireClient(plr, current, size, reserve)
 end
 
-function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: Instance, participant: Types.Participant, onTouch: (BasePart, Types.Round, BasePart) -> ()): Item
+function module.OnWeaponTouched(weapon: BasePart, round: Types.Round, part: BasePart)
+    local char = part.Parent :: Model
+    local plr = Players:GetPlayerFromCharacter(char)
+    if not plr then
+        return
+    end
+    local participant = round:GetParticipant(plr.Name)
+    if not participant then
+        return
+    end
+
+    if weapon.Name:split("_")[2] == "Ammo" then
+        local ammoType: ItemTypes.AmmoType = weapon.Name:split("_")[1] :: ItemTypes.AmmoType
+        local ammoData = module.AmmoData[ammoType]
+        local ammo = module.AmmoBoxes[weapon]
+
+        if not ammo then
+            return
+        end
+
+        if ammo <= 0 then
+            return weapon:Destroy()
+        end
+
+        local currentReserve = module.GetReserve(plr, ammoType)
+        if module.HasWeaponOfAmmoType(plr, ammoType) and currentReserve < ammoData.Max then
+            local diff = math.min(ammo, ammoData.Magazine, ammoData.Max - currentReserve)
+            module.AmmoBoxes[weapon] -= diff
+            module.SetReserve(plr, ammoType, module.GetReserve(plr, ammoType) + diff)
+            module.UpdateAmmo(plr)
+
+            if ammo - diff <= 0 then
+                weapon:Destroy()
+            end
+        end
+        return
+    end
+
+    local item = module.Items[weapon] :: ItemTypes.Weapon
+    local base = if item then item.Base else Items[weapon.Name] :: ItemTypes.WeaponDefinition
+
+    if not base then
+        return
+    end
+
+    for _, v in module.GetInventory(plr) do
+        if v.Base.Slot == base.Slot then
+            return
+        end
+    end
+    
+    if not item then
+        module.Items[weapon] = module.NewItem(base, weapon, participant)
+    end
+
+    module.AddEquipment(participant.Player, module.Items[weapon])
+    weapon.Parent = nil
+end
+
+function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: Instance?, participant: Types.Participant): Item
+    if not instance then
+        instance = base.Model
+    end
+    assert(instance)
     local itemInstance = {Base = base, Instance = instance:Clone(), Kind = base.Kind}
     if base.Kind ~= "Item" then -- You may think that an equality check would work. It does not.
         local multiUse = base.MultiUse
@@ -320,7 +384,7 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
         end
         itemInstance.LastFireTime = 0
         (itemInstance.Instance :: BasePart).Touched:Connect(function(part)
-            onTouch(itemInstance.Instance :: BasePart, participant.Round, part)
+            module.OnWeaponTouched(itemInstance.Instance :: BasePart, participant.Round, part)
         end)
     end
     return itemInstance :: any

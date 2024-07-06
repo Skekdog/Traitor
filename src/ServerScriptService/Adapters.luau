@@ -53,65 +53,6 @@ local hitSounds = {
     Mud = groundSounds,
 }
 
-local function onWeaponTouched(weapon: BasePart, round: Types.Round, part: BasePart)
-    local char = part.Parent :: Model
-    local plr = Players:GetPlayerFromCharacter(char)
-    if not plr then
-        return
-    end
-    local participant = round:GetParticipant(plr.Name)
-    if not participant then
-        return
-    end
-
-    if weapon.Name:split("_")[2] == "Ammo" then
-        local ammoType: ItemTypes.AmmoType = weapon.Name:split("_")[1] :: ItemTypes.AmmoType
-        local ammoData = InventoryManager.AmmoData[ammoType]
-        local ammo = InventoryManager.AmmoBoxes[weapon]
-
-        if not ammo then
-            return
-        end
-
-        if ammo <= 0 then
-            return weapon:Destroy()
-        end
-
-        local currentReserve = InventoryManager.GetReserve(plr, ammoType)
-        if InventoryManager.HasWeaponOfAmmoType(plr, ammoType) and currentReserve < ammoData.Max then
-            local diff = math.min(ammo, ammoData.Magazine, ammoData.Max - currentReserve)
-            InventoryManager.AmmoBoxes[weapon] -= diff
-            InventoryManager.SetReserve(plr, ammoType, InventoryManager.GetReserve(plr, ammoType) + diff)
-            InventoryManager.UpdateAmmo(plr)
-
-            if ammo - diff <= 0 then
-                weapon:Destroy()
-            end
-        end
-        return
-    end
-
-    local item = InventoryManager.Items[weapon] :: ItemTypes.Weapon
-    local base = if item then item.Base else Items[weapon.Name] :: ItemTypes.WeaponDefinition
-
-    if not base then
-        return
-    end
-
-    for _, v in InventoryManager.GetInventory(plr) do
-        if v.Base.Slot == base.Slot then
-            return
-        end
-    end
-    
-    if not item then
-        InventoryManager.Items[weapon] = InventoryManager.NewItem(base, weapon, participant, onWeaponTouched)
-    end
-
-    InventoryManager.AddEquipment(participant.Player, InventoryManager.Items[weapon])
-    weapon.Parent = nil
-end
-
 local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
 
 local deathsounds = {
@@ -242,7 +183,7 @@ local module: Types.Adapter = {
             end
         end
         
-        local itemInstance = InventoryManager.NewItem(base, item.Item, participant, onWeaponTouched)
+        local itemInstance = InventoryManager.NewItem(base, item.Item, participant)
         InventoryManager.Items[itemInstance.Instance] = itemInstance
         
         InventoryManager.AddEquipment(plr, itemInstance)
@@ -418,7 +359,7 @@ local module: Types.Adapter = {
         end
 
         weaponSpawn.Touched:Connect(function(part)
-            onWeaponTouched(weaponSpawn, round, part)
+            InventoryManager.OnWeaponTouched(weaponSpawn, round, part)
         end)
     end,
 
