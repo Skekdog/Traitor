@@ -174,7 +174,6 @@ function module.Actions.IncrementCounter(_, _, name: unknown, amount: unknown): 
     end
     assert(typeof(amount) == "number", "Parameter 2 must be a number or nil")
 
-    print(tostring(counters))
     local counter = counters[name]
     if counter then
         counters[name] = counter + amount -- Unable to use += here because of whacky type-checking
@@ -361,8 +360,6 @@ function module.InterpretConditional(participant: Types.Participant, conditional
             end
         end
     end
-
-    print(conditional, pass, counters)
 
     return pass
 end
