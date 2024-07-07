@@ -140,7 +140,7 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 end
 
 local nextRoundReady = true
-local nextMap = ServerStorage.Maps["Facility"] :: Types.MapStructureCast
+local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructureCast
 
 local function sendRoundInfo(plr: Player?)
 	local round = GetRound()

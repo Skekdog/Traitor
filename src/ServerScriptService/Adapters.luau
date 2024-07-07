@@ -6,9 +6,9 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local ActionItems = require(script.Parent.ActionItems)
 local API = require(ReplicatedFirst.API)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
-local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local Items = require(ReplicatedFirst.ItemsManager.Items)
 local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
 local ProfileManager = require(ServerScriptService.ProfileManager)
@@ -392,6 +392,8 @@ local module: Types.Adapter = {
                     soundPart:Destroy()
                 end)
                 sound:Play()
+
+                ActionItems.Execute(prop.PropInstance, prop.Attacker :: any)
             end
             oldOnBreak(self)
         end

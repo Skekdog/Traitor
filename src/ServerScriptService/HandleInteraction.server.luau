@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local ActionItems = require(script.Parent.ActionItems)
 local GetRound = require(script.Parent.GetRound)
 
 ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: unknown)
@@ -20,6 +21,11 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: P
 	if not round then
 		return
 	end
+
+	local participant = round:GetParticipant(plr.Name)
+	if not participant then
+		return
+	end
 	
 	local hum = char:FindFirstChild("Humanoid") :: Humanoid?
 	if not hum or hum.Health <= 0 then
@@ -37,7 +43,7 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: P
 	local props = map:FindFirstChild("Props")
 
 	if actionItems and actionItems:IsAncestorOf(part) then
-		(require)(part.Parent:FindFirstChildOfClass("ModuleScript"))()
+		ActionItems.Execute(part:FindFirstAncestorOfClass("Model") :: Model, participant)
 	elseif doors and doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
 		part:SetAttribute("Opening", true)
 		part:SetAttribute("Open", not part:GetAttribute("Open"))

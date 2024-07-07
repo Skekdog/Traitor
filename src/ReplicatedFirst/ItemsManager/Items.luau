@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemTypes = require(script.Parent.ItemTypes)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
-local projectiles = ReplicatedStorage.Projectiles
+local projectiles = ReplicatedStorage:WaitForChild("Projectiles") :: typeof(ReplicatedStorage.Projectiles)
 local models = ReplicatedStorage.WeaponModels
 local weaponSounds = ReplicatedStorage.WeaponSounds
 local firedSounds = weaponSounds.Fired

@@ -3,18 +3,20 @@ local TweenService = game:GetService("TweenService")
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local Items = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.Items)
 local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
-local WeaponsManager = require(script.Parent.WeaponsManager)
 local module = {}
 
 type Relationship = "__This" | Types.RoleRelationship | "__Part_"
 
 local counters: {[string]: number?} = {}
 
-local function tweenSlidingDoor(actionItem: Model, door: BasePart): ()
+local function tweenSlidingDoor(actionItem: Model, door: BasePart, mult: number?): ()
+    mult = mult or -1
+    assert(mult)
+
     local cframe = door.CFrame
 
     actionItem:SetAttribute("Disabled", true)
-    TweenService:Create(door, TweenInfo.new(1), {CFrame = cframe * CFrame.new(0, 0, -2.8)}):Play()
+    TweenService:Create(door, TweenInfo.new(1), {CFrame = cframe * CFrame.new(0, 0, mult * 2.8)}):Play()
 
     task.delay(5, function() -- Actions must never yield
         local tween = TweenService:Create(door, TweenInfo.new(1), {CFrame = cframe})
@@ -26,9 +28,12 @@ local function tweenSlidingDoor(actionItem: Model, door: BasePart): ()
 end
 
 local function playSlidingDoorSound(door: BasePart): ()
-    local sound = door:FindFirstChild("DoorSound") or ServerStorage.DoorSound:Clone()
+    local sound = door:FindFirstChild("SlidingDoorSound") or ServerStorage.SlidingDoorSound:Clone()
     assert(sound:IsA("Sound"), "DoorSound must be a Sound")
     sound.Parent = door
+    sound.Ended:Once(function()
+        sound:Destroy()
+    end)
     sound:Play()
 end
 
@@ -88,10 +93,6 @@ function module.Actions.SlidingDoor(actionItem: Model, _, doorName: unknown): ()
     assert(door, "Could not find Door")
     assert(door:IsA("BasePart"), "Door must be a BasePart")
 
-    if actionItem:GetAttribute("Disabled") then
-        return
-    end
-
     tweenSlidingDoor(actionItem, door)
     playSlidingDoorSound(door)
 end
@@ -111,12 +112,8 @@ function module.Actions.DoubleSlidingDoor(actionItem: Model, _, door1Name: unkno
     assert(door1:IsA("BasePart"), "Door 1 must be a BasePart")
     assert(door2:IsA("BasePart"), "Door 2 must be a BasePart")
 
-    if actionItem:GetAttribute("Disabled") then
-        return
-    end
-
     tweenSlidingDoor(actionItem, door1)
-    tweenSlidingDoor(actionItem, door2)
+    tweenSlidingDoor(actionItem, door2, 1)
 
     playSlidingDoorSound(door1)
 end
@@ -134,7 +131,7 @@ function module.Actions.SpawnProp(_, participant: Types.Participant, prop: unkno
     assert(typeof(prop) == "string", "Parameter 1 must be a string")
 
     local props = participant.Round.Map:FindFirstChild("Props")
-    assert(props, "Map does not have a props folder!")
+    assert(props, "Map does not have a props folder")
 
     local propInstance = props:FindFirstChild(prop)
     assert(propInstance, `Could not find prop with name {prop}`)
@@ -159,6 +156,7 @@ function module.Actions.TriggerVictory(_, participant: Types.Participant, team: 
 end
 
 function module.Actions.ExplosiveBarrel(actionItem: Model, participant: Types.Participant): ()
+    local WeaponsManager = require(script.Parent.WeaponsManager)
     WeaponsManager.CreateExplosion(actionItem:GetPivot().Position, {
         Kind = "Explosion",
         Radius = 25,
@@ -174,29 +172,45 @@ function module.Actions.IncrementCounter(_, _, name: unknown, amount: unknown): 
     if not amount then
         amount = 1
     end
-    assert(typeof(amount) == "number", "Parameter 2 must be a number")
+    assert(typeof(amount) == "number", "Parameter 2 must be a number or nil")
 
+    print(tostring(counters))
     local counter = counters[name]
     if counter then
-        counter += amount
+        counters[name] = counter + amount -- Unable to use += here because of whacky type-checking
     else
         counters[name] = amount
     end
 end
 
 --todo: This should use Map.Dynamic, not Map.Map
-function module.Actions.MoveMapElement(_, participant: Types.Participant, name: unknown, cframe: unknown): ()
+function module.Actions.MoveMapElement(actionItem: Model, participant: Types.Participant, name: unknown, cframe: unknown): ()
     assert(name, "Missing Parameter 1")
     assert(typeof(name) == "string", "Parameter 1 must be a string")
 
     assert(cframe, "Missing Parameter 2")
     assert(typeof(cframe) == "CFrame", "Parameter 2 must be a CFrame")
 
-    local element = participant.Round.Map.Map:FindFirstChild(name, true)
-    assert(element, `Map element with name {name} was not found!`)
+    local element = if name == "__This" then actionItem else participant.Round.Map.Map:FindFirstChild(name, true)
+    assert(element, `Map element with name {name} was not found`)
     assert(element:IsA("PVInstance"), `Map element with name {name} is not a moveable Instance (PVInstance)! Check that there are no elements with an identical name.`)
 
     element:PivotTo(cframe)
+end
+
+--todo: This should use Map.Dynamic, not Map.Map
+function module.Actions.MoveMapElementRelative(actionItem: Model, participant: Types.Participant, name: unknown, cframe: unknown): ()
+    assert(name, "Missing Parameter 1")
+    assert(typeof(name) == "string", "Parameter 1 must be a string")
+
+    assert(cframe, "Missing Parameter 2")
+    assert(typeof(cframe) == "CFrame", "Parameter 2 must be a CFrame")
+
+    local element = if name == "__This" then actionItem else participant.Round.Map.Map:FindFirstChild(name, true)
+    assert(element, `Map element with name {name} was not found`)
+    assert(element:IsA("PVInstance"), `Map element with name {name} is not a moveable Instance (PVInstance)! Check that there are no elements with an identical name.`)
+
+    element:PivotTo(element:GetPivot() * cframe)
 end
 
 function module.Actions.Teleport(_, participant: Types.Participant, targets: unknown, location: unknown): ()
@@ -217,6 +231,7 @@ function module.Actions.Kill(_, participant: Types.Participant, targets: unknown
     assert(targets, "Missing Parameter 1")
     assert(typeof(targets) == "string", "Parameter 1 must be __All, __Ally, __Enemy, __This, or a role name")
 
+    assert(cause, "Missing Parameter 2")
     assert(table.find({"Blade", "Blunt", "Burn", "Crush", "Drown", "Explosion", "Fall", "Firearm", "Mutation", "Suicide"}, cause :: string), "Parameter 2 must be one of: Blade, Blunt, Burn, Crush, Drown, Explosion, Fall, Firearm, Mutation, Suicide")
     assert(typeof(credit) == "nil" or typeof(credit) == "boolean", "Parameter 3 must be a boolean or nil")
 
@@ -228,14 +243,14 @@ end
 
 function module.Actions.Wait(_, _, duration: unknown): ()
     assert(duration, "Missing Parameter 1")
-    assert(typeof(duration) == "number")
+    assert(typeof(duration) == "number", "Parameter 1 must be a number")
 
     task.wait(duration)
 end
 
 function module.Actions.DeductCredits(_, participant: Types.Participant, amount: unknown): ()
     assert(amount, "Missing Parameter 1")
-    assert(typeof(amount) == "number")
+    assert(typeof(amount) == "number", "Parameter 1 must be a number")
 
     participant:SetCredits(participant:GetCredits() - amount)
 end
@@ -262,34 +277,156 @@ local function getCounter(participant: Types.Participant, counter: string): numb
         return participant:GetCredits()
     elseif counter == "Health" then
         return participant:GetHealth()
+    elseif counter == "RoundInProgress" then
+        return if participant.Round:IsRoundInProgress() then 1 else 0
     end
     return counters[counter] or 0
 end
 
-function module.Conditions.CounterEq(participant: Types.Participant, counter: string, target: number): boolean
-    return getCounter(participant, counter) == target
+local operations = {">", ">=", "<", "<=", "==", "?="}
+function module.InterpretConditional(participant: Types.Participant, conditional: string): boolean
+    local split = conditional:split(" ")
+
+    local pass = true
+    for i, v in split do
+        if table.find(operations, v) then
+            local lhs = split[i - 1]
+            local rhs = split[i + 1]
+            assert(lhs and rhs, "Invalid syntax")
+
+            local lhsValue: Types.RoleName | number
+            if tonumber(lhs) then
+                lhsValue = tonumber(lhs) :: number
+            elseif lhs:sub(1, 1) == `"` and lhs:sub(-1) == `"` then
+                local role = participant.Round:GetRoleFromName(lhs:sub(2, -2))
+                if v == "?=" then
+                    lhsValue = role.Allegiance or role.Name
+                elseif v == "==" then
+                    lhsValue = role.Name
+                else
+                    error("Invalid operator for role comparison")
+                end
+            elseif rhs:sub(1, 2) == "__" then
+                if rhs == "__This" then
+                    local role = participant.Role
+                    if v == "?=" then
+                        lhsValue = role.Allegiance or role.Name
+                    elseif v == "==" then
+                        lhsValue = role.Name
+                    else
+                        error("Invalid operator for role comparison")
+                    end
+                end
+            else
+                lhsValue = getCounter(participant, lhs)
+            end
+
+            local rhsValue: Types.RoleName | number
+            if tonumber(rhs) then
+                rhsValue = tonumber(rhs) :: number
+            elseif rhs:sub(1, 1) == `"` and rhs:sub(-1) == `"` then
+                local role = participant.Round:GetRoleFromName(rhs:sub(2, -2))
+                if v == "?=" then
+                    rhsValue = role.Allegiance or role.Name
+                elseif v == "==" then
+                    rhsValue = role.Name
+                else
+                    error("Invalid operator for role comparison")
+                end
+            elseif rhs:sub(1, 2) == "__" then
+                if rhs == "__This" then
+                    local role = participant.Role
+                    if v == "?=" then
+                        rhsValue = role.Allegiance or role.Name
+                    elseif v == "==" then
+                        rhsValue = role.Name
+                    else
+                        error("Invalid operator for role comparison")
+                    end
+                end
+            else
+                rhsValue = getCounter(participant, rhs)
+            end
+
+            if v == ">" then
+                pass = lhsValue > rhsValue
+            elseif v == ">=" then
+                pass = lhsValue >= rhsValue
+            elseif v == "<" then
+                pass = lhsValue < rhsValue
+            elseif v == "<=" then
+                pass = lhsValue <= rhsValue
+            elseif v == "==" then
+                pass = lhsValue == rhsValue
+            end
+        end
+    end
+
+    print(conditional, pass, counters)
+
+    return pass
 end
 
-function module.Conditions.CounterGT(participant: Types.Participant, counter: string, target: number): boolean
-    return getCounter(participant, counter) > target
+function module.Execute(actionItem: Model, participant: Types.Participant): ()
+    if actionItem:GetAttribute("Disabled") then
+        return
+    end
+	local attributes = actionItem:GetAttributes()
+
+	local actions: {[string]: string} = {}
+	local actionParameters: {[string]: {string | number | CFrame}?} = {}
+	local actionOrder: {string} = {}
+
+	local conditions: {[string]: string} = {}
+	for i, v: string | number | CFrame in attributes do
+		local split = i:split("_")
+		if split[2] and split[2]:sub(1, 9) == "Parameter" then
+			local action = actionParameters[split[1]]
+			if not action then
+				action = {}
+				actionParameters[split[1]] = action
+			end
+			assert(action)
+
+			local index = tonumber(split[2]:sub(10, -1))
+			assert(index, `Expected number after parameter name ({i})`)
+
+			table.insert(action, index, v)
+		elseif split[2] and split[2]:sub(1, 9) == "Condition" then
+			assert(typeof(v) == "string", `Condition {i} must be a string`)
+			conditions[split[1]] = v
+		elseif i:sub(1, 6) == "Action" and tonumber(i:sub(7, -1)) then
+			if not module.Actions[v] or typeof(v) ~= "string" then
+				error(`Expected ActionName for {i}`)
+			end
+
+			actions[i] = v
+			table.insert(actionOrder, i)
+		end
+	end
+	
+	for i in conditions do
+		if not table.find(actionOrder, i) then
+			warn(`No Action is associated with condition for {i}`)
+		end
+	end
+	
+	for i in actions do
+		if not table.find(actionOrder, i) then
+			warn(`No Action is associated with parameters for {i}`)
+		end
+	end
+
+	table.sort(actionOrder, function(a, b)
+		return tonumber(a:sub(7, -1)) < tonumber(b:sub(7, -1))
+	end)
+	
+	for _, v in actionOrder do
+        if conditions[v] and not module.InterpretConditional(participant, conditions[v]) then
+            break
+        end
+		module.Actions[actions[v]](actionItem, participant, table.unpack(actionParameters[v] or {}))
+	end
 end
 
-function module.Conditions.CounterLT(participant: Types.Participant, counter: string, target: number): boolean
-    return getCounter(participant, counter) < target
-end
-
-function module.Conditions.CounterLTE(participant: Types.Participant, counter: string, target: number): boolean
-    return getCounter(participant, counter) <= target
-end
-
-function module.Conditions.CounterGTE(participant: Types.Participant, counter: string, target: number): boolean
-    return getCounter(participant, counter) >= target
-end
-
-function module.Conditions.TeamIs(participant: Types.Participant, team: string): boolean
-    return participant.Role.Allegiance == team
-end
-
-function module.Conditions.RoundInProgress(round: Types.Round): boolean
-    return round:IsRoundInProgress()
-end
+return module

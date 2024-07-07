@@ -37,7 +37,11 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
 
     local start = weapon.FalloffStart or 0
     if distance >= start then
-        damage *= API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: ItemTypes.ExplosionInfo).Radius))
+        local multiplier = API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: ItemTypes.ExplosionInfo).Radius))
+        if multiplier < 0 then
+            multiplier = 0
+        end
+        damage *= multiplier
     end
 
     if attacker then
