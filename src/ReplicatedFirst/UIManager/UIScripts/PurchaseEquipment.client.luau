@@ -13,7 +13,7 @@ local purchaseButton = UI.Purchase
 
 local radarCooldown = 5
 
-local function update(item, credits)
+local function update(item: string, credits: number)
 	UI.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
 	if credits >= UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost") then
 		UI.CreditCost.TextColor3 = Color3.new(0.294118, 1, 0.243137)
@@ -121,12 +121,12 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 end);
 
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
-	local participant = p :: Types.ClientOwnParticipant
+	local participant = p :: Types.ClientOwnParticipant?
 	local item = purchaseButton:GetAttribute("Item")
 	if item == "" then
 		return
 	end
-	update(item, participant.Credits)
+	update(item, if participant then participant.Credits else 0)
 end);
 
 (ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).InformClientSideEquipment.OnClientEvent:Connect(function(item)

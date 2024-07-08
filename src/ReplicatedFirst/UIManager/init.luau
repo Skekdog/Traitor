@@ -66,6 +66,11 @@ function UIManager.RegisterUI(object: GuiObject): UI
 
 		ToggleVisible = function(self: UI, force: boolean?, ignoreOtherUIs: boolean?)
 			local newVisible = if force ~= nil then force else not self.Visible
+
+			if newVisible == self.Visible then
+				return
+			end
+
 			self.Visible = newVisible
 
 			local object = self.Object

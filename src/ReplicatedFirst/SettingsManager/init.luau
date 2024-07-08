@@ -111,7 +111,7 @@ module.AvailableSettings = {
 		Category = "User Interface",
 		Tooltip = "",
 		PossibleValues = {"0.2", "0.3", "0.4", "0.5"},
-		Default = "0.75",
+		Default = "0.2",
 	},
 	{
 		Name = "Animate UI Transitions",

@@ -47,6 +47,9 @@ end
 
 local slots: {[number]: ItemTypes.Item} = {}
 (ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item)
+	if not equipment then
+		return
+	end
 	if event == "Add" then
 		InventoryManager.AddEquipment(plr, equipment)
 		local clone = backpack.Sample:Clone()
