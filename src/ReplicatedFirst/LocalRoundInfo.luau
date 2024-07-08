@@ -89,7 +89,7 @@ end
 
 --- @returns A function to stop listening for changes
 function module.Listen(event: Event, callback: ListenerCallback): () -> ()
-    table.insert(listeners[event], callback :: ListenerCallback)
+    table.insert(listeners[event], callback)
     local pos = #listeners[event]
     return function()
         listeners[event][pos] = nil

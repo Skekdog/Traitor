@@ -467,7 +467,7 @@ local CriticalStateStart = 0 -- os.clock()
 local IsStudio = RunService:IsStudio()
 local IsLiveCheckActive = false
 
-local UseMockDataStore = false
+local UseMockDataStore = IsStudio
 local MockDataStore = ProfileService._mock_data_store -- Mock data store used when API access is disabled
 
 local UserMockDataStore = ProfileService._user_mock_data_store -- Separate mock data store accessed via ProfileStore.Mock
