@@ -503,6 +503,10 @@ local module: Types.Adapter = {
             assert(v:IsA("Constraint"))
 
             local part = clone:FindFirstChild(ragdollConstraints[v.Name]) :: BasePart
+            if not part then
+                victim.Player.Character = nil
+                return -- When falling into the void this causes an error. For some reason the descendantof workspace check does not actually do anything?
+            end
             v.Attachment1 = part:FindFirstChild(v.Name.."RigAttachment", true) :: Attachment
 
             local att = v.Attachment1 :: Attachment
