@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local ActionItems = require(script.Parent.ActionItems)
 local GetRound = require(script.Parent.GetRound)
+local StandardDoor = require(script.Parent.Parent.ReplicatedFirst.StandardDoor)
 
 ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: unknown)
 	local char = plr.Character
@@ -46,17 +48,31 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: P
 		ActionItems.Execute(part:FindFirstAncestorOfClass("Model") :: Model, participant)
 	elseif doors and doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
 		part:SetAttribute("Opening", true)
-		part:SetAttribute("Open", not part:GetAttribute("Open"))
 
-		TweenService:Create(part, TweenInfo.new(1), {CFrame = part.CFrame * CFrame.Angles(0, math.rad(if part:GetAttribute("Open") then -90 else 90), 0)}):Play()
+		local angle = part:FindFirstChild("DoorAngle") :: NumberValue or Instance.new("NumberValue")
+		if not angle.Parent then
+			angle.Name = "DoorAngle"
+			angle.Parent = part
+		end
+
+		local open = not part:GetAttribute("Open")
+		part:SetAttribute("Open", open)
+
+		local initialCFrame = part.CFrame
+
+		StandardDoor(part, initialCFrame, open, angle)
+		ReplicatedStorage.ServerClient.TweenStandardDoor:FireAllClients(part, initialCFrame, open, angle)
 		
 		local sounds = {}
 		for _, v in part:GetChildren() do
-			if v:IsA("Sound") and v.Name == (part:GetAttribute("Open") and "OpenSound" or "CloseSound") then
+			if v:IsA("Sound") and v.Name == if open then "OpenSound" else "CloseSound" then
 				table.insert(sounds, v)
 			end
 		end
 		sounds[math.random(1, #sounds)]:Play()
+
+		task.wait(1)
+		part:SetAttribute("Opening", false)
 	elseif props and props:IsAncestorOf(part) then
 
 	end

@@ -21,11 +21,11 @@ local function tweenSlidingDoor(actionItem: Model, door: BasePart, mult: number?
     local target = cframe * CFrame.new(0, 0, mult * 2.8)
 
     door.CFrame = target -- on the server we just set it instantly, the client will tween it
-    serverClient.TweenDoor:FireAllClients(door, cframe, target)
+    serverClient.TweenSlidingDoor:FireAllClients(door, cframe, target)
 
     task.delay(5, function() -- Actions must never yield
         door.CFrame = cframe
-        serverClient.TweenDoor:FireAllClients(door, target, cframe)
+        serverClient.TweenSlidingDoor:FireAllClients(door, target, cframe)
         task.wait(1)
         actionItem:SetAttribute("Disabled", false)
     end)

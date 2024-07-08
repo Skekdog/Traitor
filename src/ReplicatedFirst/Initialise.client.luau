@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local API = require(script.Parent.API)
 local InventoryManager = require(script.Parent.InventoryManager)
@@ -6,6 +7,7 @@ local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
 local ShatterGlass = require(script.Parent.ShatterGlass)
+local StandardDoor = require(script.Parent.StandardDoor)
 local UIManager = require(script.Parent.UIManager)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)
@@ -25,10 +27,12 @@ serverClient.TweenProjectile.OnClientEvent:Connect(function(projectile: PVInstan
     projectile.Parent = workspace.Projectiles
 end)
 
-serverClient.TweenDoor.OnClientEvent:Connect(function(door: BasePart, initialCFrame: CFrame, targetCFrame: CFrame): ()
+serverClient.TweenSlidingDoor.OnClientEvent:Connect(function(door: BasePart, initialCFrame: CFrame, targetCFrame: CFrame): ()
     door.CFrame = initialCFrame
     TweenService:Create(door, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = targetCFrame}):Play()
 end)
+
+serverClient.TweenStandardDoor.OnClientEvent:Connect(StandardDoor)
 
 serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, position: Vector3, normal: Vector3)
     local impactHole = Instance.new("Part")
