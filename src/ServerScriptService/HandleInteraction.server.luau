@@ -1,6 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 local ActionItems = require(script.Parent.ActionItems)
 local GetRound = require(script.Parent.GetRound)
 local StandardDoor = require(script.Parent.Parent.ReplicatedFirst.StandardDoor)

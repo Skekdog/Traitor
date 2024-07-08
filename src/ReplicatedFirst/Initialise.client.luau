@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local API = require(script.Parent.API)
 local InventoryManager = require(script.Parent.InventoryManager)
