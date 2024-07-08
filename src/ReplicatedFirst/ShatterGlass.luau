@@ -9,6 +9,11 @@ local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePa
     wedge.Anchored = false
     wedge.Color = parent.Color
     wedge.Transparency = parent.Transparency
+    wedge.Material = parent.Material
+    wedge.MaterialVariant = parent.MaterialVariant
+    wedge.Reflectance = parent.Reflectance
+    wedge.CollisionGroup = "ShatteredGlass"
+    wedge.BottomSurface = Enum.SurfaceType.Smooth
     wedge.CanTouch = false
     wedge.CanQuery = false
     wedge.Name = "GlassFragment"

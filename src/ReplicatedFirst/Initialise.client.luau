@@ -25,6 +25,11 @@ serverClient.TweenProjectile.OnClientEvent:Connect(function(projectile: PVInstan
     projectile.Parent = workspace.Projectiles
 end)
 
+serverClient.TweenDoor.OnClientEvent:Connect(function(door: BasePart, initialCFrame: CFrame, targetCFrame: CFrame): ()
+    door.CFrame = initialCFrame
+    TweenService:Create(door, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = targetCFrame}):Play()
+end)
+
 serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, position: Vector3, normal: Vector3)
     local impactHole = Instance.new("Part")
     impactHole.Anchored = false

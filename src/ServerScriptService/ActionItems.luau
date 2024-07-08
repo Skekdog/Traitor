@@ -1,29 +1,33 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local TweenService = game:GetService("TweenService")
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local Items = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.Items)
 local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
 local module = {}
+
+local serverClient = ReplicatedStorage.ServerClient
 
 type Relationship = "__This" | Types.RoleRelationship | "__Part_"
 
 local counters: {[string]: number?} = {}
 
 local function tweenSlidingDoor(actionItem: Model, door: BasePart, mult: number?): ()
+    actionItem:SetAttribute("Disabled", true)
+
     mult = mult or -1
     assert(mult)
 
     local cframe = door.CFrame
+    local target = cframe * CFrame.new(0, 0, mult * 2.8)
 
-    actionItem:SetAttribute("Disabled", true)
-    TweenService:Create(door, TweenInfo.new(1), {CFrame = cframe * CFrame.new(0, 0, mult * 2.8)}):Play()
+    door.CFrame = target -- on the server we just set it instantly, the client will tween it
+    serverClient.TweenDoor:FireAllClients(door, cframe, target)
 
     task.delay(5, function() -- Actions must never yield
-        local tween = TweenService:Create(door, TweenInfo.new(1), {CFrame = cframe})
-        tween.Completed:Once(function()
-            actionItem:SetAttribute("Disabled", false)
-        end)
-        tween:Play()
+        door.CFrame = cframe
+        serverClient.TweenDoor:FireAllClients(door, target, cframe)
+        task.wait(1)
+        actionItem:SetAttribute("Disabled", false)
     end)
 end
 
