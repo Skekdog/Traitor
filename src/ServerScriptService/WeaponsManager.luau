@@ -3,6 +3,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local GetRound = require(script.Parent.GetRound)
+local CalculateDamageModifier = require(script.Parent.Parent.ReplicatedFirst.CalculateDamageModifier)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
 local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
@@ -45,7 +46,7 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
     end
 
     if attacker then
-        damage *= 1--Adapters.CalculateDamageModifier(attacker.Karma)
+        damage *= CalculateDamageModifier(attacker.Karma)
     end
 
     return damage

@@ -355,7 +355,7 @@ function module.OnWeaponTouched(weapon: BasePart, round: Types.Round, part: Base
     end
     
     if not item then
-        module.Items[weapon] = module.NewItem(base, weapon, participant)
+        module.NewItem(base, weapon, participant)
     end
 
     module.AddEquipment(participant.Player, module.Items[weapon])
@@ -387,6 +387,10 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
             module.OnWeaponTouched(itemInstance.Instance :: BasePart, participant.Round, part)
         end)
     end
+
+    module.Items[itemInstance.Instance] = itemInstance :: any
+    module.AddEquipment(participant.Player, itemInstance :: any)
+
     return itemInstance :: any
 end
 

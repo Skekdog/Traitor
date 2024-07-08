@@ -7,6 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ActionItems = require(script.Parent.ActionItems)
+local CalculateDamageModifier = require(script.Parent.Parent.ReplicatedFirst.CalculateDamageModifier)
 local API = require(ReplicatedFirst.API)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local Items = require(ReplicatedFirst.ItemsManager.Items)
@@ -183,10 +184,7 @@ local module: Types.Adapter = {
             end
         end
         
-        local itemInstance = InventoryManager.NewItem(base, item.Item, participant)
-        InventoryManager.Items[itemInstance.Instance] = itemInstance
-        
-        InventoryManager.AddEquipment(plr, itemInstance)
+        InventoryManager.NewItem(base, item.Item, participant)
 
         return
     end,
@@ -324,9 +322,7 @@ local module: Types.Adapter = {
         remote:FireClient(to.Player, target.Player)
     end,
 
-    CalculateDamageModifier = function(karma)
-        return ((0.00005 * (karma^2)) + 50) / 100
-    end,
+    CalculateDamageModifier = CalculateDamageModifier,
 
     LoadBound = function(round, bound)
         if bound.Name == "KillBound" then
