@@ -23,6 +23,29 @@ local function findPlr(plrName: string)
 	return list:FindFirstChild("Player-"..plrName) :: PlayerElement
 end
 
+local function selectMark(marks: Frame & any, button: (TextButton & any)?, plr: Player)
+	if button and button.UIStroke.Enabled then
+		plr:SetAttribute("Mark", "")
+		plr:SetAttribute("MarkColour", Color3.new())
+		button.UIStroke.Enabled = false
+		return
+	end
+
+	for _, b in marks:GetChildren() :: {any} do
+		if b.ClassName ~= "TextButton" then
+			continue
+		end
+		b.UIStroke.Enabled = false
+	end
+
+	if not button then
+		return
+	end
+	button.UIStroke.Enabled = true
+	plr:SetAttribute("Mark", button.Name)
+	plr:SetAttribute("MarkColour", button.TextColor3)
+end
+
 function updatePlr(plr: Player, clone: any)
 	local participant: Types.ClientOwnParticipant | Types.ClientParticipant?
 	if plr == Players.LocalPlayer then
@@ -31,7 +54,18 @@ function updatePlr(plr: Player, clone: any)
 		participant = LocalRoundInfo.GetParticipantInfo(plr.Name)
 	end
 
-	movePlr(plr, if participant then participant.Status else "Spectating")
+	local status = if participant then participant.Status else "Spectating"
+
+	local marksVisible = (status == "Alive") and (plr ~= Players.LocalPlayer)
+	for _, v in clone.Marks:GetChildren() do
+		if v:IsA("TextButton") then
+			v.Visible = marksVisible
+		end
+	end
+
+	selectMark(clone.Marks, nil, plr)
+
+	movePlr(plr, status :: any)
 
 	if not participant then
 		clone.Username:SetAttribute("StyleData")
@@ -71,20 +105,7 @@ local function createPlr(plr: Player)
 			continue
 		end
 		v.MouseButton1Click:Connect(function()
-			if v.UIStroke.Enabled then
-				plr:SetAttribute("Mark", "")
-				v.UIStroke.Enabled = false
-				return
-			end
-
-			for _, b in clone.Marks:GetChildren() :: {any} do
-				if b.ClassName ~= "TextButton" then
-					continue
-				end
-				b.UIStroke.Enabled = false
-			end
-			v.UIStroke.Enabled = true
-			plr:SetAttribute("Mark", v.Name)
+			selectMark(clone.Marks, v, plr)
 		end)
 	end
 
@@ -126,7 +147,6 @@ function movePlr(plr: Player, status: Status)
 	local clone = findPlr(plr.Name) or createPlr(plr)
 	local oldOrder = (clone.LayoutOrder // 1000) * 1000
 	clone.LayoutOrder = layoutOrders[status] + 1
-	clone.Marks.Visible = status == "Alive"
 
 	for _, v in list:GetChildren() do
 		if not v:IsA("TextLabel") then
@@ -164,10 +184,11 @@ local function removePlr(plr: Player | string)
 	end
 end
 
-Players.PlayerRemoving:Connect(removePlr)
 Players.PlayerAdded:Connect(function(plr)
 	movePlr(plr, "Spectating")
 end)
+
+Players.PlayerRemoving:Connect(removePlr)
 
 local participants = LocalRoundInfo.GetAllParticipants()
 local plrToParticipant: {[Player]: Types.ClientParticipant} = {}
@@ -191,8 +212,11 @@ end)
 LocalRoundInfo.Listen("UpdateParticipant", function(p)
 	local participant = p :: Types.ClientParticipant | string
 	if type(participant) == "string" then
-		removePlr(participant)
-		return
+		local player = Players:FindFirstChild(participant)
+		if not player then
+			return removePlr(participant)
+		end
+		return updatePlr(player, findPlr(participant))
 	end
 	updatePlr(participant.Player, findPlr(participant.Player.Name))
 end);

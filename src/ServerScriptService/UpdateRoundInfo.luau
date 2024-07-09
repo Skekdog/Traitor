@@ -12,7 +12,7 @@ function module.UpdateParticipant(participant: Types.Participant, nillify: boole
 		if v == participant.Player then
 			remotes.UpdateOwnParticipant:FireClient(v, if nillify then nil else participant:ViewPartialSelf())
 		else
-			remotes.UpdateParticipant:FireClient(v, if nillify then nil else participant:ViewPartialParticipant(participant.Round:GetParticipant(v.Name)))
+			remotes.UpdateParticipant:FireClient(v, if nillify then participant.Player.Name else participant:ViewPartialParticipant(participant.Round:GetParticipant(v.Name)))
 		end
 	end
 end
