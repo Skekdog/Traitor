@@ -9,7 +9,7 @@ local weaponSounds = ReplicatedStorage.WeaponSounds
 local firedSounds = weaponSounds.Fired
 local reloadSounds = weaponSounds.Reload
 
-local bullet = projectiles.Bullet :: PVInstance
+local bullet = projectiles:WaitForChild("Bullet") :: PVInstance -- Somehow this ended up not loading despite Waiting for Projectiles?
 
 local function burn(attacker: Types.Participant?, part: BasePart, callback: (fire: Fire, burnSound: Sound) -> ()): ()
     if not attacker then
@@ -68,7 +68,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
         Description = "Kaboom",
 
         ProjectileInfo = {
-            Base = projectiles.Grenade :: PVInstance,
+            Base = projectiles:WaitForChild("Grenade") :: PVInstance,
             Speed = 500
         },
         Slot = 7,
@@ -270,7 +270,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
 
         MultiUse = false,
         ProjectileInfo = {
-            Base = projectiles.GoldenBullet :: PVInstance,
+            Base = projectiles:WaitForChild("GoldenBullet") :: PVInstance,
             Speed = 250
         },
 
@@ -360,7 +360,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
         FiredSound = firedSounds["Flare Gun"],
 
         ProjectileInfo = {
-            Base = projectiles.Flare :: PVInstance,
+            Base = projectiles:WaitForChild("Flare") :: PVInstance,
             Speed = 140
         },
 
@@ -560,7 +560,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
 
         MultiUse = false,
         ProjectileInfo = {
-            Base = projectiles.Flashbang :: PVInstance,
+            Base = projectiles:WaitForChild("Flashbang") :: PVInstance,
             Speed = 80,
         },
 
@@ -608,7 +608,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
         ReloadSound = reloadSounds["Silenced Pistol"],
 
         ProjectileInfo = {
-            Base = projectiles.SilencedBullet :: PVInstance,
+            Base = projectiles:WaitForChild("SilencedBullet") :: PVInstance,
             Speed = 100
         },
 
