@@ -122,7 +122,7 @@ function module.Actions.DoubleSlidingDoor(actionItem: Model, _, door1Name: unkno
     playSlidingDoorSound(door1)
 end
 
-function module.Actions.GiveItem(_, participant: Types.Participant, item: unknown): ()
+function module.Actions.GiveItem(actionItem: Model, participant: Types.Participant, item: unknown): ()
     assert(item, "Missing Parameter 1")
     assert(typeof(item) == "string", "Parameter 1 must be a string")
     assert(Items[item], "Invalid item")
@@ -130,17 +130,18 @@ function module.Actions.GiveItem(_, participant: Types.Participant, item: unknow
     InventoryManager.NewItem(Items[item], nil, participant)
 end
 
-function module.Actions.SpawnProp(_, participant: Types.Participant, prop: unknown): ()
+function module.Actions.SpawnProp(actionItem: Model, participant: Types.Participant, prop: unknown): ()
     assert(prop, "Missing Parameter 1")
     assert(typeof(prop) == "string", "Parameter 1 must be a string")
 
     local props = participant.Round.Map:FindFirstChild("Props")
     assert(props, "Map does not have a props folder")
 
-    local propInstance = props:FindFirstChild(prop)
+    local propInstance = props:FindFirstChild(prop) :: PVInstance?
     assert(propInstance, `Could not find prop with name {prop}`)
 
     propInstance = propInstance:Clone()
+    propInstance:PivotTo(actionItem:GetPivot())
     propInstance.Parent = props
 end
 
