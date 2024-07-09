@@ -66,10 +66,10 @@ return function(glass: BasePart, direction: Vector3?): ()
 
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://"..tostring(sounds[math.random(1, #sounds)])
-    sound.PlayOnRemove = true
     sound.RollOffMaxDistance = 200
     sound.RollOffMinDistance = 10
-    sound.Parent = glass
+    sound.Parent = fragments[1]
+    sound:Play()
 
     glass:Destroy()
 

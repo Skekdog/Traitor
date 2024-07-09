@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local API = require(script.Parent.API)
 
 local module = {}
@@ -42,7 +43,7 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	
 	local SettingsManager = require(script.Parent.SettingsManager)
 	local tweenInfo = TweenInfo.new((SettingsManager.GetSetting("Animate UI Transitions") and not noTransition) and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
-	theme = theme or module.Themes.Dark
+	theme = theme or module.Themes[SettingsManager.GetSetting("UI Theme") :: string]
 	assert(theme)
 	
 	local styleData = (v:GetAttribute("StyleData") or ""):split(";")
@@ -86,9 +87,13 @@ function module.UpdateTheme(theme: string | Theme): ()
 		theme = module.Themes[theme]
 	end
 	assert(typeof(theme) == "table")
-	for _, v in game:GetService("CollectionService"):GetTagged("StyledUI") do
+	for _, v in CollectionService:GetTagged("StyledUI") do
 		module.UpdateThemeInstance(v, theme)
 	end
 end
+
+CollectionService:GetInstanceAddedSignal("StyledUI"):Connect(function(instance)
+	module.UpdateThemeInstance(instance)
+end)
 
 return module

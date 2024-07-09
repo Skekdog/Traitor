@@ -193,7 +193,6 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
         entry:SetAttribute("CreditCost", equipment.Cost)
         entry:SetAttribute("Description", equipment.Description)
         
-        entry.BackgroundTransparency = 0
         entry.Image = equipment.Icon
         entry.Name = equipment.Name
         entry.Visible = true

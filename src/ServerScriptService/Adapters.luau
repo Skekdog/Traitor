@@ -19,7 +19,7 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local remotes = ReplicatedStorage.RoundHandler
 
-local plasticSounds = {5682538842, 9114858163, 9114857307, 9114626534}
+local plasticSounds = {5682538842, 9114626534}
 local metalSounds = {7842407959, 4072627278, 2303101209}
 local woodSounds = {8542226017, 8542224235, 8542224819, 8542225504, 8542223682}
 local fabricSounds = {6636232274, 2706199011, 9118771226}
@@ -378,8 +378,9 @@ local module: Types.Adapter = {
                 soundPart.Position = self.PropInstance.Position
 
                 local sound = Instance.new("Sound")
-                Random.new():Shuffle(hitSounds[material] or plasticSounds)
-                sound.SoundId = "rbxassetid://"..(hitSounds[material] or plasticSounds)[1]
+                local list = hitSounds[material] or plasticSounds
+                Random.new():Shuffle(list)
+                sound.SoundId = "rbxassetid://"..list[1]
                 sound.Volume = 1
                 sound.Parent = soundPart
                 soundPart.Parent = workspace.Projectiles
