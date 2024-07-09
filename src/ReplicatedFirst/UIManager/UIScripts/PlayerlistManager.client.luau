@@ -34,8 +34,8 @@ function updatePlr(plr: Player, clone: any)
 	movePlr(plr, if participant then participant.Status else "Spectating")
 
 	if not participant then
-		ThemesManager.UpdateThemeInstance(clone.Username)
-		return
+		clone.Username:SetAttribute("StyleData")
+		return ThemesManager.UpdateThemeInstance(clone.Username)
 	end
 
 	local role = LocalRoundInfo.GetRole(participant.Role)
