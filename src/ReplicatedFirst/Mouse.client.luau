@@ -94,7 +94,7 @@ local corpseHint = crosshairInfoUI.SearchCorpseHint
 local function showCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
-	if plr:DistanceFromCharacter(char:GetPivot().Position) > 10 then
+	if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
 		return
 	end
 
@@ -118,7 +118,8 @@ params.CollisionGroup = "Raycasts"
 local interactTarget: Instance?
 RunService.PostSimulation:Connect(function()
     params.FilterDescendantsInstances = {plr.Character :: Model}
-    local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10, params)
+    local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
+	-- 10000 distance because we should still be able to see players. Corpses can be viewed from distance 10, so we include that as a check there.
 
 	playerInfo.Visible = false
 	corpseHint.Visible = false

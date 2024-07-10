@@ -141,8 +141,8 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
     local role
     if participant then
         role = LocalRoundInfo.GetRole(participant.Role)
-
     end
+    
     if not participant or role.Name == "" then
         if equipmentShop then
             equipmentShop:Unregister()
