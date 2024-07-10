@@ -47,18 +47,13 @@ return function(glass: BasePart, direction: Vector3?): ()
     -- Loop through the grid and create fragments
     for row = 0, rows - 1 do
         for col = 0, cols - 1 do
-            -- Calculate the position for the fragment
             local posX = (col * fragmentWidth) - (glassSize.X / 2) + (fragmentWidth / 2)
             local posY = (row * fragmentHeight) - (glassSize.Y / 2) + (fragmentHeight / 2)
             local posZ = 0
 
-            -- Create the first fragment
             local fragmentCFrame1 = glassCFrame * CFrame.new(posX, posY, posZ) * CFrame.Angles(0, math.rad(-90), 0)
-
-            -- Create the second fragment
             local fragmentCFrame2 = fragmentCFrame1 * CFrame.Angles(0, math.rad(180), math.rad(180))
 
-            -- Create the wedge fragments
             table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame1, glass, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one))
             table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame2, glass, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one))
         end
