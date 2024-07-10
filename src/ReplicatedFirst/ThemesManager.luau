@@ -13,8 +13,8 @@ export type Theme = {
 
 module.Themes = {
 	Light = {
-		Primary = Color3.fromRGB(250, 250, 250),
-		Secondary = Color3.fromRGB(235, 235, 235),
+		Primary = Color3.fromRGB(220, 220, 220),
+		Secondary = Color3.fromRGB(200, 200, 200),
 		Text = Color3.fromRGB(0, 0, 0),
 		TextStroke = Color3.fromRGB(255, 255, 255),
 		UIStroke = Color3.fromRGB(0, 0, 0),
@@ -27,8 +27,8 @@ module.Themes = {
 		UIStroke = Color3.fromRGB(255, 255, 255),
 	},
 	Blue = {
-		Primary = Color3.fromRGB(33, 66, 200),
-		Secondary = Color3.fromRGB(67, 123, 255),
+		Primary = Color3.fromRGB(33, 66, 100),
+		Secondary = Color3.fromRGB(0, 0, 68),
 		Text = Color3.fromRGB(255, 255, 255),
 		TextStroke = Color3.fromRGB(0, 0, 0),
 		UIStroke = Color3.fromRGB(255, 255, 255),
