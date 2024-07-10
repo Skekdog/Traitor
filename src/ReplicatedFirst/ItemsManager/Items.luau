@@ -850,7 +850,7 @@ local items: {[string]: ItemTypes.ItemDefinition} = {
             local object = result.Instance :: BasePart
             local model = object:FindFirstAncestorOfClass("Model")
 
-            if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (model and not model:GetAttribute("IsCorpse")) then
+            if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (model and not model:IsDescendantOf(workspace.Corpses)) then
                 return
             end
 

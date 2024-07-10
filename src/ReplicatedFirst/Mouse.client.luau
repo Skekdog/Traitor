@@ -132,9 +132,9 @@ RunService.PostSimulation:Connect(function()
             return
         end
 
-        if char:GetAttribute("IsCorpse") then
+        if char:IsDescendantOf(workspace.Corpses) then
             showCorpseHint(char)
-        else
+        elseif char:IsDescendantOf(workspace.Characters) then
             showPlayerInfo(char)
         end
 
@@ -154,7 +154,7 @@ ControlManager.Register("Interact", true, function(action, state, input, toggled
 	end
 
 	local model = interactTarget:FindFirstAncestorOfClass("Model")
-	if model and model:GetAttribute("IsCorpse") then
+	if model and model:IsDescendantOf(workspace.Corpses) then
 		CorpseInfo(ReplicatedStorage.RoundHandler.SearchCorpse:InvokeServer(model))
 		return Enum.ContextActionResult.Sink
 	end

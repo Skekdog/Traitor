@@ -139,7 +139,7 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
         end
 
         onEntityHit(round, weapon, attacker, victim, part, rayResult.Distance, (rayResult.Position - origin).Unit)
-    elseif not model or not model:GetAttribute("IsCorpse") then
+    elseif not model or not model:IsDescendantOf(workspace.Corpses) then
         ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?

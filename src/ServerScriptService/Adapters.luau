@@ -496,8 +496,6 @@ local module: Types.Adapter = {
         end
 
         char:Destroy()
-
-        clone:SetAttribute("IsCorpse", true)
         clone.Name = "__Unidentified"
 
         local joints = ServerStorage.RagdollJoints:Clone()

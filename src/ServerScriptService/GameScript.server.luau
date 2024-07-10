@@ -97,7 +97,7 @@ remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: 
 end
 
 remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
-	if (typeof(corpse) ~= "Instance" or not corpse:IsA("Model") or not corpse:GetAttribute("IsCorpse")) and (typeof(corpse) ~= "string") then
+	if (typeof(corpse) ~= "Instance" or not corpse:IsA("Model") or not corpse:IsDescendantOf(workspace.Corpses)) and (typeof(corpse) ~= "string") then
 		return
 	end
 
