@@ -94,7 +94,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
         Recoil = 10,
         Spread = 0.25,
 
-        Model = models.Grenade,
+        Model = models:WaitForChild("Grenade"),
         FiredSound = firedSounds.Grenade,
     },
     Crowbar = {
@@ -118,7 +118,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             FireTime = 0.35,
             ReloadTime = 0,
         },
-        Model = models.Crowbar,
+        Model = models:WaitForChild("Crowbar"),
         FiredSound = firedSounds.Crowbar,
 
         ProjectileInfo = false
@@ -160,7 +160,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             Speed = 140
         },
 
-        Model = models.HUGE,
+        Model = models:WaitForChild("HUGE"),
         FiredSound = firedSounds.HUGE,
     },
     Scout = {
@@ -201,7 +201,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             AmmoType = "Scout"
         },
 
-        Model = models.Scout,
+        Model = models:WaitForChild("Scout"),
         FiredSound = firedSounds.Scout,
         ReloadSound = reloadSounds.Scout,
     },
@@ -237,7 +237,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             AmmoType = "Assault Rifle"
         },
 
-        Model = models.Pistol,
+        Model = models:WaitForChild("Pistol"),
         FiredSound = firedSounds.Pistol,
         ReloadSound = reloadSounds.Pistol,
 
@@ -435,8 +435,8 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             AmmoType = "SMG"
         },
 
-        Model = models.SMG,
-        FiredSound = firedSounds.SMG,
+        Model = models:WaitForChild("SMG"),
+        FiredSound = firedSounds:WaitForChild("SMG"),
         ReloadSound = reloadSounds.SMG,
 
         ProjectileInfo = {
@@ -483,7 +483,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             MagazineSize = 4,
         },
 
-        Model = models.AWP,
+        Model = models:WaitForChild("AWP"),
         FiredSound = firedSounds.AWP,
 
         ProjectileInfo = {
@@ -564,7 +564,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             Speed = 80,
         },
 
-        Model = models.Flashbang,
+        Model = models:WaitForChild("Flashbang"),
         FiredSound = firedSounds.Flashbang,
 
         BeforeHitParticipant = function(_, victim)
@@ -663,7 +663,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             Speed = 150
         },
 
-        Model = models.XM1014,
+        Model = models:WaitForChild("XM1014"),
         FiredSound = firedSounds.XM1014,
         ReloadSound = reloadSounds.XM1014,
     },
@@ -704,7 +704,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             Speed = 190
         },
 
-        Model = models.Glock,
+        Model = models:WaitForChild("Glock"),
         FiredSound = firedSounds.Glock,
         ReloadSound = reloadSounds.Glock,
     },
@@ -745,7 +745,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             Speed = 190
         },
 
-        Model = models.Deagle,
+        Model = models:WaitForChild("Deagle"),
         FiredSound = firedSounds.Deagle,
         ReloadSound = reloadSounds.Deagle,
     },
@@ -781,7 +781,7 @@ local weapons: {[string]: ItemTypes.WeaponDefinition} = {
             AmmoType = "Assault Rifle"
         },
 
-        Model = models.BAR,
+        Model = models:WaitForChild("BAR"),
         FiredSound = firedSounds.BAR,
         ReloadSound = reloadSounds.BAR,
 
