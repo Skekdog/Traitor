@@ -78,13 +78,14 @@ local pageOrders = {
 	Scores = 3
 }
 
+local currentTab = "Highlights"
+
 local function showTab(tab)
-	local curPage = script:GetAttribute("CurrentTab")
-	if curPage == tab then
+	if currentTab == tab then
 		return
 	end
-	script:SetAttribute("CurrentTab", tab)
-	API.TransitionUIPage(page:FindFirstChild(curPage) :: any, pageOrders[curPage], page:FindFirstChild(tab) :: any, pageOrders[tab], UDim2.fromScale(0.5, 0.5))
+	API.TransitionUIPage(page:FindFirstChild(currentTab) :: any, pageOrders[currentTab], page:FindFirstChild(tab) :: any, pageOrders[tab], UDim2.fromScale(0.5, 0.5))
+	currentTab = tab
 end
 
 local function _adjustEventFilter(filter, visible)
@@ -98,5 +99,3 @@ end
 page.Parent.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
 page.Parent.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
 page.Parent.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
-
-script:SetAttribute("CurrentTab", "Highlights")

@@ -46,7 +46,7 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 end
 
 local slots: {[number]: ItemTypes.Item} = {}
-(ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item)
+(ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item?)
 	if not equipment then
 		return
 	end
@@ -84,9 +84,7 @@ local slots: {[number]: ItemTypes.Item} = {}
 	end
 end)
 
-local MAX_SLOT = 9
-
-for i = 1, MAX_SLOT do
+for i = 1, 9 do
 	ControlManager.Register("Slot "..i, false, function()
 		local equipment = slots[i]
 		if equipment then
@@ -131,7 +129,7 @@ do
 			return switchToEquipment()
 		end
 
-		for i = selectedSlot + 1, MAX_SLOT do
+		for i = selectedSlot + 1, 9 do
 			if slots[i] then
 				return switchToEquipment(slots[i])
 			end

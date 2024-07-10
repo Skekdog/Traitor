@@ -126,6 +126,10 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			table.remove(registeredUIs, table.find(registeredUIs, self))
 		end
 	}
+
+	if object.Visible and self.Layer == "Popup" then
+		nextUI = self -- For things like the welcome popup. This won't work properly if there is more than 1 default visible Ui but who cares lol
+	end
 	
 	if self.Layer == "Popup" and not object:GetAttribute("NoKeybind") then
 		ControlManager.Register(self.Name, false, function(act, state, input, toggled)
