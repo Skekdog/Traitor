@@ -839,6 +839,8 @@ local items: {[string]: ItemTypes.ItemDefinition} = {
             rayParams.IgnoreWater = true
             rayParams.RespectCanCollide = false
             rayParams.CollisionGroup = "Raycasts"
+            rayParams.FilterType = Enum.RaycastFilterType.Include
+            rayParams.FilterDescendantsInstances = {workspace.Corpses, workspace.Characters, participant.Round.Map :: Types.MapStructureCast}
 
             local result = workspace:Raycast(head.Position, cameraRayInfo.Direction * 10, rayParams)
             if not result then

@@ -108,16 +108,14 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
 end)
 
 -- shitty problems require shitty solutions - Sun Tzu, the art of war
-workspace.ChildAdded:Connect(function(child)
-    if child:GetAttribute("IsCorpse") then
-        while child.Parent do
-            for _, v in child:GetDescendants() do
-                if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
-                    v.CanCollide = true
-                end
+workspace.Corpses.ChildAdded:Connect(function(child)
+    while child.Parent do
+        for _, v in child:GetDescendants() do
+            if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+                v.CanCollide = true
             end
-            task.wait()
         end
+        task.wait()
     end
 end)
 

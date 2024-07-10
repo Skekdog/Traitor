@@ -13,16 +13,14 @@ end)
 
 local special = plr.PlayerGui:FindFirstChild("Special") :: any
 
-while true do
-    if found then
-        local warning = special:FindFirstChild("LoadWarning")
-        if warning then
-            warning:Destroy()
-        end
-        break
-    end
+while not found do
     if (os.time() - start > 5) and unregisteredUIs:FindFirstChild("LoadWarning") then
         unregisteredUIs.LoadWarning.Parent = special
     end
     task.wait()
+end
+
+local warning = special:FindFirstChild("LoadWarning")
+if warning then
+    warning:Destroy()
 end

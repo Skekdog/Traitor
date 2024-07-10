@@ -269,6 +269,7 @@ local module: Types.Adapter = {
     end,
 
     OnCharacterLoad = function(participant)
+        participant.Character.Parent = workspace.Characters
         local root = participant.Character.PrimaryPart
         if not root then
             return
@@ -520,7 +521,7 @@ local module: Types.Adapter = {
             v.Parent = part
         end
 
-        clone.Parent = workspace
+        clone.Parent = workspace.Corpses
         for _, v in clone:GetDescendants() do
             if v:IsA("JointInstance") or v:IsA("BaseScript") or v:IsA("Fire") then
                 v:Destroy()
