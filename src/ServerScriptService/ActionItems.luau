@@ -174,6 +174,8 @@ function module.Actions.IncrementCounter(_, _, name: unknown, amount: unknown): 
     assert(name, "Missing Parameter 1")
     assert(typeof(name) == "string", "Parameter 1 must be a string")
 
+    assert(name:sub(1, 2) ~= "__", "Parameter 1 invalid as counters starting with '__' are reserved")
+
     if not amount then
         amount = 1
     end
@@ -287,6 +289,30 @@ local function getCounter(participant: Types.Participant, counter: string): numb
     return counters[counter] or 0
 end
 
+local function getRoleEq(role: Types.Role, operator: "==" | "?=" | string): Types.RoleName
+    if operator == "?=" then
+        return role.Allegiance or role.Name
+    elseif operator == "==" then
+        return role.Name
+    end
+    error("Invalid operator for role comparison")
+end
+
+local function getConditionalParameterValue(participant: Types.Participant, parameter: string, operator: string): Types.RoleName | number
+    if tonumber(parameter) then
+        return tonumber(parameter) :: number
+    elseif parameter:sub(1, 1) == `"` and parameter:sub(-1) == `"` then
+        return getRoleEq(participant.Round:GetRoleFromName(parameter:sub(2, -2)), operator)
+    elseif parameter:sub(1, 2) == "__" then
+        if parameter == "__This" then
+            return getRoleEq(participant.Role, operator)
+        end
+    else
+        return getCounter(participant, parameter)
+    end
+    error("Invalid parameter")
+end
+
 local operations = {">", ">=", "<", "<=", "==", "?="}
 function module.InterpretConditional(participant: Types.Participant, conditional: string): boolean
     local split = conditional:split(" ")
@@ -298,60 +324,11 @@ function module.InterpretConditional(participant: Types.Participant, conditional
             local rhs = split[i + 1]
             assert(lhs and rhs, "Invalid syntax")
 
-            local lhsValue: Types.RoleName | number
-            if tonumber(lhs) then
-                lhsValue = tonumber(lhs) :: number
-            elseif lhs:sub(1, 1) == `"` and lhs:sub(-1) == `"` then
-                local role = participant.Round:GetRoleFromName(lhs:sub(2, -2))
-                if v == "?=" then
-                    lhsValue = role.Allegiance or role.Name
-                elseif v == "==" then
-                    lhsValue = role.Name
-                else
-                    error("Invalid operator for role comparison")
-                end
-            elseif rhs:sub(1, 2) == "__" then
-                if rhs == "__This" then
-                    local role = participant.Role
-                    if v == "?=" then
-                        lhsValue = role.Allegiance or role.Name
-                    elseif v == "==" then
-                        lhsValue = role.Name
-                    else
-                        error("Invalid operator for role comparison")
-                    end
-                end
-            else
-                lhsValue = getCounter(participant, lhs)
-            end
+            local lhsValue = getConditionalParameterValue(participant, lhs, v)
+            local rhsValue = getConditionalParameterValue(participant, rhs, v)
 
-            local rhsValue: Types.RoleName | number
-            if tonumber(rhs) then
-                rhsValue = tonumber(rhs) :: number
-            elseif rhs:sub(1, 1) == `"` and rhs:sub(-1) == `"` then
-                local role = participant.Round:GetRoleFromName(rhs:sub(2, -2))
-                if v == "?=" then
-                    rhsValue = role.Allegiance or role.Name
-                elseif v == "==" then
-                    rhsValue = role.Name
-                else
-                    error("Invalid operator for role comparison")
-                end
-            elseif rhs:sub(1, 2) == "__" then
-                if rhs == "__This" then
-                    local role = participant.Role
-                    if v == "?=" then
-                        rhsValue = role.Allegiance or role.Name
-                    elseif v == "==" then
-                        rhsValue = role.Name
-                    else
-                        error("Invalid operator for role comparison")
-                    end
-                end
-            else
-                rhsValue = getCounter(participant, rhs)
-            end
-
+            -- It is tempting to use loadstring() here, but remember why this module exists in the first place (to prevent arbitrary code execution)
+            -- And also ?= would mess it up anyway
             if v == ">" then
                 pass = lhsValue > rhsValue
             elseif v == ">=" then
@@ -360,7 +337,7 @@ function module.InterpretConditional(participant: Types.Participant, conditional
                 pass = lhsValue < rhsValue
             elseif v == "<=" then
                 pass = lhsValue <= rhsValue
-            elseif v == "==" then
+            elseif v == "==" or v == "?=" then
                 pass = lhsValue == rhsValue
             end
         end
