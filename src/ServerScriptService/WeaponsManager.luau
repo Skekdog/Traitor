@@ -237,10 +237,6 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
-    if weapon.CurrentAmmo <= 0 then
-        return
-    end
-
     if weapon.LastFireTime + (if weapon.Base.MultiUse then weapon.Base.MultiUse.FireTime else 0) > workspace:GetServerTimeNow() then
         return
     end
@@ -258,6 +254,12 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     local hum = char:FindFirstChildOfClass("Humanoid")
     if not hum or hum.Health <= 0 then
         return
+    end
+
+    if weapon.CurrentAmmo <= 0 then
+        local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
+        sound.Parent = char.PrimaryPart
+        return sound:Destroy()
     end
 
     weapon.CurrentAmmo -= 1
