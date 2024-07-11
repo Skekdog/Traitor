@@ -91,7 +91,13 @@ local module: Types.Gamemode = {
 
         while (eventIndex < #deathLog) and (not firstKill) do
             eventIndex += 1
-            if deathLog[eventIndex] and deathLog[eventIndex].Data.Attacker ~= deathLog[eventIndex].Data.Victim then
+            local log = deathLog[eventIndex]
+            if not log then
+                break
+            end
+
+            local data = log.Data
+            if data.Attacker and data.Attacker ~= data.Victim then
                 firstKill = deathLog[eventIndex].Data
                 break
             end
@@ -132,6 +138,9 @@ local module: Types.Gamemode = {
             local allyKills = 0
             local enemyKills = 0
             for _, kill in participant.KillList do
+                if kill == participant then
+                    continue
+                end
                 if not kill.KilledInSelfDefense and round:IsRoleAlliedWith(participant.Role, kill.Role) then
                     allyKills += 1
                 else

@@ -323,7 +323,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     local amount = if weapon.Kind == "Gun" then weapon.Base.BulletsPerShot or 1 else 1
     for _ = 1, amount do
         local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
-        local target = (cameraRayInfo.Direction + spreadVector) * 10000
+        local target = (cameraRayInfo.Direction + spreadVector) * if weapon.Kind == "Melee" then weapon.Base.MaxDistance else 10000
 
         local result = workspace:Raycast(origin, target, rayParams)
         if not result then
