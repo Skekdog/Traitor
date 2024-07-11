@@ -195,34 +195,35 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
     local windows = round.Map:FindFirstChild("Windows")
 
     local propsHit = {}
-    local participantsHit = {}
-
-    explosion.Hit:Connect(function(hit, distance)
-        local entity: Entity
-        if props and hit:IsDescendantOf(props) then
-            local prop = findPropAncestor(hit, props)
+    local participantsHit: {[Types.Participant]: number} = {}
+    
+    for _, part in workspace:GetPartBoundsInRadius(position, explosionInfo.Radius) do
+        local distance = (position - part.Position).Magnitude
+        if props and part:IsDescendantOf(props) then
+            local prop = findPropAncestor(part, props)
             if not prop then
                 return
             end
-            entity = round:GetProp(prop)
-            if table.find(propsHit, entity) then
+            local roundProp = round:GetProp(prop)
+            if table.find(propsHit, roundProp) then
                 return
             end
-            table.insert(propsHit, entity)
-        elseif windows and hit:IsDescendantOf(windows) then
-            return ShatterGlass(hit, (hit.Position - position).Unit * explosionInfo.Pressure / distance)
-        elseif hit.Parent and hit.Parent:IsA("Model") and hit.Parent:FindFirstChildOfClass("Humanoid") then
-            local participant = round:GetParticipant(hit.Parent.Name)
-            if not participant or table.find(participantsHit, participant) then
+            table.insert(propsHit, roundProp)
+            onEntityHit(round, explosionInfo, attacker, roundProp, part, distance, (part.Position - position).Unit)
+        elseif windows and part:IsDescendantOf(windows) then
+            return ShatterGlass(part, (part.Position - position).Unit * explosionInfo.Pressure / distance)
+        elseif part.Parent and part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") then
+            local participant = round:GetParticipant(part.Parent.Name)
+            if not participant or participantsHit[participant] then
                 return
             end
-            entity = participant
-            table.insert(participantsHit, participant)
+            participantsHit[participant] = calculateDamage(attacker, explosionInfo, part, distance)
         else
             return
         end
-        onEntityHit(round, explosionInfo, attacker, entity, hit, (hit.Position - position).Magnitude, (hit.Position - position).Unit)
-    end)
+    end
+
+    round:DoMassDamage(participantsHit, if weapon then round:GetEquipment(weapon.Name) or "Explosion" else "Explosion", attacker)
 
     explosion.Parent = workspace.Projectiles
 end
