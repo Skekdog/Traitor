@@ -64,9 +64,34 @@ local module: Types.Gamemode = {
         local firstKill: Types.RoundEvent_Death?
         local eventIndex = 0
 
+        local suiciders = {}
+        for _, v in deathLog do
+            if v.Data.Attacker == v.Data.Victim then
+                table.insert(suiciders, v.Data.Attacker :: Types.Participant)
+            end
+        end
+
+        table.sort(suiciders, function(a, b)
+            return a.KilledAt < b.KilledAt
+        end)
+
+        if #suiciders > 0 then
+            if #suiciders == 1 then
+                table.insert(highlights, {
+                    Name = "Lonely and Sad",
+                    Description = `{suiciders[1].FormattedName} was the only one to kill themselves.`
+                })
+            else
+                table.insert(highlights, {
+                    Name = "Suicide Cult Leader",
+                    Description = `{suiciders[1].FormattedName} showed the other suiciders how to do it by being the first to go.`
+                })
+            end
+        end
+
         while (eventIndex < #deathLog) and (not firstKill) do
             eventIndex += 1
-            if deathLog[eventIndex] and deathLog[eventIndex].Data.Attacker then
+            if deathLog[eventIndex] and deathLog[eventIndex].Data.Attacker ~= deathLog[eventIndex].Data.Victim then
                 firstKill = deathLog[eventIndex].Data
                 break
             end
@@ -257,7 +282,6 @@ local module: Types.Gamemode = {
             },
 
             Allies = {"Traitor"},
-            Allegiance = "Traitor",
             VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
             VictoryText = "The dastardly traitors have won the round!",
 
@@ -315,7 +339,6 @@ local module: Types.Gamemode = {
             },
 
             Allies = {"Detective", "Innocent"},
-            Allegiance = "Innocent",
             VictoryMusic = ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
             VictoryText = "The loveable innocents have won the round!",
             KnowsRoles = {"Detective"},
