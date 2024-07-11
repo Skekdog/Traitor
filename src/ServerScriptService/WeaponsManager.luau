@@ -228,6 +228,10 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
                 continue
             end
             participantsHit[participant] = calculateDamage(attacker, explosionInfo, part, distance)
+
+            if explosionInfo.BeforeHitParticipant then
+                explosionInfo.BeforeHitParticipant(attacker, participant, false, part.Name)
+            end
         end
     end
 
@@ -309,35 +313,55 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     local function nextSpread(): number
         return random:NextNumber(-spread, spread)
     end
+
+    if weapon.Kind == "Grenade" then
+        InventoryManager.RemoveEquipment(player, weapon)
+        local proj = weapon.Base.ProjectileBase:Clone()
+        proj:PivotTo(CFrame.new(origin))
+        proj.Parent = workspace.Projectiles
+
+        if not proj:IsA("BasePart") then
+            error("[ProjectileBase] is not a BasePart")
+        end
+        proj:ApplyImpulse(weapon.Base.ProjectileForce * head.CFrame.LookVector)
+
+        task.delay(weapon.Base.Fuse, function()
+            if not proj:IsDescendantOf(workspace) then
+                return
+            end
+
+            module.CreateExplosion(proj.Position, weapon.Base.ExplosionInfo, attacker, weapon.Base)
+            proj:Destroy()
+        end)
+    else
+        local function tweenProjectile(targetPosition: Vector3): ()
+            if weapon.Kind ~= "Gun" then
+                return
+            end
+            ReplicatedStorage.ServerClient.TweenProjectile:FireAllClients(weapon.Base.ProjectileBase, origin, targetPosition, weapon.Base.ProjectileSpeed)
+        end
     
-    --todo: should this be on the client instead?
-    local function tweenProjectile(targetPosition: Vector3): ()
-        if weapon.Kind ~= "Gun" then
-            return
+        local rayParams = RaycastParams.new()
+        rayParams.FilterType = Enum.RaycastFilterType.Exclude
+        rayParams.IgnoreWater = true
+        rayParams.RespectCanCollide = false
+        rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
+        rayParams.CollisionGroup = "Raycasts"
+    
+        local amount = if weapon.Kind == "Gun" then weapon.Base.BulletsPerShot or 1 else 1
+        for _ = 1, amount do
+            local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
+            local target = (cameraRayInfo.Direction + spreadVector) * if weapon.Kind == "Melee" then weapon.Base.MaxDistance else 10000
+    
+            local result = workspace:Raycast(origin, target, rayParams)
+            if not result then
+                return tweenProjectile(target)
+            end
+    
+            tweenProjectile(result.Position)
+    
+            onPartHit(round, weapon.Base, attacker, result, origin)
         end
-        ReplicatedStorage.ServerClient.TweenProjectile:FireAllClients(weapon.Base.ProjectileBase, origin, targetPosition, weapon.Base.ProjectileSpeed)
-    end
-
-    local rayParams = RaycastParams.new()
-    rayParams.FilterType = Enum.RaycastFilterType.Exclude
-    rayParams.IgnoreWater = true
-    rayParams.RespectCanCollide = false
-    rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
-    rayParams.CollisionGroup = "Raycasts"
-
-    local amount = if weapon.Kind == "Gun" then weapon.Base.BulletsPerShot or 1 else 1
-    for _ = 1, amount do
-        local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
-        local target = (cameraRayInfo.Direction + spreadVector) * if weapon.Kind == "Melee" then weapon.Base.MaxDistance else 10000
-
-        local result = workspace:Raycast(origin, target, rayParams)
-        if not result then
-            return tweenProjectile(target)
-        end
-
-        tweenProjectile(result.Position)
-
-        onPartHit(round, weapon.Base, attacker, result, origin)
     end
 end
 

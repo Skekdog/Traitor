@@ -679,7 +679,7 @@ grenades.Grenade = {
     Fuse = 5,
 
     ProjectileBase = models:WaitForChild("Grenade"),
-    ProjectileForce = 300,
+    ProjectileForce = 0.5,
     Spread = 0.25,
 
     FiredSound = firedSounds.Grenade,
@@ -709,7 +709,7 @@ grenades.Flashbang = {
     Fuse = 3,
 
     ProjectileBase = models:WaitForChild("Flashbang"),
-    ProjectileForce = 300,
+    ProjectileForce = 100,
     Spread = 0.25,
 
     FiredSound = firedSounds.Grenade,

@@ -180,7 +180,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Magneto Stick"},
+    StartingEquipment = {"Crowbar", "Magneto Stick", "Grenade", "Flashbang"},
     AvailableEquipment = {
         {
             Name = "Crowbar",
@@ -258,13 +258,21 @@ local module: Types.Gamemode = {
         },
         {
             Name = "Grenade",
-            Description = "Explodes in a decent radius after a few seconds. Can be disarmed by being shot.",
+            Description = "Explodes in a decent radius after a few seconds.",
             Cost = 2,
             Icon = "rbxassetid://8096856961",
             MaxStock = 1,
             AttackType = "Explosion",
 
             Item = items.Grenade
+        },
+        {
+            Name = "Flashbang",
+            Description = "Blinds and deafens anyone in range.",
+            Cost = 1,
+            Icon = "rbxassetid://10753198321",
+            MaxStock = 2,
+            Item = items.Flashbang,
         },
         {
             Name = "Radar",
@@ -301,7 +309,7 @@ local module: Types.Gamemode = {
             },
 
             StartingCredits = 2,
-			EquipmentShop = {"Radar", "Flare Gun"},
+			EquipmentShop = {"Radar", "Flare Gun", "Grenade", "Flashbang"},
 			CanSeeMissing = true,
 
             HighlightRoles = {"Traitor"},
@@ -331,7 +339,7 @@ local module: Types.Gamemode = {
             CorpseResultsPublicised = true,
 
             StartingCredits = 2,
-            EquipmentShop = {"Radar", "Golden Gun"},
+            EquipmentShop = {"Radar", "Golden Gun", "Flashbang", "Grenade"},
 
             KnowsRoles = {"Detective"},
         },
