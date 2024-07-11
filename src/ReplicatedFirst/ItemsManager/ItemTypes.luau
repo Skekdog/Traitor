@@ -1,62 +1,16 @@
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
 type OnUnequipFunction = (player: Player) -> ()
-export type ItemDefinition = {
-    Kind: "Item",
-    Name: string,
-    Description: string,
-    Icon: string?,
-
-    Slot: number,
-    CanDrop: boolean,
-
-    Model: MeshPart?,
-
-    PrimaryFire: ((Types.Participant, cameraRay: Ray) -> ())?,
-    AlternateFire: ((Types.Participant, cameraRay: Ray) -> ())?,
-    OnUnequip: OnUnequipFunction?,
-}
-
-export type Item = {
-    Kind: "Item",
-    Base: ItemDefinition,
-    Instance: PVInstance,
-}
-
-export type Weapon = {
-    Kind: "Weapon",
-    Base: WeaponDefinition,
-    Instance: PVInstance,
-    CurrentAmmo: number,
-    LastFireTime: number,
-    Reloading: thread?,
-}
 
 export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
 type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> boolean?
 type BeforeHitPropFunction = (attacker: Types.Participant?, target: Types.Prop, willDestroy: boolean?, hitPartName: string) -> boolean?
 type BeforeHitCorpseFunction = (attacker: Types.Participant?, part: BasePart) -> ()
 
-type AimInfo = {
-    FOV: number,
-    HasScope: boolean?,
-    ScopeRequired: boolean?,
-    SpreadMultiplier: number,
-}
 type DamageInfo = number | {
     Head: number,
     Body: number,
     Limb: number,
-}
-type MultiUseInfo = {
-    FireTime: number, -- Delay between firing
-    ReloadTime: number,
-    MagazineSize: number?,
-    AmmoType: AmmoType?,
-}
-type ProjectileInfo = {
-    Base: PVInstance,
-    Speed: number,
 }
 
 export type ExplosionInfo = {
@@ -71,9 +25,45 @@ export type ExplosionInfo = {
     FalloffMultiplier: number?,
 }
 
-export type WeaponDefinition = {
+export type Item = GenericItem | Weapon
+
+export type GenericItem = {
+    Kind: "Item",
+    Instance: PVInstance,
+    Base: ItemDefinition,
+}
+
+export type Weapon = GunWeapon | GrenadeWeapon | MeleeWeapon
+
+export type GunWeapon = {
+    Kind: "Gun",
+    Instance: PVInstance,
+    Base: GunDefinition,
+
+    CurrentAmmo: number,
+    LastFireTime: number,
+    LastFireAttempt: number, -- For empty clip sound
+    Reloading: thread?,
+}
+
+export type GrenadeWeapon = {
+    Kind: "Grenade",
+    Instance: PVInstance,
+    Base: GrenadeDefinition,
+}
+
+export type MeleeWeapon = {
+    Kind: "Melee",
+    Instance: PVInstance,
+    Base: MeleeDefinition,
+
+    LastFireTime: number,
+}
+
+export type ItemDefinition = {
+    Kind: "Item",
     Name: string,
-    Description: string,
+    Description: string?,
     Icon: string?,
 
     Slot: number,
@@ -84,32 +74,91 @@ export type WeaponDefinition = {
     PrimaryFire: ((Types.Participant, cameraRay: Ray) -> ())?,
     AlternateFire: ((Types.Participant, cameraRay: Ray) -> ())?,
     OnUnequip: OnUnequipFunction?,
+}
 
-    Kind: "Weapon",
+export type WeaponDefinition = GunDefinition | GrenadeDefinition | MeleeDefinition
+
+export type GunDefinition = {
+    Kind: "Gun",
+    Name: string,
+    Description: string?,
+    Icon: string?,
+    Slot: number,
+    CanDrop: boolean,
+    Model: MeshPart,
+
     Damage: DamageInfo,
+
+    FiredSound: Sound,
+    ReloadSound: Sound?,
 
     FalloffStart: number,
     FalloffEnd: number,
     FalloffMultiplier: number,
 
-    ExplosionInfo: ExplosionInfo?,
-    FuseTime: number?,
+    FireTime: number,
+    ReloadTime: number,
+    MagazineSize: number?,
+    AmmoType: AmmoType?,
 
-    AimInfo: AimInfo | false,
+    AimFOV: number,
+    HasScope: boolean?,
+    ScopeRequired: boolean?,
+    AimSpreadMultiplier: number,
+
+    ProjectileBase: PVInstance,
+    ProjectileSpeed: number,
 
     Recoil: number,
     Spread: number,
-    
-    MultiUse: MultiUseInfo | false,
+
     BulletsPerShot: number?,
 
-    ProjectileInfo: ProjectileInfo | false,
+    BeforeHitCorpse: BeforeHitCorpseFunction?,
+    BeforeHitParticipant: BeforeHitParticipantFunction?,
+    BeforeHitProp: BeforeHitPropFunction?,
+}
+
+export type GrenadeDefinition = {
+    Kind: "Grenade",
+    Name: string,
+    Description: string?,
+    Icon: string?,
+    Slot: number,
+    CanDrop: boolean,
+    Model: MeshPart,
+
+    ExplosionInfo: ExplosionInfo,
+    Fuse: number,
+    
+    ProjectileBase: PVInstance,
+    ProjectileForce: number,
+    Spread: number,
 
     FiredSound: Sound,
-    ReloadSound: Sound?,
 
     BeforeHitParticipant: BeforeHitParticipantFunction?,
     BeforeHitCorpse: BeforeHitCorpseFunction?,
+    BeforeHitProp: BeforeHitPropFunction?,
+}
+
+export type MeleeDefinition = {
+    Kind: "Melee",
+    Name: string,
+    Description: string?,
+    Icon: string?,
+    Slot: number,
+    CanDrop: boolean,
+    Model: MeshPart,
+
+    MaxDistance: number,
+    Damage: number,
+    FireTime: number,
+    FiredSound: Sound,
+
+    BeforeHitParticipant: BeforeHitParticipantFunction?,
+    BeforeHitCorpse: BeforeHitCorpseFunction?,
+    BeforeHitProp: BeforeHitPropFunction?,
 }
 
 return {}

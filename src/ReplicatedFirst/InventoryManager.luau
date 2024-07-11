@@ -80,22 +80,18 @@ function module.Reset(): ()
     table.clear(module.Items)
 end
 
-function module.Reload(player: Player, weapon: ItemTypes.Weapon): ()
-    local multiUse = weapon.Base.MultiUse
-    if not multiUse then
-        return
-    end
-    assert(typeof(multiUse) ~= "boolean")
+function module.Reload(player: Player, weapon: ItemTypes.GunWeapon): ()
+    local base = weapon.Base
 
-    local ammoType: ItemTypes.AmmoType? = multiUse.AmmoType
+    local ammoType: ItemTypes.AmmoType = base.AmmoType :: ItemTypes.AmmoType
     local reserve = module.GetReserve(player, ammoType)
     local char = player.Character
 
-    if reserve <= 0 or not ammoType or not char or weapon.Reloading or weapon.CurrentAmmo == multiUse.MagazineSize or weapon.CurrentAmmo == math.huge then
+    if reserve <= 0 or not ammoType or not char or weapon.Reloading or weapon.CurrentAmmo == base.MagazineSize then
         return
     end
 
-    local reloadSound = weapon.Base.ReloadSound
+    local reloadSound = base.ReloadSound
     if reloadSound then
         reloadSound = reloadSound:Clone()
         reloadSound.Name = "ReloadSound"
@@ -106,11 +102,11 @@ function module.Reload(player: Player, weapon: ItemTypes.Weapon): ()
         reloadSound:Play()
     end
 
-    weapon.Reloading = task.delay(multiUse.ReloadTime, function()
+    weapon.Reloading = task.delay(base.ReloadTime, function()
         weapon.Reloading = nil
 
         local prevAmmo = weapon.CurrentAmmo
-        weapon.CurrentAmmo = math.min(weapon.CurrentAmmo + reserve, multiUse.MagazineSize or module.AmmoData[ammoType].Magazine)
+        weapon.CurrentAmmo = math.min(weapon.CurrentAmmo + reserve, base.MagazineSize or module.AmmoData[ammoType].Magazine)
 
         -- We need to GetReserve() again because they may have picked up more ammo whilst reloading
         module.SetReserve(player, ammoType, module.GetReserve(player, ammoType) - (weapon.CurrentAmmo - prevAmmo))
@@ -121,10 +117,8 @@ end
 function module.HasWeaponOfAmmoType(plr: Player, ammoType: ItemTypes.AmmoType): boolean
     for _, v in inventories[plr] do
         local weapon = v.Base
-        if weapon.Kind == "Weapon" then
-            if weapon.MultiUse and weapon.MultiUse.AmmoType == ammoType then
-                return true
-            end
+        if weapon.Kind == "Gun" and weapon.AmmoType == ammoType then
+            return true
         end
     end
     return false
@@ -177,10 +171,10 @@ function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
         end
     else
         local old = equipped[plr]
-        if (old :: any) ~= equipment then
+        if old ~= equipment then
             return
         end
-        if old and old.Base.OnUnequip then
+        if old and old.Kind == "Item" and old.Base.OnUnequip then
             old.Base.OnUnequip(plr)
         end
         equipped[plr] = nil
@@ -203,14 +197,10 @@ function module.Drop(plr: Player, equipment: Item, position: Vector3)
     runCallback(plr, "Drop", equipment)
 end
 
-function module.DropAmmo(plr: Player, weapon: ItemTypes.Weapon)
-    local multiUse = weapon.Base.MultiUse
-    if not multiUse then
-        return
-    end
-    assert(typeof(multiUse) ~= "boolean")
+function module.DropAmmo(plr: Player, weapon: ItemTypes.GunWeapon)
+    local base = weapon.Base
 
-    local ammoType: ItemTypes.AmmoType = multiUse.AmmoType :: ItemTypes.AmmoType
+    local ammoType: ItemTypes.AmmoType = base.AmmoType :: ItemTypes.AmmoType
     if not ammoType then
         return
     end
@@ -271,7 +261,7 @@ end
 
 module.UpdateAmmo = function(plr: Player)
     local weapon = equipped[plr]
-    if not weapon or weapon.Kind ~= "Weapon" then
+    if not weapon or weapon.Kind ~= "Gun" then
         return
     end
 
@@ -280,21 +270,20 @@ module.UpdateAmmo = function(plr: Player)
         return
     end
 
-    local size: number
+    local size: number?
     local reserve: number
 
-    if weapon.Base.MultiUse then
-        local ammoType = weapon.Base.MultiUse.AmmoType
-        if ammoType then
-            size = module.AmmoData[ammoType :: ItemTypes.AmmoType].Magazine
-            reserve = module.GetReserve(plr, weapon.Base.MultiUse.AmmoType)
-        end
-        if weapon.Base.MultiUse.MagazineSize then
-            size = weapon.Base.MultiUse.MagazineSize
-        end
-    else
-        size = 1
+    local base = weapon.Base
+
+    local ammoType = base.AmmoType
+    if base.MagazineSize then
+        size = base.MagazineSize
+    elseif ammoType then
+        size = module.AmmoData[ammoType :: ItemTypes.AmmoType].Magazine
+        reserve = module.GetReserve(plr, base.AmmoType)
     end
+
+    assert(size, "One of AmmoType or MagazineSize must be set")
 
     if not reserve then
         reserve = 0
@@ -303,7 +292,7 @@ module.UpdateAmmo = function(plr: Player)
     serverClient.AmmoUpdate:FireClient(plr, current, size, reserve)
 end
 
-function module.OnWeaponTouched(weapon: BasePart, round: Types.Round, part: BasePart)
+function module.OnItemTouched(weapon: BasePart, round: Types.Round, part: BasePart)
     local char = part.Parent :: Model
     local plr = Players:GetPlayerFromCharacter(char)
     if not plr then
@@ -341,8 +330,8 @@ function module.OnWeaponTouched(weapon: BasePart, round: Types.Round, part: Base
         return
     end
 
-    local item = module.Items[weapon] :: ItemTypes.Weapon
-    local base = if item then item.Base else Items[weapon.Name] :: ItemTypes.WeaponDefinition
+    local item = module.Items[weapon] :: ItemTypes.Item
+    local base = if item then item.Base else Items[weapon.Name]
 
     if not base then
         return
@@ -367,26 +356,60 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
         instance = base.Model
     end
     assert(instance)
-    local itemInstance = {Base = base, Instance = instance:Clone(), Kind = base.Kind}
-    if base.Kind ~= "Item" then -- You may think that an equality check would work. It does not.
-        local multiUse = base.MultiUse
-        if multiUse then
-            assert(typeof(multiUse) ~= "boolean")
-            if multiUse.MagazineSize then
-                itemInstance.CurrentAmmo = multiUse.MagazineSize
-            elseif multiUse.AmmoType then
-                itemInstance.CurrentAmmo = module.AmmoData[multiUse.AmmoType].Magazine
-            else
-                itemInstance.CurrentAmmo = math.huge
-            end
-        else
-            itemInstance.CurrentAmmo = 1
+
+    instance = instance:Clone()
+    assert(instance:IsA("BasePart") and instance:IsA("PVInstance"))
+
+    local itemInstance: ItemTypes.Item = {} :: ItemTypes.Item
+
+    if base.Kind == "Gun" then
+        if not base.MagazineSize and not base.AmmoType then
+            error("One of MagazineSize or AmmoType must be set")
         end
-        itemInstance.LastFireTime = 0
-        (itemInstance.Instance :: BasePart).Touched:Connect(function(part)
-            module.OnWeaponTouched(itemInstance.Instance :: BasePart, participant.Round, part)
-        end)
+        
+        local currentAmmo = base.MagazineSize or module.AmmoData[base.AmmoType :: ItemTypes.AmmoType].Magazine
+        local gunInstance: ItemTypes.GunWeapon = {
+            Base = base,
+            Instance = instance,
+            Kind = "Gun",
+
+            CurrentAmmo = currentAmmo,
+            LastFireTime = 0,
+            LastFireAttempt = 0,
+        }
+
+        itemInstance = gunInstance
+    elseif base.Kind == "Melee" then
+        local meleeInstance: ItemTypes.MeleeWeapon = {
+            Base = base,
+            Instance = instance,
+            Kind = "Melee",
+
+            LastFireTime = 0,
+        }
+
+        itemInstance = meleeInstance
+    elseif base.Kind == "Grenade" then
+        local grenadeInstance: ItemTypes.GrenadeWeapon = {
+            Base = base,
+            Instance = instance,
+            Kind = "Grenade",
+        }
+
+        itemInstance = grenadeInstance
+    elseif base.Kind == "Item" then
+        local genericItemInstance: ItemTypes.GenericItem = {
+            Base = base,
+            Instance = instance,
+            Kind = "Item",
+        }
+
+        itemInstance = genericItemInstance
     end
+
+    (itemInstance.Instance :: BasePart).Touched:Connect(function(part)
+        module.OnItemTouched(itemInstance.Instance :: BasePart, participant.Round, part)
+    end)
 
     module.Items[itemInstance.Instance] = itemInstance :: any
     module.AddEquipment(participant.Player, itemInstance :: any)

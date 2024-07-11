@@ -61,7 +61,7 @@ end)
 
 ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr)
     local weapon, participant = allow(plr)
-    if not weapon or not participant or weapon.Kind == "Item" then
+    if not weapon or not participant or weapon.Kind ~= "Gun" then
         return
     end
 
@@ -70,7 +70,7 @@ end)
 
 ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr)
     local weapon, participant = allow(plr)
-    if not weapon or not participant or weapon.Kind == "Item" then
+    if not weapon or not participant or weapon.Kind ~= "Gun" then
         return
     end
 

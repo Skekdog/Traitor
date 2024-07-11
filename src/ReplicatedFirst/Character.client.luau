@@ -76,11 +76,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
         while input.UserInputState == Enum.UserInputState.Begin do
             ReplicatedStorage.ClientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
-            if item.Base.Kind == "Weapon" and item.Base.MultiUse then
-                task.wait(item.Base.MultiUse.FireTime)
-            else
-                task.wait()
-            end
+            task.wait()
         end
         return Enum.ContextActionResult.Sink
     end)

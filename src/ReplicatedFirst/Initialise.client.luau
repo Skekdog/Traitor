@@ -90,21 +90,8 @@ local function setAmmo(current: number, magazineSize: number, reserve: number, n
     activeTween = API.Animate(ammoBar.Background, TweenInfo.new(0.1), {Size = UDim2.new(current / magazineSize, 0, 1, 0)}, noTransition)
 end
 
-InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
-    if item.Base.Kind == "Item" then
-        ammoBar.Visible = false
-        return
-    end
-
-    local weapon = item :: ItemTypes.Weapon
-
-    local isInf = weapon.CurrentAmmo == math.huge
-	if isInf then
-        ammoBar.Visible = false
-		return
-	end
-
-    ammoBar.Visible = true
+InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
+    ammoBar.Visible = item.Kind == "Gun"
 end)
 
 -- shitty problems require shitty solutions - Sun Tzu, the art of war

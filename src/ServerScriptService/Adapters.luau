@@ -356,7 +356,7 @@ local module: Types.Adapter = {
         end
 
         weaponSpawn.Touched:Connect(function(part)
-            InventoryManager.OnWeaponTouched(weaponSpawn, round, part)
+            InventoryManager.OnItemTouched(weaponSpawn, round, part)
         end)
     end,
 

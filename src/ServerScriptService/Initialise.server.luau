@@ -126,7 +126,7 @@ end)
 InventoryManager.Listen("Equip", InventoryManager.UpdateAmmo)
 
 InventoryManager.Listen("Unequip", function(plr, equipment)
-	if equipment.Kind ~= "Weapon" then
+	if equipment.Kind ~= "Gun" then
 		return
 	end
 

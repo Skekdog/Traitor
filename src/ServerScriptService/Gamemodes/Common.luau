@@ -7,10 +7,10 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 local module = {}
 
 function module.TestForOneSurvivingRole(self: Types.Gamemode, round: Types.Round): string?
-    local allegiances = {}
+    local allegiances: {string} = {}
     for _, v in self.Roles do
-        if not table.find(allegiances, v.Allegiance) then
-            table.insert(allegiances, v.Allegiance)
+        if not table.find(allegiances, v.Allegiance or v.Name) then
+            table.insert(allegiances, v.Allegiance or v.Name)
         end
     end
 
@@ -35,7 +35,7 @@ function module.TestForOneSurvivingRole(self: Types.Gamemode, round: Types.Round
     }
     for _, v in round.Participants do
         if checkAlive(v) then
-            rolesAlive[v.Role.Allegiance] = true
+            rolesAlive[v.Role.Allegiance or v.Role.Name] = true
         end
         if rolesAlive[allegiances[1]] and rolesAlive[allegiances[2]] then
             return nil -- Both roles are still alive, nobody wins yet

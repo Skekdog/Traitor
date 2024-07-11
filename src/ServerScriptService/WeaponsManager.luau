@@ -23,26 +23,29 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
         return (part.Name == name) or (part:FindFirstAncestor(name) ~= nil) or (match and (part.Name:match(name) ~= nil))
     end
 
+    local damageData = if weapon.Kind == "Grenade" then weapon.ExplosionInfo.Damage else weapon.Damage
     local damage: number
-    if type(weapon.Damage) == "table" then
+    if type(damageData) == "table" then
         if isOf("Head") then
-            damage = weapon.Damage.Head
+            damage = damageData.Head
         elseif isOf("HumanoidRootPart") or isOf("Torso", true) then
-            damage = weapon.Damage.Body
+            damage = damageData.Body
         else
-            damage = weapon.Damage.Limb
+            damage = damageData.Limb
         end
     else
-        damage = weapon.Damage
+        damage = damageData
     end
 
-    local start = weapon.FalloffStart or 0
-    if distance >= start then
-        local multiplier = API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: ItemTypes.ExplosionInfo).Radius))
-        if multiplier < 0 then
-            multiplier = 0
+    if weapon.Kind == "Gun" or weapon.Kind == "Explosion" then
+        local start = weapon.FalloffStart or 0
+        if distance >= start then
+            local multiplier = API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: ItemTypes.ExplosionInfo).Radius))
+            if multiplier < 0 then
+                multiplier = 0
+            end
+            damage *= multiplier
         end
-        damage *= multiplier
     end
 
     if attacker then
@@ -73,10 +76,12 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
 
             if willDie then
                 local force
-                if weapon.Kind ~= "Explosion" and weapon.ProjectileInfo then
-                    force = weapon.ProjectileInfo.Speed
+                if weapon.Kind == "Gun" then
+                    force = weapon.ProjectileSpeed
                 elseif weapon.Kind == "Explosion" then
                     force = (weapon :: ItemTypes.ExplosionInfo).Pressure
+                elseif weapon.Kind == "Grenade" then
+                    force = weapon.ExplosionInfo.Pressure
                 else
                     force = 1
                 end
@@ -121,7 +126,7 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
 
     if windows then
         if part:IsDescendantOf(windows) then
-            return ShatterGlass(part, (rayResult.Position - origin).Unit * if weapon.ProjectileInfo then math.max(weapon.ProjectileInfo.Speed / 50, 3) else 3)
+            return ShatterGlass(part, (rayResult.Position - origin).Unit * if weapon.Kind == "Gun" then math.max(weapon.ProjectileSpeed / 50, 3) else 3)
         end
     end
 
@@ -202,34 +207,33 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
         if props and part:IsDescendantOf(props) then
             local prop = findPropAncestor(part, props)
             if not prop then
-                return
+                continue
             end
             local roundProp = round:GetProp(prop)
             if table.find(propsHit, roundProp) then
-                return
+                continue
             end
             table.insert(propsHit, roundProp)
             onEntityHit(round, explosionInfo, attacker, roundProp, part, distance, (part.Position - position).Unit)
         elseif windows and part:IsDescendantOf(windows) then
-            return ShatterGlass(part, (part.Position - position).Unit * explosionInfo.Pressure / distance)
+            ShatterGlass(part, (part.Position - position).Unit * explosionInfo.Pressure / distance)
         elseif part.Parent and part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") then
             local participant = round:GetParticipant(part.Parent.Name)
             if not participant or participantsHit[participant] then
-                return
+                continue
             end
             participantsHit[participant] = calculateDamage(attacker, explosionInfo, part, distance)
-        else
-            return
         end
     end
 
-    round:DoMassDamage(participantsHit, if weapon then round:GetEquipment(weapon.Name) or "Explosion" else "Explosion", attacker)
+    local sendWeapon = if weapon then round:GetEquipment(weapon.Name) or "Explosion" else "Explosion"
+    task.spawn(round.DoMassDamage, round, participantsHit, sendWeapon :: Types.Equipment | Types.DeathType, attacker)
 
     explosion.Parent = workspace.Projectiles
 end
 
 function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: Ray): ()
-    if weapon.Reloading then
+    if weapon.Kind == "Gun" and weapon.Reloading then
         return
     end
 
@@ -238,8 +242,10 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
-    if weapon.LastFireTime + (if weapon.Base.MultiUse then weapon.Base.MultiUse.FireTime else 0) > workspace:GetServerTimeNow() then
-        return
+    if weapon.Kind == "Gun" or weapon.Kind == "Melee" then
+        if weapon.LastFireTime + (weapon.Base.FireTime) > workspace:GetServerTimeNow() then
+            return
+        end
     end
 
     local round = GetRound()
@@ -257,16 +263,27 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
-    if weapon.CurrentAmmo <= 0 then
-        local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
-        sound.Parent = char.PrimaryPart
-        return sound:Destroy()
+    local timeNow = workspace:GetServerTimeNow()
+    if weapon.Kind == "Gun" then
+        if weapon.CurrentAmmo <= 0 then
+            if weapon.LastFireAttempt + weapon.Base.FireTime < timeNow then
+                weapon.LastFireAttempt = timeNow
+                local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
+                sound.Parent = char.PrimaryPart
+                sound:Destroy()
+            end
+            return
+        end
+
+        weapon.LastFireAttempt = timeNow
+
+        weapon.CurrentAmmo -= 1
+        InventoryManager.UpdateAmmo(player)
     end
 
-    weapon.CurrentAmmo -= 1
-    InventoryManager.UpdateAmmo(player)
-    
-    weapon.LastFireTime = workspace:GetServerTimeNow()
+    if weapon.Kind == "Gun" or weapon.Kind == "Melee" then
+        (weapon :: ItemTypes.GunWeapon).LastFireTime = workspace:GetServerTimeNow()
+    end
 
     local firedSound = weapon.Base.FiredSound:Clone()
     firedSound.Parent = char.PrimaryPart
@@ -282,7 +299,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     local origin = head.Position
 
     local random = Random.new()
-    local spread = math.rad(weapon.Base.Spread)
+    local spread = math.rad(if weapon.Kind ~= "Melee" then weapon.Base.Spread else 0)
 
     local function nextSpread(): number
         return random:NextNumber(-spread, spread)
@@ -290,13 +307,10 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     
     --todo: should this be on the client instead?
     local function tweenProjectile(targetPosition: Vector3): ()
-        local projectileInfo = weapon.Base.ProjectileInfo
-        if projectileInfo then
-            assert(typeof(projectileInfo) ~= "boolean") -- projectileInfo gets reduced to true... from a type of false | ProjectileInfo...
-
-            local projectile = projectileInfo.Base
-            ReplicatedStorage.ServerClient.TweenProjectile:FireAllClients(projectile, origin, targetPosition, projectileInfo.Speed)
+        if weapon.Kind ~= "Gun" then
+            return
         end
+        ReplicatedStorage.ServerClient.TweenProjectile:FireAllClients(weapon.Base.ProjectileBase, origin, targetPosition, weapon.Base.ProjectileSpeed)
     end
 
     local rayParams = RaycastParams.new()
@@ -306,7 +320,8 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     rayParams.FilterDescendantsInstances = {char, workspace.Projectiles}
     rayParams.CollisionGroup = "Raycasts"
 
-    for _ = 1, weapon.Base.BulletsPerShot or 1 do
+    local amount = if weapon.Kind == "Gun" then weapon.Base.BulletsPerShot or 1 else 1
+    for _ = 1, amount do
         local spreadVector = Vector3.new(nextSpread(), nextSpread(), nextSpread())
         local target = (cameraRayInfo.Direction + spreadVector) * 10000
 
