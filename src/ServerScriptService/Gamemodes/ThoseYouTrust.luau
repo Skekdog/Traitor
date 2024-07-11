@@ -357,6 +357,8 @@ local module: Types.Gamemode = {
     AssignRoles = function(self, participants)
         -- Participants are already shuffled, no need to do it here
         local roles = self.Roles
+
+        if false then return participants[1]:AssignRole(roles[2]) end
         -- Sort roles by lowest AssignmentPriority. These roles will be assigned first.
         -- The greatest value for AssignmentPriority is used as a backup role for anyone who did not receive their role.
         -- Lower AssignmentPriority values will be used first, if there are not enough players for a proper round.

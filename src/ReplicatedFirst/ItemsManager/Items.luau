@@ -11,20 +11,7 @@ local reloadSounds = weaponSounds.Reload
 
 local bullet = projectiles:WaitForChild("Bullet") :: PVInstance -- Somehow this ended up not loading despite Waiting for Projectiles?
 
-local function burn(attacker: Types.Participant?, part: BasePart, callback: (fire: Fire, burnSound: Sound) -> ()): ()
-    if not attacker then
-        return
-    end
 
-    local fire = Instance.new("Fire")
-    fire.Size = 10
-    fire.Parent = part
-
-    local burnSound = weaponSounds.FlareBurn:Clone()
-    burnSound.Parent = part :: any
-
-    task.spawn(callback, fire, burnSound)
-end
 
 local controlledProps: {[number]: BasePart} = {}
 
@@ -184,17 +171,26 @@ guns["Golden Gun"] = {
     Spread = 0,
     Recoil = 5,
 
+    MagazineSize = 1,
+
     ProjectileBase = projectiles:WaitForChild("GoldenBullet"),
     ProjectileSpeed = 250,
 
     Model = models["Golden Gun"],
     FiredSound = firedSounds["Golden Gun"],
 
-    FireTime = 0,
+    FireTime = 0.5,
     ReloadTime = 0,
 
     AimFOV = 70,
     AimSpreadMultiplier = 0,
+
+    BeforeHitProp = function(attacker, target)
+        if target:HasHealth() then
+            target:TakeDamage(math.huge, attacker)
+        end
+        return true
+    end,
 
     BeforeHitParticipant = function(attacker, target, dead, hitPartName)
         if not attacker then
@@ -249,6 +245,50 @@ guns["Golden Gun"] = {
     end,
 }
 
+local function burn(attacker: Types.Participant?, target: Types.Participant | Types.Prop?, part: BasePart): ()
+    if not attacker then
+        return
+    end
+
+    local fire = Instance.new("Fire")
+    fire.Size = 10
+    fire.Parent = part
+
+    local burnSound = weaponSounds.FlareBurn:Clone()
+    burnSound.Parent = part :: any
+
+    local endTime = workspace:GetServerTimeNow() + 10
+    task.spawn(function()
+        while true do
+            if workspace:GetServerTimeNow() > endTime then
+                break
+            end
+            if target and (target :: any):HasHealth() and (target :: any):GetHealth() < 0 then
+                break
+            end
+            if not part:IsDescendantOf(workspace) then
+                break
+            end
+
+            burnSound:Play()
+
+            if target and (target :: any):HasHealth() then
+                (target :: any):TakeDamage(1, attacker, "Burn", false, true)
+            end
+
+            task.wait(0.25)
+        end
+
+        burnSound:Destroy()
+        fire:Destroy()
+
+        local model = part:FindFirstAncestorOfClass("Model")
+        if not target and model then
+            model:Destroy()
+        end
+    end)
+end
+
 guns["Flare Gun"] = {
     Kind = "Gun",
     Name = "Flare Gun",
@@ -284,42 +324,35 @@ guns["Flare Gun"] = {
     AimSpreadMultiplier = 0.3,
 
     BeforeHitParticipant = function(attacker: Types.Participant?, target: Types.Participant, dead: boolean?, hitPartName: string)
-        local humanoid = target.Character:FindFirstChildOfClass("Humanoid")
-        if not humanoid then
+        burn(attacker, target, target.Character.PrimaryPart :: BasePart)
+        return
+    end,
+
+    BeforeHitProp = function(attacker, target, willDestroy, partName)
+        if willDestroy then
             return
         end
 
-        local endTime = workspace:GetServerTimeNow() + 10
-        burn(attacker, target.Character.PrimaryPart :: BasePart,function(fire, burnSound)
-            while (endTime > workspace:GetServerTimeNow()) and (humanoid.Health > 0) and humanoid.Parent do
-                burnSound:Play()
-                target:TakeDamage(1, attacker, "Burn", false, true)
-                task.wait(0.25)
-            end
-            burnSound:Destroy()
-            fire:Destroy()
-        end)
+        local part = target.PropInstance:FindFirstChild(partName, true) or target.PropInstance
+        if not part or not part:IsA("BasePart") then
+            return
+        end
+
+        burn(attacker, target, part)
         return
     end,
 
     BeforeHitCorpse = function(attacker, part)
-        local endTime = workspace:GetServerTimeNow() + 10
         if not part.Parent then
             return
         end
-        local root = part.Parent:FindFirstChild("HumanoidRootPart") :: BasePart
-        burn(attacker, (root or part :: any), function(fire, burnSound)
-            while (endTime > workspace:GetServerTimeNow()) and part.Parent do
-                burnSound:Play()
-                task.wait(0.25)
-            end
-            burnSound:Destroy()
-            fire:Destroy()
 
-            if part.Parent then
-                part.Parent:Destroy()
-            end
-        end)
+        local root = part.Parent:FindFirstChild("HumanoidRootPart")
+        if not root or not root:IsA("BasePart") then
+            return
+        end
+
+        burn(attacker, nil, root)
     end,
 }
 

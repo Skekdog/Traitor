@@ -20,6 +20,7 @@ export type ExplosionInfo = {
     Damage: number,
     BeforeHitParticipant: BeforeHitParticipantFunction?,
     BeforeHitCorpse: BeforeHitCorpseFunction?,
+    BeforeHitProp: BeforeHitPropFunction?,
     FalloffStart: number?,
     FalloffEnd: number?,
     FalloffMultiplier: number?,

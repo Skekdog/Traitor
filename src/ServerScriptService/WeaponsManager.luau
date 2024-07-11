@@ -64,16 +64,21 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
         if attacker then
             sameTeam = round:IsRoleAlliedWith(attacker.Role, entity.Role)
         end
-    elseif not entity:HasHealth() then
-        return
+    else
+        if weapon.BeforeHitProp then
+            if weapon.BeforeHitProp(attacker, entity, if entity:HasHealth() then entity:GetHealth() - damage <= 0 else false, part.Name) then
+                return
+            end
+        end
+        if not entity:HasHealth() then
+            return
+        end
     end
 
     local canDamage = if sameTeam then round.Gamemode.FriendlyFire else true
     if canDamage then
+        local willDie = (entity :: any):GetHealth() - damage <= 0
         if entity.Kind == "Participant" then
-            local health = (entity :: any):GetHealth() :: number
-            local willDie = health - damage <= 0
-
             if willDie then
                 local force
                 if weapon.Kind == "Gun" then
