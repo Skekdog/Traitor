@@ -751,10 +751,7 @@ grenades["Incendiary Grenade"] = {
             overlapParams.RespectCanCollide = false
 
             task.spawn(function()
-                print("psanwed")
-                print(firePart:IsDescendantOf(workspace))
                 while firePart:IsDescendantOf(workspace) do
-                    print("a")
                     local found: {Model} = {}
                     for _, v in workspace:GetPartBoundsInBox(firePart.CFrame, firePart.Size, overlapParams) do
                         local model = v:FindFirstAncestorOfClass("Model")
@@ -775,10 +772,8 @@ grenades["Incendiary Grenade"] = {
 
                         participant:TakeDamage(4, nil, "Burn")
                     end
-                    print(found)
                     task.wait(0.05)
                 end
-                print(firePart:IsDescendantOf(workspace))
             end)
 
             local fire = Instance.new("Fire")
