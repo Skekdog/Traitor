@@ -391,7 +391,9 @@ local module: Types.Adapter = {
                 end)
                 sound:Play()
 
-                ActionItems.Execute(prop.PropInstance, prop.Attacker :: any)
+                if prop.Attacker then
+                    ActionItems.Execute(prop.PropInstance, prop.Attacker)
+                end
             end
             oldOnBreak(self)
         end

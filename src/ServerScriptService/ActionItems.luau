@@ -347,6 +347,9 @@ function module.InterpretConditional(participant: Types.Participant, conditional
 end
 
 function module.Execute(actionItem: Model, participant: Types.Participant): ()
+    if not participant then
+        error("Participant must be set")
+    end
     if actionItem:GetAttribute("Disabled") then
         return
     end
