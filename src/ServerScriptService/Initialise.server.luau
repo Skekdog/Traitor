@@ -4,13 +4,10 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local TeleportService = game:GetService("TeleportService")
 
-local GetRound = require(script.Parent.GetRound)
 local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local ProfileManager = require(script.Parent.ProfileManager)
-local RestartServer = require(script.Parent.RestartServer)
 
 local _earlyTesters = { -- These players should be awarded the badge whenever they join, even after release
 	465187670,
@@ -36,12 +33,6 @@ local _earlyTesters = { -- These players should be awarded the badge whenever th
 	4051361442,
 	3106058458
 }
-local meId = 965735486
-local testPlace = 9648179685
-
-local function isAdmin(plr: Player)
-	return plr.UserId == meId or plr.UserId < 0
-end
 
 Players.PlayerAdded:Connect(function(plr): ()
 	if ServerStorage:GetAttribute("ServerLocked") then
@@ -54,36 +45,6 @@ Players.PlayerAdded:Connect(function(plr): ()
     end
 
 	InventoryManager.InitInventory(plr)
-
-	plr.Chatted:Connect(function(msg, to)
-        if to then
-            return
-        end
-
-        msg = msg:lower()
-
-        if msg == "!testplace" and game.PlaceId ~= testPlace then
-            local targets = {plr}
-			if isAdmin(plr) then
-				targets = Players:GetPlayers()
-			end
-			TeleportService:TeleportAsync(testPlace, targets)
-        elseif msg == "!pause" and isAdmin(plr) then
-            local round = GetRound()
-			if not round then
-				return
-			end
-
-            round:PauseRound()
-
-            if not round.Paused then
-                ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
-            end
-            ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
-        elseif msg == "!restart" and plr.UserId == meId then
-            RestartServer(5)
-        end
-    end)
 
 	local tries = 0
 	local suc = false
