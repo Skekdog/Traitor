@@ -117,6 +117,7 @@ for i, v in createdTabs do
 	
 	local page = pageBase:Clone() :: GuiObject
 	page.Name = "Page_"..v
+	page.LayoutOrder = i
 	page.Parent = settingsFrame
 	
 	tab.MouseButton1Click:Connect(function()
@@ -131,7 +132,8 @@ for i, v in createdTabs do
 		if settingsFrame:GetAttribute("CurrentTab") == v then
 			return
 		end
-		API.TransitionUIPage(currentPage, (tabsFrame:FindFirstChild(currentPage.Name:sub(6)) :: GuiButton).LayoutOrder, page, tab.LayoutOrder, UDim2.fromScale(0, 0.1))
+
+		API.TransitionUIPage(currentPage, page, UDim2.fromScale(0, 0.1))
 		settingsFrame:SetAttribute("CurrentTab", v)
 	end)
 	

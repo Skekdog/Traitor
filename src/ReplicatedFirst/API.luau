@@ -146,46 +146,30 @@ function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[st
 	return tween
 end
 
-function module.TransitionUIPage(currentPage: GuiObject, currentPageOrder: number, newPage: GuiObject, newPageOrder: number, targetPosition: UDim2)
-	-- If new page is to the right, then the new page should be positioned on the right
-	-- and current page should slide to the left
-	local goRight = newPageOrder > currentPageOrder
-	
+local pageTransitionTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Exponential, Enum.EasingDirection.In)
+function module.TransitionUIPage(currentPage: GuiObject, newPage: GuiObject, targetPosition: UDim2): ()
+	assert(currentPage.LayoutOrder ~= newPage.LayoutOrder, `I forgor 💀 (Page transition failed for {currentPage:GetFullName()})`)
+	local goRight = currentPage.LayoutOrder < newPage.LayoutOrder
+
 	local targetPositionForCurrent
-	-- Can't do anything smart with * -1, because UDim2 does not support multiplication
 	if goRight then
-		newPage.Position = UDim2.new(targetPosition.X + currentPage.Size.X, newPage.Position.Y)
 		targetPositionForCurrent = UDim2.new(targetPosition.X - currentPage.Size.X, newPage.Position.Y)
+		newPage.Position = UDim2.new(targetPosition.X + newPage.Size.X, newPage.Position.Y)
 	else
-		newPage.Position = UDim2.new(targetPosition.X - currentPage.Size.X, newPage.Position.Y)
 		targetPositionForCurrent = UDim2.new(targetPosition.X + currentPage.Size.X, newPage.Position.Y)
+		newPage.Position = UDim2.new(targetPosition.X - newPage.Size.X, newPage.Position.Y)
 	end
-	
+
 	newPage.Visible = true
-	module.Animate(newPage, TweenInfo.new(0.2,
-		Enum.EasingStyle.Exponential,
-		Enum.EasingDirection.In
-		),
-		{
-			Position = currentPage.Position
-		}
-	)
-	local animTween = module.Animate(currentPage, TweenInfo.new(0.2,
-		Enum.EasingStyle.Exponential,
-		Enum.EasingDirection.In
-		),
-		{
-			Position = targetPositionForCurrent
-		}
-	)
-	if animTween then
-		animTween:GetPropertyChangedSignal("PlaybackState"):Connect(function()
-			if animTween.PlaybackState ~= Enum.PlaybackState.Playing then
-				currentPage.Position = targetPositionForCurrent
-				newPage.Position = targetPosition
-				animTween:Destroy()
+	module.Animate(newPage, pageTransitionTweenInfo, { Position = targetPosition })
+
+	local tween = module.Animate(currentPage, pageTransitionTweenInfo, { Position = targetPositionForCurrent })
+	if tween then
+		tween:GetPropertyChangedSignal("PlaybackState"):Connect(function()
+			if tween.PlaybackState == Enum.PlaybackState.Completed then
+				currentPage.Visible = false
 			end
-		end)	
+		end)
 	end
 end
 

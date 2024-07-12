@@ -72,19 +72,13 @@ local eTemplate = eFrame.Template;
 	UI:ToggleVisible(true)
 end)
 
-local pageOrders = {
-	Events = 1,
-	Highlights = 2,
-	Scores = 3
-}
-
 local currentTab = "Highlights"
 
 local function showTab(tab)
 	if currentTab == tab then
 		return
 	end
-	API.TransitionUIPage(page:FindFirstChild(currentTab) :: any, pageOrders[currentTab], page:FindFirstChild(tab) :: any, pageOrders[tab], UDim2.fromScale(0.5, 0.5))
+	API.TransitionUIPage(page:FindFirstChild(currentTab) :: GuiObject, page:FindFirstChild(tab) :: GuiObject, UDim2.fromScale(0.5, 0.5))
 	currentTab = tab
 end
 
