@@ -238,6 +238,10 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
     local sendWeapon = if weapon then round:GetEquipment(weapon.Name) or "Explosion" else "Explosion"
     task.spawn(round.DoMassDamage, round, participantsHit, sendWeapon :: Types.Equipment | Types.DeathType, attacker)
 
+    if explosionInfo.OnExplode then
+        explosionInfo.OnExplode(explosionInfo, position, attacker)
+    end
+
     explosion.Parent = workspace.Projectiles
 end
 
@@ -316,7 +320,8 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
 
     if weapon.Kind == "Grenade" then
         InventoryManager.RemoveEquipment(player, weapon)
-        local proj = weapon.Base.ProjectileBase:Clone()
+        local proj = weapon.Base.ProjectileBase:Clone();
+        (proj :: BasePart).CollisionGroup = "Grenades"
         proj:PivotTo(CFrame.new(origin))
         proj.Parent = workspace.Projectiles
 

@@ -180,11 +180,10 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Magneto Stick", "Grenade", "Flashbang"},
+    StartingEquipment = {"Crowbar", "Magneto Stick", "Grenade", "Flashbang", "Discombobulator"},
     AvailableEquipment = {
         {
             Name = "Crowbar",
-            Description = "Become a Gordonite",
             Icon = "rbxassetid://",
             AttackType = "Blunt",
 
@@ -192,21 +191,18 @@ local module: Types.Gamemode = {
         },
         {
             Name = "Magneto Stick",
-            Description = "Haha props",
             Icon = "rbxassetid://",
 
             Item = items["Magneto Stick"]
         },
         {
             Name = "Newton Launcher",
-            Description = "Haha props",
             Icon = "rbxassetid://",
 
             Item = items["Newton Launcher"]
         },
         {
             Name = "Pistol",
-            Description = "Reliable",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
 
@@ -214,7 +210,6 @@ local module: Types.Gamemode = {
         },
         {
             Name = "BAR",
-            Description = "Reliable",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
 
@@ -222,7 +217,6 @@ local module: Types.Gamemode = {
         },
         {
             Name = "Assault Rifle",
-            Description = "pewpewpew",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
 
@@ -230,7 +224,6 @@ local module: Types.Gamemode = {
         },
         {
             Name = "XM1014",
-            Description = "bang bang bang",
             Icon = "rbxassetid://",
             AttackType = "Firearm",
 
@@ -255,6 +248,35 @@ local module: Types.Gamemode = {
             Cost = 1,
 
             Item = items["Flare Gun"]
+        },
+        {
+            Name = "Grenade",
+            Description = "Explodes in a decent radius after a few seconds.",
+            Cost = 2,
+            Icon = "rbxassetid://8096856961",
+            MaxStock = 1,
+            AttackType = "Explosion",
+
+            Item = items.Grenade
+        },
+        {
+            Name = "Smoke Grenade",
+            Icon = "rbxassetid://8096856961",
+
+            Item = items["Smoke Grenade"]
+        },
+        {
+            Name = "Incendiary Grenade",
+            Icon = "rbxassetid://8096856961",
+            AttackType = "Explosion",
+
+            Item = items["Incendiary Grenade"]
+        },
+        {
+            Name = "Discombobulator",
+            Icon = "rbxassetid://8096856961",
+
+            Item = items.Discombobulator
         },
         {
             Name = "Grenade",

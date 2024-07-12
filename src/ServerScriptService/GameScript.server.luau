@@ -140,7 +140,7 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 end
 
 local nextRoundReady = true
-local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructureCast
+local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
 
 local function sendRoundInfo(plr: Player?)
 	local round = GetRound()
@@ -278,6 +278,7 @@ joinRound.OnServerInvoke = function(plr)
 			end
 
 			InventoryManager.Reset()
+			workspace.Projectiles:ClearAllChildren()
 
 			for _, v in round.Participants do
 				v.Role = RoundHandler.NoRole

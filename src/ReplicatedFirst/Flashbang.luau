@@ -1,5 +1,4 @@
 local Lighting = game:GetService("Lighting")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 
@@ -13,8 +12,8 @@ equaliser.LowGain = 10
 equaliser.MidGain = -20
 equaliser.Enabled = true
 
-(ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).Flashbang.OnClientEvent:Connect(function()
-	local correction = Instance.new("ColorCorrectionEffect")
+return function()
+    local correction = Instance.new("ColorCorrectionEffect")
 	local blur = Instance.new("BlurEffect")
 	
 	correction.Name = "FlashbangCorrection"
@@ -46,4 +45,4 @@ equaliser.Enabled = true
 	ring.PlayOnRemove = true
 	ring.Parent = SoundService
 	ring:Destroy()
-end)
+end

@@ -679,7 +679,7 @@ grenades.Grenade = {
     Fuse = 5,
 
     ProjectileBase = models:WaitForChild("Grenade"),
-    ProjectileForce = 0.5,
+    ProjectileForce = 0.75,
     Spread = 0.25,
 
     FiredSound = firedSounds.Grenade,
@@ -709,7 +709,162 @@ grenades.Flashbang = {
     Fuse = 3,
 
     ProjectileBase = models:WaitForChild("Flashbang"),
-    ProjectileForce = 100,
+    ProjectileForce = 60,
+    Spread = 0.25,
+
+    FiredSound = firedSounds.Grenade,
+}
+
+grenades["Incendiary Grenade"] = {
+    Kind = "Grenade",
+    Name = "Incendiary Grenade",
+
+    Slot = 4,
+    CanDrop = true,
+
+    Model = models:WaitForChild("Incendiary Grenade"),
+
+    ExplosionInfo = {
+        Kind = "Explosion",
+        Radius = 15,
+        Pressure = 10000,
+        Damage = 10,
+
+        OnExplode = function(self, position, attacker)
+            if not attacker then
+                return
+            end
+
+            local firePart = Instance.new("Part")
+            firePart.Anchored = true
+            firePart.CanCollide = false
+            firePart.CanTouch = true
+            firePart.CanQuery = true
+            firePart.Transparency = 1
+            firePart.Size = Vector3.new(15, 1, 15)
+            firePart.Position = position
+            firePart.Parent = workspace.Projectiles
+
+            local overlapParams = OverlapParams.new()
+            overlapParams.FilterDescendantsInstances = {workspace.Characters}
+            overlapParams.FilterType = Enum.RaycastFilterType.Include
+            overlapParams.RespectCanCollide = false
+
+            task.spawn(function()
+                print("psanwed")
+                print(firePart:IsDescendantOf(workspace))
+                while firePart:IsDescendantOf(workspace) do
+                    print("a")
+                    local found: {Model} = {}
+                    for _, v in workspace:GetPartBoundsInBox(firePart.CFrame, firePart.Size, overlapParams) do
+                        local model = v:FindFirstAncestorOfClass("Model")
+                        if not model or table.find(found, model) then
+                            continue
+                        end
+                        table.insert(found, model)
+
+                        local plr = Players:GetPlayerFromCharacter(model)
+                        if not plr then
+                            continue
+                        end
+
+                        local participant = attacker.Round:GetParticipant(plr.Name)
+                        if not participant then
+                            continue
+                        end
+
+                        participant:TakeDamage(4, nil, "Burn")
+                    end
+                    print(found)
+                    task.wait(0.05)
+                end
+                print(firePart:IsDescendantOf(workspace))
+            end)
+
+            local fire = Instance.new("Fire")
+            fire.Size = 40
+            fire.Parent = firePart
+
+            task.delay(30, firePart.Destroy, firePart)
+        end
+    },
+
+    Fuse = 3,
+
+    ProjectileBase = models:WaitForChild("Incendiary Grenade"),
+    ProjectileForce = 2.5,
+    Spread = 0.25,
+
+    FiredSound = firedSounds.Grenade,
+}
+
+grenades["Smoke Grenade"] = {
+    Kind = "Grenade",
+    Name = "Smoke Grenade",
+
+    Slot = 4,
+    CanDrop = true,
+
+    Model = models:WaitForChild("Smoke Grenade"),
+
+    ExplosionInfo = {
+        Kind = "Explosion",
+        Radius = 15,
+        Pressure = 10000,
+        Damage = 0,
+
+        OnExplode = function(self, position)
+            local smoke = Instance.new("Smoke")
+            smoke.Size = 20
+            smoke.Opacity = 1
+            smoke.RiseVelocity = 5
+            
+            local smokePart = Instance.new("Part")
+            smokePart.Anchored = true
+            smokePart.CanCollide = false
+            smokePart.Transparency = 1
+            smokePart.Size = Vector3.new(0, 0, 0)
+            smokePart.Position = position
+            smokePart.Parent = workspace.Projectiles
+            smoke.Parent = smokePart
+
+            task.delay(30, smokePart.Destroy, smokePart)
+        end,
+    },
+
+    Fuse = 3,
+
+    ProjectileBase = models:WaitForChild("Smoke Grenade"),
+    ProjectileForce = 2.5,
+    Spread = 0.25,
+
+    FiredSound = firedSounds.Grenade,
+}
+
+grenades["Discombobulator"] = {
+    Kind = "Grenade",
+    Name = "Discombobulator",
+
+    Slot = 4,
+    CanDrop = true,
+
+    Model = models:WaitForChild("Discombobulator"),
+
+    ExplosionInfo = {
+        Kind = "Explosion",
+        Radius = 15,
+        Pressure = 10000,
+        Damage = 0,
+
+        BeforeHitParticipant = function(attacker, target, dead, hitPartName)
+            return ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
+        end,
+    },
+
+    Fuse = 3,
+
+    ProjectileBase = models:WaitForChild("Discombobulator"),
+    ProjectileForce = 2.5,
     Spread = 0.25,
 
     FiredSound = firedSounds.Grenade,

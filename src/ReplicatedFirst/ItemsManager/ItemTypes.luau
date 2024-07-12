@@ -21,6 +21,7 @@ export type ExplosionInfo = {
     BeforeHitParticipant: BeforeHitParticipantFunction?,
     BeforeHitCorpse: BeforeHitCorpseFunction?,
     BeforeHitProp: BeforeHitPropFunction?,
+    OnExplode: ((self: ExplosionInfo, position: Vector3, attacker: Types.Participant?) -> ())?,
     FalloffStart: number?,
     FalloffEnd: number?,
     FalloffMultiplier: number?,
