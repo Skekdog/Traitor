@@ -48,45 +48,95 @@ function module.TestForOneSurvivingRole(self: Types.Gamemode, round: Types.Round
     return allegiances[2]
 end
 
--- returns a table of EquipmentName = {Username, Kills}
--- I don't like this
-function module.GetWeaponHighlights(roundEvents: {["Death"]: {Types.RoundEvent<Types.RoundEvent_Death>}}): {[Types.EquipmentName]: {Types.Username | Types.PositiveInteger}}
+function module.GetWeaponHighlights(roundEvents: Types.RoundEventLog): {Types.RoundHighlight}
     local deathEvents = roundEvents.Death
-
     if not deathEvents then
         return {}
     end
-    
-    local counter: {[Types.EquipmentName]: {[Types.Participant]: Types.Integer}} = {} -- yeah i'm not giving this a nice name
+
+    local data: {[Types.EquipmentName]: {[Types.Participant]: number?}?} = {}
     for _, v in deathEvents do
         local attacker = v.Data.Attacker
         local weapon = v.Data.Weapon
-        if (not attacker) or (type(weapon) ~= "table") then
+
+        if not attacker or typeof(weapon) ~= "table" then
             continue
         end
 
-        local weaponName = weapon.Name
-
-        if not counter[weaponName] then
-            counter[weaponName] = {}
+        local thisData = data[weapon.Name]
+        if not thisData then
+            data[weapon.Name] = {}
+            thisData = data[weapon.Name]
         end
-
-        if not counter[weaponName][attacker] then
-            counter[weaponName][attacker] = 0
-        end
-        counter[weaponName][attacker] += 1
+        assert(thisData)
+        
+        thisData[attacker] = (thisData[attacker] or 0) + 1
     end
 
-    local bestPerWeapon: {[Types.EquipmentName]: {Types.Username | Types.PositiveInteger}} = {} -- [1] = username, [2] = amount
-    for weapon, v in counter do
-        for participant, amount in v do
-            if (not bestPerWeapon[weapon]) or (bestPerWeapon[weapon][2] < amount) then
-                bestPerWeapon[weapon] = {participant.Player.Name, amount :: any} :: any
+    local results: {[Types.EquipmentName]: {Participant: Types.Participant, Kills: number}} = {}
+    for i, v in data do
+        assert(v)
+
+        results[i] = {Participant = nil :: any, Kills = 0}
+
+        local ranOnce = false
+        for participant, kills in v do
+            assert(kills)
+
+            if kills < 2 then
+                continue
+            end
+
+            if kills > results[i].Kills then
+                results[i] = {
+                    Participant = participant,
+                    Kills = kills,
+                }
+                ranOnce = true
             end
         end
+
+        if not ranOnce then
+            results[i] = nil
+        end
     end
 
-    return bestPerWeapon
+    local highlights: {Types.RoundHighlight} = {}
+    for i, v in results do
+        local participant = v.Participant.FormattedName
+        local amount = v.Kills
+
+        local name: string?, description: string?
+
+        if i == "Crowbar" then
+            if amount >= 4 then
+                name = "Gordonite"
+                description = `{participant} smeared their Crowbar in the brains of no less than {amount} people.`
+            else
+                name = "It's like a crow's beak"
+                description = `{participant} thought their Crowbar looked funny and showed it to {amount} people.`
+            end
+        elseif i == "Pistol" then
+            if amount >= 4 then
+                name = "Small Arms Slaughter"
+                description = `{participant} killed a small army of {amount} using only their pistol. Presumably had a tiny shotgun installed in the barrel.`
+            else
+                name = "Persistent Little Bugger"
+                description = `{participant} scored {amount} kills with their pistol. They then went on and hugged someone to death.`
+            end
+        end
+
+        if not name or not description then
+            continue
+        end
+
+        table.insert(highlights, {
+            Name = name,
+            Description = description,
+        })
+    end
+
+    return highlights
 end
 
 return module

@@ -24,41 +24,8 @@ local module: Types.Gamemode = {
     CalculateRoundHighlights = function(self, round)
         local weaponList = common.GetWeaponHighlights(round.EventLog)
         local highlights: {Types.RoundHighlight} = {}
-        
-        for equipmentName, v in weaponList do
-            local username = v[1]
-            local amount = v[2]
 
-            local name = ""
-            local description = ""
-
-            if not amount or amount < 2 then
-                continue
-            end
-
-            if equipmentName == "Crowbar" then
-                if amount >= 4 then
-                    name = "Gordonite"
-                    description = `{username} smeared their Crowbar in the brains of no less than {amount} people.`
-                else
-                    name = "It's like a crow's beak"
-                    description = `{username} thought their Crowbar looked funny and showed it to {amount} people.`
-                end
-            elseif equipmentName == "Pistol" then
-                if amount >= 4 then
-                    name = "Persistent Little Bugger"
-                    description = `{username} scored {amount} kills with their pistol. They then went on and hugged someone to death.`
-                else
-                    name = "Small Arms Slaughter"
-                    description = `{username} killed a small army of {amount} using only their pistol. Presumably had a tiny shotgun installed in the barrel.`
-                end
-            end
-
-            table.insert(highlights, {
-                Name = name,
-                Description = description
-            })
-        end
+        table.move(weaponList, 1, #weaponList, 1, highlights)
 
         local deathLog = round.EventLog.Death
         local firstKill: Types.RoundEvent_Death?
