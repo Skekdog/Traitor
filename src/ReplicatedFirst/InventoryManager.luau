@@ -84,10 +84,11 @@ function module.Reload(player: Player, weapon: ItemTypes.GunWeapon): ()
     local base = weapon.Base
 
     local ammoType: ItemTypes.AmmoType = base.AmmoType :: ItemTypes.AmmoType
+    local maxAmmo = base.MagazineSize or module.AmmoData[ammoType].Magazine
     local reserve = module.GetReserve(player, ammoType)
     local char = player.Character
 
-    if reserve <= 0 or not ammoType or not char or weapon.Reloading or weapon.CurrentAmmo == base.MagazineSize then
+    if reserve <= 0 or not ammoType or not char or weapon.Reloading or weapon.CurrentAmmo == maxAmmo then
         return
     end
 
