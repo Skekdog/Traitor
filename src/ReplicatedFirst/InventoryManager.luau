@@ -107,7 +107,7 @@ function module.Reload(player: Player, weapon: ItemTypes.GunWeapon): ()
         weapon.Reloading = nil
 
         local prevAmmo = weapon.CurrentAmmo
-        weapon.CurrentAmmo = math.min(weapon.CurrentAmmo + reserve, base.MagazineSize or module.AmmoData[ammoType].Magazine)
+        weapon.CurrentAmmo = math.min(weapon.CurrentAmmo + reserve, maxAmmo)
 
         -- We need to GetReserve() again because they may have picked up more ammo whilst reloading
         module.SetReserve(player, ammoType, module.GetReserve(player, ammoType) - (weapon.CurrentAmmo - prevAmmo))
