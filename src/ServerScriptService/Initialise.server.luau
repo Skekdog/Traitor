@@ -156,7 +156,7 @@ ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target: u
 		return
 	end
 	local profile = ProfileManager.GetProfile(plr)
-	return profile and profile.Karma or 1000
+	return if profile then profile.Karma else 1000
 end
 
 while true do
