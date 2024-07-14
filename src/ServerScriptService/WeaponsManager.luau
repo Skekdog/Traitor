@@ -206,6 +206,9 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
 
     local propsHit = {}
     local participantsHit: {[Types.Participant]: number} = {}
+
+    local sendWeapon:  Types.Equipment | Types.DeathType = (if weapon then round:GetEquipment(weapon.Name) or "Explosion" else "Explosion")  :: Types.Equipment | Types.DeathType
+    local ignoreKarma = if typeof(sendWeapon) == "table" then sendWeapon.NoGuilt else false
     
     for _, part in workspace:GetPartBoundsInRadius(position, explosionInfo.Radius) do
         local distance = (position - part.Position).Magnitude
@@ -227,16 +230,14 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
             if not participant or participantsHit[participant] then
                 continue
             end
-            participantsHit[participant] = calculateDamage(attacker, explosionInfo, part, distance)
+
+            participant:TakeDamage(calculateDamage(attacker, explosionInfo, part, distance), attacker, sendWeapon, false, ignoreKarma)
 
             if explosionInfo.BeforeHitParticipant then
                 explosionInfo.BeforeHitParticipant(attacker, participant, false, part.Name)
             end
         end
     end
-
-    local sendWeapon = if weapon then round:GetEquipment(weapon.Name) or "Explosion" else "Explosion"
-    task.spawn(round.DoMassDamage, round, participantsHit, sendWeapon :: Types.Equipment | Types.DeathType, attacker)
 
     if explosionInfo.OnExplode then
         explosionInfo.OnExplode(explosionInfo, position, attacker)

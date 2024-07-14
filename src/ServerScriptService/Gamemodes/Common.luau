@@ -44,8 +44,11 @@ function module.TestForOneSurvivingRole(self: Types.Gamemode, round: Types.Round
 
     if rolesAlive[allegiances[1]] then
         return allegiances[1]
+    elseif rolesAlive[allegiances[2]] then
+        return allegiances[2]
+    else
+        return self.PhyrricVictors
     end
-    return allegiances[2]
 end
 
 function module.GetWeaponHighlights(roundEvents: Types.RoundEventLog): {Types.RoundHighlight}
