@@ -5,6 +5,7 @@ local UIManager = require(ReplicatedFirst.UIManager)
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 
 local TS = game:GetService("TweenService")
+local TextChatService = game:GetService("TextChatService")
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local global = ui.Global
@@ -57,7 +58,15 @@ local function makeLabel(isTeam: boolean, text: string)
 end
 
 local teamMessages: {Types.MessageType?} = {"creditsEarned"}
+local chatChannel: TextChannel = TextChatService
+
+if true then error("Remember to set chatChannel") end
 
 (ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
-	makeLabel(table.find(teamMessages, msgType) ~= nil, msg)
+	if msgType == "other" then
+		chatChannel:DisplaySystemMessage(msg)
+	else
+		makeLabel(table.find(teamMessages, msgType) ~= nil, msg)
+	end
+	
 end)

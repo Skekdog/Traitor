@@ -207,7 +207,7 @@ local module: Types.Adapter = {
         return false
     end,
 
-    SendMessage = function(message: string, severity: Types.MessageSeverity, messageType: Types.MessageType, recipients: true | {Types.Participant})
+    SendMessage = function(message: string, severity: Types.MessageSeverity, messageType: Types.MessageType, recipients: true | {Types.Participant | Player})
         -- If isGlobal = true, then recipients is empty. The adapter is expected to send this message to all connected players (Players:GetPlayers()).
         -- Sends a private server message to each recipient.
         -- The message can be further processed here, such as using rich text to change text colour depending on severity.
@@ -224,15 +224,16 @@ local module: Types.Adapter = {
             message = `<font color='{fontColour}'>{message}</font>`
         end
 
-        if recipients == true or (recipients[1] and recipients[1].Round.Participants == recipients) then
+        if recipients == true then
             return remote:FireAllClients(message, messageType)
         end
         for _, v in recipients do
-            if v.Player then
+            if typeof(v) == "table" then
                 remote:FireClient(v.Player, message, messageType)
+            else
+                remote:FireClient(v, message, messageType)
             end
         end
-        return
     end,
 
     SendRoleAlert = function(recipient, role)
