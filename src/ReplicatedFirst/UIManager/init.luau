@@ -1,7 +1,6 @@
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local UIS = game:GetService("UserInputService")
 
 local ControlManager = require(ReplicatedFirst.ControlManager)
 local API = require(script.Parent.API)
@@ -49,7 +48,6 @@ local nextUI: UI
 UIManager.UnregisteredUIs = script.UnregisteredUIs
 
 function UIManager.RegisterUI(object: GuiObject): UI
-	local SettingsManager = require(script.Parent.SettingsManager)
 	local ignoreInset: boolean? = object:GetAttribute("IgnoreInset")
 	local modal: boolean? = object:GetAttribute("Modal")
 	local transitionStyle: "Position" | "Size" = object:GetAttribute("TransitionStyle")
@@ -151,19 +149,14 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		if not ReplicatedFirst:GetAttribute("ControlsReady") then
 			ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
 		end
+
 		local but = sb.Button:Clone()
-		local keybinding = SettingsManager.GetSetting(self.Name) :: SettingsManager.KeybindSetting
-		local key = keybinding["Keycodes"][1][1]
-		local modifier = keybinding["Keycodes"][1][2]
-		local str = ""
-		if key then
-			str = ControlManager.GetStringForKeyCode(key)
-			if modifier then
-				str = " + "..ControlManager.GetStringForKeyCode(modifier)
-			end
-		end
 		but.Name = self.Name
-		but.Text = self.DisplayName..(UIS.KeyboardEnabled and "<br/>["..str.."]" or "")
+		
+		local key = ControlManager.GetFirstKeyCode(self.Name, true)
+		local keyHint = if key ~= "" and key ~= "NONE" then `<br/>{key}` else ""
+		but.Text = self.DisplayName..keyHint
+
 		but.Visible = true
 		but.Parent = sb
 		but.MouseButton1Click:Connect(function()

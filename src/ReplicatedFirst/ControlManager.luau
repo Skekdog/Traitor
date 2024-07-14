@@ -25,9 +25,21 @@ function module.OnSettingUpdate(name, val)
 	end
 end
 
+export type InputMethod = "touch" | "keyboard" | "controller"
+function module.GetPreferredInputMethod(): InputMethod
+	if UIS.GamepadEnabled then
+		return "controller"
+	elseif UIS.KeyboardEnabled then
+		return "keyboard"
+	elseif UIS.TouchEnabled then
+		return "touch"
+	end
+	error("No valid input methods!")
+end
+
 function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?): string
 	if not keycode then
-		return ""
+		return "NONE"
 	end
 	if keycode.EnumType == Enum.KeyCode then
 		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
@@ -92,13 +104,47 @@ function module.SetupTouchButton(actionName)
 	end
 end
 
-function module.GetFirstKeyCode(actionName: string): string
+function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): string
 	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
 	local keybinds = keybindSetting.Keycodes
-	if keybinds then
-		return module.GetStringForKeyCode(keybinds[1][1])
+
+	local preferred: InputMethod = module.GetPreferredInputMethod()
+	if preferred == "touch" then
+		return if blankForTouch then "" else actionName
 	end
-	return ""
+
+	if not keybinds then
+		return "NONE"
+	end
+
+	for _, v in keybinds do
+		local key = v[1]
+		if not key then
+			continue
+		end
+		
+		if preferred == "controller" and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
+			return module.GetStringForKeyCode(key)
+		elseif preferred == "keyboard" and key.Name:sub(1, 6) ~= "Button" then
+			return module.GetStringForKeyCode(key)
+		end
+	end
+
+	-- If we didn't find our preferred method then we look for the first valid method
+	for _, v in keybinds do
+		local key = v[1]
+		if not key then
+			continue
+		end
+
+		if UIS.GamepadEnabled and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
+			return module.GetStringForKeyCode(key)
+		elseif UIS.KeyboardEnabled and key.Name:sub(1, 6) ~= "Button" then
+			return module.GetStringForKeyCode(key)
+		end
+	end
+
+	return "NONE"
 end
 
 -- Returns the Button if it was created
