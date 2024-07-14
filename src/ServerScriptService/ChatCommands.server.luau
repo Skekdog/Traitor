@@ -53,6 +53,7 @@ Players.PlayerAdded:Connect(function(plr: Player)
             end
             ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
         elseif msg == "!restart" and plr.UserId == meId then
+            Adapters.SendMessage("Server restarting...", "error", "update", true)
             RestartServer(5)
         end
     end)
