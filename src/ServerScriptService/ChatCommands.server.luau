@@ -30,7 +30,11 @@ Players.PlayerAdded:Connect(function(plr: Player)
 
         msg = msg:lower()
 
-        if msg == "!testplace" and game.PlaceId ~= testPlace then
+        if msg == "!testplace" then
+            if game.PlaceId == testPlace then
+                return Adapters.SendMessage("You are already in test place, silly.", "error", "update", true)
+            end
+
             local targets = {plr}
 			if isAdmin(plr) then
 				targets = Players:GetPlayers()
@@ -47,6 +51,8 @@ Players.PlayerAdded:Connect(function(plr: Player)
 			end
 
             round:PauseRound()
+
+            Adapters.SendMessage("Round paused.", "info", "update", true)
 
             if not round.Paused then
                 ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
