@@ -117,12 +117,7 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 		return "NONE"
 	end
 
-	for _, v in keybinds do
-		local key = v[1]
-		if not key then
-			continue
-		end
-		
+	for _, key in keybinds do
 		if preferred == "controller" and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
 			return module.GetStringForKeyCode(key)
 		elseif preferred == "keyboard" and key.Name:sub(1, 6) ~= "Button" then
@@ -131,12 +126,7 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 	end
 
 	-- If we didn't find our preferred method then we look for the first valid method
-	for _, v in keybinds do
-		local key = v[1]
-		if not key then
-			continue
-		end
-
+	for _, key in keybinds do
 		if UIS.GamepadEnabled and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
 			return module.GetStringForKeyCode(key)
 		elseif UIS.KeyboardEnabled and key.Name:sub(1, 6) ~= "Button" then
@@ -165,28 +155,23 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
 	local toggled = keybindSetting.Toggled
 	local keybinds = keybindSetting.Keycodes
-	
-	local triggers = {}
-	local modifiers = {}
-	for _, v in keybinds do
-		table.insert(triggers, v[1])
-		modifiers[v[1]] = v[2]
-	end
-	CAS:BindAction(actionName, function(action, state, input: InputObject)
-		local inp = input.KeyCode or input.UserInputType
-		local modifier = modifiers[inp] :: Enum.KeyCode
-		
-		if not modifier or UIS:IsKeyDown(modifier) then
-			local show = false
-			if (toggled) and (state == Enum.UserInputState.End) then show = true end
-			if (not toggled) and ((state == Enum.UserInputState.Begin) or (state == Enum.UserInputState.End)) then show = true end
 
-			if show then
-				return callback(action, state, input, toggled)
-			end
+	CAS:BindAction(actionName, function(action, state, input)
+		local show = false
+
+		if (toggled) and (state == Enum.UserInputState.End) then
+			show = true
+		end
+
+		if (not toggled) and ((state == Enum.UserInputState.Begin) or (state == Enum.UserInputState.End)) then
+			show = true
+		end
+
+		if show then
+			return callback(action, state, input, toggled)
 		end
 		return Enum.ContextActionResult.Pass
-	end, createTouchButton, table.unpack(triggers) :: Enum.KeyCode | Enum.UserInputType)
+	end, createTouchButton, table.unpack(keybinds))
 	
 	module.SetupTouchButton(actionName)
 	

@@ -9,12 +9,24 @@ local SM = require(script.Parent)
 -- This must be run before anything yields, especially todo with ui
 local options = (ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).LoadSavedData.OnClientEvent:Wait()
 options = SM.JSONDecode(options)
-for i, v in options do
-	local definition = SM.Settings[i].Definition
-	if definition.SpecifyToggle == false then
-		v.Toggled = (definition.Default :: SM.KeybindSetting).Toggled
+
+local previousVersion = options.__VERSION
+if previousVersion ~= SM.SETTINGS_VERSION then
+	for _, v in SM.AvailableSettings do
+		SM.SetSetting(v.Name, v.Default)
 	end
-	SM.SetSetting(i, v)
+else
+	for i, v in options do
+		if i == "__VERSION" then
+			continue
+		end
+
+		local definition = SM.Settings[i].Definition
+		if definition.SpecifyToggle == false then
+			v.Toggled = (definition.Default :: SM.KeybindSetting).Toggled
+		end
+		SM.SetSetting(i, v)
+	end
 end
 
 ReplicatedFirst:SetAttribute("ControlsReady", true)
@@ -187,7 +199,7 @@ settingsFrame.Parent:GetPropertyChangedSignal("Visible"):Connect(function()
 	end
 end)
 
-local keybindingCons = {}
+local keybindingCons: {RBXScriptConnection} = {}
 for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	local tab = setting.Tab
 	local settingType = setting.PossibleValues
@@ -263,21 +275,21 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		
 		local setBinds = SM.GetSetting(name) :: SM.KeybindSetting
 		
-		local function updateBinds(binds: any)
+		local function updateBinds(binds: {SM.Keybind})
 			local numBoundKeys = 0
 			for _, v in m.Keybinds:GetChildren() do
 				if v:IsA("Frame") and (v.Name ~= "__KeybindFrame") then
 					numBoundKeys += 1
 				end
 			end
-			for i, v: {SM.Keybind} in binds do
+			for i, v in binds do
 				local bind = m.Keybinds.__KeybindFrame:Clone()
 				
 				bind.LayoutOrder = (i + numBoundKeys)*2 -- Separator in between, hence *2
 
-				bind.Name = name..tostring(i + numBoundKeys)
+				bind.Name = name .. tostring(i + numBoundKeys)
 				
-				local result = Controls.GetStringForKeyCode(v[1])
+				local result = Controls.GetStringForKeyCode(v)
 				if result:sub(1, 11) == "rbxasset://" then
 					local img = bind.KeycodeImage
 					img.Image = result
@@ -285,12 +297,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 					bind.Keycode.Visible = false
 				else
 					bind.Keycode.Text = result
-				end
-
-				if v[2] then
-					bind.Modifier.Text = Controls.GetStringForKeyCode(v[2])
-					bind.Modifier.Visible = true
-					bind.Plus.Visible = true
 				end
 
 				bind.Visible = true
@@ -306,8 +312,8 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				end
 
 				local function removeBind()
-					local binds = SM.GetSetting(name) :: any
-					table.remove(binds.Keycodes, table.find((binds :: any).Keycodes, setBinds))
+					local binds = SM.GetSetting(name) :: SM.KeybindSetting
+					table.remove(binds.Keycodes, table.find(binds.Keycodes, v))
 					SM.SetSetting(name, binds)
 
 					bind:Destroy()
@@ -323,7 +329,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				
 				bind.KeycodeImage.MouseButton1Click:Connect(removeBind)
 				bind.Keycode.MouseButton1Click:Connect(removeBind)
-				bind.Modifier.MouseButton1Click:Connect(removeBind)
 			end
 		end
 		
@@ -332,9 +337,9 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		if setting.SpecifyToggle then
 			local toggleButton = m.Toggled
 			toggleButton.Visible = true
-			toggleButton.Image = (SM.GetSetting(name)::any).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
+			toggleButton.Image = (SM.GetSetting(name) :: SM.KeybindSetting).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
 			toggleButton.MouseButton1Click:Connect(function()
-				local cur = SM.GetSetting(name) :: any
+				local cur = SM.GetSetting(name) :: SM.KeybindSetting
 				cur.Toggled = not cur.Toggled
 				SM.SetSetting(name, cur)
 				
@@ -343,8 +348,10 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		end
 		
 		frame.ClickDetector.MouseButton1Click:Connect(function()
-			for _, v: any in keybindingCons do v:Disconnect() end
-			local msg = API.ScreenMessage("Info", "Press F5 to cancel keybinding.\nYou can also add a modifier key, such as Shift or Ctrl.")
+			for _, v in keybindingCons do
+				v:Disconnect()
+			end
+			local msg = API.ScreenMessage("Info", "Press F5 to cancel keybinding.")
 			CAS:BindActionAtPriority("SelectKeybind", function(_, state, input)
 				
 				if state ~= Enum.UserInputState.End then return end
@@ -354,14 +361,8 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 					CAS:UnbindAction("SelectKeybind")
 				end
 
-				local t = {((input.KeyCode ~= Enum.KeyCode.Unknown) and input.KeyCode) or input.UserInputType}
-				for _, v in {Enum.KeyCode.LeftControl, Enum.KeyCode.LeftShift, Enum.KeyCode.LeftAlt, Enum.KeyCode.RightControl, Enum.KeyCode.RightShift, Enum.KeyCode.RightAlt} do
-					if UIS:IsKeyDown(v) then
-						table.insert(t, v)
-						break
-					end
-				end
-				local cur = SM.GetSetting(name) :: any
+				local t = if input.KeyCode ~= Enum.KeyCode.Unknown then input.KeyCode else input.UserInputType
+				local cur = SM.GetSetting(name) :: SM.KeybindSetting
 				table.insert(cur.Keycodes, t)
 				SM.SetSetting(name, cur)
 				if msg then msg:Destroy() end
@@ -375,7 +376,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	elseif settingType == "TouchPosition" then
 		local frame = touchFrame:Clone()
 		frame.Label.Text = name
-		frame.MouseButton1Click:Connect(function(): any
+		frame.MouseButton1Click:Connect(function(): ()
 			if not UIS.TouchEnabled then
 				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
@@ -396,7 +397,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	elseif settingType == "TouchScale" then
 		local frame = touchFrame:Clone()
 		frame.Label.Text = name
-		frame.MouseButton1Click:Connect(function(): any
+		frame.MouseButton1Click:Connect(function(): ()
 			if not UIS.TouchEnabled then
 				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end

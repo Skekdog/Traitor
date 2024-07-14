@@ -17,13 +17,14 @@ export type SettingDefinition = {
 
 export type Keybind = Enum.UserInputType | Enum.KeyCode
 export type KeybindSetting = {
-	["Keycodes"]: {{Keybind | nil}}, -- KeyCode + Modifier
-	["Toggled"]: boolean,
+	Keycodes: {Keybind},
+	Toggled: boolean,
 }
 export type Setting = KeybindSetting | string | boolean | UDim2 | number -- SelectionChoice, Boolean, TouchPosition, TouchScale
 
 local module = {}
 
+module.SETTINGS_VERSION = 1
 module.Settings = {}
 module.AvailableSettings = {
 	{
@@ -166,7 +167,7 @@ module.AvailableSettings = {
 		Tooltip = "For using weapons or planting equipment.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.UserInputType.MouseButton1, nil :: any}}, Toggled=false},
+		Default = {Keycodes = {Enum.UserInputType.MouseButton1}, Toggled = false},
 	},
 	{
 		Name = "Drop Ammo",
@@ -175,7 +176,7 @@ module.AvailableSettings = {
 		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Z, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Z}, Toggled = true},
 	},
 	{
 		Name = "Reload Weapon",
@@ -184,7 +185,7 @@ module.AvailableSettings = {
 		Tooltip = "Reloads the currently equipped weapon.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.R, nil :: any}, {Enum.KeyCode.ButtonX, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.R, Enum.KeyCode.ButtonX}, Toggled = true},
 	},
 	{
 		Name = "Drop",
@@ -193,7 +194,7 @@ module.AvailableSettings = {
 		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadDown}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Q, Enum.KeyCode.DPadDown}, Toggled = true},
 	},
 	{
 		Name = "Alternate Fire",
@@ -202,7 +203,7 @@ module.AvailableSettings = {
 		Tooltip = "For aiming weapons or using the alternate item function.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.UserInputType.MouseButton2, nil :: any}, {Enum.KeyCode.ButtonL2 :: any, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2}, Toggled = true},
 	},
 	{
 		Name = "Interact",
@@ -211,7 +212,7 @@ module.AvailableSettings = {
 		Tooltip = "General interaction",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.F, nil :: any}, {Enum.KeyCode.ButtonA, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.F, Enum.KeyCode.ButtonA}, Toggled = true},
 	},
 	{
 		Name = "Spectate Next",
@@ -220,7 +221,7 @@ module.AvailableSettings = {
 		Tooltip = "Spectates the next player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.E, nil :: any}, {Enum.KeyCode.DPadRight, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.E, Enum.KeyCode.DPadRight}, Toggled = true},
 	},
 	{
 		Name = "Spectate Previous",
@@ -229,7 +230,7 @@ module.AvailableSettings = {
 		Tooltip = "Spectates the previous player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Q, nil :: any}, {Enum.KeyCode.DPadLeft, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Q, Enum.KeyCode.DPadLeft}, Toggled = true},
 	},
 	--{
 	--	Name = "Crouch",
@@ -248,9 +249,9 @@ module.AvailableSettings = {
 		Tooltip = "Closes the fore-most UI.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.X, nil :: any}, {Enum.KeyCode.ButtonB, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.X, Enum.KeyCode.ButtonB}, Toggled = true},
 	},
-	
+
 	{
 		Name = "Next Weapon",
 		Tab = "Keybinds",
@@ -258,7 +259,7 @@ module.AvailableSettings = {
 		Tooltip = "Cycles to the next weapon. Primarily used for controllers.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.ButtonY, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.ButtonY}, Toggled = true},
 	},
 	{
 		Name = "Slot 1",
@@ -267,7 +268,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 1.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.One, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.One}, Toggled = true},
 	},
 	{
 		Name = "Slot 2",
@@ -276,7 +277,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 2.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Two, nil :: any}}, Toggled=true},
+		Default = {Keycodes={Enum.KeyCode.Two}, Toggled = true},
 	},
 	{
 		Name = "Slot 3",
@@ -285,7 +286,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 3.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Three, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Three}, Toggled = true},
 	},
 	{
 		Name = "Slot 4",
@@ -294,7 +295,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 4.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Four, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Four}, Toggled = true},
 	},
 	{
 		Name = "Slot 5",
@@ -303,7 +304,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 5.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Five, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Five}, Toggled = true},
 	},
 	{
 		Name = "Slot 6",
@@ -312,7 +313,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 6.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Six, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Six}, Toggled = true},
 	},
 	{
 		Name = "Slot 7",
@@ -321,7 +322,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 7.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Seven, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Seven}, Toggled = true},
 	},
 	{
 		Name = "Slot 8",
@@ -330,7 +331,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 8.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Eight, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Eight}, Toggled = true},
 	},
 	{
 		Name = "Slot 9",
@@ -339,7 +340,7 @@ module.AvailableSettings = {
 		Tooltip = "Equips the item in slot 9.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes={{Enum.KeyCode.Nine, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.Nine}, Toggled = true},
 	},
 	
 	{
@@ -349,7 +350,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the equipment shop. Only available for certain roles.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.C, nil :: any}, {Enum.KeyCode.DPadUp, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.C, Enum.KeyCode.DPadUp}, Toggled = true},
 	},
 	{
 		Name = "Playerlist",
@@ -358,7 +359,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the playerlist.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.Tab, nil :: any}, {Enum.KeyCode.ButtonL3, nil :: any}}, Toggled=false},
+		Default = {Keycodes = {Enum.KeyCode.Tab, Enum.KeyCode.ButtonL3}, Toggled = false},
 	},
 	{
 		Name = "Settings",
@@ -367,7 +368,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the settings page. Can also be opened by typing !settings in chat.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.G, nil :: any}, {Enum.KeyCode.ButtonR3, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.G, Enum.KeyCode.ButtonR3}, Toggled = true},
 	},
 	{
 		Name = "Highlights",
@@ -376,7 +377,7 @@ module.AvailableSettings = {
 		Tooltip = "Opens the round highlights.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = true,
-		Default = {Keycodes={{Enum.KeyCode.B, nil :: any}}, Toggled=true},
+		Default = {Keycodes = {Enum.KeyCode.B}, Toggled = true},
 	},
 	
 	
@@ -500,17 +501,14 @@ end
 local function keybindToJson(keybind: KeybindSetting): string
 	local keycodeText = '['
 	for i, v in keybind.Keycodes do
-		keycodeText = `{keycodeText}["{v[1]}{v[2] and `","{v[2]}"` or `"`}]`
-		if i < #keybind.Keycodes then
-			keycodeText = keycodeText..","
-		end
+		keycodeText = keycodeText .. tostring(v) .. if i < #keybind.Keycodes then "," else ""
 	end
 	keycodeText = keycodeText..']'
 	return `\{"Keycodes":{keycodeText},"Toggled":{keybind.Toggled}}`
 end
 
 function module.JSONEncode(): string
-	local toEncode = {}
+	local toEncode = {__VERSION = module.SETTINGS_VERSION}
 	for i, v in module.Settings do
 		local value = v.Value
 		local converted: any = value
