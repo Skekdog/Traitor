@@ -4,7 +4,7 @@ local UIManager = require(script.Parent.UIManager)
 local unregisteredUIs = UIManager.UnregisteredUIs
 local plr = Players.LocalPlayer
 
-local start = os.time()
+local start = os.clock()
 local found = false
 task.spawn(function()
     UIManager.WaitForUI("Crosshair", true)
@@ -14,7 +14,7 @@ end)
 local special = plr.PlayerGui:FindFirstChild("Special") :: any
 
 while not found do
-    if (os.time() - start > 5) and unregisteredUIs:FindFirstChild("LoadWarning") then
+    if (os.clock() - start > 5) and unregisteredUIs:FindFirstChild("LoadWarning") then
         unregisteredUIs.LoadWarning.Parent = special
     end
     task.wait()

@@ -107,7 +107,7 @@ local paused = false
 local lastTime = ""
 local function updateTimer(time: number)
     if paused then
-		if math.round(time) % 2 == 1 then --Alternate every second
+		if math.round(time) % 2 == 1 then
 			roundInfo.TopBar.Timer.Text = "PAUSED"
 		else
 			roundInfo.TopBar.Timer.Text = lastTime
