@@ -8,7 +8,7 @@ local UI = UIManager.WaitForUI("Credits")
 local fibSettingDefinition = SettingsManager.Settings["Use FIB Lighting"].Definition
 
 LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)
-	(UI.Object :: typeof(UIManager.UnregisteredUIs.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage.RoundHandler:GetAttribute("MapName")} by {mapAuthors}`
+	(UI.Object :: typeof(UIManager.UnregisteredUIs.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage:WaitForChild("RoundHandler"):GetAttribute("MapName")} by {mapAuthors}`
 	UI:ToggleVisible(true)
 	task.delay(5, UI.ToggleVisible, UI, false)
 

@@ -191,6 +191,7 @@ function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
     runCallback(plr, "Unequip", equipment, switching)
 end
 
+local mapValue = ReplicatedStorage:WaitForChild("RoundHandler"):WaitForChild("MapFolder")
 function module.Drop(plr: Player, equipment: Item, position: Vector3)
     if not equipment.Base.CanDrop then
         return
@@ -198,7 +199,7 @@ function module.Drop(plr: Player, equipment: Item, position: Vector3)
     if IS_CLIENT then
         module.InvEvent:FireServer("Drop", equipment.Base.Name)
     else
-        local spawns = (ReplicatedStorage.RoundHandler.MapFolder.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
+        local spawns = (mapValue.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
         equipment.Instance.Parent = spawns
         equipment.Instance:PivotTo(CFrame.new(position))
         module.RemoveEquipment(plr, equipment)
@@ -239,7 +240,7 @@ function module.DropAmmo(plr: Player, weapon: ItemTypes.GunWeapon)
     local box = ServerStorage.AmmoBoxes:FindFirstChild(ammoType.."_Ammo"):Clone() :: PVInstance
     module.NewAmmoBox(box, amount)
     box:PivotTo(CFrame.new(char:GetPivot().Position + char:GetPivot().LookVector * 10))
-    box.Parent = (ReplicatedStorage.RoundHandler.MapFolder.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
+    box.Parent = (mapValue.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
 end
 
 function module.ClearInventory(plr: Player)

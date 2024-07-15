@@ -3,15 +3,32 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemTypes = require(script.Parent.ItemTypes)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
-local projectiles = ReplicatedStorage:WaitForChild("Projectiles")
-local models = ReplicatedStorage.WeaponModels
-local weaponSounds = ReplicatedStorage.WeaponSounds
-local firedSounds = weaponSounds.Fired
-local reloadSounds = weaponSounds.Reload
+local function projectiles(name: string): PVInstance
+    return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name)
+end
 
-local bullet = projectiles:WaitForChild("Bullet") :: PVInstance -- Somehow this ended up not loading despite Waiting for Projectiles?
+local bullet = projectiles("Bullet")
+
+local function models(name: string): MeshPart
+    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name)
+end
+
+local function weaponSounds(name: string): Sound
+    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name)
+end
+
+local function firedSounds(name: string): Sound
+    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name)
+end
+
+local function reloadSounds(name: string): Sound
+    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name)
+end
 
 local controlledProps: {[number]: BasePart} = {}
+
+local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
+local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
 local function stopControllingProp(prop: BasePart, userId: number)
     if not prop:IsDescendantOf(workspace) then
@@ -77,9 +94,9 @@ guns.HUGE = {
     ProjectileBase = bullet,
     ProjectileSpeed = 140,
 
-    Model = models:WaitForChild("HUGE"),
+    Model = models("HUGE"),
 
-    FiredSound = firedSounds.HUGE,
+    FiredSound = firedSounds("HUGE"),
 }
 
 guns.Scout = {
@@ -113,9 +130,9 @@ guns.Scout = {
     ReloadTime = 1.5,
     AmmoType = "Scout",
 
-    Model = models:WaitForChild("Scout"),
-    FiredSound = firedSounds.Scout,
-    ReloadSound = reloadSounds.Scout,
+    Model = models("Scout"),
+    FiredSound = firedSounds("Scout"),
+    ReloadSound = reloadSounds("Scout"),
 }
 
 guns.Pistol = {
@@ -145,9 +162,9 @@ guns.Pistol = {
     ReloadTime = 1,
     AmmoType = "Assault Rifle",
 
-    Model = models:WaitForChild("Pistol"),
-    FiredSound = firedSounds.Pistol,
-    ReloadSound = reloadSounds.Pistol,
+    Model = models("Pistol"),
+    FiredSound = firedSounds("Pistol"),
+    ReloadSound = reloadSounds("Pistol"),
 
     ProjectileBase = bullet,
     ProjectileSpeed = 100,
@@ -171,11 +188,11 @@ guns["Golden Gun"] = {
 
     MagazineSize = 1,
 
-    ProjectileBase = projectiles:WaitForChild("GoldenBullet"),
+    ProjectileBase = projectiles("GoldenBullet"),
     ProjectileSpeed = 250,
 
-    Model = models["Golden Gun"],
-    FiredSound = firedSounds["Golden Gun"],
+    Model = models("Golden Gun"),
+    FiredSound = firedSounds("Golden Gun"),
 
     FireTime = 0.5,
     ReloadTime = 0,
@@ -209,9 +226,9 @@ guns["Golden Gun"] = {
                     deathSound:Destroy()
                 end
 
-                local sound = weaponSounds.GoldenGunHit:Clone()
+                local sound = weaponSounds("GoldenGunHit"):Clone()
                 sound.Name = "DeathSound"
-                sound.Parent = root :: any
+                sound.Parent = root
             end
             for _, v in char:GetChildren() do
                 if v:IsA("BasePart") then
@@ -252,7 +269,7 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
     fire.Size = 10
     fire.Parent = part
 
-    local burnSound = weaponSounds.FlareBurn:Clone()
+    local burnSound = weaponSounds("FlareBurn"):Clone()
     burnSound.Parent = part :: any
 
     local endTime = workspace:GetServerTimeNow() + 10
@@ -312,10 +329,10 @@ guns["Flare Gun"] = {
     ReloadTime = 0,
     MagazineSize = 6,
 
-    Model = models["Flare Gun"],
-    FiredSound = firedSounds["Flare Gun"],
+    Model = models("Flare Gun"),
+    FiredSound = firedSounds("Flare Gun"),
 
-    ProjectileBase = projectiles:WaitForChild("Flare"),
+    ProjectileBase = projectiles("Flare"),
     ProjectileSpeed = 140,
 
     AimFOV = 60,
@@ -378,9 +395,9 @@ guns.SMG = {
     ReloadTime = 1,
     AmmoType = "SMG",
 
-    Model = models:WaitForChild("SMG"),
-    FiredSound = firedSounds:WaitForChild("SMG"),
-    ReloadSound = reloadSounds.SMG,
+    Model = models("SMG"),
+    FiredSound = firedSounds("SMG"),
+    ReloadSound = reloadSounds("SMG"),
 
     ProjectileBase = bullet,
     ProjectileSpeed = 140,
@@ -419,8 +436,8 @@ guns.AWP = {
     ReloadTime = 0,
     MagazineSize = 4,
 
-    Model = models:WaitForChild("AWP"),
-    FiredSound = firedSounds.AWP,
+    Model = models("AWP"),
+    FiredSound = firedSounds("AWP"),
 
     ProjectileBase = bullet,
     ProjectileSpeed = 300,
@@ -449,9 +466,9 @@ guns["Assault Rifle"] = {
     AimFOV = 50,
     AimSpreadMultiplier = 0.25,
 
-    Model = models["Assault Rifle"],
-    FiredSound = firedSounds["Assault Rifle"],
-    ReloadSound = reloadSounds["Assault Rifle"],
+    Model = models("Assault Rifle"),
+    FiredSound = firedSounds("Assault Rifle"),
+    ReloadSound = reloadSounds("Assault Rifle"),
 
     FalloffStart = 75,
     FalloffEnd = 125,
@@ -489,11 +506,11 @@ guns["Silenced Pistol"] = {
     ReloadTime = 1,
     AmmoType = "Assault Rifle",
 
-    Model = models["Silenced Pistol"],
-    FiredSound = firedSounds["Silenced Pistol"],
-    ReloadSound = reloadSounds["Silenced Pistol"],
+    Model = models("Silenced Pistol"),
+    FiredSound = firedSounds("Silenced Pistol"),
+    ReloadSound = reloadSounds("Silenced Pistol"),
 
-    ProjectileBase = projectiles:WaitForChild("SilencedBullet"),
+    ProjectileBase = projectiles("SilencedBullet"),
     ProjectileSpeed = 100,
 
     BeforeHitParticipant = function(_, victim)
@@ -542,9 +559,9 @@ guns.XM1014 = {
     ProjectileBase = bullet,
     ProjectileSpeed = 150,
 
-    Model = models:WaitForChild("XM1014"),
-    FiredSound = firedSounds.XM1014,
-    ReloadSound = reloadSounds.XM1014,
+    Model = models("XM1014"),
+    FiredSound = firedSounds("XM1014"),
+    ReloadSound = reloadSounds("XM1014"),
 }
 
 guns.Glock = {
@@ -574,9 +591,9 @@ guns.Glock = {
     ReloadTime = 1,
     AmmoType = "Assault Rifle",
 
-    Model = models:WaitForChild("Glock"),
-    FiredSound = firedSounds.Glock,
-    ReloadSound = reloadSounds.Glock,
+    Model = models("Glock"),
+    FiredSound = firedSounds("Glock"),
+    ReloadSound = reloadSounds("Glock"),
 
     ProjectileBase = bullet,
     ProjectileSpeed = 190,
@@ -612,9 +629,9 @@ guns.Deagle = {
     ProjectileBase = bullet,
     ProjectileSpeed = 190,
 
-    Model = models:WaitForChild("Deagle"),
-    FiredSound = firedSounds.Deagle,
-    ReloadSound = reloadSounds.Deagle,
+    Model = models("Deagle"),
+    FiredSound = firedSounds("Deagle"),
+    ReloadSound = reloadSounds("Deagle"),
 }
 
 guns.BAR = {
@@ -641,9 +658,9 @@ guns.BAR = {
     ReloadTime = 2.5,
     AmmoType = "Assault Rifle",
 
-    Model = models:WaitForChild("BAR"),
-    FiredSound = firedSounds.BAR,
-    ReloadSound = reloadSounds.BAR,
+    Model = models("BAR"),
+    FiredSound = firedSounds("BAR"),
+    ReloadSound = reloadSounds("BAR"),
 
     ProjectileBase = bullet,
     ProjectileSpeed = 120,
@@ -661,7 +678,7 @@ grenades.Grenade = {
     Slot = 7,
     CanDrop = true,
 
-    Model = models:WaitForChild("Grenade"),
+    Model = models("Grenade"),
     
     ExplosionInfo = {
         Kind = "Explosion",
@@ -676,11 +693,11 @@ grenades.Grenade = {
 
     Fuse = 5,
 
-    ProjectileBase = models:WaitForChild("Grenade"),
+    ProjectileBase = models("Grenade"),
     ProjectileForce = 0.75,
     Spread = 0.25,
 
-    FiredSound = firedSounds.Grenade,
+    FiredSound = firedSounds("Grenade"),
 }
 
 grenades.Flashbang = {
@@ -691,7 +708,7 @@ grenades.Flashbang = {
     Slot = 7,
     CanDrop = true,
 
-    Model = models:WaitForChild("Flashbang"),
+    Model = models("Flashbang"),
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -706,11 +723,11 @@ grenades.Flashbang = {
 
     Fuse = 3,
 
-    ProjectileBase = models:WaitForChild("Flashbang"),
+    ProjectileBase = models("Flashbang"),
     ProjectileForce = 60,
     Spread = 0.25,
 
-    FiredSound = firedSounds.Grenade,
+    FiredSound = firedSounds("Grenade"),
 }
 
 grenades["Incendiary Grenade"] = {
@@ -720,7 +737,7 @@ grenades["Incendiary Grenade"] = {
     Slot = 4,
     CanDrop = true,
 
-    Model = models:WaitForChild("Incendiary Grenade"),
+    Model = models("Incendiary Grenade"),
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -784,11 +801,11 @@ grenades["Incendiary Grenade"] = {
 
     Fuse = 3,
 
-    ProjectileBase = models:WaitForChild("Incendiary Grenade"),
+    ProjectileBase = models("Incendiary Grenade"),
     ProjectileForce = 2.5,
     Spread = 0.25,
 
-    FiredSound = firedSounds.Grenade,
+    FiredSound = firedSounds("Grenade"),
 }
 
 grenades["Smoke Grenade"] = {
@@ -798,7 +815,7 @@ grenades["Smoke Grenade"] = {
     Slot = 4,
     CanDrop = true,
 
-    Model = models:WaitForChild("Smoke Grenade"),
+    Model = models("Smoke Grenade"),
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -827,11 +844,11 @@ grenades["Smoke Grenade"] = {
 
     Fuse = 3,
 
-    ProjectileBase = models:WaitForChild("Smoke Grenade"),
+    ProjectileBase = models("Smoke Grenade"),
     ProjectileForce = 2.5,
     Spread = 0.25,
 
-    FiredSound = firedSounds.Grenade,
+    FiredSound = firedSounds("Grenade"),
 }
 
 grenades["Discombobulator"] = {
@@ -841,7 +858,7 @@ grenades["Discombobulator"] = {
     Slot = 4,
     CanDrop = true,
 
-    Model = models:WaitForChild("Discombobulator"),
+    Model = models("Discombobulator"),
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -856,11 +873,11 @@ grenades["Discombobulator"] = {
 
     Fuse = 3,
 
-    ProjectileBase = models:WaitForChild("Discombobulator"),
+    ProjectileBase = models("Discombobulator"),
     ProjectileForce = 2.5,
     Spread = 0.25,
 
-    FiredSound = firedSounds.Grenade,
+    FiredSound = firedSounds("Grenade"),
 }
 
 local melees: {[string]: ItemTypes.MeleeDefinition} = {}
@@ -871,12 +888,12 @@ melees.Crowbar = {
     Slot = 1,
     CanDrop = false,
 
-    Model = models:WaitForChild("Crowbar"),
+    Model = models("Crowbar"),
 
     MaxDistance = 7,
     Damage = 20,
     FireTime = 0.3,
-    FiredSound = firedSounds.Crowbar,
+    FiredSound = firedSounds("Crowbar"),
 }
 
 local items: {[string]: ItemTypes.ItemDefinition} = {}
@@ -887,7 +904,7 @@ items["Magneto Stick"] = {
     Slot = 5,
     CanDrop = false,
 
-    Model = models["Magneto Stick"],
+    Model = models("Magneto Stick"),
     AlternateFire = function(participant: Types.Participant, cameraRayInfo: Ray)
         local char = participant.Character
 
@@ -901,7 +918,7 @@ items["Magneto Stick"] = {
             return
         end
 
-        local map = ReplicatedStorage.RoundHandler.MapFolder.Value
+        local map = roundHandlerEvents.MapFolder.Value
         if not map then
             return
         end
@@ -1017,7 +1034,7 @@ items["DNA Scanner"] = {
     Slot = 9,
     CanDrop = true,
 
-    Model = models["DNA Scanner"],
+    Model = models("DNA Scanner"),
 
     Toggled = true,
 
@@ -1053,7 +1070,7 @@ items["DNA Scanner"] = {
             return
         end
 
-        ReplicatedStorage.ServerClient.AcquireDNASample:FireClient(participant.Player, model, attacker.Player.Name)
+        serverClient.AcquireDNASample:FireClient(participant.Player, model, attacker.Player.Name)
     end,
 
     OnEquipClient = function()

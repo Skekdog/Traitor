@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local plr = Players.LocalPlayer
 
+local radarPoint = ReplicatedStorage:WaitForChild("RadarPoint")
 return function()
     workspace.RadarPoints:ClearAllChildren()
 	
@@ -24,7 +25,7 @@ return function()
 			continue
 		end
 
-		local clone = ReplicatedStorage.RadarPoint:Clone()
+		local clone = radarPoint:Clone()
 		clone:PivotTo(root.CFrame)
 		clone.RadarPoint.TextLabel.Text = tostring(math.round(plr:DistanceFromCharacter(root.Position)))
 		clone.RadarPoint.Enabled = true

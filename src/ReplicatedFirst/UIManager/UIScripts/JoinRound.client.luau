@@ -11,7 +11,7 @@ local isInRound = false
 this.Object.MouseButton1Click:Connect(function()
 	isInRound = true
 	this:ToggleVisible(false)
-	local success = ReplicatedStorage.RoundHandler.JoinRound:InvokeServer()
+	local success = ReplicatedStorage:WaitForChild("RoundHandler").JoinRound:InvokeServer()
 	if not success then
 		isInRound = false
 		this:ToggleVisible(table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil)

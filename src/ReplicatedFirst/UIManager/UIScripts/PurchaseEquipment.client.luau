@@ -100,7 +100,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 		end
 		credits = participant.Credits
 		if credits >= creditCost then
-			local response: PurchaseResponse = ReplicatedStorage.RoundHandler.PurchaseEquipment:InvokeServer(item)
+			local response: PurchaseResponse = ReplicatedStorage:WaitForChild("RoundHandler").PurchaseEquipment:InvokeServer(item)
 			if response == "NoRound" then
 				API.ScreenMessage("Error", "Round is not loaded.")
 			elseif response == "NotInRound" then

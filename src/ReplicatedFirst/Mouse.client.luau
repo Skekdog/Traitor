@@ -156,7 +156,7 @@ ControlManager.Register("Interact", true, function(action, state, input, toggled
 
 	local model = interactTarget:FindFirstAncestorOfClass("Model")
 	if model and model:IsDescendantOf(workspace.Corpses) then
-		CorpseInfo(ReplicatedStorage.RoundHandler.SearchCorpse:InvokeServer(model))
+		CorpseInfo(ReplicatedStorage:WaitForChild("RoundHandler").SearchCorpse:InvokeServer(model))
 		return Enum.ContextActionResult.Sink
 	end
 
@@ -170,7 +170,7 @@ ControlManager.Register("Interact", true, function(action, state, input, toggled
 	local props = map:FindFirstChild("Props")
 
 	if (actionItems and actionItems:IsAncestorOf(interactTarget)) or (doors and doors:IsAncestorOf(interactTarget)) or (props and props:IsAncestorOf(interactTarget)) then
-		ReplicatedStorage.ClientServer.Interaction:FireServer(interactTarget)
+		ReplicatedStorage:WaitForChild("ClientServer").Interaction:FireServer(interactTarget)
 		return Enum.ContextActionResult.Sink
 	end
 

@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+
+local radarPoint = ReplicatedStorage:WaitForChild("RadarPoint")
 return function(target: string): ()
     if LocalRoundInfo.DNACharge < 1000 then
         return
@@ -21,7 +23,7 @@ return function(target: string): ()
         LocalRoundInfo.DNACharge = math.max(0, LocalRoundInfo.DNACharge - distance / 2)
     end
 
-    local clone = ReplicatedStorage.RadarPoint:Clone()
+    local clone = radarPoint:Clone()
 
     local highlight = clone.Highlight
     highlight.FillColor = Color3.new(0.466667, 0.980392, 1.000000)

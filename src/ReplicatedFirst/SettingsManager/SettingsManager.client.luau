@@ -178,7 +178,7 @@ darken.Done.MouseButton1Click:Connect(done)
 
 settingsFrame.Parent:GetPropertyChangedSignal("Visible"):Connect(function()
 	if not settingsFrame.Parent.Visible then
-		ReplicatedStorage.ClientServer.SaveSettings:FireServer(SM.JSONEncode())
+		ReplicatedStorage:WaitForChild("ClientServer").SaveSettings:FireServer(SM.JSONEncode())
 	end
 end)
 

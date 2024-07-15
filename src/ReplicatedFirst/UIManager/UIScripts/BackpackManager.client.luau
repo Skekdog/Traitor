@@ -46,7 +46,7 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 end
 
 local slots: {[number]: ItemTypes.Item} = {}
-(ReplicatedStorage :: any):WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item?)
+ReplicatedStorage:WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item?)
 	if not equipment then
 		return
 	end

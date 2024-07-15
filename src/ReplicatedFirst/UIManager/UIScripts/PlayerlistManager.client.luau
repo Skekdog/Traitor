@@ -18,6 +18,9 @@ local layoutOrders = {
 	["Spectating"] = 3000,
 }
 
+local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
+local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
+
 type PlayerElement = typeof(ui.PlayerFrame)
 local function findPlr(plrName: string)
 	return list:FindFirstChild("Player-"..plrName) :: PlayerElement
@@ -88,7 +91,7 @@ local function createPlr(plr: Player)
 	clone.Username.Text = "@"..plr.Name
 	clone.Username.TextColor3 = Color3.new()
 
-	clone.Karma.Text = tostring(ReplicatedStorage.ClientServer.GetKarma:InvokeServer(plr))
+	clone.Karma.Text = tostring(clientServer.GetKarma:InvokeServer(plr))
 	clone.Total.Text = tostring(nil)
 	clone.Score.Text = tostring(nil)
 
@@ -112,7 +115,7 @@ local function createPlr(plr: Player)
 	clone.MouseButton1Click:Connect(function()
 		local order = (clone.LayoutOrder // 1000) * 1000
 		if order == layoutOrders["Dead"] or order == layoutOrders["Missing"] then
-			CorpseInfo(ReplicatedStorage.RoundHandler.SearchCorpse:InvokeServer(plr.Name))
+			CorpseInfo(roundHandlerEvents.SearchCorpse:InvokeServer(plr.Name))
 		end
 	end)
 
@@ -221,7 +224,7 @@ LocalRoundInfo.Listen("UpdateParticipant", function(p)
 	updatePlr(participant.Player, findPlr(participant.Player.Name))
 end)
 
-ReplicatedStorage:WaitForChild("RoundHandler").CorpseSearched.OnClientEvent:Connect(function(name: string)
+roundHandlerEvents.CorpseSearched.OnClientEvent:Connect(function(name: string)
 	findPlr(name).SearchedIcon.Visible = true
 end)
 

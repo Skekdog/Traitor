@@ -23,6 +23,8 @@ local function onDeath()
     roundInfo.Frame.HealthBar.Visible = false
 end
 
+local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
+
 Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     LocalRoundInfo.SetSpectating(false)
 
@@ -68,7 +70,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
         if not neck then
             continue
         end
-        ReplicatedStorage.ClientServer.RotateHead:FireServer(y)
+        clientServer.RotateHead:FireServer(y)
     end
 end)
 
@@ -76,11 +78,11 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
         if item.Kind == "Item" and item.Base.Toggled then
             if input.UserInputState == Enum.UserInputState.End then
-                ReplicatedStorage.ClientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+                clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
             end
         else
             while input.UserInputState == Enum.UserInputState.Begin do
-                ReplicatedStorage.ClientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+                clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
                 task.wait()
             end
         end
@@ -88,7 +90,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     end)
     
     ControlManager.Register("Alternate Fire", true, function(action, state, input, toggled)
-        ReplicatedStorage.ClientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+        clientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
         return Enum.ContextActionResult.Sink
     end)
     
@@ -106,7 +108,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
         if not equipped then
             return Enum.ContextActionResult.Pass
         end
-        ReplicatedStorage.ClientServer.ReloadWeapon:FireServer()
+        clientServer.ReloadWeapon:FireServer()
         return Enum.ContextActionResult.Sink
     end)
 
@@ -115,7 +117,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
         if not equipped then
             return Enum.ContextActionResult.Pass
         end
-        ReplicatedStorage.ClientServer.DropAmmo:FireServer()
+        clientServer.DropAmmo:FireServer()
         return Enum.ContextActionResult.Sink
     end)
 end)

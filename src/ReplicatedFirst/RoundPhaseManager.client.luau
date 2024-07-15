@@ -10,7 +10,9 @@ local UIManager = require(ReplicatedFirst.UIManager)
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
 local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
-for _, v in ReplicatedStorage:WaitForChild("RoundHandler").GetMaps:InvokeServer() do
+
+local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
+for _, v in roundHandlerEvents.GetMaps:InvokeServer() do
 	local clone = vote.Object.Sample:Clone()
 	clone.Text = v
 	clone.Visible = true
@@ -18,7 +20,7 @@ for _, v in ReplicatedStorage:WaitForChild("RoundHandler").GetMaps:InvokeServer(
 	clone.Parent = vote.Object.Choices :: any
 
     clone.MouseButton1Click:Connect(function()
-        ReplicatedStorage.RoundHandler.VoteMap:FireServer(v)
+        roundHandlerEvents.VoteMap:FireServer(v)
     end)
 end
 
@@ -98,7 +100,7 @@ local function update(roundPhase)
     end
 end
 
-ReplicatedStorage.RoundHandler.VoteMap.OnClientEvent:Connect(function(allow)
+roundHandlerEvents.VoteMap.OnClientEvent:Connect(function(allow)
     vote:ToggleVisible(allow)
 end)
 
