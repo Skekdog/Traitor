@@ -77,7 +77,7 @@ return function(corpseInfo: Types.CorpseInfo?)
     object.DNADuration.Visible = corpseInfo.DNAExpiry ~= nil
 
     if corpseInfo.DNAExpiry then
-        object.DNADuration.TextLabel.Text = API.ToRoundTime(corpseInfo.DNAExpiry, timeNow)
+        object.DNADuration.TextLabel.Text = API.ToRoundTime(timeNow, corpseInfo.DNAExpiry)
 
         if timeNow < corpseInfo.DNAExpiry then
             object.DNADuration:SetAttribute("Description", "The killer left a sample of their DNA on the body. Use a DNA Scanner to find them.")

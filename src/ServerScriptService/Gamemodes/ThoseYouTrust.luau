@@ -217,16 +217,6 @@ local module: Types.Gamemode = {
             Item = items["Flare Gun"]
         },
         {
-            Name = "Grenade",
-            Description = "Explodes in a decent radius after a few seconds.",
-            Cost = 2,
-            Icon = "rbxassetid://8096856961",
-            MaxStock = 1,
-            AttackType = "Explosion",
-
-            Item = items.Grenade
-        },
-        {
             Name = "Smoke Grenade",
             Icon = "rbxassetid://8096856961",
 
@@ -236,6 +226,7 @@ local module: Types.Gamemode = {
             Name = "Incendiary Grenade",
             Icon = "rbxassetid://8096856961",
             AttackType = "Explosion",
+            NoDNA = true,
 
             Item = items["Incendiary Grenade"]
         },
@@ -252,6 +243,7 @@ local module: Types.Gamemode = {
             Icon = "rbxassetid://8096856961",
             MaxStock = 1,
             AttackType = "Explosion",
+            NoDNA = true,
 
             Item = items.Grenade
         },
