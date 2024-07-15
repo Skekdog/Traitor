@@ -47,6 +47,7 @@ ReplicatedStorage:WaitForChild("ServerClient").AcquireDNASample.OnClientEvent:Co
     sample.MouseButton1Click:Connect(function()
         if selected == name then
             sample.UIStroke.Enabled = false
+            selected = nil
             return
         end
         for _, v in ui.Samples:GetChildren() do

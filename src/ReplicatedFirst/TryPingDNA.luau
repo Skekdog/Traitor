@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 return function(target: string): ()
     if LocalRoundInfo.DNACharge < 1000 then
@@ -35,4 +36,6 @@ return function(target: string): ()
     clone.RadarPoint.Enabled = true
     clone.Name = "DNAPoint"
     clone.Parent = workspace
+
+    SoundService.AllSounds.DNAScan:Play()
 end

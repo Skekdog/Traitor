@@ -222,7 +222,20 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 
 	local isSize = frame:GetAttribute("TransitionStyle") == "Size"
 	local targetUDim = frame:GetAttribute("TransitionTarget")
-	local offScreenPosition = UDim2.fromScale(targetUDim.X.Scale, -frame.Size.Y.Scale)
+
+	local direction = frame:GetAttribute("TransitionDirection")
+	local offScreenPosition = targetUDim
+	if direction == "Right" then
+		offScreenPosition -= UDim2.fromScale(0.5, 0)
+	elseif direction == "Left" then
+		offScreenPosition += UDim2.fromScale(0.5, 0)
+	elseif direction == "Up" then
+		offScreenPosition -= UDim2.fromScale(0, 0.5)
+	elseif direction == "Down" then
+		offScreenPosition += UDim2.fromScale(0, 0.5)
+	elseif not isSize then
+		error("Invalid direction for "..frame.Name)
+	end
 
 	local function onFinish()
 		if open then
@@ -256,11 +269,11 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 	local properties
 	if isSize then
 		properties = {
-			Size = open and targetUDim or startSize
+			Size = if open then targetUDim else startSize
 		}
 	else
 		properties = {
-			Position = open and targetUDim or offScreenPosition
+			Position = if open then targetUDim else offScreenPosition
 		}
 	end
 	
