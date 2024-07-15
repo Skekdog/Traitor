@@ -10,8 +10,7 @@ local SM = require(script.Parent)
 local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
 options = SM.JSONDecode(options)
 
-local previousVersion = options.__VERSION
-if previousVersion ~= SM.SETTINGS_VERSION then
+if not options then
 	for _, v in SM.AvailableSettings do
 		SM.SetSetting(v.Name, v.Default)
 	end

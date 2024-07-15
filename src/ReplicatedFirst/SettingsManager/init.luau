@@ -24,7 +24,7 @@ export type Setting = KeybindSetting | string | boolean | UDim2 | number -- Sele
 
 local module = {}
 
-module.SETTINGS_VERSION = 1
+module.SETTINGS_VERSION = 3
 module.Settings = {}
 module.AvailableSettings = {
 	{
@@ -522,8 +522,12 @@ function module.JSONEncode(): string
 	return HTTPService:JSONEncode(toEncode)
 end
 
-function module.JSONDecode(optionsString): {}
+function module.JSONDecode(optionsString): {} | false
 	local options = HTTPService:JSONDecode(optionsString)
+	local version = options.__VERSION
+	if version ~= module.SETTINGS_VERSION then
+		return false
+	end
 	for i, v in options do
 		local isKeybind, isTouchPosition
 		for _, p in module.AvailableSettings do
