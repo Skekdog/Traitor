@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 local Adapters = require(script.Parent.Adapters)
 local GetRound = require(script.Parent.GetRound)
+local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
 local RestartServer = require(script.Parent.RestartServer)
 
 -- This is separate from Initialise so that if anything goes badly wrong server restart is still possible.
@@ -21,6 +22,29 @@ TeleportService.TeleportInitFailed:Connect(function(plr, result, errorMessage)
         Adapters.SendMessage(`Teleport failed: {errorMessage}`, "error", "other", true)
     end
 end)
+
+local oldVictory: ((any, any) -> ())?
+
+local function pause(): Types.Round?
+    local round = GetRound()
+    if not round or not round:IsRoundInProgress() then
+        return Adapters.SendMessage("Failed to pause as there is no round in progress.", "error", "other", true)
+    end
+
+    round:PauseRound()
+    Adapters.SendMessage(if round.Paused then "Round paused." else "Round unpaused.", "info", "other", true)
+
+    if not round.Paused then
+        ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
+        if oldVictory then
+            round.Gamemode.OnDeath = oldVictory
+            oldVictory = nil
+        end
+    end
+    ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
+
+    return round
+end
 
 Players.PlayerAdded:Connect(function(plr: Player)
     plr.Chatted:Connect(function(msg, to)
@@ -45,22 +69,33 @@ Players.PlayerAdded:Connect(function(plr: Player)
 
             TeleportService:TeleportAsync(testPlace, targets)
         elseif msg == "!pause" and isAdmin(plr) then
-            local round = GetRound()
-			if not round or not round:IsRoundInProgress() then
-				return Adapters.SendMessage("Failed to pause as there is no round in progress.", "error", "other", true)
-			end
-
-            round:PauseRound()
-
-            Adapters.SendMessage("Round paused.", "info", "other", true)
-
-            if not round.Paused then
-                ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
-            end
-            ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
+            pause()
         elseif msg == "!restart" and plr.UserId == meId then
             Adapters.SendMessage("Server restarting...", "info", "update", true) -- type is update to be consistent with RoundHandler restarts
             RestartServer(5)
+        elseif msg == "!pausevictory" and isAdmin(plr) then
+            local round = GetRound()
+            if round and round.Paused then
+                if oldVictory then
+                    pause()
+                    return Adapters.SendMessage("Re-enabled victory.", "info", "other", true)
+                end
+                return Adapters.SendMessage("Round is already paused.", "error", "other", true)
+            end
+
+            pause()
+            
+            if not round then
+                return
+            end
+
+            if round.Paused then
+                oldVictory = round.Gamemode.OnDeath
+                round.Gamemode.OnDeath = nil
+            else
+                round.Gamemode.OnDeath = oldVictory
+                oldVictory = nil
+            end
         end
     end)
 end)

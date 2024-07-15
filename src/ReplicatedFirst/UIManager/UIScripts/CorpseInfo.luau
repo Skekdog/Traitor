@@ -74,6 +74,18 @@ return function(corpseInfo: Types.CorpseInfo?)
     object.Headshot.Visible = corpseInfo.Headshot
     object.SD.Visible = corpseInfo.SelfDefense
 
+    object.DNADuration.Visible = corpseInfo.DNAExpiry ~= nil
+
+    if corpseInfo.DNAExpiry then
+        object.DNADuration.TextLabel.Text = API.ToRoundTime(corpseInfo.DNAExpiry, timeNow)
+
+        if timeNow < corpseInfo.DNAExpiry then
+            object.DNADuration:SetAttribute("Description", "The killer left a sample of their DNA on the body. Use a DNA Scanner to find them.")
+        else
+            object.DNADuration:SetAttribute("Description", "The killer's DNA sample has expired.\n\"There is nothing we can do.\" - Napoleon")
+        end
+    end
+
     local equipment = corpseInfo.EquipmentList
     local equipmentText = "You find"
     if #equipment > 0 then
