@@ -11,7 +11,7 @@ local ShatterGlass = require(script.Parent.ShatterGlass)
 local StandardDoor = require(script.Parent.StandardDoor)
 local UIManager = require(script.Parent.UIManager)
 
-local serverClient = ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)
+local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
 serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
 

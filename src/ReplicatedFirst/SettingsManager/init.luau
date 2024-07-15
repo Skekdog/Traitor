@@ -501,7 +501,7 @@ end
 local function keybindToJson(keybind: KeybindSetting): string
 	local keycodeText = '['
 	for i, v in keybind.Keycodes do
-		keycodeText = keycodeText .. tostring(v) .. if i < #keybind.Keycodes then "," else ""
+		keycodeText = keycodeText .. `"{v}"` .. if i < #keybind.Keycodes then "," else ""
 	end
 	keycodeText = keycodeText..']'
 	return `\{"Keycodes":{keycodeText},"Toggled":{keybind.Toggled}}`
@@ -534,11 +534,10 @@ function module.JSONDecode(optionsString): {}
 			end
 		end
 		if isKeybind then
-			local result = HTTPService:JSONDecode(v)
-			for b, keybindList in result.Keycodes do
-				for a, keybind in keybindList do
-					result.Keycodes[b][a] = (Enum :: any)[keybind:split(".")[2]][keybind:split(".")[3]]
-				end
+			local result = HTTPService:JSONDecode(v) :: KeybindSetting
+			for b, keybind in result.Keycodes do
+				assert(typeof(keybind) == "string")
+				result.Keycodes[b] = (Enum :: any)[keybind:split(".")[2]][keybind:split(".")[3]]
 			end
 			options[i] = result
 		elseif isTouchPosition then

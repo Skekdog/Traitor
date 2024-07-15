@@ -147,7 +147,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Magneto Stick", "Grenade", "Flashbang", "Discombobulator"},
+    StartingEquipment = {"Crowbar", "Magneto Stick", "Grenade", "Flashbang", "Discombobulator", "DNA Scanner"},
     AvailableEquipment = {
         {
             Name = "Crowbar",
@@ -271,7 +271,13 @@ local module: Types.Gamemode = {
             MaxStock = 1,
 
             Item = function() end,
-        }
+        },
+        {
+            Name = "DNA Scanner",
+            Description = "scan",
+            Icon = "rbxassetid://",
+            Item = items["DNA Scanner"]
+        },
     } :: {Types.Equipment},
 
     Roles = {

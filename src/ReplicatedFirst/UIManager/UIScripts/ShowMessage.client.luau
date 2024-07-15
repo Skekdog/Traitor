@@ -58,11 +58,9 @@ local function makeLabel(isTeam: boolean, text: string)
 end
 
 local teamMessages: {Types.MessageType?} = {"creditsEarned"}
-local chatChannel: TextChannel = TextChatService
+local chatChannel: TextChannel = TextChatService:WaitForChild("TextChannels").RBXGeneral
 
-if true then error("Remember to set chatChannel") end
-
-(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
+ReplicatedStorage:WaitForChild("RoundHandler").SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
 	if msgType == "other" then
 		chatChannel:DisplaySystemMessage(msg)
 	else

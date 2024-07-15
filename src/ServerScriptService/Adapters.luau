@@ -499,7 +499,7 @@ local module: Types.Adapter = {
         end
 
         char:Destroy()
-        clone.Name = "__Unidentified"
+        clone:SetAttribute("Unidentified", true)
 
         local joints = ServerStorage.RagdollJoints:Clone()
         for _, v in joints:GetChildren() do

@@ -219,9 +219,9 @@ LocalRoundInfo.Listen("UpdateParticipant", function(p)
 		return updatePlr(player, findPlr(participant))
 	end
 	updatePlr(participant.Player, findPlr(participant.Player.Name))
-end);
+end)
 
-(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).CorpseSearched.OnClientEvent:Connect(function(name: string)
+ReplicatedStorage:WaitForChild("RoundHandler").CorpseSearched.OnClientEvent:Connect(function(name: string)
 	findPlr(name).SearchedIcon.Visible = true
 end)
 

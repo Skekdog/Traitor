@@ -7,7 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SM = require(script.Parent)
 
 -- This must be run before anything yields, especially todo with ui
-local options = (ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).LoadSavedData.OnClientEvent:Wait()
+local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
 options = SM.JSONDecode(options)
 
 local previousVersion = options.__VERSION
@@ -93,30 +93,6 @@ local function transitionUnderline(underline: Frame, target: TextButton)
 	{ Position = newPosition })
 end
 
-local function transitionSwitch(target: Frame, disabled: boolean)
-	-- Disabled if transitioning to green
-	disabled = not disabled
-	-- I confused myself and now I don't know what disabled actually means I just know that it does the wrong thing if you don't invert it
-	local switch = target:FindFirstChild("Switch") :: TextLabel
-	API.Animate(switch,
-		TweenInfo.new(
-			0.25,
-			Enum.EasingStyle.Quad
-		), {
-			Position = UDim2.fromScale(disabled and 0.9 or 0.1, 0.5)
-		}
-	)
-	API.Animate(target,
-		TweenInfo.new(
-			0.25,
-			Enum.EasingStyle.Quad
-		), {
-			BackgroundColor3 = disabled and Color3.fromRGB(189, 0, 0) or Color3.fromRGB(47, 189, 47)
-		}
-	)
-	
-	switch.Text = disabled and "O" or "I"
-end
 for i, v in createdTabs do
 	local tab = tabBase:Clone() :: TextButton
 	tab.Name = v
@@ -226,14 +202,14 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	if settingType == "Boolean" then
 		local frame = booleanFrame:Clone() :: typeof(booleanFrame)
 		local val = frame.Value
-		transitionSwitch(val, SM.GetSetting(name) :: boolean)
+		API.TransitionSwitch(val, SM.GetSetting(name) :: boolean)
 		
 		frame.Label.Text = name..":"
 		
 		frame.MouseButton1Click:Connect(function()
 			local newVal = not SM.GetSetting(name)
 			SM.SetSetting(name, newVal)
-			transitionSwitch(frame.Value, newVal)
+			API.TransitionSwitch(frame.Value, newVal)
 		end)
 		f = frame
 	elseif type(settingType) == "table" then

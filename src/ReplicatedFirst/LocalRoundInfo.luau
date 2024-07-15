@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(script.Parent.RoundHandler.Types)
-local replicatedData = ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler) -- Yes this is in ReplicatedFirst, but it's nice to have few containers for scripts
+local replicatedData = ReplicatedStorage:WaitForChild("RoundHandler")
 
 local module = {}
 
@@ -106,6 +106,8 @@ local isSpectating = false
 function module.IsSpectating(): boolean
     return isSpectating
 end
+
+module.DNACharge = 1000
 
 function module.SetSpectating(value: boolean): ()
     isSpectating = value

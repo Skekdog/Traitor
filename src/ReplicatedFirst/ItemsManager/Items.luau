@@ -3,15 +3,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemTypes = require(script.Parent.ItemTypes)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
-local projectiles = ReplicatedStorage:WaitForChild("Projectiles") :: typeof(ReplicatedStorage.Projectiles)
+local projectiles = ReplicatedStorage:WaitForChild("Projectiles")
 local models = ReplicatedStorage.WeaponModels
 local weaponSounds = ReplicatedStorage.WeaponSounds
 local firedSounds = weaponSounds.Fired
 local reloadSounds = weaponSounds.Reload
 
 local bullet = projectiles:WaitForChild("Bullet") :: PVInstance -- Somehow this ended up not loading despite Waiting for Projectiles?
-
-
 
 local controlledProps: {[number]: BasePart} = {}
 
@@ -1009,6 +1007,65 @@ items["Magneto Stick"] = {
         if prop then
             stopControllingProp(prop, userId)
         end
+    end
+}
+
+items["DNA Scanner"] = {
+    Kind = "Item",
+    Name = "DNA Scanner",
+    
+    Slot = 9,
+    CanDrop = true,
+
+    Model = models["DNA Scanner"],
+
+    Toggled = true,
+
+    PrimaryFire = function(participant, cameraRay)
+        local head = participant.Character:FindFirstChild("Head")
+        if not head or not head:IsA("BasePart") then
+            return
+        end
+
+        local params = RaycastParams.new()
+        params.CollisionGroup = "CorpseRaycasts"
+        params.RespectCanCollide = false
+        params.FilterDescendantsInstances = {workspace.Corpses}
+        params.FilterType = Enum.RaycastFilterType.Include
+
+        local result = workspace:Raycast(head.Position, cameraRay.Direction * 10)
+        if not result then
+            return
+        end
+
+        local model = result.Instance:FindFirstAncestorOfClass("Model")
+        if not model or not model:IsDescendantOf(workspace.Corpses) or model:GetAttribute("Unidentified") then
+            return
+        end
+
+        local victim = participant.Round:GetParticipant(model.Name)
+        if not victim then
+            return
+        end
+
+        local attacker = victim.KilledByParticipant
+        if not attacker or not victim.DNAExpiry or victim.DNAExpiry < workspace:GetServerTimeNow() then
+            return
+        end
+
+        ReplicatedStorage.ServerClient.AcquireDNASample:FireClient(participant.Player, model, attacker.Player.Name)
+    end,
+
+    OnEquipClient = function()
+        local UIManager = require(script.Parent.Parent.UIManager)
+        local scannerUi = UIManager.WaitForUI("DNAScanner")
+        scannerUi:ToggleVisible(true)
+    end,
+
+    OnUnequipClient = function()
+        local UIManager = require(script.Parent.Parent.UIManager)
+        local scannerUi = UIManager.WaitForUI("DNAScanner")
+        scannerUi:ToggleVisible(false)
     end
 }
 

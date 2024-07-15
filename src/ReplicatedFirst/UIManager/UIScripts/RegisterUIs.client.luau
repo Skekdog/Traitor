@@ -38,9 +38,9 @@ controls.Register("Close UI", false, function()
 		end
 	end
 	return Enum.ContextActionResult.Pass
-end);
+end)
 
-(ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)).OpenSettings.OnClientEvent:Connect(function()
+ReplicatedStorage:WaitForChild("ServerClient").OpenSettings.OnClientEvent:Connect(function()
 	manager.WaitForUI("Settings"):ToggleVisible(true)
 end)
 

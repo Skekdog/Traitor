@@ -127,9 +127,9 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
 		return
 	end
 	update(item, if participant then participant.Credits else 0)
-end);
+end)
 
-(ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).InformClientSideEquipment.OnClientEvent:Connect(function(item)
+ReplicatedStorage:WaitForChild("RoundHandler").InformClientSideEquipment.OnClientEvent:Connect(function(item)
 	if item == "Radar" then
 		radar()
 	end

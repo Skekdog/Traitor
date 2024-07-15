@@ -188,6 +188,29 @@ function module.ToRoundTime(time: number, target: number): string
 	return minutes..":"..seconds
 end
 
+function module.TransitionSwitch(target: GuiObject, disabled: boolean)
+	disabled = not disabled
+	local switch = target:FindFirstChild("Switch") :: TextLabel
+	module.Animate(switch,
+		TweenInfo.new(
+			0.25,
+			Enum.EasingStyle.Quad
+		), {
+			Position = UDim2.fromScale(disabled and 0.9 or 0.1, 0.5)
+		}
+	)
+	module.Animate(target,
+		TweenInfo.new(
+			0.25,
+			Enum.EasingStyle.Quad
+		), {
+			BackgroundColor3 = disabled and Color3.fromRGB(189, 0, 0) or Color3.fromRGB(47, 189, 47)
+		}
+	)
+	
+	switch.Text = disabled and "O" or "I"
+end
+
 function module.TransitionUIState(frame: GuiObject, open: boolean)
 	-- If open is true, open animation should play, otherwise close
 	

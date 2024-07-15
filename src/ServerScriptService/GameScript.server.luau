@@ -135,7 +135,7 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 	end
 
 	participant:SearchCorpse(corpseParticipant)
-	corpse.Name = corpseParticipant.Player.Name
+	corpse:SetAttribute("Unidentified", nil)
 	return corpseParticipant:ViewCorpse()
 end
 

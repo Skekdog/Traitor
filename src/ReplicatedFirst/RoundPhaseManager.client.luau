@@ -10,7 +10,7 @@ local UIManager = require(ReplicatedFirst.UIManager)
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
 local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
-for _, v in (ReplicatedStorage:WaitForChild("RoundHandler") :: typeof(ReplicatedStorage.RoundHandler)).GetMaps:InvokeServer() do
+for _, v in ReplicatedStorage:WaitForChild("RoundHandler").GetMaps:InvokeServer() do
 	local clone = vote.Object.Sample:Clone()
 	clone.Text = v
 	clone.Visible = true

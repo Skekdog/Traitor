@@ -26,7 +26,7 @@ type InventoryRemote = {
     OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, string?, boolean?) -> ()) -> ()},
 }
 
-local serverClient = ReplicatedStorage:WaitForChild("ServerClient") :: typeof(ReplicatedStorage.ServerClient)
+local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 module.InvEvent = (serverClient.InventoryEvent :: any) :: InventoryRemote
 
 local ammoData: {[string]: {Magazine: number, Max: number, [number]: nil}} = {
@@ -146,8 +146,12 @@ end
 
 function module.Equip(plr: Player, equipment: Item)
     if IS_CLIENT then
-       module.InvEvent:FireServer("Equip", equipment.Base.Name)
-       equipped[plr] = equipment
+        local base = Items[equipment.Base.Name]
+        module.InvEvent:FireServer("Equip", base.Name)
+        equipped[plr] = equipment
+        if base.Kind == "Item" and base.OnEquipClient then
+            base.OnEquipClient()
+        end
     else
         local old = equipped[plr]
         if (old :: any) == equipment then
@@ -165,7 +169,11 @@ end
 
 function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
     if IS_CLIENT then
-        module.InvEvent:FireServer("Unequip", equipment.Base.Name, switching)
+        local base = Items[equipment.Base.Name]
+        module.InvEvent:FireServer("Unequip", base.Name, switching)
+        if base.Kind == "Item" and base.OnUnequipClient then
+            base.OnUnequipClient()
+        end
         local old = equipped[plr]
         if old and old.Base.Name == equipment.Base.Name then
             equipped[plr] = nil

@@ -73,6 +73,10 @@ export type ItemDefinition = {
 
     Model: MeshPart?,
 
+    Toggled: boolean?,
+    OnEquipClient: (() -> ())?,
+    OnUnequipClient: (() -> ())?,
+    
     PrimaryFire: ((Types.Participant, cameraRay: Ray) -> ())?,
     AlternateFire: ((Types.Participant, cameraRay: Ray) -> ())?,
     OnUnequip: OnUnequipFunction?,
