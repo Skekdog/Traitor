@@ -133,10 +133,18 @@ for i, v in createdTabs do
 end
 
 local tt = settingsFrame.Parent.Tooltip
-local function tooltip(text: string, pos: UDim2)
-	tt.Position = pos
-	tt.Text = text
-	tt.Visible = true
+local helpTarget: string?
+local function tooltip(text: string, target: string)
+	local show = helpTarget ~= target
+
+	if show then
+		tt.Text = text
+		helpTarget = target
+	else
+		helpTarget = nil
+	end
+
+	tt.Visible = show
 end
 
 local categories = {__len = 0}
@@ -151,7 +159,7 @@ local function done()
 	CAS:UnbindAction(displayName)
 	settingsParent.Main.Visible = true
 	settingsParent.Close.Visible = true
-	settingsParent.Tooltip.Visible = true
+	tt.Visible = true
 	darken.Visible = false
 end
 
@@ -365,7 +373,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			
 			settingsParent.Main.Visible = false
 			settingsParent.Close.Visible = false
-			settingsParent.Tooltip.Visible = false
+			tt.Visible = false
 			darken.Visible = true
 			return
 		end)
@@ -400,11 +408,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	
 	local help = f:FindFirstChild("Help") :: TextButton
 	help.MouseButton1Click:Connect(function()
-		local newPos = UDim2.new(0.05, help.AbsolutePosition.X, 0, help.AbsolutePosition.Y)
-		if (newPos == tt.Position) and (tt.Visible) then
-			tt.Visible = false
-			return
-		end
-		tooltip(setting.Tooltip, newPos)
+		tooltip(setting.Tooltip, setting.Name)
 	end)
 end
