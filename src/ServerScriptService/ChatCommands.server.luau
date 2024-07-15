@@ -96,6 +96,8 @@ Players.PlayerAdded:Connect(function(plr: Player)
                 round.Gamemode.OnDeath = oldVictory
                 oldVictory = nil
             end
+        elseif msg == "!settings" then
+            ReplicatedStorage.ServerClient.OpenSettings:FireClient(plr)
         end
     end)
 end)
