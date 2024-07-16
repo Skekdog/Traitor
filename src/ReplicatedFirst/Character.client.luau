@@ -4,6 +4,7 @@ local API = require(script.Parent.API)
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local Items = require(script.Parent.ItemsManager.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 
@@ -75,51 +76,69 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
 end)
 
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
-    ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
-        if item.Kind == "Item" and item.Base.Toggled then
-            if input.UserInputState == Enum.UserInputState.End then
-                clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+    local base = Items[item.Base.Name] :: ItemTypes.ItemDefinition & ItemTypes.GunDefinition
+    if (item.Kind == "Item" and base.PrimaryFire) or (item.Kind == "Gun" or item.Kind == "Grenade" or item.Kind == "Melee") then
+        ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
+            if item.Kind == "Item" and base.Toggled then
+                if input.UserInputState == Enum.UserInputState.End then
+                    clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+                end
+            else
+                while input.UserInputState == Enum.UserInputState.Begin do
+                    clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+                    task.wait()
+                end
             end
-        else
-            while input.UserInputState == Enum.UserInputState.Begin do
-                clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
-                task.wait()
+            return Enum.ContextActionResult.Sink
+        end)
+    else
+        ControlManager.Unregister("Primary Fire")
+    end
+    
+    if (item.Kind == "Item" and base.AlternateFire) or (item.Kind == "Gun") then
+        ControlManager.Register("Alternate Fire", true, function(action, state, input, toggled)
+            clientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+            return Enum.ContextActionResult.Sink
+        end)
+    else
+        ControlManager.Unregister("Alternate Fire")
+    end
+    
+    if base.CanDrop then
+        ControlManager.Register("Drop", true, function()
+            local equipped = InventoryManager.GetEquipped(plr)
+            if not equipped then
+                return Enum.ContextActionResult.Pass
             end
-        end
-        return Enum.ContextActionResult.Sink
-    end)
-    
-    ControlManager.Register("Alternate Fire", true, function(action, state, input, toggled)
-        clientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
-        return Enum.ContextActionResult.Sink
-    end)
-    
-    ControlManager.Register("Drop", true, function()
-        local equipped = InventoryManager.GetEquipped(plr)
-        if not equipped then
-            return Enum.ContextActionResult.Pass
-        end
-        InventoryManager.Drop(plr, equipped, Vector3.zero)
-        return Enum.ContextActionResult.Sink
-    end)
+            InventoryManager.Drop(plr, equipped, Vector3.zero)
+            return Enum.ContextActionResult.Sink
+        end)
+    else
+        ControlManager.Unregister("Drop")
+    end
 
-    ControlManager.Register("Reload Weapon", true, function()
-        local equipped = InventoryManager.GetEquipped(plr)
-        if not equipped then
-            return Enum.ContextActionResult.Pass
-        end
-        clientServer.ReloadWeapon:FireServer()
-        return Enum.ContextActionResult.Sink
-    end)
+    if item.Kind == "Gun" and base.AmmoType then
+        ControlManager.Register("Reload Weapon", true, function()
+            local equipped = InventoryManager.GetEquipped(plr)
+            if not equipped then
+                return Enum.ContextActionResult.Pass
+            end
+            clientServer.ReloadWeapon:FireServer()
+            return Enum.ContextActionResult.Sink
+        end)
 
-    ControlManager.Register("Drop Ammo", true, function(action, state, input, toggled)
-        local equipped = InventoryManager.GetEquipped(plr)
-        if not equipped then
-            return Enum.ContextActionResult.Pass
-        end
-        clientServer.DropAmmo:FireServer()
-        return Enum.ContextActionResult.Sink
-    end)
+        ControlManager.Register("Drop Ammo", true, function(action, state, input, toggled)
+            local equipped = InventoryManager.GetEquipped(plr)
+            if not equipped then
+                return Enum.ContextActionResult.Pass
+            end
+            clientServer.DropAmmo:FireServer()
+            return Enum.ContextActionResult.Sink
+        end)
+    else
+        ControlManager.Unregister("Reload Weapon")
+        ControlManager.Unregister("Drop Ammo")
+    end
 end)
 
 InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)

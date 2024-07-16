@@ -1005,9 +1005,7 @@ items["Magneto Stick"] = {
         alignPos.Attachment1 = head:FindFirstChild("MagnetoAttachment") :: Attachment?
         alignPos.Enabled = true
     end,
-    PrimaryFire = function(plr: Types.Participant, cameraRayInfo: Ray)
-        
-    end,
+    
     OnUnequip = function(plr: Player)
         local userId = plr.UserId
         local prop = controlledProps[userId]
