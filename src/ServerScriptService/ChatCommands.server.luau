@@ -46,34 +46,39 @@ local function pause(): Types.Round?
     return round
 end
 
+local function send(message: string): ()
+    Adapters.SendMessage(message, "info", "other", true)
+end
+
 Players.PlayerAdded:Connect(function(plr: Player)
     plr.Chatted:Connect(function(msg, to)
         if to then
             return
         end
 
-        msg = msg:lower()
+        local args = msg:split(" ")
+        local cmd = args[1]:lower()
 
-        if msg == "!testplace" then
+        if cmd == "!testplace" then
             if game.PlaceId == testPlace then
-                return Adapters.SendMessage("You are already in test place, silly.", "error", "other", true)
+                return send("You are already in test place, silly.")
             end
 
             local targets = {plr}
 			if isAdmin(plr) then
 				targets = Players:GetPlayers()
-                Adapters.SendMessage("Teleporting everyone to test place.", "info", "other", true)
+                send("Teleporting everyone to test place.")
             else
-                Adapters.SendMessage(`Teleporting {plr.Name} to test place.`, "info", "other", true)
+                send(`Teleporting {plr.Name} to test place.`)
             end
 
             TeleportService:TeleportAsync(testPlace, targets)
-        elseif msg == "!pause" and isAdmin(plr) then
+        elseif cmd == "!pause" and isAdmin(plr) then
             pause()
-        elseif msg == "!restart" and plr.UserId == meId then
+        elseif cmd == "!restart" and plr.UserId == meId then
             Adapters.SendMessage("Server restarting...", "info", "update", true) -- type is update to be consistent with RoundHandler restarts
             RestartServer(5)
-        elseif msg == "!pausevictory" and isAdmin(plr) then
+        elseif cmd == "!pausevictory" and isAdmin(plr) then
             local round = GetRound()
             if round and round.Paused then
                 if oldVictory then
@@ -96,8 +101,25 @@ Players.PlayerAdded:Connect(function(plr: Player)
                 round.Gamemode.OnDeath = oldVictory
                 oldVictory = nil
             end
-        elseif msg == "!settings" then
+        elseif cmd == "!settings" then
             ReplicatedStorage.ServerClient.OpenSettings:FireClient(plr)
+        elseif cmd == "!endround" and isAdmin(plr) then
+            if not args[2] then
+                return send("Missing Argument 2")
+            end
+            local round = GetRound()
+            if not round or not round:IsRoundInProgress() then
+                return send("Failed to end round as there is no round in progress.")
+            end
+
+            local success, err = pcall(function()
+                round:EndRound(round:GetParticipant(args[2]) or round:GetRoleFromName(args[2]))
+            end)
+            if success then
+                send("Round ended.")
+            else
+                send("Failed to end round: "..err)
+            end
         end
     end)
 end)
