@@ -89,7 +89,6 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
                     task.wait()
                     if item.Kind == "Gun" then
                         if LocalRoundInfo.Ammo and LocalRoundInfo.Ammo <= 0 then
-                            print(LocalRoundInfo.Ammo)
                             clientServer.ReloadWeapon:FireServer()
                         end
                     end
