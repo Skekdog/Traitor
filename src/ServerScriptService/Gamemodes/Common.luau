@@ -138,14 +138,22 @@ module.Equipment = {
     {
         Name = "Silenced Pistol",
         AttackType = "Firearm",
+        Description = "A pistol that has been fitted with a suppressor. People killed with silenced weapons will not scream.",
         Icon = "rbxassetid://299432421",
+
+        Cost = 1,
+        MaxStock = 2,
 
         Item = items["Silenced Pistol"]
     },
     {
         Name = "AWP",
         AttackType = "Firearm",
+        Description = "A high-powered sniper rifle that must be scoped in to shoot. Cannot be reloaded.",
         Icon = "rbxassetid://4772214897",
+
+        Cost = 1,
+        MaxStock = 2,
 
         Item = items["AWP"]
     },
@@ -210,9 +218,8 @@ function module.TestForOneSurvivingRole(self: Types.Gamemode, round: Types.Round
         end
     end
 
-    if #allegiances ~= 2 then
-        error("TestForOneSurvivingRole Victory Checker only works if there are 2 teams!")
-    end
+    assert(#allegiances == 2, "TestForOneSurvivingRole Victory Checker requires 2 teams!")
+    assert(self.PhyrricVictors, "TestForOneSurvivingRole Victory Checker requires PhyrricVictors to be set.")
 
     local function checkAlive(participant: Types.Participant)
         -- Remember what they took from you: https://github.com/luau-lang/luau/pull/501

@@ -47,7 +47,7 @@ end)
 
 local gamemodes = {}
 for _, v in script.Parent.Gamemodes:GetChildren() do
-	if v.Name == "ThoseYouTrust" then
+	if v.Name == "Elimination" then
 		local gm = require(v) :: Types.Gamemode
 		table.insert(gamemodes, gm)
 	end

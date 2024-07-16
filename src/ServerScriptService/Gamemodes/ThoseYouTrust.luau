@@ -15,9 +15,9 @@ local module: Types.Gamemode = {
     RecommendedPlayers = 4,
     MaximumPlayers = 32,
     
+    PhyrricVictors = "Traitor",
     TimeoutVictors = "Innocent",
     TimeoutMusic = ReplicatedStorage.VictoryMusic.Timeout:GetChildren() :: any,
-    PhyrricVictors = "Traitor",
 
     SelfDefenseDuration = 15,
 
@@ -131,7 +131,7 @@ local module: Types.Gamemode = {
             },
 
             StartingCredits = 2,
-			EquipmentShop = {"Radar", "Flare Gun", "Grenade", "Flashbang"},
+			EquipmentShop = {"Radar", "Flare Gun", "Grenade", "Flashbang", "Silenced Pistol", "AWP"},
 			CanSeeMissing = true,
 
             HighlightRoles = {"Traitor"},
