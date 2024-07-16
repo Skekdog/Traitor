@@ -418,27 +418,26 @@ local module: Types.Adapter = {
             end
 
             local lastHolder = object:FindFirstChild("LastHolder") :: NumberValue?
-            local char = part:FindFirstAncestorOfClass("Model")
-            local lastHolderPlr
-            local lastHolderParticipant
-            if lastHolder then
-                lastHolderPlr = Players:GetPlayerByUserId(lastHolder.Value)
-                if lastHolderPlr then
-                    lastHolderParticipant = round:GetParticipant(lastHolderPlr.Name)
-                end
-            end
 
             if not lastHolder then
+                return
+            end
+
+            local char = part:FindFirstAncestorOfClass("Model")
+            local lastHolderPlr = Players:GetPlayerByUserId(lastHolder.Value)
+
+            if not lastHolderPlr then
+                return
+            end
+            local lastHolderParticipant = round:GetParticipant(lastHolderPlr.Name)
+
+            if lastHolderPlr == Players:GetPlayerFromCharacter(char :: Model) then
                 return
             end
 
             local damage = (energy - 2000) / 1000
             if prop:HasHealth() then
                 prop:TakeDamage(damage, lastHolderParticipant)
-            end
-
-            if lastHolderPlr == Players:GetPlayerFromCharacter(char :: Model) then
-                return
             end
 
             local windows = round.Map:FindFirstChild("Windows")
@@ -460,8 +459,7 @@ local module: Types.Adapter = {
                 return
             end
 
-            if lastHolder and lastHolder.Value ~= nil then
-                
+            if lastHolder.Value ~= nil then
                 participant:TakeDamage(damage, lastHolderParticipant, "Crush") -- only do damage if the prop was flung by someone
             end
         end)

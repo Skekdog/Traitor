@@ -960,7 +960,7 @@ items["Magneto Stick"] = {
             return
         end
 
-        if (object.AssemblyMass > 50) or (object.Size.X * object.Size.Y * object.Size.Z > 50) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
+        if (object.AssemblyMass > 160) or (object.Size.X * object.Size.Y * object.Size.Z > 50) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
             return
         end
 
@@ -968,7 +968,7 @@ items["Magneto Stick"] = {
         if not alignPos.Parent then
             alignPos.Responsiveness = 200
             alignPos.MaxVelocity = 40
-            alignPos.MaxForce = 10000
+            alignPos.MaxForce = 10000000
             alignPos.ApplyAtCenterOfMass = true
             alignPos.Mode = Enum.PositionAlignmentMode.TwoAttachment
 
