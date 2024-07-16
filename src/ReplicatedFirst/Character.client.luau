@@ -87,6 +87,12 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
                 while input.UserInputState == Enum.UserInputState.Begin do
                     clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
                     task.wait()
+                    if item.Kind == "Gun" then
+                        if LocalRoundInfo.Ammo and LocalRoundInfo.Ammo <= 0 then
+                            print(LocalRoundInfo.Ammo)
+                            clientServer.ReloadWeapon:FireServer()
+                        end
+                    end
                 end
             end
             return Enum.ContextActionResult.Sink
