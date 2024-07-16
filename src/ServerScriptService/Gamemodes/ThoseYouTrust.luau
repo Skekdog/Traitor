@@ -230,7 +230,7 @@ local module: Types.Gamemode = {
     end,
     
     Duration = function(self, numParticipants)
-        return 10 + (numParticipants * 10)
+        return 120 + (numParticipants * 10)
     end,
 
     OnCharacterLoad = function(self, char)

@@ -80,8 +80,13 @@ local module: Types.Gamemode = {
 
     Duration = 180,
     OnDeath = function(self, victim)
+        local round = victim.Round
+        if victim.Round:IsRoundOver() then
+            return
+        end
+
         local survivor: Types.Participant?, moreThanOneSurvivor = nil, false
-        for _, v in victim.Round.Participants do
+        for _, v in round.Participants do
             if not v:IsDead() then
                 if survivor then
                     moreThanOneSurvivor = true
@@ -98,7 +103,7 @@ local module: Types.Gamemode = {
         end
 
         if not moreThanOneSurvivor then
-            victim.Round:EndRound(survivor or determineWinnerByScore(self, victim.Round))
+            round:EndRound(survivor or determineWinnerByScore(self, round))
         end
     end,
 
