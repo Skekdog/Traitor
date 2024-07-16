@@ -1,10 +1,8 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Common = require(script.Parent.Common)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
-local common = require(script.Parent.Common)
-
-local items = ReplicatedStorage.WeaponModels
 
 local module: Types.Gamemode = {
     Name = "Those You Trust",
@@ -21,59 +19,18 @@ local module: Types.Gamemode = {
     TimeoutMusic = ReplicatedStorage.VictoryMusic.Timeout:GetChildren() :: any,
     PhyrricVictors = "Traitor",
 
+    SelfDefenseDuration = 15,
+
     CalculateRoundHighlights = function(self, round)
-        local weaponList = common.GetWeaponHighlights(round.EventLog)
+        local firstKill, standardList = Common.GetDefaultHighlights(round)
         local highlights: {Types.RoundHighlight} = {}
 
-        table.move(weaponList, 1, #weaponList, 1, highlights)
-
-        local deathLog = round.EventLog.Death
-        local firstKill: Types.RoundEvent_Death?
-        local eventIndex = 0
-
-        local suiciders = {}
-        for _, v in deathLog do
-            if v.Data.Attacker == v.Data.Victim then
-                table.insert(suiciders, v.Data.Attacker :: Types.Participant)
-            end
-        end
-
-        table.sort(suiciders, function(a, b)
-            return a.KilledAt < b.KilledAt
-        end)
-
-        if #suiciders > 0 then
-            if #suiciders == 1 then
-                table.insert(highlights, {
-                    Name = "Lonely and Sad",
-                    Description = `{suiciders[1].FormattedName} was the only one to kill themselves.`
-                })
-            else
-                table.insert(highlights, {
-                    Name = "Suicide Cult Leader",
-                    Description = `{suiciders[1].FormattedName} showed the other suiciders how to do it by being the first to go.`
-                })
-            end
-        end
-
-        while (eventIndex < #deathLog) and (not firstKill) do
-            eventIndex += 1
-            local log = deathLog[eventIndex]
-            if not log then
-                break
-            end
-
-            local data = log.Data
-            if data.Attacker and data.Attacker ~= data.Victim then
-                firstKill = deathLog[eventIndex].Data
-                break
-            end
-        end
+        table.move(standardList, 1, #standardList, 1, highlights)
         
         if firstKill then
             assert(firstKill.Attacker)
-            local aRole = firstKill.Attacker.Role.Allegiance
-            local vRole = firstKill.Victim.Role.Allegiance
+            local aRole = firstKill.Attacker.Role.Allegiance or firstKill.Attacker.Role.Name
+            local vRole = firstKill.Victim.Role.Allegiance or firstKill.Victim.Role.Name
 
             local attackerName = firstKill.Attacker.FormattedName
             if (aRole == "Traitor") and (vRole == "Traitor") then
@@ -147,130 +104,8 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Magneto Stick", "Grenade", "Flashbang", "Discombobulator", "DNA Scanner"},
-    AvailableEquipment = {
-        {
-            Name = "Crowbar",
-            Icon = "rbxassetid://",
-            AttackType = "Blunt",
-
-            Item = items.Crowbar
-        },
-        {
-            Name = "Magneto Stick",
-            Icon = "rbxassetid://",
-
-            Item = items["Magneto Stick"]
-        },
-        {
-            Name = "Newton Launcher",
-            Icon = "rbxassetid://",
-
-            Item = items["Newton Launcher"]
-        },
-        {
-            Name = "Pistol",
-            Icon = "rbxassetid://",
-            AttackType = "Firearm",
-
-            Item = items.Pistol
-        },
-        {
-            Name = "BAR",
-            Icon = "rbxassetid://",
-            AttackType = "Firearm",
-
-            Item = items.BAR
-        },
-        {
-            Name = "Assault Rifle",
-            Icon = "rbxassetid://",
-            AttackType = "Firearm",
-
-            Item = items["Assault Rifle"]
-        },
-        {
-            Name = "XM1014",
-            Icon = "rbxassetid://",
-            AttackType = "Firearm",
-
-            Item = items.XM1014
-        },
-        {
-            Name = "Golden Gun",
-            Description = "Instant kills if the death is justified. Otherwise - bad luck.",
-            Icon = "rbxassetid://10282780102",
-            Cost = 1,
-            AttackType = "Firearm",
-            MaxStock = 1,
-
-            Item = items["Golden Gun"]
-        },
-        {
-            Name = "Flare Gun",
-            Description = "Sets fire to anyone it hits. Can be used to incinerate corpses, hiding evidence.",
-            Icon = "rbxassetid://444145395",
-            AttackType = "Firearm",
-            MaxStock = 1,
-            Cost = 1,
-
-            Item = items["Flare Gun"]
-        },
-        {
-            Name = "Smoke Grenade",
-            Icon = "rbxassetid://8096856961",
-
-            Item = items["Smoke Grenade"]
-        },
-        {
-            Name = "Incendiary Grenade",
-            Icon = "rbxassetid://8096856961",
-            AttackType = "Explosion",
-            NoDNA = true,
-
-            Item = items["Incendiary Grenade"]
-        },
-        {
-            Name = "Discombobulator",
-            Icon = "rbxassetid://8096856961",
-
-            Item = items.Discombobulator
-        },
-        {
-            Name = "Grenade",
-            Description = "Explodes in a decent radius after a few seconds.",
-            Cost = 2,
-            Icon = "rbxassetid://8096856961",
-            MaxStock = 1,
-            AttackType = "Explosion",
-            NoDNA = true,
-
-            Item = items.Grenade
-        },
-        {
-            Name = "Flashbang",
-            Description = "Blinds and deafens anyone in range.",
-            Cost = 1,
-            Icon = "rbxassetid://10753198321",
-            MaxStock = 2,
-            Item = items.Flashbang,
-        },
-        {
-            Name = "Radar",
-            Description = "Reveals the location of all living players every 30 seconds.",
-            Cost = 1,
-            Icon = "rbxassetid://62159372",
-            MaxStock = 1,
-
-            Item = function() end,
-        },
-        {
-            Name = "DNA Scanner",
-            Description = "scan",
-            Icon = "rbxassetid://",
-            Item = items["DNA Scanner"]
-        },
-    } :: {Types.Equipment},
+    StartingEquipment = {"Crowbar", "Magneto Stick"},
+    AvailableEquipment = Common.Equipment,
 
     Roles = {
         {
@@ -314,6 +149,8 @@ local module: Types.Gamemode = {
                 AssignmentPriority = 2,
                 Sound = 9042823666,
             },
+
+            StartingEquipment = {"DNA Scanner"},
 
             Allies = {"Innocent", "Detective"},
             Allegiance = "Innocent",
@@ -386,7 +223,7 @@ local module: Types.Gamemode = {
             return
         end
 
-        local winner = common.TestForOneSurvivingRole(self, round)
+        local winner = Common.TestForOneSurvivingRole(self, round)
         if winner then
             round:EndRound(round:GetRoleFromName(winner))
         end

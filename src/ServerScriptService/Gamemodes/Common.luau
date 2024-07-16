@@ -1,10 +1,206 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Not a Gamemode, but contains some useful functions that are used by multiple Gamemodes.
 -- Not a part of the standard implementation, can be removed to your tastes.
 
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local module = {}
+
+local items = ReplicatedStorage.WeaponModels
+
+module.Equipment = {
+    {
+        Name = "Crowbar",
+        AttackType = "Blunt",
+
+        Item = items.Crowbar
+    },
+    {
+        Name = "Magneto Stick",
+        Item = items["Magneto Stick"]
+    },
+    {
+        Name = "Pistol",
+        AttackType = "Firearm",
+
+        Item = items.Pistol
+    },
+    {
+        Name = "BAR",
+        AttackType = "Firearm",
+
+        Item = items.BAR
+    },
+    {
+        Name = "Assault Rifle",
+        AttackType = "Firearm",
+
+        Item = items["Assault Rifle"]
+    },
+    {
+        Name = "XM1014",
+        AttackType = "Firearm",
+
+        Item = items.XM1014
+    },
+    {
+        Name = "Golden Gun",
+        Description = "Instant kills if the death is justified. Otherwise - bad luck.",
+        Icon = "rbxassetid://10282780102",
+        Cost = 1,
+        AttackType = "Firearm",
+        MaxStock = 1,
+
+        Item = items["Golden Gun"]
+    },
+    {
+        Name = "Flare Gun",
+        Description = "Sets fire to anyone it hits. Can be used to incinerate corpses, hiding evidence.",
+        Icon = "rbxassetid://444145395",
+        AttackType = "Firearm",
+        MaxStock = 1,
+        Cost = 1,
+
+        Item = items["Flare Gun"]
+    },
+    {
+        Name = "Smoke Grenade",
+        Icon = "rbxassetid://8096856961",
+
+        Item = items["Smoke Grenade"]
+    },
+    {
+        Name = "Incendiary Grenade",
+        Icon = "rbxassetid://8096856961",
+        AttackType = "Explosion",
+        NoDNA = true,
+
+        Item = items["Incendiary Grenade"]
+    },
+    {
+        Name = "Discombobulator",
+        Icon = "rbxassetid://8096856961",
+
+        Item = items.Discombobulator
+    },
+    {
+        Name = "Grenade",
+        Description = "Explodes in a decent radius after a few seconds.",
+        Cost = 2,
+        Icon = "rbxassetid://8096856961",
+        MaxStock = 1,
+        AttackType = "Explosion",
+        NoDNA = true,
+
+        Item = items.Grenade
+    },
+    {
+        Name = "Flashbang",
+        Description = "Blinds and deafens anyone in range.",
+        Cost = 1,
+        Icon = "rbxassetid://10753198321",
+        MaxStock = 2,
+        Item = items.Flashbang,
+    },
+    {
+        Name = "Radar",
+        Description = "Reveals the location of all living players every 30 seconds.",
+        Cost = 1,
+        Icon = "rbxassetid://62159372",
+        MaxStock = 1,
+
+        Item = function() end,
+    },
+    {
+        Name = "DNA Scanner",
+        Description = "scan",
+        Item = items["DNA Scanner"]
+    },
+    {
+        Name = "SMG",
+        AttackType = "Firearm",
+
+        Item = items["SMG"]
+    },
+    {
+        Name = "Deagle",
+        AttackType = "Firearm",
+
+        Item = items["Deagle"]
+    },
+    {
+        Name = "Glock",
+        AttackType = "Firearm",
+
+        Item = items["Glock"]
+    },
+    {
+        Name = "Silenced Pistol",
+        AttackType = "Firearm",
+        Icon = "rbxassetid://299432421",
+
+        Item = items["Silenced Pistol"]
+    },
+    {
+        Name = "AWP",
+        AttackType = "Firearm",
+        Icon = "rbxassetid://4772214897",
+
+        Item = items["AWP"]
+    },
+    {
+        Name = "Scout",
+        AttackType = "Firearm",
+
+        Item = items["Scout"]
+    },
+    {
+        Name = "HUGE",
+        AttackType = "Firearm",
+
+        Item = items["HUGE"]
+    },
+} :: {Types.Equipment}
+
+function module.GetDefaultHighlights(round: Types.Round): (Types.RoundEvent_Death?, {Types.RoundHighlight})
+    local weaponList = module.GetWeaponHighlights(round.EventLog)
+    local highlights: {Types.RoundHighlight} = {}
+
+    table.move(weaponList, 1, #weaponList, 1, highlights)
+
+    local deathLog = round.EventLog.Death
+    local firstKill: Types.RoundEvent<Types.RoundEvent_Death>?
+
+    local suiciders = {}
+    for _, v in deathLog do
+        if v.Data.Attacker == v.Data.Victim then
+            table.insert(suiciders, v.Data.Attacker :: Types.Participant)
+        elseif v.Data.Attacker and not v.Data.SelfDefense and (not firstKill or v.Timestamp < firstKill.Timestamp) then
+            firstKill = v
+        end
+    end
+
+    table.sort(suiciders, function(a, b)
+        return a.KilledAt < b.KilledAt
+    end)
+
+    if #suiciders > 0 then
+        if #suiciders == 1 then
+            table.insert(highlights, {
+                Name = "Lonely and Sad",
+                Description = `{suiciders[1].FormattedName} was the only one to kill themselves.`
+            })
+        else
+            table.insert(highlights, {
+                Name = "Suicide Cult Leader",
+                Description = `{suiciders[1].FormattedName} showed the other suiciders how to do it by being the first to go.`
+            })
+        end
+    end
+
+    return if firstKill then firstKill.Data else nil, highlights
+end
 
 function module.TestForOneSurvivingRole(self: Types.Gamemode, round: Types.Round): string?
     local allegiances: {string} = {}
