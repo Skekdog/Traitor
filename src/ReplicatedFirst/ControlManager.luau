@@ -42,11 +42,16 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 		return "NONE"
 	end
 	if keycode.EnumType == Enum.KeyCode then
-		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
-		if img ~= "" then return img end
+		-- local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
+		-- if img ~= "" then return img end
 
 		local str = UIS:GetStringForKeyCode(keycode :: Enum.KeyCode)
-		if str ~= "" then return str end
+		if str ~= "" then
+			if str:sub(1, 6) == "Button" then
+				return str:sub(7, -1)
+			end
+			return str
+		end
 
 		if keycode == Enum.KeyCode.LeftControl then
 			return "Ctrl"
