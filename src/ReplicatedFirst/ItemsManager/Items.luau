@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemTypes = require(script.Parent.ItemTypes)
+local CreateEmptyPart = require(script.Parent.Parent.CreateEmptyPart)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
 local function projectiles(name: string): PVInstance
@@ -750,14 +751,8 @@ grenades["Incendiary Grenade"] = {
                 return
             end
 
-            local firePart = Instance.new("Part")
-            firePart.Anchored = true
-            firePart.CanCollide = false
-            firePart.CanTouch = true
-            firePart.CanQuery = true
-            firePart.Transparency = 1
+            local firePart = CreateEmptyPart(CFrame.new(position), nil, false, true, true)
             firePart.Size = Vector3.new(15, 1, 15)
-            firePart.Position = position
             firePart.Parent = workspace.Projectiles
 
             local overlapParams = OverlapParams.new()
@@ -829,14 +824,9 @@ grenades["Smoke Grenade"] = {
             smoke.Opacity = 1
             smoke.RiseVelocity = 5
             
-            local smokePart = Instance.new("Part")
-            smokePart.Anchored = true
-            smokePart.CanCollide = false
-            smokePart.Transparency = 1
-            smokePart.Size = Vector3.new(0, 0, 0)
-            smokePart.Position = position
-            smokePart.Parent = workspace.Projectiles
+            local smokePart = CreateEmptyPart(CFrame.new(position))
             smoke.Parent = smokePart
+            smokePart.Parent = workspace.Projectiles
 
             task.delay(30, smokePart.Destroy, smokePart)
         end,

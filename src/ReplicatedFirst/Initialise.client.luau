@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local API = require(script.Parent.API)
+local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
 local InventoryManager = require(script.Parent.InventoryManager)
@@ -36,16 +37,9 @@ end)
 serverClient.TweenStandardDoor.OnClientEvent:Connect(StandardDoor)
 
 serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, position: Vector3, normal: Vector3)
-    local impactHole = Instance.new("Part")
+    local impactHole = CreateEmptyPart(CFrame.lookAt(position, position + normal))
     impactHole.Anchored = false
-    impactHole.Transparency = 1
     impactHole.Size = Vector3.new(0.5, 0.5, 0.1)
-    impactHole.CFrame = CFrame.lookAt(position, position + normal)
-    
-    impactHole.CanCollide = false
-    impactHole.CanTouch = false
-    impactHole.CanQuery = false
-    impactHole.Massless = true
     
     local impactDecal = Instance.new("Decal")
     impactDecal.Texture = "rbxassetid://130624105"

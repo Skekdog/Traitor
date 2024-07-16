@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local CreateEmptyPart = require(script.Parent.Parent.ReplicatedFirst.CreateEmptyPart)
 local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
 local Items = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.Items)
 local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
@@ -83,6 +84,14 @@ local function getMatchingParticipants(participant: Types.Participant, compariso
     return participants
 end
 
+local function interpretStringParameter(parameter: string): string
+    local split = parameter:split(" ")
+    if split[1] == "ONEOF" and #split > 1 then
+        return split[math.random(2, #split)]
+    end
+    return parameter
+end
+
 function module.ResetCounters(): ()
     counters = {}
 end
@@ -93,9 +102,11 @@ function module.Actions.SlidingDoor(actionItem: Model, _, doorName: unknown): ()
     assert(doorName, "Missing Parameter 1")
     assert(typeof(doorName) == "string", "Parameter 1 must be a string")
 
+    doorName = interpretStringParameter(doorName)
+
     local door = actionItem:FindFirstChild(doorName, true)
-    assert(door, "Could not find Door")
-    assert(door:IsA("BasePart"), "Door must be a BasePart")
+    assert(door, "Could not find Door "..doorName)
+    assert(door:IsA("BasePart"), "Door must be a BasePart "..doorName)
 
     tweenSlidingDoor(actionItem, door)
     playSlidingDoorSound(door)
@@ -108,13 +119,16 @@ function module.Actions.DoubleSlidingDoor(actionItem: Model, _, door1Name: unkno
     assert(typeof(door1Name) == "string", "Parameter 1 must be a string")
     assert(typeof(door2Name) == "string", "Parameter 2 must be a string")
 
+    door1Name = interpretStringParameter(door1Name)
+    door2Name = interpretStringParameter(door2Name)
+
     local door1 = actionItem:FindFirstChild(door1Name, true)
     local door2 = actionItem:FindFirstChild(door2Name, true)
-    assert(door1, "Could not find Door 1")
-    assert(door2, "Could not find Door 2")
+    assert(door1, "Could not find Door 1 "..door1Name)
+    assert(door2, "Could not find Door 2 "..door2Name)
 
-    assert(door1:IsA("BasePart"), "Door 1 must be a BasePart")
-    assert(door2:IsA("BasePart"), "Door 2 must be a BasePart")
+    assert(door1:IsA("BasePart"), "Door 1 must be a BasePart "..door1Name)
+    assert(door2:IsA("BasePart"), "Door 2 must be a BasePart "..door2Name)
 
     tweenSlidingDoor(actionItem, door1)
     tweenSlidingDoor(actionItem, door2, 1)
@@ -125,7 +139,10 @@ end
 function module.Actions.GiveItem(actionItem: Model, participant: Types.Participant, item: unknown): ()
     assert(item, "Missing Parameter 1")
     assert(typeof(item) == "string", "Parameter 1 must be a string")
-    assert(Items[item], "Invalid item")
+
+    item = interpretStringParameter(item)
+
+    assert(Items[item], "Invalid item "..item)
 
     InventoryManager.NewItem(Items[item], nil, participant)
 end
@@ -136,6 +153,8 @@ function module.Actions.SpawnProp(actionItem: Model, participant: Types.Particip
 
     local props = participant.Round.Map:FindFirstChild("Props")
     assert(props, "Map does not have a props folder")
+
+    prop = interpretStringParameter(prop)
 
     local propInstance = props:FindFirstChild(prop) :: PVInstance?
     assert(propInstance, `Could not find prop with name {prop}`)
@@ -148,6 +167,8 @@ end
 function module.Actions.TriggerVictory(_, participant: Types.Participant, team: unknown): ()
     assert(team, "Missing Parameter 1")
     assert(typeof(team) == "string", "Parameter 1 must be __This, __ThisParticipant, or a role name")
+
+    team = interpretStringParameter(team)
 
     local round = participant.Round
 
@@ -174,7 +195,9 @@ function module.Actions.IncrementCounter(_, _, name: unknown, amount: unknown): 
     assert(name, "Missing Parameter 1")
     assert(typeof(name) == "string", "Parameter 1 must be a string")
 
-    assert(name:sub(1, 2) ~= "__", "Parameter 1 invalid as counters starting with '__' are reserved")
+    name = interpretStringParameter(name)
+
+    assert(name:sub(1, 2) ~= "__", "Parameter 1 invalid as counters starting with '__' are reserved "..name)
 
     if not amount then
         amount = 1
@@ -194,6 +217,8 @@ function module.Actions.MoveMapElement(actionItem: Model, participant: Types.Par
     assert(name, "Missing Parameter 1")
     assert(typeof(name) == "string", "Parameter 1 must be a string")
 
+    name = interpretStringParameter(name)
+
     assert(cframe, "Missing Parameter 2")
     assert(typeof(cframe) == "CFrame", "Parameter 2 must be a CFrame")
 
@@ -209,6 +234,8 @@ function module.Actions.MoveMapElementRelative(actionItem: Model, participant: T
     assert(name, "Missing Parameter 1")
     assert(typeof(name) == "string", "Parameter 1 must be a string")
 
+    name = interpretStringParameter(name)
+
     assert(cframe, "Missing Parameter 2")
     assert(typeof(cframe) == "CFrame", "Parameter 2 must be a CFrame")
 
@@ -223,6 +250,8 @@ function module.Actions.Teleport(_, participant: Types.Participant, targets: unk
     assert(targets, "Missing Parameter 1")
     assert(typeof(targets) == "string", "Parameter 1 must be __All, __Ally, __Enemy, __This, or a role name")
 
+    targets = interpretStringParameter(targets)
+
     assert(location, "Missing Parameter 2")
     assert(typeof(location) == "Vector3", "Parameter 2 must be a Vector3")
 
@@ -236,6 +265,8 @@ end
 function module.Actions.Kill(_, participant: Types.Participant, targets: unknown, cause: unknown, credit: unknown): ()
     assert(targets, "Missing Parameter 1")
     assert(typeof(targets) == "string", "Parameter 1 must be __All, __Ally, __Enemy, __This, or a role name")
+
+    targets = interpretStringParameter(targets)
 
     assert(cause, "Missing Parameter 2")
     assert(table.find({"Blade", "Blunt", "Burn", "Crush", "Drown", "Explosion", "Fall", "Firearm", "Mutation", "Suicide"}, cause :: string), "Parameter 2 must be one of: Blade, Blunt, Burn, Crush, Drown, Explosion, Fall, Firearm, Mutation, Suicide")
@@ -265,9 +296,19 @@ function module.Actions.PlaySound(actionItem: Model, participant: Types.Particip
     assert(soundName, "Missing Parameter 1")
     assert(typeof(soundName) == "string", "Parameter 1 must be a string")
 
+    soundName = interpretStringParameter(soundName)
+
     local sound = actionItem:FindFirstChild(soundName, true)
-    assert(sound, "Could not find Sound")
-    assert(sound:IsA("Sound"), "Sound must be a Sound")
+    assert(sound, "Could not find Sound "..soundName)
+    assert(sound:IsA("Sound"), "Sound must be a Sound "..soundName)
+
+    sound = sound:Clone()
+    local part = CreateEmptyPart(actionItem:GetPivot(), {sound :: Instance})
+    part.Parent = workspace.Projectiles
+
+    sound.Ended:Once(function()
+        part:Destroy()
+    end)
 
     sound:Play()
 end

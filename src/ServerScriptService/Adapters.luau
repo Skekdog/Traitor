@@ -428,13 +428,17 @@ local module: Types.Adapter = {
                 end
             end
 
-            if lastHolder and (lastHolderPlr == Players:GetPlayerFromCharacter(char :: Model)) then
+            if not lastHolder then
                 return
             end
 
             local damage = (energy - 2000) / 1000
             if prop:HasHealth() then
                 prop:TakeDamage(damage, lastHolderParticipant)
+            end
+
+            if lastHolderPlr == Players:GetPlayerFromCharacter(char :: Model) then
+                return
             end
 
             local windows = round.Map:FindFirstChild("Windows")
@@ -457,6 +461,7 @@ local module: Types.Adapter = {
             end
 
             if lastHolder and lastHolder.Value ~= nil then
+                
                 participant:TakeDamage(damage, lastHolderParticipant, "Crush") -- only do damage if the prop was flung by someone
             end
         end)
