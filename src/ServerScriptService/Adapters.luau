@@ -158,8 +158,7 @@ local module: Types.Adapter = {
     DoIntermission = function()
         local roundNumber = (ServerStorage:GetAttribute("RoundNumber") or -1) + 1 -- or -1, because +1, so then == 0, so % 5 == 0.
         ServerStorage:SetAttribute("RoundNumber", roundNumber)
-        if roundNumber % 2 == 0 then
-            -- also enable map voting here, or whatever
+        if roundNumber % 3 == 0 then
             return true
         end
         return false

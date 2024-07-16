@@ -5,6 +5,8 @@ local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 
+local Elimination = require(script.Parent.Gamemodes.Elimination)
+local ThoseYouTrust = require(script.Parent.Gamemodes.ThoseYouTrust)
 local GetRound = require(script.Parent.GetRound)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
@@ -45,13 +47,7 @@ slayVote.OnServerEvent:Connect(function(plr, target: unknown)
 	end
 end)
 
-local gamemodes = {}
-for _, v in script.Parent.Gamemodes:GetChildren() do
-	if v.Name == "Elimination" then
-		local gm = require(v) :: Types.Gamemode
-		table.insert(gamemodes, gm)
-	end
-end
+local gamemodes = {ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, Elimination}
 
 remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: unknown)
 	local round = GetRound()
