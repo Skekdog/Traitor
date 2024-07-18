@@ -4,16 +4,16 @@ local CAS = game:GetService("ContextActionService")
 local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local SM = require(script.Parent)
+local SettingsManager = require(script.Parent)
 local UIAnimation = require(script.Parent.Parent.UIAnimation)
 
 -- This must be run before anything yields, especially todo with ui
 local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
-options = SM.JSONDecode(options)
+options = SettingsManager.JSONDecode(options)
 
 if not options then
-	for _, v in SM.AvailableSettings do
-		SM.SetSetting(v.Name, v.Default)
+	for _, v in SettingsManager.AvailableSettings do
+		SettingsManager.SetSetting(v.Name, v.Default)
 	end
 else
 	for i, v in options do
@@ -21,11 +21,11 @@ else
 			continue
 		end
 
-		local definition = SM.Settings[i].Definition
+		local definition = SettingsManager.Settings[i].Definition
 		if definition.SpecifyToggle == false then
-			v.Toggled = (definition.Default :: SM.KeybindSetting).Toggled
+			v.Toggled = (definition.Default :: SettingsManager.KeybindSetting).Toggled
 		end
-		SM.SetSetting(i, v)
+		SettingsManager.SetSetting(i, v)
 	end
 end
 
@@ -47,7 +47,7 @@ local settingsFrame = (UIManager.WaitForUI("Settings").Object :: typeof(UIManage
 local tabsFrame = settingsFrame.Tabs
 local tabUnderline = tabsFrame.Underline
 local createdTabs = {}
-for _, v in SM.AvailableSettings do
+for _, v in SettingsManager.AvailableSettings do
 	if not table.find(createdTabs, v.Tab) then
 		table.insert(createdTabs, v.Tab)
 	end
@@ -115,7 +115,7 @@ local darken = settingsParent.LayoutDarken
 local function done()
 	local name = darken:GetAttribute("Setting")
 	local displayName = darken:GetAttribute("DisplayName")
-	SM.SetSetting(name, CAS:GetButton(displayName).Position)
+	SettingsManager.SetSetting(name, CAS:GetButton(displayName).Position)
 	CAS:UnbindAction(displayName)
 	settingsParent.Main.Visible = true
 	settingsParent.Close.Visible = true
@@ -139,12 +139,12 @@ darken.Done.MouseButton1Click:Connect(done)
 
 settingsFrame.Parent:GetPropertyChangedSignal("Visible"):Connect(function()
 	if not settingsFrame.Parent.Visible then
-		ReplicatedStorage:WaitForChild("ClientServer").SaveSettings:FireServer(SM.JSONEncode())
+		ReplicatedStorage:WaitForChild("ClientServer").SaveSettings:FireServer(SettingsManager.JSONEncode())
 	end
 end)
 
 local keybindingCons: {RBXScriptConnection} = {}
-for _, setting: SM.SettingDefinition in SM.AvailableSettings do
+for _, setting: SettingsManager.SettingDefinition in SettingsManager.AvailableSettings do
 	local tab = setting.Tab
 	local settingType = setting.PossibleValues
 	local name = setting.Name
@@ -170,13 +170,13 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	if settingType == "Boolean" then
 		local frame = booleanFrame:Clone() :: typeof(booleanFrame)
 		local val = frame.Value
-		UIAnimation.TransitionSwitch(val, SM.GetSetting(name) :: boolean)
+		UIAnimation.TransitionSwitch(val, SettingsManager.GetSetting(name) :: boolean)
 		
 		frame.Label.Text = name..":"
 		
 		frame.MouseButton1Click:Connect(function()
-			local newVal = not SM.GetSetting(name)
-			SM.SetSetting(name, newVal)
+			local newVal = not SettingsManager.GetSetting(name)
+			SettingsManager.SetSetting(name, newVal)
 			UIAnimation.TransitionSwitch(frame.Value, newVal)
 		end)
 		f = frame
@@ -195,7 +195,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			opt.Position = UDim2.fromScale((i-1) / #settingType, 0)
 			
 			local selectionUnderline = selections.Underline
-			if SM.GetSetting(setting.Name) == v then
+			if SettingsManager.GetSetting(setting.Name) == v then
 				UIAnimation.TransitionUnderline(selectionUnderline, opt)
 			end
 			
@@ -203,7 +203,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			
 			table.insert(opts, opt)
 			opt.MouseButton1Click:Connect(function()
-				SM.SetSetting(name, v)
+				SettingsManager.SetSetting(name, v)
 				for _, p in opts do
 					p.Text = p.Name
 				end
@@ -217,9 +217,9 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		local m = frame.Frame
 		m.Label.Text = name..":"
 		
-		local setBinds = SM.GetSetting(name) :: SM.KeybindSetting
+		local setBinds = SettingsManager.GetSetting(name) :: SettingsManager.KeybindSetting
 		
-		local function updateBinds(binds: {SM.Keybind})
+		local function updateBinds(binds: {SettingsManager.Keybind})
 			local numBoundKeys = 0
 			for _, v in m.Keybinds:GetChildren() do
 				if v:IsA("Frame") and (v.Name ~= "__KeybindFrame") then
@@ -256,9 +256,9 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				end
 
 				local function removeBind()
-					local binds = SM.GetSetting(name) :: SM.KeybindSetting
+					local binds = SettingsManager.GetSetting(name) :: SettingsManager.KeybindSetting
 					table.remove(binds.Keycodes, table.find(binds.Keycodes, v))
-					SM.SetSetting(name, binds)
+					SettingsManager.SetSetting(name, binds)
 
 					bind:Destroy()
 					local sep
@@ -281,11 +281,11 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		if setting.SpecifyToggle then
 			local toggleButton = m.Toggled
 			toggleButton.Visible = true
-			toggleButton.Image = (SM.GetSetting(name) :: SM.KeybindSetting).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
+			toggleButton.Image = (SettingsManager.GetSetting(name) :: SettingsManager.KeybindSetting).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
 			toggleButton.MouseButton1Click:Connect(function()
-				local cur = SM.GetSetting(name) :: SM.KeybindSetting
+				local cur = SettingsManager.GetSetting(name) :: SettingsManager.KeybindSetting
 				cur.Toggled = not cur.Toggled
-				SM.SetSetting(name, cur)
+				SettingsManager.SetSetting(name, cur)
 				
 				toggleButton.Image = cur.Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
 			end)
@@ -306,9 +306,9 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				end
 
 				local t = if input.KeyCode ~= Enum.KeyCode.Unknown then input.KeyCode else input.UserInputType
-				local cur = SM.GetSetting(name) :: SM.KeybindSetting
+				local cur = SettingsManager.GetSetting(name) :: SettingsManager.KeybindSetting
 				table.insert(cur.Keycodes, t)
-				SM.SetSetting(name, cur)
+				SettingsManager.SetSetting(name, cur)
 				if msg then msg:Destroy() end
 				updateBinds({t})
 				API.ScreenMessage("Success", "Keybinding updated!")
@@ -347,7 +347,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			end
 			local newScale = require(ReplicatedFirst.TextInput).Create(name, "Number", "0.1-10", "TouchScale")
 			if newScale then
-				SM.SetSetting(name, newScale)
+				SettingsManager.SetSetting(name, newScale)
 			end
 			local name = name:split(" Scale")[1]
 			CAS:BindAction(name, function() return end, true)
