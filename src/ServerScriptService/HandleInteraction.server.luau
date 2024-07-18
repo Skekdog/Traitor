@@ -3,12 +3,26 @@ local ActionItems = require(script.Parent.ActionItems)
 local GetRound = require(script.Parent.GetRound)
 local StandardDoor = require(script.Parent.Parent.ReplicatedFirst.StandardDoor)
 
-ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: unknown)
+local function isAlive(plr: Player, targetPart: BasePart): boolean
 	local char = plr.Character
 	if not char then
-		return
+		return false
 	end
 
+	local hum = char:FindFirstChildOfClass("Humanoid")
+	if not hum or hum.Health <= 0 then
+		return false
+	end
+
+	local root = hum.RootPart
+	if not root or (root.Position - targetPart.Position).Magnitude > 10 then
+		return false
+	end
+
+	return true
+end
+
+ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: Player, part: unknown)
 	if typeof(part) ~= "Instance" or not part:IsA("BasePart") then
 		return
 	end
@@ -26,25 +40,15 @@ ReplicatedStorage.ClientServer.Interaction.OnServerEvent:Connect(function(plr: P
 	if not participant then
 		return
 	end
-	
-	local hum = char:FindFirstChild("Humanoid") :: Humanoid?
-	if not hum or hum.Health <= 0 then
-		return
-	end
-
-	local root = hum.RootPart
-	if not root or (root.Position - part.Position).Magnitude > 10 then
-		return
-	end
 
 	local map = round.Map
 	local actionItems = map:FindFirstChild("ActionItems")
 	local doors = map:FindFirstChild("Doors")
 	local props = map:FindFirstChild("Props")
 
-	if actionItems and actionItems:IsAncestorOf(part) then
+	if actionItems and actionItems:IsAncestorOf(part) and isAlive(plr, part) then
 		ActionItems.Execute(part:FindFirstAncestorOfClass("Model") :: Model, participant)
-	elseif doors and doors:IsAncestorOf(part) and not part:GetAttribute("Opening") then
+	elseif doors and doors:IsAncestorOf(part) and not part:GetAttribute("Opening") and isAlive(plr, part) then
 		part:SetAttribute("Opening", true)
 
 		local angle = part:FindFirstChild("DoorAngle") :: NumberValue or Instance.new("NumberValue")
