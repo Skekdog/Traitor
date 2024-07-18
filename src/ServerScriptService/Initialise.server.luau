@@ -1,5 +1,4 @@
 local BadgeService = game:GetService("BadgeService")
-local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -157,11 +156,4 @@ ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target: u
 	end
 	local profile = ProfileManager.GetProfile(plr)
 	return if profile then profile.Karma else 1000
-end
-
-while true do
-	for _, v in CollectionService:GetTagged("HealthStationRechargeable") do
-        v:SetAttribute("CurrentCharge", math.min(200, v:GetAttribute("CurrentCharge")+1))
-    end
-	task.wait(1)
 end
