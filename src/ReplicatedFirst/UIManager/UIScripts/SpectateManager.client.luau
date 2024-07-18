@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local plr = Players.LocalPlayer
 
-local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
+local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local uiManager = require(ReplicatedFirst.UIManager)
 local controls = require(ReplicatedFirst.ControlManager)
 
@@ -42,6 +42,10 @@ local function spectateFunc(action, state)
 end
 
 LocalRoundInfo.Listen("IsSpectating", function(val)
+	print(val)
+	if ui.Visible == val then
+		return
+	end
 	uiO.Username.Text = "Use buttons to spectate"
 	lastKey = 0
 	if val then

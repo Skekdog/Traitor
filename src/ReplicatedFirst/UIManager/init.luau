@@ -183,7 +183,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	
 	if transitionStyle then
 		if not transitionTarget then -- check to make sure transTarget is not already set, because uis like EquipmentShop are registered multiple times
-			object:SetAttribute("TransitionTarget", transitionStyle == "Size" and object.Size or object.Position)
+			object:SetAttribute("TransitionTarget", if transitionStyle == "Size" then object.Size else object.Position)
 		end
 	elseif self.Layer == "Popup" then
 		warn(self.Name.." does not have a transition style!")

@@ -149,6 +149,7 @@ local function sendRoundInfo(plr: Player?)
 	if plr then
 		remotes.UpdateEquipment:FireClient(plr, gm.AvailableEquipment)
 		remotes.UpdateRoles:FireClient(plr, gm.Name, gm.Roles)
+		remotes.UpdateRoundEndInfo:FireClient(plr, round.RoundEndInfo)
 		for _, v in round.Participants do
 			UpdateRoundInfo.UpdateParticipantForPlayer(v, plr)
 		end
@@ -156,6 +157,7 @@ local function sendRoundInfo(plr: Player?)
 	end
 	remotes.UpdateEquipment:FireAllClients(gm.AvailableEquipment)
 	remotes.UpdateRoles:FireAllClients(gm.Name, gm.Roles)
+	remotes.UpdateRoundEndInfo:FireAllClients(round.RoundEndInfo)
 end
 
 local stopMusic: (() -> ())?

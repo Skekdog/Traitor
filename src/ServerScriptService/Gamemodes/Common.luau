@@ -157,17 +157,6 @@ module.Equipment = {
 
         Item = items["AWP"]
     },
-    { -- todo: implement this
-        Name = "Knife",
-        AttackType = "Blade",
-        Description = "Instantly and silently kills the target. Can be thrown with Alternate Fire.",
-        Icon = "rbxassetid://",
-
-        Cost = 1,
-        MaxStock = 2,
-
-        Item = items["Knife"]
-    },
     {
         Name = "Scout",
         AttackType = "Firearm",
