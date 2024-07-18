@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UIManager = require(script.Parent.Parent)
-local API = require(script.Parent.Parent.Parent.API)
 local LocalRoundInfo = require(script.Parent.Parent.Parent.LocalRoundInfo)
 local TryPingDNA = require(script.Parent.Parent.Parent.TryPingDNA)
+local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
 
 local ui = UIManager.WaitForUI("DNAScanner").Object :: typeof(UIManager.UnregisteredUIs.DNAScanner)
 
@@ -30,7 +30,7 @@ end)
 
 ui.AutoScanButton.MouseButton1Click:Connect(function()
     autoScan = not autoScan
-    API.TransitionSwitch(ui.AutoScanButton.Value, autoScan)
+    UIAnimation.TransitionSwitch(ui.AutoScanButton.Value, autoScan)
 end)
 
 ReplicatedStorage:WaitForChild("ServerClient").AcquireDNASample.OnClientEvent:Connect(function(model: Model, name: string)

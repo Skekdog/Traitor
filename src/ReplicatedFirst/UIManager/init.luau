@@ -3,7 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
 local ControlManager = require(ReplicatedFirst.ControlManager)
-local API = require(script.Parent.API)
+local UIAnimation = require(script.Parent.UIAnimation)
 
 local plr = Players.LocalPlayer
 local plrUi = plr.PlayerGui
@@ -73,7 +73,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 
 			local object = self.Object
 			if transitionStyle then
-				API.TransitionUIState(object, newVisible)
+				UIAnimation.TransitionUIState(object, newVisible)
 			else
 				object.Visible = newVisible
 			end

@@ -5,6 +5,7 @@ local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local SM = require(script.Parent)
+local UIAnimation = require(script.Parent.Parent.UIAnimation)
 
 -- This must be run before anything yields, especially todo with ui
 local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
@@ -52,46 +53,6 @@ for _, v in SM.AvailableSettings do
 	end
 end
 
-local UNDERLINE_TRANSITION_SCALE = 0.125
-local function transitionUnderline(underline: Frame, target: TextButton)
-	local shouldAnimate = SM.GetSetting("Animate UI Transitions")
-	local UNDERLINE_TRANSITION_TIME = SM.GetSetting("Animate UI Transitions") and 0.5 or 0
-	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, 0, 3)
-	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, 0, 3)
-	
-	local newPosition = UDim2.fromScale(target.Position.X.Scale + (target.Size.X.Scale / 2), 1)
-	
-	-- Tween size to be smaller
-	if shouldAnimate then
-		local halfSizeTween = API.Animate(underline, TweenInfo.new(
-			UNDERLINE_TRANSITION_TIME / 2,
-			Enum.EasingStyle.Exponential,
-			Enum.EasingDirection.Out
-		),
-			{ Size = halfSize }
-		)
-		assert(halfSizeTween)
-		halfSizeTween.Completed:Once(function()
-			-- Return to original size
-			API.Animate(underline, TweenInfo.new(
-				UNDERLINE_TRANSITION_TIME / 2,
-				Enum.EasingStyle.Exponential,
-				Enum.EasingDirection.Out
-				),
-				{ Size = fullSize }
-			)
-		end)
-	end
-	
-	-- Tween position
-	API.Animate(underline, TweenInfo.new(
-		UNDERLINE_TRANSITION_TIME,
-		Enum.EasingStyle.Exponential,
-		Enum.EasingDirection.Out
-		),
-	{ Position = newPosition })
-end
-
 for i, v in createdTabs do
 	local tab = tabBase:Clone() :: TextButton
 	tab.Name = v
@@ -108,7 +69,7 @@ for i, v in createdTabs do
 	page.Parent = settingsFrame
 	
 	tab.MouseButton1Click:Connect(function()
-		transitionUnderline(tabUnderline, tab)
+		UIAnimation.TransitionUnderline(tabUnderline, tab)
 		local currentPage
 		for _, b in settingsFrame:GetChildren() do
 			if (b.Name == "Page_"..settingsFrame:GetAttribute("CurrentTab")) then
@@ -120,14 +81,14 @@ for i, v in createdTabs do
 			return
 		end
 
-		API.TransitionUIPage(currentPage, page, UDim2.fromScale(0, 0.1))
+		UIAnimation.TransitionUIPage(currentPage, page, UDim2.fromScale(0, 0.1))
 		settingsFrame:SetAttribute("CurrentTab", v)
 	end)
 	
 	if i == 1 then
 		page.Visible = true
 		settingsFrame:SetAttribute("CurrentTab", v)
-		transitionUnderline(tabUnderline, tab)
+		UIAnimation.TransitionUnderline(tabUnderline, tab)
 	end
 end
 
@@ -209,14 +170,14 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	if settingType == "Boolean" then
 		local frame = booleanFrame:Clone() :: typeof(booleanFrame)
 		local val = frame.Value
-		API.TransitionSwitch(val, SM.GetSetting(name) :: boolean)
+		UIAnimation.TransitionSwitch(val, SM.GetSetting(name) :: boolean)
 		
 		frame.Label.Text = name..":"
 		
 		frame.MouseButton1Click:Connect(function()
 			local newVal = not SM.GetSetting(name)
 			SM.SetSetting(name, newVal)
-			API.TransitionSwitch(frame.Value, newVal)
+			UIAnimation.TransitionSwitch(frame.Value, newVal)
 		end)
 		f = frame
 	elseif type(settingType) == "table" then
@@ -235,7 +196,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			
 			local selectionUnderline = selections.Underline
 			if SM.GetSetting(setting.Name) == v then
-				transitionUnderline(selectionUnderline, opt)
+				UIAnimation.TransitionUnderline(selectionUnderline, opt)
 			end
 			
 			opt.Parent = selections
@@ -246,7 +207,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				for _, p in opts do
 					p.Text = p.Name
 				end
-				transitionUnderline(selectionUnderline, opt)
+				UIAnimation.TransitionUnderline(selectionUnderline, opt)
 				opt.Text = v
 			end)
 		end

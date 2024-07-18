@@ -1,5 +1,4 @@
 local CollectionService = game:GetService("CollectionService")
-local API = require(script.Parent.API)
 
 local module = {}
 
@@ -42,6 +41,7 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
 	
 	local SettingsManager = require(script.Parent.SettingsManager)
+local UIAnimation = require(script.Parent.UIAnimation)
 	local tweenInfo = TweenInfo.new((SettingsManager.GetSetting("Animate UI Transitions") and not noTransition) and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
 	theme = theme or module.Themes[SettingsManager.GetSetting("UI Theme") :: string]
 	assert(theme)
@@ -54,22 +54,22 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	local style = v:GetAttribute("Style")
 	
 	if v.ClassName == "UIStroke" then
-		API.Animate(v, tweenInfo, {Color = theme["UIStroke"]})
+		UIAnimation.Animate(v, tweenInfo, {Color = theme["UIStroke"]})
 	elseif (v.ClassName == "TextButton") or (v.ClassName == "TextLabel") then
 		if not keepText then
-			API.Animate(v, tweenInfo, {
+			UIAnimation.Animate(v, tweenInfo, {
 				TextColor3 = (not inverse) and theme.Text or theme[style or "Primary"],
 				TextStrokeColor3 = (not inverse) and theme.TextStroke or theme[style or "Text"]
 			})
 		end
 	elseif (v.ClassName == "ImageButton") or (v.ClassName == "ImageLabel") then
 		if updateImage then
-			API.Animate(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]})
+			UIAnimation.Animate(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]})
 		end
 	end
 	
 	if v.ClassName ~= "UIStroke" then
-		API.Animate(v, tweenInfo, {
+		UIAnimation.Animate(v, tweenInfo, {
 			BackgroundColor3 = (not inverse) and theme[style or "Primary"] or theme.Text,
 			BorderColor3 = (not inverse) and theme.UIStroke or theme[style or "Primary"]
 		})

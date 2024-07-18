@@ -1,11 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local API = require(script.Parent.API)
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local Items = require(script.Parent.ItemsManager.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
@@ -16,7 +16,7 @@ local function setHealth(hum: Humanoid)
     if activeTween then
         activeTween:Cancel()
     end
-    activeTween = API.Animate(roundInfo.Frame.HealthBar.Background, TweenInfo.new(0.1),  {Size = UDim2.new(hum.Health / hum.MaxHealth, 0, 1, 0)})
+    activeTween = UIAnimation.Animate(roundInfo.Frame.HealthBar.Background, TweenInfo.new(0.1),  {Size = UDim2.new(hum.Health / hum.MaxHealth, 0, 1, 0)})
 end
 
 local function onDeath()
