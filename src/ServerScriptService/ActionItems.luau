@@ -394,14 +394,14 @@ function module.Execute(actionItem: Model, participant: Types.Participant): ()
     if actionItem:GetAttribute("Disabled") then
         return
     end
-	local attributes = actionItem:GetAttributes()
+	local attributes = actionItem:GetAttributes() :: {[string]: string | number | CFrame}
 
 	local actions: {[string]: string} = {}
 	local actionParameters: {[string]: {string | number | CFrame}?} = {}
 	local actionOrder: {string} = {}
 
 	local conditions: {[string]: string} = {}
-	for i, v: string | number | CFrame in attributes do
+	for i, v in attributes do
 		local split = i:split("_")
 		if split[2] and split[2]:sub(1, 9) == "Parameter" then
 			local action = actionParameters[split[1]]

@@ -46,7 +46,7 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	theme = theme or module.Themes[SettingsManager.GetSetting("UI Theme") :: string]
 	assert(theme)
 	
-	local styleData = (v:GetAttribute("StyleData") or ""):split(";")
+	local styleData = (v:GetAttribute("StyleData") :: string? or ""):split(";")
 	local inverse = table.find(styleData, "Inverse")
 	local keepText = table.find(styleData, "KeepText")
 	local updateImage = table.find(styleData, "UpdateImage")

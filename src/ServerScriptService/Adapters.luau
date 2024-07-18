@@ -339,7 +339,7 @@ local module: Types.Adapter = {
                 if not participant then
                     return
                 end
-                participant:TakeDamage(math.huge, nil, bound:GetAttribute("KillMethod") or "Suicide", nil, true)
+                participant:TakeDamage(math.huge, nil, bound:GetAttribute("KillMethod") :: Types.DeathType or "Suicide", nil, true)
             end)
         end
     end,

@@ -151,6 +151,7 @@ local module: Types.Gamemode = {
             },
 
             StartingEquipment = {"DNA Scanner"},
+            Accessories = {},
 
             Allies = {"Innocent", "Detective"},
             Allegiance = "Innocent",

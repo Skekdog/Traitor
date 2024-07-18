@@ -221,7 +221,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 	end
 
 	local isSize = frame:GetAttribute("TransitionStyle") == "Size"
-	local targetUDim = frame:GetAttribute("TransitionTarget")
+	local targetUDim = frame:GetAttribute("TransitionTarget") :: UDim2
 
 	local direction = frame:GetAttribute("TransitionDirection")
 	local offScreenPosition = targetUDim
@@ -255,7 +255,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 	end
 	
 	local UI_TRANSITION_TIME = if open then 0.2 else tonumber(SettingsManager.GetSetting("Close Speed")) :: number
-	local UI_SCALE_FACTOR = tonumber(SettingsManager.GetSetting("Close Scale"))
+	local UI_SCALE_FACTOR = tonumber(SettingsManager.GetSetting("Close Scale")) :: number
 	
 	
 	local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
@@ -266,7 +266,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 		Enum.EasingDirection.Out
 	)
 	
-	local properties
+	local properties: {[string]: any}
 	if isSize then
 		properties = {
 			Size = if open then targetUDim else startSize

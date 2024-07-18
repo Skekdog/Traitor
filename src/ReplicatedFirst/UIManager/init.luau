@@ -48,18 +48,18 @@ local nextUI: UI
 UIManager.UnregisteredUIs = script.UnregisteredUIs
 
 function UIManager.RegisterUI(object: GuiObject): UI
-	local ignoreInset: boolean? = object:GetAttribute("IgnoreInset")
-	local modal: boolean? = object:GetAttribute("Modal")
-	local transitionStyle: "Position" | "Size" = object:GetAttribute("TransitionStyle")
-	local transitionTarget: UDim2 = object:GetAttribute("TransitionTarget")
+	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
+	local modal = object:GetAttribute("Modal") :: boolean?
+	local transitionStyle = object:GetAttribute("TransitionStyle") :: "Position" | "Size"
+	local transitionTarget = object:GetAttribute("TransitionTarget") :: UDim2
 
 	local self: UI = {
 		Name = object.Name,
-		Layer = object:GetAttribute("Layer"),
-		DisplayName = object:GetAttribute("DisplayName") or object.Name,
+		Layer = object:GetAttribute("Layer") :: Layer,
+		DisplayName = object:GetAttribute("DisplayName") :: string? or object.Name,
 		Visible = object.Visible,
-		NoClose = object:GetAttribute("PreventClose"),
-		Sidebar = object:GetAttribute("Sidebar"),
+		NoClose = object:GetAttribute("PreventClose") :: boolean?,
+		Sidebar = object:GetAttribute("Sidebar") :: boolean?,
 		Object = object,
 
 		ToggleVisible = function(self: UI, force: boolean?, ignoreOtherUIs: boolean?)
