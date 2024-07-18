@@ -42,7 +42,6 @@ local function spectateFunc(action, state)
 end
 
 LocalRoundInfo.Listen("IsSpectating", function(val)
-	print(val)
 	if ui.Visible == val then
 		return
 	end

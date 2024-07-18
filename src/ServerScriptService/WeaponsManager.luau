@@ -227,7 +227,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
             ShatterGlass(part, (part.Position - position).Unit * explosionInfo.Pressure / distance)
         elseif part.Parent and part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") then
             local participant = round:GetParticipant(part.Parent.Name)
-            if not participant or table.find(participantsHit, participant) then
+            if not participant or table.find(participantsHit, participant) or not participant.Character then
                 continue
             end
 

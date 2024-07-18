@@ -776,7 +776,7 @@ grenades["Incendiary Grenade"] = {
                         end
 
                         local participant = attacker.Round:GetParticipant(plr.Name)
-                        if not participant then
+                        if not participant or not participant.Character then
                             continue
                         end
 
