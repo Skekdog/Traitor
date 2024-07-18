@@ -4,12 +4,8 @@ local CAS = game:GetService("ContextActionService")
 local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-<<<<<<< HEAD
-local SettingsManager = require(script.Parent)
-local TextInput = require(script.Parent.Parent.TextInput)
-=======
 local SM = require(script.Parent)
->>>>>>> parent of 44c298e (Slight cleanup of settings)
+local TextInput = require(script.Parent.Parent.TextInput)
 local UIAnimation = require(script.Parent.Parent.UIAnimation)
 
 -- This must be run before anything yields, especially todo with ui
