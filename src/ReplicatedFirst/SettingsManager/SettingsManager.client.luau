@@ -5,6 +5,7 @@ local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local SettingsManager = require(script.Parent)
+local TextInput = require(script.Parent.Parent.TextInput)
 local UIAnimation = require(script.Parent.Parent.UIAnimation)
 
 -- This must be run before anything yields, especially todo with ui
@@ -345,7 +346,7 @@ for _, setting: SettingsManager.SettingDefinition in SettingsManager.AvailableSe
 			if not UIS.TouchEnabled then
 				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
-			local newScale = require(ReplicatedFirst.TextInput).Create(name, "Number", "0.1-10", "TouchScale")
+			local newScale = TextInput.Create(name, "Number", "0.5-3", "TouchScale")
 			if newScale then
 				SettingsManager.SetSetting(name, newScale)
 			end
@@ -355,6 +356,8 @@ for _, setting: SettingsManager.SettingDefinition in SettingsManager.AvailableSe
 			return
 		end)
 		f = frame
+	else
+		error("Unknown setting type for Setting: "..setting.Name)
 	end
 	
 	if not f then

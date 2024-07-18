@@ -78,7 +78,7 @@ end)
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
     local base = Items[item.Base.Name] :: ItemTypes.ItemDefinition & ItemTypes.GunDefinition
     if (item.Kind == "Item" and base.PrimaryFire) or (item.Kind == "Gun" or item.Kind == "Grenade" or item.Kind == "Melee") then
-        ControlManager.Register("Primary Fire", true, function(action, state, input, toggled)
+        ControlManager.Register("Primary Fire", true, function(action, state, input)
             if item.Kind == "Item" and base.Toggled then
                 if input.UserInputState == Enum.UserInputState.End then
                     clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
@@ -101,7 +101,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     end
     
     if (item.Kind == "Item" and base.AlternateFire) or (item.Kind == "Gun") then
-        ControlManager.Register("Alternate Fire", true, function(action, state, input, toggled)
+        ControlManager.Register("Alternate Fire", true, function(action, state, input)
             clientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
             return Enum.ContextActionResult.Sink
         end)
@@ -132,7 +132,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
             return Enum.ContextActionResult.Sink
         end)
 
-        ControlManager.Register("Drop Ammo", true, function(action, state, input, toggled)
+        ControlManager.Register("Drop Ammo", true, function(action, state, input)
             local equipped = InventoryManager.GetEquipped(plr)
             if not equipped then
                 return Enum.ContextActionResult.Pass

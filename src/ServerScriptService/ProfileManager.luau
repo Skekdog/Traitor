@@ -55,12 +55,16 @@ function module.GetProfile(plr: Player): PlayerData?
 	return profiles[plr].Data
 end
 
-function module.UpdateProfile(plr: Player, key: string, value: string | number): ()
+type UpdateProfile =
+	((Player, "Karma", number) -> ()) &
+	((Player, "Settings", string) -> ())
+
+module.UpdateProfile = function(plr: Player, key, value): ()
 	if not profiles[plr] then
 		return warn(plr.Name.." profile not found!")
 	end
 	profiles[plr].Data[key] = value
-end
+end :: UpdateProfile
 
 function module.ReleaseAllProfiles(): ()
     for _, v in profiles do

@@ -144,7 +144,7 @@ RunService.PostSimulation:Connect(function()
     interactTarget = nil
 end)
 
-ControlManager.Register("Interact", true, function(action, state, input, toggled)
+ControlManager.Register("Interact", true, function(action, state, input)
     if not interactTarget then
         return Enum.ContextActionResult.Pass
     end
