@@ -2,7 +2,6 @@ local HTTPService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local UserInputService = game:GetService("UserInputService")
 
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
 
 export type SettingDefinition = {
@@ -36,7 +35,7 @@ module.AvailableSettings = {
 		PossibleValues = "Boolean",
 		Default = true,
 		Callback = function(val)
-			Lighting.GlobalShadows = val :: boolean
+			game:GetService("Lighting").GlobalShadows = val :: boolean
 		end,
 	},
 	{
@@ -47,7 +46,7 @@ module.AvailableSettings = {
 		PossibleValues = "Boolean",
 		Default = false,
 		Callback = function(val)
-			local map = LocalRoundInfo.GetMap()
+			local map = require(script.Parent.LocalRoundInfo).GetMap()
 			if not map then
 				return
 			end
@@ -147,6 +146,9 @@ module.AvailableSettings = {
 		Tooltip = "Hidden - Menus are not visible behind other menus, but are shown again when the menu is closed.\nClosed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
 		PossibleValues = {"Hidden", "Closed", "Stacked"},
 		Default = "Hidden",
+		Callback = function(val)
+			script.Parent.UIManager:SetAttribute("BackgroundMenuMode", val)
+		end,
 	},
 	
 	{

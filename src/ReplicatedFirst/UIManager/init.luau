@@ -2,7 +2,6 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local SettingsManager = require(script.Parent.SettingsManager)
 local ControlManager = require(ReplicatedFirst.ControlManager)
 local UIAnimation = require(script.Parent.UIAnimation)
 
@@ -88,7 +87,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				return
 			end
 
-			local mode = SettingsManager.GetSetting("Background Menus") :: BackgroundMenuMode
+			local mode: BackgroundMenuMode = script:GetAttribute("BackgroundMenuMode")
 			local highestIndex = 0
 			for _, ui in registeredUIs do
 				if ui.Layer == "Popup" and highestIndex < ui.Object.ZIndex and ui.Visible then
