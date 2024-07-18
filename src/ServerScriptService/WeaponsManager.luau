@@ -205,7 +205,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
     local windows = round.Map:FindFirstChild("Windows")
 
     local propsHit = {}
-    local participantsHit: {[Types.Participant]: number} = {}
+    local participantsHit: {Types.Participant} = {}
 
     local sendWeapon:  Types.Equipment | Types.DeathType = (if weapon then round:GetEquipment(weapon.Name) or "Explosion" else "Explosion")  :: Types.Equipment | Types.DeathType
     local ignoreKarma = if typeof(sendWeapon) == "table" then sendWeapon.NoGuilt else false
@@ -227,9 +227,11 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
             ShatterGlass(part, (part.Position - position).Unit * explosionInfo.Pressure / distance)
         elseif part.Parent and part.Parent:IsA("Model") and part.Parent:FindFirstChildOfClass("Humanoid") then
             local participant = round:GetParticipant(part.Parent.Name)
-            if not participant or participantsHit[participant] then
+            if not participant or table.find(participantsHit, participant) then
                 continue
             end
+
+            table.insert(participantsHit, participant)
 
             participant:TakeDamage(calculateDamage(attacker, explosionInfo, part, distance), attacker, sendWeapon, false, ignoreKarma)
 
