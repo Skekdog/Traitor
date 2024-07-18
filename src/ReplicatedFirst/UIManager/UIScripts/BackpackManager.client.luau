@@ -45,7 +45,7 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 	return Enum.ContextActionResult.Sink
 end
 
-local slots: {[number]: ItemTypes.Item} = {}
+local slots: {[number]: ItemTypes.Item?} = {}
 ReplicatedStorage:WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item?)
 	if not equipment then
 		return

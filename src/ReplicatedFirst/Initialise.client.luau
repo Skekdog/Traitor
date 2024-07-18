@@ -1,6 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local API = require(script.Parent.API)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
@@ -10,6 +9,7 @@ local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local StandardDoor = require(script.Parent.StandardDoor)
+local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
@@ -84,7 +84,7 @@ local function setAmmo(current: number, magazineSize: number, reserve: number, n
     if activeTween then
         activeTween:Cancel()
     end
-    activeTween = API.Animate(ammoBar.Background, TweenInfo.new(0.1), {Size = UDim2.new(current / magazineSize, 0, 1, 0)}, noTransition)
+    activeTween = UIAnimation.Animate(ammoBar.Background, TweenInfo.new(0.1), {Size = UDim2.new(current / magazineSize, 0, 1, 0)}, noTransition)
 end
 
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
