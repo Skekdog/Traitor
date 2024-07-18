@@ -4,7 +4,7 @@ local replicatedData = ReplicatedStorage:WaitForChild("RoundHandler")
 
 local module = {}
 
-local function get(attr: Attribute)
+local function get(attr)
     return replicatedData:GetAttribute(attr)
 end
 
@@ -72,32 +72,46 @@ function module.GetRoundEndInfo(): Types.RoundEndInfo?
     return roundEndInfo
 end
 
-type Attribute = "MapAuthors" | "MapName" | "GamemodeAuthors" | "GamemodeName" | "TimeMilestone" | "RoundPhase" | "IsPaused" | "RoundStartTime"
-type AttributeValue = (string | number | boolean)?
-type ListenerCallback = (newValue: EventValue) -> ()
-type Event = Attribute | "UpdateParticipant" | "UpdateOwnParticipant" | "UpdateEquipment" | "UpdateRoles" | "UpdateRoundEndInfo" | "IsSpectating"
-type EventValue = AttributeValue | Types.ClientParticipant | {Types.Equipment} | {Types.Role} | Types.RoundEndInfo | Types.ClientOwnParticipant | nil
-
-local listeners: {[Event]: {ListenerCallback}} = {}
+local listeners: {[any]: {any}} = {}
 for i in replicatedData:GetAttributes() do
-    listeners[i :: Attribute] = {}
+    listeners[i] = {}
 end
 
 for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "UpdateRoles", "UpdateRoundEndInfo", "IsSpectating"} do
-    listeners[v :: Event] = {}
+    listeners[v] = {}
 end
 
+type Ret = () -> ()
+type Listen =
+    (("UpdateParticipant", (Types.ClientParticipant | string) -> ()) -> Ret) &
+    (("UpdateOwnParticipant", (Types.ClientOwnParticipant?) -> ()) -> Ret) &
+    (("UpdateEquipment", ({Types.Equipment}) -> ()) -> Ret) &
+    (("UpdateRoles", ({Types.Role}) -> ()) -> Ret) &
+    (("UpdateRoundEndInfo", (Types.RoundEndInfo) -> ()) -> Ret) &
+
+    (("IsSpectating", (boolean) -> ()) -> Ret) &
+
+    (("MapAuthors", (string) -> ()) -> Ret) &
+    (("MapName", (string) -> ()) -> Ret) &
+    (("GamemodeAuthors", (string) -> ()) -> Ret) &
+    (("GamemodeName", (string) -> ()) -> Ret) &
+
+    (("TimeMilestone", (number) -> ()) -> Ret) &
+    (("RoundPhase", (Types.RoundPhase) -> ()) -> Ret) &
+    (("IsPaused", (boolean) -> ()) -> Ret) &
+    (("RoundStartTime", (number) -> ()) -> Ret)
+
 --- @returns A function to stop listening for changes
-function module.Listen(event: Event, callback: ListenerCallback): () -> ()
+module.Listen = function(event, callback)
     table.insert(listeners[event], callback)
     local pos = #listeners[event]
     return function()
         listeners[event][pos] = nil
     end
-end
+end :: Listen
 
-local function runCallbacks(event: Event, newValue: EventValue)
-    for _, v in listeners[event :: Event] do
+local function runCallbacks(event, newValue)
+    for _, v in listeners[event] do
         v(newValue)
     end
 end
@@ -116,7 +130,7 @@ function module.SetSpectating(value: boolean): ()
 end
 
 replicatedData.AttributeChanged:Connect(function(attr)
-    runCallbacks(attr :: Attribute, get(attr :: Attribute))
+    runCallbacks(attr, get(attr))
 end)
 
 replicatedData.UpdateParticipant.OnClientEvent:Connect(function(participant: Types.ClientParticipant | string)

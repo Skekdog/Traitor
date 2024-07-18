@@ -75,7 +75,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     end
 end)
 
-InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
+InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     local base = Items[item.Base.Name] :: ItemTypes.ItemDefinition & ItemTypes.GunDefinition
     if (item.Kind == "Item" and base.PrimaryFire) or (item.Kind == "Gun" or item.Kind == "Grenade" or item.Kind == "Melee") then
         ControlManager.Register("Primary Fire", true, function(action, state, input)
@@ -146,7 +146,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item | It
     end
 end)
 
-InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item | ItemTypes.Weapon)
+InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)
     if InventoryManager.GetEquipped(plr) then
         return
     end

@@ -27,8 +27,7 @@ end
 local ownParticipant: Types.ClientOwnParticipant?
 local ownRole: Types.Role?
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
-    local participant = p :: Types.ClientOwnParticipant?
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
     ownParticipant = participant
     if ownParticipant then
         ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
@@ -46,8 +45,7 @@ local function highlight(participant)
     clone.Parent = participant.Player.Character
 end
 
-LocalRoundInfo.Listen("UpdateParticipant", function(p)
-    local participant = p :: Types.ClientParticipant | string
+LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.ClientParticipant | string)
     if type(participant) == "string" then
         return
     end
@@ -128,18 +126,16 @@ task.spawn(function()
 end)
 
 LocalRoundInfo.Listen("TimeMilestone", function(time)
-    timeTarget = time :: number
+    timeTarget = time
 end)
 
 LocalRoundInfo.Listen("IsPaused", function(isPaused)
     lastTime = roundInfo.TopBar.Timer.Text
-    paused = isPaused :: boolean
+    paused = isPaused
 end)
 
 local equipmentShop: UIManager.UI?
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
-    local participant = p :: Types.ClientOwnParticipant
-
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
     local role
     if participant then
         role = LocalRoundInfo.GetRole(participant.Role)

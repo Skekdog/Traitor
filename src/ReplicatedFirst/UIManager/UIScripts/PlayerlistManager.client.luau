@@ -212,8 +212,7 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
 	updatePlr(Players.LocalPlayer, findPlr(Players.LocalPlayer.Name))
 end)
 
-LocalRoundInfo.Listen("UpdateParticipant", function(p)
-	local participant = p :: Types.ClientParticipant | string
+LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.ClientParticipant | string)
 	if type(participant) == "string" then
 		local player = Players:FindFirstChild(participant)
 		if not player then
@@ -230,16 +229,16 @@ end)
 
 -- There is probably a better way to do this
 LocalRoundInfo.Listen("MapName", function(mapName)
-	info.RoundInfo.Info.Map.Text = "Map: "..mapName :: string
+	info.RoundInfo.Info.Map.Text = "Map: "..mapName
 end)
 LocalRoundInfo.Listen("MapAuthors", function(mapCreator)
-	info.RoundInfo.Creators.Map.Text = mapCreator :: string
+	info.RoundInfo.Creators.Map.Text = mapCreator
 end)
 LocalRoundInfo.Listen("GamemodeName", function(gamemodeName)
-	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName :: string
+	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName
 end)
 LocalRoundInfo.Listen("GamemodeAuthors", function(gamemodeCreator)
-	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator :: string
+	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator
 end)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
