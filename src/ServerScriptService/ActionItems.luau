@@ -434,10 +434,10 @@ function module.Execute(actionItem: Model, participant: Types.Participant): ()
 		end
 	end
 	
-	for i in actions do
-		if not table.find(actionOrder, i) then
-			warn(`No Action is associated with parameters for {i}`)
-		end
+	for i in actionParameters do
+        if not table.find(actionOrder, i) then
+            warn(`No Action is associated with {i}`)
+        end
 	end
 
 	table.sort(actionOrder, function(a, b)
