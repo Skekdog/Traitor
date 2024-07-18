@@ -71,10 +71,14 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 			return keycode.Name
 		end
 	else
-		if keycode == Enum.UserInputType.MouseButton1 then return "LMB"
-		elseif keycode == Enum.UserInputType.MouseButton2 then return "RMB"
-		elseif keycode == Enum.UserInputType.MouseButton3 then return "MMB"
-		elseif keycode == Enum.UserInputType.None then return "NONE"
+		if keycode == Enum.UserInputType.MouseButton1 then
+			return "LMB"
+		elseif keycode == Enum.UserInputType.MouseButton2 then
+			return "RMB"
+		elseif keycode == Enum.UserInputType.MouseButton3 then
+			return "MMB"
+		elseif keycode == Enum.UserInputType.None then
+			return "NONE"
 		end
 	end
 	return keycode.Name
@@ -84,7 +88,7 @@ function module.SetupTouchButton(actionName)
 	local butt = CAS:GetButton(actionName) :: ImageButton & {ActionTitle: TextLabel}
 	if butt then
 		butt.Position = SettingsManager.GetSetting(actionName.." Position") :: UDim2
-		butt.Size = UDim2.fromScale(0.2, 0.2)
+		butt.Size = UDim2.fromScale(0.1, 0.1)
 		butt.AnchorPoint = Vector2.one/2
 
 		Instance.new("UIAspectRatioConstraint", butt)
