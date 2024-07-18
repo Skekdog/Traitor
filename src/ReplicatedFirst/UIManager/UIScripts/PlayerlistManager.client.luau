@@ -50,6 +50,9 @@ local function selectMark(marks: Frame & any, button: (TextButton & any)?, plr: 
 end
 
 function updatePlr(plr: Player, clone: any)
+	if not clone then
+		return
+	end
 	local participant: Types.ClientOwnParticipant | Types.ClientParticipant?
 	if plr == Players.LocalPlayer then
 		participant = LocalRoundInfo.GetOwnParticipant()
@@ -146,25 +149,29 @@ local function recalculateCount(status: Status)
 	label.Text = `{status} ({count})`
 end
 
-function movePlr(plr: Player, status: Status)
-	local clone = findPlr(plr.Name) or createPlr(plr)
-	local oldOrder = (clone.LayoutOrder // 1000) * 1000
-	clone.LayoutOrder = layoutOrders[status] + 1
-
+local function getStatus(order: number): Status
+	order = (order // 1000) * 1000
 	for _, v in list:GetChildren() do
 		if not v:IsA("TextLabel") then
 			continue
 		end
-
-		if v.LayoutOrder == oldOrder then
-			local oldStatus = v.Text:split(" ")[1]
-			if oldStatus == "Confirmed" then
-				oldStatus = "Dead"
+		if v.LayoutOrder == order then
+			local status = v.Text:split(" ")[1]
+			if status == "Confirmed" then
+				status = "Dead"
 			end
-			recalculateCount(oldStatus :: Status)
-			break
+			return status
 		end
 	end
+	error("Failed to get status for order: "..order)
+end
+
+function movePlr(plr: Player, status: Status)
+	local clone = findPlr(plr.Name) or createPlr(plr)
+	local oldOrder = clone.LayoutOrder
+	clone.LayoutOrder = layoutOrders[status] + 1
+
+	recalculateCount(getStatus(oldOrder))
 
 	if status == "Alive" or status == "Spectating" then
 		clone.SearchedIcon.Visible = false
@@ -184,6 +191,7 @@ local function removePlr(plr: Player | string)
 	local f = findPlr(plrName)
 	if f then
 		f:Destroy()
+		recalculateCount(getStatus(f.LayoutOrder))
 	end
 end
 

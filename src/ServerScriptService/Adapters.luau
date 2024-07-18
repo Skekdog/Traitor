@@ -637,6 +637,8 @@ local module: Types.Adapter = {
                 else
                     event.Text = v.Data.Winners.VictoryText :: string
                 end
+            elseif v.Data.DisconnectedParticipant then
+                event.Text = v.Data.DisconnectedParticipant.FormattedName .. " disconnected."
             end
             table.insert(userFacingLog, event)
         end
