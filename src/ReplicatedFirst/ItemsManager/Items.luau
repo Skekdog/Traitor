@@ -694,7 +694,6 @@ grenades.Grenade = {
 
     Fuse = 5,
 
-    ProjectileBase = models("Grenade"),
     ProjectileForce = 0.75,
     Spread = 0.25,
 
@@ -724,7 +723,6 @@ grenades.Flashbang = {
 
     Fuse = 3,
 
-    ProjectileBase = models("Flashbang"),
     ProjectileForce = 60,
     Spread = 0.25,
 
@@ -796,7 +794,6 @@ grenades["Incendiary Grenade"] = {
 
     Fuse = 3,
 
-    ProjectileBase = models("Incendiary Grenade"),
     ProjectileForce = 2.5,
     Spread = 0.25,
 
@@ -863,7 +860,6 @@ grenades["Discombobulator"] = {
 
     Fuse = 3,
 
-    ProjectileBase = models("Discombobulator"),
     ProjectileForce = 2.5,
     Spread = 0.25,
 

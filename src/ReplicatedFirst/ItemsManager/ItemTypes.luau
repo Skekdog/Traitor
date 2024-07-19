@@ -137,7 +137,6 @@ export type GrenadeDefinition = {
     ExplosionInfo: ExplosionInfo,
     Fuse: number,
     
-    ProjectileBase: PVInstance,
     ProjectileForce: number,
     Spread: number,
 

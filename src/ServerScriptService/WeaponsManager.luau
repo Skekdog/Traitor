@@ -323,7 +323,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
 
     if weapon.Kind == "Grenade" then
         InventoryManager.RemoveEquipment(player, weapon)
-        local proj = weapon.Base.ProjectileBase:Clone();
+        local proj = weapon.Base.Model:Clone();
         (proj :: BasePart).CollisionGroup = "Grenades"
         proj:PivotTo(CFrame.new(origin))
         proj.Parent = workspace.Projectiles
