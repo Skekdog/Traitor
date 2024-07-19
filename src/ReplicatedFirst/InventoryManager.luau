@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local Items = require(script.Parent.ItemsManager.Items)
@@ -133,6 +134,9 @@ end
 function module.RemoveEquipment(plr: Player, equipment: Item)
     module.Unequip(plr, equipment)
     table.remove(inventories[plr], table.find(inventories[plr], equipment))
+    if not equipment.Base.CanDrop and not IS_CLIENT then
+        equipment.Instance:Destroy()
+    end
     runCallback(plr, "Remove", equipment)
 end
 
@@ -162,11 +166,34 @@ function module.Equip(plr: Player, equipment: Item)
         end
 
         equipped[plr] = equipment
-        -- server code for equipping
+
+        if equipment.Base.HoldAnimation then
+            local instance = equipment.Instance
+            instance.Name = "Item"
+
+            local PlayAnimation = require(ServerScriptService.PlayAnimation)
+            local char = PlayAnimation(plr, equipment.Base.HoldAnimation, equipment.Base.Name.."HoldAnimation")
+            if not char then
+                return
+            end
+
+            local motor = instance:FindFirstChildOfClass("Motor6D") or Instance.new("Motor6D")
+            if not motor.Parent then
+                motor.Part0 = char:FindFirstChild("RightHand") :: BasePart?
+                motor.Part1 = instance
+                motor.Parent = instance
+            end
+
+            instance.CanCollide = false
+            instance.CanTouch = false
+            instance.CanQuery = false
+            instance.Parent = char
+        end
     end
     runCallback(plr, "Equip", equipment)
 end
 
+local priorities = {Enum.AnimationPriority.Action, Enum.AnimationPriority.Action2} -- hold and hit animations
 function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
     if IS_CLIENT then
         local base = Items[equipment.Base.Name]
@@ -187,6 +214,37 @@ function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
             old.Base.OnUnequip(plr)
         end
         equipped[plr] = nil
+
+        local char = plr.Character
+        if not char then
+            return
+        end
+
+        if old and old.Instance.Parent == char then
+            old.Instance.Parent = nil
+        end
+
+        local motor = equipment.Instance:FindFirstChildOfClass("Motor6D")
+        if motor then
+            motor:Destroy()
+        end
+        equipment.Instance.Parent = nil
+
+        local hum = char:FindFirstChildOfClass("Humanoid")
+        if not hum then
+            return
+        end
+
+        local animator = hum:FindFirstChildOfClass("Animator")
+        if not animator then
+            return
+        end
+
+        for _, v in animator:GetPlayingAnimationTracks() do
+            if table.find(priorities, v.Priority) and v.IsPlaying then
+                v:Stop()
+            end
+        end
     end
     runCallback(plr, "Unequip", equipment, switching)
 end
@@ -200,9 +258,24 @@ function module.Drop(plr: Player, equipment: Item, position: Vector3)
         module.InvEvent:FireServer("Drop", equipment.Base.Name)
     else
         local spawns = (mapValue.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
-        equipment.Instance.Parent = spawns
-        equipment.Instance:PivotTo(CFrame.new(position))
+
+        local instance = equipment.Instance
+        
+        local motor = instance:FindFirstChildOfClass("Motor6D")
+        if motor then
+            motor:Destroy()
+        end
+        
         module.RemoveEquipment(plr, equipment)
+
+        instance.Name = equipment.Base.Name
+        instance:PivotTo(CFrame.new(position))
+
+        instance.CanCollide = true
+        instance.CanTouch = true
+        instance.CanQuery = true
+
+        instance.Parent = spawns
     end
     runCallback(plr, "Drop", equipment)
 end
@@ -219,15 +292,6 @@ function module.DropAmmo(plr: Player, weapon: ItemTypes.GunWeapon)
     if not char then
         return
     end
-
-    -- this is if we want to use reserve ammo
-
-    -- local reserve = module.GetReserve(plr, ammoType)
-    -- if reserve <= 0 then
-    --     return
-    -- end
-    -- local amount = math.min(ammoData[ammoType].Magazine, reserve)
-    -- module.SetReserve(plr, ammoType, reserve - amount)
 
     local amount = weapon.CurrentAmmo
     if amount <= 0 then
@@ -362,13 +426,10 @@ function module.OnItemTouched(weapon: BasePart, round: Types.Round, part: BasePa
 end
 
 function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: Instance?, participant: Types.Participant): Item
-    if not instance then
-        instance = base.Model
-    end
     assert(instance)
 
-    instance = instance:Clone()
-    assert(instance:IsA("BasePart") and instance:IsA("PVInstance"))
+    instance = base.Model:Clone()
+    assert(instance:IsA("BasePart"))
 
     local itemInstance: ItemTypes.Item = {} :: ItemTypes.Item
 

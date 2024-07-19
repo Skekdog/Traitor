@@ -1,10 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ItemTypes = require(script.Parent.ItemTypes)
 local CreateEmptyPart = require(script.Parent.Parent.CreateEmptyPart)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
-local function projectiles(name: string): PVInstance
+local function projectiles(name: string): BasePart
     return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name)
 end
 
@@ -61,6 +62,12 @@ local function stopControllingProp(prop: BasePart, userId: number)
         task.cancel(resetHolderThread)
     end)
 
+    local plr = Players:GetPlayerByUserId(userId)
+    if plr then
+        local PlayAnimation = require(ServerScriptService.PlayAnimation)
+        PlayAnimation(plr, 13269497293, "MagnetoAnimation")
+    end
+
     controlledProps[userId] = nil
 end
 
@@ -96,6 +103,7 @@ guns.HUGE = {
     ProjectileSpeed = 140,
 
     Model = models("HUGE"),
+    HoldAnimation = 12498608892,
 
     FiredSound = firedSounds("HUGE"),
 }
@@ -132,6 +140,7 @@ guns.Scout = {
     AmmoType = "Scout",
 
     Model = models("Scout"),
+    HoldAnimation = 10247529531,
     FiredSound = firedSounds("Scout"),
     ReloadSound = reloadSounds("Scout"),
 }
@@ -164,6 +173,7 @@ guns.Pistol = {
     AmmoType = "Assault Rifle",
 
     Model = models("Pistol"),
+    HoldAnimation = 9253211833,
     FiredSound = firedSounds("Pistol"),
     ReloadSound = reloadSounds("Pistol"),
 
@@ -193,6 +203,7 @@ guns["Golden Gun"] = {
     ProjectileSpeed = 250,
 
     Model = models("Golden Gun"),
+    HoldAnimation = 9253211833,
     FiredSound = firedSounds("Golden Gun"),
 
     FireTime = 0.5,
@@ -331,6 +342,7 @@ guns["Flare Gun"] = {
     MagazineSize = 6,
 
     Model = models("Flare Gun"),
+    HoldAnimation = 11411819299,
     FiredSound = firedSounds("Flare Gun"),
 
     ProjectileBase = projectiles("Flare"),
@@ -397,6 +409,7 @@ guns.SMG = {
     AmmoType = "SMG",
 
     Model = models("SMG"),
+    HoldAnimation = 12481091962,
     FiredSound = firedSounds("SMG"),
     ReloadSound = reloadSounds("SMG"),
 
@@ -438,6 +451,7 @@ guns.AWP = {
     MagazineSize = 4,
 
     Model = models("AWP"),
+    HoldAnimation = 10247529531,
     FiredSound = firedSounds("AWP"),
 
     ProjectileBase = bullet,
@@ -468,6 +482,7 @@ guns["Assault Rifle"] = {
     AimSpreadMultiplier = 0.25,
 
     Model = models("Assault Rifle"),
+    HoldAnimation = 10247380824,
     FiredSound = firedSounds("Assault Rifle"),
     ReloadSound = reloadSounds("Assault Rifle"),
 
@@ -508,6 +523,7 @@ guns["Silenced Pistol"] = {
     AmmoType = "Assault Rifle",
 
     Model = models("Silenced Pistol"),
+    HoldAnimation = 9253211833,
     FiredSound = firedSounds("Silenced Pistol"),
     ReloadSound = reloadSounds("Silenced Pistol"),
 
@@ -561,6 +577,7 @@ guns.XM1014 = {
     ProjectileSpeed = 150,
 
     Model = models("XM1014"),
+    HoldAnimation = 11436160569,
     FiredSound = firedSounds("XM1014"),
     ReloadSound = reloadSounds("XM1014"),
 }
@@ -593,6 +610,7 @@ guns.Glock = {
     AmmoType = "Assault Rifle",
 
     Model = models("Glock"),
+    HoldAnimation = 9253211833,
     FiredSound = firedSounds("Glock"),
     ReloadSound = reloadSounds("Glock"),
 
@@ -631,6 +649,7 @@ guns.Deagle = {
     ProjectileSpeed = 190,
 
     Model = models("Deagle"),
+    HoldAnimation = 9253211833,
     FiredSound = firedSounds("Deagle"),
     ReloadSound = reloadSounds("Deagle"),
 }
@@ -660,6 +679,7 @@ guns.BAR = {
     AmmoType = "Assault Rifle",
 
     Model = models("BAR"),
+    HoldAnimation = 11418976539,
     FiredSound = firedSounds("BAR"),
     ReloadSound = reloadSounds("BAR"),
 
@@ -680,6 +700,7 @@ grenades.Grenade = {
     CanDrop = true,
 
     Model = models("Grenade"),
+    HoldAnimation = 12498620263,
     
     ExplosionInfo = {
         Kind = "Explosion",
@@ -709,6 +730,7 @@ grenades.Flashbang = {
     CanDrop = true,
 
     Model = models("Flashbang"),
+    HoldAnimation = 12498620263,
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -737,6 +759,7 @@ grenades["Incendiary Grenade"] = {
     CanDrop = true,
 
     Model = models("Incendiary Grenade"),
+    HoldAnimation = 12498620263,
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -808,6 +831,7 @@ grenades["Smoke Grenade"] = {
     CanDrop = true,
 
     Model = models("Smoke Grenade"),
+    HoldAnimation = 12498620263,
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -846,6 +870,7 @@ grenades["Discombobulator"] = {
     CanDrop = true,
 
     Model = models("Discombobulator"),
+    HoldAnimation = 12498620263,
 
     ExplosionInfo = {
         Kind = "Explosion",
@@ -875,6 +900,8 @@ melees.Crowbar = {
     CanDrop = false,
 
     Model = models("Crowbar"),
+    HoldAnimation = 10247423634,
+    HitAnimation = 13269497293,
 
     MaxDistance = 7,
     Damage = 20,
@@ -891,6 +918,7 @@ items["Magneto Stick"] = {
     CanDrop = false,
 
     Model = models("Magneto Stick"),
+    HoldAnimation = 10247423634,
     AlternateFire = function(participant: Types.Participant, cameraRayInfo: Ray)
         local char = participant.Character
 
@@ -976,6 +1004,9 @@ items["Magneto Stick"] = {
             attachPoint.Parent = object
             alignPos.Parent = object
         end
+
+        local PlayAnimation = require(ServerScriptService.PlayAnimation)
+        PlayAnimation(participant.Player, 13269497293, "MagnetoAnimation")
 
         local activeHolder = object:FindFirstChild("ActiveHolder") :: NumberValue or Instance.new("NumberValue")
         if activeHolder.Parent and Players:GetPlayerByUserId(activeHolder.Value) then

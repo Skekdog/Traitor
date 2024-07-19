@@ -31,7 +31,7 @@ export type Item = GenericItem | Weapon
 
 export type GenericItem = {
     Kind: "Item",
-    Instance: PVInstance,
+    Instance: BasePart,
     Base: ItemDefinition,
 }
 
@@ -39,7 +39,7 @@ export type Weapon = GunWeapon | GrenadeWeapon | MeleeWeapon
 
 export type GunWeapon = {
     Kind: "Gun",
-    Instance: PVInstance,
+    Instance: BasePart,
     Base: GunDefinition,
 
     CurrentAmmo: number,
@@ -50,13 +50,13 @@ export type GunWeapon = {
 
 export type GrenadeWeapon = {
     Kind: "Grenade",
-    Instance: PVInstance,
+    Instance: BasePart,
     Base: GrenadeDefinition,
 }
 
 export type MeleeWeapon = {
     Kind: "Melee",
-    Instance: PVInstance,
+    Instance: BasePart,
     Base: MeleeDefinition,
 
     LastFireTime: number,
@@ -71,7 +71,8 @@ export type ItemDefinition = {
     Slot: number,
     CanDrop: boolean,
 
-    Model: MeshPart?,
+    Model: BasePart,
+    HoldAnimation: number?,
 
     Toggled: boolean?,
     OnEquipClient: (() -> ())?,
@@ -91,7 +92,9 @@ export type GunDefinition = {
     Icon: string?,
     Slot: number,
     CanDrop: boolean,
-    Model: MeshPart,
+    
+    Model: BasePart,
+    HoldAnimation: number,
 
     Damage: DamageInfo,
 
@@ -112,7 +115,7 @@ export type GunDefinition = {
     ScopeRequired: boolean?,
     AimSpreadMultiplier: number,
 
-    ProjectileBase: PVInstance,
+    ProjectileBase: BasePart,
     ProjectileSpeed: number,
 
     Recoil: number,
@@ -132,7 +135,9 @@ export type GrenadeDefinition = {
     Icon: string?,
     Slot: number,
     CanDrop: boolean,
-    Model: MeshPart,
+
+    Model: BasePart,
+    HoldAnimation: number,
 
     ExplosionInfo: ExplosionInfo,
     Fuse: number,
@@ -154,7 +159,10 @@ export type MeleeDefinition = {
     Icon: string?,
     Slot: number,
     CanDrop: boolean,
-    Model: MeshPart,
+
+    Model: BasePart,
+    HoldAnimation: number,
+    HitAnimation: number,
 
     MaxDistance: number,
     Damage: number,

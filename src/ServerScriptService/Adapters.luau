@@ -350,6 +350,10 @@ local module: Types.Adapter = {
             return
         end
 
+        weaponSpawn.CanCollide = true
+        weaponSpawn.CanTouch = true
+        weaponSpawn.CanQuery = true
+
         local ammo = InventoryManager.AmmoBoxes[weaponSpawn]
         if not ammo and weaponSpawn.Name:split("_")[2] == "Ammo" then
             InventoryManager.NewAmmoBox(weaponSpawn)
@@ -471,15 +475,6 @@ local module: Types.Adapter = {
     OnDeath = function(victim)
         local char = victim.Character
         local plr = victim.Player
-        if not char:IsDescendantOf(workspace) then
-            return
-        end
-
-        char.Archivable = true
-        local clone = char:Clone()
-
-        local root = clone:FindFirstChild("HumanoidRootPart") :: Part?
-        local hum = clone:FindFirstChildOfClass("Humanoid")
 
         local equipment = InventoryManager.GetInventory(plr)
         for i = #equipment, 1, -1 do
@@ -489,6 +484,16 @@ local module: Types.Adapter = {
                 InventoryManager.RemoveEquipment(plr, equipment[i])
             end
         end
+
+        if not char:IsDescendantOf(workspace) then
+            return
+        end
+
+        char.Archivable = true
+        local clone = char:Clone()
+
+        local root = clone:FindFirstChild("HumanoidRootPart") :: Part?
+        local hum = clone:FindFirstChildOfClass("Humanoid")
 
         if hum then
             hum:ChangeState(Enum.HumanoidStateType.Physics)

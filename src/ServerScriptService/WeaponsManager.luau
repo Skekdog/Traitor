@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local GetRound = require(script.Parent.GetRound)
 local CalculateDamageModifier = require(script.Parent.Parent.ReplicatedFirst.CalculateDamageModifier)
+local PlayAnimation = require(script.Parent.PlayAnimation)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
 local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
@@ -299,6 +300,10 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
 
     if weapon.Kind == "Gun" or weapon.Kind == "Melee" then
         (weapon :: ItemTypes.GunWeapon).LastFireTime = workspace:GetServerTimeNow()
+    end
+
+    if weapon.Kind == "Melee" then
+        PlayAnimation(player, weapon.Base.HitAnimation, weapon.Base.Name.."HitAnimation")
     end
 
     local firedSound = weapon.Base.FiredSound:Clone()
