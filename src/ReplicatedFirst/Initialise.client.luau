@@ -11,6 +11,7 @@ local ShatterGlass = require(script.Parent.ShatterGlass)
 local StandardDoor = require(script.Parent.StandardDoor)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
+local Viewmodel = require(script.Parent.Viewmodel)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
@@ -113,3 +114,4 @@ end)
 serverClient.AmmoUpdate.OnClientEvent:Connect(setAmmo)
 serverClient.Discombobulate.OnClientEvent:Connect(Discombobulate)
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
+serverClient.PlayViewmodelAnimation.OnClientEvent:Connect(Viewmodel.PlayAnimation)

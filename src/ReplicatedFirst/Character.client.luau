@@ -7,6 +7,7 @@ local Items = require(script.Parent.ItemsManager.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
+local Viewmodel = require(script.Parent.Viewmodel)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
@@ -76,6 +77,8 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
 end)
 
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
+    Viewmodel.Show(item)
+    
     local base = Items[item.Base.Name] :: ItemTypes.ItemDefinition & ItemTypes.GunDefinition
     if (item.Kind == "Item" and base.PrimaryFire) or (item.Kind == "Gun" or item.Kind == "Grenade" or item.Kind == "Melee") then
         ControlManager.Register("Primary Fire", true, function(action, state, input)
@@ -155,6 +158,8 @@ InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)
     ControlManager.Unregister("Drop")
     ControlManager.Unregister("Reload Weapon")
     ControlManager.Unregister("Drop Ammo")
+
+    Viewmodel.Hide()
 
     roundInfo.Frame.AmmoBar.Visible = false
 end)

@@ -66,6 +66,7 @@ local function stopControllingProp(prop: BasePart, userId: number)
     if plr then
         local PlayAnimation = require(ServerScriptService.PlayAnimation)
         PlayAnimation(plr, 13269497293, "MagnetoAnimation")
+        serverClient.PlayViewmodelAnimation:FireClient(plr, 13269497293)
     end
 
     controlledProps[userId] = nil
@@ -1007,6 +1008,7 @@ items["Magneto Stick"] = {
 
         local PlayAnimation = require(ServerScriptService.PlayAnimation)
         PlayAnimation(participant.Player, 13269497293, "MagnetoAnimation")
+        serverClient.PlayViewmodelAnimation:FireClient(participant.Player, 13269497293)
 
         local activeHolder = object:FindFirstChild("ActiveHolder") :: NumberValue or Instance.new("NumberValue")
         if activeHolder.Parent and Players:GetPlayerByUserId(activeHolder.Value) then

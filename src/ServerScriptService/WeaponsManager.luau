@@ -304,6 +304,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
 
     if weapon.Kind == "Melee" then
         PlayAnimation(player, weapon.Base.HitAnimation, weapon.Base.Name.."HitAnimation")
+        ReplicatedStorage.ServerClient.PlayViewmodelAnimation:FireClient(player, weapon.Base.HitAnimation)
     end
 
     local firedSound = weapon.Base.FiredSound:Clone()
