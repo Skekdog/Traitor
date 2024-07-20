@@ -41,7 +41,7 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
 	
 	local SettingsManager = require(script.Parent.SettingsManager)
-local UIAnimation = require(script.Parent.UIAnimation)
+	local UIAnimation = require(script.Parent.UIAnimation)
 	local tweenInfo = TweenInfo.new((SettingsManager.GetSetting("Animate UI Transitions") and not noTransition) and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
 	theme = theme or module.Themes[SettingsManager.GetSetting("UI Theme") :: string]
 	assert(theme)

@@ -20,6 +20,11 @@ function module.Show(item: ItemTypes.Item): ()
         return
     end
 
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then
+        return
+    end
+
     local viewmodel = ReplicatedStorage.Viewmodel:Clone()
 
     local shirt = char:FindFirstChildOfClass("Shirt")
@@ -46,8 +51,23 @@ function module.Show(item: ItemTypes.Item): ()
 
     module.PlayAnimation(item.Base.HoldAnimation)
 
-    renderCon = RunService.RenderStepped:Connect(function(dt)
-        viewmodel.PrimaryPart.CFrame = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180)) * CFrame.new(0, -1.75, -0.75)
+    local bobbing = CFrame.new()
+    renderCon = RunService.RenderStepped:Connect(function(dt: number)
+        local breathing = CFrame.new(0, math.cos(os.clock() * 2) / 100, 0)
+        local isMoving = hum.MoveDirection:Dot(hum.MoveDirection) > 0
+        
+        if isMoving then
+            local bob = math.sin(os.clock() * 5) / 4
+            bobbing = bobbing:Lerp(CFrame.new(bob, bob, bob), dt)
+        else
+            bobbing = bobbing:Lerp(CFrame.new(), dt)
+        end
+
+        local modifiers = breathing * bobbing
+
+        local rotation = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180))
+        local final = modifiers * rotation * CFrame.new(0, -1.75, -0.75)
+        viewmodel.PrimaryPart.CFrame = final
     end)
 end
 
