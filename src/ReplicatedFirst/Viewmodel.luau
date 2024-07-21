@@ -8,8 +8,6 @@ local module = {}
 local renderCon: RBXScriptConnection?
 
 function module.Show(item: ItemTypes.Item): ()
-    module.Hide()
-
     if not item.Base.HoldAnimation then
         return
     end
@@ -25,11 +23,23 @@ function module.Show(item: ItemTypes.Item): ()
         return
     end
 
-    local viewmodel = ReplicatedStorage.Viewmodel:Clone()
+    local viewmodel = camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Viewmodel:Clone()
 
-    local shirt = char:FindFirstChildOfClass("Shirt")
-    if shirt then
-        shirt:Clone().Parent = viewmodel
+    if not viewmodel.Parent then
+        local shirt = char:FindFirstChildOfClass("Shirt")
+        if shirt then
+            shirt:Clone().Parent = viewmodel
+        end
+        viewmodel.Parent = camera
+    else
+        local model = viewmodel:FindFirstChild("Item")
+        if model then
+            model:Destroy()
+        end
+
+        for _, v in viewmodel.Humanoid.Animator:GetPlayingAnimationTracks() do
+            v:Stop()
+        end
     end
 
     local model = item.Base.Model:Clone()
@@ -47,9 +57,11 @@ function module.Show(item: ItemTypes.Item): ()
 
     model.Parent = viewmodel
 
-    viewmodel.Parent = camera
-
     module.PlayAnimation(item.Base.HoldAnimation)
+
+    if renderCon then
+        renderCon:Disconnect()
+    end
 
     local bobbing = CFrame.new()
     renderCon = RunService.RenderStepped:Connect(function(dt: number)
@@ -57,7 +69,7 @@ function module.Show(item: ItemTypes.Item): ()
         local isMoving = hum.MoveDirection:Dot(hum.MoveDirection) > 0
         
         if isMoving then
-            local bob = math.sin(os.clock() * 5) / 4
+            local bob = math.sin(os.clock() * 6) / 3
             bobbing = bobbing:Lerp(CFrame.new(bob, bob, bob), dt)
         else
             bobbing = bobbing:Lerp(CFrame.new(), dt)
