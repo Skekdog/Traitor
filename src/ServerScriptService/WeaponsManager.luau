@@ -3,8 +3,10 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local GetRound = require(script.Parent.GetRound)
+local HitSounds = require(script.Parent.HitSounds)
 local CalculateDamageModifier = require(script.Parent.Parent.ReplicatedFirst.CalculateDamageModifier)
 local PlayAnimation = require(script.Parent.PlayAnimation)
+local PlayPositionalSound = require(script.Parent.PlayPositionalSound)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
 local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
@@ -152,6 +154,11 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
         onEntityHit(round, weapon, attacker, victim, part, rayResult.Distance, (rayResult.Position - origin).Unit)
     elseif not model or not model:IsDescendantOf(workspace.Corpses) then
         ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
+
+        if weapon.Kind == "Melee" then
+            local material = part:GetAttribute("MaterialOverride") or rayResult.Material
+            PlayPositionalSound(HitSounds[material] or HitSounds.Default, rayResult.Position)
+        end
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
         if mapProps and part:IsDescendantOf(mapProps) then
