@@ -256,7 +256,7 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
     explosion.Parent = workspace.Projectiles
 end
 
-function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: Ray): ()
+function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: Ray): true?
     if weapon.Kind == "Gun" and weapon.Reloading then
         return
     end
@@ -384,6 +384,8 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
             onPartHit(round, weapon.Base, attacker, result, origin)
         end
     end
+
+    return true
 end
 
 return module

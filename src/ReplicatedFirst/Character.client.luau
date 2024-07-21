@@ -81,14 +81,21 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     
     local base = Items[item.Base.Name] :: ItemTypes.ItemDefinition & ItemTypes.GunDefinition
     if (item.Kind == "Item" and base.PrimaryFire) or (item.Kind == "Gun" or item.Kind == "Grenade" or item.Kind == "Melee") then
-        ControlManager.Register("Primary Fire", true, function(action, state, input)
+        ControlManager.Register("Primary Fire", true, function(action, _, input)
+            local camera = workspace.CurrentCamera
+            local ray = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+
             if item.Kind == "Item" and base.Toggled then
                 if input.UserInputState == Enum.UserInputState.End then
-                    clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+                    clientServer.PrimaryFire:InvokeServer(ray)
                 end
             else
                 while input.UserInputState == Enum.UserInputState.Begin do
-                    clientServer.PrimaryFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+                    camera = workspace.CurrentCamera
+                    ray = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+                    if clientServer.PrimaryFire:InvokeServer(ray) and item.Kind == "Gun" then
+                        LocalRoundInfo.PrimaryFire(item)
+                    end
                     task.wait()
                     if item.Kind == "Gun" then
                         if LocalRoundInfo.Ammo and LocalRoundInfo.Ammo <= 0 then

@@ -32,7 +32,7 @@ local function allow(plr: Player, cameraRayInfo: unknown, requireRayInfo: boolea
     return weapon, round:GetParticipant(plr.Name)
 end
 
-ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, cameraRayInfo: unknown)
+ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, cameraRayInfo: unknown)
     local weapon, participant = allow(plr, cameraRayInfo, true)
     if not weapon or not participant then
         return
@@ -43,9 +43,9 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, c
         assert(weapon.Base.PrimaryFire)
         weapon.Base.PrimaryFire(participant, cameraRayInfo)
     else
-        WeaponsManager.Shoot(plr, weapon, cameraRayInfo)
+        return WeaponsManager.Shoot(plr, weapon, cameraRayInfo)
     end
-end)
+end
 
 ReplicatedStorage.ClientServer.AlternateFire.OnServerEvent:Connect(function(plr, cameraRayInfo: unknown)
     local weapon, participant = allow(plr, cameraRayInfo, true)

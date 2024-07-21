@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local Types = require(script.Parent.RoundHandler.Types)
 local replicatedData = ReplicatedStorage:WaitForChild("RoundHandler")
 
@@ -77,7 +78,7 @@ for i in replicatedData:GetAttributes() do
     listeners[i] = {}
 end
 
-for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "UpdateRoles", "UpdateRoundEndInfo", "IsSpectating"} do
+for _, v in {"UpdateParticipant", "UpdateOwnParticipant", "UpdateEquipment", "UpdateRoles", "UpdateRoundEndInfo", "IsSpectating", "PrimaryFire"} do
     listeners[v] = {}
 end
 
@@ -99,7 +100,9 @@ type Listen =
     (("TimeMilestone", (number) -> ()) -> Ret) &
     (("RoundPhase", (Types.RoundPhase) -> ()) -> Ret) &
     (("IsPaused", (boolean) -> ()) -> Ret) &
-    (("RoundStartTime", (number) -> ()) -> Ret)
+    (("RoundStartTime", (number) -> ()) -> Ret) &
+    
+    (("PrimaryFire", (ItemTypes.GunWeapon) -> ()) -> Ret)
 
 --- @returns A function to stop listening for changes
 module.Listen = function(event, callback)
@@ -114,6 +117,10 @@ local function runCallbacks(event, newValue)
     for _, v in listeners[event] do
         v(newValue)
     end
+end
+
+function module.PrimaryFire(item: ItemTypes.GunWeapon): ()
+    runCallbacks("PrimaryFire", item)
 end
 
 local isSpectating = false

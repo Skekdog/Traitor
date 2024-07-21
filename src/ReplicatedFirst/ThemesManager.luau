@@ -12,8 +12,8 @@ export type Theme = {
 
 module.Themes = {
 	Light = {
-		Primary = Color3.fromRGB(220, 220, 220),
-		Secondary = Color3.fromRGB(200, 200, 200),
+		Primary = Color3.fromRGB(250, 250, 250),
+		Secondary = Color3.fromRGB(210, 230, 230),
 		Text = Color3.fromRGB(0, 0, 0),
 		TextStroke = Color3.fromRGB(255, 255, 255),
 		UIStroke = Color3.fromRGB(0, 0, 0),
@@ -73,10 +73,6 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 			BackgroundColor3 = (not inverse) and theme[style or "Primary"] or theme.Text,
 			BorderColor3 = (not inverse) and theme.UIStroke or theme[style or "Primary"]
 		})
-	end
-	
-	if v:GetAttribute("DefaultTextColour") then
-		v:SetAttribute("DefaultTextColour", theme.Text)
 	end
 	
 	return

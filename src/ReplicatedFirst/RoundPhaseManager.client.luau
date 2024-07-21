@@ -2,6 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ThemesManager = require(script.Parent.ThemesManager)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local API = require(ReplicatedFirst.API)
@@ -141,18 +142,22 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Client
         role = LocalRoundInfo.GetRole(participant.Role)
     end
     
+    local roleLabel = roundInfo.TopBar.Role
     if not participant or role.Name == "" then
         if equipmentShop then
             equipmentShop:Unregister()
             equipmentShop = nil
         end
-        roundInfo.TopBar.Role.TextColor3 = Color3.new(1, 1, 1)
-        roundInfo.TopBar.Role.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
+
+        roleLabel:SetAttribute("StyleData", "")
+        ThemesManager.UpdateThemeInstance(roleLabel)
+        roleLabel.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
         return
     end
 
-    roundInfo.TopBar.Role.Text = role.Name
-    roundInfo.TopBar.Role.TextColor3 = role.Colour
+    roleLabel.Text = role.Name
+    roleLabel:SetAttribute("StyleData", "KeepText")
+    roleLabel.TextColor3 = role.Colour
 
     if not role.EquipmentShop or #role.EquipmentShop <= 0 then
         if equipmentShop then

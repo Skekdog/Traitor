@@ -2,10 +2,14 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local module = {}
 
 local renderCon: RBXScriptConnection?
+
+local recoilTarget = CFrame.new()
+local recoil = CFrame.new()
 
 function module.Show(item: ItemTypes.Item): ()
     if not item.Base.HoldAnimation then
@@ -77,6 +81,8 @@ function module.Show(item: ItemTypes.Item): ()
     renderCon = RunService.RenderStepped:Connect(function(dt: number)
         local breathing = CFrame.new(0, math.cos(os.clock() * 2) / 100, 0)
         local isMoving = hum.MoveDirection:Dot(hum.MoveDirection) > 0
+
+        recoil = recoil:Lerp(recoilTarget, dt)
         
         if isMoving then
             local bob = math.sin(os.clock() * 6) / 3
@@ -85,7 +91,9 @@ function module.Show(item: ItemTypes.Item): ()
             bobbing = bobbing:Lerp(CFrame.new(), dt)
         end
 
-        local modifiers = breathing * bobbing
+        local modifiers = breathing * bobbing * recoil
+
+        camera.CFrame *= CFrame.Angles(recoil.X, 0, 0)
 
         local rotation = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180))
         local final = modifiers * rotation * CFrame.new(0, -1.75, -0.75)
@@ -115,5 +123,12 @@ function module.Hide(): ()
         renderCon:Disconnect()
     end
 end
+
+LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.GunWeapon)
+    recoilTarget = CFrame.new(0, item.Base.Recoil, 0) * recoilTarget
+    task.delay(1, function()
+        recoilTarget *= CFrame.new(0, -item.Base.Recoil, 0)
+    end)
+end)
 
 return module
