@@ -30,6 +30,12 @@ function module.Show(item: ItemTypes.Item): ()
         if shirt then
             shirt:Clone().Parent = viewmodel
         end
+
+        local bodyColours = char:FindFirstChildOfClass("BodyColors")
+        if bodyColours then
+            bodyColours:Clone().Parent = viewmodel
+        end
+        
         viewmodel.Parent = camera
     else
         local model = viewmodel:FindFirstChild("Item")
@@ -56,6 +62,10 @@ function module.Show(item: ItemTypes.Item): ()
     model.CanQuery = false
 
     model.Parent = viewmodel
+
+    task.defer(function()
+        viewmodel.UpperTorso.CanCollide = false
+    end)
 
     module.PlayAnimation(item.Base.HoldAnimation)
 
