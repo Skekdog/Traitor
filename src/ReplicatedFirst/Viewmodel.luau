@@ -124,11 +124,15 @@ function module.Hide(): ()
     end
 end
 
-LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.GunWeapon)
-    recoilTarget = CFrame.new(0, item.Base.Recoil, 0) * recoilTarget
-    task.delay(1, function()
-        recoilTarget *= CFrame.new(0, -item.Base.Recoil, 0)
-    end)
+LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
+    if item.Kind == "Gun" then
+        recoilTarget = CFrame.new(0, item.Base.Recoil, 0) * recoilTarget
+        task.delay(1, function()
+            recoilTarget *= CFrame.new(0, -item.Base.Recoil, 0)
+        end)
+    elseif item.Kind == "Melee" then
+        module.PlayAnimation(item.Base.HitAnimation)
+    end
 end)
 
 return module

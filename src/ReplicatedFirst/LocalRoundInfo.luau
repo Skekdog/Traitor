@@ -102,7 +102,7 @@ type Listen =
     (("IsPaused", (boolean) -> ()) -> Ret) &
     (("RoundStartTime", (number) -> ()) -> Ret) &
     
-    (("PrimaryFire", (ItemTypes.GunWeapon) -> ()) -> Ret)
+    (("PrimaryFire", (ItemTypes.Weapon) -> ()) -> Ret)
 
 --- @returns A function to stop listening for changes
 module.Listen = function(event, callback)
@@ -119,7 +119,7 @@ local function runCallbacks(event, newValue)
     end
 end
 
-function module.PrimaryFire(item: ItemTypes.GunWeapon): ()
+function module.PrimaryFire(item: ItemTypes.Weapon): ()
     runCallbacks("PrimaryFire", item)
 end
 

@@ -93,7 +93,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
                 while input.UserInputState == Enum.UserInputState.Begin do
                     camera = workspace.CurrentCamera
                     ray = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-                    if clientServer.PrimaryFire:InvokeServer(ray) and item.Kind == "Gun" then
+                    if clientServer.PrimaryFire:InvokeServer(ray) and item.Kind ~= "Item" then
                         LocalRoundInfo.PrimaryFire(item)
                     end
                     task.wait()
