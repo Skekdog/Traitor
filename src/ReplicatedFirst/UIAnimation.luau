@@ -207,11 +207,13 @@ function module.TransitionUIPage(currentPage: GuiObject, newPage: GuiObject, tar
 end
 
 local UNDERLINE_TRANSITION_SCALE = 0.125
+local UNDERLINE_TRANSITION_TIME = 0.5
 function module.TransitionUnderline(underline: Frame, target: TextButton)
 	local shouldAnimate = SettingsManager.GetSetting("Animate UI Transitions")
-	local UNDERLINE_TRANSITION_TIME = SettingsManager.GetSetting("Animate UI Transitions") and 0.5 or 0
-	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, 0, 3)
-	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, 0, 3)
+	-- We need shouldAnimate because module.Animate might return nil which will error halfSizeTween.Completed which will mean the underline will be stuck at small size
+	
+	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, 0.1, 0)
+	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, 0.1, 0)
 	
 	local newPosition = UDim2.fromScale(target.Position.X.Scale + (target.Size.X.Scale / 2), 1)
 	

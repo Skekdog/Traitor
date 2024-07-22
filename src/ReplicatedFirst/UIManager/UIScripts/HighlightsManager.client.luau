@@ -74,8 +74,10 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 end)
 
 local currentTab = "Highlights"
+local tabs = page.Parent.Tabs
 
-local function showTab(tab)
+local function showTab(tab: string)
+	UIAnimation.TransitionUnderline(tabs.Underline, tabs[tab.."Button"])
 	if currentTab == tab then
 		return
 	end
@@ -91,6 +93,8 @@ local function _adjustEventFilter(filter, visible)
 	end
 end
 
-page.Parent.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
-page.Parent.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
-page.Parent.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
+tabs.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
+tabs.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights") end)
+tabs.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
+
+showTab("Highlights")
