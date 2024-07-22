@@ -903,6 +903,8 @@ items["Magneto Stick"] = {
 
     Model = models("Magneto Stick"),
     HoldAnimation = 10247423634,
+
+    ToggledAlt = true,
     AlternateFire = function(participant: Types.Participant, cameraRayInfo: Ray)
         require(ServerScriptService.MagnetoStick).AlternateFire(participant, cameraRayInfo)
     end,

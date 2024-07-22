@@ -47,6 +47,17 @@ local function runCallback(plr: Player, event: InventoryEvent, equipment: Item, 
 end
 
 module.Items = {} :: {[Instance]: Item | ItemTypes.Weapon}
+local aiming: {[Player]: boolean?} = {}
+
+function module.IsAiming(plr: Player): boolean
+    return aiming[plr] or false
+end
+
+function module.SetAiming(plr: Player, isAiming: boolean): ()
+    aiming[plr] = isAiming
+    ReplicatedStorage.ClientServer.AimWeapon:FireClient(plr, isAiming)
+    print(isAiming)
+end
 
 function module.HasEquipment(plr: Player, equipment: Item): boolean
     return table.find(inventories[plr], equipment) ~= nil
@@ -158,7 +169,7 @@ function module.Equip(plr: Player, equipment: Item)
         end
     else
         local old = equipped[plr]
-        if (old :: any) == equipment then
+        if old == equipment then
             return
         end
         if old then
@@ -206,6 +217,7 @@ function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
             equipped[plr] = nil
         end
     else
+        module.SetAiming(plr, false)
         local old = equipped[plr]
         if old ~= equipment then
             return

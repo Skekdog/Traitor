@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AimWeaponClient = require(script.Parent.AimWeaponClient)
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManager)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
@@ -76,24 +77,24 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     end
 end)
 
+local function getCenterRay(): Ray
+    local camera = workspace.CurrentCamera
+    return camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+end
+
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     Viewmodel.Show(item)
     
     local base = Items[item.Base.Name] :: ItemTypes.ItemDefinition & ItemTypes.GunDefinition
     if (item.Kind == "Item" and base.PrimaryFire) or (item.Kind == "Gun" or item.Kind == "Grenade" or item.Kind == "Melee") then
         ControlManager.Register("Primary Fire", true, function(action, _, input)
-            local camera = workspace.CurrentCamera
-            local ray = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-
             if item.Kind == "Item" and base.Toggled then
                 if input.UserInputState == Enum.UserInputState.End then
-                    clientServer.PrimaryFire:InvokeServer(ray)
+                    clientServer.PrimaryFire:InvokeServer(getCenterRay())
                 end
             else
                 while input.UserInputState == Enum.UserInputState.Begin do
-                    camera = workspace.CurrentCamera
-                    ray = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-                    if clientServer.PrimaryFire:InvokeServer(ray) and item.Kind ~= "Item" then
+                    if clientServer.PrimaryFire:InvokeServer(getCenterRay()) and item.Kind ~= "Item" then
                         LocalRoundInfo.PrimaryFire(item)
                     end
                     task.wait()
@@ -112,7 +113,21 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     
     if (item.Kind == "Item" and base.AlternateFire) or (item.Kind == "Gun") then
         ControlManager.Register("Alternate Fire", true, function(action, state, input)
-            clientServer.AlternateFire:FireServer(workspace.CurrentCamera:ViewportPointToRay(workspace.CurrentCamera.ViewportSize.X/2, workspace.CurrentCamera.ViewportSize.Y/2, 1))
+            if item.Kind == "Gun" then
+                return AimWeaponClient(input)
+            elseif item.Kind == "Item" then
+                if item.Base.ToggledAlt then
+                    if input.UserInputState == Enum.UserInputState.End then
+                        clientServer.AlternateFire:FireServer(getCenterRay())
+                        return Enum.ContextActionResult.Sink
+                    else
+                        return Enum.ContextActionResult.Pass
+                    end
+                end
+                
+                clientServer.AlternateFire:FireServer(getCenterRay())
+                return Enum.ContextActionResult.Sink
+            end
             return Enum.ContextActionResult.Sink
         end)
     else

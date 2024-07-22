@@ -20,95 +20,147 @@ end
 function module.TransitionUIState(frame: GuiObject, open: boolean)
 	-- If open is true, open animation should play, otherwise close
 	
-	local oldTween = frame:FindFirstChild("StateTransitionTween") :: Tween
-	if oldTween then
-		oldTween:Cancel()
-		oldTween:Destroy()
-	end
+	local style = frame:GetAttribute("TransitionStyle")
+	if style == "Position" or style == "Size" then
+		local oldTween = frame:FindFirstChild("StateTransitionTween") :: Tween
+		if oldTween then
+			oldTween:Cancel()
+			oldTween:Destroy()
+		end
 
-	local isSize = frame:GetAttribute("TransitionStyle") == "Size"
-	local targetUDim = frame:GetAttribute("TransitionTarget") :: UDim2
+		local isSize = frame:GetAttribute("TransitionStyle") == "Size"
+		local targetUDim = frame:GetAttribute("TransitionTarget") :: UDim2
 
-	local direction = frame:GetAttribute("TransitionDirection")
-	local offScreenPosition = targetUDim
-	if direction == "Right" then
-		offScreenPosition -= UDim2.fromScale(0.5, 0)
-	elseif direction == "Left" then
-		offScreenPosition += UDim2.fromScale(0.5, 0)
-	elseif direction == "Up" then
-		offScreenPosition -= UDim2.fromScale(0, 0.5)
-	elseif direction == "Down" then
-		offScreenPosition += UDim2.fromScale(0, 0.5)
-	elseif not isSize then
-		error("Invalid direction for "..frame.Name)
-	end
+		local direction = frame:GetAttribute("TransitionDirection")
+		local offScreenPosition = targetUDim
+		if direction == "Right" then
+			offScreenPosition -= UDim2.fromScale(0.5, 0)
+		elseif direction == "Left" then
+			offScreenPosition += UDim2.fromScale(0.5, 0)
+		elseif direction == "Up" then
+			offScreenPosition -= UDim2.fromScale(0, 0.5)
+		elseif direction == "Down" then
+			offScreenPosition += UDim2.fromScale(0, 0.5)
+		elseif not isSize then
+			error("Invalid direction for "..frame.Name)
+		end
 
-	local function onFinish()
+		local function onFinish()
+			if open then
+				if isSize then
+					frame.Size = targetUDim
+				else
+					frame.Position = targetUDim
+				end
+			else
+				frame.Visible = false
+				if isSize then
+					frame.Size = UDim2.new()
+				else
+					frame.Position = offScreenPosition
+				end
+			end
+		end
+		
+		local UI_TRANSITION_TIME = if open then 0.2 else tonumber(SettingsManager.GetSetting("Close Speed")) :: number
+		local UI_SCALE_FACTOR = tonumber(SettingsManager.GetSetting("Close Scale")) :: number
+		
+		
+		local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
+		
+		local info = TweenInfo.new(
+			UI_TRANSITION_TIME,
+			Enum.EasingStyle.Exponential,
+			Enum.EasingDirection.Out
+		)
+		
+		local properties: {[string]: any}
+		if isSize then
+			properties = {
+				Size = if open then targetUDim else startSize
+			}
+		else
+			properties = {
+				Position = if open then targetUDim else offScreenPosition
+			}
+		end
+		
+		local tween = module.Animate(frame, info, properties)
+		
 		if open then
 			if isSize then
-				frame.Size = targetUDim
-			else
-				frame.Position = targetUDim
-			end
-		else
-			frame.Visible = false
-			if isSize then
-				frame.Size = UDim2.new()
+				frame.Size = startSize
 			else
 				frame.Position = offScreenPosition
 			end
+			frame.Visible = true
 		end
-	end
-	
-	local UI_TRANSITION_TIME = if open then 0.2 else tonumber(SettingsManager.GetSetting("Close Speed")) :: number
-	local UI_SCALE_FACTOR = tonumber(SettingsManager.GetSetting("Close Scale")) :: number
-	
-	
-	local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
-	
-	local info = TweenInfo.new(
-		UI_TRANSITION_TIME,
-		Enum.EasingStyle.Exponential,
-		Enum.EasingDirection.Out
-	)
-	
-	local properties: {[string]: any}
-	if isSize then
-		properties = {
-			Size = if open then targetUDim else startSize
-		}
-	else
-		properties = {
-			Position = if open then targetUDim else offScreenPosition
-		}
-	end
-	
-	local tween = module.Animate(frame, info, properties)
-	
-	if open then
-		if isSize then
-			frame.Size = startSize
-		else
-			frame.Position = offScreenPosition
+		
+		local modalise = frame:FindFirstChild("Modalise") :: TextButton
+		if modalise then
+			modalise.Visible = open
 		end
-		frame.Visible = true
-	end
-	
-	local modalise = frame:FindFirstChild("Modalise") :: TextButton
-	if modalise then
-		modalise.Visible = open
-	end
 
-	if tween then
-		tween.Completed:Once(function()
-			tween:Destroy()
+		if tween then
+			tween.Completed:Once(function()
+				tween:Destroy()
+				onFinish()
+			end)
+			tween.Name = "StateTransitionTween"
+			tween.Parent = frame
+		else
 			onFinish()
-		end)
-		tween.Name = "StateTransitionTween"
-		tween.Parent = frame
-	else
-		onFinish()
+		end
+	elseif style == "Transparency" then
+		local lastTween: Tween?
+		for _, v in frame:GetDescendants() do
+			local oldTween = v:FindFirstChildOfClass("Tween")
+			if oldTween then
+				oldTween:Cancel()
+				oldTween:Destroy()
+			end
+
+			local property
+			if v:IsA("ImageLabel") then
+				property = "ImageTransparency"
+			elseif v:IsA("Frame") then
+				property = "BackgroundTransparency"
+			else
+				continue
+			end
+
+			if open then
+				(v :: any)[property] = 1
+			end
+
+			local properties = {[property] = if open then 0 else 1}
+			local tween = module.Animate(v, TweenInfo.new(0.25, Enum.EasingStyle.Quad), properties)
+
+			if tween then
+				lastTween = tween
+				tween.Parent = v
+				tween.Completed:Once(function()
+					tween:Destroy()
+					if open then
+						(v :: any)[property] = 0
+					else
+						(v :: any)[property] = 1
+					end
+				end)
+			end
+		end
+
+		if open then
+			frame.Visible = true
+		end
+
+		if lastTween and not open then
+			lastTween.Completed:Once(function()
+				frame.Visible = false
+			end)
+		end
 	end
+	
 end
 
 function module.TransitionSwitch(target: GuiObject, disabled: boolean)

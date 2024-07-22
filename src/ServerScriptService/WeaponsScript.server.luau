@@ -59,6 +59,18 @@ ReplicatedStorage.ClientServer.AlternateFire.OnServerEvent:Connect(function(plr,
     end
 end)
 
+ReplicatedStorage.ClientServer.AimWeapon.OnServerEvent:Connect(function(plr, isAiming: unknown)
+    local weapon, participant = allow(plr)
+    if not weapon or not participant then
+        return
+    end
+    if typeof(isAiming) ~= "boolean" then
+        return
+    end
+
+    InventoryManager.SetAiming(plr, isAiming)
+end)
+
 ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr)
     local weapon, participant = allow(plr)
     if not weapon or not participant or weapon.Kind ~= "Gun" then

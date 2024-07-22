@@ -75,6 +75,7 @@ export type ItemDefinition = {
     HoldAnimation: number?,
 
     Toggled: boolean?,
+    ToggledAlt: boolean?,
     OnEquipClient: (() -> ())?,
     OnUnequipClient: (() -> ())?,
     

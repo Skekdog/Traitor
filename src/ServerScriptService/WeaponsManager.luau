@@ -294,7 +294,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
 
     local timeNow = workspace:GetServerTimeNow()
     if weapon.Kind == "Gun" then
-        if weapon.CurrentAmmo <= 0 then
+        if (weapon.CurrentAmmo <= 0) or (weapon.Base.ScopeRequired and not InventoryManager.IsAiming(player)) then
             if weapon.LastFireAttempt + weapon.Base.FireTime < timeNow then
                 weapon.LastFireAttempt = timeNow
                 local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
@@ -328,7 +328,15 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     local origin = head.Position
 
     local random = Random.new()
-    local spread = math.rad(if weapon.Kind ~= "Melee" then weapon.Base.Spread else 0)
+
+    local spreadNum = 0
+    if weapon.Kind == "Gun" then
+        spreadNum = weapon.Base.Spread
+        if InventoryManager.IsAiming(player) then
+            spreadNum *= weapon.Base.AimSpreadMultiplier
+        end
+    end
+    local spread = math.rad(spreadNum)
 
     local function nextSpread(): number
         return random:NextNumber(-spread, spread)

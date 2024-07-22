@@ -159,6 +159,14 @@ module.AvailableSettings = {
 		PossibleValues = "Boolean",
 		Default = true,
 	},
+	{
+		Name = "Toggle Aim",
+		Tab = "Gameplay",
+		Category = "Controls",
+		Tooltip = "Determines whether the alternate fire should be toggled to aim.",
+		PossibleValues = "Boolean",
+		Default = false,
+	},
 	
 	{
 		Name = "Primary Fire",
@@ -202,8 +210,8 @@ module.AvailableSettings = {
 		Category = "Items - Enable the checkbox to make a keybind toggled",
 		Tooltip = "For aiming weapons or using the alternate item function.",
 		PossibleValues = "Keybind",
-		SpecifyToggle = true,
-		Default = {Keycodes = {Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2}, Toggled = true},
+		SpecifyToggle = false,
+		Default = {Keycodes = {Enum.UserInputType.MouseButton2, Enum.KeyCode.ButtonL2}, Toggled = false},
 	},
 	{
 		Name = "Interact",
