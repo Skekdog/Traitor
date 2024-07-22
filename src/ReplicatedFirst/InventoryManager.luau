@@ -56,7 +56,6 @@ end
 function module.SetAiming(plr: Player, isAiming: boolean): ()
     aiming[plr] = isAiming
     ReplicatedStorage.ClientServer.AimWeapon:FireClient(plr, isAiming)
-    print(isAiming)
 end
 
 function module.HasEquipment(plr: Player, equipment: Item): boolean

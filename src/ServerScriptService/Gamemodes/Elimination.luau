@@ -98,7 +98,7 @@ local module: Types.Gamemode = {
         end
 
         local attacker = victim.KilledByParticipant
-        if attacker and attacker ~= victim then
+        if attacker --[[and attacker ~= victim]] then
             attacker:AddScore("Kills", 1)
         end
 

@@ -47,7 +47,7 @@ slayVote.OnServerEvent:Connect(function(plr, target: unknown)
 	end
 end)
 
-local gamemodes = {ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, Elimination}
+local gamemodes = {--[[ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, ]]Elimination}
 
 remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: unknown)
 	local round = GetRound()

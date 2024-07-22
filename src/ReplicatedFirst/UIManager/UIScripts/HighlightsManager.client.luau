@@ -12,7 +12,15 @@ local page = UI.Object.Page
 local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
 local eTemplate = eFrame.Template
 
-ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.Participant]: Types.ParticipantScoring}, victors: Types.Role | Types.ClientParticipant)
+local function calculateTotalScore(score: Types.ParticipantScoring): number
+	local total = 0
+	for _, v in score do
+		total += v
+	end
+	return total
+end
+
+ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.FormattedUsername]: Types.ParticipantScoring}, victors: Types.Role | Types.ClientParticipant)
 	if victors.Kind == "ClientParticipant" then
 		hFrame.Winners.Text = victors.Player.Name:upper().." WINS"
 		hFrame.Winners.TextColor3 = LocalRoundInfo.GetRole(victors.Role).Colour
@@ -27,7 +35,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 		end
 	end
 	for _, v in sFrame:GetChildren() do
-		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" then
+		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.ClassName ~= "UIPadding" then
 			v:Destroy()
 		end
 	end
@@ -46,6 +54,51 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 		h.Description.Text = v.Description
 		h.Highlight.Text = v.Name
 	end
+
+	for i, v in scores do
+		local scoreFrame = sFrame.Template:Clone()
+		scoreFrame.Size = UDim2.fromScale(1, 0.075)
+
+		local usernameLabel = scoreFrame.Username
+		local totalLabel = scoreFrame.Total
+		local scoreList = scoreFrame.Score
+
+		local minimisedSize = sFrame.AbsoluteSize.Y * 0.075
+		repeat
+			minimisedSize = sFrame.AbsoluteSize.Y * 0.075
+		until minimisedSize > 0
+
+		local openedSize = (minimisedSize / 3) * 10
+		local scoreListSize = (minimisedSize / 3) * 7
+
+		scoreList.Position = UDim2.fromOffset(0, minimisedSize)
+		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedSize)
+		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedSize)
+
+		usernameLabel.Text = "@"..i
+		totalLabel.Text = calculateTotalScore(v).." Total"
+
+		scoreFrame.Visible = true
+		scoreFrame.Parent = sFrame
+		
+		scoreFrame.MouseButton1Click:Connect(function()
+			local open = not scoreFrame:GetAttribute("Open")
+			scoreFrame:SetAttribute("Open", open)
+
+			local targetSize = if open then openedSize else minimisedSize
+			local scoreListTarget = if open then scoreListSize else 0
+
+			local tweenInfo = TweenInfo.new(0.2)
+			UIAnimation.Animate(scoreFrame, tweenInfo, {
+				Size = UDim2.new(1, 0, 0, targetSize)
+			})
+
+			UIAnimation.Animate(scoreList, tweenInfo, {
+				Size = UDim2.new(1, 0, 0, scoreListTarget)
+			})
+		end)
+	end
+
 	-- todo: need something for syncing music
 
 	local startTime = LocalRoundInfo.GetStartTime()
