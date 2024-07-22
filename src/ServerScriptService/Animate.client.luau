@@ -1,4 +1,5 @@
 --!nocheck
+--!nolint
 
 -- Society if core scripts weren't so irritating to work with
 
