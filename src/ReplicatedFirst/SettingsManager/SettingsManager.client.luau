@@ -120,7 +120,6 @@ local function done()
 	CAS:UnbindAction(displayName)
 	settingsParent.Main.Visible = true
 	settingsParent.Close.Visible = true
-	tt.Visible = true
 	darken.Visible = false
 end
 
@@ -334,6 +333,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			
 			settingsParent.Main.Visible = false
 			settingsParent.Close.Visible = false
+			tooltip("", "NONE")
 			tt.Visible = false
 			darken.Visible = true
 			return
