@@ -118,7 +118,8 @@ export type GunDefinition = {
     ProjectileBase: BasePart,
     ProjectileSpeed: number,
 
-    Recoil: number,
+    RecoilX: number,
+    RecoilY: number,
     Spread: number,
 
     BulletsPerShot: number?,

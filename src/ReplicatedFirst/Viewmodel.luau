@@ -93,7 +93,7 @@ function module.Show(item: ItemTypes.Item): ()
 
         local modifiers = breathing * bobbing * recoil
 
-        camera.CFrame *= CFrame.Angles(math.rad(recoil.Y), 0, 0)
+        camera.CFrame *= CFrame.Angles(math.rad(recoil.Y), math.rad(recoil.X), 0)
 
         local rotation = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180))
         local final = modifiers * rotation * CFrame.new(0, -1.75, -0.75)
@@ -126,9 +126,11 @@ end
 
 LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
     if item.Kind == "Gun" then
-        recoilTarget = CFrame.new(0, item.Base.Recoil, 0) * recoilTarget
-        task.delay(0.2, function()
-            recoilTarget *= CFrame.new(0, -item.Base.Recoil, 0)
+        local y = item.Base.RecoilY / 4
+        local x = item.Base.RecoilX / 4
+        recoilTarget *= CFrame.new(x, y, 0)
+        task.delay(0.15, function()
+            recoilTarget *= CFrame.new(-x, -y, 0)
         end)
     elseif item.Kind == "Melee" then
         module.PlayAnimation(item.Base.HitAnimation)

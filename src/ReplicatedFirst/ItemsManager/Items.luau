@@ -79,8 +79,7 @@ guns.HUGE = {
 
     Slot = 3,
     CanDrop = true,
-
-    Recoil = 0.6,
+    
     Spread = 1.5,
 
     Damage = {
@@ -107,6 +106,9 @@ guns.HUGE = {
     HoldAnimation = 12498608892,
 
     FiredSound = firedSounds("HUGE"),
+
+    RecoilX = 1.0,
+    RecoilY = 2.0,
 }
 
 guns.Scout = {
@@ -116,7 +118,6 @@ guns.Scout = {
     Slot = 3,
     CanDrop = true,
 
-    Recoil = 1.5,
     Spread = 0.25,
 
     FalloffStart = 180,
@@ -144,6 +145,9 @@ guns.Scout = {
     HoldAnimation = 10247529531,
     FiredSound = firedSounds("Scout"),
     ReloadSound = reloadSounds("Scout"),
+
+    RecoilX = 0.5,
+    RecoilY = 1.5,
 }
 
 guns.Pistol = {
@@ -160,7 +164,6 @@ guns.Pistol = {
     },
 
     Spread = 0.25,
-    Recoil = 0.5,
 
     FalloffStart = 55,
     FalloffEnd = 110,
@@ -180,6 +183,9 @@ guns.Pistol = {
 
     ProjectileBase = bullet,
     ProjectileSpeed = 100,
+
+    RecoilX = 0.2,
+    RecoilY = 1.0,
 }
 
 guns["Golden Gun"] = {
@@ -196,8 +202,7 @@ guns["Golden Gun"] = {
     FalloffMultiplier = 1,
 
     Spread = 0,
-    Recoil = 5,
-
+    
     MagazineSize = 1,
 
     ProjectileBase = projectiles("GoldenBullet"),
@@ -271,6 +276,9 @@ guns["Golden Gun"] = {
 
         return true
     end,
+
+    RecoilX = 0.0,
+    RecoilY = 0.0,
 }
 
 local function burn(attacker: Types.Participant?, target: Types.Participant | Types.Prop?, part: BasePart): ()
@@ -336,8 +344,7 @@ guns["Flare Gun"] = {
     FalloffMultiplier = 0.5,
 
     Spread = 1,
-    Recoil = 0.3,
-
+    
     FireTime = 0.25,
     ReloadTime = 0,
     MagazineSize = 6,
@@ -383,6 +390,9 @@ guns["Flare Gun"] = {
 
         burn(attacker, nil, root)
     end,
+
+    RecoilX = 0.8,
+    RecoilY = 1.2,
 }
 
 guns.SMG = {
@@ -403,14 +413,13 @@ guns.SMG = {
     FalloffMultiplier = 0.5,
 
     Spread = 1,
-    Recoil = 0.3,
-
+    
     FireTime = 0.05,
     ReloadTime = 1,
     AmmoType = "SMG",
 
     Model = models("SMG"),
-    HoldAnimation = 12481091962,
+    HoldAnimation = 11263597228,
     FiredSound = firedSounds("SMG"),
     ReloadSound = reloadSounds("SMG"),
 
@@ -419,6 +428,9 @@ guns.SMG = {
 
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
+
+    RecoilX = 0.7,
+    RecoilY = 1.5,
 }
 
 guns.AWP = {
@@ -445,7 +457,6 @@ guns.AWP = {
     HasScope = true,
 
     Spread = 0.25,
-    Recoil = 2,
 
     FireTime = 2,
     ReloadTime = 0,
@@ -457,6 +468,9 @@ guns.AWP = {
 
     ProjectileBase = bullet,
     ProjectileSpeed = 300,
+
+    RecoilX = 0.8,
+    RecoilY = 2.5,
 }
 
 guns["Assault Rifle"] = {
@@ -467,7 +481,6 @@ guns["Assault Rifle"] = {
     CanDrop = true,
 
     Spread = 0.5,
-    Recoil = 0.3,
 
     Damage = {
         Head = 60,
@@ -493,6 +506,9 @@ guns["Assault Rifle"] = {
 
     ProjectileBase = bullet,
     ProjectileSpeed = 150,
+
+    RecoilX = 0.6,
+    RecoilY = 1.5,
 }
 
 guns["Silenced Pistol"] = {
@@ -510,7 +526,6 @@ guns["Silenced Pistol"] = {
     },
 
     Spread = 0.25,
-    Recoil = 0.5,
 
     FalloffStart = 55,
     FalloffEnd = 110,
@@ -543,6 +558,9 @@ guns["Silenced Pistol"] = {
         end
         return
     end,
+
+    RecoilX = 0.2,
+    RecoilY = 1.0,
 }
 
 guns.XM1014 = {
@@ -566,7 +584,6 @@ guns.XM1014 = {
     AimSpreadMultiplier = 0.7,
 
     Spread = 1.5,
-    Recoil = 1.2,
 
     FireTime = 0.8,
     ReloadTime = 1.5,
@@ -581,6 +598,9 @@ guns.XM1014 = {
     HoldAnimation = 11436160569,
     FiredSound = firedSounds("XM1014"),
     ReloadSound = reloadSounds("XM1014"),
+
+    RecoilX = 1.0,
+    RecoilY = 2.0,
 }
 
 guns.Glock = {
@@ -603,7 +623,6 @@ guns.Glock = {
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
 
-    Recoil = 0.5,
     Spread = 0.35,
 
     FireTime = 0.1,
@@ -617,6 +636,9 @@ guns.Glock = {
 
     ProjectileBase = bullet,
     ProjectileSpeed = 190,
+
+    RecoilX = 0.2,
+    RecoilY = 0.8,
 }
 
 guns.Deagle = {
@@ -639,7 +661,6 @@ guns.Deagle = {
     AimFOV = 50,
     AimSpreadMultiplier = 0.1,
 
-    Recoil = 0.5,
     Spread = 0.25,
 
     FireTime = 0.5,
@@ -653,6 +674,9 @@ guns.Deagle = {
     HoldAnimation = 9253211833,
     FiredSound = firedSounds("Deagle"),
     ReloadSound = reloadSounds("Deagle"),
+
+    RecoilX = 0.3,
+    RecoilY = 1.2,
 }
 
 guns.BAR = {
@@ -669,7 +693,6 @@ guns.BAR = {
     },
 
     Spread = 0.75,
-    Recoil = 0.7,
 
     FalloffStart = 50,
     FalloffEnd = 120,
@@ -689,6 +712,9 @@ guns.BAR = {
 
     AimFOV = 65,
     AimSpreadMultiplier = 0.2,
+
+    RecoilX = 0.6,
+    RecoilY = 1.8,
 }
 
 local grenades: {[string]: ItemTypes.GrenadeDefinition} = {}
