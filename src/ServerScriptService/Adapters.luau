@@ -317,6 +317,7 @@ local module: Types.Adapter = {
             return
         end
 
+        weaponSpawn.CollisionGroup = "DroppedWeapons"
         weaponSpawn.CanCollide = true
         weaponSpawn.CanTouch = true
         weaponSpawn.CanQuery = true
