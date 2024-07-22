@@ -163,7 +163,7 @@ module.AvailableSettings = {
 		Name = "Toggle Aim",
 		Tab = "Gameplay",
 		Category = "Controls",
-		Tooltip = "Determines whether the alternate fire should be toggled to aim.",
+		Tooltip = "Determines whether the Alternate Fire key should be toggled to aim.",
 		PossibleValues = "Boolean",
 		Default = false,
 	},
