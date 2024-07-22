@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local AimWeaponClient = require(script.Parent.AimWeaponClient)
 local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
@@ -127,9 +128,16 @@ end
 
 LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
     if item.Kind == "Gun" then
-        local y = item.Base.RecoilY / 4
         local x = item.Base.RecoilX / 4
+        local y = item.Base.RecoilY / 4
+
+        if AimWeaponClient.IsAiming then
+            x /= 2
+            y /= 2
+        end
+
         recoilTarget *= CFrame.new(x, y, 0)
+        
         task.delay(0.15, function()
             recoilTarget *= CFrame.new(-x, -y, 0)
         end)

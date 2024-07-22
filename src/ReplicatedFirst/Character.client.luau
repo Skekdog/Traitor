@@ -114,7 +114,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     if (item.Kind == "Item" and base.AlternateFire) or (item.Kind == "Gun") then
         ControlManager.Register("Alternate Fire", true, function(action, state, input)
             if item.Kind == "Gun" then
-                return AimWeaponClient(input)
+                return AimWeaponClient.Aim(input)
             elseif item.Kind == "Item" then
                 if item.Base.ToggledAlt then
                     if input.UserInputState == Enum.UserInputState.End then
