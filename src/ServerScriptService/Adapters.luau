@@ -268,6 +268,11 @@ local module: Types.Adapter = {
             return
         end
 
+        local oldAnimate = participant.Character:WaitForChild("Animate")
+        oldAnimate:Destroy()
+
+        ServerScriptService.Animate:Clone().Parent = participant.Character
+
         -- local startHeight = nil
         -- hum.StateChanged:Connect(function(oldState, newState)
         --     if newState == Enum.HumanoidStateType.Freefall then

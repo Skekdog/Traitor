@@ -187,7 +187,7 @@ task.spawn(function()
             end
             
             local distance = plr:DistanceFromCharacter(prop.Position)
-            if distance == 0 or distance > 15 then
+            if distance == 0 or distance > 20 then
                 stopControllingProp(prop, userId)
                 continue
             end
