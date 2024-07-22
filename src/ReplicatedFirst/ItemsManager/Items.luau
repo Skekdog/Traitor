@@ -419,7 +419,7 @@ guns.SMG = {
     AmmoType = "SMG",
 
     Model = models("SMG"),
-    HoldAnimation = 11263597228,
+    HoldAnimation = 12481091962,
     FiredSound = firedSounds("SMG"),
     ReloadSound = reloadSounds("SMG"),
 

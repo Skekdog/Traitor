@@ -43,7 +43,7 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, camera
         assert(weapon.Base.PrimaryFire)
         weapon.Base.PrimaryFire(participant, cameraRayInfo)
     else
-        return WeaponsManager.Shoot(plr, weapon, cameraRayInfo)
+        return WeaponsManager.Shoot(plr, weapon, cameraRayInfo)s
     end
 end
 

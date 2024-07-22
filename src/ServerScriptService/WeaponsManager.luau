@@ -287,6 +287,11 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
+    local head = char:FindFirstChild("Head")
+    if not head or not head:IsA("BasePart") then
+        return
+    end
+
     local timeNow = workspace:GetServerTimeNow()
     if weapon.Kind == "Gun" then
         if weapon.CurrentAmmo <= 0 then
@@ -320,10 +325,6 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     end)
     firedSound:Play()
 
-    local head = char:FindFirstChild("Head")
-    if not head or not head:IsA("BasePart") then
-        return
-    end
     local origin = head.Position
 
     local random = Random.new()
@@ -336,13 +337,10 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     if weapon.Kind == "Grenade" then
         InventoryManager.RemoveEquipment(player, weapon)
         local proj = weapon.Base.Model:Clone();
-        (proj :: BasePart).CollisionGroup = "Grenades"
+        proj.CollisionGroup = "Grenades"
         proj:PivotTo(CFrame.new(origin))
         proj.Parent = workspace.Projectiles
 
-        if not proj:IsA("BasePart") then
-            error("[ProjectileBase] is not a BasePart")
-        end
         proj:ApplyImpulse(weapon.Base.ProjectileForce * head.CFrame.LookVector)
 
         task.delay(weapon.Base.Fuse, function()
@@ -375,7 +373,11 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
     
             local result = workspace:Raycast(origin, target, rayParams)
             if not result then
-                return tweenProjectile(target)
+                tweenProjectile(target)
+                if weapon.Kind == "Melee" then
+                    return true
+                end
+                return
             end
     
             tweenProjectile(result.Position)
