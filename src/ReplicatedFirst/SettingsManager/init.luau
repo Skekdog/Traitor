@@ -171,7 +171,7 @@ module.AvailableSettings = {
 	{
 		Name = "Primary Fire",
 		Tab = "Keybinds",
-		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Category = "Items",
 		Tooltip = "For using weapons or planting equipment.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -180,7 +180,7 @@ module.AvailableSettings = {
 	{
 		Name = "Drop Ammo",
 		Tab = "Keybinds",
-		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Category = "Items",
 		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -189,7 +189,7 @@ module.AvailableSettings = {
 	{
 		Name = "Reload Weapon",
 		Tab = "Keybinds",
-		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Category = "Items",
 		Tooltip = "Reloads the currently equipped weapon.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -198,7 +198,7 @@ module.AvailableSettings = {
 	{
 		Name = "Drop",
 		Tab = "Keybinds",
-		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Category = "Items",
 		Tooltip = "Drops the currently equipped item. Not all items can be dropped.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -207,7 +207,7 @@ module.AvailableSettings = {
 	{
 		Name = "Alternate Fire",
 		Tab = "Keybinds",
-		Category = "Items - Enable the checkbox to make a keybind toggled",
+		Category = "Items",
 		Tooltip = "For aiming weapons or using the alternate item function.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -225,7 +225,7 @@ module.AvailableSettings = {
 	{
 		Name = "Spectate Next",
 		Tab = "Keybinds",
-		Category = "Spectating - Enable the checkbox to make a keybind toggled",
+		Category = "Spectating",
 		Tooltip = "Spectates the next player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -234,7 +234,7 @@ module.AvailableSettings = {
 	{
 		Name = "Spectate Previous",
 		Tab = "Keybinds",
-		Category = "Spectating - Enable the checkbox to make a keybind toggled",
+		Category = "Spectating",
 		Tooltip = "Spectates the previous player.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -243,7 +243,7 @@ module.AvailableSettings = {
 	--{
 	--	Name = "Crouch",
 	--	Tab = "Keybinds",
-	--	Category = "Movement - Enable the checkbox to make a keybind toggled",
+	--	Category = "Movement",
 	--	Tooltip = "Not functional.",
 	--	PossibleValues = "Keybind",
 	--  SpecifyToggle = true,
@@ -253,7 +253,7 @@ module.AvailableSettings = {
 	{
 		Name = "Close UI",
 		Tab = "Keybinds",
-		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Category = "Menus",
 		Tooltip = "Closes the fore-most UI.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -263,7 +263,7 @@ module.AvailableSettings = {
 	{
 		Name = "Next Weapon",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Cycles to the next weapon. Primarily used for controllers.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -272,7 +272,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 1",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 1.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -281,7 +281,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 2",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 2.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -290,7 +290,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 3",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 3.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -299,7 +299,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 4",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 4.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -308,7 +308,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 5",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 5.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -317,7 +317,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 6",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 6.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -326,7 +326,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 7",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 7.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -335,7 +335,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 8",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 8.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
@@ -344,7 +344,7 @@ module.AvailableSettings = {
 	{
 		Name = "Slot 9",
 		Tab = "Keybinds",
-		Category = "Inventory - Enable the checkbox to make a keybind toggled",
+		Category = "Inventory",
 		Tooltip = "Equips the item in slot 9.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
