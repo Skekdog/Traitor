@@ -54,7 +54,7 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	local style = v:GetAttribute("Style")
 	
 	if v.ClassName == "UIStroke" then
-		UIAnimation.Animate(v, tweenInfo, {Color = theme["UIStroke"]})
+		UIAnimation.Animate(v, tweenInfo, {Color = if not inverse then theme["UIStroke"] else theme[style or "Text"]})
 	elseif (v.ClassName == "TextButton") or (v.ClassName == "TextLabel") then
 		if not keepText then
 			UIAnimation.Animate(v, tweenInfo, {
