@@ -13,6 +13,7 @@ local recoil = CFrame.new()
 
 function module.Show(item: ItemTypes.Item): ()
     if not item.Base.HoldAnimation then
+        module.Hide()
         return
     end
 

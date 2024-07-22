@@ -104,7 +104,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Magneto Stick"},
+    StartingEquipment = {"Crowbar", "Magneto Stick", "DNA Scanner"},
     AvailableEquipment = Common.Equipment,
 
     Roles = {
@@ -131,7 +131,7 @@ local module: Types.Gamemode = {
             },
 
             StartingCredits = 2,
-			EquipmentShop = {"Radar", "Flare Gun", "Grenade", "Flashbang", "Silenced Pistol", "AWP"},
+			EquipmentShop = {"Radar", "Flare Gun", "Grenade", "Silenced Pistol", "AWP"},
 			CanSeeMissing = true,
 
             HighlightRoles = {"Traitor"},
@@ -164,7 +164,7 @@ local module: Types.Gamemode = {
             CorpseResultsPublicised = true,
 
             StartingCredits = 2,
-            EquipmentShop = {"Radar", "Golden Gun", "Flashbang", "Grenade"},
+            EquipmentShop = {"Radar", "Golden Gun", "Flashbang"},
 
             KnowsRoles = {"Detective"},
         },
