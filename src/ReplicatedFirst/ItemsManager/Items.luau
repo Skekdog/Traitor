@@ -37,7 +37,7 @@ guns.HUGE = {
     Slot = 3,
     CanDrop = true,
     
-    Spread = 1.5,
+    Spread = 2,
 
     Damage = {
         Head = 15,
@@ -64,8 +64,8 @@ guns.HUGE = {
 
     FiredSound = firedSounds("HUGE"),
 
-    RecoilX = 1.0,
-    RecoilY = 2.0,
+    RecoilX = 0.8,
+    RecoilY = 1.2,
 }
 
 guns.Scout = {
@@ -386,8 +386,8 @@ guns.SMG = {
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
-    RecoilX = 0.7,
-    RecoilY = 1.5,
+    RecoilX = 0.5,
+    RecoilY = 1,
 }
 
 guns.AWP = {
