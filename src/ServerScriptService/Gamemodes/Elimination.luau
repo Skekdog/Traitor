@@ -98,8 +98,12 @@ local module: Types.Gamemode = {
         end
 
         local attacker = victim.KilledByParticipant
-        if attacker --[[and attacker ~= victim]] then
-            attacker:AddScore("Kills", 1)
+        if attacker then
+            if attacker == victim then
+                attacker:AddScore("Suicide", -2)
+            else
+                attacker:AddScore("Kills", 1)
+            end
         end
 
         if not moreThanOneSurvivor then

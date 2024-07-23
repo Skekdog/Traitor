@@ -224,6 +224,30 @@ local module: Types.Gamemode = {
             return
         end
 
+        local attacker = victim.KilledByParticipant
+        if attacker then
+            local attackerRole, victimRole = attacker.Role.Name, victim.Role.Name
+            if attacker == victim then
+                attacker:AddScore("Suicide", -2)
+            elseif attackerRole == "Traitor" then
+                if victimRole == "Traitor" then
+                    attacker:AddScore("Killed Traitor", -10)
+                elseif victimRole == "Innocent" then
+                    attacker:AddScore("Killed Innocent", 1)
+                elseif victimRole == "Detective" then
+                    attacker:AddScore("Killed Detective", 3)
+                end
+            elseif attackerRole == "Innocent" or attackerRole == "Detective" then
+                if victimRole == "Traitor" then
+                    attacker:AddScore("Killed Traitor", 4)
+                elseif victimRole == "Innocent" then
+                    attacker:AddScore("Killed Innocent", -2)
+                elseif victimRole == "Detective" then
+                    attacker:AddScore("Killed Detective", -5)
+                end
+            end
+        end
+
         local winner = Common.TestForOneSurvivingRole(self, round)
         if winner then
             round:EndRound(round:GetRoleFromName(winner))
