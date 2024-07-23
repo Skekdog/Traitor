@@ -47,7 +47,7 @@ slayVote.OnServerEvent:Connect(function(plr, target: unknown)
 	end
 end)
 
-local gamemodes = {--[[ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, ]]Elimination}
+local gamemodes = {ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, Elimination}
 
 remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: unknown)
 	local round = GetRound()
@@ -131,6 +131,10 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 	end
 
 	participant:SearchCorpse(corpseParticipant)
+	if participant.Role.PointsForSearchingCorpse then
+		participant:AddScore("Bodies Found", participant.Role.PointsForSearchingCorpse)
+	end
+
 	corpse:SetAttribute("Unidentified", nil)
 	return corpseParticipant:ViewCorpse()
 end

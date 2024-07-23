@@ -153,6 +153,8 @@ local module: Types.Gamemode = {
             StartingEquipment = {"DNA Scanner"},
             Accessories = {},
 
+            PointsForSearchingCorpse = 1,
+
             Allies = {"Innocent", "Detective"},
             Allegiance = "Innocent",
 
@@ -179,6 +181,8 @@ local module: Types.Gamemode = {
                 AssignmentPriority = 3,
                 Sound = 9042819926,
             },
+
+            PointsForSearchingCorpse = 1,
 
             Allies = {"Detective", "Innocent"},
             VictoryMusic = ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
