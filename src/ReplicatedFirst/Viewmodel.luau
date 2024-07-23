@@ -29,7 +29,7 @@ function module.Show(item: ItemTypes.Item): ()
         return
     end
 
-    local viewmodel = camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Viewmodel:Clone()
+    local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Viewmodel:Clone()) :: typeof(ReplicatedStorage.Viewmodel)
 
     if not viewmodel.Parent then
         local shirt = char:FindFirstChildOfClass("Shirt")
@@ -98,13 +98,13 @@ function module.Show(item: ItemTypes.Item): ()
         camera.CFrame *= CFrame.Angles(math.rad(recoil.Y), math.rad(recoil.X), 0)
 
         local rotation = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180))
-        local final = modifiers * rotation * CFrame.new(0, -1.75, -0.75)
-        viewmodel.PrimaryPart.CFrame = final
+        local final = modifiers * rotation * CFrame.new(0, -1.75, -0.75);
+        (viewmodel.PrimaryPart :: BasePart).CFrame = final
     end)
 end
 
 function module.PlayAnimation(id: number): ()
-    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel")
+    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: typeof(ReplicatedStorage.Viewmodel)?
     if not viewmodel then
         return
     end

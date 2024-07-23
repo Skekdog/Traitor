@@ -10,15 +10,15 @@ local function get(attr)
 end
 
 function module.IsPaused(): boolean
-    return get("IsPaused")
+    return get("IsPaused") :: boolean
 end
 
 function module.GetTimeMilestone(): number
-    return get("TimeMilestone")
+    return get("TimeMilestone") :: number
 end
 
 function module.GetStartTime(): number
-    return get("RoundStartTime")
+    return get("RoundStartTime") :: number
 end
 
 local participants: {[string]: Types.ClientParticipant?} = {}
@@ -48,7 +48,7 @@ function module.GetAllParticipants(): {Types.ClientParticipant}
 end
 
 function module.GetRoundPhase(): Types.RoundPhase
-    return get("RoundPhase")
+    return get("RoundPhase") :: Types.RoundPhase
 end
 
 function module.GetMap(): Types.MapStructure?

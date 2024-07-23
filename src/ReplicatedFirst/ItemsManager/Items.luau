@@ -6,25 +6,25 @@ local CreateEmptyPart = require(script.Parent.Parent.CreateEmptyPart)
 local Types = require(script.Parent.Parent.RoundHandler.Types)
 
 local function projectiles(name: string): BasePart
-    return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name)
+    return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
 end
 
 local bullet = projectiles("Bullet")
 
 local function models(name: string): MeshPart
-    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name)
+    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: MeshPart
 end
 
 local function weaponSounds(name: string): Sound
-    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name)
+    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound
 end
 
 local function firedSounds(name: string): Sound
-    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name)
+    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound
 end
 
 local function reloadSounds(name: string): Sound
-    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name)
+    return ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name) :: Sound
 end
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")

@@ -4,8 +4,8 @@ local UIManager = require(script.Parent.Parent)
 local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
-local corpseUi = UIManager.WaitForUI("CorpseInfo")
-local object = (corpseUi.Object :: typeof(UIManager.UnregisteredUIs.CorpseInfo)).CorpseInfo
+local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
+local object = corpseUi.Object.CorpseInfo
 
 local flavourTexts: {[Types.MurderWeapon]: string} = {
 	Crush = "Many of their bones are broken. It seems the impact of a heavy object killed them.",
@@ -33,10 +33,11 @@ local flavourImages: {[Types.MurderWeapon]: string} = {
     Suicide = "rbxassetid://17079244437"
 }
 
+local information = corpseUi.Object.Information
 for _, v in object:GetChildren() do
     if v:IsA("ImageButton") then
         v.MouseButton1Click:Connect(function()
-            object.Parent.Information.Text = v:GetAttribute("Description")
+            information.Text = v:GetAttribute("Description") :: string
         end)
     end
 end
@@ -56,7 +57,7 @@ return function(corpseInfo: Types.CorpseInfo?)
     end
     object.MurderWeapon.TextLabel.Text = weapon
 
-    object.Parent.Information.Text = "Click on an icon to reveal detailed information."
+    information.Text = "Click on an icon to reveal detailed information."
 
     local flavourText = flavourTexts[deathType]
     if deathType == "Firearm" and weapon ~= "Firearm" then
@@ -125,7 +126,7 @@ return function(corpseInfo: Types.CorpseInfo?)
         object.KillList.Visible = false
     end
 
-    object.Parent.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
+    corpseUi.Object.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
 
     local determinerRole = API.StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
     object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)

@@ -83,8 +83,8 @@ local function showPlayerInfo(char: Model)
 		playerInfo.Role.Text = ""
 	end
 
-	playerInfo.Mark.Text = plr:GetAttribute("Mark") or ""
-	playerInfo.Mark.TextColor3 = plr:GetAttribute("MarkColour") or Color3.new(0, 0, 0)
+	playerInfo.Mark.Text = plr:GetAttribute("Mark") :: string or ""
+	playerInfo.Mark.TextColor3 = plr:GetAttribute("MarkColour") :: Color3 or Color3.new(0, 0, 0)
 
 	playerInfo.Visible = true
 	return true

@@ -127,10 +127,10 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 end)
 
 local currentTab = "Highlights"
-local tabs = page.Parent.Tabs
+local tabs = UI.Object.Tabs
 
 local function showTab(tab: string)
-	UIAnimation.TransitionUnderline(tabs.Underline, tabs[tab.."Button"])
+	UIAnimation.TransitionUnderline(tabs.Underline, (tabs :: any)[tab.."Button"])
 	if currentTab == tab then
 		return
 	end

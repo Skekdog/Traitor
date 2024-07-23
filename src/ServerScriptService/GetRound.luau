@@ -4,7 +4,7 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RoundHandler = require(ReplicatedFirst.RoundHandler.RoundHandler)
 
 return function(): Types.Round?
-    local roundId = ServerStorage:GetAttribute("RoundID")
+    local roundId = ServerStorage:GetAttribute("RoundID") :: string
     if not roundId then
         return
     end

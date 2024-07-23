@@ -191,6 +191,7 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Client
 
     for _, v in role.EquipmentShop do
         local equipment = nameToObj[v]
+        assert(equipment.Icon and equipment.Description and equipment.Cost, `Equipment {v} is missing an icon, description, or cost.`)
         
         local entry = shopObject.EquipmentEntry:Clone()
         entry:SetAttribute("CreditCost", equipment.Cost)

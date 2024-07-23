@@ -123,7 +123,7 @@ local module: Types.Adapter = {
     end,
 
     DoIntermission = function()
-        local roundNumber = (ServerStorage:GetAttribute("RoundNumber") or -1) + 1 -- or -1, because +1, so then == 0, so % 5 == 0.
+        local roundNumber = (ServerStorage:GetAttribute("RoundNumber") :: number or -1) + 1 -- or -1, because +1, so then == 0, so % 5 == 0.
         ServerStorage:SetAttribute("RoundNumber", roundNumber)
         if roundNumber % 3 == 0 then
             return true
@@ -271,7 +271,7 @@ local module: Types.Adapter = {
         local oldAnimate = participant.Character:WaitForChild("Animate")
         oldAnimate:Destroy()
 
-        ServerScriptService.Animate:Clone().Parent = participant.Character
+        ServerScriptService.Animate:Clone().Parent = participant.Character :: any
 
         -- local startHeight = nil
         -- hum.StateChanged:Connect(function(oldState, newState)

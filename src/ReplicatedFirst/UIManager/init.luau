@@ -87,7 +87,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				return
 			end
 
-			local mode: BackgroundMenuMode = script:GetAttribute("BackgroundMenuMode")
+			local mode = script:GetAttribute("BackgroundMenuMode") :: BackgroundMenuMode
 			local highestIndex = 0
 			for _, ui in registeredUIs do
 				if ui.Layer == "Popup" and highestIndex < ui.Object.ZIndex and ui.Visible then

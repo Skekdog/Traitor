@@ -43,7 +43,10 @@ local keybindFrame = script.__SettingKeybind
 local selectorFrame = script.__SettingSelector
 local booleanFrame = script.__SettingBoolean
 local touchFrame = script.__SettingTouch
-local settingsFrame = (UIManager.WaitForUI("Settings").Object :: typeof(UIManager.UnregisteredUIs.Settings)).Main
+
+local ui = UIManager.WaitForUI("Settings") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Settings)}
+local uiObject = ui.Object
+local settingsFrame = uiObject.Main
 
 local tabsFrame = settingsFrame.Tabs
 local tabUnderline = tabsFrame.Underline
@@ -73,7 +76,7 @@ for i, v in createdTabs do
 		UIAnimation.TransitionUnderline(tabUnderline, tab)
 		local currentPage
 		for _, b in settingsFrame:GetChildren() do
-			if (b.Name == "Page_"..settingsFrame:GetAttribute("CurrentTab")) then
+			if (b.Name == "Page_"..settingsFrame:GetAttribute("CurrentTab") :: string) then
 				currentPage = b :: GuiObject
 				break
 			end
@@ -93,7 +96,7 @@ for i, v in createdTabs do
 	end
 end
 
-local tt = settingsFrame.Parent.Tooltip
+local tt = uiObject.Tooltip
 local helpTarget: string?
 local function tooltip(text: string, target: string)
 	local show = helpTarget ~= target
@@ -110,16 +113,15 @@ end
 
 local categories = {__len = 0}
 
-local settingsParent = settingsFrame.Parent
-local darken = settingsParent.LayoutDarken
+local darken = uiObject.LayoutDarken
 
 local function done()
-	local name = darken:GetAttribute("Setting")
-	local displayName = darken:GetAttribute("DisplayName")
+	local name = darken:GetAttribute("Setting") :: string
+	local displayName = darken:GetAttribute("DisplayName") :: string
 	SM.SetSetting(name, CAS:GetButton(displayName).Position)
 	CAS:UnbindAction(displayName)
-	settingsParent.Main.Visible = true
-	settingsParent.Close.Visible = true
+	uiObject.Main.Visible = true
+	uiObject.Close.Visible = true
 	darken.Visible = false
 end
 
@@ -127,7 +129,7 @@ UIS.TouchTap:Connect(function(posVectors, proc)
 	if proc then return end
 	if not darken.Visible then return end
 	if darken:GetAttribute("OpenedAt") > (os.time() - 0.001) then return end -- For some reason taps are sometimes detected immediately after
-	local name = darken:GetAttribute("DisplayName")
+	local name = darken:GetAttribute("DisplayName") :: string
 	local posVector: Vector2 = posVectors[1]
 
 	local inset = GUI:GetGuiInset()
@@ -137,8 +139,8 @@ end)
 
 darken.Done.MouseButton1Click:Connect(done)
 
-settingsFrame.Parent:GetPropertyChangedSignal("Visible"):Connect(function()
-	if not settingsFrame.Parent.Visible then
+uiObject:GetPropertyChangedSignal("Visible"):Connect(function()
+	if not uiObject.Visible then
 		ReplicatedStorage:WaitForChild("ClientServer").SaveSettings:FireServer(SM.JSONEncode())
 	end
 end)
@@ -148,7 +150,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 	local tab = setting.Tab
 	local settingType = setting.PossibleValues
 	local name = setting.Name
-	local page = settingsFrame:FindFirstChild("Page_"..tab)
+	local page = settingsFrame:FindFirstChild("Page_"..tab) :: Instance
 	
 	local cat = setting.Category
 	local catIndex = tab.."_"..cat
@@ -331,8 +333,8 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			CAS:BindAction(name, function() return end, true)
 			Controls.SetupTouchButton(name)
 			
-			settingsParent.Main.Visible = false
-			settingsParent.Close.Visible = false
+			uiObject.Main.Visible = false
+			uiObject.Close.Visible = false
 			tooltip("", "NONE")
 			tt.Visible = false
 			darken.Visible = true

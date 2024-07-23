@@ -34,8 +34,8 @@ end
 
 local function playSlidingDoorSound(door: BasePart): ()
     local sound = door:FindFirstChild("SlidingDoorSound") or ServerStorage.SlidingDoorSound:Clone()
-    assert(sound:IsA("Sound"), "DoorSound must be a Sound")
-    sound.Parent = door
+    assert(sound:IsA("Sound"), "DoorSound must be a Sound");
+    (sound :: Sound).Parent = door
     sound.Ended:Once(function()
         sound:Destroy()
     end)

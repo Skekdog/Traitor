@@ -15,7 +15,7 @@ local radarCooldown = 5
 
 local function update(item: string, credits: number)
 	UI.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
-	if credits >= UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost") then
+	if credits >= (UI.ScrollingFrame:FindFirstChild(item) :: Instance):GetAttribute("CreditCost") :: number then
 		UI.CreditCost.TextColor3 = Color3.new(0.294118, 1, 0.243137)
 		UI.CurrentCredits.TextColor3 = Color3.new(0.294118, 1, 0.243137)
 		purchaseButton.TextColor3 = Color3.fromRGB(56, 167, 31)
@@ -59,7 +59,7 @@ local function childAdded(v: Instance)
 		purchaseButton:SetAttribute("Item", v.Name)
 		local cost = v:GetAttribute("CreditCost")
 		UI.CreditCost.Text = `This costs {cost} {if cost == 1 then "credit" else "credits"}.`
-		UI.Description.Text = v:GetAttribute("Description")
+		UI.Description.Text = v:GetAttribute("Description") :: string
 		UI:FindFirstChild("Name").Text = v.Name
 	end)
 end
@@ -72,13 +72,13 @@ end
 local purchaseCon
 type PurchaseResponse = "NoRound" | "NotInRound" | "NotFound" | "NotEnoughCredits" | "NotInStock" | "Dead"?
 purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
-	local item = purchaseButton:GetAttribute("Item")
+	local item = purchaseButton:GetAttribute("Item") :: string
 	
 	if item == "" then
 		return
 	end
 	
-	local creditCost = UI.ScrollingFrame:FindFirstChild(item):GetAttribute("CreditCost")
+	local creditCost = (UI.ScrollingFrame:FindFirstChild(item) :: Instance):GetAttribute("CreditCost") :: number
 
 	local participant = LocalRoundInfo.GetOwnParticipant()
 
@@ -121,7 +121,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 end);
 
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
-	local item = purchaseButton:GetAttribute("Item")
+	local item = purchaseButton:GetAttribute("Item") :: string
 	if item == "" then
 		return
 	end

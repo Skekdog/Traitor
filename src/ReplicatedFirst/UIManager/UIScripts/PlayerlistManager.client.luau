@@ -160,7 +160,7 @@ local function getStatus(order: number): Status
 			if status == "Confirmed" then
 				status = "Dead"
 			end
-			return status
+			return status :: Types.ParticipantStatus
 		end
 	end
 	error("Failed to get status for order: "..order)
@@ -222,7 +222,7 @@ end)
 
 LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.ClientParticipant | string)
 	if type(participant) == "string" then
-		local player = Players:FindFirstChild(participant)
+		local player = Players:FindFirstChild(participant) :: Player
 		if not player then
 			return removePlr(participant)
 		end
