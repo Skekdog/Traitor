@@ -8,6 +8,7 @@ local TweenService = game:GetService("TweenService")
 local Elimination = require(script.Parent.Gamemodes.Elimination)
 local ThoseYouTrust = require(script.Parent.Gamemodes.ThoseYouTrust)
 local GetRound = require(script.Parent.GetRound)
+local ProfileManager = require(script.Parent.ProfileManager)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -265,6 +266,26 @@ joinRound.OnServerInvoke = function(plr)
 					end
 				else
 					sound.Ended:Once(stopMusic)
+				end
+
+				for _, v in round.Participants do
+					local total = 0
+					for _, score in v.Score do
+						total += score
+					end
+
+					local plr = v.Player
+					plr:SetAttribute("Score", plr:GetAttribute("Score") :: number + total)
+					plr:SetAttribute("TotalScore", plr:GetAttribute("TotalScore") :: number + total)
+
+					local profile = ProfileManager.GetProfile(plr)
+					if not profile then
+						continue
+					end
+
+					ProfileManager.UpdateProfile(plr, "TotalPoints", profile.TotalPoints + total)
+
+					UpdateRoundInfo.UpdateParticipant(v)
 				end
 
 				sound.Parent = sound.SoundGroup

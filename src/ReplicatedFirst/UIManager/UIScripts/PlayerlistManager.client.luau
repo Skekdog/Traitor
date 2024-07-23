@@ -71,6 +71,10 @@ function updatePlr(plr: Player, clone: any)
 
 	selectMark(clone.Marks, nil, plr)
 
+	clone.Karma.Text = tostring(clientServer.GetKarma:InvokeServer(plr))
+	clone.Score.Text = tostring(plr:GetAttribute("Score"))
+	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
+
 	movePlr(plr, status :: any)
 
 	if not participant then
@@ -95,8 +99,8 @@ local function createPlr(plr: Player)
 	clone.Username.TextColor3 = Color3.new()
 
 	clone.Karma.Text = tostring(clientServer.GetKarma:InvokeServer(plr))
-	clone.Total.Text = tostring(nil)
-	clone.Score.Text = tostring(nil)
+	clone.Score.Text = tostring(plr:GetAttribute("Score"))
+	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)

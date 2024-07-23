@@ -39,8 +39,11 @@ Players.PlayerAdded:Connect(function(plr): ()
 	end
 	
     local profile = ProfileManager.LoadProfile(plr)
+	plr:SetAttribute("Score", 0)
+	plr:SetAttribute("TotalScore", 0)
 	if profile then
         ReplicatedStorage.ServerClient.LoadSavedData:FireClient(plr, profile.Data.Settings)
+		plr:SetAttribute("TotalScore", profile.Data.TotalPoints)
     end
 
 	InventoryManager.InitInventory(plr)

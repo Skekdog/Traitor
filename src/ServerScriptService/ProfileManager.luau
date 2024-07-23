@@ -9,7 +9,7 @@ module.ProfileTemplate = {
 	Karma = 1000,
 	Settings = SettingsManager.JSONEncode(),
 	TotalPoints = 0,
-	AvailablePoints = 0,
+	SpentPoints = 0,
 	PurchasedAccessories = {},
 }
 
@@ -57,7 +57,8 @@ end
 
 type UpdateProfile =
 	((Player, "Karma", number) -> ()) &
-	((Player, "Settings", string) -> ())
+	((Player, "Settings", string) -> ()) &
+	((Player, "TotalPoints", number) -> ())
 
 module.UpdateProfile = function(plr: Player, key, value): ()
 	if not profiles[plr] then
