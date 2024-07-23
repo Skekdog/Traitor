@@ -4,7 +4,7 @@
 -- Society if core scripts weren't so irritating to work with
 
 -- This is the Animate script as of 22/07/24
--- Only change made is removing the idle and swimIdle animations
+-- Changes made are removing one annoying idle animation, and removing the PlayEmote hook
 
 -- This is loaded in Adapters.LoadCharacter(), as this is not parented to StarterCharacterScripts
 -- Reason it is in ServerScriptService is because i don't want to make a new folder!
@@ -775,29 +775,6 @@ game:GetService("Players").LocalPlayer.Chatted:connect(function(msg)
 		playAnimation(emote, EMOTE_TRANSITION_TIME, Humanoid)
 	end
 end)
-
--- emote bindable hook
-script:WaitForChild("PlayEmote").OnInvoke = function(emote)
-	-- Only play emotes when idling
-	if pose ~= "Standing" then
-		return
-	end
-
-	if emoteNames[emote] ~= nil then
-		-- Default emotes
-		playAnimation(emote, EMOTE_TRANSITION_TIME, Humanoid)
-		
-		return true, currentAnimTrack
-	elseif typeof(emote) == "Instance" and emote:IsA("Animation") then
-		-- Non-default emotes
-		playEmote(emote, EMOTE_TRANSITION_TIME, Humanoid)
-
-		return true, currentAnimTrack
-	end
-	
-	-- Return false to indicate that the emote could not be played
-	return false
-end
 
 if Character.Parent ~= nil then
 	-- initialize to idle
