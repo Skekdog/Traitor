@@ -20,6 +20,12 @@ local function calculateTotalScore(score: Types.ParticipantScoring): number
 	return total
 end
 
+local minimisedScoreSize = sFrame.AbsoluteSize.Y * 0.075
+repeat
+	minimisedScoreSize = sFrame.AbsoluteSize.Y * 0.075
+	task.wait()
+until minimisedScoreSize > 0
+
 ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.FormattedUsername]: Types.ParticipantScoring}, victors: Types.Role | Types.ClientParticipant)
 	if victors.Kind == "ClientParticipant" then
 		hFrame.Winners.Text = victors.Player.Name:upper().." WINS"
@@ -63,21 +69,29 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 		local totalLabel = scoreFrame.Total
 		local scoreList = scoreFrame.Score
 
-		local minimisedSize = sFrame.AbsoluteSize.Y * 0.075
-		repeat
-			minimisedSize = sFrame.AbsoluteSize.Y * 0.075
-		until minimisedSize > 0
+		local openedSize = (minimisedScoreSize / 3) * 10
+		local scoreListSize = (minimisedScoreSize / 3) * 7
 
-		local openedSize = (minimisedSize / 3) * 10
-		local scoreListSize = (minimisedSize / 3) * 7
-
-		scoreList.Position = UDim2.fromOffset(0, minimisedSize)
-		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedSize)
-		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedSize)
+		scoreList.Position = UDim2.fromOffset(0, minimisedScoreSize)
+		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
+		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 
 		usernameLabel.Text = "@"..i
-		totalLabel.Text = calculateTotalScore(v).." Total"
 
+		local total = calculateTotalScore(v)
+		totalLabel.Text = total.." Total"
+
+		scoreFrame.LayoutOrder = -total
+
+		for reason, value in v do
+			local reasonFrame = scoreList.Template:Clone()
+			reasonFrame.Text = reason .. (if value > 0 then " +" else " -") .. math.abs(value)
+			reasonFrame.Name = reason
+			reasonFrame.Visible = true
+			reasonFrame.Parent = scoreList
+		end
+
+		scoreFrame.Name = "ScoreFrame"
 		scoreFrame.Visible = true
 		scoreFrame.Parent = sFrame
 		
@@ -85,7 +99,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 			local open = not scoreFrame:GetAttribute("Open")
 			scoreFrame:SetAttribute("Open", open)
 
-			local targetSize = if open then openedSize else minimisedSize
+			local targetSize = if open then openedSize else minimisedScoreSize
 			local scoreListTarget = if open then scoreListSize else 0
 
 			local tweenInfo = TweenInfo.new(0.2)
@@ -136,14 +150,6 @@ local function showTab(tab: string)
 	end
 	UIAnimation.TransitionUIPage(page:FindFirstChild(currentTab) :: GuiObject, page:FindFirstChild(tab) :: GuiObject, UDim2.fromScale(0.5, 0.5))
 	currentTab = tab
-end
-
-local function _adjustEventFilter(filter, visible)
-	for _, v in eFrame:GetChildren() :: any do
-		if v:GetAttribute("Category") == filter then
-			v.Visible = visible
-		end
-	end
 end
 
 tabs.EventsButton.MouseButton1Click:Connect(function() showTab("Events") end)
