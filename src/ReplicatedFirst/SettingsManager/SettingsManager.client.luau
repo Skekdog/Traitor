@@ -194,7 +194,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			opt.Name = v
 			opt.Text = v
 			opt.Visible = true
-			opt.Position = UDim2.fromScale((i-1) / #settingType, 0)
+			opt.Position = UDim2.fromScale((i-1) / #settingType, 0.5)
 			
 			local selectionUnderline = selections.Underline
 			if SM.GetSetting(setting.Name) == v then

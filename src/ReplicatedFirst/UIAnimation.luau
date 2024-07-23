@@ -212,8 +212,8 @@ function module.TransitionUnderline(underline: Frame, target: TextButton)
 	local shouldAnimate = SettingsManager.GetSetting("Animate UI Transitions")
 	-- We need shouldAnimate because module.Animate might return nil which will error halfSizeTween.Completed which will mean the underline will be stuck at small size
 	
-	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, 0.1, 0)
-	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, 0.1, 0)
+	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, underline.Size.Y.Scale, 0)
+	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, underline.Size.Y.Scale, 0)
 	
 	local newPosition = UDim2.fromScale(target.Position.X.Scale + (target.Size.X.Scale / 2), 1)
 	
