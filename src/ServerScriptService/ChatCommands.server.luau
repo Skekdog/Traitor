@@ -1,9 +1,10 @@
 local Players = game:GetService("Players")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 local Adapters = require(script.Parent.Adapters)
 local GetRound = require(script.Parent.GetRound)
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local RestartServer = require(script.Parent.RestartServer)
 
 -- This is separate from Initialise so that if anything goes badly wrong server restart is still possible.

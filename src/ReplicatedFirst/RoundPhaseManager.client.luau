@@ -1,12 +1,11 @@
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ThemesManager = require(script.Parent.ThemesManager)
 local ToRoundTime = require(script.Parent.ToRoundTime)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
-local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
-local UIManager = require(ReplicatedFirst.UIManager)
+local Types = require(script.Parent.RoundHandler.Types)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local UIManager = require(script.Parent.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 

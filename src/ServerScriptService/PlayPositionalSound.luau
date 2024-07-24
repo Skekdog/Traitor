@@ -1,4 +1,5 @@
-local CreateEmptyPart = require(script.Parent.Parent.ReplicatedFirst.CreateEmptyPart)
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local CreateEmptyPart = require(ReplicatedFirst.CreateEmptyPart)
 
 type SoundId = number | Sound | string
 
