@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(script.Parent.Parent)
+local ToRoundTime = require(script.Parent.Parent.Parent.ToRoundTime)
 local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
@@ -68,7 +69,7 @@ return function(corpseInfo: Types.CorpseInfo?)
     object.MurderWeapon.Image = flavourImages[deathType]
 
     local timeNow = workspace:GetServerTimeNow()
-    object.DeathTime.TextLabel.Text = API.ToRoundTime(corpseInfo.DeathTime, timeNow)
+    object.DeathTime.TextLabel.Text = ToRoundTime(corpseInfo.DeathTime, timeNow)
     object.DeathTime:SetAttribute("Description", `Their watch stopped, indicating that they died {math.round(timeNow - corpseInfo.DeathTime)} seconds ago.`)
 
     object.FreeKill.Visible = corpseInfo.FreeKill
@@ -78,7 +79,7 @@ return function(corpseInfo: Types.CorpseInfo?)
     object.DNADuration.Visible = corpseInfo.DNAExpiry ~= nil
 
     if corpseInfo.DNAExpiry then
-        object.DNADuration.TextLabel.Text = API.ToRoundTime(timeNow, corpseInfo.DNAExpiry)
+        object.DNADuration.TextLabel.Text = ToRoundTime(timeNow, corpseInfo.DNAExpiry)
 
         if timeNow < corpseInfo.DNAExpiry then
             object.DNADuration:SetAttribute("Description", "The killer left a sample of their DNA on the body. Use a DNA Scanner to find them.")

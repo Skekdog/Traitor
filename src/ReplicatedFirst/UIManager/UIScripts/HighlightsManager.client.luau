@@ -1,8 +1,8 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ToRoundTime = require(script.Parent.Parent.Parent.ToRoundTime)
 local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
-local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local uiManager = require(ReplicatedFirst.UIManager)
 
@@ -117,7 +117,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 	for _, v in events do
 		local e = eTemplate:Clone()
 		e.TextLabel.Text = v.Text
-		e.Time.Text = API.ToRoundTime(startTime, v.Timestamp)
+		e.Time.Text = ToRoundTime(startTime, v.Timestamp)
 		e.Visible = true
 		e.Name = "ActiveEvent"
 

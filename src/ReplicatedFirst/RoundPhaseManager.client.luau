@@ -3,9 +3,9 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ThemesManager = require(script.Parent.ThemesManager)
+local ToRoundTime = require(script.Parent.ToRoundTime)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
-local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
@@ -116,7 +116,7 @@ local function updateTimer(time: number)
 		return
 	end
 
-	roundInfo.TopBar.Timer.Text = API.ToRoundTime(time, timeTarget)
+	roundInfo.TopBar.Timer.Text = ToRoundTime(time, timeTarget)
 end
 
 task.spawn(function()
