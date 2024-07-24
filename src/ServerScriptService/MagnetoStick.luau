@@ -50,7 +50,7 @@ local function stopControllingProp(prop: BasePart, userId: number)
     controlledProps[userId] = nil
 end
 
-function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray)
+local function getPropByRay(participant: Types.Participant, ray: Ray): (BasePart?, Vector3?)
     local char = participant.Character
 
     local head = char:FindFirstChild("Head")
@@ -74,6 +74,22 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         return
     end
 
+    local rayParams = RaycastParams.new()
+    rayParams.IgnoreWater = true
+    rayParams.RespectCanCollide = false
+    rayParams.CollisionGroup = "Raycasts"
+    rayParams.FilterType = Enum.RaycastFilterType.Include
+    rayParams.FilterDescendantsInstances = {workspace.Corpses, workspace.Characters, participant.Round.Map :: Types.MapStructureCast}
+
+    local result = workspace:Raycast(head.Position, ray.Direction * 10, rayParams)
+    if not result then
+        return
+    end
+
+    return result.Instance, result.Position
+end
+
+function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray)
     local userId = participant.Player.UserId
     local alreadyControlled = controlledProps[userId]
     if alreadyControlled then
@@ -84,19 +100,19 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         end
     end
 
-    local rayParams = RaycastParams.new()
-    rayParams.IgnoreWater = true
-    rayParams.RespectCanCollide = false
-    rayParams.CollisionGroup = "Raycasts"
-    rayParams.FilterType = Enum.RaycastFilterType.Include
-    rayParams.FilterDescendantsInstances = {workspace.Corpses, workspace.Characters, participant.Round.Map :: Types.MapStructureCast}
-
-    local result = workspace:Raycast(head.Position, cameraRayInfo.Direction * 10, rayParams)
-    if not result then
+    local object = getPropByRay(participant, cameraRayInfo)
+    if not object then
         return
     end
 
-    local object = result.Instance :: BasePart
+    local map = roundHandlerEvents.MapFolder.Value
+    if not map then
+        return
+    end
+
+    local props = map:FindFirstChild("Props")
+    local weaponSpawns = map:FindFirstChild("WeaponSpawns")
+
     local model = object:FindFirstAncestorOfClass("Model")
 
     if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (model and not model:IsDescendantOf(workspace.Corpses)) then
@@ -159,6 +175,11 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         lastHolder.Parent = object
     end
 
+    local head = participant.Character:FindFirstChild("Head")
+    if not head or not head:IsA("BasePart") then
+        return
+    end
+
     controlledProps[userId] = object
     object:SetNetworkOwner(participant.Player)
     alignPos.Attachment1 = head:FindFirstChild("MagnetoAttachment") :: Attachment?
@@ -166,7 +187,11 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
 end
 
 function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
-    
+    local object, position = getPropByRay(participant, cameraRayInfo)
+    if not object or not position then
+        return
+    end
+    object:ApplyImpulseAtPosition(participant.Character:GetPivot().LookVector * 10, position)
 end
 
 function module.OnUnequip(plr: Player): ()
