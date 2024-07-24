@@ -19,9 +19,8 @@ return function(target: string): ()
     local position = if model then model:GetPivot() else CFrame.new()
     local distance = Players.LocalPlayer:DistanceFromCharacter(position.Position)
 
-    if target then
-        LocalRoundInfo.DNACharge = math.max(0, LocalRoundInfo.DNACharge - distance / 2)
-    end
+    local cost = math.max(distance / 2, 15)
+    LocalRoundInfo.DNACharge = math.max(0, LocalRoundInfo.DNACharge - cost)
 
     local clone = radarPoint:Clone()
 
