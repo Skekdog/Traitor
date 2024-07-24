@@ -5,6 +5,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 
+local ActionItems = require(script.Parent.ActionItems)
 local Elimination = require(script.Parent.Gamemodes.Elimination)
 local ThoseYouTrust = require(script.Parent.Gamemodes.ThoseYouTrust)
 local GetRound = require(script.Parent.GetRound)
@@ -301,6 +302,7 @@ joinRound.OnServerInvoke = function(plr)
 			end
 
 			InventoryManager.Reset()
+			ActionItems.ResetCounters()
 			workspace.Projectiles:ClearAllChildren()
 
 			for _, v in round.Participants do

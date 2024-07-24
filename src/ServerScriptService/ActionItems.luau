@@ -19,7 +19,7 @@ local function tweenSlidingDoor(actionItem: Model, door: BasePart, mult: number?
     assert(mult)
 
     local cframe = door.CFrame
-    local target = cframe * CFrame.new(0, 0, mult * 2.8)
+    local target = cframe * CFrame.new(0, 0, mult * (door.Size.X * 0.8))
 
     door.CFrame = target -- on the server we just set it instantly, the client will tween it
     serverClient.TweenSlidingDoor:FireAllClients(door, cframe, target)
@@ -147,9 +147,19 @@ function module.Actions.GiveItem(actionItem: Model, participant: Types.Participa
     InventoryManager.NewItem(Items[item], nil, participant)
 end
 
-function module.Actions.SpawnProp(actionItem: Model, participant: Types.Participant, prop: unknown): ()
+function module.Actions.SpawnProp(actionItem: Model, participant: Types.Participant, prop: unknown, cframe: unknown, relative: unknown): ()
     assert(prop, "Missing Parameter 1")
     assert(typeof(prop) == "string", "Parameter 1 must be a string")
+
+    assert(not cframe or typeof(cframe) == "CFrame" or typeof(cframe) == "Vector3", "Parameter 2 must be nil, CFrame, or Vector3")
+    if typeof(cframe) == "Vector3" then
+        cframe = CFrame.new(cframe)
+    elseif not cframe then
+        cframe = CFrame.new()
+    end
+    assert(typeof(cframe) == "CFrame")
+
+    assert(not relative or typeof(relative) == "boolean", "Parameter 3 must be nil or a boolean")
 
     local props = participant.Round.Map:FindFirstChild("Props")
     assert(props, "Map does not have a props folder")
@@ -160,7 +170,12 @@ function module.Actions.SpawnProp(actionItem: Model, participant: Types.Particip
     assert(propInstance, `Could not find prop with name {prop}`)
 
     propInstance = propInstance:Clone()
-    propInstance:PivotTo(actionItem:GetPivot())
+
+    if relative then
+        cframe *= actionItem:GetPivot()
+    end
+    propInstance:PivotTo(cframe or actionItem:GetPivot())
+
     propInstance.Parent = props
 end
 
@@ -213,52 +228,56 @@ function module.Actions.IncrementCounter(_, _, name: unknown, amount: unknown): 
 end
 
 --todo: This should use Map.Dynamic, not Map.Map
-function module.Actions.MoveMapElement(actionItem: Model, participant: Types.Participant, name: unknown, cframe: unknown): ()
+function module.Actions.MoveMapElement(actionItem: Model, participant: Types.Participant, name: unknown, cframe: unknown, relative: unknown): ()
     assert(name, "Missing Parameter 1")
     assert(typeof(name) == "string", "Parameter 1 must be a string")
 
     name = interpretStringParameter(name)
 
     assert(cframe, "Missing Parameter 2")
-    assert(typeof(cframe) == "CFrame", "Parameter 2 must be a CFrame")
+    assert(typeof(cframe) == "CFrame" or typeof(cframe) == "Vector3", "Parameter 2 must be a CFrame or Vector3")
+
+    if typeof(cframe) == "Vector3" then
+        cframe = CFrame.new(cframe)
+    end
+    assert(typeof(cframe) == "CFrame")
+
+    assert(typeof(relative) == "boolean" or not relative, "Parameter 3 must be boolean or nil")
 
     local element = if name == "__This" then actionItem else participant.Round.Map.Map:FindFirstChild(name, true)
     assert(element, `Map element with name {name} was not found`)
     assert(element:IsA("PVInstance"), `Map element with name {name} is not a moveable Instance (PVInstance)! Check that there are no elements with an identical name.`)
 
-    element:PivotTo(cframe)
+    element:PivotTo(if relative then actionItem:GetPivot() * cframe else cframe)
 end
 
---todo: This should use Map.Dynamic, not Map.Map
-function module.Actions.MoveMapElementRelative(actionItem: Model, participant: Types.Participant, name: unknown, cframe: unknown): ()
-    assert(name, "Missing Parameter 1")
-    assert(typeof(name) == "string", "Parameter 1 must be a string")
-
-    name = interpretStringParameter(name)
-
-    assert(cframe, "Missing Parameter 2")
-    assert(typeof(cframe) == "CFrame", "Parameter 2 must be a CFrame")
-
-    local element = if name == "__This" then actionItem else participant.Round.Map.Map:FindFirstChild(name, true)
-    assert(element, `Map element with name {name} was not found`)
-    assert(element:IsA("PVInstance"), `Map element with name {name} is not a moveable Instance (PVInstance)! Check that there are no elements with an identical name.`)
-
-    element:PivotTo(element:GetPivot() * cframe)
-end
-
-function module.Actions.Teleport(_, participant: Types.Participant, targets: unknown, location: unknown): ()
+function module.Actions.Teleport(actionItem: Model, participant: Types.Participant, targets: unknown, cframe: unknown, relativeTo: unknown): ()
     assert(targets, "Missing Parameter 1")
     assert(typeof(targets) == "string", "Parameter 1 must be __All, __Ally, __Enemy, __This, or a role name")
 
     targets = interpretStringParameter(targets)
 
-    assert(location, "Missing Parameter 2")
-    assert(typeof(location) == "Vector3", "Parameter 2 must be a Vector3")
+    assert(cframe, "Missing Parameter 2")
+    assert(typeof(cframe) == "CFrame" or typeof(cframe) == "Vector3", "Parameter 2 must be a CFrame or Vector3")
+
+    if typeof(cframe) == "Vector3" then
+        cframe = CFrame.new(cframe)
+    end
+    assert(typeof(cframe) == "CFrame")
+
+    local validRelatives = {"__This", "__Player", "__None"}
+    assert(not relativeTo or table.find(validRelatives, relativeTo :: string), "Parameter 3 must be nil or one of: __This, __Player, __None")
 
     local participants = getMatchingParticipants(participant, targets)
 
     for _, v in participants do
-        v.Character:PivotTo(CFrame.new(location))
+        local to = cframe
+        if relativeTo == "__Player" then
+            to *= v.Character:GetPivot()
+        elseif relativeTo == "__This" then
+            to *= actionItem:GetPivot()
+        end
+        v.Character:PivotTo(cframe)
     end
 end
 
@@ -320,12 +339,20 @@ end
 module.Conditions = {}
 
 local function getCounter(participant: Types.Participant, counter: string): number
-    if counter == "Credits" then
+    if counter == "__Credits" then
         return participant:GetCredits()
-    elseif counter == "Health" then
+    elseif counter == "__Health" then
         return participant:GetHealth()
-    elseif counter == "RoundInProgress" then
+    elseif counter == "__RoundInProgress" then
         return if participant.Round:IsRoundInProgress() then 1 else 0
+    elseif counter == "__Score" then
+        local total = 0
+        for _, v in participant.Score do
+            total += v
+        end
+        return total
+    elseif counter:sub(1, 2) == "__" then
+        error("Invalid counter")
     end
     return counters[counter] or 0
 end
@@ -388,68 +415,76 @@ function module.InterpretConditional(participant: Types.Participant, conditional
 end
 
 function module.Execute(actionItem: Model, participant: Types.Participant): ()
-    if not participant then
-        error("Participant must be set")
-    end
-    if actionItem:GetAttribute("Disabled") then
-        return
-    end
-	local attributes = actionItem:GetAttributes() :: {[string]: string | number | CFrame}
-
-	local actions: {[string]: string} = {}
-	local actionParameters: {[string]: {string | number | CFrame}?} = {}
-	local actionOrder: {string} = {}
-
-	local conditions: {[string]: string} = {}
-	for i, v in attributes do
-		local split = i:split("_")
-		if split[2] and split[2]:sub(1, 9) == "Parameter" then
-			local action = actionParameters[split[1]]
-			if not action then
-				action = {}
-				actionParameters[split[1]] = action
-			end
-			assert(action)
-
-			local index = tonumber(split[2]:sub(10, -1))
-			assert(index, `Expected number after parameter name ({i})`)
-
-			table.insert(action, index, v)
-		elseif split[2] and split[2]:sub(1, 9) == "Condition" then
-			assert(typeof(v) == "string", `Condition {i} must be a string`)
-			conditions[split[1]] = v
-		elseif i:sub(1, 6) == "Action" and tonumber(i:sub(7, -1)) then
-			if not module.Actions[v] or typeof(v) ~= "string" then
-				error(`Expected ActionName for {i}`)
-			end
-
-			actions[i] = v
-			table.insert(actionOrder, i)
-		end
-	end
-	
-	for i in conditions do
-		if not table.find(actionOrder, i) then
-			warn(`No Action is associated with condition for {i}`)
-		end
-	end
-	
-	for i in actionParameters do
-        if not table.find(actionOrder, i) then
-            warn(`No Action is associated with {i}`)
+    local success: boolean, err: string? = (pcall :: any)(function() -- as of 24/07/24 pcall is incorrectly typed, hence the cast to any
+        if not participant then
+            error("Participant must be set")
         end
-	end
-
-	table.sort(actionOrder, function(a, b)
-		return tonumber(a:sub(7, -1)) < tonumber(b:sub(7, -1))
-	end)
-	
-	for _, v in actionOrder do
-        if conditions[v] and not module.InterpretConditional(participant, conditions[v]) then
-            break
+        if actionItem:GetAttribute("Disabled") then
+            return
         end
-		module.Actions[actions[v]](actionItem, participant, table.unpack(actionParameters[v] or {}))
-	end
+        local attributes = actionItem:GetAttributes()
+    
+        local actions: {[string]: string} = {}
+        local actionParameters: {[string]: {unknown?}} = {}
+        local actionOrder: {string} = {}
+    
+        local conditions: {[string]: string} = {}
+        for i, v in attributes do
+            local split = i:split("_")
+            if split[2] and split[2]:sub(1, 9) == "Parameter" then
+                local action = actionParameters[split[1]]
+                if not action then
+                    action = {}
+                    actionParameters[split[1]] = action
+                end
+                assert(action)
+    
+                local index = tonumber(split[2]:sub(10, -1))
+                assert(index, `Expected number after parameter name ({i})`)
+    
+                table.insert(action, index, v)
+            elseif split[2] and split[2]:sub(1, 9) == "Condition" then
+                assert(typeof(v) == "string", `Condition {i} must be a string`)
+                conditions[split[1]] = v
+            elseif i:sub(1, 6) == "Action" and tonumber(i:sub(7, -1)) then
+                if not module.Actions[v] or typeof(v) ~= "string" then
+                    error(`Expected ActionName for {i}`)
+                end
+    
+                actions[i] = v
+                table.insert(actionOrder, i)
+            end
+        end
+        
+        for i in conditions do
+            if not table.find(actionOrder, i) then
+                warn(`No Action is associated with condition for {i}`)
+            end
+        end
+        
+        for i in actionParameters do
+            if not table.find(actionOrder, i) then
+                warn(`No Action is associated with {i}`)
+            end
+        end
+    
+        table.sort(actionOrder, function(a, b)
+            return tonumber(a:sub(7, -1)) < tonumber(b:sub(7, -1))
+        end)
+        
+        task.spawn(function()
+            for _, v in actionOrder do
+                if conditions[v] and not module.InterpretConditional(participant, conditions[v]) then
+                    break
+                end
+                module.Actions[actions[v]](actionItem, participant, table.unpack(actionParameters[v] or {}))
+            end
+        end)
+    end)
+
+    if not success then
+        warn(err)
+    end
 end
 
 return module
