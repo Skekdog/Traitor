@@ -28,15 +28,6 @@ end
 local ownParticipant: Types.ClientOwnParticipant?
 local ownRole: Types.Role?
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
-    ownParticipant = participant
-    if ownParticipant then
-        ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
-    else
-        ownRole = nil
-    end
-end)
-
 local function highlight(participant)
     local clone = Instance.new("Highlight")
     CollectionService:AddTag(clone, "AllyMarker")
@@ -46,7 +37,7 @@ local function highlight(participant)
     clone.Parent = participant.Player.Character
 end
 
-LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.ClientParticipant | string)
+local function highlightParticipant(participant: Types.ClientParticipant | string)
     if type(participant) == "string" then
         return
     end
@@ -65,7 +56,21 @@ LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.ClientPar
             end
         end
     end
+end
+
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
+    ownParticipant = participant
+    if ownParticipant then
+        ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
+        for _, v in LocalRoundInfo.GetAllParticipants() do
+            highlight(v)
+        end
+    else
+        ownRole = nil
+    end
 end)
+
+LocalRoundInfo.Listen("UpdateParticipant", highlightParticipant)
 
 local function update(roundPhase)
     if roundPhase == "Destroy" then
