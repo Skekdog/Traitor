@@ -79,7 +79,7 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (BasePart
     rayParams.RespectCanCollide = false
     rayParams.CollisionGroup = "Raycasts"
     rayParams.FilterType = Enum.RaycastFilterType.Include
-    rayParams.FilterDescendantsInstances = {workspace.Corpses, workspace.Characters, participant.Round.Map :: Types.MapStructureCast}
+    rayParams.FilterDescendantsInstances = {workspace.Corpses, props, weaponSpawns}
 
     local result = workspace:Raycast(head.Position, ray.Direction * 10, rayParams)
     if not result then
@@ -191,7 +191,14 @@ function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
     if not object or not position then
         return
     end
-    object:ApplyImpulseAtPosition(participant.Character:GetPivot().LookVector * 10, position)
+
+    local activeHolder = object:FindFirstChild("ActiveHolder") :: NumberValue?
+    if activeHolder and Players:GetPlayerByUserId(activeHolder.Value) then
+        return
+    end
+    
+    object:SetNetworkOwner()
+    object:ApplyImpulseAtPosition(participant.Character:GetPivot().LookVector * 50 * (object.AssemblyMass / 20), position)
 end
 
 function module.OnUnequip(plr: Player): ()
