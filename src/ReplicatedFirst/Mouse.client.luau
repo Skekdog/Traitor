@@ -94,8 +94,10 @@ local corpseHint = crosshairInfoUI.SearchCorpseHint
 local function showCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
-	if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
-		return
+	if not LocalRoundInfo.IsSpectating() then
+		if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
+			return
+		end	
 	end
 
 	local key = ControlManager.GetFirstKeyCode("Interact")

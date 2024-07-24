@@ -113,8 +113,6 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 		end)
 	end
 
-	-- todo: need something for syncing music
-
 	local startTime = LocalRoundInfo.GetStartTime()
 	for _, v in events do
 		local e = eTemplate:Clone()
