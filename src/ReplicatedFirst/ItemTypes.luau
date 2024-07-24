@@ -1,4 +1,4 @@
-local Types = require(script.Parent.Parent.RoundHandler.Types)
+local Types = require(script.Parent.RoundHandler.Types)
 
 type OnUnequipFunction = (player: Player) -> ()
 

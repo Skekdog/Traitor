@@ -1,9 +1,10 @@
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local CreateEmptyPart = require(script.Parent.Parent.ReplicatedFirst.CreateEmptyPart)
-local InventoryManager = require(script.Parent.Parent.ReplicatedFirst.InventoryManager)
-local Items = require(script.Parent.Parent.ReplicatedFirst.ItemsManager.Items)
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundHandler.Types)
+local CreateEmptyPart = require(ReplicatedFirst.CreateEmptyPart)
+local InventoryManager = require(ReplicatedFirst.InventoryManager)
+local Items = require(ReplicatedFirst.Items)
+local Types = require(ReplicatedFirst.RoundHandler.Types)
 local module = {}
 
 local serverClient = ReplicatedStorage.ServerClient

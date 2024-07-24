@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local ItemTypes = require(script.Parent.ItemTypes)
 local Types = require(script.Parent.RoundHandler.Types)
 local replicatedData = ReplicatedStorage:WaitForChild("RoundHandler")
 

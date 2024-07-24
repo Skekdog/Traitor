@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local AimWeaponClient = require(script.Parent.AimWeaponClient)
-local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
+local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local module = {}

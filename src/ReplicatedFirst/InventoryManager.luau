@@ -3,8 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
-local ItemTypes = require(script.Parent.ItemsManager.ItemTypes)
-local Items = require(script.Parent.ItemsManager.Items)
+local ItemTypes = require(script.Parent.ItemTypes)
+local Items = require(script.Parent.Items)
 local Types = require(script.Parent.RoundHandler.Types)
 local module = {}
 

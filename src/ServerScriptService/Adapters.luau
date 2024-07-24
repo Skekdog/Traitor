@@ -9,10 +9,10 @@ local ServerStorage = game:GetService("ServerStorage")
 local ActionItems = require(script.Parent.ActionItems)
 local HitSounds = require(script.Parent.HitSounds)
 local CalculateDamageModifier = require(script.Parent.Parent.ReplicatedFirst.CalculateDamageModifier)
+local StringWithDeterminer = require(script.Parent.Parent.ReplicatedFirst.StringWithDeterminer)
 local PlayPositionalSound = require(script.Parent.PlayPositionalSound)
-local API = require(ReplicatedFirst.API)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
-local Items = require(ReplicatedFirst.ItemsManager.Items)
+local Items = require(ReplicatedFirst.Items)
 local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
 local ProfileManager = require(ServerScriptService.ProfileManager)
 local RestartServer = require(ServerScriptService.RestartServer)
@@ -549,7 +549,7 @@ local module: Types.Adapter = {
                 end
             elseif type(weapon) == "table" then
                 local attack = weapon.AttackType
-                local name = API.StringWithDeterminer(weapon.Name)
+                local name = StringWithDeterminer(weapon.Name)
                 if attack == "Blade" then
                     text ..= ` was stabbed by {name}`
                 elseif attack == "Blunt" then

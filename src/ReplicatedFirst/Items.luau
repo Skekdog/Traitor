@@ -2,8 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ItemTypes = require(script.Parent.ItemTypes)
-local CreateEmptyPart = require(script.Parent.Parent.CreateEmptyPart)
-local Types = require(script.Parent.Parent.RoundHandler.Types)
+local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
+local Types = require(script.Parent.RoundHandler.Types)
 
 local function projectiles(name: string): BasePart
     return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
@@ -965,13 +965,13 @@ items["DNA Scanner"] = {
     end,
 
     OnEquipClient = function()
-        local UIManager = require(script.Parent.Parent.UIManager)
+        local UIManager = require(script.Parent.UIManager)
         local scannerUi = UIManager.WaitForUI("DNAScanner")
         scannerUi:ToggleVisible(true)
     end,
 
     OnUnequipClient = function()
-        local UIManager = require(script.Parent.Parent.UIManager)
+        local UIManager = require(script.Parent.UIManager)
         local scannerUi = UIManager.WaitForUI("DNAScanner")
         scannerUi:ToggleVisible(false)
     end

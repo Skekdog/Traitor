@@ -4,7 +4,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
-local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
+local ItemTypes = require(ReplicatedFirst.ItemTypes)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local ProfileManager = require(script.Parent.ProfileManager)
 

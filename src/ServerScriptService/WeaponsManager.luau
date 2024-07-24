@@ -4,14 +4,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local GetRound = require(script.Parent.GetRound)
 local HitSounds = require(script.Parent.HitSounds)
+local LerpNumber = require(script.Parent.LerpNumber)
 local CalculateDamageModifier = require(script.Parent.Parent.ReplicatedFirst.CalculateDamageModifier)
 local PlayAnimation = require(script.Parent.PlayAnimation)
 local PlayPositionalSound = require(script.Parent.PlayPositionalSound)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
 local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
-local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
+local ItemTypes = require(ReplicatedFirst.ItemTypes)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
-local API = require(ReplicatedFirst.API)
 
 local module = {}
 
@@ -43,7 +43,7 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
     if weapon.Kind == "Gun" or weapon.Kind == "Explosion" then
         local start = weapon.FalloffStart or 0
         if distance >= start then
-            local multiplier = API.LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: ItemTypes.ExplosionInfo).Radius))
+            local multiplier = LerpNumber(1, (weapon.FalloffMultiplier or 0), (distance - start) / (weapon.FalloffEnd or (weapon :: ItemTypes.ExplosionInfo).Radius))
             if multiplier < 0 then
                 multiplier = 0
             end

@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(script.Parent.Parent)
+local StringWithDeterminer = require(script.Parent.Parent.Parent.StringWithDeterminer)
 local ToRoundTime = require(script.Parent.Parent.Parent.ToRoundTime)
-local API = require(ReplicatedFirst.API)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
@@ -62,7 +62,7 @@ return function(corpseInfo: Types.CorpseInfo?)
 
     local flavourText = flavourTexts[deathType]
     if deathType == "Firearm" and weapon ~= "Firearm" then
-        flavourText = flavourText:format(API.StringWithDeterminer(weapon))
+        flavourText = flavourText:format(StringWithDeterminer(weapon))
     end
     object.MurderWeapon:SetAttribute("Description", flavourText)
 
@@ -93,11 +93,11 @@ return function(corpseInfo: Types.CorpseInfo?)
     if #equipment > 0 then
         for i, v in equipment do
             if i == 1 then
-                equipmentText ..= ` {API.StringWithDeterminer(equipment[1].Name)}`
+                equipmentText ..= ` {StringWithDeterminer(equipment[1].Name)}`
             elseif i == #equipment then
-                equipmentText ..= ` and {API.StringWithDeterminer(equipment[i].Name)}`
+                equipmentText ..= ` and {StringWithDeterminer(equipment[i].Name)}`
             else
-                equipmentText ..= `, {API.StringWithDeterminer(equipment[i].Name)}`
+                equipmentText ..= `, {StringWithDeterminer(equipment[i].Name)}`
             end
         end
         equipmentText ..= " on their corpse."
@@ -129,7 +129,7 @@ return function(corpseInfo: Types.CorpseInfo?)
 
     corpseUi.Object.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
 
-    local determinerRole = API.StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
+    local determinerRole = StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
     object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)
 
     task.defer(Players.GetUserThumbnailAsync, Players, corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)

@@ -4,7 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(ReplicatedFirst.ControlManager)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
-local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
+local ItemTypes = require(ReplicatedFirst.ItemTypes)
 local UIManager = require(ReplicatedFirst.UIManager)
 
 local plr = Players.LocalPlayer

@@ -2,7 +2,7 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetRound = require(script.Parent.GetRound)
 local InventoryManager = require(ReplicatedFirst.InventoryManager)
-local ItemTypes = require(ReplicatedFirst.ItemsManager.ItemTypes)
+local ItemTypes = require(ReplicatedFirst.ItemTypes)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local WeaponsManager = require(script.Parent.WeaponsManager)
 

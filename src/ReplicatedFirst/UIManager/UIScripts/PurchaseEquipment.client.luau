@@ -7,8 +7,6 @@ local PingRadar = require(ReplicatedFirst.PingRadar)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local API = require(ReplicatedFirst.API)
-
 local UI = UIManager.WaitForUI("Equipment Shop", true).Object :: typeof(UIManager.UnregisteredUIs["Equipment Shop"])
 local purchaseButton = UI.Purchase
 
