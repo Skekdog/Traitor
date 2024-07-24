@@ -156,7 +156,7 @@ function module.Actions.SpawnProp(actionItem: Model, participant: Types.Particip
     if typeof(cframe) == "Vector3" then
         cframe = CFrame.new(cframe)
     elseif not cframe then
-        cframe = CFrame.new()
+        cframe = actionItem:GetPivot()
     end
     assert(typeof(cframe) == "CFrame")
 
@@ -175,7 +175,7 @@ function module.Actions.SpawnProp(actionItem: Model, participant: Types.Particip
     if relative then
         cframe *= actionItem:GetPivot()
     end
-    propInstance:PivotTo(cframe or actionItem:GetPivot())
+    propInstance:PivotTo(cframe)
 
     propInstance.Parent = props
 end
