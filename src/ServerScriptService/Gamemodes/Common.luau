@@ -113,6 +113,17 @@ module.Equipment = {
         Item = function() end,
     },
     {
+        Name = "Ballistic Vest",
+        Description = "Protects against a limited amount of damage to the torso. Will break after a lot of use and ineffective against non-firearms.",
+        Cost = 1,
+        MaxStock = 1,
+        Icon = "rbxassetid://395920626",
+
+        Item = function(_, participant)
+            participant.Extras.BallisticVest = 60
+        end
+    },
+    {
         Name = "DNA Scanner",
         Description = "scan",
         Item = items["DNA Scanner"]

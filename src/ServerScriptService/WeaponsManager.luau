@@ -101,15 +101,20 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
                     return
                 end
             end
-            
-            -- Would be nicer to use a local for weapon.Kind == "Explosion" but type checker does not reduce correctly then. Here I am writing it out a third time instead :)
-            entity:TakeDamage(damage, attacker, if weapon.Kind == "Explosion" then "Explosion" else round:GetEquipment(weapon.Name), part.Name == "Head" and weapon.Kind ~= "Explosion")
 
             if attacker then
                 local karmaDiff = damage * 1.5
                 karmaDiff *= if attacker:IsDamageJustifiedAgainst(entity) then 1 else -1
                 attacker.Karma += karmaDiff
             end
+
+            if entity.Extras.BallisticVest and entity.Extras.BallisticVest > 0 then
+                entity.Extras.BallisticVest -= damage
+                return
+            end
+            
+            -- Would be nicer to use a local for weapon.Kind == "Explosion" but type checker does not reduce correctly then. Here I am writing it out a third time instead :)
+            entity:TakeDamage(damage, attacker, if weapon.Kind == "Explosion" then "Explosion" else round:GetEquipment(weapon.Name), part.Name == "Head" and weapon.Kind ~= "Explosion")
         else
             entity:TakeDamage(damage, attacker)
         end
