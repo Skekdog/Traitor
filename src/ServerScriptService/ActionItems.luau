@@ -20,7 +20,7 @@ local function tweenSlidingDoor(actionItem: Model, door: BasePart, mult: number?
     assert(mult)
 
     local cframe = door.CFrame
-    local target = cframe * CFrame.new(0, 0, mult * (door.Size.X * 0.8))
+    local target = cframe * CFrame.new(0, 0, mult * (door.Size.Z * 0.8))
 
     door.CFrame = target -- on the server we just set it instantly, the client will tween it
     serverClient.TweenSlidingDoor:FireAllClients(door, cframe, target)
