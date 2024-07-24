@@ -351,9 +351,6 @@ module.UpdateAmmo = function(plr: Player)
     end
 
     local current = weapon.CurrentAmmo
-    if current == math.huge then
-        return
-    end
 
     local size: number?
     local reserve: number
@@ -493,8 +490,8 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
         module.OnItemTouched(itemInstance.Instance :: BasePart, participant.Round, part)
     end)
 
-    module.Items[itemInstance.Instance] = itemInstance :: any
-    module.AddEquipment(participant.Player, itemInstance :: any)
+    module.Items[itemInstance.Instance] = itemInstance
+    module.AddEquipment(participant.Player, itemInstance)
 
     return itemInstance :: any
 end

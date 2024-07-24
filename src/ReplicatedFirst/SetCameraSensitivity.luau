@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 
-local CameraInput = (require :: any)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("CameraModule"):WaitForChild("CameraInput"))
+local CameraInput = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("CameraModule"):WaitForChild("CameraInput"))
 local OriginalFunction = CameraInput.getRotation
 
 return function(multiplier: number): ()
