@@ -426,18 +426,15 @@ function module.OnItemTouched(weapon: BasePart, round: Types.Round, part: BasePa
     end
     
     if not item then
-        module.NewItem(base, weapon, participant)
+        module.NewItem(base, participant)
     end
 
     module.AddEquipment(participant.Player, module.Items[weapon])
     weapon.Parent = nil
 end
 
-function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: Instance?, participant: Types.Participant): Item
-    assert(instance)
-
-    instance = base.Model:Clone()
-    assert(instance:IsA("BasePart"))
+function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, participant: Types.Participant): Item
+    local instance = base.Model:Clone()
 
     local itemInstance: ItemTypes.Item = {} :: ItemTypes.Item
 

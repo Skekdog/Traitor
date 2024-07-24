@@ -150,7 +150,7 @@ local module: Types.Adapter = {
             end
         end
         
-        InventoryManager.NewItem(base, item.Item, participant)
+        InventoryManager.NewItem(base, participant)
 
         return
     end,

@@ -1,5 +1,4 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 -- Not a Gamemode, but contains some useful functions that are used by multiple Gamemodes.
 -- Not a part of the standard implementation, can be removed to your tastes.
 
@@ -7,42 +6,29 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local module = {}
 
-local items = ReplicatedStorage.WeaponModels
-
 module.Equipment = {
     {
         Name = "Crowbar",
         AttackType = "Blunt",
-
-        Item = items.Crowbar
     },
     {
         Name = "Magneto Stick",
-        Item = items["Magneto Stick"]
     },
     {
         Name = "Pistol",
         AttackType = "Firearm",
-
-        Item = items.Pistol
     },
     {
         Name = "BAR",
         AttackType = "Firearm",
-
-        Item = items.BAR
     },
     {
         Name = "Assault Rifle",
         AttackType = "Firearm",
-
-        Item = items["Assault Rifle"]
     },
     {
         Name = "XM1014",
         AttackType = "Firearm",
-
-        Item = items.XM1014
     },
     {
         Name = "Golden Gun",
@@ -51,8 +37,6 @@ module.Equipment = {
         Cost = 1,
         AttackType = "Firearm",
         MaxStock = 1,
-
-        Item = items["Golden Gun"]
     },
     {
         Name = "Flare Gun",
@@ -61,28 +45,20 @@ module.Equipment = {
         AttackType = "Firearm",
         MaxStock = 1,
         Cost = 1,
-
-        Item = items["Flare Gun"]
     },
     {
         Name = "Smoke Grenade",
         Icon = "rbxassetid://8096856961",
-
-        Item = items["Smoke Grenade"]
     },
     {
         Name = "Incendiary Grenade",
         Icon = "rbxassetid://8096856961",
         AttackType = "Explosion",
         NoDNA = true,
-
-        Item = items["Incendiary Grenade"]
     },
     {
         Name = "Discombobulator",
         Icon = "rbxassetid://8096856961",
-
-        Item = items.Discombobulator
     },
     {
         Name = "Grenade",
@@ -92,8 +68,6 @@ module.Equipment = {
         MaxStock = 1,
         AttackType = "Explosion",
         NoDNA = true,
-
-        Item = items.Grenade
     },
     {
         Name = "Flashbang",
@@ -101,7 +75,6 @@ module.Equipment = {
         Cost = 1,
         Icon = "rbxassetid://10753198321",
         MaxStock = 2,
-        Item = items.Flashbang,
     },
     {
         Name = "Radar",
@@ -125,26 +98,18 @@ module.Equipment = {
     },
     {
         Name = "DNA Scanner",
-        Description = "scan",
-        Item = items["DNA Scanner"]
     },
     {
         Name = "SMG",
         AttackType = "Firearm",
-
-        Item = items["SMG"]
     },
     {
         Name = "Deagle",
         AttackType = "Firearm",
-
-        Item = items["Deagle"]
     },
     {
         Name = "Glock",
         AttackType = "Firearm",
-
-        Item = items["Glock"]
     },
     {
         Name = "Silenced Pistol",
@@ -154,8 +119,6 @@ module.Equipment = {
 
         Cost = 1,
         MaxStock = 2,
-
-        Item = items["Silenced Pistol"]
     },
     {
         Name = "AWP",
@@ -165,20 +128,14 @@ module.Equipment = {
 
         Cost = 1,
         MaxStock = 2,
-
-        Item = items["AWP"]
     },
     {
         Name = "Scout",
         AttackType = "Firearm",
-
-        Item = items["Scout"]
     },
     {
         Name = "HUGE",
         AttackType = "Firearm",
-
-        Item = items["HUGE"]
     },
 } :: {Types.Equipment}
 
