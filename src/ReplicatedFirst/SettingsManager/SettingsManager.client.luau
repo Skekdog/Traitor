@@ -5,6 +5,7 @@ local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local SM = require(script.Parent)
+local ScreenMessage = require(script.Parent.Parent.ScreenMessage)
 local TextInput = require(script.Parent.Parent.TextInput)
 local UIAnimation = require(script.Parent.Parent.UIAnimation)
 
@@ -32,7 +33,6 @@ end
 
 ReplicatedFirst:SetAttribute("ControlsReady", true)
 
-local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
 local Controls = require(ReplicatedFirst.ControlManager)
 
@@ -297,12 +297,12 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			for _, v in keybindingCons do
 				v:Disconnect()
 			end
-			local msg = API.ScreenMessage("Info", "Press F5 to cancel keybinding.")
+			local msg = ScreenMessage("Info", "Press F5 to cancel keybinding.")
 			CAS:BindActionAtPriority("SelectKeybind", function(_, state, input)
 				
 				if state ~= Enum.UserInputState.End then return end
 				if (input.KeyCode == Enum.KeyCode.F5) then
-					API.ScreenMessage("Info", "Cancelled keybinding.")
+					ScreenMessage("Info", "Cancelled keybinding.")
 					if msg then msg:Destroy() end
 					CAS:UnbindAction("SelectKeybind")
 				end
@@ -313,7 +313,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				SM.SetSetting(name, cur)
 				if msg then msg:Destroy() end
 				updateBinds({t})
-				API.ScreenMessage("Success", "Keybinding updated!")
+				ScreenMessage("Success", "Keybinding updated!")
 				CAS:UnbindAction("SelectKeybind")
 				return
 			end, false, 100000, Enum.UserInputType.MouseButton1, Enum.UserInputType.MouseButton2, Enum.UserInputType.Keyboard, Enum.UserInputType.Gamepad1, Enum.UserInputType.MouseButton3)
@@ -324,7 +324,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		frame.Label.Text = name
 		frame.MouseButton1Click:Connect(function(): ()
 			if not UIS.TouchEnabled then
-				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
+				return ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
 			darken:SetAttribute("Setting", name)
 			darken:SetAttribute("OpenedAt", workspace:GetServerTimeNow())
@@ -346,7 +346,7 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		frame.Label.Text = name
 		frame.MouseButton1Click:Connect(function(): ()
 			if not UIS.TouchEnabled then
-				return API.ScreenMessage("Info", "You must have touchscreen enabled to use this.")
+				return ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
 			local newScale = TextInput.Create(name, "Number", "0.5-3", "TouchScale")
 			if newScale then

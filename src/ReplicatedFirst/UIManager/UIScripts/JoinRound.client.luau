@@ -1,9 +1,10 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local ScreenMessage = require(script.Parent.Parent.Parent.ScreenMessage)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
-local API = require(ReplicatedFirst.API)
 local UIManager = require(ReplicatedFirst.UIManager)
+
 local this = UIManager.WaitForUI("JoinRound") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.JoinRound)}
 
 local validPhases = {"Waiting", "Preparing", "Destroy"}
@@ -15,7 +16,7 @@ this.Object.MouseButton1Click:Connect(function()
 	if not success then
 		isInRound = false
 		this:ToggleVisible(table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil)
-		API.ScreenMessage("Error", "Failed to join round.")
+		ScreenMessage("Error", "Failed to join round.")
 		return
 	end
 end)

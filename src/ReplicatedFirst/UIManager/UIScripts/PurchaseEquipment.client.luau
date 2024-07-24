@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
+local ScreenMessage = require(script.Parent.Parent.Parent.ScreenMessage)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local PingRadar = require(ReplicatedFirst.PingRadar)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -102,19 +103,19 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 		if credits >= creditCost then
 			local response: PurchaseResponse = ReplicatedStorage:WaitForChild("RoundHandler").PurchaseEquipment:InvokeServer(item)
 			if response == "NoRound" then
-				API.ScreenMessage("Error", "Round is not loaded.")
+				ScreenMessage("Error", "Round is not loaded.")
 			elseif response == "NotInRound" then
-				API.ScreenMessage("Error", "Not in round.")
+				ScreenMessage("Error", "Not in round.")
 			elseif response == "NotFound" then
-				API.ScreenMessage("Error", "Item not found.")
+				ScreenMessage("Error", "Item not found.")
 			elseif response == "NotEnoughCredits" then
-				API.ScreenMessage("Error", "You do not have enough credits to purchase this.")
+				ScreenMessage("Error", "You do not have enough credits to purchase this.")
 			elseif response == "NotInStock" then
-				API.ScreenMessage("Error", "You have purchased the maximum amount of this item.")
+				ScreenMessage("Error", "You have purchased the maximum amount of this item.")
 			elseif response == "Dead" then
-				API.ScreenMessage("Error", "You are dead.")
+				ScreenMessage("Error", "You are dead.")
 			elseif response == "SlotInUse" then
-				API.ScreenMessage("Error", "This slot is already being used.")
+				ScreenMessage("Error", "This slot is already being used.")
 			end
 		end
 	end)
