@@ -74,7 +74,7 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
     ProfileManager.UpdateProfile(plr, "Settings", options)
 end)
 
-local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item | ItemTypes.Weapon)
+local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item)
 	InventoryManager.InvEvent:FireClient(plr, event, equipment)
 end
 
@@ -112,7 +112,7 @@ InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: unk
 	end
 
 	local inventory = InventoryManager.GetInventory(plr)
-	local foundEquipment: ItemTypes.Item? | ItemTypes.Weapon?
+	local foundEquipment: ItemTypes.Item?
 	for _, v in inventory do
 		if v.Base.Name == equipmentName then
 			foundEquipment = v
