@@ -106,7 +106,7 @@ function module.SetupTouchButton(actionName)
 
 		CS:AddTag(butt, "StyledUI")
 		butt:SetAttribute("Style", "Primary")
-		butt:SetAttribute("StyleData", "UpdateImage")
+		butt:SetAttribute("UpdateImage", true)
 
 		ThemesManager.UpdateThemeInstance(butt, nil, true)
 		ThemesManager.UpdateThemeInstance(actionText, nil, true)

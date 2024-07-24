@@ -49,10 +49,6 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	local inverse = v:GetAttribute("Inverse")
 	local keepText = v:GetAttribute("KeepText")
 	local updateImage = v:GetAttribute("UpdateImage")
-
-	if v:GetAttribute("StyleData") then
-		error("remember to remove styledata, from: "..v:GetFullName())
-	end
 	
 	local style = v:GetAttribute("Style")
 	

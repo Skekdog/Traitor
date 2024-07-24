@@ -153,14 +153,13 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Client
             equipmentShop = nil
         end
 
-        roleLabel:SetAttribute("StyleData", "")
         ThemesManager.UpdateThemeInstance(roleLabel)
         roleLabel.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
         return
     end
 
     roleLabel.Text = role.Name
-    roleLabel:SetAttribute("StyleData", "KeepText")
+    roleLabel:SetAttribute("KeepText", true)
     roleLabel.TextColor3 = role.Colour
 
     if not role.EquipmentShop or #role.EquipmentShop <= 0 then
