@@ -12,13 +12,9 @@ local Viewmodel = require(script.Parent.Viewmodel)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
-local activeTween: Tween?
 local function setHealth(hum: Humanoid)
     roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.round(hum.Health))
-    if activeTween then
-        activeTween:Cancel()
-    end
-    activeTween = UIAnimation.Animate(roundInfo.Frame.HealthBar.Background, TweenInfo.new(0.1),  {Size = UDim2.new(hum.Health / hum.MaxHealth, 0, 1, 0)})
+    UIAnimation.Slider(roundInfo.Frame.HealthBar.Background, false, hum.Health, hum.MaxHealth)
 end
 
 local function onDeath()

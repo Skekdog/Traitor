@@ -248,4 +248,8 @@ function module.TransitionUnderline(underline: Frame, target: TextButton)
 	{ Position = newPosition })
 end
 
+function module.Slider(background: Frame, noTransition: boolean?, value: number, max: number): ()
+	module.Animate(background, TweenInfo.new(0.1), {Size = UDim2.new(value / max, 0, 1, 0)}, noTransition)
+end
+
 return module

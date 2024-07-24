@@ -78,14 +78,10 @@ end)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 local ammoBar = roundInfo.Frame.AmmoBar
-local activeTween: Tween?
 local function setAmmo(current: number, magazineSize: number, reserve: number, noTransition: boolean?)
     LocalRoundInfo.Ammo = current
     ammoBar.AmmoLabel.Text = `{current} / {magazineSize} + {reserve}`
-    if activeTween then
-        activeTween:Cancel()
-    end
-    activeTween = UIAnimation.Animate(ammoBar.Background, TweenInfo.new(0.1), {Size = UDim2.new(current / magazineSize, 0, 1, 0)}, noTransition)
+    UIAnimation.Slider(ammoBar.Background, noTransition, current, magazineSize)
 end
 
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
