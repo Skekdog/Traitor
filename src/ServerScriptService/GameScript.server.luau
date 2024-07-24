@@ -133,9 +133,6 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 	end
 
 	participant:SearchCorpse(corpseParticipant)
-	if participant.Role.PointsForSearchingCorpse then
-		participant:AddScore("Bodies Found", participant.Role.PointsForSearchingCorpse)
-	end
 
 	corpse:SetAttribute("Unidentified", nil)
 	return corpseParticipant:ViewCorpse()
