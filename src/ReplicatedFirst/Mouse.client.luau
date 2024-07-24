@@ -73,8 +73,8 @@ local function showPlayerInfo(char: Model)
 		karmaText = "Liability"
 	end
 
-	playerInfo.Karma.Text = karmaText	
-	playerInfo.Karma.TextColor3 = Color3.new(1, 0, 0):Lerp(Color3.new(1, 1, 1), karma / 1000)
+	playerInfo.Karma.Text = karmaText
+	playerInfo.Karma.TextColor3 = Color3.new(1, 0.4, 0):Lerp(Color3.new(1, 1, 1), (karma - 600) / 400)
 
 	if role then
 		playerInfo.Role.TextColor3 = role.Colour
