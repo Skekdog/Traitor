@@ -186,8 +186,8 @@ function module.Show(item: ItemTypes.Item): ()
         breathingSpring.target = Vector3.new(math.cos(timeNow) / 2, math.cos(timeNow), math.cos(timeNow) / 2) / 5
         breathingSpring:update(dt)
 
-        cameraRecoilSpring:update(dt)
-        armRecoilSpring:update(dt)
+        cameraRecoilSpring:update(1 / 60)
+        armRecoilSpring:update(1 / 60)
 
         local isMoving = hum.MoveDirection:Dot(hum.MoveDirection) > 0
         
@@ -248,7 +248,7 @@ LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
         end
 
         armRecoilSpring.p = Vector3.new(x, y, 0)
-        cameraRecoilSpring.p = Vector3.new(y * 2, x * 2, x + y)
+        cameraRecoilSpring.p = Vector3.new(y, x, x + y)
     elseif item.Kind == "Melee" then
         module.PlayAnimation(item.Base.HitAnimation)
     end
