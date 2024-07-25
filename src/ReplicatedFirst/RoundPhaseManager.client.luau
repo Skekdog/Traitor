@@ -62,7 +62,7 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Client
     if ownParticipant then
         ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
         for _, v in LocalRoundInfo.GetAllParticipants() do
-            highlight(v)
+            highlightParticipant(v)
         end
     else
         ownRole = nil
