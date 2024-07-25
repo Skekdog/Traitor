@@ -86,7 +86,18 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (BasePart
         return
     end
 
-    return result.Instance :: BasePart, result.Position
+    local object = result.Instance :: BasePart
+    local model = object:FindFirstAncestorOfClass("Model")
+
+    if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (model and not model:IsDescendantOf(workspace.Corpses)) then
+        return
+    end
+
+    if object.AssemblyMass == math.huge then -- anchored props have inf assemblymass
+        return
+    end
+
+    return object, result.Position
 end
 
 function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray)
@@ -110,24 +121,11 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         return
     end
 
-    local props = map:FindFirstChild("Props")
-    local weaponSpawns = map:FindFirstChild("WeaponSpawns")
-
-    local model = object:FindFirstAncestorOfClass("Model")
-
-    if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (model and not model:IsDescendantOf(workspace.Corpses)) then
-        return
-    end
-
     if object:GetAttribute("NoGrab") then
         return
     end
 
     if alreadyControlled == object then
-        return
-    end
-
-    if object.AssemblyMass == math.huge then -- anchored props have inf assemblymass
         return
     end
 

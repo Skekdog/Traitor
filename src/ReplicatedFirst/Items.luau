@@ -159,6 +159,8 @@ guns["Golden Gun"] = {
     FalloffMultiplier = 1,
 
     Spread = 0,
+
+    LaserColour = Color3.fromRGB(47, 47, 255),
     
     MagazineSize = 1,
 

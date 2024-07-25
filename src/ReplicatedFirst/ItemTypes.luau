@@ -97,6 +97,8 @@ export type GunDefinition = {
     Model: BasePart,
     HoldAnimation: number,
 
+    LaserColour: Color3?,
+
     Damage: DamageInfo,
 
     FiredSound: Sound,

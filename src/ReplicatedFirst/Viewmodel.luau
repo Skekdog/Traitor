@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local AimWeaponClient = require(script.Parent.AimWeaponClient)
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local Types = require(script.Parent.RoundHandler.Types)
 
 local module = {}
 
@@ -11,6 +12,93 @@ local renderCon: RBXScriptConnection?
 
 local recoilTarget = CFrame.new()
 local recoil = CFrame.new()
+
+type Viewmodel = typeof(ReplicatedStorage.Viewmodel)
+local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
+    if not gun.LaserColour then
+        return
+    end
+
+    local item = viewmodel:FindFirstChild("Item")
+    if not item or not item:IsA("BasePart") then
+        return
+    end
+
+    local attachment = item:FindFirstChild("LaserAttachment", true)
+    if not attachment or not attachment:IsA("Attachment") then
+        return
+    end
+
+    local laser = item:FindFirstChild("Laser") :: typeof(ReplicatedStorage.Laser)?
+    local ball = item:FindFirstChild("Ball") :: Part?
+
+    if not ball then
+        ball = Instance.new("Part")
+        assert(ball)
+
+        ball.Anchored = true
+        ball.Shape = Enum.PartType.Ball
+        ball.Size = Vector3.one * 1.75
+
+        ball.CastShadow = false
+        ball.Transparency = 0.2
+        ball.Material = Enum.Material.Neon
+        ball.Color = gun.LaserColour
+
+        ball.CanCollide = false
+        ball.CanTouch = false
+        ball.CanQuery = false
+        
+        ball.TopSurface = Enum.SurfaceType.Smooth
+        ball.BottomSurface = Enum.SurfaceType.Smooth
+        ball.LeftSurface = Enum.SurfaceType.Smooth
+        ball.RightSurface = Enum.SurfaceType.Smooth
+        ball.FrontSurface = Enum.SurfaceType.Smooth
+        ball.BackSurface = Enum.SurfaceType.Smooth
+
+        ball.Name = "Ball"
+        ball.Parent = item
+    end
+    assert(ball)
+
+    if not laser then
+        laser = ReplicatedStorage.Laser:Clone()
+        assert(laser)
+
+        laser.Color = gun.LaserColour
+        laser.Material = Enum.Material.Neon
+
+        laser.Parent = item
+    end
+
+    assert(laser)
+
+    local camera = workspace.CurrentCamera
+    local direction = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2, 1).Direction * 10000
+
+    local rayParams = RaycastParams.new()
+    local map = ReplicatedStorage.RoundHandler.MapFolder.Value :: Types.MapStructureCast?
+    if map then
+        local bounds = map:FindFirstChild("Bounds")
+        if bounds then
+            rayParams:AddToFilter(bounds)
+        end
+    end
+    rayParams.FilterDescendantsInstances = {viewmodel}
+    rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
+    local result = workspace:Raycast(attachment.WorldPosition, direction, rayParams)
+
+    local distance = if result then result.Distance else 10000
+    local half = distance / 2
+
+    laser.Mesh.Scale = Vector3.new(0.2, half, 0.2)
+
+    laser.PivotOffset = CFrame.new(0, -half, 0)
+    laser:PivotTo(CFrame.lookAlong(attachment.WorldPosition, direction) * CFrame.Angles(math.rad(-90), 0, 0))
+
+    ball.Position = if result then result.Position else Vector3.new()
+end
 
 function module.Show(item: ItemTypes.Item): ()
     if not item.Base.HoldAnimation then
@@ -29,7 +117,7 @@ function module.Show(item: ItemTypes.Item): ()
         return
     end
 
-    local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Viewmodel:Clone()) :: typeof(ReplicatedStorage.Viewmodel)
+    local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Viewmodel:Clone()) :: Viewmodel
 
     if not viewmodel.Parent then
         local shirt = char:FindFirstChildOfClass("Shirt")
@@ -61,11 +149,21 @@ function module.Show(item: ItemTypes.Item): ()
     motor.Part0 = viewmodel.RightHand
     motor.Part1 = model
     motor.Parent = model
+
+    local function configure(part: BasePart): ()
+        part.Anchored = false
+        part.CanCollide = false
+        part.CanTouch = false
+        part.CanQuery = false
+        part.Massless = true
+    end
     
-    model.Anchored = false
-    model.CanCollide = false
-    model.CanTouch = false
-    model.CanQuery = false
+    configure(model)
+    for _, v in model:GetDescendants() do
+        if v:IsA("BasePart") then
+            configure(v)
+        end
+    end
 
     model.Parent = viewmodel
 
@@ -100,11 +198,15 @@ function module.Show(item: ItemTypes.Item): ()
         local rotation = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180))
         local final = modifiers * rotation * CFrame.new(0, -1.75, -0.75);
         (viewmodel.PrimaryPart :: BasePart).CFrame = final
+
+        if item.Kind == "Gun" then
+            laser(viewmodel, item.Base)
+        end
     end)
 end
 
 function module.PlayAnimation(id: number): ()
-    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: typeof(ReplicatedStorage.Viewmodel)?
+    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
     if not viewmodel then
         return
     end
