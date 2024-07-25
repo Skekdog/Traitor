@@ -79,14 +79,14 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (BasePart
     rayParams.RespectCanCollide = false
     rayParams.CollisionGroup = "Raycasts"
     rayParams.FilterType = Enum.RaycastFilterType.Include
-    rayParams.FilterDescendantsInstances = {workspace.Corpses, props, weaponSpawns}
+    rayParams.FilterDescendantsInstances = {workspace.Corpses, props :: Instance, weaponSpawns :: Instance}
 
     local result = workspace:Raycast(head.Position, ray.Direction * 10, rayParams)
     if not result then
         return
     end
 
-    return result.Instance, result.Position
+    return result.Instance :: BasePart, result.Position
 end
 
 function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray)

@@ -77,7 +77,7 @@ return function(format: string, text: string, formatOverrides: {[string]: any}?)
 	
 	label.Text = text
 
-	local gui: Frame = Players.LocalPlayer.PlayerGui.Special.ScreenMessage
+	local gui: Frame = (Players.LocalPlayer.PlayerGui:WaitForChild("Special") :: any).ScreenMessage
 	label.Size = UDim2.fromScale(0.8, 0.05)
 	label.AnchorPoint = Vector2.new(0.5, 0)
 	label.Position = UDim2.fromScale(0.5, 0.05 * (#gui:GetChildren() + 1))
