@@ -30,7 +30,7 @@ type InventoryRemote = {
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 module.InvEvent = (serverClient.InventoryEvent :: any) :: InventoryRemote
 
-local ammoData: {[string]: {Magazine: number, Max: number, [number]: nil}} = {
+local ammoData: {[string]: {Magazine: number, Max: number}} = {
     ["Assault Rifle"] = {Magazine = 20, Max = 60},
     Shotgun = {Magazine = 8, Max = 16},
     Deagle = {Magazine = 8, Max = 32},
