@@ -5,13 +5,16 @@ local AimWeaponClient = require(script.Parent.AimWeaponClient)
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
+local spring = require(script.Parent.spring)
 
 local module = {}
 
 local renderCon: RBXScriptConnection?
 
-local recoilTarget = CFrame.new()
-local recoil = CFrame.new()
+local cameraRecoilSpring = spring.new(nil, nil, nil, 20, 0.8)
+local armRecoilSpring = spring.new(nil, nil, nil, 20, 0.8)
+local breathingSpring = spring.new(nil, nil, nil, 1, 10)
+local bobbingSpring = spring.new(nil, nil, nil, 10, 1)
 
 type Viewmodel = typeof(ReplicatedStorage.Viewmodel)
 local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
@@ -177,26 +180,32 @@ function module.Show(item: ItemTypes.Item): ()
         renderCon:Disconnect()
     end
 
-    local bobbing = CFrame.new()
     renderCon = RunService.RenderStepped:Connect(function(dt: number)
-        local breathing = CFrame.new(0, math.cos(os.clock() * 2) / 100, 0)
-        local isMoving = hum.MoveDirection:Dot(hum.MoveDirection) > 0
+        local timeNow = os.clock()
 
-        recoil = recoil:Lerp(recoilTarget, dt * 30)
+        breathingSpring.target = Vector3.new(math.cos(timeNow) / 2, math.cos(timeNow), math.cos(timeNow) / 2) / 5
+        breathingSpring:update(dt)
+
+        cameraRecoilSpring:update(dt)
+        armRecoilSpring:update(dt)
+
+        local isMoving = hum.MoveDirection:Dot(hum.MoveDirection) > 0
         
         if isMoving then
-            local bob = math.sin(os.clock() * 6) / 3
-            bobbing = bobbing:Lerp(CFrame.new(bob, bob, bob), dt)
+            bobbingSpring.target = Vector3.new(math.sin(timeNow * 7) * 0.1, math.sin(timeNow * 10) * 0.1, 0)
         else
-            bobbing = bobbing:Lerp(CFrame.new(), dt)
+            bobbingSpring.target = Vector3.zero
         end
 
-        local modifiers = breathing * bobbing * recoil
+        bobbingSpring:update(dt)
 
-        camera.CFrame *= CFrame.Angles(math.rad(recoil.Y), math.rad(recoil.X), 0)
+        local modifiers = breathingSpring.p + bobbingSpring.p + armRecoilSpring.p
+
+        local r = cameraRecoilSpring.p
+        camera.CFrame *= CFrame.Angles(math.rad(r.X), math.rad(r.Y), math.rad(r.Z))
 
         local rotation = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180))
-        local final = modifiers * rotation * CFrame.new(0, -1.75, -0.75);
+        local final = CFrame.new(modifiers) * rotation * CFrame.new(0, -1.75, -0.75);
         (viewmodel.PrimaryPart :: BasePart).CFrame = final
 
         if item.Kind == "Gun" then
@@ -238,11 +247,8 @@ LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
             y /= 2
         end
 
-        recoilTarget *= CFrame.new(x, y, 0)
-        
-        task.delay(0.15, function()
-            recoilTarget *= CFrame.new(-x, -y, 0)
-        end)
+        armRecoilSpring.p = Vector3.new(x, y, 0)
+        cameraRecoilSpring.p = Vector3.new(y * 2, x * 2, x + y)
     elseif item.Kind == "Melee" then
         module.PlayAnimation(item.Base.HitAnimation)
     end

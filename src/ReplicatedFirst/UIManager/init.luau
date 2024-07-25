@@ -178,7 +178,6 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	if ignoreInset and not object:GetAttribute("InsetAdjusted") then
 		object:SetAttribute("InsetAdjusted", true)
 		object.Size += UDim2.fromOffset(inset.X, inset.Y)
-		object.Position -= UDim2.fromOffset(inset.X / 2, inset.Y / 2)
 	end
 	
 	if transitionStyle then

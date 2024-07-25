@@ -64,8 +64,8 @@ guns.HUGE = {
 
     FiredSound = firedSounds("HUGE"),
 
-    RecoilX = 0.8,
-    RecoilY = 1.2,
+    RecoilX = 1,
+    RecoilY = 2,
 }
 
 guns.Scout = {
