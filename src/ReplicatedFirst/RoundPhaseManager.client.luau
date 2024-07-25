@@ -27,7 +27,7 @@ end
 local ownParticipant: Types.ClientOwnParticipant?
 local ownRole: Types.Role?
 
-local function highlight(participant)
+local function highlight(participant: Types.ClientParticipant)
     local clone = Instance.new("Highlight")
     CollectionService:AddTag(clone, "AllyMarker")
     clone.FillTransparency = 1
@@ -153,8 +153,9 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.Client
             equipmentShop = nil
         end
 
-        ThemesManager.UpdateThemeInstance(roleLabel)
         roleLabel.Text = if LocalRoundInfo.GetRoundPhase() == "Destroy" then "SPECTATING" else "PREPARING"
+        roleLabel:SetAttribute("KeepText")
+        ThemesManager.UpdateThemeInstance(roleLabel)
         return
     end
 

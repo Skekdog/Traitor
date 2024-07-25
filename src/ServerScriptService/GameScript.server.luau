@@ -283,7 +283,7 @@ joinRound.OnServerInvoke = function(plr)
 
 					ProfileManager.UpdateProfile(plr, "TotalPoints", profile.TotalPoints + total)
 
-					UpdateRoundInfo.UpdateParticipant(v)
+					--UpdateRoundInfo.UpdateParticipant(v)
 				end
 
 				sound.Parent = sound.SoundGroup

@@ -78,11 +78,13 @@ function updatePlr(plr: Player, clone: any)
 	movePlr(plr, status :: any)
 
 	if not participant then
+		clone.Username:SetAttribute("KeepText")
 		return ThemesManager.UpdateThemeInstance(clone.Username)
 	end
 
 	local role = LocalRoundInfo.GetRole(participant.Role)
 	if role.Name == "" or LocalRoundInfo.GetRoundPhase() == "Destroy" then
+		clone.Username:SetAttribute("KeepText")
 		ThemesManager.UpdateThemeInstance(clone.Username)
 	else
 		clone.Username:SetAttribute("KeepText", true)
