@@ -1,5 +1,5 @@
 return function(time: number, target: number): string
-	local diffTime = math.max(math.round(target - time), 0)
+	local diffTime = math.max(0, math.round(target - time))
 	local minutes = tostring(diffTime // 60)
 	local seconds = tostring(diffTime % 60)
 
