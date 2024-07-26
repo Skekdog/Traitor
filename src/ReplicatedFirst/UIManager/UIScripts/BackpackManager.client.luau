@@ -50,18 +50,17 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 end
 
 -- 25 padding, X size is 0.065
+local INV_BUTTON_SIZE = 0.065
+local INV_BUTTON_PADDING = 25
 local function move(clone: typeof(sample), order: number, middle: number): ()
 	local difference = order - middle
+	local mult = if difference < 0 then -1 else 1
+	
 	local relativePosition
-	print(difference)
 	if order == middle then
 		relativePosition = UDim2.new()
 	else
-		relativePosition = UDim2.new(0.098 * difference, if difference < 0 then -25 else 25, 0, 0)
-	end
-
-	if math.abs(difference) == 1 then
-		relativePosition -= UDim2.fromScale(0.033 * if difference < 0 then -1 else 1, 0)
+		relativePosition = UDim2.new((INV_BUTTON_SIZE * 1.5 * difference) - (INV_BUTTON_SIZE * 0.5 * mult), INV_BUTTON_PADDING * mult, 0, 0)
 	end
 
 	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + relativePosition})
