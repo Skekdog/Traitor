@@ -131,7 +131,7 @@ local module: Types.Gamemode = {
             },
 
             StartingCredits = 2,
-			EquipmentShop = {"Radar", "Flare Gun", "Grenade", "Silenced Pistol", "AWP"},
+			EquipmentShop = {"Radar", "Flare Gun", "Grenade", "Silenced Pistol", "AWP", "Ballistic Vest"},
 			CanSeeMissing = true,
 
             HighlightRoles = {"Traitor"},
@@ -150,7 +150,7 @@ local module: Types.Gamemode = {
                 Sound = 9042823666,
             },
 
-            StartingEquipment = {"DNA Scanner"},
+            StartingEquipment = {"DNA Scanner", "Ballistic Vest"},
             Accessories = {},
 
             PointsForSearchingCorpse = 1,

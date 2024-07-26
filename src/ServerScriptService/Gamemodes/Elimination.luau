@@ -71,7 +71,7 @@ local module: Types.Gamemode = {
             VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
             VictoryText = "The round has ended.",
 
-            EquipmentShop = {"Grenade", "Flashbang", "Flare Gun", "AWP"},
+            EquipmentShop = {"Grenade", "Flashbang", "Flare Gun", "AWP", "Ballistic Vest"},
             StartingEquipment = {"Radar"},
 
             KnowsRoles = {"Competitor"},

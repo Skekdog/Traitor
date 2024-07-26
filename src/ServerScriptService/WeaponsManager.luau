@@ -108,7 +108,7 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
                 attacker.Karma += karmaDiff
             end
 
-            if entity.Extras.BallisticVest and entity.Extras.BallisticVest > 0 then
+            if weapon.Kind == "Gun" and entity.Extras.BallisticVest and entity.Extras.BallisticVest > 0 then
                 entity.Extras.BallisticVest -= damage
                 return
             end

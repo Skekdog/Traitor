@@ -712,7 +712,7 @@ grenades.Flashbang = {
     Name = "Flashbang",
     Description = "Explodes in a good radius after 3 seconds, blinding and deafening anyone in range.",
 
-    Slot = 7,
+    Slot = 8,
     CanDrop = true,
 
     Model = models("Flashbang"),
