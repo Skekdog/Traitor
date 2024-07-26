@@ -44,6 +44,10 @@ ReplicatedStorage:WaitForChild("ServerClient").OpenSettings.OnClientEvent:Connec
 	manager.WaitForUI("Settings"):ToggleVisible(true)
 end)
 
+-- If we do not have this event, then the server fires various data sync events before the client begins listening, resulting in desync. This is a (bad) fix.
+task.wait(1)
+ReplicatedStorage:WaitForChild("ClientServer").RequestData:FireServer()
+
 local CASui = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge) :: any
 local CASFrame = CASui:WaitForChild("ContextButtonFrame")
 CASFrame.Size = UDim2.fromScale(1, 1)

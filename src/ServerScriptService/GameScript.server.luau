@@ -345,4 +345,6 @@ joinRound.OnServerInvoke = function(plr)
 	return
 end
 
-Players.PlayerAdded:Connect(sendRoundInfo)
+ReplicatedStorage.ClientServer.RequestData.OnServerEvent:Connect(function(plr)
+	sendRoundInfo(plr)
+end)
