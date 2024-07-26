@@ -132,7 +132,10 @@ return function(corpseInfo: Types.CorpseInfo?)
     local determinerRole = StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
     object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)
 
-    task.defer(Players.GetUserThumbnailAsync, Players, corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    task.defer(function()
+        local thumbnail = Players:GetUserThumbnailAsync(corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+        object.Avatar.Image = thumbnail
+    end)
 
     corpseUi:ToggleVisible(true)
 end
