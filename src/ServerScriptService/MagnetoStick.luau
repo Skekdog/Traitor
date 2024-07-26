@@ -217,13 +217,13 @@ task.spawn(function()
             end
             
             local distance = plr:DistanceFromCharacter(prop.Position)
-            if distance == 0 or distance > 20 then
+            if distance == 0 or distance > 30 then -- 30 is quite high but we want to account for network lag and such
                 stopControllingProp(prop, userId)
                 continue
             end
 
             for _, v in prop:GetTouchingParts() do
-                if v:FindFirstAncestorOfClass("Model") == plr.Character then
+                if v.Name:match("Foot") and v:FindFirstAncestorOfClass("Model") == plr.Character then
                     stopControllingProp(prop, userId)
                     continue
                 end
