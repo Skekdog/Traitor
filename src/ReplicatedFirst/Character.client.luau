@@ -89,7 +89,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
                     clientServer.PrimaryFire:InvokeServer(getCenterRay())
                 end
             else
-                while input.UserInputState == Enum.UserInputState.Begin do
+                while input.UserInputState == Enum.UserInputState.Begin and InventoryManager.GetEquipped(plr) == item do
                     if clientServer.PrimaryFire:InvokeServer(getCenterRay()) and item.Kind ~= "Item" then
                         LocalRoundInfo.PrimaryFire(item)
                     end

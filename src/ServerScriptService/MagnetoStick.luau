@@ -11,7 +11,7 @@ local controlledProps: {[number]: BasePart} = {}
 local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
-local function stopControllingProp(prop: BasePart, userId: number)
+local function stopControllingProp(prop: BasePart, userId: number, stoppedHoldingStick: boolean?)
     if not prop:IsDescendantOf(workspace) then
         return
     end
@@ -42,7 +42,7 @@ local function stopControllingProp(prop: BasePart, userId: number)
     end)
 
     local plr = Players:GetPlayerByUserId(userId)
-    if plr then
+    if plr and not stoppedHoldingStick then
         PlayAnimation(plr, 13269497293, "MagnetoAnimation")
         serverClient.PlayViewmodelAnimation:FireClient(plr, 13269497293)
     end
@@ -203,7 +203,7 @@ function module.OnUnequip(plr: Player): ()
     local userId = plr.UserId
     local prop = controlledProps[userId]
     if prop then
-        stopControllingProp(prop, userId)
+        stopControllingProp(prop, userId, true)
     end
 end
 
