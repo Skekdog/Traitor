@@ -17,7 +17,7 @@ sample.Parent = nil -- so that it doesn't get counted for animation
 local selectedEquipment: ItemTypes.Item?
 
 local function unequip(equipment: ItemTypes.Item): ()
-	local found = backpack:FindFirstChild(equipment.Base.Name) :: TextButton
+	local found = backpack.Container:FindFirstChild(equipment.Base.Name) :: TextButton
 	if found then
 		found.BackgroundTransparency = 0.75
 	end
@@ -33,7 +33,7 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 			return Enum.ContextActionResult.Sink
 		else
 			InventoryManager.Equip(plr, equipment)
-			local found = backpack:FindFirstChild(equipment.Base.Name) :: TextButton
+			local found = backpack.Container:FindFirstChild(equipment.Base.Name) :: TextButton
 			if found then
 				found.BackgroundTransparency = 0.25
 			end
@@ -49,7 +49,6 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 	return Enum.ContextActionResult.Sink
 end
 
--- 25 padding, X size is 0.065
 local INV_BUTTON_SIZE = 0.065
 local INV_BUTTON_PADDING = 25
 local function move(clone: typeof(sample), order: number, middle: number): ()
