@@ -338,20 +338,15 @@ local module: Types.Adapter = {
     end,
 
     LoadProp = function(round, prop)
-        local object = prop.PropInstance
-        if not object:IsA("BasePart") then
-            return
-        end
+        local object = prop.PropInstance.PrimaryPart :: BasePart
 
         local oldOnBreak = prop.OnBreak
         prop.OnBreak = function(self)
-            if self.PropInstance:IsA("BasePart") then
-                local material = self.PropInstance:GetAttribute("MaterialOverride") or self.PropInstance.Material.Name
-                PlayPositionalSound(HitSounds[material] or HitSounds.Default, self.PropInstance.Position)
+            local material = self.PropInstance:GetAttribute("MaterialOverride") or object.Material.Name
+            PlayPositionalSound(HitSounds[material] or HitSounds.Default, object.Position)
 
-                if prop.Attacker then
-                    ActionItems.Execute(prop.PropInstance, prop.Attacker)
-                end
+            if prop.Attacker then
+                ActionItems.Execute(prop.PropInstance, prop.Attacker)
             end
             oldOnBreak(self)
         end
@@ -369,12 +364,12 @@ local module: Types.Adapter = {
                 return
             end
 
-            local activeHolder = object:FindFirstChild("ActiveHolder") :: NumberValue?
+            local activeHolder = prop.PropInstance:FindFirstChild("ActiveHolder") :: NumberValue?
             if activeHolder and Players:GetPlayerByUserId(activeHolder.Value) then
                 return
             end
 
-            local lastHolder = object:FindFirstChild("LastHolder") :: NumberValue?
+            local lastHolder = prop.PropInstance:FindFirstChild("LastHolder") :: NumberValue?
 
             if not lastHolder then
                 return
@@ -393,13 +388,11 @@ local module: Types.Adapter = {
             end
 
             local damage = (energy - 2000) / 1000
-            if prop:HasHealth() then
-                prop:TakeDamage(damage, lastHolderParticipant)
-            end
+            prop:TakeDamage(damage, lastHolderParticipant)
 
             local windows = round.Map:FindFirstChild("Windows")
             if windows and windows:IsAncestorOf(part) then
-                return ShatterGlass(part, object.AssemblyLinearVelocity / 100)
+                return ShatterGlass(part :: BasePart, object.AssemblyLinearVelocity / 100)
             end
             
             if not char then

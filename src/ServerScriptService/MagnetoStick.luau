@@ -154,7 +154,7 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
 
         alignPos.Attachment0 = attachPoint
 
-        attachPoint.Parent = object
+        attachPoint.Parent = object.PrimaryPart
         alignPos.Parent = object
     end
 

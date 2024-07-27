@@ -178,9 +178,7 @@ guns["Golden Gun"] = {
     AimSpreadMultiplier = 0,
 
     BeforeHitProp = function(attacker, target)
-        if target:HasHealth() then
-            target:TakeDamage(math.huge, attacker)
-        end
+        target:TakeDamage(math.huge, attacker)
         return true
     end,
 
