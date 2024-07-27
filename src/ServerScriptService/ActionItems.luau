@@ -167,7 +167,7 @@ function module.Actions.SpawnProp(actionItem: Model, participant: Types.Particip
 
     prop = interpretStringParameter(prop)
 
-    local propInstance = props:FindFirstChild(prop) :: PVInstance?
+    local propInstance = props:FindFirstChild(prop) :: Model?
     assert(propInstance, `Could not find prop with name {prop}`)
 
     propInstance = propInstance:Clone()
@@ -475,10 +475,12 @@ function module.Execute(actionItem: Model, participant: Types.Participant): ()
         
         task.spawn(function()
             for _, v in actionOrder do
-                if conditions[v] and not module.InterpretConditional(participant, conditions[v]) then
+                local condition = conditions[v]
+                if not condition or module.InterpretConditional(participant, condition) then
+                    module.Actions[actions[v]](actionItem, participant, table.unpack(actionParameters[v] or {}))
+                elseif condition and not actionItem:GetAttribute(v.."_ConditionContinue") then
                     break
                 end
-                module.Actions[actions[v]](actionItem, participant, table.unpack(actionParameters[v] or {}))
             end
         end)
     end)
