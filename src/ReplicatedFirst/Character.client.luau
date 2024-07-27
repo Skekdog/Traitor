@@ -64,8 +64,8 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     local camera = workspace.CurrentCamera
     while char.Parent do
         task.wait(1 / 60)
-        local y, _, _ = camera.CFrame:ToOrientation()
-        local neck = char:FindFirstChild("Neck", true) :: Motor6D
+        local y = camera.CFrame:ToOrientation()
+        local neck = char:FindFirstChild("Neck", true) :: Motor6D?
         if not neck then
             continue
         end
