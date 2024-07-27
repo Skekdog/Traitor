@@ -69,11 +69,12 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
         end
     else
         if weapon.BeforeHitProp then
-            if weapon.BeforeHitProp(attacker, entity, if entity:HasHealth() then entity:GetHealth() - damage <= 0 else false, part.Name) then
+            local health = entity:GetHealth()
+            if weapon.BeforeHitProp(attacker, entity, if health then health - damage <= 0 else false, part.Name) then
                 return
             end
         end
-        if not entity:HasHealth() then
+        if not entity:GetHealth() then
             return
         end
     end
@@ -121,18 +122,6 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
     end
 end
 
-local function findPropAncestor(prop: Instance, propsFolder: Folder): Types.PropInstance?
-    if prop == propsFolder then
-        return
-    end
-    assert(prop.Parent)
-    if prop.Parent == propsFolder then
-        return prop :: Types.PropInstance
-    else
-        return findPropAncestor(prop.Parent, propsFolder)
-    end
-end
-
 local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition, attacker: Types.Participant?, rayResult: RaycastResult, origin: Vector3): ()
     local part = rayResult.Instance :: BasePart
     local windows = round.Map:FindFirstChild("Windows")
@@ -157,7 +146,7 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
         end
 
         onEntityHit(round, weapon, attacker, victim, part, rayResult.Distance, (rayResult.Position - origin).Unit)
-    elseif not model or not model:IsDescendantOf(workspace.Corpses) then
+    elseif model and not model:IsDescendantOf(workspace.Corpses) then
         ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
 
         if weapon.Kind == "Melee" then
@@ -167,10 +156,7 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
 
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
         if mapProps and part:IsDescendantOf(mapProps) then
-            local prop = round._props[findPropAncestor(part, mapProps) :: Types.PropInstance]
-            if not prop then
-                return
-            end
+            local prop = round._props[model :: Types.PropInstance]
             onEntityHit(round, weapon, attacker, prop, part, rayResult.Distance, (rayResult.Position - origin).Unit)
         end
     elseif model and weapon.BeforeHitCorpse then
@@ -226,14 +212,16 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
     for _, part in workspace:GetPartBoundsInRadius(position, explosionInfo.Radius) do
         local distance = (position - part.Position).Magnitude
         if props and part:IsDescendantOf(props) then
-            local prop = findPropAncestor(part, props)
+            local prop = part:FindFirstAncestorWhichIsA("Model")
             if not prop then
                 continue
             end
-            local roundProp = round:GetProp(prop)
+
+            local roundProp = round:GetProp(prop :: Types.PropInstance)
             if table.find(propsHit, roundProp) then
                 continue
             end
+            
             table.insert(propsHit, roundProp)
             onEntityHit(round, explosionInfo, attacker, roundProp, part, distance, (part.Position - position).Unit)
         elseif windows and part:IsDescendantOf(windows) then

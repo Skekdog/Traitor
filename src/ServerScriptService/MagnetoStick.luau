@@ -6,12 +6,12 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local module = {}
 
-local controlledProps: {[number]: BasePart} = {}
+local controlledProps: {[number]: Model} = {}
 
 local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
-local function stopControllingProp(prop: BasePart, userId: number, stoppedHoldingStick: boolean?)
+local function stopControllingProp(prop: Model, userId: number, stoppedHoldingStick: boolean?)
     if not prop:IsDescendantOf(workspace) then
         return
     end
@@ -31,7 +31,7 @@ local function stopControllingProp(prop: BasePart, userId: number, stoppedHoldin
         if not prop:IsDescendantOf(workspace) then
             return
         end
-        prop:SetNetworkOwnershipAuto()
+        (prop.PrimaryPart :: BasePart):SetNetworkOwnershipAuto()
         lastHolder.Value = 0
     end)
 
@@ -50,7 +50,7 @@ local function stopControllingProp(prop: BasePart, userId: number, stoppedHoldin
     controlledProps[userId] = nil
 end
 
-local function getPropByRay(participant: Types.Participant, ray: Ray): (BasePart?, Vector3?)
+local function getPropByRay(participant: Types.Participant, ray: Ray): (Model?, Vector3?)
     local char = participant.Character
 
     local head = char:FindFirstChild("Head")
@@ -97,7 +97,7 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (BasePart
         return
     end
 
-    return object, result.Position
+    return model, result.Position
 end
 
 function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray)
@@ -129,8 +129,15 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         return
     end
 
-    local biggestPlane = math.max(object.Size.X, object.Size.Y, object.Size.Z)
-    if (object.AssemblyMass > 160) or (object.Size.X * object.Size.Y * object.Size.Z > 50) or (biggestPlane > 5) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
+    local size = object:GetExtentsSize()
+    local biggestPlane = math.max(size.X, size.Y, size.Z)
+
+    local primaryPart = object.PrimaryPart
+    assert(primaryPart)
+
+    local mass = primaryPart.AssemblyMass
+
+    if (mass > 160) or (size.X * size.Y * size.Z > 50) or (biggestPlane > 5) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
         return
     end
 
@@ -138,7 +145,7 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
     if not alignPos.Parent then
         alignPos.Responsiveness = 200
         alignPos.MaxVelocity = 40
-        alignPos.MaxForce = 10000 * (object.AssemblyMass / 20) -- 20 is the mass of a Mesa Monocraft barrel
+        alignPos.MaxForce = 10000 * (mass / 20) -- 20 is the mass of a Mesa Monocraft barrel
         alignPos.ApplyAtCenterOfMass = true
         alignPos.Mode = Enum.PositionAlignmentMode.TwoAttachment
 
@@ -179,7 +186,7 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
     end
 
     controlledProps[userId] = object
-    object:SetNetworkOwner(participant.Player)
+    primaryPart:SetNetworkOwner(participant.Player)
     alignPos.Attachment1 = head:FindFirstChild("MagnetoAttachment") :: Attachment?
     alignPos.Enabled = true
 end
@@ -194,9 +201,12 @@ function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
     if activeHolder and Players:GetPlayerByUserId(activeHolder.Value) then
         return
     end
+
+    local primaryPart = object.PrimaryPart
+    assert(primaryPart)
     
-    object:SetNetworkOwner()
-    object:ApplyImpulseAtPosition(participant.Character:GetPivot().LookVector * 50 * (object.AssemblyMass / 20), position)
+    primaryPart:SetNetworkOwner()
+    primaryPart:ApplyImpulseAtPosition(participant.Character:GetPivot().LookVector * 50 * (primaryPart.AssemblyMass / 20), position)
 end
 
 function module.OnUnequip(plr: Player): ()
@@ -215,17 +225,25 @@ task.spawn(function()
                 stopControllingProp(prop, userId)
                 continue
             end
+
+            local primaryPart = prop.PrimaryPart
+            assert(primaryPart)
             
-            local distance = plr:DistanceFromCharacter(prop.Position)
+            local distance = plr:DistanceFromCharacter(primaryPart.Position)
             if distance == 0 or distance > 30 then -- 30 is quite high but we want to account for network lag and such
                 stopControllingProp(prop, userId)
                 continue
             end
 
-            for _, v in prop:GetTouchingParts() do
-                if v.Name:match("Foot") and v:FindFirstAncestorOfClass("Model") == plr.Character then
-                    stopControllingProp(prop, userId)
-                    continue
+            -- That's a lot of looping - is it really a good idea? Maybe try to make this run in parallel?
+            for _, part in prop:GetDescendants() do
+                if part:IsA("BasePart") and part.CanCollide then
+                    for _, v in primaryPart:GetTouchingParts() do
+                        if v.Name:match("Foot") and v:FindFirstAncestorOfClass("Model") == plr.Character then
+                            stopControllingProp(prop, userId)
+                            continue
+                        end
+                    end
                 end
             end
         end
