@@ -1,9 +1,7 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local manager = require(script.Parent.Parent)
-local controls = require(ReplicatedFirst.ControlManager)
 
 local orders = {
 	Special = 4,
@@ -30,7 +28,8 @@ for _, object in manager.UnregisteredUIs:GetChildren() do
 	manager.RegisterUI(object :: GuiObject)
 end
 
-controls.Register("Close UI", false, function()
+local ControlManager = require(script.Parent.Parent.Parent.ControlManager)
+ControlManager.Register("Close UI", false, function()
 	for _, v in manager.GetUIs("Popup") do
 		if v.Visible and not v.NoClose then
 			v:ToggleVisible(false)

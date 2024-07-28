@@ -1,26 +1,38 @@
-local Players = game:GetService("Players")
+local UIManager = require(script.Parent.UIManager)
+
 local textInput = {}
 
-local index = 0
-function textInput.Create(text: string, inputType: "Number", range: string, context: string): any?
-	index = index + 1
-	local clone = script.TextInput:Clone()
-	local can = clone.Darken.CancelButton
-	local but = clone.Darken.TextButton
-	local box = clone.Darken.TextBox
-	
+local ui = UIManager.WaitForUI("TextInput") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.TextInput)}
+local object = ui.Object
+
+local box = object.TextBox
+local confirm = object.TextButton
+local cancel = object.CancelButton
+
+local cons: {RBXScriptConnection} = {}
+local val: NumberValue?
+
+function textInput.Create(text: string, inputType: "Number", range: string, context: string): number?
+	box.Text = ""
 	box.PlaceholderText = `{text} ({range})`
-	clone.Enabled = true
-	clone.Name = `{context}{inputType}TextInput{index}`
-	clone.Parent = Players.LocalPlayer.PlayerGui :: any
+	ui:ToggleVisible(true)
+
+	for _, v in cons do
+		v:Disconnect()
+	end
+	cons = {}
+
+	if val then
+		val:Destroy()
+	end
 	
-	local val = Instance.new(inputType.."Value") :: NumberValue
-	val.Parent = clone
+	val = Instance.new(inputType.."Value") :: NumberValue
+	assert(val)
 	
 	local min = tonumber(string.split(range, "-")[1]) :: number
 	local max = tonumber(string.split(range, "-")[2]) :: number
 	
-	but.MouseButton1Click:Once(function()
+	table.insert(cons, confirm.MouseButton1Click:Once(function()
 		local num = tonumber(box.Text)
 		if inputType == "Number" then
 			if num then
@@ -28,17 +40,17 @@ function textInput.Create(text: string, inputType: "Number", range: string, cont
 			end
 			return
 		end
-		val.Value = tonumber(box.Text) :: number
-	end)
+	end))
 	
-	can.MouseButton1Click:Once(function()
-		val.Value = tonumber("-inf") :: number
-		clone:Destroy()
-	end)
+	table.insert(cons, cancel.MouseButton1Click:Once(function()
+		val.Value = -math.huge
+	end))
 	
 	val.Changed:Wait()
-	clone:Destroy()
-	return if val.Value ~= tonumber("-inf") then val.Value else nil
+
+	ui:ToggleVisible(false)
+
+	return if val.Value == -math.huge then nil else val.Value
 end
 
 return textInput

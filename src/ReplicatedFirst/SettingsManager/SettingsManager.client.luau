@@ -5,9 +5,6 @@ local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local SM = require(script.Parent)
-local ScreenMessage = require(script.Parent.Parent.ScreenMessage)
-local TextInput = require(script.Parent.Parent.TextInput)
-local UIAnimation = require(script.Parent.Parent.UIAnimation)
 
 -- This must be run before anything yields, especially todo with ui
 local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
@@ -30,8 +27,11 @@ else
 		SM.SetSetting(i, v)
 	end
 end
-
 ReplicatedFirst:SetAttribute("ControlsReady", true)
+
+local UIAnimation = require(script.Parent.Parent.UIAnimation)
+local ScreenMessage = require(script.Parent.Parent.ScreenMessage)
+local TextInput = require(script.Parent.Parent.TextInput)
 
 local UIManager = require(ReplicatedFirst.UIManager)
 local Controls = require(ReplicatedFirst.ControlManager)

@@ -259,7 +259,7 @@ function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 		if not warned and not ignoreYield then
 			if start + 5 <= os.clock() then
 				warned = true
-				warn(debug.traceback(`Infinite yield possible on WaitForUI("{name}")`, 1))
+				warn(debug.traceback(`Infinite yield possible on WaitForUI("{name}")`, 0))
 			end
 		end
 	until UIManager.TryGetUI(name)
