@@ -15,6 +15,7 @@ end
 
 local scope = UIManager.WaitForUI("Scope")
 local function aim(aiming: boolean): ()
+    local Viewmodel = (require)(script.Parent.Viewmodel)
     if aiming then
         local item = InventoryManager.GetEquipped(Players.LocalPlayer)
         if not item or item.Kind ~= "Gun" then
@@ -30,12 +31,16 @@ local function aim(aiming: boolean): ()
         else
             scope:ToggleVisible(false)
         end
+
+        Viewmodel.PlayAnimation(item.Base.AimAnimation, "AimAnimation")
     else
         SetCameraSensitivity(1)
         scope:ToggleVisible(false)
 
         local camera = workspace.CurrentCamera
         TweenService:Create(camera, TweenInfo.new(0.1), {FieldOfView = 70}):Play()
+
+        Viewmodel.StopAnimation("AimAnimation")
     end
 end
 

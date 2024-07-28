@@ -61,6 +61,7 @@ guns.HUGE = {
 
     Model = models("HUGE"),
     HoldAnimation = 12498608892,
+    AimAnimation = 18691844030,
 
     FiredSound = firedSounds("HUGE"),
 
@@ -100,6 +101,7 @@ guns.Scout = {
 
     Model = models("Scout"),
     HoldAnimation = 10247529531,
+    AimAnimation = 18691492037,
     FiredSound = firedSounds("Scout"),
     ReloadSound = reloadSounds("Scout"),
 
@@ -135,6 +137,7 @@ guns.Pistol = {
 
     Model = models("Pistol"),
     HoldAnimation = 9253211833,
+    AimAnimation = 18691552315,
     FiredSound = firedSounds("Pistol"),
     ReloadSound = reloadSounds("Pistol"),
 
@@ -169,6 +172,7 @@ guns["Golden Gun"] = {
 
     Model = models("Golden Gun"),
     HoldAnimation = 9253211833,
+    AimAnimation = 18691552315,
     FiredSound = firedSounds("Golden Gun"),
 
     FireTime = 0.5,
@@ -308,6 +312,7 @@ guns["Flare Gun"] = {
 
     Model = models("Flare Gun"),
     HoldAnimation = 11411819299,
+    AimAnimation = 18691743842,
     FiredSound = firedSounds("Flare Gun"),
 
     ProjectileBase = projectiles("Flare"),
@@ -377,6 +382,7 @@ guns.SMG = {
 
     Model = models("SMG"),
     HoldAnimation = 12481091962,
+    AimAnimation = 18691799004,
     FiredSound = firedSounds("SMG"),
     ReloadSound = reloadSounds("SMG"),
 
@@ -421,6 +427,7 @@ guns.AWP = {
 
     Model = models("AWP"),
     HoldAnimation = 10247529531,
+    AimAnimation = 18691492037,
     FiredSound = firedSounds("AWP"),
 
     ProjectileBase = bullet,
@@ -454,6 +461,7 @@ guns["Assault Rifle"] = {
 
     Model = models("Assault Rifle"),
     HoldAnimation = 10247380824,
+    AimAnimation = 18691831450,
     FiredSound = firedSounds("Assault Rifle"),
     ReloadSound = reloadSounds("Assault Rifle"),
 
@@ -497,6 +505,7 @@ guns["Silenced Pistol"] = {
 
     Model = models("Silenced Pistol"),
     HoldAnimation = 9253211833,
+    AimAnimation = 18691552315,
     FiredSound = firedSounds("Silenced Pistol"),
     ReloadSound = reloadSounds("Silenced Pistol"),
 
@@ -553,6 +562,7 @@ guns.XM1014 = {
 
     Model = models("XM1014"),
     HoldAnimation = 11436160569,
+    AimAnimation = 18691725191,
     FiredSound = firedSounds("XM1014"),
     ReloadSound = reloadSounds("XM1014"),
 
@@ -588,6 +598,7 @@ guns.Glock = {
 
     Model = models("Glock"),
     HoldAnimation = 9253211833,
+    AimAnimation = 18691552315,
     FiredSound = firedSounds("Glock"),
     ReloadSound = reloadSounds("Glock"),
 
@@ -629,6 +640,7 @@ guns.Deagle = {
 
     Model = models("Deagle"),
     HoldAnimation = 9253211833,
+    AimAnimation = 18691552315,
     FiredSound = firedSounds("Deagle"),
     ReloadSound = reloadSounds("Deagle"),
 
@@ -661,6 +673,7 @@ guns.BAR = {
 
     Model = models("BAR"),
     HoldAnimation = 11418976539,
+    AimAnimation = 18691787606,
     FiredSound = firedSounds("BAR"),
     ReloadSound = reloadSounds("BAR"),
 

@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local AimWeaponClient = require(script.Parent.AimWeaponClient)
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
@@ -214,7 +213,7 @@ function module.Show(item: ItemTypes.Item): ()
     end)
 end
 
-function module.PlayAnimation(id: number): ()
+function module.PlayAnimation(id: number, name: string?): ()
     local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
     if not viewmodel then
         return
@@ -223,7 +222,22 @@ function module.PlayAnimation(id: number): ()
     local animation = Instance.new("Animation")
     animation.AnimationId = "rbxassetid://"..id
 
-    viewmodel.Humanoid.Animator:LoadAnimation(animation):Play()
+    local track = viewmodel.Humanoid.Animator:LoadAnimation(animation)
+    track.Name = name or ""
+    track:Play()
+end
+
+function module.StopAnimation(name: string): ()
+    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
+    if not viewmodel then
+        return
+    end
+
+    for _, v in viewmodel.Humanoid.Animator:GetPlayingAnimationTracks() do
+        if v.Name == name then
+            v:Stop()
+        end
+    end
 end
 
 function module.Hide(): ()
@@ -242,6 +256,7 @@ LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
         local x = item.Base.RecoilX / 4
         local y = item.Base.RecoilY / 4
 
+        local AimWeaponClient = (require)(script.Parent.AimWeaponClient)
         if AimWeaponClient.IsAiming then
             x /= 2
             y /= 2
