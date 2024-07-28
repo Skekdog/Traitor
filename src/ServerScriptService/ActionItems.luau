@@ -178,7 +178,6 @@ function module.Actions.SpawnProp(actionItem: Model, participant: Types.Particip
     propInstance:PivotTo(cframe)
 
     propInstance.Parent = props
-    print(propInstance:GetFullName())
 end
 
 function module.Actions.TriggerVictory(_, participant: Types.Participant, team: unknown): ()

@@ -6,12 +6,12 @@ local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local module = {}
 
-local controlledProps: {[number]: Model} = {}
+local controlledProps: {[number]: Model | BasePart} = {}
 
 local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
-local function stopControllingProp(prop: Model, userId: number, stoppedHoldingStick: boolean?)
+local function stopControllingProp(prop: Model | BasePart, userId: number, stoppedHoldingStick: boolean?)
     if not prop:IsDescendantOf(workspace) then
         return
     end
@@ -31,7 +31,9 @@ local function stopControllingProp(prop: Model, userId: number, stoppedHoldingSt
         if not prop:IsDescendantOf(workspace) then
             return
         end
-        (prop.PrimaryPart :: BasePart):SetNetworkOwnershipAuto()
+
+        local primaryPart = if prop:IsA("Model") then prop.PrimaryPart :: BasePart else prop
+        primaryPart:SetNetworkOwnershipAuto()
         lastHolder.Value = 0
     end)
 
@@ -50,7 +52,7 @@ local function stopControllingProp(prop: Model, userId: number, stoppedHoldingSt
     controlledProps[userId] = nil
 end
 
-local function getPropByRay(participant: Types.Participant, ray: Ray): (Model?, Vector3?)
+local function getPropByRay(participant: Types.Participant, ray: Ray): (Model | BasePart?, Vector3?, boolean?)
     local char = participant.Character
 
     local head = char:FindFirstChild("Head")
@@ -70,9 +72,6 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (Model?, 
 
     local props = map:FindFirstChild("Props")
     local weaponSpawns = map:FindFirstChild("WeaponSpawns")
-    if not props and not weaponSpawns then
-        return
-    end
 
     local rayParams = RaycastParams.new()
     rayParams.IgnoreWater = true
@@ -89,7 +88,9 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (Model?, 
     local object = result.Instance :: BasePart
     local model = object:FindFirstAncestorOfClass("Model")
 
-    if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (model and not model:IsDescendantOf(workspace.Corpses)) then
+    local isCorpse = model and model:IsDescendantOf(workspace.Corpses)
+
+    if (props and not props:IsAncestorOf(object)) and (weaponSpawns and not weaponSpawns:IsAncestorOf(object)) and (not isCorpse) then
         return
     end
 
@@ -97,7 +98,7 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (Model?, 
         return
     end
 
-    return model, result.Position
+    return model or object, result.Position, isCorpse
 end
 
 function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray)
@@ -111,7 +112,7 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         end
     end
 
-    local object = getPropByRay(participant, cameraRayInfo)
+    local object, _, isCorpse = getPropByRay(participant, cameraRayInfo)
     if not object then
         return
     end
@@ -125,19 +126,19 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         return
     end
 
-    if alreadyControlled == object then
+    if alreadyControlled == (object :: Model) then
         return
     end
 
-    local size = object:GetExtentsSize()
+    local size = if object:IsA("Model") then object:GetExtentsSize() else object.Size
     local biggestPlane = math.max(size.X, size.Y, size.Z)
 
-    local primaryPart = object.PrimaryPart
+    local primaryPart = if object:IsA("Model") then object.PrimaryPart else object
     assert(primaryPart)
 
     local mass = primaryPart.AssemblyMass
 
-    if (mass > 160) or (size.X * size.Y * size.Z > 50) or (biggestPlane > 5) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
+    if (not isCorpse) and ((mass > 160) or (size.X * size.Y * size.Z > 50) or (biggestPlane > 5)) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
         return
     end
 
@@ -154,7 +155,7 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
 
         alignPos.Attachment0 = attachPoint
 
-        attachPoint.Parent = object.PrimaryPart
+        attachPoint.Parent = primaryPart
         alignPos.Parent = object
     end
 
@@ -202,7 +203,7 @@ function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
         return
     end
 
-    local primaryPart = object.PrimaryPart
+    local primaryPart = if object:IsA("Model") then object.PrimaryPart else object
     assert(primaryPart)
     
     primaryPart:SetNetworkOwner()
@@ -226,7 +227,7 @@ task.spawn(function()
                 continue
             end
 
-            local primaryPart = prop.PrimaryPart
+            local primaryPart = if prop:IsA("Model") then prop.PrimaryPart else prop
             assert(primaryPart)
             
             local distance = plr:DistanceFromCharacter(primaryPart.Position)
