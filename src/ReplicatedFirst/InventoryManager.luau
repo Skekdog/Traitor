@@ -282,6 +282,7 @@ function module.Drop(plr: Player, equipment: Item, position: Vector3)
         instance.Name = equipment.Base.Name
         instance:PivotTo(CFrame.new(position))
 
+        instance.CollisionGroup = "DroppedWeapons"
         instance.CanCollide = true
         instance.CanTouch = true
         instance.CanQuery = true
