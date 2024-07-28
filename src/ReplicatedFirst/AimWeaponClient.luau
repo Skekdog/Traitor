@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local InventoryManager = require(script.Parent.InventoryManager)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(script.Parent.UIManager)
@@ -11,6 +12,29 @@ module.IsAiming = false
 
 local function getSensitivityMultiplier(fov: number): number
     return fov / 70
+end
+
+local function setWalkspeed(diff: number)
+    local char = Players.LocalPlayer.Character
+    if not char then
+        return
+    end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if not hum then
+        return
+    end
+
+    local ownParticipant = LocalRoundInfo.GetOwnParticipant()
+    if not ownParticipant then
+        return
+    end
+
+    local role = LocalRoundInfo.GetRole(ownParticipant.Role)
+    if not role then
+        return
+    end
+    hum.WalkSpeed = (role.Speed or 16) - diff
 end
 
 local scope = UIManager.WaitForUI("Scope")
@@ -33,6 +57,8 @@ local function aim(aiming: boolean): ()
         end
 
         Viewmodel.PlayAnimation(item.Base.AimAnimation, "AimAnimation")
+
+        setWalkspeed(5)
     else
         SetCameraSensitivity(1)
         scope:ToggleVisible(false)
@@ -41,6 +67,8 @@ local function aim(aiming: boolean): ()
         TweenService:Create(camera, TweenInfo.new(0.1), {FieldOfView = 70}):Play()
 
         Viewmodel.StopAnimation("AimAnimation")
+
+        setWalkspeed(0)
     end
 end
 
