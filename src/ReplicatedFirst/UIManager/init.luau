@@ -38,7 +38,7 @@ export type UI = {
 	Sidebar: boolean?,
 	Object: GuiObject,
 
-	ToggleVisible: (self: UI, force: boolean?, ignoreOtherUIs: boolean?) -> (),
+	ToggleVisible: (self: UI, force: boolean?, ignoreOtherUIs: boolean?, callback: (() -> ())?) -> (),
 	Unregister: (self: UI) -> (),
 }
 
@@ -62,7 +62,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		Sidebar = object:GetAttribute("Sidebar") :: boolean?,
 		Object = object,
 
-		ToggleVisible = function(self: UI, force: boolean?, ignoreOtherUIs: boolean?)
+		ToggleVisible = function(self: UI, force: boolean?, ignoreOtherUIs: boolean?, callback: ((Enum.PlaybackState) -> ())?)
 			local newVisible = if force ~= nil then force else not self.Visible
 
 			if newVisible == self.Visible then
@@ -73,7 +73,14 @@ function UIManager.RegisterUI(object: GuiObject): UI
 
 			local object = self.Object
 			if transitionStyle then
-				UIAnimation.TransitionUIState(object, newVisible)
+				local tween = UIAnimation.TransitionUIState(object, newVisible)
+				if callback then
+					if tween then
+						tween.Completed:Once(callback)
+					else
+						callback(Enum.PlaybackState.Completed)
+					end
+				end
 			else
 				object.Visible = newVisible
 			end
@@ -113,8 +120,9 @@ function UIManager.RegisterUI(object: GuiObject): UI
 				return warn(self.Name.." is not registered!")
 			end
 			ControlManager.Unregister(self.Name)
-			self:ToggleVisible(false, true)
-			self.Object.Parent = UIManager.UnregisteredUIs
+			self:ToggleVisible(false, true, function()
+				self.Object.Parent = UIManager.UnregisteredUIs
+			end)
 			
 			if self.Sidebar then
 				local sb = UIManager.GetUI("Sidebar").Object; -- Ambiguous syntax means we need a semicolon here, day ruined

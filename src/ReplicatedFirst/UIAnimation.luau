@@ -17,9 +17,10 @@ function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[st
 	return tween
 end
 
-function module.TransitionUIState(frame: GuiObject, open: boolean)
+function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 	-- If open is true, open animation should play, otherwise close
 	
+	local tween: Tween?
 	local style = frame:GetAttribute("TransitionStyle")
 	if style == "Position" or style == "Size" then
 		local oldTween = frame:FindFirstChild("StateTransitionTween") :: Tween
@@ -85,7 +86,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 			}
 		end
 		
-		local tween = module.Animate(frame, info, properties)
+		tween = module.Animate(frame, info, properties)
 		
 		if open then
 			if isSize then
@@ -134,7 +135,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 			end
 
 			local properties = {[property] = if open then 0 else 1}
-			local tween = module.Animate(v, TweenInfo.new(0.25, Enum.EasingStyle.Quad), properties)
+			tween = module.Animate(v, TweenInfo.new(0.25, Enum.EasingStyle.Quad), properties)
 
 			if tween then
 				lastTween = tween
@@ -161,6 +162,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean)
 		end
 	end
 	
+	return tween
 end
 
 function module.TransitionSwitch(target: GuiObject, disabled: boolean)
