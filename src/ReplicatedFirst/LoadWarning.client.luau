@@ -11,7 +11,7 @@ task.spawn(function()
     found = true
 end)
 
-local special = plr.PlayerGui:FindFirstChild("Special") :: any
+local special = plr.PlayerGui:WaitForChild("Special")
 
 while not found do
     if (os.clock() - start > 5) and unregisteredUIs:FindFirstChild("LoadWarning") then

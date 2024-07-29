@@ -207,7 +207,7 @@ function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
     assert(primaryPart)
     
     primaryPart:SetNetworkOwner()
-    primaryPart:ApplyImpulseAtPosition(participant.Character:GetPivot().LookVector * 50 * (primaryPart.AssemblyMass / 20), position)
+    primaryPart:ApplyImpulseAtPosition(participant.Character:GetPivot().LookVector * 25 * (primaryPart.AssemblyMass / 20), position)
 end
 
 function module.OnUnequip(plr: Player): ()
