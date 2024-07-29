@@ -18,12 +18,6 @@ type params = {
 	Callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> Enum.ContextActionResult,
 }
 local registered: {[string]: params} = {}
-function module.OnSettingUpdate(name, val)
-	local setting = registered[name]
-	if setting then
-		module.Register(setting.ActionName, setting.CreateTouchButton, setting.Callback)
-	end
-end
 
 export type InputMethod = "touch" | "keyboard" | "controller"
 function module.GetPreferredInputMethod(): InputMethod
@@ -190,6 +184,10 @@ end
 function module.Unregister(actionName: string)
 	CAS:UnbindAction(actionName)
 	registered[actionName] = nil
+end
+
+function module.GetRegisteredInfo(actionName: string): params?
+	return registered[actionName]
 end
 
 return module

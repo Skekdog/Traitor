@@ -5,6 +5,7 @@ local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local SM = require(script.Parent)
+local ControlManager = require(script.Parent.Parent.ControlManager)
 
 -- This must be run before anything yields, especially todo with ui
 local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
@@ -115,29 +116,49 @@ local categories = {__len = 0}
 
 local darken = uiObject.LayoutDarken
 
-local function done()
-	local name = darken:GetAttribute("Setting") :: string
-	local displayName = darken:GetAttribute("DisplayName") :: string
-	SM.SetSetting(name, CAS:GetButton(displayName).Position)
-	CAS:UnbindAction(displayName)
-	uiObject.Main.Visible = true
-	uiObject.Close.Visible = true
-	darken.Visible = false
+local tapCon: RBXScriptConnection?
+local doneCon: RBXScriptConnection?
+local function touchPosition(settingName: string)
+	if tapCon and doneCon then
+		tapCon:Disconnect()
+		doneCon:Disconnect()
+	end
+
+	local actionName = settingName:split(" Position")[1]
+	local lastParams = ControlManager.GetRegisteredInfo(actionName)
+	local button = ControlManager.Register(actionName, true, function() return Enum.ContextActionResult.Pass end)
+
+	assert(button)
+
+	uiObject.Main.Visible = false
+	uiObject.Close.Visible = false
+	tooltip("", "NONE")
+	tt.Visible = false
+	darken.Visible = true
+
+	task.wait() -- Waiting is necessary as otherwise the tap is detected when clicking the setting button
+	tapCon = UIS.TouchTap:Connect(function(pos)
+		local inset = GUI:GetGuiInset()
+		button.Position = UDim2.fromOffset(inset.X + pos[1].X, inset.Y + pos[1].Y)
+	end)
+
+	doneCon = darken.Done.MouseButton1Click:Connect(function()
+		assert(doneCon and tapCon)
+		doneCon:Disconnect()
+		tapCon:Disconnect()
+
+		SM.SetSetting(settingName, button.Position)
+		if lastParams then
+			ControlManager.Register(actionName, true, lastParams.Callback)
+		else
+			ControlManager.Unregister(actionName)
+		end
+
+		uiObject.Main.Visible = true
+		uiObject.Close.Visible = true
+		darken.Visible = false
+	end)
 end
-
-UIS.TouchTap:Connect(function(posVectors, proc)
-	if proc then return end
-	if not darken.Visible then return end
-	if darken:GetAttribute("OpenedAt") > (os.time() - 0.001) then return end -- For some reason taps are sometimes detected immediately after
-	local name = darken:GetAttribute("DisplayName") :: string
-	local posVector: Vector2 = posVectors[1]
-
-	local inset = GUI:GetGuiInset()
-	local pos = UDim2.fromOffset(posVector.X + inset.X, posVector.Y + inset.Y)
-	CAS:GetButton(name).Position = pos
-end)
-
-darken.Done.MouseButton1Click:Connect(done)
 
 uiObject:GetPropertyChangedSignal("Visible"):Connect(function()
 	if not uiObject.Visible then
@@ -326,19 +347,8 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			if not UIS.TouchEnabled then
 				return ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
-			darken:SetAttribute("Setting", name)
-			darken:SetAttribute("OpenedAt", workspace:GetServerTimeNow())
-			local name = name:split(" Position")[1]
-			darken:SetAttribute("DisplayName", name)
-			CAS:BindAction(name, function() return end, true)
-			Controls.SetupTouchButton(name)
-			
-			uiObject.Main.Visible = false
-			uiObject.Close.Visible = false
-			tooltip("", "NONE")
-			tt.Visible = false
-			darken.Visible = true
-			return
+
+			touchPosition(name)
 		end)
 		f = frame
 	elseif settingType == "TouchScale" then
@@ -348,14 +358,21 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 			if not UIS.TouchEnabled then
 				return ScreenMessage("Info", "You must have touchscreen enabled to use this.")
 			end
+
+			local actionName = name:split(" Scale")[1]
+			local lastParams = ControlManager.GetRegisteredInfo(actionName)
+			ControlManager.Register(actionName, true, function() return Enum.ContextActionResult.Pass end)
+
 			local newScale = TextInput.Create(name, "Number", "0.5-3", "TouchScale")
 			if newScale then
 				SM.SetSetting(name, newScale)
 			end
-			local name = name:split(" Scale")[1]
-			CAS:BindAction(name, function() return end, true)
-			Controls.SetupTouchButton(name)
-			return
+
+			if lastParams then
+				ControlManager.Register(actionName, lastParams.CreateTouchButton, lastParams.Callback)
+			else
+				ControlManager.Unregister(actionName)
+			end
 		end)
 		f = frame
 	else
