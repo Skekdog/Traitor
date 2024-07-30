@@ -104,7 +104,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Magneto Stick"},
+    StartingEquipment = {"Crowbar", "Magneto Stick", "DNA Scanner"},
     AvailableEquipment = Common.Equipment,
 
     Roles = {

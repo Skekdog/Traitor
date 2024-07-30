@@ -929,6 +929,9 @@ items["Magneto Stick"] = {
     Model = models("Magneto Stick"),
     HoldAnimation = 10247423634,
 
+    PrimaryHint = "to push a prop",
+    AlternateHint = "to grab a prop",
+
     ToggledAlt = true,
     AlternateFire = function(participant: Types.Participant, cameraRayInfo: Ray)
         require(ServerScriptService.MagnetoStick).AlternateFire(participant, cameraRayInfo)
@@ -953,6 +956,8 @@ items["DNA Scanner"] = {
     Model = models("DNA Scanner"),
 
     Toggled = true,
+
+    PrimaryHint = "to scan an Identified Body",
 
     PrimaryFire = function(participant, cameraRay)
         local head = participant.Character:FindFirstChild("Head")

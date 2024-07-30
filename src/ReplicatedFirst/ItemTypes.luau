@@ -78,6 +78,9 @@ export type ItemDefinition = {
     ToggledAlt: boolean?,
     OnEquipClient: (() -> ())?,
     OnUnequipClient: (() -> ())?,
+
+    PrimaryHint: string?,
+    AlternateHint: string?,
     
     PrimaryFire: ((Types.Participant, cameraRay: Ray) -> ())?,
     AlternateFire: ((Types.Participant, cameraRay: Ray) -> ())?,

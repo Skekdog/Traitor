@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AimWeaponClient = require(script.Parent.AimWeaponClient)
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManager)
+local ItemHint = require(script.Parent.ItemHint)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
@@ -79,7 +80,12 @@ local function getCenterRay(): Ray
 end
 
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
+    ItemHint()
     Viewmodel.Show(item)
+
+    if item.Kind == "Item" then
+        ItemHint(item.Base.PrimaryHint, item.Base.AlternateHint)
+    end
     
     local base = Items[item.Base.Name] :: ItemTypes.ItemDefinition & ItemTypes.GunDefinition
     if (item.Kind == "Item" and base.PrimaryFire) or (item.Kind == "Gun" or item.Kind == "Grenade" or item.Kind == "Melee") then
@@ -178,6 +184,7 @@ InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)
     ControlManager.Unregister("Drop Ammo")
 
     Viewmodel.Hide()
+    ItemHint()
 
     roundInfo.Frame.AmmoBar.Visible = false
 end)
