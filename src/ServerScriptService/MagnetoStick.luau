@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetRound = require(script.Parent.GetRound)
 local PlayAnimation = require(script.Parent.PlayAnimation)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
@@ -218,8 +219,55 @@ function module.OnUnequip(plr: Player): ()
     end
 end
 
+local function forEachPropPart(prop: Model | BasePart, func: (part: BasePart) -> ()): ()
+    local primaryPart = if prop:IsA("Model") then prop.PrimaryPart else prop
+    assert(primaryPart)
+
+    for _, part in prop:GetDescendants() do
+        if part:IsA("BasePart") and part.CanCollide then
+            for _, v in part:GetTouchingParts() do
+                func(v)
+            end
+        end
+    end
+end
+
 task.spawn(function()
+    local round = GetRound()
     while true do
+        task.wait()
+        if not round or round.RoundPhase == "Destroy" then
+            round = GetRound()
+            if not round then
+                continue
+            end
+        end
+        assert(round)
+
+        local props = round.Map:FindFirstChild("Props")
+        if not props then
+            continue
+        end
+
+        for _, v in props:GetChildren() do
+            if v:IsA("Model") and v:GetAttribute("Burning") then
+                forEachPropPart(v, function(part)
+                    local char = part:FindFirstAncestorOfClass("Model")
+                    local plr = Players:GetPlayerFromCharacter(char :: Model)
+                    if not plr then
+                        return
+                    end
+
+                    local participant = round:GetParticipant(plr.Name)
+                    if not participant then
+                        return
+                    end
+
+                    participant:TakeDamage(0.25, nil, "Burn")
+                end)
+            end
+        end
+
         for userId, prop in controlledProps do
             local plr = Players:GetPlayerByUserId(userId)
             if not plr then
@@ -236,19 +284,12 @@ task.spawn(function()
                 continue
             end
 
-            -- That's a lot of looping - is it really a good idea? Maybe try to make this run in parallel?
-            for _, part in prop:GetDescendants() do
-                if part:IsA("BasePart") and part.CanCollide then
-                    for _, v in primaryPart:GetTouchingParts() do
-                        if v.Name:match("Foot") and v:FindFirstAncestorOfClass("Model") == plr.Character then
-                            stopControllingProp(prop, userId)
-                            continue
-                        end
-                    end
+            forEachPropPart(prop, function(part)
+                if part.Name:match("Foot") and part:FindFirstAncestorOfClass("Model") == plr.Character then
+                    stopControllingProp(prop, userId)
                 end
-            end
+            end)
         end
-        task.wait()
     end
 end)
 

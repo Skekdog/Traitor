@@ -254,6 +254,12 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
     local burnSound = weaponSounds("FlareBurn"):Clone()
     burnSound.Parent = part :: any
 
+    local model = part:FindFirstAncestorOfClass("Model")
+    if target and target.Kind == "Prop" then
+        assert(model)
+        model:SetAttribute("Burning", true)
+    end
+
     local endTime = workspace:GetServerTimeNow() + 10
     task.spawn(function()
         while true do
@@ -277,11 +283,15 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
 
             task.wait(0.25)
         end
+        
+        if target and target.Kind == "Prop" then
+            assert(model)
+            model:SetAttribute("Burning", false)
+        end
 
         burnSound:Destroy()
         fire:Destroy()
 
-        local model = part:FindFirstAncestorOfClass("Model")
         if not target and model then
             model:Destroy()
         end
