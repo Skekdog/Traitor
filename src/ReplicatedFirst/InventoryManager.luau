@@ -305,9 +305,11 @@ function module.DropAmmo(plr: Player, weapon: ItemTypes.GunWeapon)
         return
     end
 
+    local max = module.AmmoData[ammoType].Magazine
+
     local amount = weapon.CurrentAmmo
-    if amount <= 0 then
-        return
+    if amount < (max / 4) then
+        return ReplicatedStorage.RoundHandler.SendMessage:FireClient(plr, "<font color='#ff0000'>You do not have enough ammo to drop a box!</font>", "other")
     end
 
     weapon.CurrentAmmo = 0
