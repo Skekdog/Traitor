@@ -260,7 +260,9 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
             if workspace:GetServerTimeNow() > endTime then
                 break
             end
-            if target and (target :: any):HasHealth() and (target :: any):GetHealth() < 0 then
+
+            local health: number? = if target then (target :: any):GetHealth() else nil
+            if health and health < 0 then
                 break
             end
             if not part:IsDescendantOf(workspace) then
@@ -269,7 +271,7 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
 
             burnSound:Play()
 
-            if target and (target :: any):HasHealth() then
+            if health then
                 (target :: any):TakeDamage(1, attacker, "Burn", false, true)
             end
 
