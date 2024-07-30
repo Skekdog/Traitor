@@ -11,7 +11,7 @@ local selected: string?
 local autoScan = true
 
 RunService.PreRender:Connect(function(dt: number)
-    LocalRoundInfo.DNACharge = math.min(1000, LocalRoundInfo.DNACharge + dt * 2)
+    LocalRoundInfo.DNACharge = math.min(1000, LocalRoundInfo.DNACharge + dt * 30)
 
     if selected and autoScan then
         TryPingDNA(selected)
