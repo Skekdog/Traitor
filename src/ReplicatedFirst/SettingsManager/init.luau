@@ -123,6 +123,19 @@ module.AvailableSettings = {
 		Default = true,
 	},
 	{
+		Name = "Show Item Hints",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "Enables hint text for item controls.",
+		PossibleValues = "Boolean",
+		Default = true,
+		Callback = function(val)
+			if not val then
+				require(script.Parent.ItemHint)()
+			end
+		end,
+	},
+	{
 		Name = "Always Show Sidebar",
 		Tab = "Display",
 		Category = "User Interface",
