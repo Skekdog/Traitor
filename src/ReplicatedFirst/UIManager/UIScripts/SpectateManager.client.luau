@@ -27,6 +27,9 @@ local function spectateFunc(action, state)
 		uiO.Username.Text = "Nobody to spectate!"
 		return Enum.ContextActionResult.Pass
 	end
+
+	camera.CameraType = Enum.CameraType.Track
+	plr.CameraMode = Enum.CameraMode.Classic
 	
 	local index: number
 	if action == "Spectate Next" then

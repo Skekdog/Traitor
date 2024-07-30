@@ -66,6 +66,9 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			local newVisible = if force ~= nil then force else not self.Visible
 
 			if newVisible == self.Visible then
+				if callback then
+					callback(Enum.PlaybackState.Cancelled)
+				end
 				return
 			end
 
@@ -121,6 +124,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			end
 			ControlManager.Unregister(self.Name)
 			self:ToggleVisible(false, true, function()
+				print("reparenting")
 				self.Object.Parent = UIManager.UnregisteredUIs
 			end)
 			
