@@ -276,7 +276,9 @@ task.spawn(function()
             end
 
             local primaryPart = if prop:IsA("Model") then prop.PrimaryPart else prop
-            assert(primaryPart)
+            if not primaryPart then -- This can fail presumably when round is destroyed, hence don't assert here
+                continue
+            end
             
             local distance = plr:DistanceFromCharacter(primaryPart.Position)
             if distance == 0 or distance > 30 then -- 30 is quite high but we want to account for network lag and such
