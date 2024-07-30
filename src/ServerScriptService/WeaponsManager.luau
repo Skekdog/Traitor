@@ -60,6 +60,10 @@ end
 
 type Entity = Types.Participant | Types.Prop
 local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, part: BasePart, distance: number, direction: Vector3): ()
+    if round:IsRoundPreparing() then
+        return
+    end
+    
     local damage = calculateDamage(attacker, weapon, part, distance)
 
     local sameTeam: boolean?
@@ -131,14 +135,19 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
             return ShatterGlass(part, (rayResult.Position - origin).Unit * if weapon.Kind == "Gun" then math.max(weapon.ProjectileSpeed / 50, 3) else 3)
         end
     end
-
-    if round:IsRoundPreparing() then
-        return
-    end
     
     local model = part:FindFirstAncestorOfClass("Model")
 
     local plr = Players:GetPlayerFromCharacter(model :: Model)
+
+    if not plr and not part:IsDescendantOf(workspace.Corpses) then
+        ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
+        if weapon.Kind == "Melee" then
+            local material = part:GetAttribute("MaterialOverride") or rayResult.Material.Name
+            PlayPositionalSound(HitSounds[material] or HitSounds.Default, rayResult.Position)
+        end
+    end
+
     if plr then
         local victim = round:GetParticipant(plr.Name)
         if not victim then
@@ -147,13 +156,6 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
 
         onEntityHit(round, weapon, attacker, victim, part, rayResult.Distance, (rayResult.Position - origin).Unit)
     elseif model and not model:IsDescendantOf(workspace.Corpses) then
-        ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
-
-        if weapon.Kind == "Melee" then
-            local material = part:GetAttribute("MaterialOverride") or rayResult.Material
-            PlayPositionalSound(HitSounds[material] or HitSounds.Default, rayResult.Position)
-        end
-
         local mapProps = round.Map:FindFirstChild("Props") :: Types.PropsStructure?
         if mapProps and part:IsDescendantOf(mapProps) then
             local prop = round._props[model :: Types.PropInstance]
