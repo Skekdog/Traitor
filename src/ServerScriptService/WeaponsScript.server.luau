@@ -80,11 +80,11 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr)
     InventoryManager.Reload(plr, weapon)
 end)
 
-ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr)
+ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, cameraRayInfo: unknown)
     local weapon, participant = allow(plr)
-    if not weapon or not participant or weapon.Kind ~= "Gun" then
+    if not weapon or not participant or weapon.Kind ~= "Gun" or typeof(cameraRayInfo) ~= "Ray" then
         return
     end
 
-    InventoryManager.DropAmmo(plr, weapon)
+    InventoryManager.DropAmmo(plr, weapon, cameraRayInfo)
 end)

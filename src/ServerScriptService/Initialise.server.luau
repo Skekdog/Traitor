@@ -106,7 +106,7 @@ InventoryManager.Listen("Unequip", function(plr, equipment)
 	end
 end)
 
-InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: unknown, equipmentName: unknown, switching: unknown)
+InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: unknown, equipmentName: unknown, switching: unknown, cameraRayInfo: unknown)
 	if typeof(equipmentName) ~= "string" then
 		return
 	end
@@ -130,7 +130,10 @@ InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: unk
 	elseif event == "Unequip" then
 		InventoryManager.Unequip(plr, foundEquipment, switching :: boolean?)
 	elseif event == "Drop" then
-		InventoryManager.Drop(plr, foundEquipment, char:GetPivot().Position + char.PrimaryPart.CFrame.LookVector * 10)
+		if typeof(cameraRayInfo) ~= "Ray" then
+			return
+		end
+		InventoryManager.Drop(plr, foundEquipment, char:GetPivot().Position + cameraRayInfo.Direction.Unit * 10)
 	end
 end)
 

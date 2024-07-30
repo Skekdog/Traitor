@@ -22,7 +22,7 @@ local listeners: {[InventoryEvent]: {((Player, Item, boolean?) -> ())}} = {Add =
 local IS_CLIENT = RunService:IsClient()
 
 type InventoryRemote = {
-    FireServer: (self: any, InventoryEvent, string, boolean?) -> (),
+    FireServer: (self: any, InventoryEvent, string, boolean?, Ray?) -> (),
     FireClient: (self: any, Player, InventoryEvent, Item) -> (),
     OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, string?, boolean?) -> ()) -> ()},
 }
@@ -261,12 +261,12 @@ function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
 end
 
 local mapValue = ReplicatedStorage:WaitForChild("RoundHandler"):WaitForChild("MapFolder")
-function module.Drop(plr: Player, equipment: Item, position: Vector3)
+function module.Drop(plr: Player, equipment: Item, position: Vector3, cameraRayInfo: Ray?)
     if not equipment.Base.CanDrop then
         return
     end
     if IS_CLIENT then
-        module.InvEvent:FireServer("Drop", equipment.Base.Name)
+        module.InvEvent:FireServer("Drop", equipment.Base.Name, nil, cameraRayInfo)
     else
         local spawns = (mapValue.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
 
@@ -292,7 +292,7 @@ function module.Drop(plr: Player, equipment: Item, position: Vector3)
     runCallback(plr, "Drop", equipment)
 end
 
-function module.DropAmmo(plr: Player, weapon: ItemTypes.GunWeapon)
+function module.DropAmmo(plr: Player, weapon: ItemTypes.GunWeapon, cameraRayInfo: Ray)
     local base = weapon.Base
 
     local ammoType: ItemTypes.AmmoType = base.AmmoType :: ItemTypes.AmmoType
@@ -317,7 +317,7 @@ function module.DropAmmo(plr: Player, weapon: ItemTypes.GunWeapon)
 
     local box = (ServerStorage.AmmoBoxes:FindFirstChild(ammoType.."_Ammo") :: PVInstance):Clone()
     module.NewAmmoBox(box, amount)
-    box:PivotTo(CFrame.new(char:GetPivot().Position + char:GetPivot().LookVector * 10))
+    box:PivotTo(CFrame.new(char:GetPivot().Position + cameraRayInfo.Direction.Unit * 10))
     box.Parent = (mapValue.Value :: Types.MapStructureCast):FindFirstChild("WeaponSpawns")
 end
 

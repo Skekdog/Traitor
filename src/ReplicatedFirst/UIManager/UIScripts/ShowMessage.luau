@@ -1,5 +1,4 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UIManager = require(ReplicatedFirst.UIManager)
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
@@ -60,11 +59,10 @@ end
 local teamMessages: {Types.MessageType?} = {"creditsEarned"}
 local chatChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
 
-ReplicatedStorage:WaitForChild("RoundHandler").SendMessage.OnClientEvent:Connect(function(msg: string, msgType: Types.MessageType)
+return function(msg: string, msgType: Types.MessageType)
 	if msgType == "other" then
 		chatChannel:DisplaySystemMessage(msg)
 	else
 		makeLabel(table.find(teamMessages, msgType) ~= nil, msg)
 	end
-	
-end)
+end

@@ -9,6 +9,7 @@ local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
+local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
 local Viewmodel = require(script.Parent.Viewmodel)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
@@ -79,6 +80,28 @@ local function getCenterRay(): Ray
     return camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
 end
 
+local function isDropObstructed(char: Model?): boolean
+    if not char or not char.PrimaryPart then
+        return true
+    end
+
+    local pos = char.PrimaryPart.Position
+
+    local params = RaycastParams.new()
+    params.IgnoreWater = true
+    params.FilterDescendantsInstances = {ReplicatedStorage.RoundHandler.MapFolder.Value :: Instance}
+    params.FilterType = Enum.RaycastFilterType.Include
+    params.RespectCanCollide = true
+    params.CollisionGroup = "DroppedWeapons"
+
+    local result = workspace:Raycast(pos, getCenterRay().Direction.Unit * 10, params)
+    if result then
+        ShowMessage("<font color='#ff0000'>There is no room to drop anything here!</font>", "other")
+        return true
+    end
+    return false
+end
+
 InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     ItemHint()
     Viewmodel.Show(item)
@@ -139,10 +162,10 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     if base.CanDrop then
         ControlManager.Register("Drop", true, function()
             local equipped = InventoryManager.GetEquipped(plr)
-            if not equipped then
+            if not equipped or isDropObstructed(plr.Character) then
                 return Enum.ContextActionResult.Pass
             end
-            InventoryManager.Drop(plr, equipped, Vector3.zero)
+            InventoryManager.Drop(plr, equipped, Vector3.zero, getCenterRay())
             return Enum.ContextActionResult.Sink
         end)
     else
@@ -161,10 +184,10 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
 
         ControlManager.Register("Drop Ammo", true, function(action, state, input)
             local equipped = InventoryManager.GetEquipped(plr)
-            if not equipped then
+            if isDropObstructed(plr.Character) or not equipped then
                 return Enum.ContextActionResult.Pass
             end
-            clientServer.DropAmmo:FireServer()
+            clientServer.DropAmmo:FireServer(getCenterRay())
             return Enum.ContextActionResult.Sink
         end)
     else
