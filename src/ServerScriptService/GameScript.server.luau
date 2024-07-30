@@ -139,6 +139,7 @@ end
 
 local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
+--nextMap = workspace.TestMap :: Types.MapStructureCast
 
 local function sendRoundInfo(plr: Player?)
 	local round = GetRound()

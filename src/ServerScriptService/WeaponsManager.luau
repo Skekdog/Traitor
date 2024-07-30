@@ -375,10 +375,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
             local result = workspace:Raycast(origin, target, rayParams)
             if not result then
                 tweenProjectile(target)
-                if weapon.Kind == "Melee" then
-                    return true
-                end
-                return
+                continue
             end
     
             tweenProjectile(result.Position)

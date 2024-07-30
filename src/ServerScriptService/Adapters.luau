@@ -273,21 +273,21 @@ local module: Types.Adapter = {
 
         ServerScriptService.Animate:Clone().Parent = participant.Character :: any
 
-        -- local startHeight = nil
-        -- hum.StateChanged:Connect(function(oldState, newState)
-        --     if newState == Enum.HumanoidStateType.Freefall then
-        --         startHeight = root.Position.Y
-        --     elseif oldState == Enum.HumanoidStateType.Freefall and startHeight then
-        --         local magnitude = startHeight - root.Position.Y
+        local startHeight = nil
+        hum.StateChanged:Connect(function(oldState, newState)
+            if newState == Enum.HumanoidStateType.Freefall then
+                startHeight = root.Position.Y
+            elseif oldState == Enum.HumanoidStateType.Freefall and startHeight then
+                local magnitude = startHeight - root.Position.Y
 
-        --         if magnitude <= 15 then
-        --             return
-        --         end
+                if magnitude <= 15 then
+                    return
+                end
 
-        --         local damage = (0.5 * (magnitude - 15) ^ 1.5) * 80 / workspace.Gravity
-        --         participant:TakeDamage(damage, nil, "Fall")
-        --     end
-        -- end)
+                local damage = (0.5 * (magnitude - 15) ^ 1.5) * 80 / workspace.Gravity
+                participant:TakeDamage(damage, nil, "Fall")
+            end
+        end)
     end,
 
     SendSlayVote = function(to, target)
