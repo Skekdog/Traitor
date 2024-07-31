@@ -119,7 +119,7 @@ purchaseButton:GetAttributeChangedSignal("Item"):Connect(function()
 	end)
 end);
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participant: Types.ClientOwnParticipant?)
 	local item = purchaseButton:GetAttribute("Item") :: string
 	if item == "" then
 		return

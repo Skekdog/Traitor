@@ -84,8 +84,8 @@ end
 
 type Ret = () -> ()
 type Listen =
-    (("UpdateParticipant", (Types.ClientParticipant | string) -> ()) -> Ret) &
-    (("UpdateOwnParticipant", (Types.ClientOwnParticipant?) -> ()) -> Ret) &
+    (("UpdateParticipant", (Player, Types.ClientParticipant?) -> ()) -> Ret) &
+    (("UpdateOwnParticipant", (Player, Types.ClientOwnParticipant?) -> ()) -> Ret) &
     (("UpdateEquipment", ({Types.Equipment}) -> ()) -> Ret) &
     (("UpdateRoles", ({Types.Role}) -> ()) -> Ret) &
     (("UpdateRoundEndInfo", (Types.RoundEndInfo) -> ()) -> Ret) &
@@ -113,9 +113,9 @@ module.Listen = function(event, callback)
     end
 end :: Listen
 
-local function runCallbacks(event, newValue)
+local function runCallbacks(event, ...)
     for _, v in listeners[event] do
-        v(newValue)
+        v(...)
     end
 end
 
@@ -140,19 +140,14 @@ replicatedData.AttributeChanged:Connect(function(attr)
     runCallbacks(attr, get(attr))
 end)
 
-replicatedData.UpdateParticipant.OnClientEvent:Connect(function(participant: Types.ClientParticipant | string)
-    if type(participant) == "string" then
-        participants[participant] = nil
-        runCallbacks("UpdateParticipant", participant)
-        return
-    end
-    participants[participant.Player.Name] = participant
-    runCallbacks("UpdateParticipant", participant)
+replicatedData.UpdateParticipant.OnClientEvent:Connect(function(player: Player, participant: Types.ClientParticipant?)
+    participants[player.Name] = participant
+    runCallbacks("UpdateParticipant", player, participant)
 end)
 
-replicatedData.UpdateOwnParticipant.OnClientEvent:Connect(function(participant: Types.ClientOwnParticipant?)
+replicatedData.UpdateOwnParticipant.OnClientEvent:Connect(function(player: Player, participant: Types.ClientOwnParticipant?)
     ownParticipant = participant
-    runCallbacks("UpdateOwnParticipant", participant)
+    runCallbacks("UpdateOwnParticipant", player, participant)
 end)
 
 replicatedData.UpdateEquipment.OnClientEvent:Connect(function(newEquipment: {Types.Equipment}?)

@@ -26,7 +26,7 @@ LocalRoundInfo.Listen("RoundPhase", function(phase)
 	this:ToggleVisible(not isInRound and table.find(validPhases, phase) ~= nil)
 end)
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(_, p)
 	isInRound = p ~= nil
 	this:ToggleVisible(not isInRound and table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil)
 end)

@@ -49,7 +49,7 @@ local function selectMark(marks: Frame & any, button: (TextButton & any)?, plr: 
 	plr:SetAttribute("MarkColour", button.TextColor3)
 end
 
-function updatePlr(plr: Player, clone: any)
+function updatePlr(plr: Player, clone: PlayerElement?)
 	if not clone then
 		return
 	end
@@ -184,7 +184,7 @@ function movePlr(plr: Player, status: Status)
 	recalculateCount(status)
 end
 
-local function removePlr(plr: Player | string)
+local function removePlr(plr: Player)
 	local plrName: string
 	if typeof(plr) == "string" then
 		plrName = plr
@@ -199,40 +199,24 @@ local function removePlr(plr: Player | string)
 	end
 end
 
-Players.PlayerAdded:Connect(function(plr)
-	movePlr(plr, "Spectating")
-end)
+if false then
+	(movePlr :: any)()
+end
 
 Players.PlayerRemoving:Connect(removePlr)
 
-local participants = LocalRoundInfo.GetAllParticipants()
-local plrToParticipant: {[Player]: Types.ClientParticipant} = {}
-
-for _, v in participants do
-	plrToParticipant[v.Player] = v
-end
-
-for _, plr in Players:GetPlayers() do
-	if plrToParticipant[plr] then
-		movePlr(plr, plrToParticipant[plr].Status)
-	else
-		movePlr(plr, "Spectating")
-	end
-end
-
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
-	updatePlr(Players.LocalPlayer, findPlr(Players.LocalPlayer.Name))
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(player)
+	updatePlr(player, findPlr(player.Name) or createPlr(player))
 end)
 
-LocalRoundInfo.Listen("UpdateParticipant", function(participant: Types.ClientParticipant | string)
-	if type(participant) == "string" then
-		local player = Players:FindFirstChild(participant) :: Player
-		if not player then
-			return removePlr(participant)
-		end
-		return updatePlr(player, findPlr(participant))
+LocalRoundInfo.Listen("UpdateParticipant", function(player: Player, participant: Types.ClientParticipant?)
+	if not player:IsDescendantOf(Players) then
+		return removePlr(player)
 	end
-	updatePlr(participant.Player, findPlr(participant.Player.Name))
+	if not participant then
+		movePlr(player, "Spectating")
+	end
+	updatePlr(player, findPlr(player.Name) or createPlr(player))
 end)
 
 roundHandlerEvents.CorpseSearched.OnClientEvent:Connect(function(name: string)

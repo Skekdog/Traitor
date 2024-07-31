@@ -7,25 +7,48 @@ local remotes = ReplicatedStorage.RoundHandler
 
 local module = {}
 
-function module.UpdateParticipant(participant: Types.Participant, nillify: boolean?)
+function module.UpdateOwnParticipant(participant: Types.ClientOwnParticipant): ()
+	remotes.UpdateOwnParticipant:FireClient(participant.Player, participant.Player, participant)
+end
+
+function module.UpdateParticipant(target: Types.Participant): ()
 	for _, v in Players:GetPlayers() do
-		if v == participant.Player then
-			remotes.UpdateOwnParticipant:FireClient(v, if nillify then nil else participant:ViewPartialSelf())
+		local participant = target.Round:GetParticipant(v.Name)
+		if v == target.Player then
+			remotes.UpdateOwnParticipant:FireClient(v, v, target:ViewPartialSelf())
 		else
-			remotes.UpdateParticipant:FireClient(v, if nillify then participant.Player.Name else participant:ViewPartialParticipant(participant.Round:GetParticipant(v.Name)))
+			remotes.UpdateParticipant:FireClient(v, target.Player, target:ViewPartialParticipant(participant))
 		end
 	end
 end
 
-function module.UpdateOwnParticipant(participant: Types.Participant | Types.ClientOwnParticipant)
-	remotes.UpdateOwnParticipant:FireClient(participant.Player, if participant.Kind == "Participant" then participant:ViewPartialSelf() else participant)
+function module.UpdatePlayersForPlayer(player: Player, round: Types.Round?): ()
+	local ownParticipant = if round then round:GetParticipant(player.Name) else nil
+	for _, v in Players:GetPlayers() do
+		local participant = if round then round:GetParticipant(v.Name) else nil
+		if v == player then
+			remotes.UpdateOwnParticipant:FireClient(player, player, if participant then participant:ViewPartialSelf() else nil)
+		else
+			if participant then
+				remotes.UpdateParticipant:FireClient(player, v, participant:ViewPartialParticipant(ownParticipant))
+			else
+				remotes.UpdateParticipant:FireClient(player, v, nil)
+			end
+		end
+	end
 end
 
-function module.UpdateParticipantForPlayer(participant: Types.Participant, player: Player)
-	if player == participant.Player then
-		module.UpdateOwnParticipant(participant)
-	else
-		remotes.UpdateParticipant:FireClient(player, participant:ViewPartialParticipant(participant.Round:GetParticipant(player.Name)))
+function module.UpdatePlayers(round: Types.Round?): ()
+	for _, v in Players:GetPlayers() do
+		module.UpdatePlayersForPlayer(v, round)
+	end
+end
+
+function module.AddPlayer(player: Player): ()
+	for _, v in Players:GetPlayers() do
+		if v ~= player then
+			remotes.UpdateParticipant:FireClient(v, player, nil)
+		end
 	end
 end
 

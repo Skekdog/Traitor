@@ -36,8 +36,8 @@ local function highlight(participant: Types.ClientParticipant)
     clone.Parent = participant.Player.Character
 end
 
-local function highlightParticipant(participant: Types.ClientParticipant | string)
-    if type(participant) == "string" then
+local function highlightParticipant(player: Player, participant: Types.ClientParticipant?)
+    if not participant then
         return
     end
 
@@ -57,12 +57,12 @@ local function highlightParticipant(participant: Types.ClientParticipant | strin
     end
 end
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participant: Types.ClientOwnParticipant?)
     ownParticipant = participant
     if ownParticipant then
         ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
         for _, v in LocalRoundInfo.GetAllParticipants() do
-            highlightParticipant(v)
+            highlightParticipant(player, v)
         end
     else
         ownRole = nil
@@ -140,7 +140,7 @@ LocalRoundInfo.Listen("IsPaused", function(isPaused)
 end)
 
 local equipmentShop: UIManager.UI?
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(participant: Types.ClientOwnParticipant?)
+LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participant: Types.ClientOwnParticipant?)
     local role
     if participant then
         role = LocalRoundInfo.GetRole(participant.Role)

@@ -141,10 +141,10 @@ local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
 --nextMap = workspace.TestMap :: Types.MapStructureCast
 
-local function sendRoundInfo(plr: Player?)
+local function sendRoundInfo(plr: Player?): ()
 	local round = GetRound()
 	if not round then
-		return
+		return if plr then UpdateRoundInfo.UpdatePlayersForPlayer(plr) else UpdateRoundInfo.UpdatePlayers()
 	end
 
 	local gm = round.Gamemode
@@ -153,9 +153,7 @@ local function sendRoundInfo(plr: Player?)
 		remotes.UpdateEquipment:FireClient(plr, gm.AvailableEquipment)
 		remotes.UpdateRoles:FireClient(plr, gm.Name, gm.Roles)
 		remotes.UpdateRoundEndInfo:FireClient(plr, round.RoundEndInfo)
-		for _, v in round.Participants do
-			UpdateRoundInfo.UpdateParticipantForPlayer(v, plr)
-		end
+		UpdateRoundInfo.UpdatePlayersForPlayer(plr, round)
 		return
 	end
 	remotes.UpdateEquipment:FireAllClients(gm.AvailableEquipment)
@@ -206,9 +204,7 @@ joinRound.OnServerInvoke = function(plr)
 		local function roundPhaseChange(phase: Types.RoundPhase)
 			if phase == "Playing" then
 				remotes:SetAttribute("RoundStartTime", workspace:GetServerTimeNow())
-				for _, v in round.Participants do
-					UpdateRoundInfo.UpdateParticipant(v)
-				end
+				UpdateRoundInfo.UpdatePlayers(round)
 			elseif phase == "Intermission" then
 				voteMap:FireAllClients(true)
 				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: unknown)
@@ -302,10 +298,7 @@ joinRound.OnServerInvoke = function(plr)
 			ActionItems.ResetCounters()
 			workspace.Projectiles:ClearAllChildren()
 
-			for _, v in round.Participants do
-				v.Role = RoundHandler.NoRole
-				UpdateRoundInfo.UpdateParticipant(v, true)
-			end
+			UpdateRoundInfo.UpdatePlayers()
 		
 			if voteCon then
 				remotes.VoteMap:FireAllClients(false)
@@ -344,5 +337,6 @@ joinRound.OnServerInvoke = function(plr)
 end
 
 ReplicatedStorage.ClientServer.RequestData.OnServerEvent:Connect(function(plr)
+	UpdateRoundInfo.AddPlayer(plr)
 	sendRoundInfo(plr)
 end)
