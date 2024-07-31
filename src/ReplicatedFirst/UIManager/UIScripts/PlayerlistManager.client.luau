@@ -22,8 +22,9 @@ local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
 local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
 
 type PlayerElement = typeof(ui.PlayerFrame)
+local players: {[string]: PlayerElement?} = {}
 local function findPlr(plrName: string)
-	return list:FindFirstChild("Player-"..plrName) :: PlayerElement
+	return players[plrName]
 end
 
 local function selectMark(marks: Frame & any, button: (TextButton & any)?, plr: Player)
@@ -94,6 +95,7 @@ end
 
 local function createPlr(plr: Player)
 	local clone = ui.PlayerFrame:Clone()
+	players[plr.Name] = clone
 
 	clone.Username.Text = "@"..plr.Name
 	clone.Username.TextColor3 = Color3.new()
@@ -185,14 +187,8 @@ function movePlr(plr: Player, status: Status)
 end
 
 local function removePlr(plr: Player)
-	local plrName: string
-	if typeof(plr) == "string" then
-		plrName = plr
-	else
-		plrName = plr.Name
-	end
-
-	local f = findPlr(plrName)
+	players[plr.Name] = nil
+	local f = findPlr(plr.Name)
 	if f then
 		f:Destroy()
 		recalculateCount(getStatus(f.LayoutOrder))
@@ -220,7 +216,10 @@ LocalRoundInfo.Listen("UpdateParticipant", function(player: Player, participant:
 end)
 
 roundHandlerEvents.CorpseSearched.OnClientEvent:Connect(function(name: string)
-	findPlr(name).SearchedIcon.Visible = true
+	local element = findPlr(name)
+	if element then
+		element.SearchedIcon.Visible = true
+	end
 end)
 
 -- There is probably a better way to do this
