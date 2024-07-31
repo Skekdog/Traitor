@@ -7,6 +7,7 @@ local ItemHint = require(script.Parent.ItemHint)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local ReloadGunClient = require(script.Parent.ReloadGunClient)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
@@ -125,7 +126,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
                     task.wait()
                     if item.Kind == "Gun" then
                         if LocalRoundInfo.Ammo and LocalRoundInfo.Ammo <= 0 then
-                            clientServer.ReloadWeapon:FireServer()
+                            ReloadGunClient()
                         end
                     end
                 end
@@ -174,11 +175,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
 
     if item.Kind == "Gun" and base.AmmoType then
         ControlManager.Register("Reload Weapon", true, function()
-            local equipped = InventoryManager.GetEquipped(plr)
-            if not equipped then
-                return Enum.ContextActionResult.Pass
-            end
-            clientServer.ReloadWeapon:FireServer()
+            ReloadGunClient()
             return Enum.ContextActionResult.Sink
         end)
 

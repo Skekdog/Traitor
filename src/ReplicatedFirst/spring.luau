@@ -10,17 +10,17 @@ local sqrt = math.sqrt;
 local spring = {};
 local spring_mt = {__index = spring};
 
-function spring.new(p0: Vector3?, v0: Vector3?, target: Vector3?, angularFrequency: number?, dampingRatio: number?)
+function spring.new(angularFrequency: number, dampingRatio: number)
 	local self = {};
-	self.p = p0 or Vector3.zero;
-	self.v = v0 or Vector3.zero;
-	self.target = target or Vector3.zero;
+	self.p = Vector3.zero;
+	self.v = Vector3.zero;
+	self.target = Vector3.zero;
 	self.angularFrequency = angularFrequency or 10;
 	self.dampingRatio = dampingRatio or 1;
 	return setmetatable(self, spring_mt);
 end
 
-function spring.update(self: typeof(spring.new()), dt)
+function spring.update(self: typeof(spring.new(0, 0)), dt)
 	local aF = self.angularFrequency;
 	local dR =  self.dampingRatio;
 	

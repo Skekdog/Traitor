@@ -10,10 +10,12 @@ local module = {}
 
 local renderCon: RBXScriptConnection?
 
-local cameraRecoilSpring = spring.new(nil, nil, nil, 20, 0.8)
-local armRecoilSpring = spring.new(nil, nil, nil, 20, 0.8)
-local breathingSpring = spring.new(nil, nil, nil, 1, 10)
-local bobbingSpring = spring.new(nil, nil, nil, 10, 1)
+local cameraRecoilSpring = spring.new(20, 0.8)
+local armRecoilSpring = spring.new(20, 0.8)
+local breathingSpring = spring.new(1, 10)
+local bobbingSpring = spring.new(10, 1)
+
+module.ReloadSpring = spring.new(7, 0.8)
 
 type Viewmodel = typeof(ReplicatedStorage.Viewmodel)
 local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
@@ -197,6 +199,7 @@ function module.Show(item: ItemTypes.Item): ()
         end
 
         bobbingSpring:update(dt)
+        module.ReloadSpring:update(dt)
 
         local modifiers = breathingSpring.p + bobbingSpring.p + armRecoilSpring.p
 

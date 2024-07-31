@@ -195,7 +195,7 @@ local function removePlr(plr: Player)
 	end
 end
 
-if false then
+if false then -- This looks stupid but that's because it is. This doesn't do anything at runtime instead it silences the error about undefined global
 	(movePlr :: any)()
 end
 
