@@ -124,7 +124,6 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			end
 			ControlManager.Unregister(self.Name)
 			self:ToggleVisible(false, true, function()
-				print("reparenting")
 				self.Object.Parent = UIManager.UnregisteredUIs
 			end)
 			

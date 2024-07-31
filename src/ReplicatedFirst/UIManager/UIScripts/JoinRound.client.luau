@@ -31,7 +31,6 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(p)
 	this:ToggleVisible(not isInRound and table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil)
 end)
 
-print(LocalRoundInfo.GetRoundPhase())
 if table.find(validPhases, LocalRoundInfo.GetRoundPhase()) then
 	this:ToggleVisible(true)
 end
