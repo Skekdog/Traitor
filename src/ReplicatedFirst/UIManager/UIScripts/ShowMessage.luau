@@ -22,8 +22,7 @@ end
 local function moveDown(frame: Frame)
 	for _, v in frame:GetChildren() do
 		if v:IsA("TextLabel") then
-			v:TweenPosition(UDim2.fromScale(0, v.Position.Y.Scale+0.2), Enum.EasingDirection.InOut,
-				Enum.EasingStyle.Linear, 0.5, false)
+			v:TweenPosition(UDim2.fromScale(0, v.Position.Y.Scale+0.2), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.5, false)
 		end
 	end
 end

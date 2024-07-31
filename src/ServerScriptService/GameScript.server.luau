@@ -330,10 +330,8 @@ joinRound.OnServerInvoke = function(plr)
 		roundPhaseChange("Waiting")
 		roundEventCon = round.RoundPhaseChangeEvent.Event:Connect(roundPhaseChange)
 	end
-
-	assert(round)
 	
-	if not round:GetParticipant(plr.Name) then
+	if not round:GetParticipant(plr.Name) and round:IsRoundPreparing() then
 		local participant = round:JoinRound(plr)
 		participant.CreditsChanged.Event:Connect(UpdateRoundInfo.UpdateOwnParticipant)
 		participant.StatusChanged.Event:Connect(function()
