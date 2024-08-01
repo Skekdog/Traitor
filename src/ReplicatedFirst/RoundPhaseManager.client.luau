@@ -58,6 +58,7 @@ local function highlightParticipant(player: Player, participant: Types.ClientPar
 end
 
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participant: Types.ClientOwnParticipant?)
+    print("updating own participant", tostring(participant))
     ownParticipant = participant
     if ownParticipant then
         ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
@@ -86,9 +87,7 @@ local function update(roundPhase)
         return
     end
 
-    if not ownParticipant or not Players.LocalPlayer.Character then
-        LocalRoundInfo.SetSpectating(true)
-    end
+    LocalRoundInfo.SetSpectating(not ownParticipant or not Players.LocalPlayer.Character)
     
     if roundPhase == "Highlights" then
         local endInfo = LocalRoundInfo.GetRoundEndInfo()
