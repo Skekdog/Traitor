@@ -58,7 +58,6 @@ local function highlightParticipant(player: Player, participant: Types.ClientPar
 end
 
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participant: Types.ClientOwnParticipant?)
-    print("updating own participant", tostring(participant))
     ownParticipant = participant
     if ownParticipant then
         ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
