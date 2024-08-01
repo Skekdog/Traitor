@@ -60,11 +60,7 @@ local function calculateDamage(attacker: Types.Participant?, weapon: ItemTypes.W
 end
 
 type Entity = Types.Participant | Types.Prop
-local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, part: BasePart, distance: number, direction: Vector3): ()
-    if round:IsRoundPreparing() then
-        return
-    end
-    
+local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition | ItemTypes.ExplosionInfo, attacker: Types.Participant?, entity: Entity, part: BasePart, distance: number, direction: Vector3): ()    
     local damage = calculateDamage(attacker, weapon, part, distance)
 
     local sameTeam: boolean?
@@ -88,6 +84,9 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
     if canDamage then
         local willDie = (entity :: any):GetHealth() - damage <= 0
         if entity.Kind == "Participant" then
+            if round:IsRoundPreparing() then
+                return
+            end
             if willDie then
                 local force
                 if weapon.Kind == "Gun" then
