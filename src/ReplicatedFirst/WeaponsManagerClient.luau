@@ -63,7 +63,9 @@ function module.PrimaryFire(item: ItemTypes.Item): number?
     if item.Kind ~= "Item" then
         if item.Kind == "Gun" then
             module.SetAmmo(item.Base.Name, item.CurrentAmmo - 1)
-            item.LastFireTime = workspace:GetServerTimeNow()
+        end
+        if item.Kind == "Melee" or item.Kind == "Gun" then
+            (item :: ItemTypes.MeleeWeapon).LastFireTime = workspace:GetServerTimeNow()
         end
         LocalRoundInfo.PrimaryFire(item)
     end
