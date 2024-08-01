@@ -111,6 +111,7 @@ function module.Reload(player: Player, weapon: ItemTypes.GunWeapon): ()
         -- We need to GetReserve() again because they may have picked up more ammo whilst reloading
         module.SetReserve(player, ammoType, module.GetReserve(player, ammoType) - (weapon.CurrentAmmo - prevAmmo))
         module.UpdateAmmo(player)
+        serverClient.SetReloadingStatus:FireClient(player, weapon.Base.Name)
     end)
 end
 

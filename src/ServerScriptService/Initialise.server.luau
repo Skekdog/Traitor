@@ -109,9 +109,10 @@ InventoryManager.Listen("Unequip", function(plr, equipment)
 	if equipment.Reloading then
 		task.cancel(equipment.Reloading)
 		equipment.Reloading = nil
+		ReplicatedStorage.ServerClient.SetReloadingStatus:FireClient(plr, equipment.Base.Name)
 
 		if plr.Character and plr.Character.PrimaryPart then
-			local sound = plr.Character.PrimaryPart:FindFirstChild("ReloadSound") :: Sound
+			local sound = plr.Character.PrimaryPart:FindFirstChild("ReloadSound") :: Sound?
 			if sound then
 				sound:Stop()
 			end
