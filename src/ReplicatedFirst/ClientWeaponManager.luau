@@ -7,6 +7,7 @@ local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
+local Viewmodel = require(script.Parent.Viewmodel)
 
 local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
 
@@ -72,7 +73,15 @@ function module.PrimaryFire(item: ItemTypes.Item): number?
 end
 
 function module.Reload(item: ItemTypes.Item)
-    
+    if item.Kind ~= "Gun" then
+        return
+    end
+
+    local max = item.Base.MagazineSize or AmmoData[item.Base.AmmoType :: any].Max
+    if item.CurrentAmmo < max then
+        Viewmodel.ReloadSpring.p = Vector3.new(10, 5, 10)
+        ReplicatedStorage.ClientServer.ReloadWeapon:FireServer()
+    end
 end
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)

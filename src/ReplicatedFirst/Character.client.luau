@@ -8,7 +8,6 @@ local ItemHint = require(script.Parent.ItemHint)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local ReloadGunClient = require(script.Parent.ReloadGunClient)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
@@ -168,7 +167,7 @@ InventoryManager.Listen("Equip", function(item: ItemTypes.Item)
 
     if item.Kind == "Gun" and base.AmmoType then
         ControlManager.Register("Reload Weapon", true, function()
-            ReloadGunClient()
+            ClientWeaponManager.Reload(item)
             return Enum.ContextActionResult.Sink
         end)
 
