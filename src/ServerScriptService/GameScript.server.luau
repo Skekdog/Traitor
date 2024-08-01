@@ -332,6 +332,7 @@ joinRound.OnServerInvoke = function(plr)
 			UpdateRoundInfo.UpdateParticipant(participant)
 		end)
 		UpdateRoundInfo.UpdateParticipant(participant)
+		remotes:SetAttribute("TimeMilestone", round.TimeMilestone)
 		return true
 	end
 	return
