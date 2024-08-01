@@ -57,18 +57,6 @@ local function highlightParticipant(player: Player, participant: Types.ClientPar
     end
 end
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participant: Types.ClientOwnParticipant?)
-    ownParticipant = participant
-    if ownParticipant then
-        ownRole = LocalRoundInfo.GetRole(ownParticipant.Role)
-        for _, v in LocalRoundInfo.GetAllParticipants() do
-            highlightParticipant(player, v)
-        end
-    else
-        ownRole = nil
-    end
-end)
-
 LocalRoundInfo.Listen("UpdateParticipant", highlightParticipant)
 
 local function update(roundPhase)
@@ -142,6 +130,16 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participa
     local role
     if participant then
         role = LocalRoundInfo.GetRole(participant.Role)
+    end
+
+    ownParticipant = participant
+    if ownParticipant then
+        ownRole = role
+        for _, v in LocalRoundInfo.GetAllParticipants() do
+            highlightParticipant(player, v)
+        end
+    else
+        ownRole = nil
     end
     
     local roleLabel = roundInfo.TopBar.Role
