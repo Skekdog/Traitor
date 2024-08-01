@@ -64,8 +64,8 @@ local function move(clone: typeof(sample), order: number, middle: number): ()
 end
 
 local slots: {[number]: ItemTypes.Item?} = {}
-local function add(equipmentName: string): ()
-	local equipment = InventoryManager.AddEquipment(equipmentName)
+local function add(equipmentName: string, params: ItemTypes.ClientItemInitParams?): ()
+	local equipment = InventoryManager.AddEquipment(equipmentName, params)
 
 	local clone = sample:Clone()
 	clone.Text = equipment.Base.Name
@@ -134,12 +134,12 @@ local function remove(equipmentName: string)
 	end
 end
 
-InventoryManager.InvEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: string?)
+InventoryManager.InvEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: string?, params: ItemTypes.ClientItemInitParams?)
 	if not equipment then
 		return
 	end
 	if event == "Add" then
-		add(equipment)
+		add(equipment, params)
 	elseif event == "Remove" then
 		remove(equipment)
 	elseif event == "Unequip" then

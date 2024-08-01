@@ -75,12 +75,24 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
     ProfileManager.UpdateProfile(plr, "Settings", options)
 end)
 
-local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item)
-	InventoryManager.InvEvent:FireClient(plr, event, equipment.Base.Name)
+local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item, params: ItemTypes.ClientItemInitParams?)
+	InventoryManager.InvEvent:FireClient(plr, event, equipment.Base.Name, params)
 end
 
 InventoryManager.Listen("Add", function(plr, equipment)
-	fireInventoryClient(plr, "Add", equipment)
+	local params: ItemTypes.ClientItemInitParams?
+	if equipment.Kind == "Gun" then
+		params = {
+			LastFireTime = equipment.LastFireTime,
+			CurrentAmmo = equipment.CurrentAmmo,
+			ReloadingUntil = equipment.ReloadingUntil,
+		}
+	elseif equipment.Kind == "Melee" then
+		params = {
+			LastFireTime = equipment.LastFireTime,
+		}
+	end
+	fireInventoryClient(plr, "Add", equipment, params or nil)
 end)
 
 InventoryManager.Listen("Remove", function(plr, equipment)

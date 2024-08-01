@@ -35,6 +35,12 @@ export type GenericItem = {
     Base: ItemDefinition,
 }
 
+export type ClientItemInitParams = {
+    CurrentAmmo: number?,
+    LastFireTime: number,
+    ReloadingUntil: number?,
+}
+
 export type Weapon = GunWeapon | GrenadeWeapon | MeleeWeapon
 
 export type GunWeapon = {
@@ -46,6 +52,7 @@ export type GunWeapon = {
     LastFireTime: number,
     LastFireAttempt: number, -- For empty clip sound
     Reloading: thread?,
+    ReloadingUntil: number,
 }
 
 export type GrenadeWeapon = {

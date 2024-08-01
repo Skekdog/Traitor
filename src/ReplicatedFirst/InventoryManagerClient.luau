@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local AmmoData = require(script.Parent.AmmoData)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
 local module = {}
@@ -28,27 +27,33 @@ function module.Listen(event: InventoryEvent, callback: (ItemTypes.Item) -> ()):
     end
 end
 
-function module.LoadItem(name: string): ItemTypes.Item
+function module.LoadItem(name: string, params: ItemTypes.ClientItemInitParams?): ItemTypes.Item
     local base = Items[name]
 
     local item: ItemTypes.Item
     if base.Kind == "Gun" then
+        assert(params and params.CurrentAmmo and params.ReloadingUntil)
         local gunItem: ItemTypes.GunWeapon = {
             Base = base,
             Kind = "Gun",
-            CurrentAmmo = base.MagazineSize or AmmoData[base.AmmoType :: any].Max,
+            CurrentAmmo = params.CurrentAmmo,
             Instance = base.Model,
-            Reloading = nil,
-            LastFireTime = 0,
-            LastFireAttempt = 0,
+            Reloading = task.spawn(assert, true),
+            LastFireTime = params.LastFireTime,
+            LastFireAttempt = params.LastFireTime,
+            ReloadingUntil = 0,
         }
+        task.delay(params.ReloadingUntil - workspace:GetServerTimeNow(), function()
+            gunItem.Reloading = nil
+        end)
         item = gunItem
     elseif base.Kind == "Melee" then
+        assert(params)
         local meleeItem: ItemTypes.MeleeWeapon = {
             Base = base,
             Kind = "Melee",
             Instance = base.Model,
-            LastFireTime = 0,
+            LastFireTime = params.LastFireTime,
         }
         item = meleeItem
     elseif base.Kind == "Grenade" then
@@ -71,8 +76,8 @@ function module.LoadItem(name: string): ItemTypes.Item
     return item
 end
 
-function module.AddEquipment(equipment: string): ItemTypes.Item
-    local item = module.LoadItem(equipment)
+function module.AddEquipment(equipment: string, params: ItemTypes.ClientItemInitParams?): ItemTypes.Item
+    local item = module.LoadItem(equipment, params)
     runCallback("Add", item)
     return item
 end

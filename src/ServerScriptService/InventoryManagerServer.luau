@@ -22,7 +22,7 @@ local listeners: {[InventoryEvent]: {((Player, Item, boolean?) -> ())}} = {Add =
 
 type InventoryRemote = {
     FireServer: (self: any, InventoryEvent, string, boolean?, Ray?) -> (),
-    FireClient: (self: any, Player, InventoryEvent, string) -> (),
+    FireClient: (self: any, Player, InventoryEvent, string, ItemTypes.ClientItemInitParams?) -> (),
     OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, string?, boolean?) -> ()) -> ()},
 }
 
@@ -103,6 +103,7 @@ function module.Reload(player: Player, weapon: ItemTypes.GunWeapon): ()
         reloadSound:Play()
     end
 
+    weapon.ReloadingUntil = workspace:GetServerTimeNow() + base.ReloadTime
     weapon.Reloading = task.delay(base.ReloadTime, function()
         weapon.Reloading = nil
 
@@ -183,7 +184,7 @@ function module.Equip(plr: Player, equipment: Item)
     runCallback(plr, "Equip", equipment)
 end
 
-local priorities = {Enum.AnimationPriority.Action, Enum.AnimationPriority.Action2} -- hold and hit animations
+local priorities = {Enum.AnimationPriority.Action, Enum.AnimationPriority.Action2} -- hold and hit / aim animations
 function module.Unequip(plr: Player, equipment: Item, switching: boolean?)
     module.SetAiming(plr, false)
     local old = equipped[plr]
@@ -420,6 +421,7 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
             CurrentAmmo = currentAmmo,
             LastFireTime = 0,
             LastFireAttempt = 0,
+            ReloadingUntil = 0,
         }
 
         itemInstance = gunInstance
