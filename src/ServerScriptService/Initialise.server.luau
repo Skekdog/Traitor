@@ -2,10 +2,11 @@ local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
 local ItemTypes = require(ReplicatedFirst.ItemTypes)
-local InventoryManager = require(ReplicatedFirst.InventoryManager)
+local InventoryManager = require(ServerScriptService.InventoryManagerServer)
 local ProfileManager = require(script.Parent.ProfileManager)
 
 local _earlyTesters = { -- These players should be awarded the badge whenever they join, even after release
@@ -75,7 +76,7 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
 end)
 
 local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item)
-	InventoryManager.InvEvent:FireClient(plr, event, equipment)
+	InventoryManager.InvEvent:FireClient(plr, event, equipment.Base.Name)
 end
 
 InventoryManager.Listen("Add", function(plr, equipment)

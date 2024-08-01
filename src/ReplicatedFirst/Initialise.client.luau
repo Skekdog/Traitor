@@ -3,7 +3,7 @@ local TweenService = game:GetService("TweenService")
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
-local InventoryManager = require(script.Parent.InventoryManager)
+local InventoryManager = require(script.Parent.InventoryManagerClient)
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
@@ -85,7 +85,7 @@ local function setAmmo(current: number, magazineSize: number, reserve: number, n
     UIAnimation.Slider(ammoBar.Background, noTransition, current, magazineSize)
 end
 
-InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
+InventoryManager.Listen("Equip", function(item: ItemTypes.Item)
     ammoBar.Visible = item.Kind == "Gun"
 end)
 

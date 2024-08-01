@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local InventoryManager = require(script.Parent.InventoryManager)
+local InventoryManager = require(script.Parent.InventoryManagerClient)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local SettingsManager = require(script.Parent.SettingsManager)
@@ -41,7 +41,7 @@ local scope = UIManager.WaitForUI("Scope")
 local function aim(aiming: boolean): ()
     local Viewmodel = (require)(script.Parent.Viewmodel)
     if aiming then
-        local item = InventoryManager.GetEquipped(Players.LocalPlayer)
+        local item = InventoryManager.Equipped
         if not item or item.Kind ~= "Gun" then
             return
         end

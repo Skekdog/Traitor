@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AimWeaponClient = require(script.Parent.AimWeaponClient)
 local ControlManager = require(script.Parent.ControlManager)
-local InventoryManager = require(script.Parent.InventoryManager)
+local InventoryManager = require(script.Parent.InventoryManagerClient)
 local ItemHint = require(script.Parent.ItemHint)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
@@ -103,7 +103,7 @@ local function isDropObstructed(char: Model?): boolean
     return false
 end
 
-InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
+InventoryManager.Listen("Equip", function(item: ItemTypes.Item)
     ItemHint()
     Viewmodel.Show(item)
 
@@ -119,7 +119,7 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
                     clientServer.PrimaryFire:InvokeServer(getCenterRay())
                 end
             else
-                while input.UserInputState == Enum.UserInputState.Begin and InventoryManager.GetEquipped(plr) == item do
+                while input.UserInputState == Enum.UserInputState.Begin and InventoryManager.Equipped == item do
                     if clientServer.PrimaryFire:InvokeServer(getCenterRay()) and item.Kind ~= "Item" then
                         LocalRoundInfo.PrimaryFire(item)
                     end
@@ -162,11 +162,11 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     
     if base.CanDrop then
         ControlManager.Register("Drop", true, function()
-            local equipped = InventoryManager.GetEquipped(plr)
-            if not equipped or isDropObstructed(plr.Character) then
+            local equipped = InventoryManager.Equipped
+            if not equipped or isDropObstructed(Players.LocalPlayer.Character) then
                 return Enum.ContextActionResult.Pass
             end
-            InventoryManager.Drop(plr, equipped, Vector3.zero, getCenterRay())
+            InventoryManager.Drop(equipped, getCenterRay())
             return Enum.ContextActionResult.Sink
         end)
     else
@@ -180,8 +180,8 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
         end)
 
         ControlManager.Register("Drop Ammo", true, function(action, state, input)
-            local equipped = InventoryManager.GetEquipped(plr)
-            if isDropObstructed(plr.Character) or not equipped then
+            local equipped = InventoryManager.Equipped
+            if isDropObstructed(Players.LocalPlayer.Character) or not equipped then
                 return Enum.ContextActionResult.Pass
             end
             clientServer.DropAmmo:FireServer(getCenterRay())
@@ -193,8 +193,8 @@ InventoryManager.Listen("Equip", function(plr: Player, item: ItemTypes.Item)
     end
 end)
 
-InventoryManager.Listen("Unequip", function(plr: Player, item: ItemTypes.Item)
-    if InventoryManager.GetEquipped(plr) then
+InventoryManager.Listen("Unequip", function(item: ItemTypes.Item)
+    if InventoryManager.Equipped then
         return
     end
     ControlManager.Unregister("Primary Fire")

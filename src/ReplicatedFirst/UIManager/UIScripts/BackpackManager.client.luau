@@ -1,14 +1,12 @@
-local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
+local Items = require(script.Parent.Parent.Parent.Items)
 local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
 local ControlManager = require(ReplicatedFirst.ControlManager)
-local InventoryManager = require(ReplicatedFirst.InventoryManager)
+local InventoryManager = require(ReplicatedFirst.InventoryManagerClient)
 local ItemTypes = require(ReplicatedFirst.ItemTypes)
 local UIManager = require(ReplicatedFirst.UIManager)
 
-local plr = Players.LocalPlayer
 local backpack = UIManager.WaitForUI("Backpack").Object :: typeof(UIManager.UnregisteredUIs.Backpack)
 
 local sample = backpack.Sample
@@ -21,7 +19,7 @@ local function unequip(equipment: ItemTypes.Item): ()
 	if found then
 		found.BackgroundTransparency = 0.75
 	end
-	InventoryManager.Unequip(plr, equipment)
+	InventoryManager.Unequip(equipment)
 	selectedEquipment = nil
 end
 
@@ -32,7 +30,7 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 			unequip(equipment)
 			return Enum.ContextActionResult.Sink
 		else
-			InventoryManager.Equip(plr, equipment)
+			InventoryManager.Equip(equipment)
 			local found = backpack.Container:FindFirstChild(equipment.Base.Name) :: TextButton
 			if found then
 				found.BackgroundTransparency = 0.25
@@ -66,8 +64,8 @@ local function move(clone: typeof(sample), order: number, middle: number): ()
 end
 
 local slots: {[number]: ItemTypes.Item?} = {}
-local function add(equipment: ItemTypes.Item): ()
-	InventoryManager.AddEquipment(plr, equipment)
+local function add(equipmentName: string): ()
+	local equipment = InventoryManager.AddEquipment(equipmentName)
 
 	local clone = sample:Clone()
 	clone.Text = equipment.Base.Name
@@ -95,8 +93,12 @@ local function add(equipment: ItemTypes.Item): ()
 	end
 end
 
-local function remove(equipment: ItemTypes.Item)
-	InventoryManager.RemoveEquipment(plr, equipment)
+local function remove(equipmentName: string)
+	local equipment = InventoryManager.Items[equipmentName]
+	if not equipment then
+		return
+	end
+	InventoryManager.RemoveEquipment(equipment)
 
 	local found = backpack.Container:FindFirstChild(equipment.Base.Name)
 	local buttons = backpack.Container:GetChildren() :: {any}
@@ -132,7 +134,7 @@ local function remove(equipment: ItemTypes.Item)
 	end
 end
 
-ReplicatedStorage:WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item?)
+InventoryManager.InvEvent.OnClientEvent:Connect(function(event: InventoryManager.InventoryEvent, equipment: string?)
 	if not equipment then
 		return
 	end
@@ -141,7 +143,7 @@ ReplicatedStorage:WaitForChild("ServerClient").InventoryEvent.OnClientEvent:Conn
 	elseif event == "Remove" then
 		remove(equipment)
 	elseif event == "Unequip" then
-		if selectedEquipment and equipment.Base.Name == selectedEquipment.Base.Name then
+		if selectedEquipment and Items[equipment].Name == selectedEquipment.Base.Name then
 			selectedEquipment = nil
 		end
 	end
