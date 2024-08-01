@@ -105,7 +105,7 @@ roundHandlerEvents.VoteMap.OnClientEvent:Connect(function(allow)
     vote:ToggleVisible(allow)
 end)
 
-local timeTarget = 0
+local timeTarget = LocalRoundInfo.GetTimeMilestone()
 local paused = false
 local lastTime = ""
 local function updateTimer(time: number)
