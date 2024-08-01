@@ -187,8 +187,8 @@ function movePlr(plr: Player, status: Status)
 end
 
 local function removePlr(plr: Player)
-	players[plr.Name] = nil
 	local f = findPlr(plr.Name)
+	players[plr.Name] = nil
 	if f then
 		f:Destroy()
 		recalculateCount(getStatus(f.LayoutOrder))
