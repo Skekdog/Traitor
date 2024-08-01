@@ -6,6 +6,15 @@ local module = {}
 module.Items = {} :: {[string]: ItemTypes.Item?}
 module.Equipped = nil :: ItemTypes.Item?
 
+local reserveAmmo: {[ItemTypes.AmmoType]: number?} = {}
+function module.GetReserve(ammoType: ItemTypes.AmmoType): number
+    return reserveAmmo[ammoType] or 0
+end
+
+function module.SetReserve(ammoType: ItemTypes.AmmoType, amount: number): ()
+    reserveAmmo[ammoType] = amount
+end
+
 export type InventoryEvent = "Remove" | "Equip" | "Unequip" | "Drop" | "Add"
 type InventoryRemote = {
     FireServer: (self: any, InventoryEvent, string, boolean?, Ray?) -> (),

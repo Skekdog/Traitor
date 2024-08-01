@@ -262,12 +262,6 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
-    if weapon.Kind == "Gun" or weapon.Kind == "Melee" then
-        if weapon.LastFireTime + (weapon.Base.FireTime) > workspace:GetServerTimeNow() then
-            return
-        end
-    end
-
     local round = GetRound()
     if not round then
         return
@@ -288,16 +282,16 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         return
     end
 
+    if weapon.Kind == "Gun" or weapon.Kind == "Melee" then
+        if weapon.LastFireTime + (weapon.Base.FireTime) > workspace:GetServerTimeNow() then
+            return
+        end
+    end
+
     local timeNow = workspace:GetServerTimeNow()
     if weapon.Kind == "Gun" then
-        if (weapon.CurrentAmmo <= 0) or (weapon.Base.ScopeRequired and not InventoryManager.IsAiming(player)) then
-            if weapon.LastFireAttempt + weapon.Base.FireTime < timeNow then
-                weapon.LastFireAttempt = timeNow
-                local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
-                sound.Parent = char.PrimaryPart
-                sound:Destroy()
-            end
-            return
+        if weapon.CurrentAmmo <= 0 then
+            return InventoryManager.UpdateAmmo(player)
         end
 
         weapon.LastFireAttempt = timeNow
@@ -387,7 +381,7 @@ function module.Shoot(player: Player, weapon: ItemTypes.Weapon, cameraRayInfo: R
         end
     end
 
-    return true
+    return
 end
 
 return module

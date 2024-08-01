@@ -9,8 +9,6 @@ local Items = require(ReplicatedFirst.Items)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 local module = {}
 
--- This can be used from both the client and the server.
-
 type Item = ItemTypes.Item | ItemTypes.Weapon
 
 export type Inventory = {Item}
@@ -339,7 +337,7 @@ module.UpdateAmmo = function(plr: Player)
         reserve = 0
     end
 
-    serverClient.AmmoUpdate:FireClient(plr, current, size, reserve)
+    serverClient.AmmoUpdate:FireClient(plr, weapon.Base.Name, current, reserve)
 end
 
 function module.OnItemTouched(weapon: BasePart, round: Types.Round, part: BasePart)

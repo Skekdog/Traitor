@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local ClientWeaponManager = require(script.Parent.ClientWeaponManager)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
@@ -9,7 +10,6 @@ local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local StandardDoor = require(script.Parent.StandardDoor)
-local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
 local Viewmodel = require(script.Parent.Viewmodel)
@@ -79,11 +79,6 @@ end)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 local ammoBar = roundInfo.Frame.AmmoBar
-local function setAmmo(current: number, magazineSize: number, reserve: number, noTransition: boolean?)
-    LocalRoundInfo.Ammo = current
-    ammoBar.AmmoLabel.Text = `{current} / {magazineSize} + {reserve}`
-    UIAnimation.Slider(ammoBar.Background, noTransition, current, magazineSize)
-end
 
 InventoryManager.Listen("Equip", function(item: ItemTypes.Item)
     ammoBar.Visible = item.Kind == "Gun"
@@ -108,7 +103,7 @@ LocalRoundInfo.Listen("RoundPhase", function(phase: Types.RoundPhase)
     end
 end)
 
-serverClient.AmmoUpdate.OnClientEvent:Connect(setAmmo)
+serverClient.AmmoUpdate.OnClientEvent:Connect(ClientWeaponManager.SetAmmo)
 serverClient.Discombobulate.OnClientEvent:Connect(Discombobulate)
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
 serverClient.PlayViewmodelAnimation.OnClientEvent:Connect(Viewmodel.PlayAnimation)

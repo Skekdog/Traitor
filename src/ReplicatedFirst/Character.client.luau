@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local AimWeaponClient = require(script.Parent.AimWeaponClient)
+local ClientWeaponManager = require(script.Parent.ClientWeaponManager)
 local ControlManager = require(script.Parent.ControlManager)
 local InventoryManager = require(script.Parent.InventoryManagerClient)
 local ItemHint = require(script.Parent.ItemHint)
@@ -116,19 +117,11 @@ InventoryManager.Listen("Equip", function(item: ItemTypes.Item)
         ControlManager.Register("Primary Fire", true, function(action, _, input)
             if item.Kind == "Item" and base.Toggled then
                 if input.UserInputState == Enum.UserInputState.End then
-                    clientServer.PrimaryFire:InvokeServer(getCenterRay())
+                    ClientWeaponManager.PrimaryFire(item)
                 end
             else
                 while input.UserInputState == Enum.UserInputState.Begin and InventoryManager.Equipped == item do
-                    if clientServer.PrimaryFire:InvokeServer(getCenterRay()) and item.Kind ~= "Item" then
-                        LocalRoundInfo.PrimaryFire(item)
-                    end
-                    task.wait()
-                    if item.Kind == "Gun" then
-                        if LocalRoundInfo.Ammo and LocalRoundInfo.Ammo <= 0 then
-                            ReloadGunClient()
-                        end
-                    end
+                    task.wait(ClientWeaponManager.PrimaryFire(item))
                 end
             end
             return Enum.ContextActionResult.Sink

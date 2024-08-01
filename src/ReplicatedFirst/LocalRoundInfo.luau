@@ -129,7 +129,6 @@ function module.IsSpectating(): boolean
 end
 
 module.DNACharge = 1000
-module.Ammo = nil :: number?
 
 function module.SetSpectating(value: boolean): ()
     isSpectating = value
