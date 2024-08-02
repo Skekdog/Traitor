@@ -7,6 +7,8 @@ local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(script.Parent.UIManager)
 
+local mouse = Players.LocalPlayer:GetMouse()
+
 local module = {}
 module.IsAiming = false
 
@@ -52,8 +54,10 @@ local function aim(aiming: boolean): ()
         SetCameraSensitivity(getSensitivityMultiplier(item.Base.AimFOV))
         if item.Base.HasScope then
             scope:ToggleVisible(true)
+            mouse.Icon = ""
         else
             scope:ToggleVisible(false)
+            mouse.Icon = "rbxassetid://10801958931"
         end
 
         Viewmodel.PlayAnimation(item.Base.AimAnimation, "AimAnimation")
