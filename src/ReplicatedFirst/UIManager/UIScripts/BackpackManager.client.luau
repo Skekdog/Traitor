@@ -57,10 +57,13 @@ local function move(clone: typeof(sample), order: number, middle: number): ()
 	if order == middle then
 		relativePosition = UDim2.new()
 	else
-		if (order == difference - 0.5) or (order == difference + 0.5) then
-			difference -= 0.5
+		local padding = INV_BUTTON_PADDING * mult
+		local sizeMult = 1.5
+		if (order == middle - 0.5) or (order == middle + 0.5) then
+			sizeMult = 1.25
+			padding /= 2
 		end
-		relativePosition = UDim2.new((INV_BUTTON_SIZE * 1.5 * difference), INV_BUTTON_PADDING * mult, 0, 0)
+		relativePosition = UDim2.new((INV_BUTTON_SIZE * sizeMult * difference), padding, 0, 0)
 	end
 
 	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + relativePosition})
