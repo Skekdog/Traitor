@@ -8,6 +8,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ActionItems = require(script.Parent.ActionItems)
 local HitSounds = require(script.Parent.HitSounds)
+local CreateEmptyPart = require(script.Parent.Parent.ReplicatedFirst.CreateEmptyPart)
 local CalculateDamageModifier = require(ReplicatedFirst.CalculateDamageModifier)
 local StringWithDeterminer = require(ReplicatedFirst.StringWithDeterminer)
 local PlayPositionalSound = require(script.Parent.PlayPositionalSound)
@@ -281,6 +282,20 @@ local module: Types.Adapter = {
                 local magnitude = startHeight - root.Position.Y
 
                 if magnitude <= 15 then
+                    return
+                end
+
+                local params = RaycastParams.new()
+                params.IgnoreWater = false
+                params.FilterDescendantsInstances = {workspace.Characters, workspace.Corpses}
+                params.FilterType = Enum.RaycastFilterType.Exclude
+                local result = workspace:Raycast(root.Position, -Vector3.yAxis * 15, params)
+
+                if not result then -- Benefit of the doubt
+                    return
+                end
+
+                if result.Material == Enum.Material.Water then
                     return
                 end
 
