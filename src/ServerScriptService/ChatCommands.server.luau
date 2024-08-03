@@ -24,7 +24,22 @@ TeleportService.TeleportInitFailed:Connect(function(plr, result, errorMessage)
     end
 end)
 
-local oldVictory: ((any, any) -> ())?
+local oldVictory: ((Types.Gamemode, Types.Participant) -> ())?
+
+local deaths: {Types.Participant} = {}
+
+local function unPauseVictory(round: Types.Round): ()
+    round.Gamemode.OnDeath = oldVictory
+    oldVictory = nil
+
+    if not round.Gamemode.OnDeath then
+        return
+    end
+    
+    for _, v in deaths do
+        round.Gamemode.OnDeath(round.Gamemode, v)
+    end
+end
 
 local function pause(): Types.Round?
     local round = GetRound()
@@ -38,8 +53,7 @@ local function pause(): Types.Round?
     if not round.Paused then
         ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
         if oldVictory then
-            round.Gamemode.OnDeath = oldVictory
-            oldVictory = nil
+            unPauseVictory(round)
         end
     end
     ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
@@ -95,12 +109,15 @@ Players.PlayerAdded:Connect(function(plr: Player)
                 return
             end
 
+            deaths = {}
             if round.Paused then
                 oldVictory = round.Gamemode.OnDeath
-                round.Gamemode.OnDeath = nil
+                round.Gamemode.OnDeath = function(self, participant)
+                    table.insert(deaths, participant)
+                end
+                print(tostring(round.Gamemode.OnDeath), tostring(oldVictory))
             else
-                round.Gamemode.OnDeath = oldVictory
-                oldVictory = nil
+                unPauseVictory(round)
             end
         elseif cmd == "!settings" then
             ReplicatedStorage.ServerClient.OpenSettings:FireClient(plr)

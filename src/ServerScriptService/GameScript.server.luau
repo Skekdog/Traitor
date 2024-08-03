@@ -24,7 +24,9 @@ local voteMap = remotes.VoteMap
 getMaps.OnServerInvoke = function()
 	local names = {}
 	for _, v in ServerStorage.Maps:GetChildren() do
-		table.insert(names, v.Name)
+		if v ~= ServerStorage.Maps.TestMap then
+			table.insert(names, v.Name)
+		end
 	end
 	return names
 end
@@ -140,7 +142,7 @@ end
 
 local nextRoundReady = true
 local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
---nextMap = workspace.TestMap :: Types.MapStructureCast
+--nextMap = ServerStorage.Maps.TestMap :: Types.MapStructureCast
 
 local function sendRoundInfo(plr: Player?): ()
 	local round = GetRound()
@@ -209,7 +211,7 @@ joinRound.OnServerInvoke = function(plr)
 			elseif phase == "Intermission" then
 				voteMap:FireAllClients(true)
 				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: unknown)
-					if typeof(map) ~= "string" or not ServerStorage.Maps:FindFirstChild(map) then
+					if typeof(map) ~= "string" or not ServerStorage.Maps:FindFirstChild(map) or map == "TestMap" then
 						return
 					end
 
@@ -310,6 +312,7 @@ joinRound.OnServerInvoke = function(plr)
 					end
 				end
 				local maps = ServerStorage.Maps:GetChildren()
+				table.remove(maps, table.find(maps, ServerStorage.Maps.TestMap))
 				Random.new():Shuffle(maps)
 				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructureCast) or (maps[1] :: Types.MapStructureCast)
 			end
