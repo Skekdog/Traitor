@@ -1,6 +1,7 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local StarterGui = game:GetService("StarterGui")
 local Items = require(script.Parent.Parent.Parent.Items)
+local ThemesManager = require(script.Parent.Parent.Parent.ThemesManager)
 local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
 local ControlManager = require(ReplicatedFirst.ControlManager)
 local InventoryManager = require(ReplicatedFirst.InventoryManagerClient)
@@ -80,6 +81,9 @@ local function add(equipmentName: string, params: ItemTypes.ClientItemInitParams
 
 	clone.Position = UDim2.fromScale(0.5, 1.2)
 	clone.Visible = true
+
+	ThemesManager.UpdateThemeInstance(clone, nil, true)
+	ThemesManager.UpdateThemeInstance(clone.TextLabel, nil, true)
 
 	clone.Name = equipment.Base.Name
 	clone.Parent = backpack.Container

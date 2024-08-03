@@ -42,7 +42,7 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	
 	local SettingsManager = require(script.Parent.SettingsManager)
 	local UIAnimation = require(script.Parent.UIAnimation)
-	local tweenInfo = TweenInfo.new((SettingsManager.GetSetting("Animate UI Transitions") and not noTransition) and THEME_TRANSITION_TIME or 0, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+	local tweenInfo = TweenInfo.new(THEME_TRANSITION_TIME, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
 	theme = theme or module.Themes[SettingsManager.GetSetting("UI Theme") :: string]
 	assert(theme)
 	
@@ -53,25 +53,35 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	local style = v:GetAttribute("Style")
 	
 	if v.ClassName == "UIStroke" then
-		UIAnimation.Animate(v, tweenInfo, {Color = if not inverse then theme["UIStroke"] else theme[style or "Text"]})
+		UIAnimation.Animate(v, tweenInfo, {Color = if not inverse then theme["UIStroke"] else theme[style or "Text"]}, noTransition)
 	elseif (v.ClassName == "TextButton") or (v.ClassName == "TextLabel") then
 		if not keepText then
 			UIAnimation.Animate(v, tweenInfo, {
 				TextColor3 = (not inverse) and theme.Text or theme[style or "Primary"],
 				TextStrokeColor3 = (not inverse) and theme.TextStroke or theme[style or "Text"]
-			})
+			}, noTransition)
 		end
 	elseif (v.ClassName == "ImageButton") or (v.ClassName == "ImageLabel") then
 		if updateImage then
-			UIAnimation.Animate(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]})
+			UIAnimation.Animate(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]}, noTransition)
 		end
+	elseif v.ClassName == "ChatWindowConfiguration" then
+		UIAnimation.Animate(v, tweenInfo, {
+			BackgroundColor3 = if not inverse then theme[style or "Primary"] else theme.Text,
+			TextColor3 = if not inverse then theme.Text or theme.UIStroke else theme[style or "Primary"]
+		})
+	elseif v.ClassName == "ChatInputBarConfiguration" then
+		UIAnimation.Animate(v, tweenInfo, {
+			BackgroundColor3 = if not inverse then theme[style or "Primary"] else theme.Text,
+			TextColor3 = if not inverse then theme.Text or theme.UIStroke else theme[style or "Primary"]
+		})
 	end
 	
-	if v.ClassName ~= "UIStroke" then
+	if v.ClassName ~= "UIStroke" and v.ClassName ~= "ChatInputBarConfiguration" and v.ClassName ~= "ChatWindowConfiguration" then
 		UIAnimation.Animate(v, tweenInfo, {
 			BackgroundColor3 = (not inverse) and theme[style or "Primary"] or theme.Text,
 			BorderColor3 = (not inverse) and theme.UIStroke or theme[style or "Primary"]
-		})
+		}, noTransition)
 	end
 	
 	return
