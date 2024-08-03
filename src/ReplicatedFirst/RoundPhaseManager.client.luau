@@ -73,8 +73,6 @@ local function update(roundPhase)
 
         return
     end
-
-    LocalRoundInfo.SetSpectating(not ownParticipant or not Players.LocalPlayer.Character)
     
     if roundPhase == "Highlights" then
         local endInfo = LocalRoundInfo.GetRoundEndInfo()
@@ -141,6 +139,8 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participa
     else
         ownRole = nil
     end
+
+    LocalRoundInfo.SetSpectating((not ownParticipant or not player.Character) and LocalRoundInfo.GetRoundPhase() ~= "Destroy")
     
     local roleLabel = roundInfo.TopBar.Role
     if not participant or role.Name == "" then
