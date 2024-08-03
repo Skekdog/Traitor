@@ -25,10 +25,10 @@ end
 function module.UpdatePlayersForPlayer(player: Player, round: Types.Round?): ()
 	local ownParticipant = if round then round:GetParticipant(player.Name) else nil
 	for _, v in Players:GetPlayers() do
-		local participant = if round then round:GetParticipant(v.Name) else nil
 		if v == player then
-			remotes.UpdateOwnParticipant:FireClient(player, player, if participant then participant:ViewPartialSelf() else nil)
+			remotes.UpdateOwnParticipant:FireClient(player, player, if ownParticipant then ownParticipant:ViewPartialSelf() else nil)
 		else
+			local participant = if round then round:GetParticipant(v.Name) else nil
 			if participant then
 				remotes.UpdateParticipant:FireClient(player, v, participant:ViewPartialParticipant(ownParticipant))
 			else
