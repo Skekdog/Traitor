@@ -196,6 +196,11 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participa
         local entry = shopObject.EquipmentEntry:Clone()
         entry:SetAttribute("CreditCost", equipment.Cost)
         entry:SetAttribute("Description", equipment.Description)
+
+        if equipment.Extras and equipment.Extras.RespectTheme then
+            entry:SetAttribute("UpdateImage", true)
+            entry:AddTag("StyledUI")
+        end
         
         entry.Image = equipment.Icon
         entry.Name = equipment.Name

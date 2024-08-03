@@ -94,7 +94,11 @@ module.Equipment = {
 
         Item = function(_, participant)
             participant.Extras.BallisticVest = 60
-        end
+        end,
+
+        Extras = {
+            RespectTheme = true,
+        }
     },
     {
         Name = "DNA Scanner",

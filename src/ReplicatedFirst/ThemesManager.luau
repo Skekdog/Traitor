@@ -65,15 +65,11 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 		if updateImage then
 			UIAnimation.Animate(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]}, noTransition)
 		end
-	elseif v.ClassName == "ChatWindowConfiguration" then
+	elseif v.ClassName == "ChatWindowConfiguration" or v.ClassName == "ChatInputBarConfiguration" then
 		UIAnimation.Animate(v, tweenInfo, {
 			BackgroundColor3 = if not inverse then theme[style or "Primary"] else theme.Text,
-			TextColor3 = if not inverse then theme.Text or theme.UIStroke else theme[style or "Primary"]
-		})
-	elseif v.ClassName == "ChatInputBarConfiguration" then
-		UIAnimation.Animate(v, tweenInfo, {
-			BackgroundColor3 = if not inverse then theme[style or "Primary"] else theme.Text,
-			TextColor3 = if not inverse then theme.Text or theme.UIStroke else theme[style or "Primary"]
+			TextColor3 = if not inverse then theme.Text or theme.UIStroke else theme[style or "Primary"],
+			TextStrokeColor3 = if not inverse then theme.TextStroke else theme[style or "Primary"]
 		})
 	end
 	
