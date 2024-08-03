@@ -115,7 +115,6 @@ Players.PlayerAdded:Connect(function(plr: Player)
                 round.Gamemode.OnDeath = function(self, participant)
                     table.insert(deaths, participant)
                 end
-                print(tostring(round.Gamemode.OnDeath), tostring(oldVictory))
             else
                 unPauseVictory(round)
             end
