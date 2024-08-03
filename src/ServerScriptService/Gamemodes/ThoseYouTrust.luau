@@ -104,7 +104,7 @@ local module: Types.Gamemode = {
     SelfDefense = true,
     UseKarma = true,
 
-    StartingEquipment = {"Crowbar", "Magneto Stick", "DNA Scanner"},
+    StartingEquipment = {"Crowbar", "Magneto Stick"},
     AvailableEquipment = Common.Equipment,
 
     Roles = {
@@ -151,7 +151,7 @@ local module: Types.Gamemode = {
             },
 
             StartingEquipment = {"DNA Scanner", "Ballistic Vest"},
-            Accessories = {},
+            Accessories = {"rbxassetid://18780400341"},
 
             PointsForSearchingCorpse = 1,
 
