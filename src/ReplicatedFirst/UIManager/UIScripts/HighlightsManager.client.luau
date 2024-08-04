@@ -63,7 +63,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 
 	for i, v in scores do
 		local scoreFrame = sFrame.Template:Clone()
-		scoreFrame.Size = UDim2.fromScale(1, 0.075)
+		scoreFrame.Size = UDim2.new(1, 0, 0, minimisedScoreSize)
 
 		local usernameLabel = scoreFrame.Username
 		local totalLabel = scoreFrame.Total
