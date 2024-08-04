@@ -92,8 +92,12 @@ return function(format: string, text: string, formatOverrides: {[string]: any}?)
 		BackgroundTransparency = 1,
 		TextTransparency = 1,
 	})
+	TweenService:Create(stroke, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 3), {
+		Transparency = 1
+	}):Play()
 	tween.Completed:Once(function()
-		for _, v: any in gui:GetChildren() do
+		for _, v in gui:GetChildren() do
+			assert(v:IsA("TextLabel"))
 			local foundTween = v:FindFirstChildOfClass("Tween")
 			if foundTween then
 				foundTween:Cancel()
