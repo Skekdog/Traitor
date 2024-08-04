@@ -38,7 +38,8 @@ end)
 
 serverClient.TweenStandardDoor.OnClientEvent:Connect(StandardDoor)
 
-serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, position: Vector3, normal: Vector3)
+serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relativeCFrame: CFrame, normal: Vector3)
+    local position = part.CFrame:ToWorldSpace(relativeCFrame).Position
     local impactHole = CreateEmptyPart(CFrame.lookAt(position, position + normal))
     impactHole.Anchored = false
     impactHole.Size = Vector3.new(0.5, 0.5, 0.1)

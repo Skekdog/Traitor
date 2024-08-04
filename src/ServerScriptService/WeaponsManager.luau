@@ -141,7 +141,7 @@ local function onPartHit(round: Types.Round, weapon: ItemTypes.WeaponDefinition,
     local plr = Players:GetPlayerFromCharacter(model :: Model)
 
     if not plr and not part:IsDescendantOf(workspace.Corpses) then
-        ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, rayResult.Position, rayResult.Normal)
+        ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(part, part.CFrame:ToObjectSpace(CFrame.new(rayResult.Position)), rayResult.Normal)
         if weapon.Kind == "Melee" then
             local material = part:GetAttribute("MaterialOverride") or rayResult.Material.Name
             PlayPositionalSound(HitSounds[material] or HitSounds.Default, rayResult.Position)
