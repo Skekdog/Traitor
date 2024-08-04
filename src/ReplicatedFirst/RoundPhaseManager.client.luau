@@ -140,7 +140,28 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participa
         ownRole = nil
     end
 
-    LocalRoundInfo.SetSpectating((not ownParticipant or not player.Character) and LocalRoundInfo.GetRoundPhase() ~= "Destroy")
+    -- Because this relies on UpdateOwnParticipant it will not update when another player creates a round. But at this point I really do not care this has caused me enough misery already, it gets fixed when the round starts anyway. Who would've thought a FUCKING SPECTATE MENU would be so difficult to create!?
+    local phase = LocalRoundInfo.GetRoundPhase()
+    local function trySpectate(): boolean
+        if player.Character then
+            return false
+        end
+
+        if phase == "Destroy" then
+            return false
+        end
+
+        if not ownParticipant then
+            return true
+        end
+
+        if not player.Character and phase ~= "Waiting" and phase ~= "Preparing" then
+            return true
+        end
+
+        return false
+    end
+    LocalRoundInfo.SetSpectating(trySpectate())
     
     local roleLabel = roundInfo.TopBar.Role
     if not participant or role.Name == "" then

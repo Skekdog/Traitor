@@ -15,6 +15,7 @@ function module.UpdateParticipant(target: Types.Participant): ()
 	for _, v in Players:GetPlayers() do
 		local participant = target.Round:GetParticipant(v.Name)
 		if v == target.Player then
+			print("updating", target)
 			remotes.UpdateOwnParticipant:FireClient(v, v, target:ViewPartialSelf())
 		else
 			remotes.UpdateParticipant:FireClient(v, target.Player, target:ViewPartialParticipant(participant))
@@ -26,6 +27,7 @@ function module.UpdatePlayersForPlayer(player: Player, round: Types.Round?): ()
 	local ownParticipant = if round then round:GetParticipant(player.Name) else nil
 	for _, v in Players:GetPlayers() do
 		if v == player then
+			print("updating 2", ownParticipant)
 			remotes.UpdateOwnParticipant:FireClient(player, player, if ownParticipant then ownParticipant:ViewPartialSelf() else nil)
 		else
 			local participant = if round then round:GetParticipant(v.Name) else nil

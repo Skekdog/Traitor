@@ -45,11 +45,11 @@ local function spectateFunc(action, state)
 end
 
 LocalRoundInfo.Listen("IsSpectating", function(val)
-	if ui.Visible == val then
-		return
+	-- Do not early return here because we need to set camera properties always
+	if ui.Visible ~= val then
+		uiO.Username.Text = "Use buttons to spectate"
+		lastKey = 0
 	end
-	uiO.Username.Text = "Use buttons to spectate"
-	lastKey = 0
 	if val then
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
@@ -74,3 +74,5 @@ end)
 uiO.Back.MouseButton1Click:Connect(function()
 	spectateFunc("Spectate Previous", Enum.UserInputState.End)
 end)
+
+LocalRoundInfo.SetSpectating(LocalRoundInfo.GetRoundPhase() ~= "Destroy")
