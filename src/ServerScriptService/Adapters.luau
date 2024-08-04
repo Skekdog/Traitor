@@ -453,7 +453,7 @@ local module: Types.Adapter = {
         char.Archivable = true
         local clone = char:Clone()
 
-        local root = clone:FindFirstChild("HumanoidRootPart") :: Part?
+        local root = clone:FindFirstChild("HumanoidRootPart") :: BasePart?
         local hum = clone:FindFirstChildOfClass("Humanoid")
 
         if hum then
@@ -466,6 +466,7 @@ local module: Types.Adapter = {
             root.CanQuery = false
         end
 
+        plr.Character = nil
         char:Destroy()
         clone:SetAttribute("Unidentified", true)
 
@@ -517,7 +518,6 @@ local module: Types.Adapter = {
         end
 
         victim.Character = clone
-        victim.Player.Character = nil
     end,
 
     CalculateUserFacingEvents = function(events: Types.RoundEventLog, winners)
