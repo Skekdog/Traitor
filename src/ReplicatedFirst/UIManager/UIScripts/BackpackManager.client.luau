@@ -114,7 +114,7 @@ local function remove(equipmentName: string)
 	local buttons = backpack.Container:GetChildren() :: {any}
 
 	if found then
-		found.Parent = nil
+		found.Parent = backpack
 		slots[equipment.Base.Slot] = nil
 		table.remove(buttons, table.find(buttons, found))
 		
