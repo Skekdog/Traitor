@@ -156,9 +156,9 @@ module.AvailableSettings = {
 		Name = "Background Menus",
 		Tab = "Display",
 		Category = "User Interface",
-		Tooltip = "Hidden - Menus are not visible behind other menus, but are shown again when the menu is closed.\nClosed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
-		PossibleValues = {"Hidden", "Closed", "Stacked"},
-		Default = "Hidden",
+		Tooltip = "Closed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
+		PossibleValues = {"Closed", "Stacked"},
+		Default = "Closed",
 		Callback = function(val)
 			script.Parent.UIManager:SetAttribute("BackgroundMenuMode", val)
 		end,
