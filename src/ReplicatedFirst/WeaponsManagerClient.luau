@@ -5,8 +5,7 @@ local AmmoData = require(script.Parent.AmmoData)
 local InventoryManagerClient = require(script.Parent.InventoryManagerClient)
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local UIAnimation = require(script.Parent.UIAnimation)
-local UIManager = require(script.Parent.UIManager)
+local SetAmmoBar = require(script.Parent.SetAmmoBar)
 local Viewmodel = require(script.Parent.Viewmodel)
 
 local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
@@ -114,8 +113,7 @@ function module.SetReloadingStatus(itemName: string): ()
     item.ReloadingUntil = 0
 end
 
-local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
-local ammoBar = roundInfo.Frame.AmmoBar
+
 function module.SetAmmo(itemName: string, current: number, reserve: number?): ()
     local item = InventoryManagerClient.Items[itemName]
     if not item or item.Kind ~= "Gun" then
@@ -131,13 +129,12 @@ function module.SetAmmo(itemName: string, current: number, reserve: number?): ()
     else
         reserve = 0
     end
+    assert(reserve)
     
     item.CurrentAmmo = current
 
     local magazineSize = item.Base.MagazineSize or AmmoData[item.Base.AmmoType :: any].Magazine
-
-    ammoBar.AmmoLabel.Text = `{current} / {magazineSize} + {reserve}`
-    UIAnimation.Slider(ammoBar.Background, nil, current, magazineSize)
+    SetAmmoBar(current, magazineSize, reserve)
 end
 
 return module

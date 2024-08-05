@@ -1,13 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local AmmoData = require(script.Parent.AmmoData)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
+local SetAmmoBar = require(script.Parent.SetAmmoBar)
 local module = {}
 
 module.Items = {} :: {[string]: ItemTypes.Item?}
 module.Equipped = nil :: ItemTypes.Item?
 
-local reserveAmmo: {[ItemTypes.AmmoType]: number?} = {}
-function module.GetReserve(ammoType: ItemTypes.AmmoType): number
+local reserveAmmo: {[ItemTypes.AmmoType?]: number?} = {}
+function module.GetReserve(ammoType: ItemTypes.AmmoType?): number
     return reserveAmmo[ammoType] or 0
 end
 
@@ -108,6 +110,11 @@ function module.Equip(item: ItemTypes.Item)
     module.InvEvent:FireServer("Equip", base.Name)
     if base.Kind == "Item" and base.OnEquipClient then
         base.OnEquipClient()
+    end
+
+    if item.Kind == "Gun" then
+        local ammoType: ItemTypes.AmmoType? = item.Base.AmmoType :: ItemTypes.AmmoType?
+        SetAmmoBar(item.CurrentAmmo, item.Base.MagazineSize or AmmoData[ammoType :: ItemTypes.AmmoType].Magazine, module.GetReserve(ammoType))
     end
 
     runCallback("Equip", item)
