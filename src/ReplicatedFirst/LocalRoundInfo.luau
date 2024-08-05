@@ -92,22 +92,27 @@ type Listen =
 
     (("IsSpectating", (boolean) -> ()) -> Ret) &
 
-    (("MapAuthors", (string) -> ()) -> Ret) &
-    (("MapName", (string) -> ()) -> Ret) &
-    (("GamemodeAuthors", (string) -> ()) -> Ret) &
-    (("GamemodeName", (string) -> ()) -> Ret) &
+    (("MapAuthors", ((string) -> ()), boolean?) -> Ret) &
+    (("MapName", ((string) -> ()), boolean?) -> Ret) &
+    (("GamemodeAuthors", ((string) -> ()), boolean?) -> Ret) &
+    (("GamemodeName", ((string) -> ()), boolean?) -> Ret) &
 
-    (("TimeMilestone", (number) -> ()) -> Ret) &
-    (("RoundPhase", (Types.RoundPhase) -> ()) -> Ret) &
-    (("IsPaused", (boolean) -> ()) -> Ret) &
-    (("RoundStartTime", (number) -> ()) -> Ret) &
+    (("TimeMilestone", ((number) -> ()), boolean?) -> Ret) &
+    (("RoundPhase", ((Types.RoundPhase) -> ()), boolean?) -> Ret) &
+    (("IsPaused", ((boolean) -> ()), boolean?) -> Ret) &
+    (("RoundStartTime", ((number) -> ()), boolean?) -> Ret) &
     
     (("PrimaryFire", (ItemTypes.Weapon) -> ()) -> Ret)
 
 --- @returns A function to stop listening for changes
-module.Listen = function(event, callback)
+module.Listen = function(event, callback, runInstant: boolean?)
     table.insert(listeners[event], callback)
     local pos = #listeners[event]
+
+    if runInstant then
+        callback(get(event))
+    end
+
     return function()
         listeners[event][pos] = nil
     end

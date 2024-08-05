@@ -57,10 +57,10 @@ local ragdollConstraints: {[string]: string} = {
 }
 
 local module: Types.Adapter = {
-    HIGHLIGHTS_TIME = 20, -- Time to spend after the round ends before destroying the round
-    PREPARING_TIME = 20, -- Time to spend after a round is created where players can join the round
+    HIGHLIGHTS_TIME = 1, -- Time to spend after the round ends before destroying the round
+    PREPARING_TIME = 1, -- Time to spend after a round is created where players can join the round
     SLAY_VOTES = 2, -- Minimum number of votes to slay someone, at which point they will be slain
-    INTERMISSION_TIME = 15,
+    INTERMISSION_TIME = 1,
     LOAD_LIGHTING_SETTINGS = true,
     LOAD_TERRAIN_SETTINGS = true,
     LOAD_GRAVITY_SETTING = true,

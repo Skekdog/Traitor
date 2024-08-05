@@ -22,11 +22,24 @@ local getMaps = remotes.GetMaps
 local voteMap = remotes.VoteMap
 
 local testMap = ServerStorage.Maps.TestMap :: Types.MapStructureCast
-local startMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
-local maps = ServerStorage.Maps:GetChildren()
+local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
 
+local nextGamemode = ThoseYouTrust
+local gamemodes = {ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, Elimination}
+
+local function updateGamemodeMap(gamemode: Types.Gamemode, map: Types.MapStructure): ()
+	remotes:SetAttribute("MapName", map.Name)
+	remotes:SetAttribute("MapAuthors", (if map:FindFirstChild("Authors") then map.Authors else {Value = "unknown"}).Value)
+
+	remotes:SetAttribute("GamemodeName", gamemode.Name)
+	remotes:SetAttribute("GamemodeAuthors", gamemode.Authors or "unknown")
+end
+updateGamemodeMap(nextGamemode, nextMap)
+
+local maps = ServerStorage.Maps:GetChildren()
 table.remove(maps, table.find(maps, testMap))
 
+local random = Random.new()
 
 getMaps.OnServerInvoke = function()
 	local names = {}
@@ -55,8 +68,6 @@ slayVote.OnServerEvent:Connect(function(plr, target: unknown)
 		targetParticipant:TryAddSlayVote(voterParticipant)
 	end
 end)
-
-local gamemodes = {ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, Elimination}
 
 remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: unknown)
 	local round = GetRound()
@@ -146,7 +157,6 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 end
 
 local nextRoundReady = true
-local nextMap = startMap
 
 local function sendRoundInfo(plr: Player?): ()
 	local round = GetRound()
@@ -172,13 +182,12 @@ local stopMusic: (() -> ())?
 joinRound.OnServerInvoke = function(plr)
 	local round = GetRound()
 
-	local initialise, gamemode
+	local initialise
 	if not round then
 		if not nextRoundReady then
 			return
 		end
-		gamemode = gamemodes[math.random(1, #gamemodes)]
-		round = RoundHandler.CreateRound(nextMap, gamemode)
+		round = RoundHandler.CreateRound(nextMap, nextGamemode)
 		initialise = true
 	end
 
@@ -199,8 +208,8 @@ joinRound.OnServerInvoke = function(plr)
 		remotes:SetAttribute("MapName", nextMap.Name)
 		remotes:SetAttribute("MapAuthors", (nextMap:FindFirstChild("Authors") and nextMap.Authors or {Value = "unknown"}).Value)
 
-		remotes:SetAttribute("GamemodeName", gamemode.Name)
-		remotes:SetAttribute("GamemodeAuthors", gamemode.Authors or "unknown")
+		remotes:SetAttribute("GamemodeName", nextGamemode.Name)
+		remotes:SetAttribute("GamemodeAuthors", nextGamemode.Authors or "unknown")
 		remotes:SetAttribute("TimeMilestone", round.TimeMilestone)
 		remotes.MapFolder.Value = round.Map :: Types.MapStructureCast
 
@@ -315,9 +324,14 @@ joinRound.OnServerInvoke = function(plr)
 						bestVotes = #v
 					end
 				end
-				Random.new():Shuffle(maps)
+				random:Shuffle(maps)
 				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructureCast) or (maps[1] :: Types.MapStructureCast)
 			end
+
+			random:Shuffle(gamemodes)
+			nextGamemode = gamemodes[1]
+
+			updateGamemodeMap(nextGamemode, nextMap)
 		
 			roundEventCon:Disconnect()
 			ServerStorage:SetAttribute("RoundID", nil)

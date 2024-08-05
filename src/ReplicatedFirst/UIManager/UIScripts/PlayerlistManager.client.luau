@@ -225,15 +225,15 @@ end)
 -- There is probably a better way to do this
 LocalRoundInfo.Listen("MapName", function(mapName)
 	info.RoundInfo.Info.Map.Text = "Map: "..mapName
-end)
+end, true)
 LocalRoundInfo.Listen("MapAuthors", function(mapCreator)
 	info.RoundInfo.Creators.Map.Text = mapCreator
-end)
+end, true)
 LocalRoundInfo.Listen("GamemodeName", function(gamemodeName)
 	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName
-end)
+end, true)
 LocalRoundInfo.Listen("GamemodeAuthors", function(gamemodeCreator)
 	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator
-end)
+end, true)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
