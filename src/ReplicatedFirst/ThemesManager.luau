@@ -7,7 +7,8 @@ export type Theme = {
 	Secondary: Color3,
 	Text: Color3,
 	TextStroke: Color3,
-	UIStroke: Color3
+	UIStroke: Color3,
+	PlaceholderText: Color3,
 }
 
 module.Themes = {
@@ -16,6 +17,7 @@ module.Themes = {
 		Secondary = Color3.fromRGB(210, 230, 230),
 		Text = Color3.fromRGB(0, 0, 0),
 		TextStroke = Color3.fromRGB(255, 255, 255),
+		PlaceholderText = Color3.fromRGB(100, 100, 100),
 		UIStroke = Color3.fromRGB(0, 0, 0),
 	},
 	Dark = {
@@ -23,6 +25,7 @@ module.Themes = {
 		Secondary = Color3.fromRGB(34, 34, 34),
 		Text = Color3.fromRGB(255, 255, 255),
 		TextStroke = Color3.fromRGB(0, 0, 0),
+		PlaceholderText = Color3.fromRGB(178, 178, 178),
 		UIStroke = Color3.fromRGB(255, 255, 255),
 	},
 	Blue = {
@@ -30,6 +33,7 @@ module.Themes = {
 		Secondary = Color3.fromRGB(0, 0, 68),
 		Text = Color3.fromRGB(255, 255, 255),
 		TextStroke = Color3.fromRGB(0, 0, 0),
+		PlaceholderText = Color3.fromRGB(178, 178, 178),
 		UIStroke = Color3.fromRGB(255, 255, 255),
 	},
 } :: {[string]: Theme}
@@ -52,33 +56,38 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	
 	local style = v:GetAttribute("Style")
 	
+	local properties: {[string]: Color3} = {}
 	if v.ClassName == "UIStroke" then
-		UIAnimation.Animate(v, tweenInfo, {Color = if not inverse then theme["UIStroke"] else theme[style or "Text"]}, noTransition)
-	elseif (v.ClassName == "TextButton") or (v.ClassName == "TextLabel") then
+		properties.Color = if not inverse then theme["UIStroke"] else theme[style or "Text"]
+	elseif v.ClassName == "TextButton" or v.ClassName == "TextLabel" or v.ClassName == "TextBox" then
 		if not keepText then
-			UIAnimation.Animate(v, tweenInfo, {
-				TextColor3 = (not inverse) and theme.Text or theme[style or "Primary"],
-				TextStrokeColor3 = (not inverse) and theme.TextStroke or theme[style or "Text"]
-			}, noTransition)
+			properties.TextColor3 = if not inverse then theme.Text else theme[style or "Primary"]
+			properties.TextStrokeColor3 = if not inverse then theme.TextStroke else theme[style or "Text"]
+
+			if v.ClassName == "TextBox" then
+				properties.PlaceholderColor3 = if not inverse then theme.PlaceholderText else theme[style or "Primary"]
+			end
 		end
-	elseif (v.ClassName == "ImageButton") or (v.ClassName == "ImageLabel") then
+	elseif v.ClassName == "ImageButton" or v.ClassName == "ImageLabel" then
 		if updateImage then
-			UIAnimation.Animate(v, tweenInfo, {ImageColor3 = (not inverse) and theme[style or "Text"] or theme[style or "Primary"]}, noTransition)
+			properties.ImageColor3 = if not inverse then theme[style or "Text"] else theme[style or "Primary"]
 		end
 	elseif v.ClassName == "ChatWindowConfiguration" or v.ClassName == "ChatInputBarConfiguration" then
-		UIAnimation.Animate(v, tweenInfo, {
-			BackgroundColor3 = if not inverse then theme[style or "Primary"] else theme.Text,
-			TextColor3 = if not inverse then theme.Text or theme.UIStroke else theme[style or "Primary"],
-			TextStrokeColor3 = if not inverse then theme.TextStroke else theme[style or "Primary"]
-		})
+		properties.BackgroundColor3 = if not inverse then theme[style or "Primary"] else theme.Text
+		properties.TextColor3 = if not inverse then theme.Text or theme.UIStroke else theme[style or "Primary"]
+		properties.TextStrokeColor3 = if not inverse then theme.TextStroke else theme[style or "Primary"]
+
+		if v.ClassName == "ChatInputBarConfiguration" then
+			properties.PlaceholderColor3 = if not inverse then theme.PlaceholderText else theme[style or "Primary"]
+		end
 	end
 	
-	if v.ClassName ~= "UIStroke" and v.ClassName ~= "ChatInputBarConfiguration" and v.ClassName ~= "ChatWindowConfiguration" then
-		UIAnimation.Animate(v, tweenInfo, {
-			BackgroundColor3 = (not inverse) and theme[style or "Primary"] or theme.Text,
-			BorderColor3 = (not inverse) and theme.UIStroke or theme[style or "Primary"]
-		}, noTransition)
+	if v:IsA("GuiObject") then
+		properties.BackgroundColor3 = if not inverse then theme[style or "Primary"] else theme.Text
+		properties.BorderColor3 = if not inverse then theme.UIStroke else theme[style or "Primary"]
 	end
+
+	UIAnimation.Animate(v, tweenInfo, properties)
 	
 	return
 end
