@@ -16,7 +16,7 @@ local Viewmodel = require(script.Parent.Viewmodel)
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
 local function setHealth(hum: Humanoid)
-    roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.round(hum.Health))
+    roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.ceil(hum.Health))
     UIAnimation.Slider(roundInfo.Frame.HealthBar.Background, false, hum.Health, hum.MaxHealth)
 end
 
