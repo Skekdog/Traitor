@@ -754,7 +754,7 @@ grenades.Flashbang = {
 
     Fuse = 3,
 
-    ProjectileForce = 60,
+    ProjectileForce = 30,
     Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
@@ -826,7 +826,7 @@ grenades["Incendiary Grenade"] = {
 
     Fuse = 3,
 
-    ProjectileForce = 2.5,
+    ProjectileForce = 5,
     Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
@@ -865,7 +865,7 @@ grenades["Smoke Grenade"] = {
     Fuse = 3,
 
     ProjectileBase = models("Smoke Grenade"),
-    ProjectileForce = 2.5,
+    ProjectileForce = 5,
     Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
@@ -894,7 +894,7 @@ grenades["Discombobulator"] = {
 
     Fuse = 3,
 
-    ProjectileForce = 2.5,
+    ProjectileForce = 3,
     Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
