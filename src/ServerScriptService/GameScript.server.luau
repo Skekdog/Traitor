@@ -21,12 +21,17 @@ local joinRound = remotes.JoinRound
 local getMaps = remotes.GetMaps
 local voteMap = remotes.VoteMap
 
+local testMap = ServerStorage.Maps.TestMap :: Types.MapStructureCast
+local startMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
+local maps = ServerStorage.Maps:GetChildren()
+
+table.remove(maps, table.find(maps, testMap))
+
+
 getMaps.OnServerInvoke = function()
 	local names = {}
-	for _, v in ServerStorage.Maps:GetChildren() do
-		if v ~= ServerStorage.Maps.TestMap then
-			table.insert(names, v.Name)
-		end
+	for _, v in maps do
+		table.insert(names, v.Name)
 	end
 	return names
 end
@@ -141,8 +146,7 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
 end
 
 local nextRoundReady = true
-local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
---nextMap = ServerStorage.Maps.TestMap :: Types.MapStructureCast
+local nextMap = startMap
 
 local function sendRoundInfo(plr: Player?): ()
 	local round = GetRound()
@@ -311,8 +315,6 @@ joinRound.OnServerInvoke = function(plr)
 						bestVotes = #v
 					end
 				end
-				local maps = ServerStorage.Maps:GetChildren()
-				table.remove(maps, table.find(maps, ServerStorage.Maps.TestMap))
 				Random.new():Shuffle(maps)
 				nextMap = (ServerStorage.Maps:FindFirstChild(bestMap) :: Types.MapStructureCast) or (maps[1] :: Types.MapStructureCast)
 			end
