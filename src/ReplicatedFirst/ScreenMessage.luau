@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
+local SettingsManager = require(script.Parent.SettingsManager)
 
 local screenMessageFormats = {
 	Standard = {
@@ -87,6 +88,14 @@ return function(format: string, text: string, formatOverrides: {[string]: any}?)
 	stroke.Parent = label
 
 	label.Parent = gui
+
+	local animate = SettingsManager.GetSetting("Animate UI Transitions")
+	if not animate then
+		task.delay(4, function()
+			label:Destroy()
+		end)
+		return label
+	end
 	
 	local tween = TweenService:Create(label, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 3), {
 		BackgroundTransparency = 1,

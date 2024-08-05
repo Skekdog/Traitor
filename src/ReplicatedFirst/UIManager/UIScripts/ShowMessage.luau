@@ -3,8 +3,10 @@ local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIManager = require(ReplicatedFirst.UIManager)
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 
-local TS = game:GetService("TweenService")
+local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
+local SettingsManager = require(script.Parent.Parent.Parent.SettingsManager)
+local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local global = ui.Global
@@ -12,31 +14,30 @@ local priv = ui.Private
 
 local function fade(label: TextLabel, out: boolean)
 	if out then
-		TS:Create(label, TweenInfo.new(5), {TextTransparency=1, BackgroundTransparency=1}):Play()
+		local animate = SettingsManager.GetSetting("Animate UI Transitions")
+		if animate then
+			TweenService:Create(label, TweenInfo.new(5), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+		end
 		task.delay(5, label.Destroy, label)
 	else
-		TS:Create(label, TweenInfo.new(0.25), {TextTransparency=0, BackgroundTransparency=0.4}):Play()
+		UIAnimation.Animate(label, TweenInfo.new(0.25), {TextTransparency = 0, BackgroundTransparency = 0.4})
 	end
 end
 
 local function moveDown(frame: Frame)
 	for _, v in frame:GetChildren() do
 		if v:IsA("TextLabel") then
-			v:TweenPosition(UDim2.fromScale(0, v.Position.Y.Scale+0.2), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.5, false)
+			local target = v:GetAttribute("TargetPosition") :: UDim2 + UDim2.fromScale(0, 0.2)
+			v:SetAttribute("TargetPosition", target)
+			UIAnimation.Animate(v, TweenInfo.new(0.5), { Position = target})
 		end
 	end
 end
 
-local making = false
 local function makeLabel(isTeam: boolean, text: string)
-	if making then
-		repeat
-			task.wait()
-		until not making
-	end
-	making = true
 	local label = ui.Label:Clone()
 	label.Text = text
+	label:SetAttribute("TargetPosition", UDim2.fromScale(label.Position.X.Scale, 0))
 	label.Position = UDim2.fromScale(label.Position.X.Scale, -0.3)
 	label.BackgroundTransparency = 1
 	label.TextTransparency = 1
@@ -44,12 +45,9 @@ local function makeLabel(isTeam: boolean, text: string)
 
 	moveDown(if isTeam then priv else global)
 
-	label.Parent = if isTeam then priv else global :: any
+	label.Parent = if isTeam then priv else global
 
-	label:TweenPosition(UDim2.fromScale(label.Position.X.Scale, 0), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.45, false)
-	task.delay(0.451, function()
-		making = false
-	end)
+	UIAnimation.Animate(label, TweenInfo.new(0.45), { Position = UDim2.fromScale(label.Position.X.Scale, 0) })
 
 	fade(label, false)
 	task.delay(2, fade, label, true)
