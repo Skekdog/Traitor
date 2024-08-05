@@ -1,6 +1,7 @@
 {
   "name": "Those You Trust",
   "globIgnorePaths": ["src/ServerStorage/Maps"],
+  "emitLegacyScripts": false,
   "tree": {
     "$className": "DataModel",
     "ReplicatedFirst": {
