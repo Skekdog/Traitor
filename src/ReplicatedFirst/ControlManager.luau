@@ -156,10 +156,10 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 		Callback = callback
 	}
 	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
-	local toggled = keybindSetting.Toggled
 	local keybinds = keybindSetting.Keycodes
 
 	CAS:BindAction(actionName, function(action, state, input)
+		local toggled = keybindSetting.Toggled
 		local show = false
 
 		if (toggled) and (state == Enum.UserInputState.End) then
