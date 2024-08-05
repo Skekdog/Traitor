@@ -17,7 +17,7 @@ module.Themes = {
 		Secondary = Color3.fromRGB(210, 230, 230),
 		Text = Color3.fromRGB(0, 0, 0),
 		TextStroke = Color3.fromRGB(255, 255, 255),
-		PlaceholderText = Color3.fromRGB(100, 100, 100),
+		PlaceholderText = Color3.fromRGB(50, 50, 50),
 		UIStroke = Color3.fromRGB(0, 0, 0),
 	},
 	Dark = {
