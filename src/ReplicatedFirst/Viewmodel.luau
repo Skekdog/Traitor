@@ -81,7 +81,7 @@ local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
     local direction = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2, 1).Direction * 10000
 
     local rayParams = RaycastParams.new()
-    local map = ReplicatedStorage.RoundHandler.MapFolder.Value :: Types.MapStructureCast?
+    local map = LocalRoundInfo.GetMap()
     if map then
         local bounds = map:FindFirstChild("Bounds")
         if bounds then

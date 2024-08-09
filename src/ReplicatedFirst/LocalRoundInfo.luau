@@ -39,9 +39,7 @@ end
 function module.GetAllParticipants(): {Types.ClientParticipant}
     local list = {}
     for _, v in participants do
-        if not v then -- what?
-            continue
-        end
+        assert(v) -- todo: check that this doesn't error
         table.insert(list, v)
     end
     return list
@@ -51,7 +49,7 @@ function module.GetRoundPhase(): Types.RoundPhase
     return get("RoundPhase") :: Types.RoundPhase
 end
 
-function module.GetMap(): Types.MapStructure?
+function module.GetMap(): Types.MapStructureCast?
     return replicatedData.MapFolder.Value :: Types.MapStructureCast?
 end
 

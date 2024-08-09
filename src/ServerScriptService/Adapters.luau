@@ -247,11 +247,6 @@ local module: Types.Adapter = {
         sound.Name = "DeathSound"
         sound.Parent = root
 
-        local scale = participant.Round.Map:FindFirstChild("Scale") :: NumberValue
-        if scale then
-            participant.Character:ScaleTo(scale.Value)
-        end
-
         for _, v in participant.Character:GetDescendants() do
             if v:IsA("BasePart") then
                 v.CollisionGroup = "PlayerCharacterParts"

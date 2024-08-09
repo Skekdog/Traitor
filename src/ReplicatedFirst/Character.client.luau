@@ -8,6 +8,7 @@ local ItemHint = require(script.Parent.ItemHint)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local Types = require(script.Parent.RoundHandler.Types)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
@@ -90,7 +91,7 @@ local function isDropObstructed(char: Model?): boolean
 
     local params = RaycastParams.new()
     params.IgnoreWater = true
-    params.FilterDescendantsInstances = {ReplicatedStorage.RoundHandler.MapFolder.Value :: Instance}
+    params.FilterDescendantsInstances = {LocalRoundInfo.GetMap() :: Types.MapStructureCast}
     params.FilterType = Enum.RaycastFilterType.Include
     params.RespectCanCollide = true
     params.CollisionGroup = "DroppedWeapons"
