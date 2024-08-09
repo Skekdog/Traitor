@@ -2,20 +2,25 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SettingsManager = require(script.Parent.SettingsManager)
 local IS_SERVER = game:GetService("RunService"):IsServer()
 
-local function createWedgeFragment(size: Vector3, cframe: CFrame, parent: BasePart, direction: Vector3)
+local function createWedgeFragment(properties: GlassProperties, size: Vector3, cframe: CFrame, direction: Vector3)
     local wedge = Instance.new("WedgePart")
+
+    for i, v in properties do
+        if i ~= "Size" and i ~= "CFrame" then
+            (wedge :: any)[i] = v 
+        end
+    end
+
     wedge.Size = size
     wedge.CFrame = cframe
+
     wedge.Anchored = false
-    wedge.Color = parent.Color
-    wedge.Transparency = parent.Transparency
-    wedge.Material = parent.Material
-    wedge.MaterialVariant = parent.MaterialVariant
-    wedge.Reflectance = parent.Reflectance
-    wedge.CollisionGroup = "ShatteredGlass"
-    wedge.BottomSurface = Enum.SurfaceType.Smooth
     wedge.CanTouch = false
     wedge.CanQuery = false
+    
+    wedge.CollisionGroup = "ShatteredGlass"
+    wedge.BottomSurface = Enum.SurfaceType.Smooth
+    
     wedge.Name = "GlassFragment"
     wedge.Parent = workspace.Projectiles
 
@@ -26,16 +31,44 @@ end
 
 local sounds = {2612674531, 9103909576, 9116264426, 9113850847, 9119918457}
 
-return function(glass: BasePart, direction: Vector3?): ()
-    if IS_SERVER then
-        ReplicatedStorage.ServerClient.ShatterGlass:FireAllClients(glass, direction)
-        return glass:Destroy()
-    end
-    local cols = math.max(1, math.floor(glass.Size.X / 3))
-    local rows = math.max(1, math.floor(glass.Size.Y / 3))
+type GlassProperties = {
+    CFrame: CFrame,
+    Size: Vector3,
 
-    local glassSize = glass.Size
-    local glassCFrame = glass.CFrame
+    Material: Enum.Material,
+    MaterialVariant: string,
+
+    Color: Color3,
+    Transparency: number,
+    Reflectance: number,
+}
+
+return function(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
+    if IS_SERVER then
+        assert(typeof(glassProperties) == "Instance")
+
+        local properties = {
+            CFrame = glassProperties.CFrame,
+            Size = glassProperties.Size,
+
+            Material = glassProperties.Material,
+            MaterialVariant = glassProperties.MaterialVariant,
+
+            Color = glassProperties.Color,
+            Transparency = glassProperties.Transparency,
+            Reflectance = glassProperties.Reflectance,
+        }
+
+        ReplicatedStorage.ServerClient.ShatterGlass:FireAllClients(properties, direction)
+        return glassProperties:Destroy()
+    end
+    assert(typeof(glassProperties) == "table")
+
+    local cols = math.max(1, math.floor(glassProperties.Size.X / 3))
+    local rows = math.max(1, math.floor(glassProperties.Size.Y / 3))
+
+    local glassSize = glassProperties.Size
+    local glassCFrame = glassProperties.CFrame
 
     -- Calculate the size of each fragment
     local fragmentWidth = glassSize.X / cols
@@ -54,8 +87,14 @@ return function(glass: BasePart, direction: Vector3?): ()
             local fragmentCFrame1 = glassCFrame * CFrame.new(posX, posY, posZ) * CFrame.Angles(0, math.rad(-90), 0)
             local fragmentCFrame2 = fragmentCFrame1 * CFrame.Angles(0, math.rad(180), math.rad(180))
 
-            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame1, glass, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one))
-            table.insert(fragments, createWedgeFragment(Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth), fragmentCFrame2, glass, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one))
+            table.insert(fragments,
+                createWedgeFragment(glassProperties, Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth),
+                fragmentCFrame1, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one)
+            )
+            table.insert(fragments,
+                createWedgeFragment(glassProperties, Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth),
+                fragmentCFrame2, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one)
+            )
         end
     end
 
@@ -65,8 +104,6 @@ return function(glass: BasePart, direction: Vector3?): ()
     sound.RollOffMinDistance = 10
     sound.Parent = fragments[1]
     sound:Play()
-
-    glass:Destroy()
 
     if SettingsManager.GetSetting("Keep Shattered Glass") then
         return
