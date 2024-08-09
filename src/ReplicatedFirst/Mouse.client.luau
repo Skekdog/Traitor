@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local ControlManager = require(script.Parent.ControlManager)
+local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 local CorpseInfo = require(script.Parent.UIManager.UIScripts.CorpseInfo)
@@ -175,6 +176,15 @@ ControlManager.Register("Interact", true, function(action, state, input)
 		ReplicatedStorage:WaitForChild("ClientServer").Interaction:FireServer(interactTarget)
 		return Enum.ContextActionResult.Sink
 	end
+
+	if model then
+		local item = Items[model.Name]
+		if item and item.Kind == "Item" and item.OnInteractClient and actionItems and actionItems:IsAncestorOf(interactTarget) then
+			item.OnInteractClient(model)
+			return Enum.ContextActionResult.Sink
+		end
+	end
+	
 
 	return Enum.ContextActionResult.Pass
 end)

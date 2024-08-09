@@ -86,6 +86,8 @@ export type ItemDefinition = {
     OnEquipClient: (() -> ())?,
     OnUnequipClient: (() -> ())?,
 
+    OnInteractClient: ((instance: Model) -> ())?,
+
     PrimaryHint: string?,
     AlternateHint: string?,
     
