@@ -71,7 +71,7 @@ function module.GetRoundEndInfo(): Types.RoundEndInfo?
     return roundEndInfo
 end
 
-local listeners: {[any]: {any}} = {}
+local listeners: {[string]: {(any, any) -> ()}} = {}
 for i in replicatedData:GetAttributes() do
     listeners[i] = {}
 end
