@@ -133,7 +133,7 @@ function module.SetAmmo(itemName: string, current: number, reserve: number?): ()
     
     item.CurrentAmmo = current
 
-    local magazineSize = item.Base.MagazineSize or AmmoData[item.Base.AmmoType :: any].Magazine
+    local magazineSize = item.Base.MagazineSize or AmmoData[item.Base.AmmoType :: ItemTypes.AmmoType].Magazine
     SetAmmoBar(current, magazineSize, reserve)
 end
 

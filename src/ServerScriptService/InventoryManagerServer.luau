@@ -19,13 +19,13 @@ export type InventoryEvent = "Add" | "Remove" | "Equip" | "Unequip" | "Drop"
 local listeners: {[InventoryEvent]: {((Player, Item, boolean?) -> ())}} = {Add = {}, Remove = {}, Equip = {}, Unequip = {}, Drop = {}}
 
 type InventoryRemote = {
-    FireServer: (self: any, InventoryEvent, string, boolean?, Ray?) -> (),
-    FireClient: (self: any, Player, InventoryEvent, string, ItemTypes.ClientItemInitParams?) -> (),
+    FireServer: (self: InventoryRemote, InventoryEvent, string, boolean?, Ray?) -> (),
+    FireClient: (self: InventoryRemote, Player, InventoryEvent, string, ItemTypes.ClientItemInitParams?) -> (),
     OnServerEvent: {Connect: (self: any, (Player, InventoryEvent?, string?, boolean?) -> ()) -> ()},
 }
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
-module.InvEvent = (serverClient.InventoryEvent :: any) :: InventoryRemote
+module.InvEvent = (serverClient.InventoryEvent :: Instance & InventoryRemote) :: InventoryRemote
 
 local function runCallback(plr: Player, event: InventoryEvent, equipment: Item, switching: boolean?)
     for _, v in listeners[event] do
@@ -459,7 +459,7 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
     module.Items[itemInstance.Instance] = itemInstance
     module.AddEquipment(participant.Player, itemInstance)
 
-    return itemInstance :: any
+    return itemInstance
 end
 
 function module.NewAmmoBox(box: Instance, amount: number?): number

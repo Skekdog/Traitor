@@ -29,7 +29,7 @@ local module: Types.Gamemode = {
     
     TimeoutVictors = determineWinnerByScore,
     PhyrricVictors = "Competitor",
-    TimeoutMusic = ReplicatedStorage.VictoryMusic.Timeout:GetChildren() :: any,
+    TimeoutMusic = ReplicatedStorage.VictoryMusic.Timeout:GetChildren() :: {any},
     
     CalculateRoundHighlights = function(self, round)
         local firstKill, highlights = Common.GetDefaultHighlights(round)
@@ -68,7 +68,7 @@ local module: Types.Gamemode = {
             CanStealCredits = true,
             CorpseResultsPublicised = true,
 
-            VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
+            VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: {any},
             VictoryText = "The round has ended.",
 
             EquipmentShop = {"Grenade", "Flashbang", "Flare Gun", "AWP", "Ballistic Vest"},

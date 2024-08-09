@@ -295,7 +295,7 @@ function module.Actions.Kill(_, participant: Types.Participant, targets: unknown
 
     local participants = getMatchingParticipants(participant, targets)
     for _, v in participants do
-        v:TakeDamage(math.huge, if credit then participant else nil, cause :: any)
+        v:TakeDamage(math.huge, if credit then participant else nil, cause :: Types.DeathType)
     end
 end
 
@@ -417,7 +417,7 @@ function module.InterpretConditional(participant: Types.Participant, conditional
 end
 
 function module.Execute(actionItem: Model, participant: Types.Participant): ()
-    local success: boolean, err: string? = (pcall :: any)(function() -- as of 24/07/24 pcall is incorrectly typed, hence the cast to any
+    local success: boolean, err: string? = pcall(function()
         if not participant then
             error("Participant must be set")
         end

@@ -6,6 +6,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local GetRound = require(script.Parent.GetRound)
 local HitSounds = require(script.Parent.HitSounds)
 local LerpNumber = require(script.Parent.LerpNumber)
+local CreateEmptyPart = require(script.Parent.Parent.ReplicatedFirst.CreateEmptyPart)
 local CalculateDamageModifier = require(ReplicatedFirst.CalculateDamageModifier)
 local PlayAnimation = require(script.Parent.PlayAnimation)
 local PlayPositionalSound = require(script.Parent.PlayPositionalSound)
@@ -82,7 +83,7 @@ local function onEntityHit(round: Types.Round, weapon: ItemTypes.WeaponDefinitio
 
     local canDamage = if sameTeam then round.Gamemode.FriendlyFire else true
     if canDamage then
-        local willDie = (entity :: any):GetHealth() - damage <= 0
+        local willDie = (entity :: Types.Participant):GetHealth() - damage <= 0
         if entity.Kind == "Participant" then
             if round:IsRoundPreparing() then
                 return
@@ -175,17 +176,11 @@ function module.CreateExplosion(position: Vector3, explosionInfo: ItemTypes.Expl
     explosion.ExplosionType = Enum.ExplosionType.NoCraters
     explosion.Position = position
 
-    local soundPart = Instance.new("Part")
-    soundPart.Transparency = 1
-    soundPart.Anchored = true
-    soundPart.CanCollide = false
-    soundPart.CanTouch = false
-    soundPart.CanQuery = false
-	soundPart.Position = position
+    local sound = ServerStorage.Explosion:Clone()
+    local soundPart = CreateEmptyPart(CFrame.new(position), sound)
+    
 	soundPart.Parent = workspace.Projectiles
     
-	local sound = ServerStorage.Explosion:Clone()
-	sound.Parent = soundPart :: any
 	sound.Ended:Connect(function()
 		soundPart:Destroy()
 	end)

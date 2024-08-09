@@ -27,7 +27,7 @@ end
 -- Surely there is a better way to do this
 local function switchToEquipment(equipment: ItemTypes.Item?)
 	if equipment then
-		if (equipment :: any) == selectedEquipment then
+		if equipment == selectedEquipment then
 			unequip(equipment)
 			return Enum.ContextActionResult.Sink
 		else
@@ -170,7 +170,7 @@ for i = 1, 9 do
 	end)
 end
 
-local function minN(table: {[number]: any?}): number?
+local function minN(table: {any}): number?
 	for i in table do
 		if table[i] then
 			return i

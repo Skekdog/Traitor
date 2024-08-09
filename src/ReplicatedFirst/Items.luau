@@ -252,7 +252,7 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
     fire.Parent = part
 
     local burnSound = weaponSounds("FlareBurn"):Clone()
-    burnSound.Parent = part :: any
+    burnSound.Parent = part
 
     local model = part:FindFirstAncestorOfClass("Model")
     if target and target.Kind == "Prop" then
@@ -267,7 +267,7 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
                 break
             end
 
-            local health: number? = if target then (target :: any):GetHealth() else nil
+            local health: number? = if target then (target :: Types.Participant):GetHealth() else nil
             if health and health < 0 then
                 break
             end
@@ -278,7 +278,7 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
             burnSound:Play()
 
             if health then
-                (target :: any):TakeDamage(1, attacker, "Burn", false, true)
+                (target :: Types.Participant):TakeDamage(1, attacker, "Burn", false, true)
             end
 
             task.wait(0.25)

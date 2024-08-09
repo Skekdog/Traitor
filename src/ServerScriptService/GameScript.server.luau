@@ -89,8 +89,8 @@ remotes.GetCorpseInfo.OnServerEvent:Connect(function(plr, target: unknown)
 	remotes.SendCorpseInfo:FireClient(plr, targetParticipant:ViewCorpse())
 end)
 
-remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: any?)
-	if not equipmentName then
+remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: unknown)
+	if typeof(equipmentName) ~= "string" then
 		return
 	end
 
@@ -112,7 +112,7 @@ remotes.PurchaseEquipment.OnServerInvoke = function(plr: Player, equipmentName: 
 	return participant:PurchaseEquipment(equipment)
 end
 
-remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: any?)
+remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: unknown)
 	if (typeof(corpse) ~= "Instance" or not corpse:IsA("Model") or not corpse:IsDescendantOf(workspace.Corpses)) and (typeof(corpse) ~= "string") then
 		return
 	end

@@ -19,10 +19,10 @@ end
 
 export type InventoryEvent = "Remove" | "Equip" | "Unequip" | "Drop" | "Add"
 type InventoryRemote = {
-    FireServer: (self: any, InventoryEvent, string, boolean?, Ray?) -> (),
+    FireServer: (self: InventoryRemote, InventoryEvent, string, boolean?, Ray?) -> (),
     OnClientEvent: {Connect: (any, (event: InventoryEvent, equipment: string?) -> ()) -> RBXScriptConnection}
 }
-module.InvEvent = (ReplicatedStorage:WaitForChild("ServerClient").InventoryEvent :: any) :: InventoryRemote
+module.InvEvent = (ReplicatedStorage:WaitForChild("ServerClient").InventoryEvent :: Instance & InventoryRemote) :: InventoryRemote
 
 local listeners: {[InventoryEvent]: {((ItemTypes.Item) -> ())}} = {Remove = {}, Equip = {}, Unequip = {}, Drop = {}, Add = {}}
 local function runCallback(event: InventoryEvent, equipment: ItemTypes.Item)

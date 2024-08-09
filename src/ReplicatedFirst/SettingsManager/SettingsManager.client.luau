@@ -66,7 +66,7 @@ for i, v in createdTabs do
 	tab.Position = UDim2.fromScale((i-1) / #createdTabs, 0)
 	tab.Visible = true
 	tab.LayoutOrder = i -- This is ordered more-or-less randomly, but the same random every time 
-	tab.Parent = tabsFrame :: any
+	tab.Parent = tabsFrame
 	
 	local page = pageBase:Clone() :: GuiObject
 	page.Name = "Page_"..v

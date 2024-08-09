@@ -110,7 +110,7 @@ local function createPlr(plr: Player)
 
 	clone.Visible = true
 	clone.Name = "Player-"..plr.Name
-	clone.Parent = list :: any
+	clone.Parent = list
 
 	for _, v in clone.Marks:GetChildren() :: {any} do
 		if not v:IsA("TextButton") then

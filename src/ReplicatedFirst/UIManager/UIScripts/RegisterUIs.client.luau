@@ -48,8 +48,12 @@ task.wait(1)
 require(script.Parent.Parent.Parent.LocalRoundInfo)
 ReplicatedStorage:WaitForChild("ClientServer").RequestData:FireServer()
 
-local CASui = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge) :: any
+local CASui = Players.LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge)
+assert(CASui and CASui:IsA("ScreenGui"))
+
 local CASFrame = CASui:WaitForChild("ContextButtonFrame")
+assert(CASFrame:IsA("Frame"))
+
 CASFrame.Size = UDim2.fromScale(1, 1)
 CASFrame.Position = UDim2.fromScale(0, 0)
 CASui.DisplayOrder = 4

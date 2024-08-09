@@ -17,7 +17,7 @@ local module: Types.Gamemode = {
     
     PhyrricVictors = "Traitor",
     TimeoutVictors = "Innocent",
-    TimeoutMusic = ReplicatedStorage.VictoryMusic.Timeout:GetChildren() :: any,
+    TimeoutMusic = ReplicatedStorage.VictoryMusic.Timeout:GetChildren() :: {any},
 
     SelfDefenseDuration = 15,
 
@@ -121,7 +121,7 @@ local module: Types.Gamemode = {
             },
 
             Allies = {"Traitor"},
-            VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: any,
+            VictoryMusic = ReplicatedStorage.VictoryMusic.Traitor:GetChildren() :: {any},
             VictoryText = "The dastardly traitors have won the round!",
 
             AnnounceDisconnect = true,
@@ -185,7 +185,7 @@ local module: Types.Gamemode = {
             PointsForSearchingCorpse = 1,
 
             Allies = {"Detective", "Innocent"},
-            VictoryMusic = ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: any,
+            VictoryMusic = ReplicatedStorage.VictoryMusic.Innocent:GetChildren() :: {any},
             VictoryText = "The loveable innocents have won the round!",
             KnowsRoles = {"Detective"},
         }

@@ -29,6 +29,6 @@ return function()
 		clone:PivotTo(root.CFrame)
 		clone.RadarPoint.TextLabel.Text = tostring(math.round(plr:DistanceFromCharacter(root.Position)))
 		clone.RadarPoint.Enabled = true
-		clone.Parent = workspace.RadarPoints :: any
+		clone.Parent = workspace.RadarPoints
 	end
 end

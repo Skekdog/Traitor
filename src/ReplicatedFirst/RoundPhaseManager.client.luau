@@ -17,7 +17,7 @@ for _, v in roundHandlerEvents.GetMaps:InvokeServer() do
 	clone.Text = v
 	clone.Visible = true
 	clone.Name = v
-	clone.Parent = vote.Object.Choices :: any
+	clone.Parent = vote.Object.Choices
 
     clone.MouseButton1Click:Connect(function()
         roundHandlerEvents.VoteMap:FireServer(v)
@@ -226,7 +226,7 @@ LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participa
         entry.Image = equipment.Icon
         entry.Name = equipment.Name
         entry.Visible = true
-        entry.Parent = shopObject.ScrollingFrame :: any
+        entry.Parent = shopObject.ScrollingFrame
     end
 end)
 
