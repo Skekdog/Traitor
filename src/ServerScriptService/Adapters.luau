@@ -4,6 +4,7 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ActionItems = require(script.Parent.ActionItems)
@@ -160,11 +161,12 @@ local module: Types.Adapter = {
     end,
 
     CheckForUpdate = function(round, timeDelay)
-        if not game:GetService("RunService"):IsStudio() and game.PlaceId ~= 9648179685 then
+       if not RunService:IsStudio() and game.PlaceId ~= 9648179685 then
             local newVersion: ProfileService.Profile & {Data: {Version: string}} = ProfileStore:ViewProfileAsync("Version")
 
+            print(newVersion.Data.Version, ServerStorage:GetAttribute("Version"))
             if newVersion then
-                if newVersion.Data.Version ~= script:GetAttribute("Version") then
+                if newVersion.Data.Version ~= ServerStorage:GetAttribute("Version") then
                     RestartServer(timeDelay)
                     return true
                 end
