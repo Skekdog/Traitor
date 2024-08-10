@@ -93,6 +93,10 @@ module.Equipment = {
         Icon = "rbxassetid://395920626",
 
         Item = function(_, participant)
+            if not participant.Extras then
+                participant.Extras = {}
+            end
+            assert(participant.Extras)
             participant.Extras.BallisticVest = 60
         end,
 

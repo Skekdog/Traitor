@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local Types = require(script.Parent.RoundHandler.Types)
 local spring = require(script.Parent.spring)
 
 local module = {}

@@ -1,4 +1,4 @@
-return function(cframe: CFrame, children: {Instance}?, canCollide: boolean?, canTouch: boolean?, canQuery: boolean?): Part
+return function(cframe: CFrame, children: Instance | {Instance}?, canCollide: boolean?, canTouch: boolean?, canQuery: boolean?): Part
     local part = Instance.new("Part")
 
     part.CanCollide = canCollide or false
@@ -11,8 +11,12 @@ return function(cframe: CFrame, children: {Instance}?, canCollide: boolean?, can
     part.Transparency = 1
 
     if children then
-        for _, v in children do
-            v.Parent = part
+        if typeof(children) == "Instance" then
+            children.Parent = part
+        else
+            for _, v in children do
+                v.Parent = part
+            end
         end
     end
 

@@ -204,7 +204,7 @@ local module: Types.Adapter = {
 
     SendRoleAlert = function(recipient, role)
         local remote = remotes.SendRoleAlert
-        remote:FireClient(recipient.Player, role.Name, role.Colour, role.Description, role.Extras.Sound)
+        remote:FireClient(recipient.Player, role.Name, role.Colour, role.Description, if role.Extras then role.Extras.Sound else nil)
     end,
 
     SendRoundHighlights = function(recipients, highlights, events, scores, victors)
