@@ -11,11 +11,7 @@ local ControlManager = require(script.Parent.Parent.ControlManager)
 local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
 options = SM.JSONDecode(options)
 
-if not options then
-	for _, v in SM.AvailableSettings do
-		SM.SetSetting(v.Name, v.Default)
-	end
-else
+if options then
 	for i, v in options do
 		if i == "__VERSION" then
 			continue

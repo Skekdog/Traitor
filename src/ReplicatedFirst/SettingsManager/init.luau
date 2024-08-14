@@ -1,5 +1,6 @@
 local HTTPService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
+local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UserInputService = game:GetService("UserInputService")
 
 local Types = require(script.Parent.RoundHandler.Types)
@@ -130,6 +131,9 @@ module.AvailableSettings = {
 		PossibleValues = "Boolean",
 		Default = true,
 		Callback = function(val)
+			if not ReplicatedFirst:GetAttribute("ControlsReady") then -- not a good fix, desperately need a better system for all this settings and ui interop
+				return
+			end
 			if not val then
 				require(script.Parent.ItemHint)()
 			end

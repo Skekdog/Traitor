@@ -163,8 +163,6 @@ local module: Types.Adapter = {
     CheckForUpdate = function(round, timeDelay)
        if not RunService:IsStudio() and game.PlaceId ~= 9648179685 then
             local newVersion: ProfileService.Profile & {Data: {Version: string}} = ProfileStore:ViewProfileAsync("Version")
-
-            print(newVersion.Data.Version, ServerStorage:GetAttribute("Version"))
             if newVersion then
                 if newVersion.Data.Version ~= ServerStorage:GetAttribute("Version") then
                     RestartServer(timeDelay)
