@@ -66,7 +66,6 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 		local UI_TRANSITION_TIME = if open then 0.2 else tonumber(SettingsManager.GetSetting("Close Speed")) :: number
 		local UI_SCALE_FACTOR = tonumber(SettingsManager.GetSetting("Close Scale")) :: number
 		
-		
 		local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
 		
 		local info = TweenInfo.new(
@@ -211,34 +210,32 @@ end
 local UNDERLINE_TRANSITION_SCALE = 0.125
 local UNDERLINE_TRANSITION_TIME = 0.5
 function module.TransitionUnderline(underline: Frame, target: TextButton)
-	local shouldAnimate = SettingsManager.GetSetting("Animate UI Transitions")
-	-- We need shouldAnimate because module.Animate might return nil which will error halfSizeTween.Completed which will mean the underline will be stuck at small size
-	
 	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, underline.Size.Y.Scale, 0)
 	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, underline.Size.Y.Scale, 0)
 	
 	local newPosition = UDim2.fromScale(target.Position.X.Scale + (target.Size.X.Scale / 2), 1)
 	
-	-- Tween size to be smaller
-	if shouldAnimate then
-		local halfSizeTween = module.Animate(underline, TweenInfo.new(
+	local halfSizeTween = module.Animate(underline, TweenInfo.new(
+		UNDERLINE_TRANSITION_TIME / 2,
+		Enum.EasingStyle.Exponential,
+		Enum.EasingDirection.Out
+	),
+		{ Size = halfSize }
+	)
+	
+	local function originalSize()
+		module.Animate(underline, TweenInfo.new(
 			UNDERLINE_TRANSITION_TIME / 2,
 			Enum.EasingStyle.Exponential,
 			Enum.EasingDirection.Out
-		),
-			{ Size = halfSize }
+			),
+			{ Size = fullSize }
 		)
-		assert(halfSizeTween)
-		halfSizeTween.Completed:Once(function()
-			-- Return to original size
-			module.Animate(underline, TweenInfo.new(
-				UNDERLINE_TRANSITION_TIME / 2,
-				Enum.EasingStyle.Exponential,
-				Enum.EasingDirection.Out
-				),
-				{ Size = fullSize }
-			)
-		end)
+	end
+	if halfSizeTween then
+		halfSizeTween.Completed:Once(originalSize)
+	else
+		originalSize()
 	end
 	
 	-- Tween position
