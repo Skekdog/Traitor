@@ -6,23 +6,13 @@ local ToRoundTime = require(script.Parent.ToRoundTime)
 local Types = require(script.Parent.RoundHandler.Types)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
+local MapVotingScreen = require(script.Parent.UIManager.UIScripts.MapVotingScreen)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
-local vote = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
+
 
 local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
-for _, v in roundHandlerEvents.GetMaps:InvokeServer() do
-	local clone = vote.Object.Sample:Clone()
-	clone.Text = v
-	clone.Visible = true
-	clone.Name = v
-	clone.Parent = vote.Object.Choices
-
-    clone.MouseButton1Click:Connect(function()
-        roundHandlerEvents.VoteMap:FireServer(v)
-    end)
-end
 
 local ownParticipant: Types.ClientOwnParticipant?
 local ownRole: Types.Role?
@@ -87,9 +77,7 @@ local function update(roundPhase)
     end
 end
 
-roundHandlerEvents.VoteMap.OnClientEvent:Connect(function(allow)
-    vote:ToggleVisible(allow)
-end)
+roundHandlerEvents.VoteMap.OnClientEvent:Connect(MapVotingScreen)
 
 local timeTarget = LocalRoundInfo.GetTimeMilestone()
 local paused = false

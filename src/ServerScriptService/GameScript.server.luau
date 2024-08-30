@@ -41,12 +41,25 @@ table.remove(maps, table.find(maps, testMap))
 
 local random = Random.new()
 
-getMaps.OnServerInvoke = function()
-	local names = {}
-	for _, v in maps do
-		table.insert(names, v.Name)
+local function getNextMaps(): {Instance}
+	random:Shuffle(maps)
+	return {maps[1], maps[2], maps[3], maps[4]}
+end
+local nextMaps = getNextMaps()
+
+type ClientMapInfo = {
+	Name: string,
+	ImageId: string,
+}
+getMaps.OnServerInvoke = function(): {ClientMapInfo}
+	local mapInfos = {}
+	for _, v in nextMaps do
+		table.insert(mapInfos, {
+			Name = v.Name,
+			ImageId = (v:GetAttribute("MapCardImageId") :: string) or "rbxassetid://78464994818646",
+		})
 	end
-	return names
+	return mapInfos
 end
 
 slayVote.OnServerEvent:Connect(function(plr, target: unknown)
@@ -222,9 +235,15 @@ joinRound.OnServerInvoke = function(plr)
 				remotes:SetAttribute("RoundStartTime", workspace:GetServerTimeNow())
 				UpdateRoundInfo.UpdatePlayers(round)
 			elseif phase == "Intermission" then
+				nextMaps = getNextMaps()
 				voteMap:FireAllClients(true)
 				voteCon = voteMap.OnServerEvent:Connect(function(plr, map: unknown)
 					if typeof(map) ~= "string" or not ServerStorage.Maps:FindFirstChild(map) or map == "TestMap" then
+						return
+					end
+
+					local mapInstance = ServerStorage.Maps:FindFirstChild(map)
+					if not assert(mapInstance) or not table.find(nextMaps, mapInstance) then
 						return
 					end
 
@@ -240,6 +259,7 @@ joinRound.OnServerInvoke = function(plr)
 					else
 						table.insert(votes[map], plr.UserId)
 					end
+					ReplicatedStorage.ServerClient.UpdateMapVotes:FireAllClients(votes)
 				end)
 			elseif phase == "Highlights" then
 				assert(round.RoundEndInfo)
