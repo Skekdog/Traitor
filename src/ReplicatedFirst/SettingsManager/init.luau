@@ -100,6 +100,17 @@ module.AvailableSettings = {
 		end,
 	},
 	{
+		Name = "Sidebar Alignment",
+		Tab = "Display",
+		Category = "User Interface",
+		Tooltip = "If your phone screen is inset, you can change this accordingly.",
+		PossibleValues = {"Left", "Right"},
+		Default = "Right",
+		Callback = function(val)
+			require(script.Parent.UIManager.UIScripts.SetSidebarAlignment)(val)
+		end
+	},
+	{
 		Name = "Close Scale",
 		Tab = "Display",
 		Category = "User Interface",
