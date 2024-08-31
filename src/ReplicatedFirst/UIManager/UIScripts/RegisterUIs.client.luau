@@ -16,6 +16,7 @@ for _, layer in {"Popup", "HUD", "Special", "Buttons"} do
 	screenUi.IgnoreGuiInset = true
 	screenUi.DisplayOrder = orders[layer]
 	screenUi.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenUi.ClipToDeviceSafeArea = false
 	screenUi.ResetOnSpawn = false
 
 	if layer == "Buttons" then
