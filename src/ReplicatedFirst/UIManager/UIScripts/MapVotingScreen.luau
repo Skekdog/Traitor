@@ -30,9 +30,10 @@ end)
 
 local function voteFor(clone: Button): ()
     ReplicatedStorage.RoundHandler.VoteMap:FireServer(clone.Name)
-    for _, v: Button in screen.Object.Choices:GetChildren() do
+    for _, v in screen.Object.Choices:GetChildren() do
         if v:IsA("ImageButton") then
-            v.UIStroke.Enabled = v == clone
+            local button = v :: Button
+            button.UIStroke.Enabled = v == clone
         end
     end
 end
