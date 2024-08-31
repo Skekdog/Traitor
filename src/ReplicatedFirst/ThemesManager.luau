@@ -87,7 +87,7 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 		properties.BorderColor3 = if not inverse then theme.UIStroke else theme[style or "Primary"]
 	end
 
-	UIAnimation.Animate(v, tweenInfo, properties)
+	UIAnimation.Animate(v, tweenInfo, properties, noTransition)
 	
 	return
 end
