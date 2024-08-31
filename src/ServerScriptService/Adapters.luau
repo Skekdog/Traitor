@@ -4,7 +4,7 @@ local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
+--local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ActionItems = require(script.Parent.ActionItems)
@@ -16,13 +16,13 @@ local InventoryManager = require(ServerScriptService.InventoryManagerServer)
 local Items = require(ReplicatedFirst.Items)
 local ShatterGlass = require(ReplicatedFirst.ShatterGlass)
 local ProfileManager = require(ServerScriptService.ProfileManager)
-local RestartServer = require(ServerScriptService.RestartServer)
-local ProfileService = require(ServerScriptService.ProfileService)
+--local RestartServer = require(ServerScriptService.RestartServer)
+--local ProfileService = require(ServerScriptService.ProfileService)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local remotes = ReplicatedStorage.RoundHandler
 
-local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
+--local ProfileStore = ProfileService.GetProfileStore("GameData_v2", {Version = "0.0.0"})
 
 local deathsounds = {
 	"9125652432",
@@ -161,16 +161,17 @@ local module: Types.Adapter = {
     end,
 
     CheckForUpdate = function(round, timeDelay)
-       if not RunService:IsStudio() and game.PlaceId ~= 9648179685 then
-            local newVersion: ProfileService.Profile & {Data: {Version: string}} = ProfileStore:ViewProfileAsync("Version")
-            if newVersion then
-                if newVersion.Data.Version ~= ServerStorage:GetAttribute("Version") then
-                    RestartServer(timeDelay)
-                    return true
-                end
-            end
-        end
         return false
+    --    if not RunService:IsStudio() and game.PlaceId ~= 9648179685 then
+    --         local newVersion: ProfileService.Profile & {Data: {Version: string}} = ProfileStore:ViewProfileAsync("Version")
+    --         if newVersion then
+    --             if newVersion.Data.Version ~= ServerStorage:GetAttribute("Version") then
+    --                 RestartServer(timeDelay)
+    --                 return true
+    --             end
+    --         end
+    --     end
+    --     return false
     end,
 
     SendMessage = function(message: string, severity: Types.MessageSeverity, messageType: Types.MessageType, recipients: true | {Types.Participant | Player})
