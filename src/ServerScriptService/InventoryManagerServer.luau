@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local AmmoData = require(script.Parent.Parent.ReplicatedFirst.AmmoData)
+local PlayAnimation = require(script.Parent.PlayAnimation)
 local ItemTypes = require(ReplicatedFirst.ItemTypes)
 local Items = require(ReplicatedFirst.Items)
 local Types = require(ReplicatedFirst.RoundHandler.Types)
@@ -162,7 +162,6 @@ function module.Equip(plr: Player, equipment: Item)
         local instance = equipment.Instance
         instance.Name = "Item"
 
-        local PlayAnimation = require(ServerScriptService.PlayAnimation)
         local char = PlayAnimation(plr, equipment.Base.HoldAnimation, equipment.Base.Name.."HoldAnimation")
         if not char then
             return
@@ -172,6 +171,12 @@ function module.Equip(plr: Player, equipment: Item)
         if not motor.Parent then
             motor.Part0 = char:FindFirstChild("RightHand") :: BasePart?
             motor.Part1 = instance
+
+            local c1 = equipment.Base.Model:GetAttribute("AnimC1")
+            if typeof(c1) == "CFrame" then
+                motor.C1 = c1
+            end
+
             motor.Parent = instance
         end
 

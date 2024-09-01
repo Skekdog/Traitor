@@ -151,6 +151,12 @@ function module.Show(item: ItemTypes.Item): ()
     local motor = Instance.new("Motor6D")
     motor.Part0 = viewmodel.RightHand
     motor.Part1 = model
+
+    local c1 = item.Base.Model:GetAttribute("AnimC1")
+    if typeof(c1) == "CFrame" then
+        motor.C1 = c1
+    end
+
     motor.Parent = model
 
     local function configure(part: BasePart): ()

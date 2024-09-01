@@ -11,8 +11,8 @@ end
 
 local bullet = projectiles("Bullet")
 
-local function models(name: string): MeshPart
-    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: MeshPart
+local function models(name: string): BasePart
+    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
 local function weaponSounds(name: string): Sound
@@ -323,8 +323,8 @@ guns["Flare Gun"] = {
     MagazineSize = 6,
 
     Model = models("Flare Gun"),
-    HoldAnimation = 11411819299,
-    AimAnimation = 18691743842,
+    HoldAnimation = 9253211833,
+    AimAnimation = 18691552315,
     FiredSound = firedSounds("Flare Gun"),
 
     ProjectileBase = projectiles("Flare"),
@@ -684,8 +684,8 @@ guns.BAR = {
     AmmoType = "Assault Rifle",
 
     Model = models("BAR"),
-    HoldAnimation = 11418976539,
-    AimAnimation = 18691787606,
+    HoldAnimation = 10247380824,
+    AimAnimation = 18691831450,
     FiredSound = firedSounds("BAR"),
     ReloadSound = reloadSounds("BAR"),
 
@@ -826,7 +826,7 @@ grenades["Incendiary Grenade"] = {
 
     Fuse = 3,
 
-    ProjectileForce = 5,
+    ProjectileForce = 60,
     Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
@@ -865,7 +865,7 @@ grenades["Smoke Grenade"] = {
     Fuse = 3,
 
     ProjectileBase = models("Smoke Grenade"),
-    ProjectileForce = 5,
+    ProjectileForce = 60,
     Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
@@ -894,7 +894,7 @@ grenades["Discombobulator"] = {
 
     Fuse = 3,
 
-    ProjectileForce = 3,
+    ProjectileForce = 60,
     Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
