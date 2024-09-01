@@ -103,28 +103,12 @@ module.AvailableSettings = {
 		Name = "Sidebar Alignment",
 		Tab = "Display",
 		Category = "User Interface",
-		Tooltip = "If your phone screen is inset, you can change this accordingly.",
+		Tooltip = "Controls the position of the sidebar. May be useful on phones with inset screens.",
 		PossibleValues = {"Left", "Right"},
 		Default = "Right",
 		Callback = function(val)
 			require(script.Parent.UIManager.UIScripts.SetSidebarAlignment)(val)
 		end
-	},
-	{
-		Name = "Close Scale",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "",
-		PossibleValues = {"0", "0.25", "0.5", "0.75"},
-		Default = "0.75",
-	},
-	{
-		Name = "Close Speed",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "",
-		PossibleValues = {"0.2", "0.3", "0.4", "0.5"},
-		Default = "0.2",
 	},
 	{
 		Name = "Animate UI Transitions",
@@ -177,6 +161,22 @@ module.AvailableSettings = {
 		Callback = function(val)
 			script.Parent.UIManager:SetAttribute("BackgroundMenuMode", val)
 		end,
+	},
+	{
+		Name = "Close Scale",
+		Tab = "Display",
+		Category = "Development",
+		Tooltip = "Intended for dev use only.",
+		PossibleValues = {"0", "0.25", "0.5", "0.75"},
+		Default = "0.75",
+	},
+	{
+		Name = "Close Speed",
+		Tab = "Display",
+		Category = "Development",
+		Tooltip = "Intended for dev use only.",
+		PossibleValues = {"0.2", "0.3", "0.4", "0.5"},
+		Default = "0.2",
 	},
 	
 	{
