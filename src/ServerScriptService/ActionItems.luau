@@ -146,7 +146,7 @@ function module.Actions.GiveItem(actionItem: Model, participant: Types.Participa
 
     assert(Items[item], "Invalid item "..item)
 
-    InventoryManager.NewItem(Items[item], participant)
+    InventoryManager.NewItem(Items[item], nil, participant.Round, participant.Player)
 end
 
 function module.Actions.SpawnProp(actionItem: Model, participant: Types.Participant, prop: unknown, cframe: unknown, relative: unknown): ()

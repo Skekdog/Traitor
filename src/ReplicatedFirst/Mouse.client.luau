@@ -2,7 +2,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local AmmoData = require(script.Parent.AmmoData)
 local ControlManager = require(script.Parent.ControlManager)
+local DroppedItemState = require(script.Parent.DroppedItemState)
 local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
@@ -113,6 +115,30 @@ local function showCorpseHint(char: Model)
 	corpseHint.Visible = true
 end
 
+local itemHint = workspace:WaitForChild("ItemHintGui")
+local function showItemHint(instance: Instance)
+	local item = DroppedItemState.GetDroppedItem(instance)
+
+	local maxAmmo = 0
+	if item.AmmoType then
+		maxAmmo = AmmoData[item.AmmoType].Magazine
+	elseif item.Kind == "Weapon" then
+		local itemData = Items[item.Name]
+		if itemData.Kind == "Gun" then
+			maxAmmo = itemData.MagazineSize or 0
+		end
+	elseif item.Kind == "Ammo" then
+		maxAmmo = AmmoData[item.Name].Magazine
+	end
+
+	itemHint.Frame.ItemName.Text = if item.Kind == "Ammo" then item.Name .. " Ammo" else item.Name
+	itemHint.Frame.AmmoAvailable.Text = if item.AmmoAvailable then `{item.AmmoAvailable} / {maxAmmo}` else ""
+	itemHint.Frame.AmmoType.Text = if item.AmmoType then item.AmmoType .. " Ammo" else ""
+
+	itemHint.Adornee = instance
+	itemHint.Enabled = true
+end
+
 local params = RaycastParams.new()
 params.IgnoreWater = true
 params.FilterType = Enum.RaycastFilterType.Exclude
@@ -126,10 +152,19 @@ RunService.PostSimulation:Connect(function()
 
 	playerInfo.Visible = false
 	corpseHint.Visible = false
+	itemHint.Enabled = false
 	
     if result then
         interactTarget = result.Instance
         assert(interactTarget)
+
+		local map = LocalRoundInfo.GetMap()
+		if map then
+			local weaponSpawns = map:FindFirstChild("WeaponSpawns")
+			if weaponSpawns and interactTarget:IsDescendantOf(weaponSpawns) then
+				showItemHint(interactTarget)
+			end
+		end
 
         local char = interactTarget:FindFirstAncestorOfClass("Model")
         if not char then

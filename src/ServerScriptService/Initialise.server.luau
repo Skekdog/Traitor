@@ -5,6 +5,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
+local BroadcastDroppedItem = require(script.Parent.BroadcastDroppedItem)
+local GetRound = require(script.Parent.GetRound)
 local ItemTypes = require(ReplicatedFirst.ItemTypes)
 local InventoryManager = require(ServerScriptService.InventoryManagerServer)
 local ProfileManager = require(script.Parent.ProfileManager)
@@ -46,6 +48,16 @@ Players.PlayerAdded:Connect(function(plr): ()
         ReplicatedStorage.ServerClient.LoadSavedData:FireClient(plr, profile.Data.Settings)
 		plr:SetAttribute("TotalScore", profile.Data.TotalPoints)
     end
+
+	local round = GetRound()
+	if round then
+		local spawns = round.Map:FindFirstChild("WeaponSpawns")
+		if spawns then
+			for _, v in spawns:GetChildren() do
+				BroadcastDroppedItem({plr}, v)
+			end
+		end
+	end
 
 	InventoryManager.InitInventory(plr)
 

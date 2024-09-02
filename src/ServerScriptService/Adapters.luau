@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local ActionItems = require(script.Parent.ActionItems)
+local BroadcastDroppedItem = require(script.Parent.BroadcastDroppedItem)
 local HitSounds = require(script.Parent.HitSounds)
 local CalculateDamageModifier = require(ReplicatedFirst.CalculateDamageModifier)
 local StringWithDeterminer = require(ReplicatedFirst.StringWithDeterminer)
@@ -151,7 +152,7 @@ local module: Types.Adapter = {
             end
         end
         
-        InventoryManager.NewItem(base, participant)
+        InventoryManager.NewItem(base, nil, participant.Round, participant.Player)
 
         return
     end,
@@ -323,6 +324,7 @@ local module: Types.Adapter = {
     LoadWeaponSpawn = function(round, weaponSpawn)
         local item = InventoryManager.Items[weaponSpawn]
         if item then -- If we don't check this we end up connecting to the touched event multiple times. Looks odd but checking here is correct.
+            BroadcastDroppedItem(Players:GetPlayers(), weaponSpawn)
             return
         end
 
@@ -331,10 +333,16 @@ local module: Types.Adapter = {
         weaponSpawn.CanTouch = true
         weaponSpawn.CanQuery = true
 
-        local ammo = InventoryManager.AmmoBoxes[weaponSpawn]
-        if not ammo and weaponSpawn.Name:split("_")[2] == "Ammo" then
-            InventoryManager.NewAmmoBox(weaponSpawn)
+        local isAmmo = weaponSpawn.Name:split("_")[2] == "Ammo"
+        if isAmmo then
+            if not InventoryManager.AmmoBoxes[weaponSpawn] then
+                InventoryManager.NewAmmoBox(weaponSpawn)
+            end
+        else
+            InventoryManager.NewItem(Items[weaponSpawn.Name], weaponSpawn, round)
         end
+
+        BroadcastDroppedItem(Players:GetPlayers(), weaponSpawn)
 
         weaponSpawn.Touched:Connect(function(part)
             InventoryManager.OnItemTouched(weaponSpawn, round, part)

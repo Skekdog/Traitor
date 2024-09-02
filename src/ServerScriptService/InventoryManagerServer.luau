@@ -384,7 +384,7 @@ function module.OnItemTouched(weapon: BasePart, round: Types.Round, part: BasePa
         return
     end
 
-    local item = module.Items[weapon] :: ItemTypes.Item
+    local item = module.Items[weapon] :: ItemTypes.Item?
     local base = if item then item.Base else Items[weapon.Name]
 
     if not base then
@@ -398,7 +398,7 @@ function module.OnItemTouched(weapon: BasePart, round: Types.Round, part: BasePa
     end
     
     if not item then
-        item = module.NewItem(base, participant)
+        item = module.NewItem(base, weapon, participant.Round, participant.Player)
     else
         module.AddEquipment(participant.Player, item)
     end
@@ -406,8 +406,11 @@ function module.OnItemTouched(weapon: BasePart, round: Types.Round, part: BasePa
     weapon.Parent = nil
 end
 
-function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, participant: Types.Participant): Item
-    local instance = base.Model:Clone()
+function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinition, instance: BasePart?, round: Types.Round, player: Player?): Item
+    if not instance then
+        instance = base.Model:Clone()
+    end
+    assert(instance)
 
     local itemInstance: ItemTypes.Item = {} :: ItemTypes.Item
 
@@ -457,12 +460,15 @@ function module.NewItem(base: ItemTypes.ItemDefinition | ItemTypes.WeaponDefinit
         itemInstance = genericItemInstance
     end
 
-    (itemInstance.Instance :: BasePart).Touched:Connect(function(part)
-        module.OnItemTouched(itemInstance.Instance :: BasePart, participant.Round, part)
+    module.Items[itemInstance.Instance] = itemInstance
+
+    itemInstance.Instance.Touched:Connect(function(part)
+        module.OnItemTouched(itemInstance.Instance :: BasePart, round, part)
     end)
 
-    module.Items[itemInstance.Instance] = itemInstance
-    module.AddEquipment(participant.Player, itemInstance)
+    if player then
+        module.AddEquipment(player, itemInstance)
+    end
 
     return itemInstance
 end
