@@ -100,8 +100,9 @@ return function(glassProperties: BasePart | GlassProperties, direction: Vector3?
 
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://"..tostring(sounds[math.random(1, #sounds)])
-    sound.RollOffMaxDistance = 200
+    sound.RollOffMaxDistance = 50
     sound.RollOffMinDistance = 10
+    sound.RollOffMode = Enum.RollOffMode.Linear
     sound.Parent = fragments[1]
     sound:Play()
 
