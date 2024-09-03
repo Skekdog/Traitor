@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local ClientWeaponManager = require(script.Parent.WeaponsManagerClient)
@@ -103,6 +104,20 @@ LocalRoundInfo.Listen("RoundPhase", function(phase: Types.RoundPhase)
         workspace.RadarPoints:ClearAllChildren()
     end
 end)
+
+local function removeFootsteps(player: Player)
+    if player == Players.LocalPlayer then
+        return
+    end
+    player.CharacterAdded:Connect(function(char: Model)
+        char:WaitForChild("HumanoidRootPart"):WaitForChild("Running"):Destroy()
+    end)
+end
+
+Players.PlayerAdded:Connect(removeFootsteps)
+for _, player in Players:GetPlayers() do
+    removeFootsteps(player)
+end
 
 serverClient.AmmoUpdate.OnClientEvent:Connect(ClientWeaponManager.SetAmmo)
 serverClient.Discombobulate.OnClientEvent:Connect(Discombobulate)

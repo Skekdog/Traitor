@@ -22,7 +22,7 @@ local getMaps = remotes.GetMaps
 local voteMap = remotes.VoteMap
 
 local testMap = ServerStorage.Maps.TestMap :: Types.MapStructureCast
-local nextMap = ServerStorage.Maps["Mesa Monocraft"] :: Types.MapStructureCast
+local nextMap = ServerStorage.Maps["Skyscraper"] :: Types.MapStructureCast
 
 local nextGamemode = ThoseYouTrust
 local gamemodes = {ThoseYouTrust, ThoseYouTrust, ThoseYouTrust, Elimination}
