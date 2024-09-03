@@ -41,6 +41,10 @@ local function getSoundProperties(humanoid: Humanoid)
 			break
 		end
 	end
+    local default = FootstepIDs.Default
+    id = default.id
+    volume = default.volume / 5
+    playbackSpeed = (humanoid.WalkSpeed / 16) * default.speed
 end
 
 -- update the sound data

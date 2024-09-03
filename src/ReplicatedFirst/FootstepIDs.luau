@@ -43,7 +43,8 @@ local IDList = {
 	Sandstone = {id = "rbxassetid://3190903775", volume = 0.60, speed = 0.75},
 	SmoothPlastic = {id = "rbxassetid://178190837", volume = 0.60, speed = 1.00},
 	Wood = {id = "rbxassetid://3199270096", volume = 0.60, speed = 1.00},
-	WoodPlanks = {id = "rbxassetid://211987063", volume = 0.60, speed = 1.00}
+	WoodPlanks = {id = "rbxassetid://211987063", volume = 0.60, speed = 1.00},
+	Default = {id = "rbxassetid://277067660", volume = 0.60, speed = 1.00},
 }
 
 return IDList

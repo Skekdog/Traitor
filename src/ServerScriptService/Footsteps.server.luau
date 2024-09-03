@@ -36,7 +36,7 @@ Players.PlayerAdded:Connect(function(player)
                     return data.id, data.volume, (humanoid.WalkSpeed / 16) * data.speed
                 end
             end
-            error("Could not find sound for material: " .. material)
+            return FootstepIDs.Default.id, FootstepIDs.Default.volume, (humanoid.WalkSpeed / 16) * FootstepIDs.Default.speed
         end
 
         -- check if the player is moving and not climbing
