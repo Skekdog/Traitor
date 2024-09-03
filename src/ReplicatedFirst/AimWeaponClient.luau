@@ -1,13 +1,12 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 local InventoryManager = require(script.Parent.InventoryManagerClient)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(script.Parent.UIManager)
-
-local mouse = Players.LocalPlayer:GetMouse()
 
 local module = {}
 module.IsAiming = false
@@ -54,10 +53,9 @@ local function aim(aiming: boolean): ()
         SetCameraSensitivity(getSensitivityMultiplier(item.Base.AimFOV))
         if item.Base.HasScope then
             scope:ToggleVisible(true)
-            mouse.Icon = ""
+            UserInputService.MouseIconEnabled = false
         else
             scope:ToggleVisible(false)
-            mouse.Icon = "rbxassetid://10801958931"
         end
 
         Viewmodel.PlayAnimation(item.Base.AimAnimation, "AimAnimation")
@@ -66,6 +64,7 @@ local function aim(aiming: boolean): ()
     else
         SetCameraSensitivity(1)
         scope:ToggleVisible(false)
+        UserInputService.MouseIconEnabled = true
 
         local camera = workspace.CurrentCamera
         TweenService:Create(camera, TweenInfo.new(0.1), {FieldOfView = 70}):Play()
