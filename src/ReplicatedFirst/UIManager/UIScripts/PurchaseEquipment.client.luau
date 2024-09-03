@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
@@ -10,7 +11,7 @@ local UIManager = require(ReplicatedFirst.UIManager)
 local UI = UIManager.WaitForUI("Equipment Shop", true).Object :: typeof(UIManager.UnregisteredUIs["Equipment Shop"])
 local purchaseButton = UI.Purchase
 
-local radarCooldown = 5
+local radarCooldown = 30
 
 local function update(item: string, credits: number)
 	UI.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
@@ -38,10 +39,8 @@ end)
 
 local function radar()
 	local stop = false
-	local con
-	con = LocalRoundInfo.Listen("IsSpectating", function()
+	Players.LocalPlayer.CharacterRemoving:Once(function()
 		stop = true
-		con()
 	end)
 	while not stop do
 		PingRadar()
