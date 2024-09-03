@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local MuzzleFlash = require(script.Parent.MuzzleFlash)
 local spring = require(script.Parent.spring)
 
 local module = {}
@@ -272,6 +273,14 @@ LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
 
         armRecoilSpring.p = Vector3.new(x, y, 0)
         cameraRecoilSpring.p = Vector3.new(y, x, x + y)
+
+        local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
+        if viewmodel then
+            local model = viewmodel:FindFirstChild("Item")
+            if model and model:IsA("BasePart") then
+                MuzzleFlash(model)
+            end
+        end
     elseif item.Kind == "Melee" then
         module.PlayAnimation(item.Base.HitAnimation)
     end
