@@ -27,7 +27,10 @@ return function(sound: SoundId | {SoundId}, position: Vector3): Sound
         soundObject.SoundId = soundId
     end
 
-    soundObject.Volume = 1
+    soundObject.Volume = 0.5
+    soundObject.RollOffMinDistance = 5
+    soundObject.RollOffMaxDistance = 15
+    soundObject.RollOffMode = Enum.RollOffMode.Linear
 
     soundObject.Parent = part
     part.Parent = workspace.Projectiles
