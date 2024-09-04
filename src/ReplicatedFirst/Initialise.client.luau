@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local ClimbLadder = require(script.Parent.ClimbLadder)
+local ControlManager = require(script.Parent.ControlManager)
 local ClientWeaponManager = require(script.Parent.WeaponsManagerClient)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
@@ -9,6 +11,7 @@ local InventoryManager = require(script.Parent.InventoryManagerClient)
 local ItemTypes = require(script.Parent.ItemTypes)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
+local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local StandardDoor = require(script.Parent.StandardDoor)
 local UIManager = require(script.Parent.UIManager)
@@ -125,3 +128,61 @@ serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
 serverClient.PlayViewmodelAnimation.OnClientEvent:Connect(Viewmodel.PlayAnimation)
 serverClient.SetReloadingStatus.OnClientEvent:Connect(ClientWeaponManager.SetReloadingStatus)
 ReplicatedStorage:WaitForChild("RoundHandler").SendMessage.OnClientEvent:Connect(ShowMessage)
+
+local function onMapChanged(m)
+    local map = (m :: Types.MapStructureCast) :: Types.MapStructure
+    if not map then
+        return
+    end
+
+    local bounds = map:FindFirstChild("Bounds")
+    if not bounds then
+        return
+    end
+
+    for _, v in bounds:GetChildren() do
+        if v.Name == "Ladder" then
+            v.CanTouch = true
+            v.Touched:Connect(function(part)
+                local char = Players.LocalPlayer.Character
+                if char and part:IsDescendantOf(char) and SettingsManager.GetSetting("Snap to Ladders") and ClimbLadder.SnapCooldown < os.clock() then
+                    ClimbLadder.SnapCooldown = os.clock() + 3
+                    ClimbLadder.Climb(v)
+                end
+            end)
+        end
+    end
+end
+ReplicatedStorage.RoundHandler.MapFolder.Changed:Connect(onMapChanged)
+onMapChanged(LocalRoundInfo.GetMap())
+
+ControlManager.Register("Climb Ladder", true, function()
+    local char = Players.LocalPlayer.Character
+    if not char then
+        return Enum.ContextActionResult.Pass
+    end
+
+    local root = char.PrimaryPart
+    if not root then
+        return Enum.ContextActionResult.Pass
+    end
+
+    local map = LocalRoundInfo.GetMap()
+    if not map then
+        return Enum.ContextActionResult.Pass
+    end
+
+    local bounds = map:FindFirstChild("Bounds")
+    if not bounds then
+        return Enum.ContextActionResult.Pass
+    end
+
+    for _, v in root:GetTouchingParts() do
+        if v.Name == "Ladder" and v:IsDescendantOf(bounds) then
+            ClimbLadder.Climb(v)
+            return Enum.ContextActionResult.Sink
+        end
+    end
+
+    return Enum.ContextActionResult.Pass
+end)

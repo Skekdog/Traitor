@@ -251,6 +251,15 @@ module.AvailableSettings = {
 		Default = {Keycodes = {Enum.KeyCode.F, Enum.KeyCode.ButtonA}, Toggled = true},
 	},
 	{
+		Name = "Climb Ladder",
+		Tab = "Keybinds",
+		Category = "Gameplay",
+		Tooltip = "Begins or ends climbing a ladder.",
+		PossibleValues = "Keybind",
+		SpecifyToggle = false,
+		Default = {Keycodes = {Enum.KeyCode.E}, Toggled = true},
+	},
+	{
 		Name = "Spectate Next",
 		Tab = "Keybinds",
 		Category = "Spectating",
@@ -465,6 +474,14 @@ module.AvailableSettings = {
 		PossibleValues = "TouchPosition",
 		Default = UDim2.fromScale(0.1, 0.6),
 	},
+	{
+		Name = "Climb Ladder Position",
+		Tab = "Touch",
+		Category = "Button Positions",
+		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
+		PossibleValues = "TouchPosition",
+		Default = UDim2.fromScale(0.1, 0.7),
+	},
 	
 	{
 		Name = "Primary Fire Scale",
@@ -513,7 +530,15 @@ module.AvailableSettings = {
 		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
 		PossibleValues = "TouchScale",
 		Default = 1,
-	}
+	},
+	{
+		Name = "Climb Ladder Scale",
+		Tab = "Touch",
+		Category = "Button Scale",
+		Tooltip = "Empties the ammo of the currently equipped weapon into a box. Not all weapons can be emptied.",
+		PossibleValues = "TouchScale",
+		Default = 1,
+	},
 } :: {SettingDefinition}
 
 
