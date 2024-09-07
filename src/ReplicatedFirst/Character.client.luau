@@ -94,7 +94,7 @@ local function isDropObstructed(char: Model?): boolean
 
     local result = workspace:Raycast(pos, getCenterRay().Direction.Unit * 10, params)
     if result then
-        ShowAlert("<font color='#ff0000'>There is no room to drop anything here!</font>")
+        ShowAlert("There is no room to drop anything here!")
         return true
     end
     return false

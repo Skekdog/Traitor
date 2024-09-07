@@ -9,6 +9,7 @@ local ActionItems = require(script.Parent.ActionItems)
 local Elimination = require(script.Parent.Gamemodes.Elimination)
 local ThoseYouTrust = require(script.Parent.Gamemodes.ThoseYouTrust)
 local GetRound = require(script.Parent.GetRound)
+local ShowAlert = require(script.Parent.Parent.ReplicatedFirst.ShowAlert)
 local ProfileManager = require(script.Parent.ProfileManager)
 local InventoryManager = require(ServerScriptService.InventoryManagerServer)
 local UpdateRoundInfo = require(script.Parent.UpdateRoundInfo)
@@ -157,6 +158,10 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: unknown)
 			return
 		end
 		return corpseParticipant:ViewCorpse()
+	end
+
+	if corpse:GetAttribute("Burning") then
+		return ShowAlert("Ouch! This corpse is on fire!", plr)
 	end
 
 	if plr:DistanceFromCharacter(corpse:GetPivot().Position) > 10 then

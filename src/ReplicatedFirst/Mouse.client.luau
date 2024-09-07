@@ -7,6 +7,7 @@ local ControlManager = require(script.Parent.ControlManager)
 local DroppedItemState = require(script.Parent.DroppedItemState)
 local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local ShowAlert = require(script.Parent.ShowAlert)
 local UIManager = require(script.Parent.UIManager)
 local CorpseInfo = require(script.Parent.UIManager.UIScripts.CorpseInfo)
 
@@ -198,6 +199,10 @@ ControlManager.Register("Interact", true, function(action, state, input)
 
 	local model = interactTarget:FindFirstAncestorOfClass("Model")
 	if model and model:IsDescendantOf(workspace.Corpses) then
+		if model:GetAttribute("Burning") then
+			ShowAlert("Ouch! This corpse is on fire!")
+			return Enum.ContextActionResult.Pass
+		end
 		CorpseInfo(ReplicatedStorage:WaitForChild("RoundHandler").SearchCorpse:InvokeServer(model))
 		return Enum.ContextActionResult.Sink
 	end
@@ -224,6 +229,5 @@ ControlManager.Register("Interact", true, function(action, state, input)
 		end
 	end
 	
-
 	return Enum.ContextActionResult.Pass
 end)

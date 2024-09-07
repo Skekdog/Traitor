@@ -260,6 +260,10 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
         model:SetAttribute("Burning", true)
     end
 
+    if model and model:IsDescendantOf(workspace.Corpses) then
+        model:SetAttribute("Burning", true)
+    end
+
     local endTime = workspace:GetServerTimeNow() + 10
     task.spawn(function()
         while true do
