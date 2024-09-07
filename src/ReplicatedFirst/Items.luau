@@ -810,9 +810,13 @@ grenades["Incendiary Grenade"] = {
                             continue
                         end
 
+                        local sound = ReplicatedStorage.WeaponSounds.FlareBurn:Clone()
+                        sound.PlayOnRemove = true
+                        sound.Parent = v
+                        sound:Destroy()
                         participant:TakeDamage(4, nil, "Burn")
                     end
-                    task.wait(0.05)
+                    task.wait(0.1)
                 end
             end)
 
