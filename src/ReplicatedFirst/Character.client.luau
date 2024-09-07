@@ -9,9 +9,9 @@ local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
+local ShowAlert = require(script.Parent.ShowAlert)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
-local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
 local Viewmodel = require(script.Parent.Viewmodel)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
@@ -63,7 +63,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
 
     local camera = workspace.CurrentCamera
     while char.Parent do
-        task.wait(1 / 60)
+        task.wait(1 / 20)
         local y = camera.CFrame:ToOrientation()
         local neck = char:FindFirstChild("Neck", true) :: Motor6D?
         if not neck then
@@ -94,7 +94,7 @@ local function isDropObstructed(char: Model?): boolean
 
     local result = workspace:Raycast(pos, getCenterRay().Direction.Unit * 10, params)
     if result then
-        ShowMessage("<font color='#ff0000'>There is no room to drop anything here!</font>", "other")
+        ShowAlert("<font color='#ff0000'>There is no room to drop anything here!</font>")
         return true
     end
     return false

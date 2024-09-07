@@ -16,6 +16,7 @@ local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
+local ShowAlert = require(script.Parent.ShowAlert)
 local StandardDoor = require(script.Parent.StandardDoor)
 local UIManager = require(script.Parent.UIManager)
 local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
@@ -137,6 +138,7 @@ serverClient.SetMagnetoHintForCorpse.OnClientEvent:Connect(function(isCorpse: bo
         ItemHint(if isCorpse then "to attach corpse" else magneto.PrimaryHint, magneto.AlternateHint)
     end
 end)
+serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
 ReplicatedStorage:WaitForChild("RoundHandler").SendMessage.OnClientEvent:Connect(ShowMessage)
 
 local function onMapChanged(m)
