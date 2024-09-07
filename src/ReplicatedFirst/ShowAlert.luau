@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 
 local IS_SERVER = RunService:IsServer()
 local id = 0
+local hideThread: thread?
 
 return function(alert: string, player: Player?): ()
     if IS_SERVER then
@@ -15,20 +16,16 @@ return function(alert: string, player: Player?): ()
         local UIManager = require(script.Parent.UIManager)
         local alertUI = UIManager.WaitForUI("Alert") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Alert)}
 
-        local function show(): ()
-            alertUI.Object.Text = alert
-            alertUI:ToggleVisible(true)
-            task.delay(3, function()
-                if id == lastId then
-                    alertUI:ToggleVisible(false)
-                end
-            end)
+        if hideThread then
+            task.cancel(hideThread)
         end
 
-        if alertUI.Visible then
-            alertUI:ToggleVisible(false, nil, show)
-        else
-            show()
-        end
+        alertUI.Object.Text = alert
+        alertUI:ToggleVisible(true)
+        hideThread = task.delay(3, function()
+            if id == lastId then
+                alertUI:ToggleVisible(false)
+            end
+        end)
     end
 end
