@@ -32,16 +32,16 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 		local isSize = frame:GetAttribute("TransitionStyle") == "Size"
 		local targetUDim = frame:GetAttribute("TransitionTarget") :: UDim2
 
-		local direction = frame:GetAttribute("TransitionDirection")
+		local direction = frame:GetAttribute("TransitionDirection") -- The direction it moves when OPENING
 		local offScreenPosition = targetUDim
 		if direction == "Right" then
-			offScreenPosition -= UDim2.fromScale(0.5, 0)
+			offScreenPosition = UDim2.fromScale(frame.Size.X.Scale * frame.AnchorPoint.X, targetUDim.Y.Scale)
 		elseif direction == "Left" then
-			offScreenPosition += UDim2.fromScale(0.5, 0)
+			offScreenPosition = UDim2.fromScale(1 + (frame.Size.X.Scale * frame.AnchorPoint.X), targetUDim.Y.Scale)
 		elseif direction == "Up" then
-			offScreenPosition -= UDim2.fromScale(0, 0.5)
+			offScreenPosition = UDim2.fromScale(targetUDim.X.Scale, 1 + (frame.Size.Y.Scale * frame.AnchorPoint.Y))
 		elseif direction == "Down" then
-			offScreenPosition += UDim2.fromScale(0, 0.5)
+			offScreenPosition = UDim2.fromScale(targetUDim.X.Scale, frame.Size.Y.Scale * frame.AnchorPoint.Y)
 		elseif not isSize then
 			error("Invalid direction for "..frame.Name)
 		end
