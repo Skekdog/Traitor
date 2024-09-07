@@ -3,7 +3,6 @@
 -- Get services
 local Players = game:GetService("Players")
 local soundService = game:GetService("SoundService")
-local replicatedStorage = game:GetService("ReplicatedStorage")
 local FootstepIDs = require(script.Parent.FootstepIDs)
 
 -- Create sound variables
@@ -14,9 +13,6 @@ local playbackSpeed
 -- Create material variables
 local floorMaterial
 local material
-
--- Get remote
-local updateWalkspeedRemote = replicatedStorage:WaitForChild("UpdateWalkspeed") :: RemoteEvent
 
 -- Create sound instance
 local currentSound = Instance.new("Sound", soundService)
@@ -71,11 +67,6 @@ Players.LocalPlayer.CharacterAdded:Connect(function(character)
         if humanoid.MoveDirection.Magnitude > 0 then
             currentSound.Playing = true
         end
-    end)
-
-    -- Let the server know our walkspeed has changed
-    humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-        updateWalkspeedRemote:FireServer(humanoid.WalkSpeed)
     end)
 
     -- check if the player is moving and not climbing

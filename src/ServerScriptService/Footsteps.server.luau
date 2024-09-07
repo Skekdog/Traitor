@@ -1,7 +1,5 @@
 -- Made by VroIok, last updated on 9/1/24 | Version 2.4
 
--- Get services
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local FootstepIDs = require(script.Parent.Parent.ReplicatedFirst.FootstepIDs)
 
@@ -68,19 +66,4 @@ Players.PlayerAdded:Connect(function(player)
             coroutine.close(serverFix)
         end)
     end)
-end)
-
-local updateWalkspeedRemote = ReplicatedStorage:FindFirstChild('UpdateWalkspeed')
-updateWalkspeedRemote.OnServerEvent:Connect(function(player, walkspeed)
-    local char = player.Character
-    if not char then
-        return
-    end
-
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if not hum then
-        return
-    end
-
-    hum.WalkSpeed = walkspeed
 end)
