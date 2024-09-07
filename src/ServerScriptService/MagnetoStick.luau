@@ -99,7 +99,7 @@ local function getPropByRay(participant: Types.Participant, ray: Ray): (Model | 
         return
     end
 
-    return model or object, result.Position, isCorpse
+    return object, result.Position, isCorpse
 end
 
 function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray)
@@ -141,6 +141,16 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
 
     if (not isCorpse) and ((mass > 160) or (size.X * size.Y * size.Z > 50) or (biggestPlane > 5)) then -- Mostly arbitrarily chosen by looking at Skyscraper and Mesa Monocraft props
         return
+    end
+
+    -- AssemblyMass is incorrect for corpses, unsure why
+    if isCorpse and object.Parent then
+        mass = 0
+        for _, descendant in object.Parent:GetDescendants() do
+            if descendant:IsA("BasePart") then
+                mass += descendant.Mass
+            end
+        end
     end
 
     local alignPos = object:FindFirstChildOfClass("AlignPosition") or Instance.new("AlignPosition")
@@ -194,6 +204,36 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
 end
 
 function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
+    local controlledProp = controlledProps[participant.Player.UserId]
+    print(controlledProp)
+    if controlledProp and controlledProp:IsA("BasePart") and controlledProp:IsDescendantOf(workspace.Corpses) then
+        local rope = controlledProp:FindFirstChildOfClass("RopeConstraint") or Instance.new("RopeConstraint")
+        rope.Attachment0 = controlledProp:FindFirstChildOfClass("Attachment") or Instance.new("Attachment")
+
+        if rope.Attachment1 then
+            rope.Attachment1:Destroy()
+        end
+
+        local params = RaycastParams.new()
+        params.CollisionGroup = "Raycasts"
+        params.FilterDescendantsInstances = {(participant.Round :: Types.MapStructureCast).Map}
+        params.FilterType = Enum.RaycastFilterType.Include
+        local result = workspace:Raycast(cameraRayInfo.Origin, cameraRayInfo.Direction * 10, params)
+        if result and (controlledProp.Position - result.Position).Magnitude < 5 then
+            local attachment = Instance.new("Attachment")
+            assert(result.Instance:IsA("BasePart") or result.Instance:IsA("Terrain"))
+            attachment.CFrame = result.Instance.CFrame:ToObjectSpace(CFrame.new(result.Position))
+            attachment.Parent = result.Instance
+            
+            rope.Attachment1 = attachment
+            rope.Visible = true
+            rope.Length = (result.Position - controlledProp.Position).Magnitude
+            rope.Parent = controlledProp
+            stopControllingProp(controlledProp, participant.Player.UserId)
+        end
+        return
+    end
+
     local object, position = getPropByRay(participant, cameraRayInfo)
     if not object or not position then
         return
