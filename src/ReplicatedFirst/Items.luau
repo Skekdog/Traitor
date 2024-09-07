@@ -97,7 +97,7 @@ guns.Scout = {
 
     FireTime = 1,
     ReloadTime = 1.5,
-    AmmoType = "Scout",
+    AmmoType = "Rifle",
 
     Model = models("Scout"),
     HoldAnimation = 10247529531,
@@ -133,7 +133,7 @@ guns.Pistol = {
 
     FireTime = 0.5,
     ReloadTime = 1,
-    AmmoType = "Assault Rifle",
+    AmmoType = "9mm",
 
     Model = models("Pistol"),
     HoldAnimation = 9253211833,
@@ -390,7 +390,7 @@ guns.SMG = {
     
     FireTime = 0.05,
     ReloadTime = 1,
-    AmmoType = "SMG",
+    AmmoType = "SMG1",
 
     Model = models("SMG"),
     HoldAnimation = 12481091962,
@@ -466,7 +466,7 @@ guns["Assault Rifle"] = {
 
     FireTime = 0.15,
     ReloadTime = 1.5,
-    AmmoType = "Assault Rifle",
+    AmmoType = "9mm",
 
     AimFOV = 50,
     AimSpreadMultiplier = 0.25,
@@ -513,7 +513,7 @@ guns["Silenced Pistol"] = {
 
     FireTime = 0.5,
     ReloadTime = 1,
-    AmmoType = "Assault Rifle",
+    AmmoType = "9mm",
 
     Model = models("Silenced Pistol"),
     HoldAnimation = 9253211833,
@@ -606,7 +606,7 @@ guns.Glock = {
 
     FireTime = 0.1,
     ReloadTime = 1,
-    AmmoType = "Assault Rifle",
+    AmmoType = "9mm",
 
     Model = models("Glock"),
     HoldAnimation = 9253211833,
@@ -681,7 +681,7 @@ guns.BAR = {
 
     FireTime = 0.1,
     ReloadTime = 2.5,
-    AmmoType = "Assault Rifle",
+    AmmoType = "9mm",
 
     Model = models("BAR"),
     HoldAnimation = 10247380824,

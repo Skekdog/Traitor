@@ -2,7 +2,7 @@ local Types = require(script.Parent.RoundHandler.Types)
 
 type OnUnequipFunction = (player: Player) -> ()
 
-export type AmmoType = "Shotgun" | "Scout" | "Assault Rifle" | "SMG" | "Deagle"
+export type AmmoType = "Shotgun" | "Rifle" | "9mm" | "SMG1" | "Deagle"
 type BeforeHitParticipantFunction = (attacker: Types.Participant?, target: Types.Participant, willDie: boolean?, hitPartName: string) -> boolean?
 type BeforeHitPropFunction = (attacker: Types.Participant?, target: Types.Prop, willDestroy: boolean?, hitPartName: string) -> boolean?
 type BeforeHitCorpseFunction = (attacker: Types.Participant?, part: BasePart) -> ()
