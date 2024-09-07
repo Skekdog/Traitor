@@ -7,8 +7,11 @@ local ClientWeaponManager = require(script.Parent.WeaponsManagerClient)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
+local InventoryManagerClient = require(script.Parent.InventoryManagerClient)
 local InventoryManager = require(script.Parent.InventoryManagerClient)
+local ItemHint = require(script.Parent.ItemHint)
 local ItemTypes = require(script.Parent.ItemTypes)
+local Items = require(script.Parent.Items)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
 local SettingsManager = require(script.Parent.SettingsManager)
@@ -127,6 +130,13 @@ serverClient.Discombobulate.OnClientEvent:Connect(Discombobulate)
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
 serverClient.PlayViewmodelAnimation.OnClientEvent:Connect(Viewmodel.PlayAnimation)
 serverClient.SetReloadingStatus.OnClientEvent:Connect(ClientWeaponManager.SetReloadingStatus)
+serverClient.SetMagnetoHintForCorpse.OnClientEvent:Connect(function(isCorpse: boolean)
+    local magneto = Items["Magneto Stick"] :: ItemTypes.ItemDefinition
+    local equipped = InventoryManagerClient.Equipped
+    if equipped and equipped.Base == magneto then
+        ItemHint(if isCorpse then "to attach corpse" else magneto.PrimaryHint, magneto.AlternateHint)
+    end
+end)
 ReplicatedStorage:WaitForChild("RoundHandler").SendMessage.OnClientEvent:Connect(ShowMessage)
 
 local function onMapChanged(m)

@@ -13,6 +13,11 @@ local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
 local function stopControllingProp(prop: Model | BasePart, userId: number, stoppedHoldingStick: boolean?)
+    local plr = Players:GetPlayerByUserId(userId)
+    if plr then
+        ReplicatedStorage.ServerClient.SetMagnetoHintForCorpse:FireClient(plr, false)
+    end
+
     if not prop:IsDescendantOf(workspace) then
         return
     end
@@ -44,7 +49,6 @@ local function stopControllingProp(prop: Model | BasePart, userId: number, stopp
         task.cancel(resetHolderThread)
     end)
 
-    local plr = Players:GetPlayerByUserId(userId)
     if plr and not stoppedHoldingStick then
         PlayAnimation(plr, 13269497293, "MagnetoAnimation")
         serverClient.PlayViewmodelAnimation:FireClient(plr, 13269497293)
@@ -153,6 +157,10 @@ function module.AlternateFire(participant: Types.Participant, cameraRayInfo: Ray
         end
     end
 
+    if isCorpse then
+        ReplicatedStorage.ServerClient.SetMagnetoHintForCorpse:FireClient(participant.Player, true)
+    end
+
     local alignPos = object:FindFirstChildOfClass("AlignPosition") or Instance.new("AlignPosition")
     if not alignPos.Parent then
         alignPos.Responsiveness = 200
@@ -205,7 +213,6 @@ end
 
 function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
     local controlledProp = controlledProps[participant.Player.UserId]
-    print(controlledProp)
     if controlledProp and controlledProp:IsA("BasePart") and controlledProp:IsDescendantOf(workspace.Corpses) then
         local rope = controlledProp:FindFirstChildOfClass("RopeConstraint") or Instance.new("RopeConstraint")
         rope.Attachment0 = controlledProp:FindFirstChildOfClass("Attachment") or Instance.new("Attachment")
@@ -219,7 +226,7 @@ function module.PrimaryFire(participant: Types.Participant, cameraRayInfo: Ray)
         params.FilterDescendantsInstances = {(participant.Round :: Types.MapStructureCast).Map}
         params.FilterType = Enum.RaycastFilterType.Include
         local result = workspace:Raycast(cameraRayInfo.Origin, cameraRayInfo.Direction * 10, params)
-        if result and (controlledProp.Position - result.Position).Magnitude < 5 then
+        if result and (controlledProp.Position - result.Position).Magnitude < 6 then
             local attachment = Instance.new("Attachment")
             assert(result.Instance:IsA("BasePart") or result.Instance:IsA("Terrain"))
             attachment.CFrame = result.Instance.CFrame:ToObjectSpace(CFrame.new(result.Position))
