@@ -146,7 +146,11 @@ params.CollisionGroup = "Raycasts"
 
 local interactTarget: Instance?
 RunService.PostSimulation:Connect(function()
-    params.FilterDescendantsInstances = {plr.Character :: Model}
+	local cameraSubject = workspace.CurrentCamera.CameraSubject
+	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
+		params.FilterDescendantsInstances = {cameraSubject.Parent}
+	end
+	
     local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
 	-- 10000 distance because we should still be able to see players. Corpses can be viewed from distance 10, so we include that as a check there.
 
