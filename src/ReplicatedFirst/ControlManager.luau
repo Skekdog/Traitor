@@ -190,4 +190,11 @@ function module.GetRegisteredInfo(actionName: string): params?
 	return registered[actionName]
 end
 
+SettingsManager.KeybindUpdatedEvent.Event:Connect(function(actionName: string, keybind: SettingsManager.KeybindSetting)
+	local info = module.GetRegisteredInfo(actionName)
+	if info then
+		module.Register(actionName, info.CreateTouchButton, info.Callback)
+	end
+end)
+
 return module
