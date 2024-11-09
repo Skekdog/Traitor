@@ -140,7 +140,7 @@ serverClient.SetMagnetoHintForCorpse.OnClientEvent:Connect(function(isCorpse: bo
     local magneto = Items["Magneto Stick"] :: ItemTypes.ItemDefinition
     local equipped = InventoryManagerClient.Equipped
     if equipped and equipped.Base == magneto then
-        ItemHint(if isCorpse then "to attach corpse" else magneto.PrimaryHint, magneto.AlternateHint)
+        ItemHint(if isCorpse then "Attach Corpse" else magneto.PrimaryHint, magneto.AlternateHint)
     end
 end)
 serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
