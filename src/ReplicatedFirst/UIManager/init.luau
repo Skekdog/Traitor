@@ -26,6 +26,8 @@ end
 
 local UIManager = {}
 
+UIManager.BackgroundMenuMode = "Closed"
+
 export type Layer = "Special" |"Popup" | "Button" | "HUD"
 export type BackgroundMenuMode = "Closed" | "Stacked"
 

@@ -15,6 +15,8 @@ return function(alignment: "Left" | "Right"): ()
         anchorPoint = Vector2.new(1, 0)
         textAlignment = Enum.TextXAlignment.Left
         paddingProperty = "PaddingLeft"
+    else
+        error("Invalid alignment: " .. tostring(alignment))
     end
 
     UIAnimation.Animate(ui, TweenInfo.new(0.1), {Position = position, AnchorPoint = anchorPoint})

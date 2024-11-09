@@ -7,6 +7,7 @@ local CS = game:GetService("CollectionService")
 local CAS = game:GetService("ContextActionService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIS = game:GetService("UserInputService")
+local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ThemesManager = require(script.Parent.ThemesManager)
 
@@ -190,10 +191,12 @@ function module.GetRegisteredInfo(actionName: string): params?
 	return registered[actionName]
 end
 
-SettingsManager.KeybindUpdatedEvent.Event:Connect(function(actionName: string, keybind: SettingsManager.KeybindSetting)
-	local info = module.GetRegisteredInfo(actionName)
-	if info then
-		module.Register(actionName, info.CreateTouchButton, info.Callback)
+SettingCallbacks.Listen(function(name, value)
+	if SettingsManager.Settings[name].Definition.PossibleValues == "Keybind" then
+		local info = module.GetRegisteredInfo(name)
+		if info then
+			module.Register(name, info.CreateTouchButton, info.Callback)
+		end
 	end
 end)
 
