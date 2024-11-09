@@ -277,16 +277,6 @@ module.AvailableSettings = {
 		SpecifyToggle = false,
 		Default = {Keycodes = {Enum.KeyCode.Q, Enum.KeyCode.DPadLeft}, Toggled = true},
 	},
-	--{
-	--	Name = "Crouch",
-	--	Tab = "Keybinds",
-	--	Category = "Movement",
-	--	Tooltip = "Not functional.",
-	--	PossibleValues = "Keybind",
-	--  SpecifyToggle = true,
-	--	Default = {Keycodes={{Enum.KeyCode.LeftControl, nil}}, Toggled=false},
-	--	Callback = keybindCallback,
-	--},
 	{
 		Name = "Close UI",
 		Tab = "Keybinds",
