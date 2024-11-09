@@ -937,8 +937,8 @@ items["Magneto Stick"] = {
     Model = models("Magneto Stick"),
     HoldAnimation = 10247423634,
 
-    PrimaryHint = "to push a prop",
-    AlternateHint = "to grab a prop",
+    PrimaryHint = "Push Prop",
+    AlternateHint = "Grab Prop",
 
     ToggledAlt = true,
     AlternateFire = function(participant: Types.Participant, cameraRayInfo: Ray)
@@ -965,7 +965,7 @@ items["DNA Scanner"] = {
 
     Toggled = true,
 
-    PrimaryHint = "to scan an Identified Body",
+    PrimaryHint = "Scan Identified Body",
 
     PrimaryFire = function(participant, cameraRay)
         local head = participant.Character:FindFirstChild("Head")

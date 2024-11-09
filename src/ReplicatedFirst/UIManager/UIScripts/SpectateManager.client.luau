@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local plr = Players.LocalPlayer
 
+local Freecam = require(script.Parent.Parent.Parent.Freecam)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local uiManager = require(ReplicatedFirst.UIManager)
 local controls = require(ReplicatedFirst.ControlManager)
@@ -50,7 +51,9 @@ LocalRoundInfo.Listen("IsSpectating", function(val)
 		uiO.Username.Text = "Use buttons to spectate"
 		lastKey = 0
 	end
+	
 	if val then
+		Freecam.StartFreecam()
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
 		plr.CameraMode = Enum.CameraMode.Classic
@@ -58,6 +61,7 @@ LocalRoundInfo.Listen("IsSpectating", function(val)
 		controls.Register("Spectate Next", false, spectateFunc)
 		controls.Register("Spectate Previous", false, spectateFunc)
 	else
+		Freecam.StopFreecam()
 		ui:ToggleVisible(false)
 		camera.CameraType = Enum.CameraType.Custom
 		plr.CameraMode = Enum.CameraMode.LockFirstPerson

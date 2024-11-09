@@ -139,7 +139,7 @@ remotes.SearchCorpse.OnServerInvoke = function(plr: Player, corpse: unknown)
 
 	local corpseParticipant: Types.Participant?
 	for _, v in round.Participants do
-		if v.Player.Name == corpse or v.Character == corpse then
+		if v.Player.Name == corpse or v.Character == (corpse :: any) then -- Nonsense type error here
 			corpseParticipant = v
 			break
 		end

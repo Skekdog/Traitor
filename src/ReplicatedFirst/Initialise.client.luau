@@ -12,12 +12,14 @@ local InventoryManager = require(script.Parent.InventoryManagerClient)
 local ItemHint = require(script.Parent.ItemHint)
 local ItemTypes = require(script.Parent.ItemTypes)
 local Items = require(script.Parent.Items)
+local KeybindHintManager = require(script.Parent.KeybindHintManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundHandler.Types)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
 local StandardDoor = require(script.Parent.StandardDoor)
+local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
 local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
 local Viewmodel = require(script.Parent.Viewmodel)
@@ -25,6 +27,9 @@ local Viewmodel = require(script.Parent.Viewmodel)
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
 serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
+
+ThemesManager.UpdateTheme("Dark")
+KeybindHintManager()
 
 serverClient.TweenProjectile.OnClientEvent:Connect(function(projectile: PVInstance, origin: Vector3, targetPosition: Vector3, speed: number)
     projectile = projectile:Clone()
@@ -135,7 +140,7 @@ serverClient.SetMagnetoHintForCorpse.OnClientEvent:Connect(function(isCorpse: bo
     local magneto = Items["Magneto Stick"] :: ItemTypes.ItemDefinition
     local equipped = InventoryManagerClient.Equipped
     if equipped and equipped.Base == magneto then
-        ItemHint(if isCorpse then "to attach corpse" else magneto.PrimaryHint, magneto.AlternateHint)
+        ItemHint(if isCorpse then "Attach Corpse" else magneto.PrimaryHint, magneto.AlternateHint)
     end
 end)
 serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)

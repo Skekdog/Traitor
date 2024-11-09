@@ -7,6 +7,7 @@ local CS = game:GetService("CollectionService")
 local CAS = game:GetService("ContextActionService")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIS = game:GetService("UserInputService")
+local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ThemesManager = require(script.Parent.ThemesManager)
 
@@ -36,8 +37,10 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 		return "NONE"
 	end
 	if keycode.EnumType == Enum.KeyCode then
-		-- local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
-		-- if img ~= "" then return img end
+		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
+		if img ~= "" then
+			return img
+		end
 
 		local str = UIS:GetStringForKeyCode(keycode :: Enum.KeyCode)
 		if str ~= "" then
@@ -107,6 +110,10 @@ function module.SetupTouchButton(actionName)
 	end
 end
 
+local function isControllerInput(key: Enum.KeyCode | Enum.UserInputType): boolean
+	return key.EnumType == Enum.KeyCode and (key.Name:sub(1, 6) == "Button" or key.Name:sub(1, 4) == "DPad" or key.Name:sub(1, 10) == "Thumbstick")
+end
+
 function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): string
 	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
 	local keybinds = keybindSetting.Keycodes
@@ -121,18 +128,18 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 	end
 
 	for _, key in keybinds do
-		if preferred == "controller" and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
+		if preferred == "controller" and key:IsA("KeyCode") and isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
-		elseif preferred == "keyboard" and key.Name:sub(1, 6) ~= "Button" then
+		elseif preferred == "keyboard" and not isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
 		end
 	end
 
 	-- If we didn't find our preferred method then we look for the first valid method
 	for _, key in keybinds do
-		if UIS.GamepadEnabled and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
+		if UIS.GamepadEnabled and key:IsA("KeyCode") and isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
-		elseif UIS.KeyboardEnabled and key.Name:sub(1, 6) ~= "Button" then
+		elseif UIS.KeyboardEnabled and not isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
 		end
 	end
@@ -190,10 +197,12 @@ function module.GetRegisteredInfo(actionName: string): params?
 	return registered[actionName]
 end
 
-SettingsManager.KeybindUpdatedEvent.Event:Connect(function(actionName: string, keybind: SettingsManager.KeybindSetting)
-	local info = module.GetRegisteredInfo(actionName)
-	if info then
-		module.Register(actionName, info.CreateTouchButton, info.Callback)
+SettingCallbacks.Listen(function(name, value)
+	if SettingsManager.Settings[name].Definition.PossibleValues == "Keybind" then
+		local info = module.GetRegisteredInfo(name)
+		if info then
+			module.Register(name, info.CreateTouchButton, info.Callback)
+		end
 	end
 end)
 

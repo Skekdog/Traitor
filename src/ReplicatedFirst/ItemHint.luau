@@ -1,4 +1,3 @@
-local ControlManager = require(script.Parent.ControlManager)
 local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(script.Parent.UIManager)
 
@@ -9,19 +8,8 @@ return function(primary: string?, alternate: string?)
         return ui:ToggleVisible(false)
     end
 
-    local primaryFireKey = ControlManager.GetFirstKeyCode("Primary Fire")
-    local alternateFireKey = ControlManager.GetFirstKeyCode("Alternate Fire")
-
-    local text = ""
-    if primary then
-        text ..= `{primaryFireKey} {primary}`
-    end
-    text ..= "\n"
-    if alternate then
-        text ..= `{alternateFireKey} {alternate}`
-    end
-
-    ui.Object.Text = text
+    ui.Object.Primary.HintLabel.Text = primary or ""
+    ui.Object.Alternate.HintLabel.Text = alternate or ""
 
     ui:ToggleVisible(true)
 end

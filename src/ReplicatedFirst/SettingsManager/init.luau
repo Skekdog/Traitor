@@ -1,9 +1,5 @@
 local HTTPService = game:GetService("HttpService")
-local Lighting = game:GetService("Lighting")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local UserInputService = game:GetService("UserInputService")
-
-local Types = require(script.Parent.RoundHandler.Types)
+local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
 
 export type SettingDefinition = {
 	Name: string,
@@ -13,7 +9,7 @@ export type SettingDefinition = {
 	PossibleValues: {string} | "Boolean" | "Keybind" | "TouchPosition" | "TouchScale",
 	Default: Setting,
 	SpecifyToggle: boolean?, -- Whether the user can change if this is toggled or not. Only for keybinds.
-	Callback: ((val: Setting?, name: string?) -> ())?,
+	Callback: nil?,
 }
 
 export type Keybind = Enum.UserInputType | Enum.KeyCode
@@ -35,9 +31,6 @@ module.AvailableSettings = {
 		Tooltip = "Enable or disable global shadows.",
 		PossibleValues = "Boolean",
 		Default = true,
-		Callback = function(val)
-			game:GetService("Lighting").GlobalShadows = val :: boolean
-		end,
 	},
 	{
 		Name = "Use FIB Lighting",
@@ -46,26 +39,6 @@ module.AvailableSettings = {
 		Tooltip = "If you have modified your client to use Future lighting, enable this for better map compatibility.",
 		PossibleValues = "Boolean",
 		Default = false,
-		Callback = function(val)
-			local map = require(script.Parent.LocalRoundInfo).GetMap()
-			if not map then
-				return
-			end
-
-			local mapConfig: Types.LightingStructure?
-			if val then
-				mapConfig = map.Map:FindFirstChild("FIBLighting") :: Types.LightingStructure?
-			else
-				mapConfig = map:FindFirstChild("Lighting") :: Types.LightingStructure?
-			end
-			if mapConfig then
-				for _, prop in mapConfig:GetChildren() do
-					if prop:IsA("ValueBase") then
-						(Lighting :: any)[prop.Name] = (prop :: any).Value
-					end
-				end
-			end
-		end,
 	},
 
 	{
@@ -75,30 +48,8 @@ module.AvailableSettings = {
 		Tooltip = "Prevents shattered glass from despawning until the round is over.",
 		PossibleValues = "Boolean",
 		Default = false,
-		Callback = function(val)
-			if val then
-				return
-			end
+	},
 
-			for _, v in workspace.Projectiles:GetChildren() do
-				if v.Name == "GlassFragment" then
-					v:Destroy()
-				end
-			end
-		end
-	},
-	
-	{
-		Name = "UI Theme",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "Select a theme for the UI.",
-		PossibleValues = {"Dark", "Light", "Blue"},
-		Default = "Dark",
-		Callback = function(val) -- Can't directly reference this because cyclic dependency!
-			require(script.Parent.ThemesManager).UpdateTheme(val)
-		end,
-	},
 	{
 		Name = "Sidebar Alignment",
 		Tab = "Display",
@@ -106,9 +57,6 @@ module.AvailableSettings = {
 		Tooltip = "Controls the position of the sidebar. May be useful on phones with inset screens.",
 		PossibleValues = {"Left", "Right"},
 		Default = "Right",
-		Callback = function(val)
-			require(script.Parent.UIManager.UIScripts.SetSidebarAlignment)(val)
-		end
 	},
 	{
 		Name = "Animate UI Transitions",
@@ -125,14 +73,6 @@ module.AvailableSettings = {
 		Tooltip = "Enables hint text for item controls.",
 		PossibleValues = "Boolean",
 		Default = true,
-		Callback = function(val)
-			if not ReplicatedFirst:GetAttribute("ControlsReady") then -- not a good fix, desperately need a better system for all this settings and ui interop
-				return
-			end
-			if not val then
-				require(script.Parent.ItemHint)()
-			end
-		end,
 	},
 	{
 		Name = "Always Show Sidebar",
@@ -141,15 +81,6 @@ module.AvailableSettings = {
 		Tooltip = "This setting has no effect if a keyboard is not connected.",
 		PossibleValues = "Boolean",
 		Default = true,
-		Callback = function(val)
-			if not UserInputService.KeyboardEnabled then
-				return
-			end
-			local sidebar = require(script.Parent.UIManager).WaitForUI("Sidebar")
-			if sidebar then
-				sidebar:ToggleVisible(val :: boolean)
-			end
-		end
 	},
 	{
 		Name = "Background Menus",
@@ -158,9 +89,6 @@ module.AvailableSettings = {
 		Tooltip = "Closed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
 		PossibleValues = {"Closed", "Stacked"},
 		Default = "Closed",
-		Callback = function(val)
-			script.Parent.UIManager:SetAttribute("BackgroundMenuMode", val)
-		end,
 	},
 	{
 		Name = "Close Scale",
@@ -203,7 +131,7 @@ module.AvailableSettings = {
 		Tooltip = "For using weapons or planting equipment.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.UserInputType.MouseButton1}, Toggled = false},
+		Default = {Keycodes = {Enum.UserInputType.MouseButton1, Enum.KeyCode.ButtonR2}, Toggled = false},
 	},
 	{
 		Name = "Drop Ammo",
@@ -536,18 +464,11 @@ for _, v in module.AvailableSettings do
 	module.Settings[v.Name] = {Value = v.Default, Definition = v}
 end
 
-module.KeybindUpdatedEvent = script.KeybindUpdated
-
 function module.SetSetting(setting: string, settingValue: Setting)
 	local ref = module.Settings[setting]
 	ref.Value = settingValue
-	if ref.Definition.Callback then
-		ref.Definition.Callback(settingValue, setting)
-	end
-
-	if ref.Definition.PossibleValues == "Keybind" then
-		module.KeybindUpdatedEvent:Fire(setting, settingValue)
-	end
+	
+	SettingCallbacks.Fire(setting, settingValue)
 end
 
 function module.GetSetting(settingName: string): Setting
