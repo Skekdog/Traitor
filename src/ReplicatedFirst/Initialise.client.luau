@@ -18,6 +18,7 @@ local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
 local StandardDoor = require(script.Parent.StandardDoor)
+local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
 local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
 local Viewmodel = require(script.Parent.Viewmodel)
@@ -25,6 +26,8 @@ local Viewmodel = require(script.Parent.Viewmodel)
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
 serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
+
+ThemesManager.UpdateTheme("Dark")
 
 serverClient.TweenProjectile.OnClientEvent:Connect(function(projectile: PVInstance, origin: Vector3, targetPosition: Vector3, speed: number)
     projectile = projectile:Clone()

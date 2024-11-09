@@ -89,17 +89,6 @@ module.AvailableSettings = {
 	},
 	
 	{
-		Name = "UI Theme",
-		Tab = "Display",
-		Category = "User Interface",
-		Tooltip = "Select a theme for the UI.",
-		PossibleValues = {"Dark", "Light", "Blue"},
-		Default = "Dark",
-		Callback = function(val) -- Can't directly reference this because cyclic dependency!
-			require(script.Parent.ThemesManager).UpdateTheme(val)
-		end,
-	},
-	{
 		Name = "Sidebar Alignment",
 		Tab = "Display",
 		Category = "User Interface",

@@ -12,25 +12,9 @@ export type Theme = {
 }
 
 module.Themes = {
-	Light = {
-		Primary = Color3.fromRGB(250, 250, 250),
-		Secondary = Color3.fromRGB(210, 230, 230),
-		Text = Color3.fromRGB(0, 0, 0),
-		TextStroke = Color3.fromRGB(255, 255, 255),
-		PlaceholderText = Color3.fromRGB(50, 50, 50),
-		UIStroke = Color3.fromRGB(0, 0, 0),
-	},
 	Dark = {
 		Primary = Color3.fromRGB(17, 17, 17),
 		Secondary = Color3.fromRGB(34, 34, 34),
-		Text = Color3.fromRGB(255, 255, 255),
-		TextStroke = Color3.fromRGB(0, 0, 0),
-		PlaceholderText = Color3.fromRGB(178, 178, 178),
-		UIStroke = Color3.fromRGB(255, 255, 255),
-	},
-	Blue = {
-		Primary = Color3.fromRGB(33, 66, 100),
-		Secondary = Color3.fromRGB(0, 0, 68),
 		Text = Color3.fromRGB(255, 255, 255),
 		TextStroke = Color3.fromRGB(0, 0, 0),
 		PlaceholderText = Color3.fromRGB(178, 178, 178),
@@ -44,10 +28,9 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 	-- Tag StyledUI means that a UI object will be updated to match the theme
 	-- Attribute Style is the style to use for the main element(s) of an object (e.g, background colour for a frame, image colour for an image)
 	
-	local SettingsManager = require(script.Parent.SettingsManager)
 	local UIAnimation = require(script.Parent.UIAnimation)
 	local tweenInfo = TweenInfo.new(THEME_TRANSITION_TIME, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
-	theme = theme or module.Themes[SettingsManager.GetSetting("UI Theme") :: string]
+	theme = theme or module.Themes.Dark
 	assert(theme)
 	
 	local inverse = v:GetAttribute("Inverse")
