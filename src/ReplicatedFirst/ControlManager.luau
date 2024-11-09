@@ -110,6 +110,10 @@ function module.SetupTouchButton(actionName)
 	end
 end
 
+local function isControllerInput(key: Enum.KeyCode | Enum.UserInputType): boolean
+	return key.EnumType == Enum.KeyCode and (key.Name:sub(1, 6) == "Button" or key.Name:sub(1, 4) == "DPad" or key.Name:sub(1, 10) == "Thumbstick")
+end
+
 function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): string
 	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
 	local keybinds = keybindSetting.Keycodes
@@ -124,18 +128,18 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 	end
 
 	for _, key in keybinds do
-		if preferred == "controller" and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
+		if preferred == "controller" and key:IsA("KeyCode") and isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
-		elseif preferred == "keyboard" and key.Name:sub(1, 6) ~= "Button" then
+		elseif preferred == "keyboard" and not isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
 		end
 	end
 
 	-- If we didn't find our preferred method then we look for the first valid method
 	for _, key in keybinds do
-		if UIS.GamepadEnabled and key:IsA("KeyCode") and key.Name:sub(1, 6) == "Button" then
+		if UIS.GamepadEnabled and key:IsA("KeyCode") and isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
-		elseif UIS.KeyboardEnabled and key.Name:sub(1, 6) ~= "Button" then
+		elseif UIS.KeyboardEnabled and not isControllerInput(key) then
 			return module.GetStringForKeyCode(key)
 		end
 	end
