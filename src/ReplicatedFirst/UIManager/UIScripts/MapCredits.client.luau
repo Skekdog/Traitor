@@ -1,11 +1,10 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SettingCallbacks = require(script.Parent.Parent.Parent.SettingCallbacks.SettingCallbacks)
 local SettingsManager = require(ReplicatedFirst.SettingsManager)
 local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
 local UIManager = require(ReplicatedFirst.UIManager)
 local UI = UIManager.WaitForUI("Credits")
-
-local fibSettingDefinition = SettingsManager.Settings["Use FIB Lighting"].Definition
 
 LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)
 	(UI.Object :: typeof(UIManager.UnregisteredUIs.Credits)).Text.Text = `Map Loaded: {ReplicatedStorage:WaitForChild("RoundHandler"):GetAttribute("MapName")} by {mapAuthors}`
@@ -16,6 +15,6 @@ LocalRoundInfo.Listen("MapAuthors", function(mapAuthors)
 	repeat
 		task.wait()
 	until LocalRoundInfo.GetMap()
-	assert(fibSettingDefinition.Callback)
-	fibSettingDefinition.Callback(SettingsManager.GetSetting(fibSettingDefinition.Name), fibSettingDefinition.Name)
+
+	SettingCallbacks.Fire("Use FIB Lighting", SettingsManager.GetSetting("Use FIB Lighting"))
 end)
