@@ -131,7 +131,7 @@ module.AvailableSettings = {
 		Tooltip = "For using weapons or planting equipment.",
 		PossibleValues = "Keybind",
 		SpecifyToggle = false,
-		Default = {Keycodes = {Enum.UserInputType.MouseButton1}, Toggled = false},
+		Default = {Keycodes = {Enum.UserInputType.MouseButton1, Enum.KeyCode.ButtonR2}, Toggled = false},
 	},
 	{
 		Name = "Drop Ammo",

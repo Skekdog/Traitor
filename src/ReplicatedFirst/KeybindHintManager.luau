@@ -19,7 +19,7 @@ local function setImageForImageLabel(image: string, label: ImageLabel): ()
     label.Image = image
 end
 
-local function createLabel(class: "TextLabel" | "ImageLabel", control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?): Label
+local function createLabel(class: "TextLabel" | "ImageLabel", control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?, textXAlignment: string?): Label
     local label = Instance.new(class) :: GuiObject
 
     label.Position = position or UDim2.fromScale(1, 0)
@@ -30,11 +30,13 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
 
     if class == "TextLabel" then
         assert(label:IsA("TextLabel"))
+        label.Name = "KeybindHintText"
 
         label.TextScaled = true
         label.Font = Enum.Font.SourceSans
         label.TextStrokeTransparency = 0
         label.AutomaticSize = Enum.AutomaticSize.X
+        label.TextXAlignment = (Enum :: any).TextXAlignment[textXAlignment or "Center"]
         
         if not noStyle then
             label:AddTag("StyledUI")
@@ -44,6 +46,7 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
     elseif class == "ImageLabel" then
         assert(label:IsA("ImageLabel"))
         label.ScaleType = Enum.ScaleType.Fit
+        label.Name = "KeybindHintImage"
 
         if not noStyle then
             label:AddTag("StyledUI")
@@ -60,8 +63,8 @@ end
 local function updateText(control: string, instance: Instance): ()
     local text = ControlManager.GetFirstKeyCode(control, true)
 
-    local imageLabel = instance:FindFirstChildOfClass("ImageLabel") :: ImageLabel?
-    local textLabel = instance:FindFirstChildOfClass("TextLabel") :: TextLabel?
+    local imageLabel = instance:FindFirstChild("KeybindHintImage") :: ImageLabel?
+    local textLabel = instance:FindFirstChild("KeybindHintText") :: TextLabel?
 
     if text:sub(1, 11) == "rbxasset://" then
         if not imageLabel then
@@ -88,9 +91,9 @@ local function updateText(control: string, instance: Instance): ()
     end
 end
 
-local function createLabels(control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?): ()
-    createLabel("ImageLabel", control, instance, position, size, anchorPoint, noStyle)
-    createLabel("TextLabel", control, instance, position, size, anchorPoint, noStyle)
+local function createLabels(control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?, textXAlignment: string?): ()
+    createLabel("ImageLabel", control, instance, position, size, anchorPoint, noStyle, textXAlignment)
+    createLabel("TextLabel", control, instance, position, size, anchorPoint, noStyle, textXAlignment)
 
     if not boundInstances[control] then
         boundInstances[control] = {}
@@ -122,8 +125,13 @@ local function loadInstance(instance: Instance): ()
     local anchorPoint = instance:GetAttribute("AnchorPoint") :: Vector2?
     assert(typeof(anchorPoint) == "Vector2" or anchorPoint == nil, "Expected attribute 'AnchorPoint' to be a Vector2 or nil")
 
+    local textXAlignment = instance:GetAttribute("TextXAlignment") :: "Left" | "Right" | "Center"?
+    assert(textXAlignment == "Left" or textXAlignment == "Right" or textXAlignment == "Center" or textXAlignment == nil, "Expected attribute 'TextXAlignment' to be a 'Left' | 'Right' | 'Center' or nil")
+
     local noStyle = instance:GetAttribute("NoStyle") :: boolean?
-    createLabels(control, instance, position, size, anchorPoint, noStyle)
+    assert(typeof(noStyle) == "boolean" or noStyle == nil, "Expected attribute 'NoStyle' to be a boolean or nil")
+
+    createLabels(control, instance, position, size, anchorPoint, noStyle, textXAlignment)
 end
 
 CollectionService:GetInstanceAddedSignal("ControlHint"):Connect(loadInstance)
