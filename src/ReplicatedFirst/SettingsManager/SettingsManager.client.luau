@@ -4,6 +4,9 @@ local CAS = game:GetService("ContextActionService")
 local GUI = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local CHECKBOX_ON = "rbxassetid://70556080680796"
+local CHECKBOX_OFF = "rbxassetid://101035239747030"
+
 local SM = require(script.Parent)
 local ControlManager = require(script.Parent.Parent.ControlManager)
 
@@ -300,13 +303,13 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 		if setting.SpecifyToggle then
 			local toggleButton = m.Toggled
 			toggleButton.Visible = true
-			toggleButton.Image = (SM.GetSetting(name) :: SM.KeybindSetting).Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
+			toggleButton.Image = if (SM.GetSetting(name) :: SM.KeybindSetting).Toggled then CHECKBOX_ON else CHECKBOX_OFF
 			toggleButton.MouseButton1Click:Connect(function()
 				local cur = SM.GetSetting(name) :: SM.KeybindSetting
 				cur.Toggled = not cur.Toggled
 				SM.SetSetting(name, cur)
 				
-				toggleButton.Image = cur.Toggled and "rbxassetid://9155626912" or "rbxassetid://9155599240"
+				toggleButton.Image = if cur.Toggled then CHECKBOX_ON else CHECKBOX_OFF
 			end)
 		end
 		
