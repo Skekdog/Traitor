@@ -268,15 +268,6 @@ for _, setting: SM.SettingDefinition in SM.AvailableSettings do
 				bind.Visible = true
 				bind.Parent = m.Keybinds
 
-				if (numBoundKeys+i) > 1 then
-					local sep = m.Keybinds.__Separator:Clone()
-					sep.Name = "Separator"
-					sep.Visible = true
-					sep.LayoutOrder = bind.LayoutOrder-1
-					sep.Name = "Separator"..tostring(sep.LayoutOrder)
-					sep.Parent = m.Keybinds
-				end
-
 				local function removeBind()
 					local binds = SM.GetSetting(name) :: SM.KeybindSetting
 					table.remove(binds.Keycodes, table.find(binds.Keycodes, v))
