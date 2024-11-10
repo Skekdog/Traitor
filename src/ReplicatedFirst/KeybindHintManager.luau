@@ -61,7 +61,7 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
 end
 
 local function updateText(control: string, instance: Instance): ()
-    local text = ControlManager.GetFirstKeyCode(control, true)
+    local text = ControlManager.GetFirstKeyCode(control, if instance:GetAttribute("AlwaysShow") then false else true)
 
     local imageLabel = instance:FindFirstChild("KeybindHintImage") :: ImageLabel?
     local textLabel = instance:FindFirstChild("KeybindHintText") :: TextLabel?
@@ -130,6 +130,9 @@ local function loadInstance(instance: Instance): ()
 
     local noStyle = instance:GetAttribute("NoStyle") :: boolean?
     assert(typeof(noStyle) == "boolean" or noStyle == nil, "Expected attribute 'NoStyle' to be a boolean or nil")
+
+    local alwaysShow = instance:GetAttribute("AlwaysShow") :: boolean?
+    assert(typeof(alwaysShow) == "boolean" or alwaysShow == nil, "Expected attribute 'AlwaysShow' to be a boolean or nil")
 
     createLabels(control, instance, position, size, anchorPoint, noStyle, textXAlignment)
 end
