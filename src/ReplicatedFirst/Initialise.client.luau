@@ -173,33 +173,46 @@ end
 ReplicatedStorage.RoundHandler.MapFolder.Changed:Connect(onMapChanged)
 onMapChanged(LocalRoundInfo.GetMap())
 
-ControlManager.Register("Climb Ladder", true, function()
-    local char = Players.LocalPlayer.Character
-    if not char then
-        return Enum.ContextActionResult.Pass
-    end
-
-    local root = char.PrimaryPart
-    if not root then
-        return Enum.ContextActionResult.Pass
-    end
-
-    local map = LocalRoundInfo.GetMap()
-    if not map then
-        return Enum.ContextActionResult.Pass
-    end
-
-    local bounds = map:FindFirstChild("Bounds")
-    if not bounds then
-        return Enum.ContextActionResult.Pass
-    end
-
-    for _, v in root:GetTouchingParts() do
-        if v.Name == "Ladder" and v:IsDescendantOf(bounds) then
-            ClimbLadder.Climb(v)
-            return Enum.ContextActionResult.Sink
+local function onLocalCharacterAdded(char: Model): ()
+    ControlManager.Register("Climb Ladder", true, function()
+        local char = Players.LocalPlayer.Character
+        if not char then
+            return Enum.ContextActionResult.Pass
         end
-    end
+    
+        local root = char.PrimaryPart
+        if not root then
+            return Enum.ContextActionResult.Pass
+        end
+    
+        local map = LocalRoundInfo.GetMap()
+        if not map then
+            return Enum.ContextActionResult.Pass
+        end
+    
+        local bounds = map:FindFirstChild("Bounds")
+        if not bounds then
+            return Enum.ContextActionResult.Pass
+        end
+    
+        for _, v in root:GetTouchingParts() do
+            if v.Name == "Ladder" and v:IsDescendantOf(bounds) then
+                ClimbLadder.Climb(v)
+                return Enum.ContextActionResult.Sink
+            end
+        end
+    
+        return Enum.ContextActionResult.Pass
+    end)
+end
 
-    return Enum.ContextActionResult.Pass
-end)
+local function onLocalCharacterRemoved(char: Model): ()
+    ControlManager.Unregister("Climb Ladder")
+end
+
+Players.LocalPlayer.CharacterAdded:Connect(onLocalCharacterAdded)
+Players.LocalPlayer.CharacterRemoving:Connect(onLocalCharacterRemoved)
+
+if Players.LocalPlayer.Character then
+    onLocalCharacterAdded(Players.LocalPlayer.Character)
+end
