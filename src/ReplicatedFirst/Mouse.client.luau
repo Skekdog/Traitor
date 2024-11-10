@@ -104,14 +104,12 @@ local function showCorpseHint(char: Model)
 		end	
 	end
 
-	local key = ControlManager.GetFirstKeyCode("Interact")
-
 	if char:GetAttribute("Unidentified") then
-		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body\nPress {key} to Search`
+		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body`
 	else
 		local info = LocalRoundInfo.GetParticipantInfo(char.Name) or LocalRoundInfo.GetOwnParticipant()
 		assert(info)
-		corpseHint.Text = `{info.FormattedName}'s Body\nPress {key} to Search`
+		corpseHint.Text = `{info.FormattedName}'s Body`
 	end
 	corpseHint.Visible = true
 end
