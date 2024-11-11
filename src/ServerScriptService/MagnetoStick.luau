@@ -298,6 +298,7 @@ task.spawn(function()
 
         for _, v in props:GetChildren() do
             if v:IsA("Model") and v:GetAttribute("Burning") then
+                local hitParticipants: {Types.Participant} = {}
                 forEachPropPart(v, function(part)
                     local char = part:FindFirstAncestorOfClass("Model")
                     local plr = Players:GetPlayerFromCharacter(char :: Model)
@@ -306,9 +307,16 @@ task.spawn(function()
                     end
 
                     local participant = round:GetParticipant(plr.Name)
-                    if not participant then
+                    if not participant or table.find(hitParticipants, participant) then
                         return
                     end
+
+                    table.insert(hitParticipants, participant)
+
+                    local sound = ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("FlareBurn"):Clone()
+                    sound.PlayOnRemove = true
+                    sound.Parent = part
+                    sound:Destroy()
 
                     participant:TakeDamage(0.25, nil, "Burn")
                 end)

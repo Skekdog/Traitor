@@ -45,6 +45,7 @@ local function spectateFunc(action, state)
 	return Enum.ContextActionResult.Sink
 end
 
+local currentCameraMode: "Player" | "Freecam" = "Player"
 LocalRoundInfo.Listen("IsSpectating", function(val)
 	-- Do not early return here because we need to set camera properties always
 	if ui.Visible ~= val then
@@ -53,7 +54,12 @@ LocalRoundInfo.Listen("IsSpectating", function(val)
 	end
 	
 	if val then
-		Freecam.StartFreecam()
+		if currentCameraMode == "Player" then
+			Freecam.StopFreecam()
+		else
+			Freecam.StartFreecam()
+		end
+
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
 		plr.CameraMode = Enum.CameraMode.Classic
@@ -77,6 +83,24 @@ end)
 
 uiO.Back.MouseButton1Click:Connect(function()
 	spectateFunc("Spectate Previous", Enum.UserInputState.End)
+end)
+
+uiO.CameraMode.Activated:Connect(function()
+	if currentCameraMode == "Player" then
+		currentCameraMode = "Freecam"
+	else
+		currentCameraMode = "Player"
+	end
+
+	uiO.CameraMode.Text = "Camera Mode: " .. currentCameraMode
+
+	if LocalRoundInfo.IsSpectating() then
+		if currentCameraMode == "Player" then
+			Freecam.StopFreecam()
+		else
+			Freecam.StartFreecam()
+		end
+	end
 end)
 
 LocalRoundInfo.SetSpectating(LocalRoundInfo.GetRoundPhase() ~= "Destroy")
