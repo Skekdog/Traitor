@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local ControlManager = require(script.Parent.ControlManager)
@@ -216,3 +217,5 @@ Players.LocalPlayer.CharacterRemoving:Connect(onLocalCharacterRemoved)
 if Players.LocalPlayer.Character then
     onLocalCharacterAdded(Players.LocalPlayer.Character)
 end
+
+StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
