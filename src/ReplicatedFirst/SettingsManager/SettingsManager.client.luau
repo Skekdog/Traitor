@@ -20,6 +20,10 @@ if options then
 			continue
 		end
 
+		if not SM.Settings[i] then
+			continue
+		end
+
 		local definition = SM.Settings[i].Definition
 		if definition.SpecifyToggle == false then
 			v.Toggled = (definition.Default :: SM.KeybindSetting).Toggled
