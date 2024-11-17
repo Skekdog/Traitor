@@ -85,12 +85,8 @@ uiO.Back.MouseButton1Click:Connect(function()
 	spectateFunc("Spectate Previous", Enum.UserInputState.End)
 end)
 
-uiO.CameraMode.Activated:Connect(function()
-	if currentCameraMode == "Player" then
-		currentCameraMode = "Freecam"
-	else
-		currentCameraMode = "Player"
-	end
+local function switchCameraMode(mode: "Player" | "Freecam")
+	currentCameraMode = mode
 
 	uiO.CameraMode.Text = "Camera Mode: " .. currentCameraMode
 
@@ -101,6 +97,11 @@ uiO.CameraMode.Activated:Connect(function()
 			Freecam.StartFreecam()
 		end
 	end
+end
+
+uiO.CameraMode.Activated:Connect(function()
+	switchCameraMode(if currentCameraMode == "Player" then "Freecam" else "Player")
 end)
+switchCameraMode("Player")
 
 LocalRoundInfo.SetSpectating(LocalRoundInfo.GetRoundPhase() ~= "Destroy")
