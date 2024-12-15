@@ -39,7 +39,7 @@ end
 function module.GetAllParticipants(): {Types.ClientParticipant}
     local list = {}
     for _, v in participants do
-        assert(v) -- todo: check that this doesn't error
+        assert(v)
         table.insert(list, v)
     end
     return list
