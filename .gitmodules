@@ -1,3 +1,4 @@
-[submodule "src/ReplicatedFirst/RoundHandler"]
-	path = src/ReplicatedFirst/RoundHandler
-	url = https://github.com/skekdog/RoundHandler
+
+[submodule "src/ReplicatedFirst/RoundRule"]
+	path = src/ReplicatedFirst/RoundRule
+	url = ../RoundRule
