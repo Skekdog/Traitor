@@ -1,9 +1,28 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Ammo = require(script.Parent.Ammo)
 local Types = require(script.Parent.Parent.RoundRule.Types)
 
 local function models(name: string): BasePart
-    return game:GetService("ReplicatedStorage"):WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
+    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
+
+local function weaponSounds(name: string): string
+    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
+end
+
+local function firedSounds(name: string): string
+    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound).SoundId
+end
+
+local function reloadSounds(name: string): string
+    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name) :: Sound).SoundId
+end
+
+local function projectiles(name: string): BasePart
+    return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
+end
+
+local bullet = projectiles("Bullet")
 
 local guns: {[string]: Types.GunWeaponDefinition} = {}
 guns.HUGE = {
