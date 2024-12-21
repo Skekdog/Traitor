@@ -1,11 +1,10 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 local Adapters = require(script.Parent.Adapters)
-local GetRound = require(script.Parent.GetRound)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
+local Types = require(script.Parent.Parent.ReplicatedFirst.RoundRule.Types)
 local RestartServer = require(script.Parent.RestartServer)
+local RoundHandler = require(script.Parent.RoundHandler)
 
 -- This is separate from Initialise so that if anything goes badly wrong server restart is still possible.
 
@@ -29,7 +28,7 @@ local oldVictory: ((Types.Gamemode, Types.Participant) -> ())?
 local deaths: {Types.Participant} = {}
 
 local function unPauseVictory(round: Types.Round): ()
-    round.Gamemode.OnDeath = oldVictory
+    round.Gamemode.OnDeath = oldVictory or function() end
     oldVictory = nil
 
     if not round.Gamemode.OnDeath then
@@ -42,21 +41,20 @@ local function unPauseVictory(round: Types.Round): ()
 end
 
 local function pause(): Types.Round?
-    local round = GetRound()
-    if not round or not round:IsRoundInProgress() then
+    local round = RoundHandler.GetRound()
+    if not round or not round:IsInProgress() then
         return Adapters.SendMessage("Failed to pause as there is no round in progress.", "error", "other", true)
     end
 
-    round:PauseRound()
-    Adapters.SendMessage(if round.Paused then "Round paused." else "Round unpaused.", "info", "other", true)
+    round:PauseRound(not round:GetIsRoundPaused())
+    Adapters.SendMessage(if round:GetIsRoundPaused() then "Round paused." else "Round unpaused.", "info", "other", true)
 
-    if not round.Paused then
-        ReplicatedStorage.RoundHandler:SetAttribute("TimeMilestone", round.TimeMilestone)
+    if not round:GetIsRoundPaused() then
         if oldVictory then
             unPauseVictory(round)
         end
     end
-    ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round.Paused)
+    ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round:GetIsRoundPaused())
 
     return round
 end
@@ -94,8 +92,8 @@ Players.PlayerAdded:Connect(function(plr: Player)
             Adapters.SendMessage("Server restarting...", "info", "update", true) -- type is update to be consistent with RoundHandler restarts
             RestartServer(5)
         elseif cmd == "!pausevictory" and isAdmin(plr) then
-            local round = GetRound()
-            if round and round.Paused then
+            local round = RoundHandler.GetRound()
+            if round and round:GetIsRoundPaused() then
                 if oldVictory then
                     pause()
                     return Adapters.SendMessage("Re-enabled victory.", "info", "other", true)
@@ -110,7 +108,7 @@ Players.PlayerAdded:Connect(function(plr: Player)
             end
 
             deaths = {}
-            if round.Paused then
+            if round:GetIsRoundPaused() then
                 oldVictory = round.Gamemode.OnDeath
                 round.Gamemode.OnDeath = function(self, participant)
                     table.insert(deaths, participant)
@@ -124,13 +122,13 @@ Players.PlayerAdded:Connect(function(plr: Player)
             if not args[2] then
                 return send("Missing Argument 2")
             end
-            local round = GetRound()
-            if not round or not round:IsRoundInProgress() then
+            local round = RoundHandler.GetRound()
+            if not round or not round:IsInProgress() then
                 return send("Failed to end round as there is no round in progress.")
             end
 
             local success, err = pcall(function()
-                round:EndRound(round:GetParticipant(args[2]) or round:GetRoleFromName(args[2]))
+                round:EndRound(round:GetParticipant(args[2]) or round:GetRoleFromRoleName(args[2]))
             end)
             if success then
                 send("Round ended.")
