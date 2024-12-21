@@ -8,14 +8,13 @@ local ClientWeaponManager = require(script.Parent.WeaponsManagerClient)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
+local Items = require(script.Parent.GameDefinition.Items)
 local InventoryManagerClient = require(script.Parent.InventoryManagerClient)
 local InventoryManager = require(script.Parent.InventoryManagerClient)
 local ItemHint = require(script.Parent.ItemHint)
-local ItemTypes = require(script.Parent.ItemTypes)
-local Items = require(script.Parent.Items)
 local KeybindHintManager = require(script.Parent.KeybindHintManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local Types = require(script.Parent.RoundHandler.Types)
+local Types = require(script.Parent.RoundRule.Types)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
@@ -95,7 +94,7 @@ end)
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 local ammoBar = roundInfo.Frame.AmmoBar
 
-InventoryManager.Listen("Equip", function(item: ItemTypes.Item)
+InventoryManager.Listen("Equip", function(item: Types.AnyItem)
     ammoBar.Visible = item.Kind == "Gun"
 end)
 
@@ -112,7 +111,7 @@ workspace.Corpses.ChildAdded:Connect(function(child)
 end)
 
 LocalRoundInfo.Listen("RoundPhase", function(phase: Types.RoundPhase)
-    if phase == "Destroy" then
+    if phase == "Intermission" then
         workspace.Projectiles:ClearAllChildren()
         workspace.RadarPoints:ClearAllChildren()
     end
@@ -138,7 +137,7 @@ serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
 serverClient.PlayViewmodelAnimation.OnClientEvent:Connect(Viewmodel.PlayAnimation)
 serverClient.SetReloadingStatus.OnClientEvent:Connect(ClientWeaponManager.SetReloadingStatus)
 serverClient.SetMagnetoHintForCorpse.OnClientEvent:Connect(function(isCorpse: boolean)
-    local magneto = Items["Magneto Stick"] :: ItemTypes.ItemDefinition
+    local magneto = Items["Magneto Stick"] :: Types.ItemDefinition
     local equipped = InventoryManagerClient.Equipped
     if equipped and equipped.Base == magneto then
         ItemHint(if isCorpse then "Attach Corpse" else magneto.PrimaryHint, magneto.AlternateHint)
@@ -148,17 +147,20 @@ serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
 ReplicatedStorage:WaitForChild("RoundHandler").SendMessage.OnClientEvent:Connect(ShowMessage)
 
 local function onMapChanged(m)
-    local map = (m :: Types.MapStructureCast) :: Types.MapStructure
+    local map = m :: Types.Map
     if not map then
         return
     end
 
-    local bounds = map:FindFirstChild("Bounds")
+    local bounds = map.Bounds
     if not bounds then
         return
     end
 
     for _, v in bounds:GetChildren() do
+        if not v:IsA("BasePart") then
+            continue
+        end
         if v.Name == "Ladder" then
             v.CanTouch = true
             v.Touched:Connect(function(part)
