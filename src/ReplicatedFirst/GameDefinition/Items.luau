@@ -930,6 +930,20 @@ melees.Crowbar = {
     FiredSound = firedSounds("Crowbar"),
 }
 
+local items: {[string]: Types.ItemDefinition} = {}
+items["Magneto Stick"] = {
+    Kind = "Item" :: "Item",
+    Name = "Magneto Stick",
+    Slot = 5,
+    CanDrop = false,
+
+    Model = models("Magneto Stick"),
+    HoldAnimation = "10247423634",
+
+    PrimaryHint = "Push Prop",
+    AlternateHint = "Grab Prop",
+}
+
 local allItems: {[string]: Types.AnyItemDefinition} = {}
 
 for i, v in guns do
