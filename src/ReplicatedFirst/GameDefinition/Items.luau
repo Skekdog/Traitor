@@ -944,6 +944,18 @@ items["Magneto Stick"] = {
     AlternateHint = "Grab Prop",
 }
 
+items["DNA Scanner"] = {
+    Kind = "Item" :: "Item",
+    Name = "DNA Scanner",
+    Slot = 9,
+    CanDrop = false,
+
+    Model = models("DNA Scanner"),
+    HoldAnimation = "10247423634",
+
+    PrimaryHint = "Scan Identified Body",
+}
+
 local allItems: {[string]: Types.AnyItemDefinition} = {}
 
 for i, v in guns do
