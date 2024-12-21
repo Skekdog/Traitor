@@ -21,7 +21,7 @@ this.Object.MouseButton1Click:Connect(function()
 	end
 end)
 
-LocalRoundInfo.Listen("RoundPhase", function()
+LocalRoundInfo.Listen("Phase", function()
 	local phase = LocalRoundInfo.GetRoundPhase()
 	this:ToggleVisible(table.find(validPhases, phase) ~= nil)
 end)

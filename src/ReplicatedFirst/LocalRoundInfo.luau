@@ -7,7 +7,7 @@ local remotes = ReplicatedFirst.RoundRule.Remotes
 
 local listeners: {[string]: {() -> ()}?} = {}
 
-type CallbackName = "Gamemode" | "Role" | "RoundPhase" | "Credits"
+type CallbackName = "Gamemode" | "Role" | "Phase" | "Credits" | "PlayerStatus" | "PlayerRole"
 
 function module.Listen(name: CallbackName, callback: () -> ())
     if not listeners[name] then
@@ -57,14 +57,18 @@ function module.GetRole(): Types.Role?
     return role
 end
 
+local function getRoleFromName(name: string): Types.Role
+    assert(gamemode, "Gamemode is not loaded")
+    return gamemode.Roles[name] or error("Role not found")
+end
+
 remotes.AssignRole.OnClientEvent:Connect(function(name: string?)
     if not name then
         role = nil
         return runCallbacks("Role")
     end
 
-    assert(gamemode, "Gamemode is not loaded")
-    role = gamemode.Roles[name] or error("Role not found")
+    role = getRoleFromName(name)
 
     runCallbacks("Role")
 end)
@@ -86,7 +90,27 @@ end
 
 replicatedData:GetAttributeChangedSignal("Phase"):Connect(function()
     roundPhase = replicatedData:GetAttribute("Phase") :: Types.RoundPhase? or "Waiting"
-    runCallbacks("RoundPhase")
+    runCallbacks("Phase")
+end)
+
+local playerStatuses: {[Player]: Types.ParticipantStatus?} = {}
+function module.GetPlayerStatus(player: Player): Types.ParticipantStatus
+    return playerStatuses[player] or "Spectating"
+end
+
+remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(player: Player, status: Types.ParticipantStatus?)
+    playerStatuses[player] = status
+    runCallbacks("PlayerStatus")
+end)
+
+local playerRoles: {[Player]: Types.Role?} = {}
+function module.GetPlayerRole(player: Player): Types.Role?
+    return playerRoles[player]
+end
+
+remotes.UpdatePlayerRole.OnClientEvent:Connect(function(player: Player, name: string)
+    playerRoles[player] = getRoleFromName(name)
+    runCallbacks("PlayerRole")
 end)
 
 return module
