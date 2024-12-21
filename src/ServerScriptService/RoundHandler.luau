@@ -21,6 +21,7 @@ task.spawn(function()
         if round:GetRoundPhase() == "Intermission" then
             round = newRound()
         end
+        task.wait()
     end
 end)
 

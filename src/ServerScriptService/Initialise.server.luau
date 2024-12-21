@@ -95,5 +95,4 @@ ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target: u
 	return if profile then profile.Karma else 1000
 end
 
-require(script.Parent.MagnetoStick)
 require(script.Parent.RoundHandler)
