@@ -1,5 +1,7 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Ammo = require(script.Parent.Ammo)
+local CreateEmptyPart = require(script.Parent.Parent.CreateEmptyPart)
 local Types = require(script.Parent.Parent.RoundRule.Types)
 
 local function models(name: string): BasePart
@@ -731,9 +733,192 @@ guns.BAR = {
     RecoilY = 1.8,
 }
 
+local grenades: {[string]: Types.GrenadeWeaponDefinition} = {}
+grenades.Grenade = {
+    Kind = "Grenade" :: "Grenade",
+    Name = "Grenade",
+    Description = "Explodes in a good radius after 5 seconds.",
+
+    Slot = 7,
+    CanDrop = true,
+
+    Projectile = "Grenade",
+    HoldAnimation = "12498620263",
+
+    Damage = 200,
+
+    FuseTime = 5,
+
+    ProjectileForce = 0.75,
+    Spread = 0.25,
+
+    FiredSound = firedSounds("Grenade"),
+}
+
+grenades.Flashbang = {
+    Kind = "Grenade" :: "Grenade",
+    Name = "Flashbang",
+    Description = "Explodes in a good radius after 3 seconds, blinding and deafening anyone in range.",
+
+    Slot = 8,
+    CanDrop = true,
+
+    Projectile = "Flashbang",
+    HoldAnimation = "12498620263",
+
+    Damage = 0,
+
+    BeforeHitParticipant = function(_, target: Types.Participant)
+        return ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
+    end,
+
+    FuseTime = 3,
+
+    ProjectileForce = 30,
+    Spread = 0.25,
+
+    FiredSound = firedSounds("Grenade"),
+}
+
+grenades["Incendiary Grenade"] = {
+    Kind = "Grenade" :: "Grenade",
+    Name = "Incendiary Grenade",
+
+    Slot = 4,
+    CanDrop = true,
+
+    Projectile = "Incendiary Grenade",
+    HoldAnimation = "12498620263",
+
+    Damage = 10,
+
+    OnExplode = function(weapon: Types.GrenadeWeapon, attacker: Types.Participant, projectile: BasePart)
+        if not attacker then
+            return
+        end
+
+        local firePart = CreateEmptyPart(CFrame.new(projectile.Position), nil, false, true, true)
+        firePart.Size = Vector3.new(15, 1, 15)
+        firePart.Parent = workspace.Projectiles
+
+        local overlapParams = OverlapParams.new()
+        overlapParams.FilterDescendantsInstances = {workspace.Characters}
+        overlapParams.FilterType = Enum.RaycastFilterType.Include
+        overlapParams.RespectCanCollide = false
+
+        task.spawn(function()
+            while firePart:IsDescendantOf(workspace) do
+                local found: {Model} = {}
+                for _, v in workspace:GetPartBoundsInBox(firePart.CFrame, firePart.Size, overlapParams) do
+                    local model = v:FindFirstAncestorOfClass("Model")
+                    if not model or table.find(found, model) then
+                        continue
+                    end
+                    table.insert(found, model)
+
+                    local plr = Players:GetPlayerFromCharacter(model)
+                    if not plr then
+                        continue
+                    end
+
+                    local participant = attacker.Round:GetParticipant(plr.Name)
+                    if not participant or not participant:GetCharacter() then
+                        continue
+                    end
+
+                    local sound = ReplicatedStorage.WeaponSounds.FlareBurn:Clone()
+                    sound.PlayOnRemove = true
+                    sound.Parent = v
+                    sound:Destroy()
+                    participant:TryTakeDamage({
+                        Amount = 1,
+                        Source = "Burn",
+                    })
+                end
+                task.wait(0.1)
+            end
+        end)
+
+        local fire = Instance.new("Fire")
+        fire.Size = 40
+        fire.Parent = firePart
+
+        task.delay(30, firePart.Destroy, firePart)
+    end,
+
+    FuseTime = 3,
+
+    ProjectileForce = 60,
+    Spread = 0.25,
+
+    FiredSound = firedSounds("Grenade"),
+}
+
+grenades["Smoke Grenade"] = {
+    Kind = "Grenade" :: "Grenade",
+    Name = "Smoke Grenade",
+
+    Slot = 4,
+    CanDrop = true,
+
+    Projectile = "Smoke Grenade",
+    HoldAnimation = "12498620263",
+
+    Damage = 0,
+
+    OnExplode = function(weapon: Types.GrenadeWeapon, attacker: Types.Participant, projectile: BasePart)
+        local smoke = Instance.new("Smoke")
+        smoke.Size = 20
+        smoke.Opacity = 1
+        smoke.RiseVelocity = 5
+        
+        local smokePart = CreateEmptyPart(CFrame.new(projectile.Position))
+        smoke.Parent = smokePart
+        smokePart.Parent = workspace.Projectiles
+
+        task.delay(30, smokePart.Destroy, smokePart)
+    end,
+
+    FuseTime = 3,
+
+    ProjectileBase = models("Smoke Grenade"),
+    ProjectileForce = 60,
+    Spread = 0.25,
+
+    FiredSound = firedSounds("Grenade"),
+}
+
+grenades["Discombobulator"] = {
+    Kind = "Grenade" :: "Grenade",
+    Name = "Discombobulator",
+
+    Slot = 4,
+    CanDrop = true,
+
+    Projectile = "Discombobulator",
+    HoldAnimation = "12498620263",
+
+    Damage = 0,
+
+    BeforeHitParticipant = function(_, target: Types.Participant)
+        return ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
+    end,
+
+    FuseTime = 3,
+
+    ProjectileForce = 60,
+    Spread = 0.25,
+
+    FiredSound = firedSounds("Grenade"),
+}
+
 local allItems: {[string]: Types.AnyItemDefinition} = {}
 
 for i, v in guns do
+    allItems[i] = v
+end
+
+for i, v in grenades do
     allItems[i] = v
 end
 
