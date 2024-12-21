@@ -1,14 +1,8 @@
 local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 
-local BroadcastDroppedItem = require(script.Parent.BroadcastDroppedItem)
-local GetRound = require(script.Parent.GetRound)
-local ItemTypes = require(ReplicatedFirst.ItemTypes)
-local InventoryManager = require(ServerScriptService.InventoryManagerServer)
 local ProfileManager = require(script.Parent.ProfileManager)
 
 local _earlyTesters = { -- These players should be awarded the badge whenever they join, even after release
@@ -49,18 +43,6 @@ Players.PlayerAdded:Connect(function(plr): ()
 		plr:SetAttribute("TotalScore", profile.Data.TotalPoints)
     end
 
-	local round = GetRound()
-	if round then
-		local spawns = round.Map:FindFirstChild("WeaponSpawns")
-		if spawns then
-			for _, v in spawns:GetChildren() do
-				BroadcastDroppedItem({plr}, v)
-			end
-		end
-	end
-
-	InventoryManager.InitInventory(plr)
-
 	local tries = 0
 	local suc = false
 	repeat
@@ -73,7 +55,6 @@ end)
 
 Players.PlayerRemoving:Connect(function(plr)
 	ProfileManager.ReleaseProfile(plr)
-	InventoryManager.DeInitInventory(plr)
 end)
 
 ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: unknown)
@@ -85,82 +66,6 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
 	end
 
     ProfileManager.UpdateProfile(plr, "Settings", options)
-end)
-
-local function fireInventoryClient(plr: Player, event: InventoryManager.InventoryEvent, equipment: ItemTypes.Item, params: ItemTypes.ClientItemInitParams?)
-	InventoryManager.InvEvent:FireClient(plr, event, equipment.Base.Name, params)
-end
-
-InventoryManager.Listen("Add", function(plr, equipment)
-	local params: ItemTypes.ClientItemInitParams?
-	if equipment.Kind == "Gun" then
-		params = {
-			LastFireTime = equipment.LastFireTime,
-			CurrentAmmo = equipment.CurrentAmmo,
-			ReloadingUntil = equipment.ReloadingUntil,
-		}
-	elseif equipment.Kind == "Melee" then
-		params = {
-			LastFireTime = equipment.LastFireTime,
-		}
-	end
-	fireInventoryClient(plr, "Add", equipment, params or nil)
-end)
-
-InventoryManager.Listen("Remove", function(plr, equipment)
-	fireInventoryClient(plr, "Remove", equipment)
-end)
-
-InventoryManager.Listen("Equip", InventoryManager.UpdateAmmo)
-
-InventoryManager.Listen("Unequip", function(plr, equipment)
-	if equipment.Kind ~= "Gun" then
-		return
-	end
-
-	if equipment.Reloading then
-		task.cancel(equipment.Reloading)
-		equipment.Reloading = nil
-		ReplicatedStorage.ServerClient.SetReloadingStatus:FireClient(plr, equipment.Base.Name)
-
-		if plr.Character and plr.Character.PrimaryPart then
-			local sound = plr.Character.PrimaryPart:FindFirstChild("ReloadSound") :: Sound?
-			if sound then
-				sound:Stop()
-			end
-		end
-	end
-end)
-
-InventoryManager.InvEvent.OnServerEvent:Connect(function(plr: Player, event: unknown, equipmentName: unknown, switching: unknown, cameraRayInfo: unknown)
-	if typeof(equipmentName) ~= "string" then
-		return
-	end
-
-	local inventory = InventoryManager.GetInventory(plr)
-	local foundEquipment: ItemTypes.Item?
-	for _, v in inventory do
-		if v.Base.Name == equipmentName then
-			foundEquipment = v
-			break
-		end
-	end
-
-	local char = plr.Character
-	if not foundEquipment or not char or not char.PrimaryPart then
-		return
-	end
-
-	if event == "Equip" then
-		InventoryManager.Equip(plr, foundEquipment)
-	elseif event == "Unequip" then
-		InventoryManager.Unequip(plr, foundEquipment, switching :: boolean?)
-	elseif event == "Drop" then
-		if typeof(cameraRayInfo) ~= "Ray" then
-			return
-		end
-		InventoryManager.Drop(plr, foundEquipment, char:GetPivot().Position + cameraRayInfo.Direction.Unit * 10)
-	end
 end)
 
 ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)
@@ -191,3 +96,4 @@ ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target: u
 end
 
 require(script.Parent.MagnetoStick)
+require(script.Parent.RoundHandler)
