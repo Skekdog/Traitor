@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-local Adapters = require(script.Parent.Adapters)
 local Types = require(script.Parent.Parent.ReplicatedFirst.RoundRule.Types)
 local RestartServer = require(script.Parent.RestartServer)
 local RoundHandler = require(script.Parent.RoundHandler)
@@ -15,11 +14,16 @@ local function isAdmin(plr: Player)
 	return plr.UserId == meId or plr.UserId < 0
 end
 
+local function send(message: string): ()
+    local round = RoundHandler.GetRound()
+    round:SendMessage(Players:GetPlayers(), message)
+end
+
 TeleportService.TeleportInitFailed:Connect(function(plr, result, errorMessage)
     if result == Enum.TeleportResult.Unauthorized then
-        Adapters.SendMessage("Teleport failed because at least 1 player is not authorised.", "error", "other", true)
+        send("Teleport failed because at least 1 player is not authorised.")
     else
-        Adapters.SendMessage(`Teleport failed: {errorMessage}`, "error", "other", true)
+        send(`Teleport failed: {errorMessage}`)
     end
 end)
 
@@ -42,12 +46,12 @@ end
 
 local function pause(): Types.Round?
     local round = RoundHandler.GetRound()
-    if not round or not round:IsInProgress() then
-        return Adapters.SendMessage("Failed to pause as there is no round in progress.", "error", "other", true)
+    if not round:IsInProgress() then
+        return send("Failed to pause as there is no round in progress.")
     end
 
     round:PauseRound(not round:GetIsRoundPaused())
-    Adapters.SendMessage(if round:GetIsRoundPaused() then "Round paused." else "Round unpaused.", "info", "other", true)
+    send(if round:GetIsRoundPaused() then "Round paused." else "Round unpaused.")
 
     if not round:GetIsRoundPaused() then
         if oldVictory then
@@ -57,10 +61,6 @@ local function pause(): Types.Round?
     ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round:GetIsRoundPaused())
 
     return round
-end
-
-local function send(message: string): ()
-    Adapters.SendMessage(message, "info", "other", true)
 end
 
 Players.PlayerAdded:Connect(function(plr: Player)
@@ -89,23 +89,19 @@ Players.PlayerAdded:Connect(function(plr: Player)
         elseif cmd == "!pause" and isAdmin(plr) then
             pause()
         elseif cmd == "!restart" and plr.UserId == meId then
-            Adapters.SendMessage("Server restarting...", "info", "update", true) -- type is update to be consistent with RoundHandler restarts
+            send("Server restarting...")
             RestartServer(5)
         elseif cmd == "!pausevictory" and isAdmin(plr) then
             local round = RoundHandler.GetRound()
-            if round and round:GetIsRoundPaused() then
+            if round:GetIsRoundPaused() then
                 if oldVictory then
                     pause()
-                    return Adapters.SendMessage("Re-enabled victory.", "info", "other", true)
+                    return send("Re-enabled victory.")
                 end
-                return Adapters.SendMessage("Round is already paused.", "error", "other", true)
+                return send("Round is already paused.")
             end
 
             pause()
-            
-            if not round then
-                return
-            end
 
             deaths = {}
             if round:GetIsRoundPaused() then
@@ -123,7 +119,7 @@ Players.PlayerAdded:Connect(function(plr: Player)
                 return send("Missing Argument 2")
             end
             local round = RoundHandler.GetRound()
-            if not round or not round:IsInProgress() then
+            if not round:IsInProgress() then
                 return send("Failed to end round as there is no round in progress.")
             end
 
