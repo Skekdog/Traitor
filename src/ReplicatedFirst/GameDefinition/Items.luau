@@ -966,4 +966,12 @@ for i, v in grenades do
     allItems[i] = v
 end
 
+for i, v in melees do
+    allItems[i] = v
+end
+
+for i, v in items do
+    allItems[i] = v
+end
+
 return allItems
