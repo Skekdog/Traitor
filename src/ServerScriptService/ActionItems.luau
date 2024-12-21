@@ -1,16 +1,14 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local CreateEmptyPart = require(ReplicatedFirst.CreateEmptyPart)
-local InventoryManager = require(ServerScriptService.InventoryManagerServer)
 local Items = require(ReplicatedFirst.Items)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
+local Types = require(ReplicatedFirst.RoundRule.Types)
 local module = {}
 
 local serverClient = ReplicatedStorage.ServerClient
 
-type Relationship = "__This" | Types.RoleRelationship | "__Part_"
+type Relationship = "__This" | "__Part_" | "__Ally" | "__Enemy" | "__All" | string
 
 local counters: {[string]: number?} = {}
 
@@ -50,40 +48,18 @@ local function getMatchingParticipants(participant: Types.Participant, compariso
     end
 
     local round = participant.Round
-
-    local participants = {}
-    if comparison:sub(1, 7) ~= "__Part_" then
-        local validRoles
-        if comparison == "__All" then
-            validRoles = round.Gamemode.Roles
-        else
-            validRoles = {}
-            for _, v in round.Gamemode.Roles do
-                if round:CompareRoles(participant.Role, v, comparison) then
-                    table.insert(validRoles, v)
-                end
-            end
+    if comparison == "__All" then
+        local participants = {}
+        for _, v in round:GetParticipants() do
+            assert(v)
+            table.insert(participants, v)
         end
-        
-        for _, v in validRoles do
-            table.move(round:GetParticipantsWithRole(v.Name), 1, 0, 1, participants)
-        end
-    else
-        local part = participant.Round.Map.Map:FindFirstChild(comparison:split("__Part_")[1]) --todo: this should be Map.Dynamic
-        assert(part, "Part not found")
-        assert(part:IsA("BasePart"), "Part must be a BasePart")
-        local function isPointInside(point: Vector3)
-            local v3 = part.CFrame:PointToObjectSpace(point)
-            return (math.abs(v3.X) <= part.Size.X / 2) and (math.abs(v3.Y) <= part.Size.Y / 2) and (math.abs(v3.Z) <= part.Size.Z / 2)
-        end
-        for _, v in round.Participants do
-            if isPointInside(v.Character:GetPivot().Position) then
-                table.insert(participants, v)
-            end
-        end
+        return participants
     end
 
-    return participants
+    --todo: Implement __Part_ and __Ally and __Enemy
+
+    return {}
 end
 
 local function interpretStringParameter(parameter: string): string
@@ -146,7 +122,7 @@ function module.Actions.GiveItem(actionItem: Model, participant: Types.Participa
 
     assert(Items[item], "Invalid item "..item)
 
-    InventoryManager.NewItem(Items[item], nil, participant.Round, participant.Player)
+    participant:GiveItemFromItemDefinition(Items[item])
 end
 
 function module.Actions.SpawnProp(actionItem: Model, participant: Types.Participant, prop: unknown, cframe: unknown, relative: unknown): ()
@@ -163,7 +139,7 @@ function module.Actions.SpawnProp(actionItem: Model, participant: Types.Particip
 
     assert(not relative or typeof(relative) == "boolean", "Parameter 3 must be nil or a boolean")
 
-    local props = participant.Round.Map:FindFirstChild("Props")
+    local props = participant.Round:GetMap().Props
     assert(props, "Map does not have a props folder")
 
     prop = interpretStringParameter(prop)
@@ -192,20 +168,15 @@ function module.Actions.TriggerVictory(_, participant: Types.Participant, team: 
     if team == "__This" then
         round:EndRound(participant)
     elseif team == "__ThisRole" then
-        round:EndRound(participant.Role)
+        local role = assert(participant:GetRole(), "Participant has no role")
+        round:EndRound(role)
     else
-        round:EndRound(round:GetRoleFromName(team))
+        round:EndRound(round:GetRoleFromRoleName(team))
     end
 end
 
 function module.Actions.ExplosiveBarrel(actionItem: Model, participant: Types.Participant): ()
-    local WeaponsManager = require(script.Parent.WeaponsManager)
-    WeaponsManager.CreateExplosion(actionItem:GetPivot().Position, {
-        Kind = "Explosion",
-        Radius = 25,
-        Pressure = 50,
-        Damage = 150,
-    }, participant)
+    --todo: implement this
 end
 
 function module.Actions.IncrementCounter(_, _, name: unknown, amount: unknown): ()
@@ -246,7 +217,9 @@ function module.Actions.MoveMapElement(actionItem: Model, participant: Types.Par
 
     assert(typeof(relative) == "boolean" or not relative, "Parameter 3 must be boolean or nil")
 
-    local element = if name == "__This" then actionItem else participant.Round.Map.Map:FindFirstChild(name, true)
+    local dynamicMap = assert(participant.Round:GetMap().DynamicMap, "Map does not have a dynamic map")
+
+    local element = if name == "__This" then actionItem else dynamicMap:FindFirstChild(name, true)
     assert(element, `Map element with name {name} was not found`)
     assert(element:IsA("PVInstance"), `Map element with name {name} is not a moveable Instance (PVInstance)! Check that there are no elements with an identical name.`)
 
@@ -275,11 +248,12 @@ function module.Actions.Teleport(actionItem: Model, participant: Types.Participa
     for _, v in participants do
         local to = cframe
         if relativeTo == "__Player" then
-            to *= v.Character:GetPivot()
+            local character = assert(v:GetCharacter(), "Participant has no character")
+            to *= character:GetPivot()
         elseif relativeTo == "__This" then
             to *= actionItem:GetPivot()
         end
-        v.Character:PivotTo(cframe)
+        assert(v:GetCharacter(), "Participant has no character"):PivotTo(cframe)
     end
 end
 
@@ -295,7 +269,11 @@ function module.Actions.Kill(_, participant: Types.Participant, targets: unknown
 
     local participants = getMatchingParticipants(participant, targets)
     for _, v in participants do
-        v:TakeDamage(math.huge, if credit then participant else nil, cause :: Types.DeathType)
+        v:TryTakeDamage({
+            Amount = math.huge,
+            Attacker = if credit then participant else nil,
+            Source = cause :: Types.DamageSource
+        })
     end
 end
 
@@ -346,10 +324,11 @@ local function getCounter(participant: Types.Participant, counter: string): numb
     elseif counter == "__Health" then
         return participant:GetHealth()
     elseif counter == "__RoundInProgress" then
-        return if participant.Round:IsRoundInProgress() then 1 else 0
+        return if participant.Round:IsInProgress() then 1 else 0
     elseif counter == "__Score" then
         local total = 0
-        for _, v in participant.Score do
+        for _, v in participant:GetScores() do
+            assert(v)
             total += v
         end
         return total
@@ -359,23 +338,26 @@ local function getCounter(participant: Types.Participant, counter: string): numb
     return counters[counter] or 0
 end
 
-local function getRoleEq(role: Types.Role, operator: "==" | "?=" | string): Types.RoleName
+local function getRoleEq(role: Types.Role, operator: "==" | "?=" | string): string
     if operator == "?=" then
-        return role.Allegiance or role.Name
+        if role.Allegiance then
+            return if role.Allegiance.Kind == "Role" then role.Allegiance.Role else role.Name
+        end
+        return role.Name
     elseif operator == "==" then
         return role.Name
     end
     error("Invalid operator for role comparison")
 end
 
-local function getConditionalParameterValue(participant: Types.Participant, parameter: string, operator: string): Types.RoleName | number
+local function getConditionalParameterValue(participant: Types.Participant, parameter: string, operator: string): string | number
     if tonumber(parameter) then
         return tonumber(parameter) :: number
     elseif parameter:sub(1, 1) == `"` and parameter:sub(-1) == `"` then
-        return getRoleEq(participant.Round:GetRoleFromName(parameter:sub(2, -2)), operator)
+        return getRoleEq(participant.Round:GetRoleFromRoleName(parameter:sub(2, -2)), operator)
     elseif parameter:sub(1, 2) == "__" then
         if parameter == "__This" then
-            return getRoleEq(participant.Role, operator)
+            return getRoleEq(assert(participant:GetRole(), "Participant has no role"), operator)
         end
     else
         return getCounter(participant, parameter)
