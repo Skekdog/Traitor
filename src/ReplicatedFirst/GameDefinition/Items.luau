@@ -912,6 +912,24 @@ grenades["Discombobulator"] = {
     FiredSound = firedSounds("Grenade"),
 }
 
+local melees: {[string]: Types.MeleeWeaponDefinition} = {}
+melees.Crowbar = {
+    Kind = "Melee" :: "Melee",
+    Name = "Crowbar",
+    
+    Slot = 1,
+    CanDrop = false,
+
+    Model = models("Crowbar"),
+    HoldAnimation = "10247423634",
+    AttackAnimation = "13269497293",
+
+    MaxDistance = 7,
+    Damage = 20,
+    AttackInterval = 0.3,
+    FiredSound = firedSounds("Crowbar"),
+}
+
 local allItems: {[string]: Types.AnyItemDefinition} = {}
 
 for i, v in guns do
