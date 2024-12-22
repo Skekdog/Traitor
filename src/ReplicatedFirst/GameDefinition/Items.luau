@@ -995,6 +995,15 @@ items.Radar = {
     end
 }
 
+items["Ballistic Vest"] = {
+    Kind = "Item" :: "Item",
+    Name = "Ballistic Vest",
+
+    OnPurchase = function(item: Types.Item, participant: Types.Participant)
+        participant.Extras.BallisticVest = 60
+    end,
+}
+
 local allItems: {[string]: Types.AnyItemDefinition} = {}
 
 for i, v in guns do
