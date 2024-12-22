@@ -948,12 +948,51 @@ items["DNA Scanner"] = {
     Kind = "Item" :: "Item",
     Name = "DNA Scanner",
     Slot = 9,
-    CanDrop = false,
+    CanDrop = true,
 
     Model = models("DNA Scanner"),
     HoldAnimation = "10247423634",
 
     PrimaryHint = "Scan Identified Body",
+}
+
+local radarPoint = ReplicatedStorage:WaitForChild("RadarPoint")
+items.Radar = {
+    Kind = "Item" :: "Item",
+    Name = "Radar",
+
+    HeartbeatClient = function(item: Types.Item)
+        local lastScan: number = item.Extras.LastScan or 0
+
+        local timeNow = workspace:GetServerTimeNow()
+        if timeNow - lastScan < 30 then
+            return
+        end
+
+        item.Extras.LastScan = timeNow
+
+        workspace.RadarPoints:ClearAllChildren()
+
+        for _, v in Players:GetPlayers() do
+            local char = v.Character
+            if not char or v == Players.LocalPlayer then
+                continue
+            end
+
+            local root = char.PrimaryPart
+            local hum = char:FindFirstChildOfClass("Humanoid")
+
+            if not root or not hum or hum.Health <= 0 then
+                continue
+            end
+
+            local clone = radarPoint:Clone()
+            clone:PivotTo(root.CFrame)
+            clone.RadarPoint.TextLabel.Text = tostring(math.round(v:DistanceFromCharacter(root.Position)))
+            clone.RadarPoint.Enabled = true
+            clone.Parent = workspace.RadarPoints
+        end
+    end
 }
 
 local allItems: {[string]: Types.AnyItemDefinition} = {}
