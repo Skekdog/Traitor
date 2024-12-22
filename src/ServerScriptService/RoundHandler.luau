@@ -1,13 +1,16 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local Maps = require(script.Parent.Maps)
 local Elimination = require(script.Parent.Parent.ReplicatedFirst.GameDefinition.Gamemodes.Elimination)
 local Round = require(script.Parent.Parent.ReplicatedFirst.RoundRule.Round)
 local Types = require(ReplicatedFirst.RoundRule.Types)
 
 local module = {}
 
-local function newRound()
-    return Round.new(Elimination)
+local function newRound(): Types.Round
+    local round = Round.new(Elimination)
+    round:LoadMap(Maps.Skyscraper)
+    return round
 end
 
 local round = newRound()
