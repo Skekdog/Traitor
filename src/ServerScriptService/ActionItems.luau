@@ -1,8 +1,8 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local Items = require(script.Parent.Parent.ReplicatedFirst.GameDefinition.Items)
 local CreateEmptyPart = require(ReplicatedFirst.CreateEmptyPart)
-local Items = require(ReplicatedFirst.Items)
 local Types = require(ReplicatedFirst.RoundRule.Types)
 local module = {}
 
@@ -120,7 +120,7 @@ function module.Actions.GiveItem(actionItem: Model, participant: Types.Participa
 
     item = interpretStringParameter(item)
 
-    assert(Items[item], "Invalid item "..item)
+    assert(Items[item], "Invalid item " .. item)
 
     participant:GiveItemFromItemDefinition(Items[item])
 end
