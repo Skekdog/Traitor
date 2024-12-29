@@ -1,7 +1,8 @@
 -- Made by VroIok, last updated on 9/1/24 | Version 2.4
 
 local Players = game:GetService("Players")
-local FootstepIDs = require(script.Parent.Parent.ReplicatedFirst.FootstepIDs)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FootstepIDs = require(ReplicatedStorage.FootstepIDs)
 
 local function update(currentSound: Sound, id: string, volume: number, playbackSpeed: number)
     currentSound.SoundId = id

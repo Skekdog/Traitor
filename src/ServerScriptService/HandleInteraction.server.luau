@@ -1,7 +1,5 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ActionItems = require(script.Parent.ActionItems)
-local StandardDoor = require(ReplicatedFirst.StandardDoor)
 
 local function isAlive(plr: Player, targetPart: BasePart): boolean
 	local char = plr.Character

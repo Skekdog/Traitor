@@ -1,10 +1,9 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local Elimination = require(script.Parent.Parent.ReplicatedFirst.GameDefinition.Gamemodes.Elimination)
-local Round = require(script.Parent.Parent.ReplicatedFirst.RoundRule.Round)
-local Types = require(ReplicatedFirst.RoundRule.Types)
+local Elimination = require(ReplicatedStorage.GameDefinition.Gamemodes.Elimination)
+local Round = require(ReplicatedStorage.RoundRule.Round)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local maps = ServerStorage.Maps
 

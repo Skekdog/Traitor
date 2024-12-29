@@ -1,5 +1,5 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-local CreateEmptyPart = require(ReplicatedFirst.CreateEmptyPart)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CreateEmptyPart = require(ReplicatedStorage.CreateEmptyPart)
 
 type SoundId = number | Sound | string
 

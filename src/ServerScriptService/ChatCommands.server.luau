@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-local Types = require(script.Parent.Parent.ReplicatedFirst.RoundRule.Types)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local RestartServer = require(script.Parent.RestartServer)
 local RoundHandler = require(script.Parent.RoundHandler)
 
