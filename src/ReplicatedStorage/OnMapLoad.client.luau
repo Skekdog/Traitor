@@ -1,8 +1,8 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
 local SettingsManager = require(script.Parent.SettingsManager)
-local UIManager = require(ReplicatedFirst.UIManager)
+local UIManager = require(ReplicatedStorage.UIManager)
 
 local creditPopupUI = UIManager.WaitForUI("Credits") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Credits)}
 local playerlistUI = UIManager.WaitForUI("Playerlist") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Playerlist)}

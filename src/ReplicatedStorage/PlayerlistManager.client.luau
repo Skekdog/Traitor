@@ -1,5 +1,4 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundRule.Types)
@@ -17,7 +16,6 @@ local layoutOrders = {
 	["Spectating"] = 3000,
 }
 
-local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
 local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
 
 type PlayerElement = typeof(ui.PlayerFrame)
@@ -195,13 +193,6 @@ LocalRoundInfo.Listen("PlayerStatus", function()
 	end
 end, true)
 
-roundHandlerEvents.CorpseSearched.OnClientEvent:Connect(function(name: string)
-	local element = findPlr(name)
-	if element then
-		element.SearchedIcon.Visible = true
-	end
-end)
-
 LocalRoundInfo.Listen("Gamemode", function()
 	local gamemode = LocalRoundInfo.GetGamemode()
 	if not gamemode then
@@ -211,9 +202,5 @@ LocalRoundInfo.Listen("Gamemode", function()
 	info.RoundInfo.Info.Gamemode.Text = "Gamemode: " .. (gamemode.DisplayName or gamemode.Name)
 	info.RoundInfo.Creators.Gamemode.Text = gamemode.Authors
 end, true)
-
-ReplicatedFirst.RoundRule.Remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(...)
-	print(...)
-end)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)

@@ -1,12 +1,12 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Map = require(script.Parent.RoundRule.Map)
 local Role = require(script.Parent.RoundRule.Role)
 local Types = require(script.Parent.RoundRule.Types)
 local module = {}
 
-local replicatedData = ReplicatedFirst.RoundRule.ReplicatedData
-local remotes = ReplicatedFirst.RoundRule.Remotes
+local replicatedData = ReplicatedStorage.RoundRule.ReplicatedData
+local remotes = ReplicatedStorage.RoundRule.Remotes
 
 local listeners: {[string]: {() -> ()}?} = {}
 
@@ -46,7 +46,7 @@ local function onGamemodeChanged()
         return runCallbacks("Gamemode")
     end
 
-    local object = ReplicatedFirst.GameDefinition.Gamemodes:FindFirstChild(name)
+    local object = ReplicatedStorage.GameDefinition.Gamemodes:FindFirstChild(name)
     if object then
         gamemode = (require)(object)
     else

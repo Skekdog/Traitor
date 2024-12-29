@@ -27,11 +27,19 @@ for _, layer in {"Popup", "HUD", "Special", "Buttons"} do
 end
 
 manager.RegisterUI(manager.UnregisteredUIs.Sidebar)
-for _, object in manager.UnregisteredUIs:GetChildren() do
+
+local function register(object)
+	print("Registering", object.Name)
 	if object:GetAttribute("DoNotRegister") then
-		continue
+		return
 	end
+	
 	manager.RegisterUI(object :: GuiObject)
+end
+
+manager.UnregisteredUIs.ChildAdded:Connect(register)
+for _, object in manager.UnregisteredUIs:GetChildren() do
+	register(object)
 end
 
 local ControlManager = require(script.Parent.Parent.Parent.ControlManager)

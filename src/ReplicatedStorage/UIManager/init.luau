@@ -1,8 +1,7 @@
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 
-local ControlManager = require(ReplicatedFirst.ControlManager)
+local ControlManager = require(script.Parent.ControlManager)
 local UIAnimation = require(script.Parent.UIAnimation)
 
 local plr = Players.LocalPlayer
@@ -147,9 +146,6 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	
 	if self.Sidebar then
 		local sb = UIManager.GetUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
-		if not ReplicatedFirst:GetAttribute("ControlsReady") then
-			ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
-		end
 
 		local but = sb.Button:Clone()
 		but.Name = self.Name

@@ -5,7 +5,6 @@
 
 local CS = game:GetService("CollectionService")
 local CAS = game:GetService("ContextActionService")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIS = game:GetService("UserInputService")
 local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
 local SettingsManager = require(script.Parent.SettingsManager)
@@ -149,10 +148,6 @@ end
 
 -- Returns the Button if it was created
 function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> Enum.ContextActionResult): ImageButton?
-	if not ReplicatedFirst:GetAttribute("ControlsReady") then
-		ReplicatedFirst:GetAttributeChangedSignal("ControlsReady"):Wait()
-	end
-
 	if registered[actionName] then
 		CAS:UnbindAction(actionName)
 	end

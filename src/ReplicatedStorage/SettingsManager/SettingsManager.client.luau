@@ -1,4 +1,3 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local UIS = game:GetService("UserInputService")
 local CAS = game:GetService("ContextActionService")
 local GUI = game:GetService("GuiService")
@@ -31,14 +30,13 @@ if options then
 		SM.SetSetting(i, v)
 	end
 end
-ReplicatedFirst:SetAttribute("ControlsReady", true)
 
 local UIAnimation = require(script.Parent.Parent.UIAnimation)
 local ScreenMessage = require(script.Parent.Parent.ScreenMessage)
 local TextInput = require(script.Parent.Parent.TextInput)
 
-local UIManager = require(ReplicatedFirst.UIManager)
-local Controls = require(ReplicatedFirst.ControlManager)
+local UIManager = require(ReplicatedStorage.UIManager)
+local Controls = require(ReplicatedStorage.ControlManager)
 
 local pageBase = script.__TabPage
 local tabBase = script.__Tab

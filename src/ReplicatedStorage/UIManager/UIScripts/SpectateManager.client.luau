@@ -1,11 +1,11 @@
 local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = Players.LocalPlayer
 
 local Freecam = require(script.Parent.Parent.Parent.Freecam)
-local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
-local uiManager = require(ReplicatedFirst.UIManager)
-local controls = require(ReplicatedFirst.ControlManager)
+local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+local uiManager = require(ReplicatedStorage.UIManager)
+local controls = require(ReplicatedStorage.ControlManager)
 
 local camera = workspace.CurrentCamera
 local ui = uiManager.WaitForUI("Spectate")

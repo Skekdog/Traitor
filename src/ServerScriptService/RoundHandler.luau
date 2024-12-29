@@ -40,7 +40,7 @@ end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
 
-ReplicatedStorage:WaitForChild("RoundHandler").JoinRound.OnServerInvoke = function(player: Player): boolean?
+ReplicatedStorage.ClientServer.JoinRound.OnServerInvoke = function(player: Player): boolean?
     if not round:IsPreGame() then
         return false
     end
