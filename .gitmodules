@@ -1,4 +1,4 @@
 
-[submodule "src/ReplicatedFirst/RoundRule"]
-	path = src/ReplicatedFirst/RoundRule
+[submodule "src/ReplicatedStorage/RoundRule"]
+	path = src/ReplicatedStorage/RoundRule
 	url = ../RoundRule
