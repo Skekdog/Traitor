@@ -87,7 +87,7 @@ local gamemode: Types.Gamemode = {
     StartingItems = {Items.Crowbar},
 
     Duration = function(numParticipants: number)
-        return 60 + 10 * numParticipants
+        return 0 + 10 * numParticipants
     end,
 
     Roles = roles,

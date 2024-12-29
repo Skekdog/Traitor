@@ -28,8 +28,7 @@ end
 
 manager.RegisterUI(manager.UnregisteredUIs.Sidebar)
 
-local function register(object)
-	print("Registering", object.Name)
+local function register(object: Instance)
 	if object:GetAttribute("DoNotRegister") then
 		return
 	end
