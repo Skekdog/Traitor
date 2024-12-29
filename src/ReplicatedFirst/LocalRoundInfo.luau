@@ -10,12 +10,16 @@ local listeners: {[string]: {() -> ()}?} = {}
 
 type CallbackName = "Map" | "Gamemode" | "Role" | "Phase" | "Credits" | "PlayerStatus" | "PlayerRole"
 
-function module.Listen(name: CallbackName, callback: () -> ())
+function module.Listen(name: CallbackName, callback: () -> (), runImmediately: boolean?): ()
     if not listeners[name] then
         listeners[name] = {}
     end
 
     table.insert(listeners[name] :: {}, callback)
+
+    if runImmediately then
+        task.defer(callback)
+    end
 end
 
 local function runCallbacks(name: CallbackName): ()
