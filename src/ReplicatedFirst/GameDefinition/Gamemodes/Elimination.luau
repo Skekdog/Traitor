@@ -22,9 +22,9 @@ local function getBestParticipant(gamemode: Types.Gamemode, round: Types.Round):
     return bestParticipant or error("No participants in round")
 end
 
-local roles: {[string]: Types.Role} = {
+local roles: {[string]: Types.RoleDefinition} = {
     Competitor = {
-        Kind = "Role",
+        Kind = "RoleDefinition",
         Name = "Competitor",
         Description = "Last player standing wins",
         Color = Color3.fromRGB(255, 176, 7),

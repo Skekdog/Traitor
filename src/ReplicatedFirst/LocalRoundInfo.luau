@@ -1,5 +1,6 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local Map = require(script.Parent.RoundRule.Map)
+local Role = require(script.Parent.RoundRule.Role)
 local Types = require(script.Parent.RoundRule.Types)
 local module = {}
 
@@ -64,7 +65,7 @@ end
 
 local function getRoleFromName(name: string): Types.Role
     assert(gamemode, "Gamemode is not loaded")
-    return gamemode.Roles[name] or error("Role not found")
+    return Role.fromDefinition(gamemode.Roles[name] or error("Role not found"))
 end
 
 remotes.AssignRole.OnClientEvent:Connect(function(name: string?)
