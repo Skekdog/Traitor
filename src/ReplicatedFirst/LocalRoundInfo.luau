@@ -1,4 +1,5 @@
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local Map = require(script.Parent.RoundRule.Map)
 local Types = require(script.Parent.RoundRule.Types)
 local module = {}
 
@@ -7,7 +8,7 @@ local remotes = ReplicatedFirst.RoundRule.Remotes
 
 local listeners: {[string]: {() -> ()}?} = {}
 
-type CallbackName = "Gamemode" | "Role" | "Phase" | "Credits" | "PlayerStatus" | "PlayerRole"
+type CallbackName = "Map" | "Gamemode" | "Role" | "Phase" | "Credits" | "PlayerStatus" | "PlayerRole"
 
 function module.Listen(name: CallbackName, callback: () -> ())
     if not listeners[name] then
@@ -112,5 +113,30 @@ remotes.UpdatePlayerRole.OnClientEvent:Connect(function(player: Player, name: st
     playerRoles[player] = getRoleFromName(name)
     runCallbacks("PlayerRole")
 end)
+
+local map: Types.Map?
+local mapScript = workspace:FindFirstChild("Map")
+if mapScript then
+    if mapScript:IsA("ModuleScript") then
+        map = Map.fromModuleScript(mapScript)
+    end
+end
+
+workspace.ChildAdded:Connect(function(child)
+    if not child:IsA("ModuleScript") or child.Name ~= "Map" then
+        return
+    end
+
+    if #child:GetChildren() < 1 then
+        child.ChildAdded:Wait()
+    end
+
+    map = Map.fromModuleScript(child)
+    runCallbacks("Map")
+end)
+
+function module.GetMap(): Types.Map?
+    return map
+end
 
 return module

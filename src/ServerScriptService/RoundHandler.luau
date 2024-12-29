@@ -5,11 +5,13 @@ local Elimination = require(script.Parent.Parent.ReplicatedFirst.GameDefinition.
 local Round = require(script.Parent.Parent.ReplicatedFirst.RoundRule.Round)
 local Types = require(ReplicatedFirst.RoundRule.Types)
 
+local maps = ServerStorage.Maps
+
 local module = {}
 
 local function newRound(): Types.Round
     local round = Round.new(Elimination)
-    round:LoadMap(ServerStorage.Maps.Skyscraper)
+    round:LoadMap(maps.Skyscraper)
     return round
 end
 
