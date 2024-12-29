@@ -1,3 +1,4 @@
+error("DNA Scanner is disabled")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UIManager = require(script.Parent.Parent)
