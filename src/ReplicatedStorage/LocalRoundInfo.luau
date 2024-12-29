@@ -59,26 +59,10 @@ end
 replicatedData:GetAttributeChangedSignal("Gamemode"):Connect(onGamemodeChanged)
 onGamemodeChanged()
 
-local role: Types.Role?
-function module.GetRole(): Types.Role?
-    return role
-end
-
 local function getRoleFromName(name: string): Types.Role
     assert(gamemode, "Gamemode is not loaded")
     return Role.fromDefinition(gamemode.Roles[name] or error("Role not found"))
 end
-
-remotes.AssignRole.OnClientEvent:Connect(function(name: string?)
-    if not name then
-        role = nil
-        return runCallbacks("Role")
-    end
-
-    role = getRoleFromName(name)
-
-    runCallbacks("Role")
-end)
 
 local credits: number = 0
 function module.GetCredits(): number

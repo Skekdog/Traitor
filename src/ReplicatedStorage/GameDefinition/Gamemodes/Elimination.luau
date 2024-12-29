@@ -27,6 +27,7 @@ local roles: {[string]: Types.RoleDefinition} = {
         Kind = "RoleDefinition",
         Name = "Competitor",
         Description = "Last player standing wins",
+        Sound = "rbxassetid://9042088276",
         Color = Color3.fromRGB(255, 176, 7),
 
         Allegiance = {Kind = "Solo"},
