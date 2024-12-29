@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local Map = require(script.Parent.RoundRule.Map)
 local Role = require(script.Parent.RoundRule.Role)
@@ -104,7 +105,22 @@ function module.GetPlayerStatus(player: Player): Types.ParticipantStatus
     return playerStatuses[player] or "Spectating"
 end
 
-remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(player: Player, status: Types.ParticipantStatus?)
+local function getPlayerFromName(name: string): Player?
+    for _, player in Players:GetPlayers() do
+        if player.Name == name then
+            return player
+        end
+    end
+
+    return nil
+end
+
+remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(name: string, status: Types.ParticipantStatus?)
+    local player = getPlayerFromName(name)
+    if not player then
+        return
+    end
+
     playerStatuses[player] = status
     runCallbacks("PlayerStatus")
 end)
@@ -114,8 +130,13 @@ function module.GetPlayerRole(player: Player): Types.Role?
     return playerRoles[player]
 end
 
-remotes.UpdatePlayerRole.OnClientEvent:Connect(function(player: Player, name: string)
-    playerRoles[player] = getRoleFromName(name)
+remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: string)
+    local player = getPlayerFromName(name)
+    if not player then
+        return
+    end
+
+    playerRoles[player] = getRoleFromName(roleName)
     runCallbacks("PlayerRole")
 end)
 

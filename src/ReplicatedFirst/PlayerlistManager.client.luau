@@ -1,11 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CorpseInfo = require(script.Parent.CorpseInfo)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
-local UIManager = require(script.Parent.Parent)
-local ThemesManager = require(script.Parent.Parent.Parent.ThemesManager)
-local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local Types = require(script.Parent.RoundRule.Types)
+local ThemesManager = require(script.Parent.ThemesManager)
+local UIManager = require(script.Parent.UIManager)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local info = ui.Info
@@ -54,14 +53,8 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	if not clone then
 		return
 	end
-	local participant: Types.ClientOwnParticipant | Types.ClientParticipant?
-	if plr == Players.LocalPlayer then
-		participant = LocalRoundInfo.GetOwnParticipant()
-	else
-		participant = LocalRoundInfo.GetParticipantInfo(plr.Name)
-	end
 
-	local status = if participant then participant.Status else "Spectating"
+	local status = LocalRoundInfo.GetPlayerStatus(plr)
 
 	local marksVisible = (status == "Alive") and (plr ~= Players.LocalPlayer)
 	for _, v in clone.Marks:GetChildren() do
@@ -78,18 +71,13 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 
 	movePlr(plr, status :: any)
 
-	if not participant then
-		clone.Username:SetAttribute("KeepText")
-		return ThemesManager.UpdateThemeInstance(clone.Username)
-	end
-
-	local role = LocalRoundInfo.GetRole(participant.Role)
-	if role.Name == "" or LocalRoundInfo.GetRoundPhase() == "Destroy" then
+	local role = LocalRoundInfo.GetPlayerRole(plr)
+	if not role then
 		clone.Username:SetAttribute("KeepText")
 		ThemesManager.UpdateThemeInstance(clone.Username)
 	else
 		clone.Username:SetAttribute("KeepText", true)
-		clone.Username.TextColor3 = role.Colour
+		clone.Username.TextColor3 = role.Definition.Color
 	end
 end
 
@@ -124,7 +112,7 @@ local function createPlr(plr: Player)
 	clone.MouseButton1Click:Connect(function()
 		local order = (clone.LayoutOrder // 1000) * 1000
 		if order == layoutOrders["Dead"] or order == layoutOrders["Missing"] then
-			CorpseInfo(roundHandlerEvents.SearchCorpse:InvokeServer(plr.Name))
+			-- CorpseInfo(roundHandlerEvents.SearchCorpse:InvokeServer(plr.Name))
 		end
 	end)
 
@@ -133,8 +121,7 @@ local function createPlr(plr: Player)
 	return clone :: PlayerElement
 end
 
-type Status = "Alive" | "Missing" | "Dead" | "Spectating"
-local function recalculateCount(status: Status)
+local function recalculateCount(status: Types.ParticipantStatus)
 	local count = -1 -- Because this also counts the header
 	for _, v in list:GetChildren() do
 		if not v:IsA("GuiObject") then
@@ -149,30 +136,25 @@ local function recalculateCount(status: Status)
 	local label = list:FindFirstChild(status) :: TextLabel
 	label.Visible = count > 0
 
-	if status == "Dead" then
-		status = "Confirmed Dead" :: any
-	end
 	label.Text = `{status} ({count})`
 end
 
-local function getStatus(order: number): Status
+local function getStatus(order: number): Types.ParticipantStatus
 	order = (order // 1000) * 1000
 	for _, v in list:GetChildren() do
 		if not v:IsA("TextLabel") then
 			continue
 		end
 		if v.LayoutOrder == order then
-			local status = v.Text:split(" ")[1]
-			if status == "Confirmed" then
-				status = "Dead"
-			end
-			return status :: Types.ParticipantStatus
+			local status = v.Name:split(" ")[1]
+			assert(status == "Alive" or status == "Missing" or status == "Dead" or status == "Spectating", "Invalid status: " .. status)
+			return status
 		end
 	end
 	error("Failed to get status for order: "..order)
 end
 
-function movePlr(plr: Player, status: Status)
+function movePlr(plr: Player, status: Types.ParticipantStatus)
 	local clone = findPlr(plr.Name) or createPlr(plr)
 	local oldOrder = clone.LayoutOrder
 	clone.LayoutOrder = layoutOrders[status] + 1
@@ -201,19 +183,17 @@ end
 
 Players.PlayerRemoving:Connect(removePlr)
 
-LocalRoundInfo.Listen("UpdateOwnParticipant", function(player)
-	updatePlr(player, findPlr(player.Name) or createPlr(player))
-end)
+LocalRoundInfo.Listen("PlayerRole", function()
+	for _, v in Players:GetPlayers() do
+		updatePlr(v, findPlr(v.Name) or createPlr(v))
+	end
+end, true)
 
-LocalRoundInfo.Listen("UpdateParticipant", function(player: Player, participant: Types.ClientParticipant?)
-	if not player:IsDescendantOf(Players) then
-		return removePlr(player)
+LocalRoundInfo.Listen("PlayerStatus", function()
+	for _, v in Players:GetPlayers() do
+		updatePlr(v, findPlr(v.Name) or createPlr(v))
 	end
-	if not participant then
-		movePlr(player, "Spectating")
-	end
-	updatePlr(player, findPlr(player.Name) or createPlr(player))
-end)
+end, true)
 
 roundHandlerEvents.CorpseSearched.OnClientEvent:Connect(function(name: string)
 	local element = findPlr(name)
@@ -222,18 +202,18 @@ roundHandlerEvents.CorpseSearched.OnClientEvent:Connect(function(name: string)
 	end
 end)
 
--- There is probably a better way to do this
-LocalRoundInfo.Listen("MapName", function(mapName)
-	info.RoundInfo.Info.Map.Text = "Map: "..mapName
+LocalRoundInfo.Listen("Gamemode", function()
+	local gamemode = LocalRoundInfo.GetGamemode()
+	if not gamemode then
+		return
+	end
+
+	info.RoundInfo.Info.Gamemode.Text = "Gamemode: " .. (gamemode.DisplayName or gamemode.Name)
+	info.RoundInfo.Creators.Gamemode.Text = gamemode.Authors
 end, true)
-LocalRoundInfo.Listen("MapAuthors", function(mapCreator)
-	info.RoundInfo.Creators.Map.Text = mapCreator
-end, true)
-LocalRoundInfo.Listen("GamemodeName", function(gamemodeName)
-	info.RoundInfo.Info.Gamemode.Text = "Gamemode: "..gamemodeName
-end, true)
-LocalRoundInfo.Listen("GamemodeAuthors", function(gamemodeCreator)
-	info.RoundInfo.Creators.Gamemode.Text = gamemodeCreator
-end, true)
+
+ReplicatedFirst.RoundRule.Remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(...)
+	print(...)
+end)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
