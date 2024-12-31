@@ -10,7 +10,7 @@ local remotes = ReplicatedStorage.RoundRule.Remotes
 
 local listeners: {[string]: {() -> ()}?} = {}
 
-type CallbackName = "Map" | "Gamemode" | "Role" | "Phase" | "Credits" | "PlayerStatus" | "PlayerRole"
+type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole"
 
 function module.Listen(name: CallbackName, callback: () -> (), runImmediately: boolean?): ()
     if not listeners[name] then
@@ -83,9 +83,29 @@ function module.GetRoundPhase(): Types.RoundPhase
     return roundPhase
 end
 
+local advanceTime: number? = replicatedData:GetAttribute("AdvanceTime") :: number?
+function module.GetAdvanceTime(): number?
+    return advanceTime
+end
+
 replicatedData:GetAttributeChangedSignal("Phase"):Connect(function()
     roundPhase = replicatedData:GetAttribute("Phase") :: Types.RoundPhase? or "Waiting"
     runCallbacks("Phase")
+end)
+
+local paused: boolean = replicatedData:GetAttribute("Paused") :: boolean
+function module.IsPaused(): boolean
+    return paused
+end
+
+replicatedData:GetAttributeChangedSignal("Paused"):Connect(function()
+    paused = replicatedData:GetAttribute("Paused") :: boolean
+    runCallbacks("Paused")
+end)
+
+replicatedData:GetAttributeChangedSignal("AdvanceTime"):Connect(function()
+    advanceTime = replicatedData:GetAttribute("AdvanceTime") :: number?
+    runCallbacks("AdvanceTime")
 end)
 
 local playerStatuses: {[Player]: Types.ParticipantStatus?} = {}

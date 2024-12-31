@@ -40,67 +40,35 @@ LocalRoundInfo.Listen("PlayerRole", function()
     end
 end, true)
 
-local function update(roundPhase)
-    if roundPhase == "Destroy" then
-        for _, v in CollectionService:GetTagged("AllyMarker") do
-            v:Destroy()
-        end
+-- local function update(roundPhase)
+--     if roundPhase == "Destroy" then
+--         for _, v in CollectionService:GetTagged("AllyMarker") do
+--             v:Destroy()
+--         end
 
-        for _, v in Players:GetPlayers() do
-            v:SetAttribute("Mark", "")
-        end
+--         for _, v in Players:GetPlayers() do
+--             v:SetAttribute("Mark", "")
+--         end
 
-        LocalRoundInfo.SetSpectating(false)
+--         LocalRoundInfo.SetSpectating(false)
 
-        return
-    end
+--         return
+--     end
     
-    if roundPhase == "Highlights" then
-        local endInfo = LocalRoundInfo.GetRoundEndInfo()
-        assert(endInfo)
+--     if roundPhase == "Highlights" then
+--         local endInfo = LocalRoundInfo.GetRoundEndInfo()
+--         assert(endInfo)
 
-        local music = endInfo.Music
-        if not music then
-            return
-        end
-        local highlights = UIManager.WaitForUI("Highlights").Object :: typeof(UIManager.UnregisteredUIs.Highlights)
-        highlights.Page.Highlights.Music.Text.Text = music.Name
-    end
-end
+--         local music = endInfo.Music
+--         if not music then
+--             return
+--         end
+--         local highlights = UIManager.WaitForUI("Highlights").Object :: typeof(UIManager.UnregisteredUIs.Highlights)
+--         highlights.Page.Highlights.Music.Text.Text = music.Name
+--     end
+-- end
 
 roundHandlerEvents.VoteMap.OnClientEvent:Connect(MapVotingScreen)
-
-local timeTarget = LocalRoundInfo.GetTimeMilestone()
-local paused = false
-local lastTime = ""
-local function updateTimer(time: number)
-    if paused then
-		if math.round(time) % 2 == 1 then
-			roundInfo.TopBar.Timer.Text = "PAUSED"
-		else
-			roundInfo.TopBar.Timer.Text = lastTime
-		end
-		return
-	end
-
-	roundInfo.TopBar.Timer.Text = ToRoundTime(time, timeTarget)
-end
-
-task.spawn(function()
-    while true do
-        updateTimer(workspace:GetServerTimeNow())
-        task.wait()
-    end
-end)
-
-LocalRoundInfo.Listen("TimeMilestone", function(time)
-    timeTarget = time
-end)
-
-LocalRoundInfo.Listen("IsPaused", function(isPaused)
-    lastTime = roundInfo.TopBar.Timer.Text
-    paused = isPaused
-end)
 
 local equipmentShop: UIManager.UI?
 LocalRoundInfo.Listen("UpdateOwnParticipant", function(player: Player, participant: Types.ClientOwnParticipant?)
