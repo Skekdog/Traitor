@@ -21,7 +21,6 @@ local ShowAlert = require(script.Parent.ShowAlert)
 local StandardDoor = require(script.Parent.StandardDoor)
 local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
-local ShowMessage = require(script.Parent.UIManager.UIScripts.ShowMessage)
 local Viewmodel = require(script.Parent.Viewmodel)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
@@ -144,7 +143,6 @@ serverClient.SetMagnetoHintForCorpse.OnClientEvent:Connect(function(isCorpse: bo
     end
 end)
 serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
-ReplicatedStorage:WaitForChild("RoundHandler").SendMessage.OnClientEvent:Connect(ShowMessage)
 
 local function onMapChanged(m)
     local map = m :: Types.Map

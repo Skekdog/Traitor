@@ -1,13 +1,12 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
-
-local UIManager = require(ReplicatedFirst.UIManager)
-local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
-local SettingsManager = require(script.Parent.Parent.Parent.SettingsManager)
-local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
+local SettingsManager = require(script.Parent.SettingsManager)
+local UIAnimation = require(script.Parent.UIAnimation)
+local UIManager = require(script.Parent.UIManager)
+local Types = require(ReplicatedStorage.RoundRule.Types)
+
+local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 
 local global = ui.Global
 local priv = ui.Private
@@ -53,13 +52,12 @@ local function makeLabel(isTeam: boolean, text: string)
 	task.delay(2, fade, label, true)
 end
 
-local teamMessages: {Types.MessageType?} = {"creditsEarned"}
 local chatChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
 
-return function(msg: string, msgType: Types.MessageType)
-	if msgType == "other" then
+return function(msg: string, kind: Types.MessageKind)
+	if kind == "Chat" then
 		chatChannel:DisplaySystemMessage(msg)
 	else
-		makeLabel(table.find(teamMessages, msgType) ~= nil, msg)
+		makeLabel(kind == "Team", msg)
 	end
 end

@@ -16,8 +16,7 @@ end
 
 local function send(message: string): ()
     local round = RoundHandler.GetRound()
-    print(message)
-    round:SendMessage(Players:GetPlayers(), message)
+    round:SendMessage(Players:GetPlayers(), message, "Chat")
 end
 
 TeleportService.TeleportInitFailed:Connect(function(plr, result, errorMessage)
