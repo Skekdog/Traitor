@@ -16,6 +16,7 @@ end
 
 local function send(message: string): ()
     local round = RoundHandler.GetRound()
+    print(message)
     round:SendMessage(Players:GetPlayers(), message)
 end
 
@@ -27,40 +28,87 @@ TeleportService.TeleportInitFailed:Connect(function(plr, result, errorMessage)
     end
 end)
 
-local oldVictory: ((Types.Gamemode, Types.Participant) -> ())?
-
-local deaths: {Types.Participant} = {}
-
-local function unPauseVictory(round: Types.Round): ()
-    round.Gamemode.OnDeath = oldVictory or function() end
-    oldVictory = nil
-
-    if not round.Gamemode.OnDeath then
-        return
+local function toTestPlace(plr: Player)
+    if game.PlaceId == testPlace then
+        return send("You are already in test place, silly.")
     end
-    
-    for _, v in deaths do
-        round.Gamemode.OnDeath(round.Gamemode, v)
+
+    local targets = {plr}
+    if isAdmin(plr) then
+        targets = Players:GetPlayers()
+        send("Teleporting everyone to test place.")
+    else
+        send(`Teleporting {plr.Name} to test place.`)
     end
+
+    TeleportService:TeleportAsync(testPlace, targets)
 end
 
 local function pause(): Types.Round?
     local round = RoundHandler.GetRound()
-    if not round:IsInProgress() then
-        return send("Failed to pause as there is no round in progress.")
+    if round:GetRoundPhase() == "Intermission" or round:GetRoundPhase() == "Waiting" then
+        return send("Cannot pause round during intermission or waiting phase.")
     end
 
     round:PauseRound(not round:GetIsRoundPaused())
     send(if round:GetIsRoundPaused() then "Round paused." else "Round unpaused.")
 
-    if not round:GetIsRoundPaused() then
-        if oldVictory then
-            unPauseVictory(round)
-        end
-    end
-    ReplicatedStorage.RoundHandler:SetAttribute("IsPaused", round:GetIsRoundPaused())
-
     return round
+end
+
+local endRoundParams: {any}?
+local normalEndRound: (...any) -> ()
+
+local function disabledEndRound(...: any): ()
+    endRoundParams = {...}
+end
+
+local function toggleVictory(): ()
+    local round = RoundHandler.GetRound()
+    if not round:IsInProgress() then
+        return send("Cannot toggle victory if round is not in progress.")
+    end
+
+    if round.EndRound ~= disabledEndRound then
+        endRoundParams = nil
+        normalEndRound = round.EndRound
+        round.EndRound = disabledEndRound
+        send("Victory disabled.")
+    else
+        round.EndRound = normalEndRound
+        if endRoundParams then
+            normalEndRound(table.unpack(endRoundParams))
+        end
+        send("Victory enabled.")
+    end
+end
+
+local function openSettingsForPlayer(plr: Player): ()
+    ReplicatedStorage.ServerClient.OpenSettings:FireClient(plr)
+end
+
+local function endRound(roleName: string?): ()
+    if not roleName then
+        return send("Missing Argument 2 (role name)")
+    end
+
+    local round = RoundHandler.GetRound()
+    if not round:IsInProgress() then
+        return send("Failed to end round as round is not in progress.")
+    end
+
+    local success, err = pcall(function()
+        round:EndRound(round:GetRoleFromRoleName(roleName))
+        if round.EndRound == disabledEndRound then
+            toggleVictory()
+        end
+    end)
+
+    if success then
+        send("Round ended.")
+    else
+        send("Failed to end round: "..err)
+    end
 end
 
 Players.PlayerAdded:Connect(function(plr: Player)
@@ -73,64 +121,18 @@ Players.PlayerAdded:Connect(function(plr: Player)
         local cmd = args[1]:lower()
 
         if cmd == "!testplace" then
-            if game.PlaceId == testPlace then
-                return send("You are already in test place, silly.")
-            end
-
-            local targets = {plr}
-			if isAdmin(plr) then
-				targets = Players:GetPlayers()
-                send("Teleporting everyone to test place.")
-            else
-                send(`Teleporting {plr.Name} to test place.`)
-            end
-
-            TeleportService:TeleportAsync(testPlace, targets)
+            toTestPlace(plr)
         elseif cmd == "!pause" and isAdmin(plr) then
             pause()
-        elseif cmd == "!restart" and plr.UserId == meId then
+        elseif cmd == "!restart" and isAdmin(plr) then
             send("Server restarting...")
             RestartServer(5)
         elseif cmd == "!pausevictory" and isAdmin(plr) then
-            local round = RoundHandler.GetRound()
-            if round:GetIsRoundPaused() then
-                if oldVictory then
-                    pause()
-                    return send("Re-enabled victory.")
-                end
-                return send("Round is already paused.")
-            end
-
-            pause()
-
-            deaths = {}
-            if round:GetIsRoundPaused() then
-                oldVictory = round.Gamemode.OnDeath
-                round.Gamemode.OnDeath = function(self, participant)
-                    table.insert(deaths, participant)
-                end
-            else
-                unPauseVictory(round)
-            end
+            toggleVictory()
         elseif cmd == "!settings" then
-            ReplicatedStorage.ServerClient.OpenSettings:FireClient(plr)
+            openSettingsForPlayer(plr)
         elseif cmd == "!endround" and isAdmin(plr) then
-            if not args[2] then
-                return send("Missing Argument 2")
-            end
-            local round = RoundHandler.GetRound()
-            if not round:IsInProgress() then
-                return send("Failed to end round as there is no round in progress.")
-            end
-
-            local success, err = pcall(function()
-                round:EndRound(round:GetParticipant(args[2]) or round:GetRoleFromRoleName(args[2]))
-            end)
-            if success then
-                send("Round ended.")
-            else
-                send("Failed to end round: "..err)
-            end
+            endRound(args[2])
         end
     end)
 end)
