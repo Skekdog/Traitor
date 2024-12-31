@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetDisplayName = require(ReplicatedStorage.RoundRule.GetDisplayName)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Types = require(script.Parent.RoundRule.Types)
 local ThemesManager = require(script.Parent.ThemesManager)
@@ -199,7 +200,7 @@ LocalRoundInfo.Listen("Gamemode", function()
 		return
 	end
 
-	info.RoundInfo.Info.Gamemode.Text = "Gamemode: " .. (gamemode.DisplayName or gamemode.Name)
+	info.RoundInfo.Info.Gamemode.Text = "Gamemode: " .. GetDisplayName(gamemode)
 	info.RoundInfo.Creators.Gamemode.Text = gamemode.Authors
 end, true)
 

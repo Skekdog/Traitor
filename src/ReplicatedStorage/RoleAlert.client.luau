@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local GetDisplayName = require(ReplicatedStorage.RoundRule.GetDisplayName)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 
@@ -20,7 +22,7 @@ LocalRoundInfo.Listen("PlayerRole", function()
 		sound:Play()
 		
 		UI:FindFirstChild("HintLabel").Text = role.Definition.Description
-		UI:FindFirstChild("RoleLabel").Text = role.Definition.DisplayName or role.Definition.Name
+		UI:FindFirstChild("RoleLabel").Text = GetDisplayName(role.Definition)
 		UI:FindFirstChild("RoleLabel").TextColor3 = role.Definition.Color
 		
 		ui:ToggleVisible(true)
