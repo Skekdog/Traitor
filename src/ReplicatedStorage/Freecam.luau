@@ -381,6 +381,18 @@ local PlayerState = {} do
 end
 
 local freecamEnabled = false
+
+local listeners: {(freecamEnabled: boolean) -> ()} = {}
+local function ListenFreecamChanged(callback: (freecamEnabled: boolean) -> ()): ()
+	table.insert(listeners, callback)
+end
+
+local function runCallbacks(): ()
+	for _, callback in listeners do
+		callback(freecamEnabled)
+	end
+end
+
 local function StartFreecam()
 	if freecamEnabled then
 		return
@@ -404,6 +416,8 @@ local function StartFreecam()
 	PlayerState.Push()
 	RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, StepFreecam)
 	Input.StartCapture()
+
+	runCallbacks()
 end
 
 local function StopFreecam()
@@ -420,9 +434,12 @@ local function StopFreecam()
 	Input.StopCapture()
 	RunService:UnbindFromRenderStep("Freecam")
 	PlayerState.Pop()
+
+	runCallbacks()
 end
 
 return {
 	StartFreecam = StartFreecam,
 	StopFreecam = StopFreecam,
+	ListenFreecamChanged = ListenFreecamChanged,
 }
