@@ -1,53 +1,44 @@
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local ThemesManager = require(script.Parent.ThemesManager)
 local ToRoundTime = require(script.Parent.ToRoundTime)
-local Types = require(script.Parent.RoundHandler.Types)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 local MapVotingScreen = require(script.Parent.UIManager.UIScripts.MapVotingScreen)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
-
-
-
 local roundHandlerEvents = ReplicatedStorage:WaitForChild("RoundHandler")
 
-local ownParticipant: Types.ClientOwnParticipant?
-local ownRole: Types.Role?
-
-local function highlight(participant: Types.ClientParticipant)
+local function highlight(player: Player, role: Types.Role)
     local clone = Instance.new("Highlight")
     CollectionService:AddTag(clone, "AllyMarker")
     clone.FillTransparency = 1
-    clone.OutlineColor = LocalRoundInfo.GetRole(participant.Role).Colour
+    clone.OutlineColor = role.Definition.Color
     clone.OutlineTransparency = 0
-    clone.Parent = participant.Player.Character
+    clone.Parent = player.Character
 end
 
-local function highlightParticipant(player: Player, participant: Types.ClientParticipant?)
-    if not participant then
+local function tryHighlightPlayer(player: Player): ()
+    local ownRole = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer)
+    local theirRole = LocalRoundInfo.GetPlayerRole(player)
+    if not ownRole or not theirRole or not ownRole.Definition.HighlightedRoles then
         return
     end
-
-    if ownRole and ownRole.HighlightRoles then
-        local allRoles = table.find(ownRole.HighlightRoles, "__All")
-        if allRoles then
-            highlight(participant)
-        else
-            if table.find(ownRole.HighlightRoles, participant.Role:split("__")[2]) then
-                highlight(participant)
-            elseif table.find(ownRole.HighlightRoles, "__Ally") and table.find(ownRole.Allies or {}, participant.Role:split("__")[2]) then
-                highlight(participant)
-            elseif table.find(ownRole.HighlightRoles, "__Enemy") and not table.find(ownRole.Allies or {}, participant.Role:split("__")[2]) then
-                highlight(participant)
-            end
-        end
+    
+    if table.find(ownRole.Definition.HighlightedRoles, theirRole.Definition.Name) then
+        highlight(player, theirRole)
     end
 end
 
-LocalRoundInfo.Listen("UpdateParticipant", highlightParticipant)
+LocalRoundInfo.Listen("PlayerRole", function()
+    for _, v in Players:GetPlayers() do
+        if v ~= Players.LocalPlayer then
+            tryHighlightPlayer(v)
+        end
+    end
+end, true)
 
 local function update(roundPhase)
     if roundPhase == "Destroy" then
