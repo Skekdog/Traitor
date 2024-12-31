@@ -443,8 +443,10 @@ guns.AWP = {
     Kind = "Gun" :: "Gun",
     Name = "AWP",
     Description = "A high-powered sniper rifle. Must be scoped in to shoot.",
+    Icon = "rbxassetid://4772214897",
     
     Slot = 7,
+    CreditCost = 1,
     CanDrop = true,
 
     Damage = {
@@ -697,8 +699,11 @@ guns.Deagle = {
 guns.BAR = {
     Kind = "Gun" :: "Gun",
     Name = "BAR",
+    Description = "A powerful mid-range rifle. Slow to reload.",
+    Icon = "",
 
     Slot = 3,
+    CreditCost = 1,
     CanDrop = true,
 
     Damage = {
@@ -759,8 +764,10 @@ grenades.Flashbang = {
     Kind = "Grenade" :: "Grenade",
     Name = "Flashbang",
     Description = "Explodes in a good radius after 3 seconds, blinding and deafening anyone in range.",
+    Icon = "rbxassetid://10753198321",
 
     Slot = 8,
+    CreditCost = 1,
     CanDrop = true,
 
     Projectile = "Flashbang",
@@ -998,6 +1005,10 @@ items.Radar = {
 items["Ballistic Vest"] = {
     Kind = "Item" :: "Item",
     Name = "Ballistic Vest",
+    Description = "Absorbs a limited amount of damage to the torso. Not visible to others.",
+    Icon = "rbxassetid://395920626",
+
+    CreditCost = 1,
 
     OnPurchase = function(item: Types.Item, participant: Types.Participant)
         participant.Extras.BallisticVest = 60

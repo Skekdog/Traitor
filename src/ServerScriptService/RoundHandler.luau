@@ -55,4 +55,18 @@ ReplicatedStorage.ClientServer.JoinRound.OnServerInvoke = function(player: Playe
     return true
 end
 
+ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(player: Player, itemName: string): Types.ItemPurchaseResult
+    local participant = round:GetParticipant(player.Name)
+    if not participant then
+        return "NotInRound"
+    end
+
+    local item = participant.Round:GetItemDefinition(itemName)
+    if not item then
+        return "InvalidItemForRole"
+    end
+
+    return participant:PurchaseItem(item)
+end
+
 return module
