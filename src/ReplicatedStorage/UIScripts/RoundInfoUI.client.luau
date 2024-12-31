@@ -1,9 +1,10 @@
 local Players = game:GetService("Players")
-local Freecam = require(script.Parent.Freecam)
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local ToRoundTime = require(script.Parent.ToRoundTime)
-local UIAnimation = require(script.Parent.UIAnimation)
-local UIManager = require(script.Parent.UIManager)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Freecam = require(ReplicatedStorage.Freecam)
+local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+local ToRoundTime = require(ReplicatedStorage.ToRoundTime)
+local UIAnimation = require(ReplicatedStorage.UIAnimation)
+local UIManager = require(ReplicatedStorage.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 

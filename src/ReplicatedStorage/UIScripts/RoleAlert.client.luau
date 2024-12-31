@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.RoundRule.GetDisplayName)
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local UIManager = require(script.Parent.UIManager)
+local UIManager = require(ReplicatedStorage.UIManager)
 
 local ui = UIManager.WaitForUI("RoleAlert") 
 local UI = ui.Object :: typeof(UIManager.UnregisteredUIs.RoleAlert)

@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Types = require(script.Parent.RoundRule.Types)
-local ScreenMessage = require(script.Parent.ScreenMessage)
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+local Types = require(ReplicatedStorage.RoundRule.Types)
+local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
 local UIManager = require(ReplicatedStorage.UIManager)
 
 local this = UIManager.WaitForUI("JoinRound") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.JoinRound)}
