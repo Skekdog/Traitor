@@ -58,18 +58,26 @@ local function setHealth(hum: Humanoid)
     UIAnimation.Slider(roundInfo.Frame.HealthBar.Background, false, hum.Health, hum.MaxHealth)
 end
 
-workspace.Camera:GetPropertyChangedSignal("CameraSubject"):Connect(function()
+local function onCameraUpdated(): ()
     local subject = workspace.Camera.CameraSubject
-    if not subject or not subject:IsA("Humanoid") then
-        return
+    if not subject or not subject:IsA("Humanoid") or not subject:IsDescendantOf(workspace) then
+        return showHealth(false)
     end
 
-    subject.AncestryChanged:Connect(function(_, parent)
-        showHealth(parent ~= nil)
+    local con: RBXScriptConnection
+    con = subject.AncestryChanged:Connect(function()
+        showHealth(subject:IsDescendantOf(workspace))
+
+        if not subject:IsDescendantOf(workspace) then
+            con:Disconnect()
+        end
     end)
 
+    showHealth(true)
     setHealth(subject)
-end)
+end
+
+workspace.Camera:GetPropertyChangedSignal("CameraSubject"):Connect(onCameraUpdated)
 
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     local hum = char:WaitForChild("Humanoid")
@@ -84,6 +92,6 @@ Freecam.ListenFreecamChanged(function(freecamEnabled)
     if freecamEnabled then
         showHealth(false)
     else
-        showHealth(true)
+        onCameraUpdated()
     end
 end)

@@ -46,14 +46,15 @@ local function spectateFunc(action, state)
 end
 
 local currentCameraMode: "Player" | "Freecam" = "Player"
-LocalRoundInfo.Listen("IsSpectating", function(val)
+LocalRoundInfo.Listen("PlayerStatus", function()
+	local isSpectating = LocalRoundInfo.GetPlayerStatus(plr) == "Spectating"
 	-- Do not early return here because we need to set camera properties always
-	if ui.Visible ~= val then
+	if ui.Visible ~= isSpectating then
 		uiO.Username.Text = "Use buttons to spectate"
 		lastKey = 0
 	end
 	
-	if val then
+	if isSpectating then
 		if currentCameraMode == "Player" then
 			Freecam.StopFreecam()
 		else
@@ -90,7 +91,7 @@ local function switchCameraMode(mode: "Player" | "Freecam")
 
 	uiO.CameraMode.Text = "Camera Mode: " .. currentCameraMode
 
-	if LocalRoundInfo.IsSpectating() then
+	if LocalRoundInfo.GetPlayerStatus(plr) == "Spectating" then
 		if currentCameraMode == "Player" then
 			Freecam.StopFreecam()
 		else
@@ -103,5 +104,3 @@ uiO.CameraMode.Activated:Connect(function()
 	switchCameraMode(if currentCameraMode == "Player" then "Freecam" else "Player")
 end)
 switchCameraMode("Player")
-
-LocalRoundInfo.SetSpectating(LocalRoundInfo.GetRoundPhase() ~= "Destroy")
