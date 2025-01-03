@@ -4,24 +4,16 @@ local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local ControlManager = require(script.Parent.ControlManager)
-local ClientWeaponManager = require(script.Parent.WeaponsManagerClient)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
-local Items = require(script.Parent.GameDefinition.Items)
-local InventoryManagerClient = require(script.Parent.InventoryManagerClient)
-local InventoryManager = require(script.Parent.InventoryManagerClient)
-local ItemHint = require(script.Parent.ItemHint)
 local KeybindHintManager = require(script.Parent.KeybindHintManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local Types = require(script.Parent.RoundRule.Types)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
 local StandardDoor = require(script.Parent.StandardDoor)
 local ThemesManager = require(script.Parent.ThemesManager)
-local UIManager = require(script.Parent.UIManager)
-local Viewmodel = require(script.Parent.Viewmodel)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
@@ -90,13 +82,6 @@ serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relat
     impactHole.Parent = part
 end)
 
-local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
-local ammoBar = roundInfo.Frame.AmmoBar
-
-InventoryManager.Listen("Equip", function(item: Types.AnyItem)
-    ammoBar.Visible = item.Kind == "Gun"
-end)
-
 -- shitty problems require shitty solutions - Sun Tzu, the art of war
 workspace.Corpses.ChildAdded:Connect(function(child)
     while child.Parent do
@@ -109,8 +94,8 @@ workspace.Corpses.ChildAdded:Connect(function(child)
     end
 end)
 
-LocalRoundInfo.Listen("RoundPhase", function(phase: Types.RoundPhase)
-    if phase == "Intermission" then
+LocalRoundInfo.Listen("Phase", function()
+    if LocalRoundInfo.GetRoundPhase() == "Waiting" then
         workspace.Projectiles:ClearAllChildren()
         workspace.RadarPoints:ClearAllChildren()
     end
@@ -130,30 +115,17 @@ for _, player in Players:GetPlayers() do
     removeFootsteps(player)
 end
 
-serverClient.AmmoUpdate.OnClientEvent:Connect(ClientWeaponManager.SetAmmo)
 serverClient.Discombobulate.OnClientEvent:Connect(Discombobulate)
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
-serverClient.PlayViewmodelAnimation.OnClientEvent:Connect(Viewmodel.PlayAnimation)
-serverClient.SetReloadingStatus.OnClientEvent:Connect(ClientWeaponManager.SetReloadingStatus)
-serverClient.SetMagnetoHintForCorpse.OnClientEvent:Connect(function(isCorpse: boolean)
-    local magneto = Items["Magneto Stick"] :: Types.ItemDefinition
-    local equipped = InventoryManagerClient.Equipped
-    if equipped and equipped.Base == magneto then
-        ItemHint(if isCorpse then "Attach Corpse" else magneto.PrimaryHint, magneto.AlternateHint)
-    end
-end)
 serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
 
-local function onMapChanged(m)
-    local map = m :: Types.Map
+LocalRoundInfo.Listen("Map", function()
+    local map = LocalRoundInfo.GetMap()
     if not map then
         return
     end
 
     local bounds = map.Bounds
-    if not bounds then
-        return
-    end
 
     for _, v in bounds:GetChildren() do
         if not v:IsA("BasePart") then
@@ -170,9 +142,7 @@ local function onMapChanged(m)
             end)
         end
     end
-end
-ReplicatedStorage.RoundHandler.MapFolder.Changed:Connect(onMapChanged)
-onMapChanged(LocalRoundInfo.GetMap())
+end, true)
 
 local function onLocalCharacterAdded(char: Model): ()
     ControlManager.Register("Climb Ladder", true, function()
@@ -191,7 +161,7 @@ local function onLocalCharacterAdded(char: Model): ()
             return Enum.ContextActionResult.Pass
         end
     
-        local bounds = map:FindFirstChild("Bounds")
+        local bounds = map.Bounds
         if not bounds then
             return Enum.ContextActionResult.Pass
         end
