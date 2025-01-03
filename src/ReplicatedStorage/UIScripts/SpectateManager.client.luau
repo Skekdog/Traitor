@@ -47,7 +47,7 @@ end
 
 local currentCameraMode: "Player" | "Freecam" = "Player"
 LocalRoundInfo.Listen("PlayerStatus", function()
-	local isSpectating = LocalRoundInfo.GetPlayerStatus(plr) == "Spectating"
+	local isSpectating = LocalRoundInfo.GetPlayerStatus(plr) ~= "Alive"
 	-- Do not early return here because we need to set camera properties always
 	if ui.Visible ~= isSpectating then
 		uiO.Username.Text = "Use buttons to spectate"
