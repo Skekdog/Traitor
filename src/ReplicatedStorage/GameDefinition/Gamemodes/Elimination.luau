@@ -51,7 +51,7 @@ local roles: {[string]: Types.RoleDefinition} = {
         AwardCreditsToRolesOnDeath = {},
 
         WalkSpeed = 16,
-        JumpPower = 50,
+        JumpPower = 18,
         Health = 100,
 
         Accessories = {},
