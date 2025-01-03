@@ -35,15 +35,15 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 		local direction = frame:GetAttribute("TransitionDirection") -- The direction it moves when OPENING
 		local offScreenPosition = targetUDim
 		if direction == "Right" then
-			offScreenPosition = UDim2.fromScale(frame.Size.X.Scale * frame.AnchorPoint.X, targetUDim.Y.Scale)
+			offScreenPosition = UDim2.new((frame.Size.X.Scale * frame.AnchorPoint.X) - 1, targetUDim.X.Offset, targetUDim.Y.Scale, targetUDim.Y.Offset)
 		elseif direction == "Left" then
-			offScreenPosition = UDim2.fromScale(1 + (frame.Size.X.Scale * frame.AnchorPoint.X), targetUDim.Y.Scale)
+			offScreenPosition = UDim2.new((frame.Size.X.Scale * frame.AnchorPoint.X) + 1, targetUDim.X.Offset, targetUDim.Y.Scale, targetUDim.Y.Offset)
 		elseif direction == "Up" then
-			offScreenPosition = UDim2.fromScale(targetUDim.X.Scale, 1 + (frame.Size.Y.Scale * frame.AnchorPoint.Y))
+			offScreenPosition = UDim2.new(targetUDim.X.Scale, targetUDim.X.Offset, (frame.Size.Y.Scale * frame.AnchorPoint.Y) + 1, targetUDim.Y.Offset)
 		elseif direction == "Down" then
-			offScreenPosition = UDim2.fromScale(targetUDim.X.Scale, frame.Size.Y.Scale * frame.AnchorPoint.Y)
+			offScreenPosition = UDim2.new(targetUDim.X.Scale, targetUDim.X.Offset, (frame.Size.Y.Scale * frame.AnchorPoint.Y) - 1, targetUDim.Y.Offset)
 		elseif not isSize then
-			error("Invalid direction for "..frame.Name)
+			error("Invalid direction for " .. frame.Name)
 		end
 
 		local function onFinish()
