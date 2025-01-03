@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
@@ -7,6 +8,7 @@ local ControlManager = require(script.Parent.ControlManager)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
+local HighlightPlayer = require(script.Parent.HighlightPlayer)
 local KeybindHintManager = require(script.Parent.KeybindHintManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SettingsManager = require(script.Parent.SettingsManager)
@@ -96,10 +98,26 @@ end)
 
 LocalRoundInfo.Listen("Phase", function()
     if LocalRoundInfo.GetRoundPhase() == "Waiting" then
+        for _, v in CollectionService:GetTagged("AllyMarker") do
+            v:Destroy()
+        end
+
+        for _, v in Players:GetPlayers() do
+            v:SetAttribute("Mark", "")
+        end
+
         workspace.Projectiles:ClearAllChildren()
         workspace.RadarPoints:ClearAllChildren()
     end
 end)
+
+LocalRoundInfo.Listen("PlayerRole", function()
+    for _, v in Players:GetPlayers() do
+        if v ~= Players.LocalPlayer then
+            HighlightPlayer(v)
+        end
+    end
+end, true)
 
 local function removeFootsteps(player: Player)
     if player == Players.LocalPlayer then
