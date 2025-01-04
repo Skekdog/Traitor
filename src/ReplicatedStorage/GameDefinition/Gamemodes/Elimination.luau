@@ -107,6 +107,8 @@ local gamemode: Types.Gamemode = {
 
         if survivor then
             participant.Round:EndRound(survivor)
+        else
+            participant.Round:EndRound(getBestParticipant(gamemode, participant.Round))
         end
     end,
 
