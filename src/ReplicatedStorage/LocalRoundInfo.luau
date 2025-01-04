@@ -10,7 +10,20 @@ local remotes = ReplicatedStorage.RoundRule.Remotes
 
 local listeners: {[string]: {() -> ()}?} = {}
 
-type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole"
+type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole" | "Winner" | "WinnerKind" | "StartTime"
+
+type RoundHighlight = {
+    Title: string,
+    Description: string
+}
+
+type RoundEvent = {
+    Timestamp: number,
+    Description: string,
+    WasFreeKill: boolean?,
+    WasSelfDefense: boolean?,
+    WasCorrectKill: boolean?,
+}
 
 function module.Listen(name: CallbackName, callback: () -> (), runImmediately: boolean?): ()
     if not listeners[name] then
@@ -78,6 +91,41 @@ remotes.UpdateCredits.OnClientEvent:Connect(function(value: number?)
     runCallbacks("Credits")
 end)
 
+function module.GetRoundHighlights(): {RoundHighlight}
+    local highlights: {RoundHighlight} = {}
+    for _, v in replicatedData.Highlights:GetChildren() do
+        if v:IsA("StringValue") then
+            table.insert(highlights, {
+                Title = v.Name,
+                Description = v.Value
+            })
+        end
+    end
+
+    return highlights
+end
+
+function module.GetOrderedRoundEvents(): {RoundEvent}
+    local events: {RoundEvent} = {}
+    for _, v in replicatedData.Events:GetChildren() do
+        if v:IsA("StringValue") then
+            table.insert(events, {
+                Timestamp = tonumber(v.Name) or error("Invalid timestamp"),
+                Description = v.Value,
+                WasFreeKill = v:GetAttribute("WasFreeKill") :: boolean?,
+                WasSelfDefense = v:GetAttribute("WasSelfDefense") :: boolean?,
+                WasCorrectKill = v:GetAttribute("WasCorrectKill") :: boolean?,
+            })
+        end
+    end
+
+    table.sort(events, function(a, b)
+        return a.Timestamp < b.Timestamp
+    end)
+
+    return events
+end
+
 local roundPhase: Types.RoundPhase = replicatedData:GetAttribute("Phase") :: Types.RoundPhase? or "Waiting"
 function module.GetRoundPhase(): Types.RoundPhase
     return roundPhase
@@ -88,19 +136,49 @@ function module.GetAdvanceTime(): number?
     return advanceTime
 end
 
-replicatedData:GetAttributeChangedSignal("Phase"):Connect(function()
-    roundPhase = replicatedData:GetAttribute("Phase") :: Types.RoundPhase? or "Waiting"
-    runCallbacks("Phase")
-end)
+local winner: string? = replicatedData:GetAttribute("Winner") :: string?
+function module.GetWinner(): string?
+    return winner
+end
+
+local winnerKind: "Role" | "Participant"? = replicatedData:GetAttribute("WinnerKind") :: "Role" | "Participant"?
+function module.GetWinnerKind(): "Role" | "Participant"?
+    return winnerKind
+end
 
 local paused: boolean = replicatedData:GetAttribute("Paused") :: boolean
 function module.IsPaused(): boolean
     return paused
 end
 
+local startTime: number? = replicatedData:GetAttribute("StartTime") :: number?
+function module.GetRoundStartTime(): number?
+    return startTime
+end
+
+replicatedData:GetAttributeChangedSignal("Winner"):Connect(function()
+    winner = replicatedData:GetAttribute("Winner") :: string?
+    runCallbacks("Winner")
+end)
+
+replicatedData:GetAttributeChangedSignal("WinnerKind"):Connect(function()
+    winnerKind = replicatedData:GetAttribute("WinnerKind") :: "Role" | "Participant"?
+    runCallbacks("WinnerKind")
+end)
+
+replicatedData:GetAttributeChangedSignal("Phase"):Connect(function()
+    roundPhase = replicatedData:GetAttribute("Phase") :: Types.RoundPhase? or "Waiting"
+    runCallbacks("Phase")
+end)
+
 replicatedData:GetAttributeChangedSignal("Paused"):Connect(function()
     paused = replicatedData:GetAttribute("Paused") :: boolean
     runCallbacks("Paused")
+end)
+
+replicatedData:GetAttributeChangedSignal("StartTime"):Connect(function()
+    startTime = replicatedData:GetAttribute("StartTime") :: number?
+    runCallbacks("StartTime")
 end)
 
 replicatedData:GetAttributeChangedSignal("AdvanceTime"):Connect(function()
@@ -147,6 +225,25 @@ remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: 
     playerRoles[player] = getRoleFromName(roleName)
     runCallbacks("PlayerRole")
 end)
+
+function module.GetPlayerScores(): {[Player]: Types.ScoreTable}
+    local playerScores: {[Player]: Types.ScoreTable} = {}
+    for _, v in replicatedData.Scores:GetChildren() do
+        if v:IsA("StringValue") then
+            local player = getPlayerFromName(v.Name)
+            if not player then
+                continue
+            end
+
+            playerScores[player] = {}
+            for reason, value in v:GetAttributes() do
+                playerScores[player][reason] = value :: number
+            end
+        end
+    end
+
+    return playerScores
+end
 
 local map: Types.Map?
 local mapScript = workspace:FindFirstChild("Map")

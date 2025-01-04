@@ -1,68 +1,71 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+local Types = require(ReplicatedStorage.RoundRule.Types)
+local UIManager = require(script.Parent.Parent)
 local ToRoundTime = require(script.Parent.Parent.Parent.ToRoundTime)
 local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
-local LocalRoundInfo = require(ReplicatedFirst.LocalRoundInfo)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
-local uiManager = require(ReplicatedFirst.UIManager)
 
-local UI = uiManager.WaitForUI("Highlights") :: uiManager.UI & {Object: typeof(uiManager.UnregisteredUIs.Highlights)}
+local UI = UIManager.WaitForUI("Highlights") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Highlights)}
 local page = UI.Object.Page
 
-local hFrame, eFrame, sFrame = page.Highlights, page.Events, page.Scores
-local eTemplate = eFrame.Template
+local highlightsPage, eventsPage, scoresPage = page.Highlights, page.Events, page.Scores
+local eventTemplate = eventsPage.Template
 
-local function calculateTotalScore(score: Types.ParticipantScoring): number
+local function calculateTotalScore(score: Types.ScoreTable): number
 	local total = 0
 	for _, v in score do
+		assert(v)
 		total += v
 	end
 	return total
 end
 
-local minimisedScoreSize = sFrame.AbsoluteSize.Y * 0.075
+local minimisedScoreSize = scoresPage.AbsoluteSize.Y * 0.075
 repeat
-	minimisedScoreSize = sFrame.AbsoluteSize.Y * 0.075
+	minimisedScoreSize = scoresPage.AbsoluteSize.Y * 0.075
 	task.wait()
 until minimisedScoreSize > 0
 
-ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Connect(function(highlights: {Types.RoundHighlight}, events: {Types.UserFacingRoundEvent}, scores: {[Types.FormattedUsername]: Types.ParticipantScoring}, victors: Types.Role | Types.ClientParticipant)
-	if victors.Kind == "ClientParticipant" then
-		hFrame.Winners.Text = victors.Player.Name:upper().." WINS"
-		hFrame.Winners.TextColor3 = LocalRoundInfo.GetRole(victors.Role).Colour
-	else
-		hFrame.Winners.Text = `THE {victors.Name:upper()}S WIN`
-		hFrame.Winners.TextColor3 = victors.Colour
-	end
-
-	for _, v in eFrame:GetChildren() do
+local function populateEvents(): ()
+	for _, v in eventsPage:GetChildren() do
 		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.Name ~= "EventFilters" then
 			v:Destroy()
 		end
 	end
-	for _, v in sFrame:GetChildren() do
+
+	local roundStartTime = LocalRoundInfo.GetRoundStartTime() or error("Round start time not found")
+	for _, v in LocalRoundInfo.GetOrderedRoundEvents() do
+		local event = eventTemplate:Clone()
+		event.Name = v.Description
+		event.TextLabel.Text = v.Description
+		event.Time.Text = ToRoundTime(roundStartTime, v.Timestamp)
+		
+		if v.WasCorrectKill == false then
+			event.IncorrectDamage.Visible = true
+		end
+
+		if v.WasFreeKill == true then
+			event.FreeKill.Visible = true
+		end
+
+		if v.WasSelfDefense == true then
+			event.SelfDefense.Visible = true
+		end
+
+		event.Visible = true
+		event.Parent = eventsPage
+	end
+end
+
+local function populateScores(): ()
+	for _, v in scoresPage:GetChildren() do
 		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.ClassName ~= "UIPadding" then
 			v:Destroy()
 		end
 	end
-	for _, v in hFrame.Highlights:GetChildren() :: any do
-		if v.ClassName == "Frame" then
-			v.Description.Text = ""
-			v.Highlight.Text = ""
-		end
-	end
 
-	for i, v in highlights do
-		if i >= 5 then
-			break
-		end
-		local h = hFrame.Highlights:FindFirstChild("Highlight"..tostring(i)) :: any
-		h.Description.Text = v.Description
-		h.Highlight.Text = v.Name
-	end
-
-	for i, v in scores do
-		local scoreFrame = sFrame.Template:Clone()
+	for i, v in LocalRoundInfo.GetPlayerScores() do
+		local scoreFrame = scoresPage.Template:Clone()
 		scoreFrame.Size = UDim2.new(1, 0, 0, minimisedScoreSize)
 
 		local usernameLabel = scoreFrame.Username
@@ -76,7 +79,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 
-		usernameLabel.Text = "@"..i
+		usernameLabel.Text = "@" .. i.Name
 
 		local total = calculateTotalScore(v)
 		totalLabel.Text = total.." Total"
@@ -84,6 +87,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 		scoreFrame.LayoutOrder = -total
 
 		for reason, value in v do
+			assert(value)
 			local reasonFrame = scoreList.Template:Clone()
 			reasonFrame.Text = reason .. (if value > 0 then " +" else " -") .. math.abs(value)
 			reasonFrame.Name = reason
@@ -93,7 +97,7 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 
 		scoreFrame.Name = "ScoreFrame"
 		scoreFrame.Visible = true
-		scoreFrame.Parent = sFrame
+		scoreFrame.Parent = scoresPage
 		
 		scoreFrame.MouseButton1Click:Connect(function()
 			local open = not scoreFrame:GetAttribute("Open")
@@ -112,29 +116,49 @@ ReplicatedStorage:WaitForChild("RoundHandler").SendHighlights.OnClientEvent:Conn
 			})
 		end)
 	end
+end
 
-	local startTime = LocalRoundInfo.GetStartTime()
-	for _, v in events do
-		local e = eTemplate:Clone()
-		e.TextLabel.Text = v.Text
-		e.Time.Text = ToRoundTime(startTime, v.Timestamp)
-		e.Visible = true
-		e.Name = "ActiveEvent"
+local function setHighlights(): ()
+	local highlights = LocalRoundInfo.GetRoundHighlights()
+	for i = 1, 5 do
+		local highlight = highlights[i]
+		local frame = highlightsPage.Highlights:FindFirstChild("Highlight" .. tostring(i)) :: typeof(highlightsPage.Highlights.Highlight1)
 
-		local icons = v.Icons
-		if table.find(icons, "IncorrectKill") then
-			e.IncorrectDamage.Visible = true
-		end
-		if table.find(icons, "FreeKill") then
-			e.FreeKill.Visible = true
-		end
-		if table.find(icons, "SelfDefense") then
-			e.SelfDefense.Visible = true
+		if not highlight then
+			highlight = {
+				Title = "",
+				Description = ""
+			}
 		end
 
-		e.Parent = eFrame
+		frame.Description.Text = highlight.Description
+		frame.Highlight.Text = highlight.Title
 	end
-	
+end
+
+local function setWinnerText(): ()
+	local winner, winnerKind = LocalRoundInfo.GetWinner(), LocalRoundInfo.GetWinnerKind()
+	assert(winner and winnerKind, "No winner")
+
+	if winnerKind == "Participant" then
+		highlightsPage.Winners.Text = winner .. " wins!"
+	else
+		highlightsPage.Winners.Text = `The {winner:upper()}s win!`
+	end
+end
+
+LocalRoundInfo.Listen("Phase", function()
+	local phase = LocalRoundInfo.GetRoundPhase()
+	if phase ~= "Highlights" then
+		return
+	end
+
+	setWinnerText()	
+
+	populateEvents()
+	populateScores()
+	setHighlights()
+
 	UI:ToggleVisible(true)
 end)
 
