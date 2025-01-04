@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Items = require(ReplicatedStorage.GameDefinition.Items)
+local GetItemDefinition = require(ReplicatedStorage.GetItemDefinition)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.Parent)
 local StringWithDeterminer = require(script.Parent.Parent.Parent.StringWithDeterminer)
@@ -39,7 +39,7 @@ local flavourImages: {[Types.GeneralDamageSource]: string} = {
 }
 
 local function getItemFromName(name: string): Types.AnyItemDefinition?
-    return Items[name]
+    return GetItemDefinition(name)
 end
 
 local function getItemAttackType(name: string): Types.GeneralDamageSource

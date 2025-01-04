@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local Ammo = require(ReplicatedStorage.GameDefinition.Ammo)
 local GetDisplayName = require(ReplicatedStorage.RoundRule.GetDisplayName)
 local ControlManager = require(script.Parent.ControlManager)
+local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
 local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShowAlert = require(script.Parent.ShowAlert)
@@ -110,7 +110,7 @@ local itemHint = workspace:WaitForChild("ItemHintGui")
 local function showItemHint(instance: Instance)
 	local state = GetDroppedItemState(instance)
 
-	local ammo = if state.AmmoType then Ammo[state.AmmoType] else nil
+	local ammo = if state.AmmoType then GetAmmoDefinition(state.AmmoType) else nil
 	local maxAmmo = if ammo then ammo.Capacity else nil
 
 	itemHint.Frame.ItemName.Text = if ammo and state.Kind == "AmmoState" then (ammo.DisplayName or ammo.Name) .. " Ammo" else GetDisplayName(state.Definition)

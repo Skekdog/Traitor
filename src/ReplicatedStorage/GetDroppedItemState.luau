@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Ammo = require(ReplicatedStorage.GameDefinition.Ammo)
-local Items = require(ReplicatedStorage.GameDefinition.Items)
+local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
+local GetItemDefinition = require(script.Parent.GetItemDefinition)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 type ItemState = {
@@ -30,7 +30,7 @@ local function GetDroppedItemState(instance: Instance): ItemState | AmmoState
 
         return {
             Kind = "AmmoState",
-            Definition = Ammo[ammoType],
+            Definition = GetAmmoDefinition(ammoType),
             StoredAmmo = storedAmmo,
             AmmoType = ammoType,
         }
@@ -41,7 +41,7 @@ local function GetDroppedItemState(instance: Instance): ItemState | AmmoState
 
     return {
         Kind = "ItemState",
-        Definition = Items[instance.Name],
+        Definition = GetItemDefinition(instance.Name),
         StoredAmmo = storedAmmo,
         AmmoType = ammoType,
     }
