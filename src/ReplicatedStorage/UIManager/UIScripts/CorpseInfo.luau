@@ -1,38 +1,73 @@
-local Players = game:GetService("Players")
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Items = require(ReplicatedStorage.GameDefinition.Items)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.Parent)
 local StringWithDeterminer = require(script.Parent.Parent.Parent.StringWithDeterminer)
 local ToRoundTime = require(script.Parent.Parent.Parent.ToRoundTime)
-local Types = require(ReplicatedFirst.RoundHandler.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
 local object = corpseUi.Object.CorpseInfo
 
-local flavourTexts: {[Types.MurderWeapon]: string} = {
-	Crush = "Many of their bones are broken. It seems the impact of a heavy object killed them.",
-	Firearm = "It is obvious that they were shot to death. Moreover, it appears %s was used to kill them.",
-	Fall = "Their injuries indicate a fatal fall.",
-	Explosion = "Their wounds and singed clothes indicate that an explosion brought about their demise.",
-	Blunt = "The body is bruised and battered. Evidently some blunt-force trauma was at hand.",
-	Drown = "Their drenched clothes and lack of struggle indicates a watery fate.",
-	Blade = "They were stabbed and cut before quickly bleeding to death.",
+local flavourTexts: {[Types.GeneralDamageSource]: string} = {
+    Fall = "Their injuries indicate a fatal fall.",
+    Drown = "Their drenched clothes and lack of struggle indicate a watery fate.",
+    Explode = "Their wounds and singed clothes indicate that an explosion brought about their demise.",
 	Burn = "Smells of burnt spy around here...",
-	Mutation = "It seems their DNA was mutated by teleporter emissions.",
-	Suicide = "This spy couldn't take it anymore and took their own life.",
+    Stab = "They were stabbed and cut before quickly bleeding to death.",
+    Shot = "It is obvious that they were shot to death.",
+    Bludgeon = "The body is bruised and battered. Evidently some blunt-force trauma was at hand.",
+    Crush = "Many of their bones are broken. It seems the impact of a heavy object killed them.",
+	Magic = "Otherworldly forces brought about this spy's death.",
+    Other = "It is unclear how this spy met their fate.",
 }
 
-local flavourImages: {[Types.MurderWeapon]: string} = {
-    Fall = "rbxassetid://27225585",
-    Firearm = "rbxassetid://700497561",
-    Explosion = "rbxassetid://1789477853",
-    Crush = "rbxassetid://953809995",
-    Blunt = "rbxassetid://15819411457",
-    Drown = "rbxassetid://1094356207",
-    Blade = "rbxassetid://949752421",
-    Burn = "rbxassetid://5664716195",
-    Mutation = "rbxassetid://2890327",
-    Suicide = "rbxassetid://17079244437"
+local flavourTextsWithWeapon: {[Types.GeneralDamageSource]: string} = {
+    Shot = "It is obvious that they were shot to death. Moreover, it appears %s was used.",
 }
+
+local flavourImages: {[Types.GeneralDamageSource]: string} = {
+    Fall = "rbxassetid://27225585",
+    Drown = "rbxassetid://1094356207",
+    Explode = "rbxassetid://1789477853",
+    Burn = "rbxassetid://5664716195",
+    Stab = "rbxassetid://949752421",
+    Shot = "rbxassetid://700497561",
+    Bludgeon = "rbxassetid://15819411457",
+    Crush = "rbxassetid://953809995",
+    Magic = "rbxassetid://15244435410",
+    Other = "rbxassetid://17079244437"
+}
+
+local function getItemFromName(name: string): Types.AnyItemDefinition?
+    return Items[name]
+end
+
+local function getItemAttackType(name: string): Types.GeneralDamageSource
+    local item = getItemFromName(name)
+    if item then
+        if item.Kind == "Gun" then
+            return "Shot"
+        elseif item.Kind == "Grenade" then
+            return "Explode"
+        elseif item.Kind == "Melee" then
+            return item.DamageKind
+        elseif item.Kind == "Item" then
+            return "Other"
+        end
+        error("Unknown item kind: " .. item.Kind)
+    else
+        return name :: Types.GeneralDamageSource
+    end
+end
+
+local function getFlavourText(deathType: Types.NamedDamageSource): string?
+    local attackType: Types.GeneralDamageSource = getItemAttackType(deathType)
+    if attackType ~= deathType then
+        return if flavourTextsWithWeapon[attackType] then flavourTextsWithWeapon[attackType]:format(StringWithDeterminer(deathType)) else flavourTexts[attackType]
+    end
+
+    return flavourTexts[attackType] or error("Unknown death type: " .. deathType)
+end
 
 local information = corpseUi.Object.Information
 for _, v in object:GetChildren() do
@@ -43,38 +78,27 @@ for _, v in object:GetChildren() do
     end
 end
 
-return function(corpseInfo: Types.CorpseInfo?)
+return function(corpseInfo: Types.CorpseView?)
     if not corpseInfo then
         return
     end
-    local weapon
-    local deathType: Types.MurderWeapon
-    if typeof(corpseInfo.MurderWeapon) == "table" then
-        weapon = corpseInfo.MurderWeapon.Name
-        deathType = corpseInfo.MurderWeapon.AttackType or "Suicide"
-    else
-        weapon = corpseInfo.MurderWeapon
-        deathType = corpseInfo.MurderWeapon
-    end
-    object.MurderWeapon.TextLabel.Text = weapon
 
     information.Text = "Click on an icon to reveal detailed information."
 
-    local flavourText = flavourTexts[deathType]
-    if deathType == "Firearm" and weapon ~= "Firearm" then
-        flavourText = flavourText:format(StringWithDeterminer(weapon))
-    end
+    object.MurderWeapon.TextLabel.Text = corpseInfo.DamageSource
+
+    local flavourText = getFlavourText(corpseInfo.DamageSource)
     object.MurderWeapon:SetAttribute("Description", flavourText)
 
-    object.MurderWeapon.Image = flavourImages[deathType]
+    object.MurderWeapon.Image = flavourImages[getItemAttackType(corpseInfo.DamageSource)]
 
     local timeNow = workspace:GetServerTimeNow()
     object.DeathTime.TextLabel.Text = ToRoundTime(corpseInfo.DeathTime, timeNow)
     object.DeathTime:SetAttribute("Description", `Their watch stopped, indicating that they died {math.round(timeNow - corpseInfo.DeathTime)} seconds ago.`)
 
-    object.FreeKill.Visible = corpseInfo.FreeKill
-    object.Headshot.Visible = corpseInfo.Headshot
-    object.SD.Visible = corpseInfo.SelfDefense
+    object.FreeKill.Visible = corpseInfo.WasFreeKill or false
+    object.Headshot.Visible = corpseInfo.WasHeadshot or false
+    object.SD.Visible = corpseInfo.WasSelfDefense or false
 
     object.DNADuration.Visible = corpseInfo.DNAExpiry ~= nil
 
@@ -93,11 +117,11 @@ return function(corpseInfo: Types.CorpseInfo?)
     if #equipment > 0 then
         for i, v in equipment do
             if i == 1 then
-                equipmentText ..= ` {StringWithDeterminer(equipment[1].Name)}`
+                equipmentText ..= ` {StringWithDeterminer(v)}`
             elseif i == #equipment then
-                equipmentText ..= ` and {StringWithDeterminer(equipment[i].Name)}`
+                equipmentText ..= ` and {StringWithDeterminer(v)}`
             else
-                equipmentText ..= `, {StringWithDeterminer(equipment[i].Name)}`
+                equipmentText ..= `, {StringWithDeterminer(v)}`
             end
         end
         equipmentText ..= " on their corpse."
@@ -127,15 +151,15 @@ return function(corpseInfo: Types.CorpseInfo?)
         object.KillList.Visible = false
     end
 
-    corpseUi.Object.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
+    -- corpseUi.Object.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
 
-    local determinerRole = StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
-    object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)
+    -- local determinerRole = StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
+    -- object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)
 
-    task.defer(function()
-        local thumbnail = Players:GetUserThumbnailAsync(corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-        object.Avatar.Image = thumbnail
-    end)
+    -- task.defer(function()
+    --     local thumbnail = Players:GetUserThumbnailAsync(corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    --     object.Avatar.Image = thumbnail
+    -- end)
 
     corpseUi:ToggleVisible(true)
 end
