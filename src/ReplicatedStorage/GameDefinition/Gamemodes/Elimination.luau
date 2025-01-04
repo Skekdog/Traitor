@@ -1,3 +1,4 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Ammo = require(script.Parent.Parent.Ammo)
 local Items = require(script.Parent.Parent.Items)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
@@ -22,6 +23,20 @@ local function getBestParticipant(gamemode: Types.Gamemode, round: Types.Round):
     return bestParticipant or error("No participants in round")
 end
 
+local competitorVictoryMusic: {Sound} = {}
+for _, v in ReplicatedStorage.VictoryMusic.Traitor:GetChildren() do
+    if v:IsA("Sound") then
+        table.insert(competitorVictoryMusic, v)
+    end
+end
+
+local timeoutVictoryMusic: {Sound} = {}
+for _, v in ReplicatedStorage.VictoryMusic.Timeout:GetChildren() do
+    if v:IsA("Sound") then
+        table.insert(timeoutVictoryMusic, v)
+    end
+end
+
 local roles: {[string]: Types.RoleDefinition} = {
     Competitor = {
         Kind = "RoleDefinition",
@@ -32,7 +47,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         Allegiance = {Kind = "Solo"},
 
-        VictoryMusic = {},
+        VictoryMusic = competitorVictoryMusic,
         VictoryText = "Everyone is dead!",
 
         StartingItems = {Items.Radar},
@@ -72,6 +87,7 @@ local gamemode: Types.Gamemode = {
 
     DefaultVictor = getBestParticipant,
     TimeoutVictor = getBestParticipant,
+    TimeoutMusic = timeoutVictoryMusic,
 
     AssignRoles = function(gamemode: Types.Gamemode, participants: {Types.Participant})
         for _, v in participants do

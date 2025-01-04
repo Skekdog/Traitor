@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.Parent)
@@ -179,3 +180,24 @@ tabs.HighlightsButton.MouseButton1Click:Connect(function() showTab("Highlights")
 tabs.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
 
 showTab("Highlights")
+
+local function onSoundServiceChildAdded(child: Instance)
+	if child:IsA("Sound") and child:GetAttribute("IsRoundVictoryMusic") then
+		child.SoundGroup = SoundService.RoundEndMusic
+		highlightsPage.Music.Text.Text = child.Name
+	end
+end
+
+SoundService.ChildAdded:Connect(onSoundServiceChildAdded)
+for _, v in SoundService:GetChildren() do
+	onSoundServiceChildAdded(v)
+end
+
+local muteMusicButton = highlightsPage.Music.Mute 
+
+local pause = false
+muteMusicButton.MouseButton1Click:Connect(function()
+	pause = not pause
+	SoundService.RoundEndMusic.Volume = if pause then 0 else 1
+	muteMusicButton.Image = `"rbxasset://textures/StudioToolbox/AssetPreview/{if pause then "pause" else "play"}_button.png`
+end)
