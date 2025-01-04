@@ -927,6 +927,8 @@ melees.Crowbar = {
     Slot = 1,
     CanDrop = false,
 
+    DamageKind = "Bludgeon" :: "Bludgeon",
+
     Model = models("Crowbar"),
     HoldAnimation = "10247423634",
     AttackAnimation = "13269497293",
