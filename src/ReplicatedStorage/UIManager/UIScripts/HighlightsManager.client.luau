@@ -199,5 +199,5 @@ local pause = false
 muteMusicButton.MouseButton1Click:Connect(function()
 	pause = not pause
 	SoundService.RoundEndMusic.Volume = if pause then 0 else 1
-	muteMusicButton.Image = `"rbxasset://textures/StudioToolbox/AssetPreview/{if pause then "pause" else "play"}_button.png`
+	muteMusicButton.Image = `rbxasset://textures/ui/VoiceChat/SpeakerLight/{if pause then "Muted@3x" else "Unmuted0@3x"}.png`
 end)
