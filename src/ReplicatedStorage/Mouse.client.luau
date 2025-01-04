@@ -1,25 +1,18 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local AmmoData = require(script.Parent.AmmoData)
+local Ammo = require(ReplicatedStorage.GameDefinition.Ammo)
 local ControlManager = require(script.Parent.ControlManager)
-local DroppedItemState = require(script.Parent.DroppedItemState)
-local Items = require(script.Parent.Items)
+local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShowAlert = require(script.Parent.ShowAlert)
 local UIManager = require(script.Parent.UIManager)
-local CorpseInfo = require(script.Parent.UIManager.UIScripts.CorpseInfo)
 
 local plr = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
 local crosshairInfoUI = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(UIManager.UnregisteredUIs.CrosshairInfo)
 local playerInfo = crosshairInfoUI.PlayerInfo
-
-UIManager.WaitForUI("Crosshair"):ToggleVisible(UserInputService.TouchEnabled and not UserInputService.MouseEnabled)
-local mouse = plr:GetMouse()
-mouse.Icon = "rbxassetid://10801958931"
 
 local function showPlayerInfo(char: Model)
 	local plr = Players:GetPlayerFromCharacter(char)
@@ -37,12 +30,7 @@ local function showPlayerInfo(char: Model)
         return
     end
 
-	local participant = LocalRoundInfo.GetParticipantInfo(plr.Name)
-	if not participant then
-        return
-    end
-
-	local role = LocalRoundInfo.GetRole(participant.Role)
+	local role = LocalRoundInfo.GetPlayerRole(plr)
 	playerInfo:FindFirstChild("Name").Text = plr.Name
 
 	local healthPercent = health / hum.MaxHealth * 100
@@ -81,8 +69,7 @@ local function showPlayerInfo(char: Model)
 	playerInfo.Karma.TextColor3 = Color3.new(1, 0.4, 0):Lerp(Color3.new(1, 1, 1), (karma - 600) / 400)
 
 	if role then
-		playerInfo.Role.TextColor3 = role.Colour
-		playerInfo.Role.Text = role.Name
+		playerInfo.Role.Text = role:GetFormattedName()
 	else
 		playerInfo.Role.Text = ""
 	end
@@ -98,7 +85,7 @@ local corpseHint = crosshairInfoUI.SearchCorpseHint
 local function showCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
-	if not LocalRoundInfo.IsSpectating() then
+	if LocalRoundInfo.GetPlayerStatus(plr) == "Alive" then
 		if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
 			return
 		end	
@@ -107,31 +94,25 @@ local function showCorpseHint(char: Model)
 	if char:GetAttribute("Unidentified") then
 		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body`
 	else
-		local info = LocalRoundInfo.GetParticipantInfo(char.Name) or LocalRoundInfo.GetOwnParticipant()
-		assert(info)
-		corpseHint.Text = `{info.FormattedName}'s Body`
+		local role = LocalRoundInfo.GetPlayerRole(plr)
+		if not role then
+			return
+		end
+
+		local formattedName = `<font color='#{role.Definition.Color:ToHex()}'>{plr.Name}</font>`
+		corpseHint.Text = `{formattedName}'s Body`
 	end
 	corpseHint.Visible = true
 end
 
 local itemHint = workspace:WaitForChild("ItemHintGui")
 local function showItemHint(instance: Instance)
-	local item = DroppedItemState.GetDroppedItem(instance)
+	local item = GetDroppedItemState(instance)
 
-	local maxAmmo = 0
-	if item.AmmoType then
-		maxAmmo = AmmoData[item.AmmoType].Magazine
-	elseif item.Kind == "Weapon" then
-		local itemData = Items[item.Name]
-		if itemData.Kind == "Gun" then
-			maxAmmo = itemData.MagazineSize or 0
-		end
-	elseif item.Kind == "Ammo" then
-		maxAmmo = AmmoData[item.Name].Magazine
-	end
+	local maxAmmo = if item.AmmoType then Ammo[item.AmmoType].Capacity else nil
 
-	itemHint.Frame.ItemName.Text = if item.Kind == "Ammo" then item.Name .. " Ammo" else item.Name
-	itemHint.Frame.AmmoAvailable.Text = if item.AmmoAvailable then `{item.AmmoAvailable} / {maxAmmo}` else ""
+	itemHint.Frame.ItemName.Text = if item.IsAmmoBox then item.Name .. " Ammo" else item.Name
+	itemHint.Frame.AmmoAvailable.Text = if item.StoredAmmo then `{item.StoredAmmo} / {maxAmmo}` else ""
 	itemHint.Frame.AmmoType.Text = if item.AmmoType then item.AmmoType .. " Ammo" else ""
 
 	itemHint.Adornee = instance
@@ -163,8 +144,7 @@ RunService.PostSimulation:Connect(function()
 
 		local map = LocalRoundInfo.GetMap()
 		if map then
-			local weaponSpawns = map:FindFirstChild("WeaponSpawns")
-			if weaponSpawns and interactTarget:IsDescendantOf(weaponSpawns) then
+			if interactTarget:IsDescendantOf(map.ItemSpawns) or interactTarget:IsDescendantOf(map.AmmoSpawns) then
 				showItemHint(interactTarget)
 			end
 		end
@@ -201,30 +181,13 @@ ControlManager.Register("Interact", true, function(action, state, input)
 			ShowAlert("Ouch! This corpse is on fire!")
 			return Enum.ContextActionResult.Pass
 		end
-		CorpseInfo(ReplicatedStorage:WaitForChild("RoundHandler").SearchCorpse:InvokeServer(model))
+		
 		return Enum.ContextActionResult.Sink
 	end
 
 	local char = plr.Character
 	if not char then
 		return Enum.ContextActionResult.Pass
-	end
-
-	local actionItems = map:FindFirstChild("ActionItems")
-	local doors = map:FindFirstChild("Doors")
-	local props = map:FindFirstChild("Props")
-
-	if (actionItems and actionItems:IsAncestorOf(interactTarget)) or (doors and doors:IsAncestorOf(interactTarget)) or (props and props:IsAncestorOf(interactTarget)) then
-		ReplicatedStorage:WaitForChild("ClientServer").Interaction:FireServer(interactTarget)
-		return Enum.ContextActionResult.Sink
-	end
-
-	if model then
-		local item = Items[model.Name]
-		if item and item.Kind == "Item" and item.OnInteractClient and actionItems and actionItems:IsAncestorOf(interactTarget) then
-			item.OnInteractClient(model)
-			return Enum.ContextActionResult.Sink
-		end
 	end
 	
 	return Enum.ContextActionResult.Pass
