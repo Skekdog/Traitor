@@ -6,6 +6,9 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
 local UIManager = require(ReplicatedStorage.UIManager)
 
+local goodColour = Color3.new(0.294118, 1, 0.243137)
+local badColour = Color3.fromRGB(167, 0, 0)
+
 local selectedItem: Types.AnyItemDefinition?
 
 local isPurchaseConnected: boolean = false
@@ -15,8 +18,9 @@ local function updateCredits(ui: ShopUI?, requiredCredits: number?): ()
     if ui then
         local credits = LocalRoundInfo.GetCredits()
         ui.Object.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
-
-        ui.Object.CurrentCredits.TextColor3 = if credits >= (requiredCredits or 0) then Color3.new(0.294118, 1, 0.243137) else Color3.fromRGB(167, 0, 0)
+        ui.Object.CurrentCredits.TextColor3 = if credits >= (requiredCredits or 0) then goodColour else badColour
+        ui.Object.Purchase.TextColor3 = if requiredCredits and credits >= requiredCredits then goodColour else badColour
+        ui.Object.CreditCost.TextColor3 = if LocalRoundInfo.GetCredits() >= (requiredCredits or 0) then goodColour else badColour
     end
 end
 
@@ -35,7 +39,6 @@ local function selectItem(ui: ShopUI, item: Types.AnyItemDefinition?): ()
 
     ui.Object.CreditCost.Visible = true
     ui.Object.CreditCost.Text = `This costs {item.CreditCost} {if item.CreditCost == 1 then "credit" else "credits"}.`
-    ui.Object.CreditCost.TextColor3 = if LocalRoundInfo.GetCredits() >= (item.CreditCost or 0) then Color3.new(0.294118, 1, 0.243137) else Color3.fromRGB(167, 0, 0)
 
     selectedItem = item
 
