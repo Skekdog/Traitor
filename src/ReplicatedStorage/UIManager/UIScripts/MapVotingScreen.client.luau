@@ -4,11 +4,15 @@ local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
 
 type ClientMapInfo = {
 	Name: string,
-	ImageId: string,
+	Icons: {
+        ["16:9"]: string?,
+        ["4:3"]: string?,
+        ["1:1"]: string?,
+    },
 }
 
 type Votes = {
-    [string]: {number}
+    [string]: number
 }
 
 local screen = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
@@ -17,19 +21,18 @@ type Button = typeof(screen.Object.Sample)
 ReplicatedStorage.ServerClient.UpdateMapVotes.OnClientEvent:Connect(function(votes: Votes)
     local totalVotes = 0
     for _, v in votes do
-        totalVotes += #v
+        totalVotes += v
     end
 
-    for i, v in votes do
-        local clone = screen.Object.Choices:FindFirstChild(i) :: Button?
-        if clone then
-            UIAnimation.Slider(clone.ProgressBar, nil, #v, totalVotes)
+    for _, v in screen.Object.Choices:GetChildren() do
+        if v:IsA("ImageButton") then
+            UIAnimation.Slider((v :: Button).ProgressBar, nil, votes[v.Name] or 0, totalVotes)
         end
     end
 end)
 
 local function voteFor(clone: Button): ()
-    ReplicatedStorage.RoundHandler.VoteMap:FireServer(clone.Name)
+    ReplicatedStorage.ClientServer.VoteMap:FireServer(clone.Name)
     for _, v in screen.Object.Choices:GetChildren() do
         if v:IsA("ImageButton") then
             local button = v :: Button
@@ -38,10 +41,10 @@ local function voteFor(clone: Button): ()
     end
 end
 
-return function(allow: boolean): ()
-    screen:ToggleVisible(allow)
+ReplicatedStorage.ServerClient.TriggerMapVote.OnClientEvent:Connect(function(triggered: boolean, votableMaps: {ClientMapInfo})
+    if not triggered then
+        screen:ToggleVisible(false)
 
-    if not allow then
         for _, v in screen.Object.Choices:GetChildren() do
             if v:IsA("ImageButton") then
                 v:Destroy()
@@ -50,9 +53,9 @@ return function(allow: boolean): ()
         return
     end
 
-    for _, v: ClientMapInfo in ReplicatedStorage.RoundHandler.GetMaps:InvokeServer() do
+    for _, v: ClientMapInfo in votableMaps do
         local clone = screen.Object.Sample:Clone()
-        clone.Image = v.ImageId
+        clone.Image = v.Icons["16:9"] or "rbxassetid://78464994818646"
         clone.MapName.Text = v.Name
         clone.Name = v.Name
         clone.Visible = true
@@ -62,4 +65,6 @@ return function(allow: boolean): ()
             voteFor(clone)
         end)
     end
-end
+
+    screen:ToggleVisible(true)
+end)
