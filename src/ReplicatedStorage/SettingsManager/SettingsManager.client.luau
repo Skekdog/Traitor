@@ -10,7 +10,7 @@ local SM = require(script.Parent)
 local ControlManager = require(script.Parent.Parent.ControlManager)
 
 -- This must be run before anything yields, especially todo with ui
-local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedData.OnClientEvent:Wait()
+local options = ReplicatedStorage:WaitForChild("ServerClient").LoadSavedSettings.OnClientEvent:Wait()
 options = SM.JSONDecode(options)
 
 if options then

@@ -56,11 +56,6 @@ ReplicatedStorage:WaitForChild("ServerClient").OpenSettings.OnClientEvent:Connec
 	manager.WaitForUI("Settings"):ToggleVisible(true)
 end)
 
--- If we do not have this event, then the server fires various data sync events before the client begins listening, resulting in desync. This is a (bad) fix.
-task.wait(1)
-require(script.Parent.Parent.Parent.LocalRoundInfo)
-ReplicatedStorage:WaitForChild("ClientServer").RequestData:FireServer()
-
 local CASui = Players.LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge)
 assert(CASui and CASui:IsA("ScreenGui"))
 

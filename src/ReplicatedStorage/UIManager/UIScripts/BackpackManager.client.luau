@@ -1,33 +1,30 @@
-local ReplicatedFirst = game:GetService("ReplicatedFirst")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
-local Items = require(script.Parent.Parent.Parent.Items)
+local Types = require(ReplicatedStorage.RoundRule.Types)
+local UIManager = require(script.Parent.Parent)
 local ThemesManager = require(script.Parent.Parent.Parent.ThemesManager)
 local UIAnimation = require(script.Parent.Parent.Parent.UIAnimation)
-local ControlManager = require(ReplicatedFirst.ControlManager)
-local InventoryManager = require(ReplicatedFirst.InventoryManagerClient)
-local ItemTypes = require(ReplicatedFirst.ItemTypes)
-local UIManager = require(ReplicatedFirst.UIManager)
 
 local backpack = UIManager.WaitForUI("Backpack").Object :: typeof(UIManager.UnregisteredUIs.Backpack)
 
 local sample = backpack.Sample
 sample.Parent = nil -- so that it doesn't get counted for animation
 
-local selectedEquipment: ItemTypes.Item?
+local selectedItem: Types.AnyItem?
 
-local function unequip(equipment: ItemTypes.Item): ()
-	local found = backpack.Container:FindFirstChild(equipment.Base.Name) :: TextButton
+local function unequip(equipment: Types.AnyItem): ()
+	local found = backpack.Container:FindFirstChild(equipment.Definition.Name) :: TextButton
 	if found then
 		found.BackgroundTransparency = 0.75
 	end
 	InventoryManager.Unequip(equipment)
-	selectedEquipment = nil
+	selectedItem = nil
 end
 
 -- Surely there is a better way to do this
-local function switchToEquipment(equipment: ItemTypes.Item?)
+local function switchToEquipment(equipment: Types.AnyItem?)
 	if equipment then
-		if equipment == selectedEquipment then
+		if equipment == selectedItem then
 			unequip(equipment)
 			return Enum.ContextActionResult.Sink
 		else
@@ -37,14 +34,14 @@ local function switchToEquipment(equipment: ItemTypes.Item?)
 				found.BackgroundTransparency = 0.25
 			end
 
-			if selectedEquipment then
-				unequip(selectedEquipment)
+			if selectedItem then
+				unequip(selectedItem)
 			end
 		end
-	elseif selectedEquipment then
-		unequip(selectedEquipment)
+	elseif selectedItem then
+		unequip(selectedItem)
 	end
-	selectedEquipment = equipment
+	selectedItem = equipment
 	return Enum.ContextActionResult.Sink
 end
 
@@ -70,7 +67,7 @@ local function move(clone: typeof(sample), order: number, middle: number): ()
 	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + relativePosition})
 end
 
-local slots: {[number]: ItemTypes.Item?} = {}
+local slots: {[number]: Types.AnyItem?} = {}
 local function add(equipmentName: string, params: ItemTypes.ClientItemInitParams?): ()
 	local equipment = InventoryManager.AddEquipment(equipmentName, params)
 
@@ -131,8 +128,8 @@ local function remove(equipmentName: string)
 		end
 	end
 
-	if selectedEquipment and equipment.Base.Name == selectedEquipment.Base.Name then
-		selectedEquipment = nil
+	if selectedItem and equipment.Base.Name == selectedItem.Base.Name then
+		selectedItem = nil
 	end
 
 	table.sort(buttons, function(a, b)
@@ -153,8 +150,8 @@ InventoryManager.InvEvent.OnClientEvent:Connect(function(event: InventoryManager
 	elseif event == "Remove" then
 		remove(equipment)
 	elseif event == "Unequip" then
-		if selectedEquipment and Items[equipment].Name == selectedEquipment.Base.Name then
-			selectedEquipment = nil
+		if selectedItem and Items[equipment].Name == selectedItem.Base.Name then
+			selectedItem = nil
 		end
 	end
 end)
@@ -190,11 +187,11 @@ do
 	end
 
 	ControlManager.Register("Next Weapon", false, function()
-		if not selectedEquipment then
+		if not selectedItem then
 			return selectLowest()
 		end
 
-		local selectedSlot = selectedEquipment.Base.Slot
+		local selectedSlot = selectedItem.Base.Slot
 
 		if selectedSlot + 1 > table.maxn(slots) then
 			return selectLowest()

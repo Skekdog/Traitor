@@ -14,7 +14,6 @@ local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
-local StandardDoor = require(script.Parent.StandardDoor)
 local ThemesManager = require(script.Parent.ThemesManager)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
@@ -23,26 +22,6 @@ serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
 
 ThemesManager.UpdateTheme("Dark")
 KeybindHintManager()
-
-serverClient.TweenProjectile.OnClientEvent:Connect(function(projectile: PVInstance, origin: Vector3, targetPosition: Vector3, speed: number)
-    projectile = projectile:Clone()
-    projectile:PivotTo(CFrame.lookAt(origin, targetPosition))
-    local tween = TweenService:Create(projectile, TweenInfo.new((origin - targetPosition).Magnitude / speed), {Position = targetPosition})
-    tween.Completed:Once(function()
-        projectile:Destroy()
-    end)
-    
-    tween:Play()
-    
-    projectile.Parent = workspace.Projectiles
-end)
-
-serverClient.TweenSlidingDoor.OnClientEvent:Connect(function(door: BasePart, initialCFrame: CFrame, targetCFrame: CFrame): ()
-    door.CFrame = initialCFrame
-    TweenService:Create(door, TweenInfo.new(1, Enum.EasingStyle.Linear), {CFrame = targetCFrame}):Play()
-end)
-
-serverClient.TweenStandardDoor.OnClientEvent:Connect(StandardDoor)
 
 serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relativeCFrame: CFrame, normal: Vector3)
     local position = part.CFrame:ToWorldSpace(relativeCFrame).Position
