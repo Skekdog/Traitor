@@ -57,8 +57,8 @@ guns.HUGE = {
     ProjectileSpeed = 140,
 
     Model = models("HUGE"),
-    HoldAnimation = "12498608892",
-    AimAnimation = "18691844030",
+    HoldAnimation = "rbxassetid://12498608892",
+    AimAnimation = "rbxassetid://18691844030",
 
     FiredSound = firedSounds("HUGE"),
     ReloadSound = "",
@@ -100,8 +100,8 @@ guns.Scout = {
     AmmoType = Ammo.Rifle,
 
     Model = models("Scout"),
-    HoldAnimation = "10247529531",
-    AimAnimation = "18691492037",
+    HoldAnimation = "rbxassetid://10247529531",
+    AimAnimation = "rbxassetid://18691492037",
     FiredSound = firedSounds("Scout"),
     ReloadSound = reloadSounds("Scout"),
 
@@ -136,8 +136,8 @@ guns.Pistol = {
     AmmoType = Ammo["9mm"],
 
     Model = models("Pistol"),
-    HoldAnimation = "9253211833",
-    AimAnimation = "18691552315",
+    HoldAnimation = "rbxassetid://9253211833",
+    AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Pistol"),
     ReloadSound = reloadSounds("Pistol"),
 
@@ -170,7 +170,7 @@ guns["Golden Gun"] = {
 
     Spread = 0,
 
-    LaserColour = Color3.fromRGB(47, 47, 255),
+    LaserColor = Color3.fromRGB(47, 47, 255),
     
     MagazineSize = 1,
 
@@ -178,8 +178,8 @@ guns["Golden Gun"] = {
     ProjectileSpeed = 250,
 
     Model = models("Golden Gun"),
-    HoldAnimation = "9253211833",
-    AimAnimation = "18691552315",
+    HoldAnimation = "rbxassetid://9253211833",
+    AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Golden Gun"),
 
     FireTime = 0.5,
@@ -357,8 +357,8 @@ guns["Flare Gun"] = {
     MagazineSize = 6,
 
     Model = models("Flare Gun"),
-    HoldAnimation = "9253211833",
-    AimAnimation = "18691552315",
+    HoldAnimation = "rbxassetid://9253211833",
+    AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Flare Gun"),
 
     ProjectileBase = projectiles("Flare"),
@@ -424,8 +424,8 @@ guns.SMG = {
     AmmoType = Ammo.SMG1,
 
     Model = models("SMG"),
-    HoldAnimation = "12481091962",
-    AimAnimation = "18691799004",
+    HoldAnimation = "rbxassetid://12481091962",
+    AimAnimation = "rbxassetid://18691799004",
     FiredSound = firedSounds("SMG"),
     ReloadSound = reloadSounds("SMG"),
 
@@ -474,8 +474,8 @@ guns.AWP = {
     MagazineSize = 4,
 
     Model = models("AWP"),
-    HoldAnimation = "10247529531",
-    AimAnimation = "18691492037",
+    HoldAnimation = "rbxassetid://10247529531",
+    AimAnimation = "rbxassetid://18691492037",
     FiredSound = firedSounds("AWP"),
 
     ProjectileBase = bullet,
@@ -508,8 +508,8 @@ guns["Assault Rifle"] = {
     AimSpreadMultiplier = 0.25,
 
     Model = models("Assault Rifle"),
-    HoldAnimation = "10247380824",
-    AimAnimation = "18691831450",
+    HoldAnimation = "rbxassetid://10247380824",
+    AimAnimation = "rbxassetid://18691831450",
     FiredSound = firedSounds("Assault Rifle"),
     ReloadSound = reloadSounds("Assault Rifle"),
 
@@ -552,8 +552,8 @@ guns["Silenced Pistol"] = {
     AmmoType = Ammo["9mm"],
 
     Model = models("Silenced Pistol"),
-    HoldAnimation = "9253211833",
-    AimAnimation = "18691552315",
+    HoldAnimation = "rbxassetid://9253211833",
+    AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Silenced Pistol"),
     ReloadSound = reloadSounds("Silenced Pistol"),
 
@@ -609,8 +609,8 @@ guns.XM1014 = {
     ProjectileSpeed = 150,
 
     Model = models("XM1014"),
-    HoldAnimation = "11436160569",
-    AimAnimation = "18691725191",
+    HoldAnimation = "rbxassetid://11436160569",
+    AimAnimation = "rbxassetid://18691725191",
     FiredSound = firedSounds("XM1014"),
     ReloadSound = reloadSounds("XM1014"),
 
@@ -645,8 +645,8 @@ guns.Glock = {
     AmmoType = Ammo["9mm"],
 
     Model = models("Glock"),
-    HoldAnimation = "9253211833",
-    AimAnimation = "18691552315",
+    HoldAnimation = "rbxassetid://9253211833",
+    AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Glock"),
     ReloadSound = reloadSounds("Glock"),
 
@@ -687,8 +687,8 @@ guns.Deagle = {
     ProjectileSpeed = 190,
 
     Model = models("Deagle"),
-    HoldAnimation = "9253211833",
-    AimAnimation = "18691552315",
+    HoldAnimation = "rbxassetid://9253211833",
+    AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Deagle"),
     ReloadSound = reloadSounds("Deagle"),
 
@@ -723,8 +723,8 @@ guns.BAR = {
     AmmoType = Ammo["9mm"],
 
     Model = models("BAR"),
-    HoldAnimation = "10247380824",
-    AimAnimation = "18691831450",
+    HoldAnimation = "rbxassetid://10247380824",
+    AimAnimation = "rbxassetid://18691831450",
     FiredSound = firedSounds("BAR"),
     ReloadSound = reloadSounds("BAR"),
 
@@ -748,7 +748,7 @@ grenades.Grenade = {
     CanDrop = true,
 
     Projectile = "Grenade",
-    HoldAnimation = "12498620263",
+    HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 200,
 
@@ -771,7 +771,7 @@ grenades.Flashbang = {
     CanDrop = true,
 
     Projectile = "Flashbang",
-    HoldAnimation = "12498620263",
+    HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 0,
 
@@ -795,7 +795,7 @@ grenades["Incendiary Grenade"] = {
     CanDrop = true,
 
     Projectile = "Incendiary Grenade",
-    HoldAnimation = "12498620263",
+    HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 10,
 
@@ -869,7 +869,7 @@ grenades["Smoke Grenade"] = {
     CanDrop = true,
 
     Projectile = "Smoke Grenade",
-    HoldAnimation = "12498620263",
+    HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 0,
 
@@ -903,7 +903,7 @@ grenades["Discombobulator"] = {
     CanDrop = true,
 
     Projectile = "Discombobulator",
-    HoldAnimation = "12498620263",
+    HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 0,
 
@@ -930,8 +930,8 @@ melees.Crowbar = {
     DamageKind = "Bludgeon" :: "Bludgeon",
 
     Model = models("Crowbar"),
-    HoldAnimation = "10247423634",
-    AttackAnimation = "13269497293",
+    HoldAnimation = "rbxassetid://10247423634",
+    AttackAnimation = "rbxassetid://13269497293",
 
     MaxDistance = 7,
     Damage = 20,
@@ -947,7 +947,7 @@ items["Magneto Stick"] = {
     CanDrop = false,
 
     Model = models("Magneto Stick"),
-    HoldAnimation = "10247423634",
+    HoldAnimation = "rbxassetid://10247423634",
 
     PrimaryHint = "Push Prop",
     AlternateHint = "Grab Prop",
@@ -960,7 +960,7 @@ items["DNA Scanner"] = {
     CanDrop = true,
 
     Model = models("DNA Scanner"),
-    HoldAnimation = "10247423634",
+    HoldAnimation = "rbxassetid://10247423634",
 
     PrimaryHint = "Scan Identified Body",
 }

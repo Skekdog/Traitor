@@ -1,9 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ItemTypes = require(script.Parent.ItemTypes)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local MuzzleFlash = require(script.Parent.MuzzleFlash)
 local spring = require(script.Parent.spring)
 
 local module = {}
@@ -18,8 +17,8 @@ local bobbingSpring = spring.new(10, 1)
 module.ReloadSpring = spring.new(7, 0.8)
 
 type Viewmodel = typeof(ReplicatedStorage.Viewmodel)
-local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
-    if not gun.LaserColour then
+local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
+    if not gun.LaserColor then
         return
     end
 
@@ -47,7 +46,7 @@ local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
         ball.CastShadow = false
         ball.Transparency = 0.2
         ball.Material = Enum.Material.Neon
-        ball.Color = gun.LaserColour
+        ball.Color = gun.LaserColor
 
         ball.CanCollide = false
         ball.CanTouch = false
@@ -69,7 +68,7 @@ local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
         laser = ReplicatedStorage.Laser:Clone()
         assert(laser)
 
-        laser.Color = gun.LaserColour
+        laser.Color = gun.LaserColor
         laser.Material = Enum.Material.Neon
 
         laser.Parent = item
@@ -83,10 +82,7 @@ local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
     local rayParams = RaycastParams.new()
     local map = LocalRoundInfo.GetMap()
     if map then
-        local bounds = map:FindFirstChild("Bounds")
-        if bounds then
-            rayParams:AddToFilter(bounds)
-        end
+        rayParams:AddToFilter(map.Bounds)
     end
     rayParams.FilterDescendantsInstances = {viewmodel}
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
@@ -104,8 +100,8 @@ local function laser(viewmodel: Viewmodel, gun: ItemTypes.GunDefinition): ()
     ball.Position = if result then result.Position else Vector3.new()
 end
 
-function module.Show(item: ItemTypes.Item): ()
-    if not item.Base.HoldAnimation then
+function module.Show(item: Types.AnyItemDefinition): ()
+    if not item.HoldAnimation or not item.Model then
         module.Hide()
         return
     end
@@ -134,7 +130,7 @@ function module.Show(item: ItemTypes.Item): ()
             bodyColours:Clone().Parent = viewmodel
         end
         
-        viewmodel.Parent = camera
+        viewmodel.Parent = camera :: any
     else
         local model = viewmodel:FindFirstChild("Item")
         if model then
@@ -146,14 +142,14 @@ function module.Show(item: ItemTypes.Item): ()
         end
     end
 
-    local model = item.Base.Model:Clone()
+    local model = item.Model:Clone()
     model.Name = "Item"
 
     local motor = Instance.new("Motor6D")
     motor.Part0 = viewmodel.RightHand
     motor.Part1 = model
 
-    local c1 = item.Base.Model:GetAttribute("AnimC1")
+    local c1 = item.Model:GetAttribute("AnimC1")
     if typeof(c1) == "CFrame" then
         motor.C1 = c1
     end
@@ -181,7 +177,7 @@ function module.Show(item: ItemTypes.Item): ()
         viewmodel.UpperTorso.CanCollide = false
     end)
 
-    module.PlayAnimation(item.Base.HoldAnimation)
+    module.PlayAnimation(item.HoldAnimation)
 
     if renderCon then
         renderCon:Disconnect()
@@ -217,19 +213,19 @@ function module.Show(item: ItemTypes.Item): ()
         (viewmodel.PrimaryPart :: BasePart).CFrame = final
 
         if item.Kind == "Gun" then
-            laser(viewmodel, item.Base)
+            laser(viewmodel, item)
         end
     end)
 end
 
-function module.PlayAnimation(id: number, name: string?): ()
+function module.PlayAnimation(uri: string, name: string?): ()
     local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
     if not viewmodel then
         return
     end
 
     local animation = Instance.new("Animation")
-    animation.AnimationId = "rbxassetid://"..id
+    animation.AnimationId = uri
 
     local track = viewmodel.Humanoid.Animator:LoadAnimation(animation)
     track.Name = name or ""
@@ -259,31 +255,5 @@ function module.Hide(): ()
         renderCon:Disconnect()
     end
 end
-
-LocalRoundInfo.Listen("PrimaryFire", function(item: ItemTypes.Weapon)
-    if item.Kind == "Gun" then
-        local x = item.Base.RecoilX / 4
-        local y = item.Base.RecoilY / 4
-
-        local AimWeaponClient = (require)(script.Parent.AimWeaponClient)
-        if AimWeaponClient.IsAiming then
-            x /= 2
-            y /= 2
-        end
-
-        armRecoilSpring.p = Vector3.new(x, y, 0)
-        cameraRecoilSpring.p = Vector3.new(y, x, x + y)
-
-        local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
-        if viewmodel then
-            local model = viewmodel:FindFirstChild("Item")
-            if model and model:IsA("BasePart") then
-                MuzzleFlash(model)
-            end
-        end
-    elseif item.Kind == "Melee" then
-        module.PlayAnimation(item.Base.HitAnimation)
-    end
-end)
 
 return module

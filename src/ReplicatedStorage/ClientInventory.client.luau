@@ -6,6 +6,7 @@ local ThemesManager = require(script.Parent.ThemesManager)
 local UIAnimation = require(script.Parent.UIAnimation)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.UIManager)
+local ViewmodelModule = require(script.Parent.ViewmodelModule)
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
 
 local sampleButton = ui.Object.Sample
@@ -28,6 +29,8 @@ local function tryUnequip(item: Types.AnyItem): ()
 	end
 
 	button.BackgroundTransparency = 0.75
+
+	ViewmodelModule.Hide()
 end
 
 local function tryEquip(item: Types.AnyItem): ()
@@ -45,6 +48,8 @@ local function tryEquip(item: Types.AnyItem): ()
 
 	button.BackgroundTransparency = 0.25
 	selectedItem = item
+
+	ViewmodelModule.Show(item.Definition)
 end
 
 local INV_BUTTON_SIZE = 0.065
