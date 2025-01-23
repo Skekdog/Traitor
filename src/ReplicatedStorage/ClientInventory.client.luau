@@ -221,13 +221,23 @@ ControlManager.Register("Next Weapon", false, function()
 	return Enum.ContextActionResult.Pass
 end)
 
-ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove", item: string | Types.AnyItem): ()
+ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.AnyItem): ()
 	if mode == "Add" then
 		assert(typeof(item) == "table", "Item must be a table")
 		addItem(item)
-	else
+	elseif mode == "Remove" then
 		assert(typeof(item) == "string", "Item must be a string")
 		removeItem(item)
+	elseif mode == "Reset" then
+		for _, v in ourInventory.Passive do
+			removeItem(v.Definition.Name)
+		end
+
+		for _, v in ourInventory.Slots do
+			removeItem(v.Definition.Name)
+		end
+	else
+		error("Invalid mode")
 	end
 end)
 
