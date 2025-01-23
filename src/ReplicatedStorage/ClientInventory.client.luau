@@ -139,6 +139,10 @@ local function tryRemoveButton(itemName: string)
 end
 
 local function removeItem(itemName: string): ()
+	if selectedItem and selectedItem.Definition.Name == itemName then
+		tryUnequip(selectedItem)
+	end
+	
 	local item = GetItemDefinition(itemName)
 	if not item then
 		return
