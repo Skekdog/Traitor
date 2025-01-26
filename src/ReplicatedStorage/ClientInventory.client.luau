@@ -178,18 +178,21 @@ for i = 1, 9 do
 	end)
 end
 
-local function minN(table: {any}): number?
-	for i in table do
-		if table[i] then
-			return i
-		end
-	end
-	return
+local function getMinIndex(tbl: {[number]: any}): number
+    -- note: the order of non-sequential table keys is undefined
+    local lowest = table.maxn(tbl :: {any})
+    for i in tbl do
+        if i < lowest then
+            lowest = i :: number
+        end
+    end
+
+    return lowest
 end
 
 local function selectLowest()
-	local lowest = minN(ourInventory.Slots)
-	if not lowest then
+	local lowest = getMinIndex(ourInventory.Slots)
+	if lowest == 0 then
 		return Enum.ContextActionResult.Pass
 	end
 	tryEquip(ourInventory.Slots[lowest])
