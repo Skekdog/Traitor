@@ -95,3 +95,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(character)
     -- Delete default running sound
     character:WaitForChild("HumanoidRootPart"):WaitForChild("Running"):Destroy()
 end)
+
+Players.LocalPlayer.CharacterRemoving:Connect(function()
+    currentSound:Stop()
+end)
