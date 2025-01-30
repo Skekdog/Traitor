@@ -56,15 +56,17 @@ local function validateRaycast(by: Types.Participant, origin: Vector3, destinati
 		return "TargetTooFar"
 	end
 
-	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {by.Round:GetMap().StaticMap}
-	params.FilterType = Enum.RaycastFilterType.Include
-	params.RespectCanCollide = true
-	params.IgnoreWater = true
+	if target then
+		local params = RaycastParams.new()
+		params.FilterDescendantsInstances = {by.Round:GetMap().StaticMap}
+		params.FilterType = Enum.RaycastFilterType.Include
+		params.RespectCanCollide = true
+		params.IgnoreWater = true
 
-	local result = workspace:Raycast(origin, destination - origin, params)
-	if result and result.Instance ~= target then
-		return "StaticObscured"
+		local result = workspace:Raycast(origin, destination - origin, params)
+		if result and result.Instance ~= target then
+			return "StaticObscured"
+		end
 	end
 
 	return "Success"
