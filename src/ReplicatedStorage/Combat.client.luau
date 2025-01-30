@@ -23,7 +23,7 @@ local function raycast(root: BasePart): RaycastResult?
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {map.Bounds}
+	params.FilterDescendantsInstances = {map.Bounds, assert(root:FindFirstAncestorOfClass("Model"))}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
@@ -68,7 +68,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			end
 
 			local ownPosition = root.Position
-			local targetPosition = raycastResult.Position
+			local targetPosition = (raycastResult.Instance :: BasePart).Position
 			local hitPart = raycastResult.Instance
 			local itemName = item.Definition.Name
 
