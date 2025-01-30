@@ -43,7 +43,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	end
 
 	ControlManager.Register("Primary Fire", true, function(_, _, input)
-		while input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
+		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
 			task.wait()
 			if item.Kind == "Gun" and item.Ammo < 0 then
 				print(2)
