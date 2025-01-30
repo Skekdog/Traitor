@@ -29,6 +29,10 @@ local function runCallbacks(): ()
 	end
 end
 
+module.ConnectEquippedItemChanged(function(item): ()
+	ReplicatedStorage.ClientServer.EquipItem:FireServer(if item then item.Definition.Name else nil)
+end)
+
 local function tryUnequip(item: Types.AnyItem): ()
 	if module.EquippedItem ~= item then
 		return

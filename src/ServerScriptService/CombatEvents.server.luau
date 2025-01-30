@@ -2,6 +2,28 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Combat = require(script.Parent.Combat)
 local RoundHandler = require(script.Parent.RoundHandler)
 
+ReplicatedStorage.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, itemName: unknown)
+	if itemName and typeof(itemName) ~= "string" then
+		return
+	end
+
+	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
+	if not participant then
+		return
+	end
+
+	if not itemName then
+		return participant:SetEquippedItem()
+	end
+
+	local item = participant:GetItems()[itemName]
+	if not item then
+		return participant:SetEquippedItem()
+	end
+
+	participant:SetEquippedItem(item)
+end)
+
 ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, itemName: unknown)
 	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" then
 		return print("invalid position args")
@@ -22,6 +44,7 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, o
 
 	local item = participant:GetEquippedItem()
 	if not item or item.Definition.Name ~= itemName then
+		print(item, itemName)
 		return print("invalid item")
 	end
 
