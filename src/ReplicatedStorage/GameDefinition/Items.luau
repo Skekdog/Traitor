@@ -49,7 +49,7 @@ guns.HUGE = {
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
-    FireTime = 0.01,
+    AttackInterval = 0.01,
     ReloadTime = 0,
     MagazineSize = 250,
 
@@ -95,7 +95,7 @@ guns.Scout = {
     ProjectileBase = bullet,
     ProjectileSpeed = 250,
 
-    FireTime = 1,
+    AttackInterval = 1,
     ReloadTime = 1.5,
     AmmoType = Ammo.Rifle,
 
@@ -131,7 +131,7 @@ guns.Pistol = {
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
 
-    FireTime = 0.5,
+    AttackInterval = 0.5,
     ReloadTime = 1,
     AmmoType = Ammo["9mm"],
 
@@ -182,7 +182,7 @@ guns["Golden Gun"] = {
     AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Golden Gun"),
 
-    FireTime = 0.5,
+    AttackInterval = 0.5,
     ReloadTime = 0,
 
     AimFOV = 70,
@@ -352,7 +352,7 @@ guns["Flare Gun"] = {
 
     Spread = 1,
     
-    FireTime = 0.25,
+    AttackInterval = 0.25,
     ReloadTime = 0,
     MagazineSize = 6,
 
@@ -419,7 +419,7 @@ guns.SMG = {
 
     Spread = 1,
     
-    FireTime = 0.05,
+    AttackInterval = 0.05,
     ReloadTime = 1,
     AmmoType = Ammo.SMG1,
 
@@ -469,7 +469,7 @@ guns.AWP = {
 
     Spread = 0.25,
 
-    FireTime = 2,
+    AttackInterval = 2,
     ReloadTime = 0,
     MagazineSize = 4,
 
@@ -500,7 +500,7 @@ guns["Assault Rifle"] = {
         Limb = 20,
     },
 
-    FireTime = 0.15,
+    AttackInterval = 0.15,
     ReloadTime = 1.5,
     AmmoType = Ammo["9mm"],
 
@@ -547,7 +547,7 @@ guns["Silenced Pistol"] = {
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
 
-    FireTime = 0.5,
+    AttackInterval = 0.5,
     ReloadTime = 1,
     AmmoType = Ammo["9mm"],
 
@@ -599,7 +599,7 @@ guns.XM1014 = {
 
     Spread = 1.5,
 
-    FireTime = 0.8,
+    AttackInterval = 0.8,
     ReloadTime = 1.5,
     AmmoType = Ammo.Shotgun,
 
@@ -640,7 +640,7 @@ guns.Glock = {
 
     Spread = 0.35,
 
-    FireTime = 0.1,
+    AttackInterval = 0.1,
     ReloadTime = 1,
     AmmoType = Ammo["9mm"],
 
@@ -679,7 +679,7 @@ guns.Deagle = {
 
     Spread = 0.25,
 
-    FireTime = 0.5,
+    AttackInterval = 0.5,
     ReloadTime = 1.2,
     AmmoType = Ammo.Deagle,
 
@@ -718,7 +718,7 @@ guns.BAR = {
     FalloffEnd = 120,
     FalloffMultiplier = 0.3,
 
-    FireTime = 0.1,
+    AttackInterval = 0.1,
     ReloadTime = 2.5,
     AmmoType = Ammo["9mm"],
 

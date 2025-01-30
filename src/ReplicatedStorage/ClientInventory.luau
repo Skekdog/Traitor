@@ -9,19 +9,34 @@ local UIManager = require(script.Parent.UIManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
 
+local module = {}
+
 local sampleButton = ui.Object.Sample
 type ItemButton = typeof(sampleButton)
 
 local ourInventory: {Passive: {Types.AnyItem}, Slots: {[number]: Types.AnyItem}} = {Passive = {}, Slots = {}}
 
-local selectedItem: Types.AnyItem?
+module.EquippedItem = nil :: Types.AnyItem?
+
+local itemChangedConnections: {(item: Types.AnyItem?) -> ()} = {}
+function module.ConnectEquippedItemChanged(callback: (item: Types.AnyItem?) -> ()): ()
+	table.insert(itemChangedConnections, callback)
+end
+
+local function runCallbacks(): ()
+	for _, v in itemChangedConnections do
+		task.spawn(v, module.EquippedItem)
+	end
+end
 
 local function tryUnequip(item: Types.AnyItem): ()
-	if selectedItem ~= item then
+	if module.EquippedItem ~= item then
 		return
 	end
 
-	selectedItem = nil
+	module.EquippedItem = nil
+
+	runCallbacks()
 
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
 	if not button then
@@ -34,11 +49,11 @@ local function tryUnequip(item: Types.AnyItem): ()
 end
 
 local function tryEquip(item: Types.AnyItem): ()
-	if selectedItem then
-		if selectedItem == item then
+	if module.EquippedItem then
+		if module.EquippedItem == item then
 			return tryUnequip(item)
 		end
-		tryUnequip(selectedItem)
+		tryUnequip(module.EquippedItem)
 	end
 
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
@@ -47,7 +62,9 @@ local function tryEquip(item: Types.AnyItem): ()
 	end
 
 	button.BackgroundTransparency = 0.25
-	selectedItem = item
+	module.EquippedItem = item
+
+	runCallbacks()
 
 	ViewmodelModule.Show(item.Definition)
 end
@@ -139,8 +156,8 @@ local function tryRemoveButton(itemName: string)
 end
 
 local function removeItem(itemName: string): ()
-	if selectedItem and selectedItem.Definition.Name == itemName then
-		tryUnequip(selectedItem)
+	if module.EquippedItem and module.EquippedItem.Definition.Name == itemName then
+		tryUnequip(module.EquippedItem)
 	end
 	
 	local item = GetItemDefinition(itemName)
@@ -200,11 +217,11 @@ local function selectLowest()
 end
 
 ControlManager.Register("Next Weapon", false, function()
-	if not selectedItem then
+	if not module.EquippedItem then
 		return selectLowest()
 	end
 
-	local selectedSlot = selectedItem.Definition.Slot
+	local selectedSlot = module.EquippedItem.Definition.Slot
 	if not selectedSlot then
 		return Enum.ContextActionResult.Pass
 	end
@@ -249,3 +266,5 @@ ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(functi
 end)
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+
+return module
