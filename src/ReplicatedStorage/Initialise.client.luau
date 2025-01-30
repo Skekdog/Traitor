@@ -28,6 +28,9 @@ KeybindHintManager()
 
 serverClient.BulletTracer.OnClientEvent:Connect(BulletTracer)
 
+local notice = UIManager.WaitForUI("Notice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Notice)}
+notice:ToggleVisible(true)
+
 local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}
 
 ClientInventory.ConnectEquippedItemChanged(function(item)
