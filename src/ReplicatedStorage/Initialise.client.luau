@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
+local BulletTracer = require(script.Parent.BulletTracer)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local ControlManager = require(script.Parent.ControlManager)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
@@ -22,6 +23,8 @@ serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
 
 ThemesManager.UpdateTheme("Dark")
 KeybindHintManager()
+
+serverClient.BulletTracer.OnClientEvent:Connect(BulletTracer)
 
 serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relativeCFrame: CFrame, normal: Vector3)
     local position = part.CFrame:ToWorldSpace(relativeCFrame).Position

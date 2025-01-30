@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BulletTracer = require(ReplicatedStorage.BulletTracer)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local module = {}
 
@@ -112,6 +113,10 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 	end
 
 	local definition = item.Definition
+
+	if definition.Kind == "Gun" and definition.Projectile then
+		BulletTracer(definition.Projectile, 100, origin, destination)
+	end
 
 	if hitPart then
 		local victim = tryGetParticipantFromPart(by.Round, hitPart)
