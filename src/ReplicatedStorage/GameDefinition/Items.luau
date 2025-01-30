@@ -53,7 +53,7 @@ guns.HUGE = {
     ReloadTime = 0,
     MagazineSize = 250,
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 140,
 
     Model = models("HUGE"),
@@ -92,7 +92,7 @@ guns.Scout = {
         Head = 150,
     },
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 250,
 
     AttackInterval = 1,
@@ -141,7 +141,7 @@ guns.Pistol = {
     FiredSound = firedSounds("Pistol"),
     ReloadSound = reloadSounds("Pistol"),
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 100,
 
     RecoilX = 0.2,
@@ -174,7 +174,7 @@ guns["Golden Gun"] = {
     
     MagazineSize = 1,
 
-    ProjectileBase = projectiles("GoldenBullet"),
+    Projectile = projectiles("GoldenBullet"),
     ProjectileSpeed = 250,
 
     Model = models("Golden Gun"),
@@ -361,7 +361,7 @@ guns["Flare Gun"] = {
     AimAnimation = "rbxassetid://18691552315",
     FiredSound = firedSounds("Flare Gun"),
 
-    ProjectileBase = projectiles("Flare"),
+    Projectile = projectiles("Flare"),
     ProjectileSpeed = 140,
 
     AimFOV = 60,
@@ -429,7 +429,7 @@ guns.SMG = {
     FiredSound = firedSounds("SMG"),
     ReloadSound = reloadSounds("SMG"),
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 140,
 
     AimFOV = 60,
@@ -478,7 +478,7 @@ guns.AWP = {
     AimAnimation = "rbxassetid://18691492037",
     FiredSound = firedSounds("AWP"),
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 300,
 
     RecoilX = 0.8,
@@ -517,7 +517,7 @@ guns["Assault Rifle"] = {
     FalloffEnd = 125,
     FalloffMultiplier = 0.5,
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 150,
 
     RecoilX = 0.6,
@@ -557,7 +557,7 @@ guns["Silenced Pistol"] = {
     FiredSound = firedSounds("Silenced Pistol"),
     ReloadSound = reloadSounds("Silenced Pistol"),
 
-    ProjectileBase = projectiles("SilencedBullet"),
+    Projectile = projectiles("SilencedBullet"),
     ProjectileSpeed = 100,
 
     BeforeHitParticipant = function(_, victim: Types.Participant)
@@ -605,7 +605,7 @@ guns.XM1014 = {
 
     BulletsPerShot = 6,
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 150,
 
     Model = models("XM1014"),
@@ -650,7 +650,7 @@ guns.Glock = {
     FiredSound = firedSounds("Glock"),
     ReloadSound = reloadSounds("Glock"),
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 190,
 
     RecoilX = 0.2,
@@ -683,7 +683,7 @@ guns.Deagle = {
     ReloadTime = 1.2,
     AmmoType = Ammo.Deagle,
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 190,
 
     Model = models("Deagle"),
@@ -728,7 +728,7 @@ guns.BAR = {
     FiredSound = firedSounds("BAR"),
     ReloadSound = reloadSounds("BAR"),
 
-    ProjectileBase = bullet,
+    Projectile = bullet,
     ProjectileSpeed = 120,
 
     AimFOV = 65,
@@ -747,7 +747,7 @@ grenades.Grenade = {
     Slot = 7,
     CanDrop = true,
 
-    Projectile = "Grenade",
+    Projectile = projectiles("Flashbang"),
     HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 200,
@@ -770,7 +770,7 @@ grenades.Flashbang = {
     CreditCost = 1,
     CanDrop = true,
 
-    Projectile = "Flashbang",
+    Projectile = projectiles("Flashbang"),
     HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 0,
@@ -794,7 +794,7 @@ grenades["Incendiary Grenade"] = {
     Slot = 4,
     CanDrop = true,
 
-    Projectile = "Incendiary Grenade",
+    Projectile = projectiles("Incendiary Grenade"),
     HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 10,
@@ -868,7 +868,6 @@ grenades["Smoke Grenade"] = {
     Slot = 4,
     CanDrop = true,
 
-    Projectile = "Smoke Grenade",
     HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 0,
@@ -888,7 +887,7 @@ grenades["Smoke Grenade"] = {
 
     FuseTime = 3,
 
-    ProjectileBase = models("Smoke Grenade"),
+    Projectile = models("Smoke Grenade"),
     ProjectileForce = 60,
     Spread = 0.25,
 
@@ -902,7 +901,7 @@ grenades["Discombobulator"] = {
     Slot = 4,
     CanDrop = true,
 
-    Projectile = "Discombobulator",
+    Projectile = projectiles("Discombobulator"),
     HoldAnimation = "rbxassetid://12498620263",
 
     Damage = 0,

@@ -73,22 +73,6 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			local hitPartCenterPosition = hitPart.Position
 			local itemName = item.Definition.Name
 
-			local p1 = Instance.new("Part")
-			p1.Material = Enum.Material.Neon
-			p1.Color = Color3.new(0,1,0)
-			p1.Anchored = true
-			p1.Position = ownPosition
-			p1.CanCollide = false
-			p1.Size = Vector3.new(1, 1, 1)
-			p1.Parent = workspace
-
-			local p2 = p1:Clone()
-			p2.Position = targetPosition
-			p2.Parent = workspace
-
-			task.delay(5, p1.Destroy, p1)
-			task.delay(5, p2.Destroy, p2)
-
 			ReplicatedStorage.ClientServer.PrimaryFire:FireServer(ownPosition, targetPosition, hitPart, hitPartCenterPosition, itemName)
 		end
 

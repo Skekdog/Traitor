@@ -115,7 +115,7 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 	local definition = item.Definition
 
 	if definition.Kind == "Gun" and definition.Projectile then
-		BulletTracer(definition.Projectile, 100, origin, destination)
+		BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, origin, destination)
 	end
 
 	if hitPart then
