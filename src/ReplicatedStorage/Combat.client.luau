@@ -16,19 +16,19 @@ local function getCenterRay(): Ray
     return camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
 end
 
-local function raycast(root: BasePart): RaycastResult?
+local function raycast(head: BasePart): RaycastResult?
 	local map = LocalRoundInfo.GetMap()
 	if not map then
 		return
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {map.Bounds, assert(root:FindFirstAncestorOfClass("Model"))}
+	params.FilterDescendantsInstances = {map.Bounds, assert(head:FindFirstAncestorOfClass("Model"))}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
 
-	return workspace:Raycast(root.Position, getCenterRay().Direction * 10000, params)
+	return workspace:Raycast(head.Position, getCenterRay().Direction * 10000, params)
 end
 
 player.CharacterRemoving:Connect(function()
@@ -58,21 +58,38 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				(item :: Types.GunWeapon).LastAttackTime = tick()
 			end
 
-			local root = char:WaitForChild("HumanoidRootPart")
-			assert(root and root:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
+			local head = char:WaitForChild("Head")
+			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
-			local raycastResult = raycast(root)
+			local raycastResult = raycast(head)
 			if not raycastResult then
 				print(4)
 				continue
 			end
 
-			local ownPosition = root.Position
-			local targetPosition = (raycastResult.Instance :: BasePart).Position
-			local hitPart = raycastResult.Instance
+			local ownPosition = head.Position
+			local targetPosition = raycastResult.Position
+			local hitPart = raycastResult.Instance :: BasePart
+			local hitPartCenterPosition = hitPart.Position
 			local itemName = item.Definition.Name
 
-			ReplicatedStorage.ClientServer.PrimaryFire:FireServer(ownPosition, targetPosition, hitPart, itemName)
+			local p1 = Instance.new("Part")
+			p1.Material = Enum.Material.Neon
+			p1.Color = Color3.new(0,1,0)
+			p1.Anchored = true
+			p1.Position = ownPosition
+			p1.CanCollide = false
+			p1.Size = Vector3.new(1, 1, 1)
+			p1.Parent = workspace
+
+			local p2 = p1:Clone()
+			p2.Position = targetPosition
+			p2.Parent = workspace
+
+			task.delay(5, p1.Destroy, p1)
+			task.delay(5, p2.Destroy, p2)
+
+			ReplicatedStorage.ClientServer.PrimaryFire:FireServer(ownPosition, targetPosition, hitPart, hitPartCenterPosition, itemName)
 		end
 
 		return Enum.ContextActionResult.Sink

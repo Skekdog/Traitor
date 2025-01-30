@@ -24,8 +24,8 @@ ReplicatedStorage.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, ite
 	participant:SetEquippedItem(item)
 end)
 
-ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, itemName: unknown)
-	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" then
+ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, hitPartCenterPosition: unknown, itemName: unknown)
+	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" or typeof(hitPartCenterPosition) ~= "Vector3" then
 		return print("invalid position args")
 	end
 
@@ -48,5 +48,5 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, o
 		return print("invalid item")
 	end
 
-	print(Combat.PrimaryFire(participant, item, ownPosition, targetPosition, hitPart))
+	print(Combat.PrimaryFire(participant, item, ownPosition, targetPosition, hitPart, hitPartCenterPosition))
 end)

@@ -5,6 +5,7 @@ local module = {}
 
 local MAX_SHOOTER_DISTANCE = 15
 local MAX_TARGET_DISTANCE = 10
+local STATIC_OBSCURE_DISTANCE = 0.05
 
 export type ValidateRaycastResult = "TargetTooFar" | "ShooterTooFar" | "StaticObscured" | "Success"
 
@@ -46,13 +47,18 @@ local function tryGetParticipantFromPart(round: Types.Round, part: BasePart): Ty
 end
 
 -- only considers static map
-local function validateRaycast(by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?): ValidateRaycastResult
+local function validateRaycast(by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3): ValidateRaycastResult
 	local char = by:GetCharacter()
-	if not char or (char:GetPivot().Position - origin).Magnitude > MAX_SHOOTER_DISTANCE then
+	if not char then
 		return "ShooterTooFar"
 	end
 
-	if target and (target.Position - destination).Magnitude > MAX_TARGET_DISTANCE then
+	local head = char:WaitForChild("Head")
+	if not head or not head:IsA("BasePart") or (head.Position - origin).Magnitude > MAX_SHOOTER_DISTANCE then
+		return "ShooterTooFar"
+	end
+
+	if target and (target.Position - targetCenterPosition).Magnitude > MAX_TARGET_DISTANCE then
 		return "TargetTooFar"
 	end
 
@@ -63,9 +69,15 @@ local function validateRaycast(by: Types.Participant, origin: Vector3, destinati
 		params.RespectCanCollide = true
 		params.IgnoreWater = true
 
+		-- We need to check the distance between the hit target and the actual intended target.
+		-- Reason being, some maps unfortunately feature Z-fighting, leading to hits being rejected as they were "obscured" by a part in the same exact place.
+		-- We do still set the actual target as the hit result though
+
 		local result = workspace:Raycast(origin, destination - origin, params)
 		if result and result.Instance ~= target then
-			return "StaticObscured"
+			if (result.Position - destination).Magnitude > STATIC_OBSCURE_DISTANCE then
+				return "StaticObscured"
+			end
 		end
 	end
 
@@ -88,13 +100,13 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem): Va
 	return "Success"
 end
 
-function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?): ValidateItemUsageResult
+function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?, hitPartCenterPosition: Vector3): ValidateItemUsageResult
 	local validateItemUsageResult = validateItemUsage(by, item)
 	if validateItemUsageResult ~= "Success" then
 		return validateItemUsageResult :: ValidateItemUsageResult
 	end
 
-	local validateRaycastResult = validateRaycast(by, origin, destination, hitPart)
+	local validateRaycastResult = validateRaycast(by, origin, destination, hitPart, hitPartCenterPosition)
 	if validateRaycastResult ~= "Success" then
 		return validateRaycastResult :: ValidateRaycastResult
 	end
