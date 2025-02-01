@@ -31,19 +31,19 @@ local function getSpreadVector(spread: number?): Vector3
 	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
 end
 
-local function raycast(head: BasePart, spread: Vector3): RaycastResult?
+local function raycast(char: Model, spread: Vector3): RaycastResult?
 	local map = LocalRoundInfo.GetMap()
 	if not map then
 		return
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {map.Bounds, assert(head:FindFirstAncestorOfClass("Model"))}
+	params.FilterDescendantsInstances = {map.Bounds, char}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
 
-	return workspace:Raycast(head.Position, (getCenterRay().Direction + spread).Unit * MAX_RANGE, params)
+	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (getCenterRay().Direction + spread).Unit * MAX_RANGE, params)
 end
 
 player.CharacterRemoving:Connect(function()
@@ -81,7 +81,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				local itemName = item.Definition.Name
 				local origin = head.Position
 
-				local raycastResult = raycast(head, spread)
+				local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread)
 
 				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, MAX_RANGE)
 				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
