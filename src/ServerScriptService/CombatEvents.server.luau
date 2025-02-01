@@ -24,6 +24,24 @@ ReplicatedStorage.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, ite
 	participant:SetEquippedItem(item)
 end)
 
+ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, itemName: unknown)
+	if typeof(itemName) ~= "string" then
+		return
+	end
+
+	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
+	if not participant then
+		return
+	end
+
+	local item = participant:GetItems()[itemName]
+	if not item or not item.Definition.Slot then
+		return
+	end
+
+	participant:DropItem(item, true)
+end)
+
 ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, hitPartCenterPosition: unknown, itemName: unknown)
 	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" then
 		return print("invalid position args")

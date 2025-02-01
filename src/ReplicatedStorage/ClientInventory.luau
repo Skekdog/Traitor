@@ -29,10 +29,6 @@ local function runCallbacks(): ()
 	end
 end
 
-module.ConnectEquippedItemChanged(function(item): ()
-	ReplicatedStorage.ClientServer.EquipItem:FireServer(if item then item.Definition.Name else nil)
-end)
-
 local function tryUnequip(item: Types.AnyItem): ()
 	if module.EquippedItem ~= item then
 		return
@@ -41,6 +37,8 @@ local function tryUnequip(item: Types.AnyItem): ()
 	module.EquippedItem = nil
 
 	runCallbacks()
+
+	ReplicatedStorage.ClientServer.EquipItem:FireServer(nil)
 
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
 	if not button then
@@ -67,6 +65,17 @@ local function tryEquip(item: Types.AnyItem): ()
 
 	button.BackgroundTransparency = 0.25
 	module.EquippedItem = item
+
+	ReplicatedStorage.ClientServer.EquipItem:FireServer(item.Definition.Name)
+
+	ControlManager.Register("Drop", true, function(_, state)
+		if state ~= Enum.UserInputState.End then
+			return Enum.ContextActionResult.Pass
+		end
+
+		ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name)
+		return Enum.ContextActionResult.Sink
+	end)
 
 	runCallbacks()
 
