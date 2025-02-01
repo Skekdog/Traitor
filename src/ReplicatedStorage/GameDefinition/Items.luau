@@ -60,7 +60,7 @@ guns.HUGE = {
     HoldAnimation = "rbxassetid://12498608892",
     AimAnimation = "rbxassetid://18691844030",
 
-    FiredSound = firedSounds("HUGE"),
+    AttackSound = firedSounds("HUGE"),
     ReloadSound = "",
 
     RecoilX = 1,
@@ -102,7 +102,7 @@ guns.Scout = {
     Model = models("Scout"),
     HoldAnimation = "rbxassetid://10247529531",
     AimAnimation = "rbxassetid://18691492037",
-    FiredSound = firedSounds("Scout"),
+    AttackSound = firedSounds("Scout"),
     ReloadSound = reloadSounds("Scout"),
 
     RecoilX = 0.5,
@@ -138,7 +138,7 @@ guns.Pistol = {
     Model = models("Pistol"),
     HoldAnimation = "rbxassetid://9253211833",
     AimAnimation = "rbxassetid://18691552315",
-    FiredSound = firedSounds("Pistol"),
+    AttackSound = firedSounds("Pistol"),
     ReloadSound = reloadSounds("Pistol"),
 
     Projectile = bullet,
@@ -180,7 +180,7 @@ guns["Golden Gun"] = {
     Model = models("Golden Gun"),
     HoldAnimation = "rbxassetid://9253211833",
     AimAnimation = "rbxassetid://18691552315",
-    FiredSound = firedSounds("Golden Gun"),
+    AttackSound = firedSounds("Golden Gun"),
 
     AttackInterval = 0.5,
     ReloadTime = 0,
@@ -359,7 +359,7 @@ guns["Flare Gun"] = {
     Model = models("Flare Gun"),
     HoldAnimation = "rbxassetid://9253211833",
     AimAnimation = "rbxassetid://18691552315",
-    FiredSound = firedSounds("Flare Gun"),
+    AttackSound = firedSounds("Flare Gun"),
 
     Projectile = projectiles("Flare"),
     ProjectileSpeed = 140,
@@ -426,7 +426,7 @@ guns.SMG = {
     Model = models("SMG"),
     HoldAnimation = "rbxassetid://12481091962",
     AimAnimation = "rbxassetid://18691799004",
-    FiredSound = firedSounds("SMG"),
+    AttackSound = firedSounds("SMG"),
     ReloadSound = reloadSounds("SMG"),
 
     Projectile = bullet,
@@ -476,7 +476,7 @@ guns.AWP = {
     Model = models("AWP"),
     HoldAnimation = "rbxassetid://10247529531",
     AimAnimation = "rbxassetid://18691492037",
-    FiredSound = firedSounds("AWP"),
+    AttackSound = firedSounds("AWP"),
 
     Projectile = bullet,
     ProjectileSpeed = 300,
@@ -510,7 +510,7 @@ guns["Assault Rifle"] = {
     Model = models("Assault Rifle"),
     HoldAnimation = "rbxassetid://10247380824",
     AimAnimation = "rbxassetid://18691831450",
-    FiredSound = firedSounds("Assault Rifle"),
+    AttackSound = firedSounds("Assault Rifle"),
     ReloadSound = reloadSounds("Assault Rifle"),
 
     FalloffStart = 75,
@@ -554,7 +554,7 @@ guns["Silenced Pistol"] = {
     Model = models("Silenced Pistol"),
     HoldAnimation = "rbxassetid://9253211833",
     AimAnimation = "rbxassetid://18691552315",
-    FiredSound = firedSounds("Silenced Pistol"),
+    AttackSound = firedSounds("Silenced Pistol"),
     ReloadSound = reloadSounds("Silenced Pistol"),
 
     Projectile = projectiles("SilencedBullet"),
@@ -611,7 +611,7 @@ guns.XM1014 = {
     Model = models("XM1014"),
     HoldAnimation = "rbxassetid://11436160569",
     AimAnimation = "rbxassetid://18691725191",
-    FiredSound = firedSounds("XM1014"),
+    AttackSound = firedSounds("XM1014"),
     ReloadSound = reloadSounds("XM1014"),
 
     RecoilX = 1.0,
@@ -647,7 +647,7 @@ guns.Glock = {
     Model = models("Glock"),
     HoldAnimation = "rbxassetid://9253211833",
     AimAnimation = "rbxassetid://18691552315",
-    FiredSound = firedSounds("Glock"),
+    AttackSound = firedSounds("Glock"),
     ReloadSound = reloadSounds("Glock"),
 
     Projectile = bullet,
@@ -689,7 +689,7 @@ guns.Deagle = {
     Model = models("Deagle"),
     HoldAnimation = "rbxassetid://9253211833",
     AimAnimation = "rbxassetid://18691552315",
-    FiredSound = firedSounds("Deagle"),
+    AttackSound = firedSounds("Deagle"),
     ReloadSound = reloadSounds("Deagle"),
 
     RecoilX = 0.3,
@@ -725,7 +725,7 @@ guns.BAR = {
     Model = models("BAR"),
     HoldAnimation = "rbxassetid://10247380824",
     AimAnimation = "rbxassetid://18691831450",
-    FiredSound = firedSounds("BAR"),
+    AttackSound = firedSounds("BAR"),
     ReloadSound = reloadSounds("BAR"),
 
     Projectile = bullet,
@@ -756,7 +756,7 @@ grenades.Grenade = {
 
     ProjectileForce = 0.75,
 
-    FiredSound = firedSounds("Grenade"),
+    AttackSound = firedSounds("Grenade"),
 }
 
 grenades.Flashbang = {
@@ -782,7 +782,7 @@ grenades.Flashbang = {
 
     ProjectileForce = 30,
 
-    FiredSound = firedSounds("Grenade"),
+    AttackSound = firedSounds("Grenade"),
 }
 
 grenades["Incendiary Grenade"] = {
@@ -855,7 +855,7 @@ grenades["Incendiary Grenade"] = {
 
     ProjectileForce = 60,
 
-    FiredSound = firedSounds("Grenade"),
+    AttackSound = firedSounds("Grenade"),
 }
 
 grenades["Smoke Grenade"] = {
@@ -887,7 +887,7 @@ grenades["Smoke Grenade"] = {
     Projectile = models("Smoke Grenade"),
     ProjectileForce = 60,
 
-    FiredSound = firedSounds("Grenade"),
+    AttackSound = firedSounds("Grenade"),
 }
 
 grenades["Discombobulator"] = {
@@ -910,7 +910,7 @@ grenades["Discombobulator"] = {
 
     ProjectileForce = 60,
 
-    FiredSound = firedSounds("Grenade"),
+    AttackSound = firedSounds("Grenade"),
 }
 
 local melees: {[string]: Types.MeleeWeaponDefinition} = {}
@@ -930,7 +930,7 @@ melees.Crowbar = {
     MaxDistance = 7,
     Damage = 20,
     AttackInterval = 0.3,
-    FiredSound = firedSounds("Crowbar"),
+    AttackSound = firedSounds("Crowbar"),
 }
 
 local items: {[string]: Types.ItemDefinition} = {}

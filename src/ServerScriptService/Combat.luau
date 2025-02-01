@@ -114,6 +114,19 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 
 	local definition = item.Definition
 
+	if definition.Kind == "Gun" or definition.Kind == "Melee" or definition.Kind == "Grenade" then
+		local char = by:GetCharacter()
+		if not char then
+			return "ShooterTooFar"
+		end
+
+		local sound = Instance.new("Sound")
+		sound.SoundId = definition.AttackSound
+		sound.PlayOnRemove = true
+		sound.Parent = char.PrimaryPart
+		sound:Destroy()
+	end
+
 	if definition.Kind == "Gun" and definition.Projectile then
 		BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, origin, destination)
 	end
