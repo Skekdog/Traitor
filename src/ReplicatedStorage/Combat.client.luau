@@ -16,7 +16,16 @@ local function getCenterRay(): Ray
     return camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
 end
 
-local function raycast(head: BasePart): RaycastResult?
+local random = Random.new(workspace:GetServerTimeNow())
+local function getSpreadVector(spread: number?): Vector3
+	if not spread then
+		return Vector3.zero
+	end
+
+	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
+end
+
+local function raycast(head: BasePart, spread: number?): RaycastResult?
 	local map = LocalRoundInfo.GetMap()
 	if not map then
 		return
@@ -28,7 +37,9 @@ local function raycast(head: BasePart): RaycastResult?
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
 
-	return workspace:Raycast(head.Position, getCenterRay().Direction * 10000, params)
+	local sv = getSpreadVector(spread)
+	print(sv)
+	return workspace:Raycast(head.Position, (getCenterRay().Direction + sv) * 10000, params)
 end
 
 player.CharacterRemoving:Connect(function()
@@ -61,7 +72,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			local head = char:WaitForChild("Head")
 			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
-			local raycastResult = raycast(head)
+			local raycastResult = raycast(head, if item.Kind == "Gun" then item.Definition.Spread else nil)
 			if not raycastResult then
 				print(4)
 				continue

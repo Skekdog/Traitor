@@ -40,7 +40,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item)
     end
 
     if item.Kind == "Gun" then
-        crosshair.Object.Size = UDim2.new(item.Definition.Spread, 0, item.Definition.Spread, 0) -- todo: these values ain't right
+        crosshair.Object.Size = UDim2.new(item.Definition.Spread * 5, 0, item.Definition.Spread * 5, 0) -- todo: these values ain't right
     else
         crosshair.Object.Size = UDim2.new()
     end

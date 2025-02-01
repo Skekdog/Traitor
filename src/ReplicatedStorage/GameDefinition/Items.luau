@@ -34,7 +34,7 @@ guns.HUGE = {
     Slot = 3,
     CanDrop = true,
     
-    Spread = 2,
+    Spread = 0.04,
 
     Damage = {
         Head = 15,
@@ -76,7 +76,7 @@ guns.Scout = {
     Slot = 3,
     CanDrop = true,
 
-    Spread = 0.25,
+    Spread = 0,
 
     FalloffStart = 180,
     FalloffEnd = 300,
@@ -122,7 +122,7 @@ guns.Pistol = {
         Limb = 20,
     },
 
-    Spread = 0.25,
+    Spread = 0.01,
 
     FalloffStart = 55,
     FalloffEnd = 110,
@@ -350,7 +350,7 @@ guns["Flare Gun"] = {
     FalloffEnd = 80,
     FalloffMultiplier = 0.5,
 
-    Spread = 1,
+    Spread = 0.015,
     
     AttackInterval = 0.25,
     ReloadTime = 0,
@@ -417,7 +417,7 @@ guns.SMG = {
     FalloffEnd = 80,
     FalloffMultiplier = 0.5,
 
-    Spread = 1,
+    Spread = 0.02,
     
     AttackInterval = 0.05,
     ReloadTime = 1,
@@ -467,7 +467,7 @@ guns.AWP = {
     ScopeRequired = true,
     HasScope = true,
 
-    Spread = 0.25,
+    Spread = 0,
 
     AttackInterval = 2,
     ReloadTime = 0,
@@ -492,7 +492,7 @@ guns["Assault Rifle"] = {
     Slot = 3,
     CanDrop = true,
 
-    Spread = 0.5,
+    Spread = 0.015,
 
     Damage = {
         Head = 60,
@@ -538,7 +538,7 @@ guns["Silenced Pistol"] = {
         Limb = 20,
     },
 
-    Spread = 0.25,
+    Spread = 0.01,
 
     FalloffStart = 55,
     FalloffEnd = 110,
@@ -597,7 +597,7 @@ guns.XM1014 = {
     AimFOV = 50,
     AimSpreadMultiplier = 0.7,
 
-    Spread = 1.5,
+    Spread = 0.03,
 
     AttackInterval = 0.8,
     ReloadTime = 1.5,
@@ -638,7 +638,7 @@ guns.Glock = {
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
 
-    Spread = 0.35,
+    Spread = 0.01,
 
     AttackInterval = 0.1,
     ReloadTime = 1,
@@ -677,7 +677,7 @@ guns.Deagle = {
     AimFOV = 50,
     AimSpreadMultiplier = 0.1,
 
-    Spread = 0.25,
+    Spread = 0,
 
     AttackInterval = 0.5,
     ReloadTime = 1.2,
@@ -712,7 +712,7 @@ guns.BAR = {
         Limb = 25,
     },
 
-    Spread = 0.75,
+    Spread = 0.02,
 
     FalloffStart = 50,
     FalloffEnd = 120,
@@ -755,7 +755,6 @@ grenades.Grenade = {
     FuseTime = 5,
 
     ProjectileForce = 0.75,
-    Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
 }
@@ -782,7 +781,6 @@ grenades.Flashbang = {
     FuseTime = 3,
 
     ProjectileForce = 30,
-    Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
 }
@@ -856,7 +854,6 @@ grenades["Incendiary Grenade"] = {
     FuseTime = 3,
 
     ProjectileForce = 60,
-    Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
 }
@@ -889,7 +886,6 @@ grenades["Smoke Grenade"] = {
 
     Projectile = models("Smoke Grenade"),
     ProjectileForce = 60,
-    Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
 }
@@ -913,7 +909,6 @@ grenades["Discombobulator"] = {
     FuseTime = 3,
 
     ProjectileForce = 60,
-    Spread = 0.25,
 
     FiredSound = firedSounds("Grenade"),
 }
