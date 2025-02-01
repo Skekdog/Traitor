@@ -68,7 +68,6 @@ local function validateRaycast(by: Types.Participant, origin: Vector3, destinati
 		local params = RaycastParams.new()
 		params.FilterDescendantsInstances = {by.Round:GetMap().StaticMap}
 		params.FilterType = Enum.RaycastFilterType.Include
-		params.RespectCanCollide = true
 		params.IgnoreWater = true
 
 		-- We need to check the distance between the hit target and the actual intended target.

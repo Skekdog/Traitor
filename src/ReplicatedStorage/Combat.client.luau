@@ -38,10 +38,10 @@ local function raycast(char: Model, spread: Vector3): RaycastResult?
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {map.Bounds, char}
+	params.FilterDescendantsInstances = {char}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
-	params.RespectCanCollide = true
+	params.CollisionGroup = "WeaponHitTargets"
 
 	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (getCenterRay().Direction + spread).Unit * MAX_RANGE, params)
 end
