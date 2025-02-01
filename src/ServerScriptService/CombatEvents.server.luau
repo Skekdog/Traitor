@@ -25,16 +25,24 @@ ReplicatedStorage.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, ite
 end)
 
 ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, hitPartCenterPosition: unknown, itemName: unknown)
-	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" or typeof(hitPartCenterPosition) ~= "Vector3" then
+	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" then
 		return print("invalid position args")
+	end
+
+	if typeof(itemName) ~= "string" then
+		return print("invalid itemname arg")
+	end
+
+	if hitPartCenterPosition and typeof(hitPartCenterPosition) ~= "Vector3" then
+		return print("invalid hitpartcenterposition arg")
 	end
 
 	if hitPart and (typeof(hitPart) ~= "Instance" or not hitPart:IsA("BasePart")) then
 		return print("invalid hitpart arg")
 	end
 
-	if typeof(itemName) ~= "string" then
-		return print("invalid itemname arg")
+	if (hitPartCenterPosition and not hitPart) or (not hitPartCenterPosition and hitPart) then
+		return print("invalid hitpart and hitpartcenterposition args")
 	end
 
 	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)

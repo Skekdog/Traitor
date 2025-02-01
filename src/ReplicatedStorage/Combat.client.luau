@@ -7,6 +7,8 @@ local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local player = Players.LocalPlayer
 
+local MAX_RANGE = 10000
+
 local function getCharacter(): Model?
 	return player.Character
 end
@@ -14,6 +16,10 @@ end
 local function getCenterRay(): Ray
     local camera = workspace.CurrentCamera
     return camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+end
+
+local function deriveTargetPosition(origin: Vector3, spread: Vector3, range: number): Vector3
+	return origin + (getCenterRay().Direction + spread).Unit * range
 end
 
 local random = Random.new(workspace:GetServerTimeNow())
@@ -25,7 +31,7 @@ local function getSpreadVector(spread: number?): Vector3
 	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
 end
 
-local function raycast(head: BasePart, spread: number?): RaycastResult?
+local function raycast(head: BasePart, spread: Vector3): RaycastResult?
 	local map = LocalRoundInfo.GetMap()
 	if not map then
 		return
@@ -37,9 +43,7 @@ local function raycast(head: BasePart, spread: number?): RaycastResult?
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
 
-	local sv = getSpreadVector(spread)
-	print(sv)
-	return workspace:Raycast(head.Position, (getCenterRay().Direction + sv) * 10000, params)
+	return workspace:Raycast(head.Position, (getCenterRay().Direction + spread).Unit * MAX_RANGE, params)
 end
 
 player.CharacterRemoving:Connect(function()
@@ -63,7 +67,6 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 
 			if item.Kind == "Melee" or item.Kind == "Gun" then
 				if item.LastAttackTime + item.Definition.AttackInterval > tick() then
-					print(3)
 					continue
 				end
 				(item :: Types.GunWeapon).LastAttackTime = tick()
@@ -72,19 +75,18 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			local head = char:WaitForChild("Head")
 			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
-			local raycastResult = raycast(head, if item.Kind == "Gun" then item.Definition.Spread else nil)
-			if not raycastResult then
-				print(4)
-				continue
-			end
+			local spread = getSpreadVector(if item.Kind == "Gun" then item.Definition.Spread else nil)
 
-			local ownPosition = head.Position
-			local targetPosition = raycastResult.Position
-			local hitPart = raycastResult.Instance :: BasePart
-			local hitPartCenterPosition = hitPart.Position
 			local itemName = item.Definition.Name
+			local origin = head.Position
 
-			ReplicatedStorage.ClientServer.PrimaryFire:FireServer(ownPosition, targetPosition, hitPart, hitPartCenterPosition, itemName)
+			local raycastResult = raycast(head, spread)
+
+			local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, MAX_RANGE)
+			local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
+			local hitPartCenterPosition = if hitPart then hitPart.Position else nil
+
+			ReplicatedStorage.ClientServer.PrimaryFire:FireServer(origin, targetPosition, hitPart, hitPartCenterPosition, itemName)
 		end
 
 		return Enum.ContextActionResult.Sink

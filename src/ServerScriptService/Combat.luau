@@ -48,7 +48,7 @@ local function tryGetParticipantFromPart(round: Types.Round, part: BasePart): Ty
 end
 
 -- only considers static map
-local function validateRaycast(by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3): ValidateRaycastResult
+local function validateRaycast(by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): ValidateRaycastResult
 	local char = by:GetCharacter()
 	if not char then
 		return "ShooterTooFar"
@@ -59,7 +59,7 @@ local function validateRaycast(by: Types.Participant, origin: Vector3, destinati
 		return "ShooterTooFar"
 	end
 
-	if target and (target.Position - targetCenterPosition).Magnitude > MAX_TARGET_DISTANCE then
+	if target and (target.Position - assert(targetCenterPosition)).Magnitude > MAX_TARGET_DISTANCE then
 		return "TargetTooFar"
 	end
 
@@ -101,7 +101,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem): Va
 	return "Success"
 end
 
-function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?, hitPartCenterPosition: Vector3): ValidateItemUsageResult
+function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?, hitPartCenterPosition: Vector3?): ValidateItemUsageResult
 	local validateItemUsageResult = validateItemUsage(by, item)
 	if validateItemUsageResult ~= "Success" then
 		return validateItemUsageResult :: ValidateItemUsageResult
