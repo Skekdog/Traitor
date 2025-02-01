@@ -75,18 +75,20 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			local head = char:WaitForChild("Head")
 			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
-			local spread = getSpreadVector(if item.Kind == "Gun" then item.Definition.Spread else nil)
+			for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
+				local spread = getSpreadVector(if item.Kind == "Gun" then item.Definition.Spread else nil)
 
-			local itemName = item.Definition.Name
-			local origin = head.Position
+				local itemName = item.Definition.Name
+				local origin = head.Position
 
-			local raycastResult = raycast(head, spread)
+				local raycastResult = raycast(head, spread)
 
-			local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, MAX_RANGE)
-			local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
-			local hitPartCenterPosition = if hitPart then hitPart.Position else nil
+				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, MAX_RANGE)
+				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
+				local hitPartCenterPosition = if hitPart then hitPart.Position else nil
 
-			ReplicatedStorage.ClientServer.PrimaryFire:FireServer(origin, targetPosition, hitPart, hitPartCenterPosition, itemName)
+				ReplicatedStorage.ClientServer.PrimaryFire:FireServer(origin, targetPosition, hitPart, hitPartCenterPosition, itemName)
+			end
 		end
 
 		return Enum.ContextActionResult.Sink
