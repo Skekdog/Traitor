@@ -15,6 +15,16 @@ export type ValidateItemUsageResult = "Dead" | "NotEnoughAmmo" | "FiringTooFast"
 										| "Success" | "UnknownItem" | "NotInRound" | ValidateRaycastResult
 										
 
+local function isOf(part: BasePart, name: string, match: boolean?): boolean?
+	local accessoryWeld = part:FindFirstChild("AccessoryWeld") :: Weld
+	if accessoryWeld and accessoryWeld.Part1 and accessoryWeld.Part1.Name == name then
+		if accessoryWeld.Part1.Name == name or (match and (accessoryWeld.Part1.Name:match(name) ~= nil)) then
+			return true
+		end
+	end
+	return (part.Name == name) or (part:FindFirstAncestor(name) ~= nil) or (match and (part.Name:match(name) ~= nil))
+end
+
 local function getItemDamage(definition: Types.AnyItemDefinition, hitPart: BasePart): number
 	assert(definition.Kind ~= "Item", "Item has no damage")
 
@@ -23,11 +33,11 @@ local function getItemDamage(definition: Types.AnyItemDefinition, hitPart: BaseP
 	end
 
 	local hitArea: "Body" | "Head" | "Limb" = "Limb"
-	if hitPart.Name == "Head" then
+	if isOf(hitPart, "Head") then
 		hitArea = "Head"
-	elseif hitPart.Name:match("Torso") or hitPart.Name == "HumanoidRootPart" then
+	elseif isOf(hitPart, "Torso", true) or isOf(hitPart, "HumanoidRootPart") then
 		hitArea = "Body"
-	elseif hitPart.Name:match("Leg") or hitPart.Name:match("Arm") or hitPart.Name:match("Foot") or hitPart.Name:match("Hand") then
+	else
 		hitArea = "Limb"
 	end
 
