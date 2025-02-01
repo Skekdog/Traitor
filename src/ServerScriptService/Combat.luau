@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BulletTracer = require(ReplicatedStorage.BulletTracer)
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local ShatterGlass = require(ReplicatedStorage.ShatterGlass)
 local module = {}
 
 local MAX_SHOOTER_DISTANCE = 15
@@ -101,6 +102,49 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem): Va
 	return "Success"
 end
 
+local function onParticipantHit(item: Types.AnyItem, by: Types.Participant, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+	local definition = item.Definition
+	if definition.Kind == "Item" then
+		return
+	end
+
+	victim:TryTakeDamage({
+		Amount = getItemDamage(definition, hitPart),
+		Source = if definition.Kind == "Gun" then "Shot" elseif definition.Kind == "Melee" then definition.DamageKind else "Other",
+
+		IsHeadshot = hitPart.Name == "Head",
+		Attacker = by,
+	})
+end
+
+local function onWindowHit(item: Types.AnyItem, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+	ShatterGlass(hitPart)
+end
+
+local function onPropHit(item: Types.AnyItem, by: Types.Participant, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+	prop:TryTakeDamage({
+		Amount = getItemDamage(item.Definition, hitPart),
+		Source = if item.Definition.Kind == "Gun" then "Shot" elseif item.Definition.Kind == "Melee" then item.Definition.DamageKind else "Other",
+
+		Attacker = by,
+	})
+end
+
+local function onPartHit(item: Types.AnyItem, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+	local round = by.Round
+	local map = round:GetMap()
+
+	local victim = tryGetParticipantFromPart(by.Round, hitPart)
+	local prop = round:GetProp(hitPart)
+	if victim then
+		onParticipantHit(item, by, victim, hitPart, hitPosition)
+	elseif hitPart:IsDescendantOf(map.Windows) then
+		onWindowHit(item, by, hitPart, hitPosition)
+	elseif prop then
+		onPropHit(item, by, prop, hitPart, hitPosition)
+	end
+end
+
 function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?, hitPartCenterPosition: Vector3?): ValidateItemUsageResult
 	local validateItemUsageResult = validateItemUsage(by, item)
 	if validateItemUsageResult ~= "Success" then
@@ -132,16 +176,7 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 	end
 
 	if hitPart then
-		local victim = tryGetParticipantFromPart(by.Round, hitPart)
-		if victim and definition.Kind ~= "Item" then
-			victim:TryTakeDamage({
-				Amount = getItemDamage(definition, hitPart),
-				Source = if definition.Kind == "Gun" then "Shot" elseif definition.Kind == "Melee" then definition.DamageKind else "Other",
-
-				IsHeadshot = hitPart.Name == "Head",
-				Attacker = by,
-			})
-		end
+		onPartHit(item, by, hitPart, destination)
 	end
 
 	return "Success"
