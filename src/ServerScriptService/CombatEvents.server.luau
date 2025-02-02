@@ -42,37 +42,46 @@ ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, it
 	participant:DropItem(item, true)
 end)
 
-ReplicatedStorage.ClientServer.PrimaryFire.OnServerEvent:Connect(function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, hitPartCenterPosition: unknown, itemName: unknown)
+ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, hitPartCenterPosition: unknown, itemName: unknown): Combat.ValidateItemUsageResult
 	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" then
-		return print("invalid position args")
+		print("invalid position args")
+		return "OtherError"
 	end
 
 	if typeof(itemName) ~= "string" then
-		return print("invalid itemname arg")
+		print("invalid itemname arg")
+		return "OtherError"
 	end
 
 	if hitPartCenterPosition and typeof(hitPartCenterPosition) ~= "Vector3" then
-		return print("invalid hitpartcenterposition arg")
+		print("invalid hitpartcenterposition arg")
+		return "OtherError"
 	end
 
 	if hitPart and (typeof(hitPart) ~= "Instance" or not hitPart:IsA("BasePart")) then
-		return print("invalid hitpart arg")
+		print("invalid hitpart arg")
+		return "OtherError"
 	end
 
 	if (hitPartCenterPosition and not hitPart) or (not hitPartCenterPosition and hitPart) then
-		return print("invalid hitpart and hitpartcenterposition args")
+		print("invalid hitpart and hitpartcenterposition args")
+		return "OtherError"
 	end
 
 	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
 	if not participant then
-		return print("participant not found")
+		print("participant not found")
+		return "OtherError"
 	end
 
 	local item = participant:GetEquippedItem()
 	if not item or item.Definition.Name ~= itemName then
 		print(item, itemName)
-		return print("invalid item")
+		print("invalid item")
+		return "NotEquipped"
 	end
 
-	print(Combat.PrimaryFire(participant, item, ownPosition, targetPosition, hitPart, hitPartCenterPosition))
-end)
+	local result: Combat.ValidateItemUsageResult = Combat.PrimaryFire(participant, item, ownPosition, targetPosition, hitPart, hitPartCenterPosition)
+	print(result)
+	return result
+end

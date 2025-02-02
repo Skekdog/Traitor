@@ -9,7 +9,7 @@ local MAX_SHOOTER_DISTANCE = 15
 local MAX_TARGET_DISTANCE = 10
 local STATIC_OBSCURE_DISTANCE = 0.05
 
-export type ValidateRaycastResult = "TargetTooFar" | "ShooterTooFar" | "StaticObscured" | "Success"
+export type ValidateRaycastResult = "TargetTooFar" | "ShooterTooFar" | "StaticObscured" | "Success" | "OtherError"
 
 export type ValidateItemUsageResult = "Dead" | "NotEnoughAmmo" | "FiringTooFast" | "NotEquipped"
 										| "Success" | "UnknownItem" | "NotInRound" | ValidateRaycastResult

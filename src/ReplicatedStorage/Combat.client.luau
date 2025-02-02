@@ -87,7 +87,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
 				local hitPartCenterPosition = if hitPart then hitPart.Position else nil
 
-				ReplicatedStorage.ClientServer.PrimaryFire:FireServer(origin, targetPosition, hitPart, hitPartCenterPosition, itemName)
+				ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(origin, targetPosition, hitPart, hitPartCenterPosition, itemName)
 			end
 		end
 
