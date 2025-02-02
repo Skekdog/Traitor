@@ -160,13 +160,7 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 		return validateItemUsageResult :: ValidateItemUsageResult
 	end
 
-	local validateRaycastResult = validateRaycast(by, origin, destination, hitPart, hitPartCenterPosition)
-	if validateRaycastResult ~= "Success" then
-		return validateRaycastResult :: ValidateRaycastResult
-	end
-
 	local definition = item.Definition
-
 	if definition.Kind == "Gun" or definition.Kind == "Melee" or definition.Kind == "Grenade" then
 		local char = by:GetCharacter()
 		if not char then
@@ -182,6 +176,11 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 
 	if definition.Kind == "Gun" and definition.Projectile then
 		BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, origin, destination)
+	end
+
+	local validateRaycastResult = validateRaycast(by, origin, destination, hitPart, hitPartCenterPosition)
+	if validateRaycastResult ~= "Success" then
+		return validateRaycastResult :: ValidateRaycastResult
 	end
 
 	if hitPart then
