@@ -34,6 +34,7 @@ export type BackgroundMenuMode = "Closed" | "Stacked"
 export type UI = {
 	Name: string, -- Unique identifier
 	Layer: Layer,
+	KeepCursorVisible: boolean?,
 	DisplayName: string, -- Name shown in sidebar
 	NoClose: boolean?, -- Prevents closing with the X key
 	Visible: boolean,
@@ -50,7 +51,7 @@ UIManager.UnregisteredUIs = script.UnregisteredUIs
 
 local function tryMakeCursorVisible(): ()
 	for _, v in registeredUIs do
-		if v.Visible and v.Layer == "Popup" then
+		if v.Visible and (v.Layer == "Popup" or v.KeepCursorVisible) then
 			return ToggleMouseVisible(true)
 		end
 	end
@@ -72,6 +73,8 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		NoClose = object:GetAttribute("PreventClose") :: boolean?,
 		Sidebar = object:GetAttribute("Sidebar") :: boolean?,
 		Object = object,
+
+		KeepCursorVisible = object:GetAttribute("KeepCursorVisible") :: boolean?,
 
 		ToggleVisible = function(self: UI, force: boolean?, ignoreOtherUIs: boolean?, callback: ((Enum.PlaybackState) -> ())?)
 			local newVisible = if force ~= nil then force else not self.Visible
