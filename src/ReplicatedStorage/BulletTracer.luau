@@ -11,7 +11,8 @@ local function BulletTracer(projectile: BasePart, projectileSpeed: number, start
 	projectile.CFrame = CFrame.new(start, target)
 	projectile.Parent = workspace.Projectiles
 
-	local tween = TweenService:Create(projectile, TweenInfo.new((start - target).Magnitude / projectileSpeed), {
+	local tweenInfo = TweenInfo.new((start - target).Magnitude / projectileSpeed, Enum.EasingStyle.Linear)
+	local tween = TweenService:Create(projectile, tweenInfo, {
 		Position = target
 	})
 
