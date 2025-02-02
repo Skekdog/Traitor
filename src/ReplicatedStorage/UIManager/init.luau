@@ -2,6 +2,7 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 
 local ControlManager = require(script.Parent.ControlManager)
+local ToggleMouseVisible = require(script.Parent.ToggleMouseVisible)
 local UIAnimation = require(script.Parent.UIAnimation)
 
 local plr = Players.LocalPlayer
@@ -47,6 +48,16 @@ local registeredUIs: {UI} = {}
 
 UIManager.UnregisteredUIs = script.UnregisteredUIs
 
+local function tryMakeCursorVisible(): ()
+	for _, v in registeredUIs do
+		if v.Visible and v.Layer == "Popup" then
+			return ToggleMouseVisible(true)
+		end
+	end
+
+	ToggleMouseVisible(false)
+end
+
 function UIManager.RegisterUI(object: GuiObject): UI
 	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
 	local modal = object:GetAttribute("Modal") :: boolean?
@@ -73,6 +84,8 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			end
 
 			self.Visible = newVisible
+
+			tryMakeCursorVisible()
 
 			local object = self.Object
 			if transitionStyle then
