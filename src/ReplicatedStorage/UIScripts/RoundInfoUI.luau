@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ClientInventory = require(ReplicatedStorage.ClientInventory)
 local Freecam = require(ReplicatedStorage.Freecam)
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -106,7 +107,7 @@ function module.UpdateAmmo(item: Types.AnyItem?): ()
     end
 
     roundInfo.Frame.AmmoBar.Visible = true
-    roundInfo.Frame.AmmoBar.AmmoLabel.Text = `{item.Ammo} / {item.Definition.AmmoType.Capacity} + 0`
+    roundInfo.Frame.AmmoBar.AmmoLabel.Text = `{item.Ammo} / {item.Definition.AmmoType.Capacity} + {ClientInventory.Ammo[item.Definition.AmmoType.Name] or 0}`
     UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, item.Ammo, item.Definition.AmmoType.Capacity)
 end
 

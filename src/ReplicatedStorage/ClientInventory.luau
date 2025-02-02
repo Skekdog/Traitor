@@ -14,19 +14,45 @@ local module = {}
 local sampleButton = ui.Object.Sample
 type ItemButton = typeof(sampleButton)
 
+export type AmmoCallback = (amount: number?) -> ()
+export type AmmoConnection = {Kind: string, Callback: AmmoCallback}
+
 local ourInventory: {Passive: {Types.AnyItem}, Slots: {[number]: Types.AnyItem}} = {Passive = {}, Slots = {}}
+local ourAmmo: {[string]: number?} = {}
 
 module.EquippedItem = nil :: Types.AnyItem?
+module.Ammo = ourAmmo
 
 local itemChangedConnections: {(item: Types.AnyItem?) -> ()} = {}
 function module.ConnectEquippedItemChanged(callback: (item: Types.AnyItem?) -> ()): ()
 	table.insert(itemChangedConnections, callback)
 end
 
-local function runCallbacks(): ()
+local ammoChangedConnections: {AmmoConnection} = {}
+function module.ConnectAmmoChanged(kind: string, callback: AmmoCallback): ()
+	local st = {Kind = kind, Callback = callback}
+	table.insert(ammoChangedConnections, st)
+	return st
+end
+
+function module.RemoveAmmoChangedConnection(connection: AmmoConnection): ()
+	local index = table.find(ammoChangedConnections, connection)
+	if index then
+		table.remove(ammoChangedConnections, index)
+	end
+end
+
+local function runAmmoChangedCallbacks(): ()
+	for _, v in ammoChangedConnections do
+		task.spawn(v.Callback, module.Ammo[v.Kind])
+	end
+end
+
+local function runItemChangedCallbacks(): ()
 	for _, v in itemChangedConnections do
 		task.spawn(v, module.EquippedItem)
 	end
+	runAmmoChangedCallbacks()
 end
 
 local function tryUnequip(item: Types.AnyItem): ()
@@ -36,7 +62,7 @@ local function tryUnequip(item: Types.AnyItem): ()
 
 	module.EquippedItem = nil
 
-	runCallbacks()
+	runItemChangedCallbacks()
 
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(nil)
 
@@ -77,7 +103,7 @@ local function tryEquip(item: Types.AnyItem): ()
 		return Enum.ContextActionResult.Sink
 	end)
 
-	runCallbacks()
+	runItemChangedCallbacks()
 
 	ViewmodelModule.Show(item.Definition)
 end
@@ -258,7 +284,7 @@ ControlManager.Register("Next Weapon", false, function()
 	return Enum.ContextActionResult.Pass
 end)
 
-ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.AnyItem): ()
+ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.AnyItem?): ()
 	if mode == "Add" then
 		assert(typeof(item) == "table", "Item must be a table")
 		addItem(item)
@@ -266,6 +292,7 @@ ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(functi
 		assert(typeof(item) == "string", "Item must be a string")
 		removeItem(item)
 	elseif mode == "Reset" then
+		assert(typeof(item) == "nil", "Item must be nil")
 		for _, v in ourInventory.Passive do
 			removeItem(v.Definition.Name)
 		end
@@ -273,6 +300,21 @@ ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(functi
 		for _, v in ourInventory.Slots do
 			removeItem(v.Definition.Name)
 		end
+	else
+		error("Invalid mode")
+	end
+end)
+
+ReplicatedStorage.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Connect(function(mode: "Update" | "Reset", kind: string?, amount: number?): ()
+	if mode == "Update" then
+		assert(typeof(kind) == "string", "Kind must be a string")
+		assert(typeof(amount) == "number", "Amount must be a number")
+		module.Ammo[kind] = amount
+		runAmmoChangedCallbacks()
+	elseif mode == "Reset" then
+		assert(typeof(kind) == "nil", "Kind must be nil")
+		module.Ammo = {}
+		runAmmoChangedCallbacks()
 	else
 		error("Invalid mode")
 	end

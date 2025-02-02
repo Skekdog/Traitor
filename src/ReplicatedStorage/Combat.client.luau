@@ -60,14 +60,24 @@ local function playEmptyClipSound(): ()
 	sound:Destroy()
 end
 
+local lastAmmoConnection: ClientInventory.AmmoConnection?
+
 ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	RoundInfoUI.UpdateAmmo(item)
+
+	if lastAmmoConnection then
+		ClientInventory.RemoveAmmoChangedConnection(lastAmmoConnection)
+	end
 
 	local char = getCharacter()
 	if not item or not char then
 		print(1)
 		return ControlManager.Unregister("Primary Fire")
 	end
+
+	lastAmmoConnection = ClientInventory.ConnectAmmoChanged(item.Kind, function(ammo)
+		RoundInfoUI.UpdateAmmo(item)
+	end)
 
 	ControlManager.Register("Primary Fire", true, function(_, _, input)
 		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
