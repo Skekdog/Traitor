@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ClientInventory = require(script.Parent.ClientInventory)
+local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
@@ -60,7 +61,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	ControlManager.Register("Primary Fire", true, function(_, _, input)
 		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
 			task.wait()
-			if item.Kind == "Gun" and item.Ammo < 0 then
+			if item.Kind == "Gun" and item.Ammo <= 0 then
 				print(2)
 				continue
 			end
@@ -75,19 +76,37 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			local head = char:WaitForChild("Head")
 			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
+			if item.Kind == "Gun" then
+				item.Ammo -= 1
+			end
+
+			local shots: {CombatTypes.Shot} = {}
 			for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
 				local spread = getSpreadVector(if item.Kind == "Gun" then item.Definition.Spread else nil)
 
-				local itemName = item.Definition.Name
 				local origin = head.Position
-
 				local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread)
 
 				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, MAX_RANGE)
 				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
 				local hitPartCenterPosition = if hitPart then hitPart.Position else nil
 
-				ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(origin, targetPosition, hitPart, hitPartCenterPosition, itemName)
+				table.insert(shots, {
+					Destination = targetPosition,
+					HitPart = hitPart,
+					HitPartCenterPosition = hitPartCenterPosition
+				})
+			end
+
+			local request: CombatTypes.PrimaryFireRequest = {
+				ItemName = item.Definition.Name,
+				Shots = shots,
+				Origin = head.Position,
+			}
+
+			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
+			if result ~= "Success" then
+				warn("Hit rejected:", result)
 			end
 		end
 

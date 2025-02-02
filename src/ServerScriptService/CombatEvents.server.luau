@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CombatTypes = require(ReplicatedStorage.CombatTypes)
 local Combat = require(script.Parent.Combat)
 local RoundHandler = require(script.Parent.RoundHandler)
 
@@ -42,46 +43,84 @@ ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, it
 	participant:DropItem(item, true)
 end)
 
-ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, ownPosition: unknown, targetPosition: unknown, hitPart: unknown, hitPartCenterPosition: unknown, itemName: unknown): Combat.ValidateItemUsageResult
-	if typeof(ownPosition) ~= "Vector3" or typeof(targetPosition) ~= "Vector3" then
-		print("invalid position args")
-		return "OtherError"
+local function isShot(value: any): boolean
+	if typeof(value) ~= "table" then
+		return false
 	end
 
-	if typeof(itemName) ~= "string" then
-		print("invalid itemname arg")
-		return "OtherError"
+	if typeof(value.Destination) ~= "Vector3" then
+		return false
 	end
 
-	if hitPartCenterPosition and typeof(hitPartCenterPosition) ~= "Vector3" then
-		print("invalid hitpartcenterposition arg")
-		return "OtherError"
+	if value.HitPart ~= nil and typeof(value.HitPart) ~= "Instance" then
+		return false
 	end
 
-	if hitPart and (typeof(hitPart) ~= "Instance" or not hitPart:IsA("BasePart")) then
-		print("invalid hitpart arg")
-		return "OtherError"
+	if value.HitPartCenterPosition ~= nil and typeof(value.HitPartCenterPosition) ~= "Vector3" then
+		return false
 	end
 
-	if (hitPartCenterPosition and not hitPart) or (not hitPartCenterPosition and hitPart) then
-		print("invalid hitpart and hitpartcenterposition args")
+	return true
+end
+
+local function isPrimaryFireRequest(value: any): boolean
+	if typeof(value) ~= "table" then
+		return false
+	end
+
+	if typeof(value.Origin) ~= "Vector3" then
+		return false
+	end
+
+	if typeof(value.ItemName) ~= "string" then
+		return false
+	end
+
+	if typeof(value.Shots) ~= "table" then
+		return false
+	end
+
+	for i, v in ipairs(value.Shots) do
+		if not isShot(v) then
+			return false
+		end
+	end
+
+	return true
+end
+
+ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
+	if not isPrimaryFireRequest(request) then
 		return "OtherError"
 	end
 
 	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
 	if not participant then
 		print("participant not found")
-		return "OtherError"
+		return "Dead"
 	end
 
 	local item = participant:GetEquippedItem()
-	if not item or item.Definition.Name ~= itemName then
-		print(item, itemName)
-		print("invalid item")
+	if not item or item.Definition.Name ~= request.ItemName then
 		return "NotEquipped"
 	end
 
-	local result: Combat.ValidateItemUsageResult = Combat.PrimaryFire(participant, item, ownPosition, targetPosition, hitPart, hitPartCenterPosition)
-	print(result)
-	return result
+	if item.Kind == "Gun" then
+		item.Ammo -= 1
+	end
+
+	local finalResult: CombatTypes.ValidateItemUsageResult?
+	for i, shot in ipairs(request.Shots) do
+		local result = Combat.PrimaryFire(participant, item, request.Origin, shot.Destination, shot.HitPart, shot.HitPartCenterPosition)
+		print(result)
+		if result ~= "Success" or not finalResult then
+			finalResult = result :: CombatTypes.ValidateItemUsageResult
+		end
+		
+		if i >= (if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1) then
+			break
+		end
+	end
+
+	return finalResult or "OtherError"
 end

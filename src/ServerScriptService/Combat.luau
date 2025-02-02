@@ -1,19 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BulletTracer = require(ReplicatedStorage.BulletTracer)
+local CombatTypes = require(ReplicatedStorage.CombatTypes)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ShatterGlass = require(ReplicatedStorage.ShatterGlass)
 local module = {}
 
 local MAX_SHOOTER_DISTANCE = 15
 local MAX_TARGET_DISTANCE = 10
-local STATIC_OBSCURE_DISTANCE = 0.05
-
-export type ValidateRaycastResult = "TargetTooFar" | "ShooterTooFar" | "StaticObscured" | "Success" | "OtherError"
-
-export type ValidateItemUsageResult = "Dead" | "NotEnoughAmmo" | "FiringTooFast" | "NotEquipped"
-										| "Success" | "UnknownItem" | "NotInRound" | ValidateRaycastResult
-										
+local STATIC_OBSCURE_DISTANCE = 0.05					
 
 local function isOf(part: BasePart, name: string, match: boolean?): boolean?
 	local accessoryWeld = part:FindFirstChild("AccessoryWeld") :: Weld
@@ -59,7 +54,7 @@ local function tryGetParticipantFromPart(round: Types.Round, part: BasePart): Ty
 end
 
 -- only considers static map
-local function validateRaycast(by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): ValidateRaycastResult
+local function validateRaycast(by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): CombatTypes.ValidateRaycastResult
 	local char = by:GetCharacter()
 	if not char then
 		return "ShooterTooFar"
@@ -95,7 +90,7 @@ local function validateRaycast(by: Types.Participant, origin: Vector3, destinati
 	return "Success"
 end
 
-local function validateItemUsage(by: Types.Participant, item: Types.AnyItem): ValidateItemUsageResult
+local function validateItemUsage(by: Types.Participant, item: Types.AnyItem): CombatTypes.ValidateItemUsageResult
 	if by:GetHealth() <= 0 then
 		return "Dead"
 	end
@@ -154,10 +149,10 @@ local function onPartHit(item: Types.AnyItem, by: Types.Participant, hitPart: Ba
 	end
 end
 
-function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?, hitPartCenterPosition: Vector3?): ValidateItemUsageResult
+function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?, hitPartCenterPosition: Vector3?): CombatTypes.ValidateItemUsageResult
 	local validateItemUsageResult = validateItemUsage(by, item)
 	if validateItemUsageResult ~= "Success" then
-		return validateItemUsageResult :: ValidateItemUsageResult
+		return validateItemUsageResult :: CombatTypes.ValidateItemUsageResult
 	end
 
 	local definition = item.Definition
@@ -180,7 +175,7 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 
 	local validateRaycastResult = validateRaycast(by, origin, destination, hitPart, hitPartCenterPosition)
 	if validateRaycastResult ~= "Success" then
-		return validateRaycastResult :: ValidateRaycastResult
+		return validateRaycastResult :: CombatTypes.ValidateRaycastResult
 	end
 
 	if hitPart then
