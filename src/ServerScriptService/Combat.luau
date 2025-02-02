@@ -149,7 +149,12 @@ local function onPartHit(item: Types.AnyItem, by: Types.Participant, hitPart: Ba
 	end
 end
 
-function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: Vector3, destination: Vector3, hitPart: BasePart?, hitPartCenterPosition: Vector3?): CombatTypes.ValidateItemUsageResult
+function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
+	local item = by:GetEquippedItem()
+	if not item or item.Definition.Name ~= request.ItemName then
+		return "NotEquipped"
+	end
+
 	local validateItemUsageResult = validateItemUsage(by, item)
 	if validateItemUsageResult ~= "Success" then
 		return validateItemUsageResult :: CombatTypes.ValidateItemUsageResult
@@ -169,17 +174,27 @@ function module.PrimaryFire(by: Types.Participant, item: Types.AnyItem, origin: 
 		sound:Destroy()
 	end
 
-	if definition.Kind == "Gun" and definition.Projectile then
-		BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, origin, destination)
+	if item.Kind == "Gun" then
+		item.Ammo -= 1
 	end
 
-	local validateRaycastResult = validateRaycast(by, origin, destination, hitPart, hitPartCenterPosition)
-	if validateRaycastResult ~= "Success" then
-		return validateRaycastResult :: CombatTypes.ValidateRaycastResult
-	end
+	for i, v in ipairs(request.Shots) do
+		if i > (if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1) then
+			break
+		end
 
-	if hitPart then
-		onPartHit(item, by, hitPart, destination)
+		if definition.Kind == "Gun" and definition.Projectile then
+			BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, request.Origin, v.Destination)
+		end
+
+		local validateRaycastResult = validateRaycast(by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)
+		if validateRaycastResult ~= "Success" then
+			return validateRaycastResult :: CombatTypes.ValidateRaycastResult
+		end
+
+		if v.HitPart then
+			onPartHit(item, by, v.HitPart, v.Destination)
+		end
 	end
 
 	return "Success"

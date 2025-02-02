@@ -100,27 +100,6 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, reques
 		return "Dead"
 	end
 
-	local item = participant:GetEquippedItem()
-	if not item or item.Definition.Name ~= request.ItemName then
-		return "NotEquipped"
-	end
-
-	if item.Kind == "Gun" then
-		item.Ammo -= 1
-	end
-
-	local finalResult: CombatTypes.ValidateItemUsageResult?
-	for i, shot in ipairs(request.Shots) do
-		local result = Combat.PrimaryFire(participant, item, request.Origin, shot.Destination, shot.HitPart, shot.HitPartCenterPosition)
-		print(result)
-		if result ~= "Success" or not finalResult then
-			finalResult = result :: CombatTypes.ValidateItemUsageResult
-		end
-		
-		if i >= (if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1) then
-			break
-		end
-	end
-
-	return finalResult or "OtherError"
+	local result = Combat.PrimaryFire(participant, request)
+	return result :: CombatTypes.ValidateItemUsageResult
 end
