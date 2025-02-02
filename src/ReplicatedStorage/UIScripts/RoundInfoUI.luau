@@ -2,11 +2,14 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Freecam = require(ReplicatedStorage.Freecam)
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local ToRoundTime = require(ReplicatedStorage.ToRoundTime)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
 local UIManager = require(ReplicatedStorage.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
+
+local module = {}
 
 local timeTarget = LocalRoundInfo.GetAdvanceTime()
 local paused = false
@@ -95,3 +98,16 @@ Freecam.ListenFreecamChanged(function(freecamEnabled)
         onCameraUpdated()
     end
 end)
+
+function module.UpdateAmmo(item: Types.AnyItem?): ()
+    if not item or item.Kind ~= "Gun" then
+        roundInfo.Frame.AmmoBar.Visible = false
+        return
+    end
+
+    roundInfo.Frame.AmmoBar.Visible = true
+    roundInfo.Frame.AmmoBar.AmmoLabel.Text = `{item.Ammo} / {item.Definition.AmmoType.Capacity} + 0`
+    UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, item.Ammo, item.Definition.AmmoType.Capacity)
+end
+
+return module

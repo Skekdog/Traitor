@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
 local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
@@ -60,6 +61,8 @@ local function playEmptyClipSound(): ()
 end
 
 ClientInventory.ConnectEquippedItemChanged(function(item): ()
+	RoundInfoUI.UpdateAmmo(item)
+
 	local char = getCharacter()
 	if not item or not char then
 		print(1)
@@ -88,6 +91,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 
 			if item.Kind == "Gun" then
 				item.Ammo -= 1
+				RoundInfoUI.UpdateAmmo(item)
 			end
 
 			if item.Kind == "Gun" and item.Definition.HasMuzzleFlash then
