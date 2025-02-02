@@ -35,6 +35,7 @@ guns.HUGE = {
     CanDrop = true,
     
     Spread = 0.04,
+    HasMuzzleFlash = true,
 
     Damage = {
         Head = 15,
@@ -77,6 +78,7 @@ guns.Scout = {
     CanDrop = true,
 
     Spread = 0,
+    HasMuzzleFlash = true,
 
     FalloffStart = 180,
     FalloffEnd = 300,
@@ -123,6 +125,7 @@ guns.Pistol = {
     },
 
     Spread = 0.01,
+    HasMuzzleFlash = true,
 
     FalloffStart = 55,
     FalloffEnd = 110,
@@ -155,6 +158,8 @@ guns["Golden Gun"] = {
 
     Slot = 7,
     CanDrop = true,
+
+    HasMuzzleFlash = true,
 
     Damage = {
         Head = 0,
@@ -350,6 +355,8 @@ guns["Flare Gun"] = {
     FalloffEnd = 80,
     FalloffMultiplier = 0.5,
 
+    HasMuzzleFlash = true,
+
     Spread = 0.015,
     
     AttackInterval = 0.25,
@@ -418,6 +425,7 @@ guns.SMG = {
     FalloffMultiplier = 0.5,
 
     Spread = 0.02,
+    HasMuzzleFlash = true,
     
     AttackInterval = 0.05,
     ReloadTime = 1,
@@ -462,6 +470,8 @@ guns.AWP = {
     FalloffEnd = 400,
     FalloffMultiplier = 0.5,
 
+    HasMuzzleFlash = true,
+
     AimFOV = 10,
     AimSpreadMultiplier = 0.05,
     ScopeRequired = true,
@@ -504,6 +514,8 @@ guns["Assault Rifle"] = {
     ReloadTime = 1.5,
     AmmoType = Ammo["9mm"],
 
+    HasMuzzleFlash = true,
+
     AimFOV = 50,
     AimSpreadMultiplier = 0.25,
 
@@ -543,6 +555,8 @@ guns["Silenced Pistol"] = {
     FalloffStart = 55,
     FalloffEnd = 110,
     FalloffMultiplier = 0.4,
+
+    HasMuzzleFlash = false,
     
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
@@ -594,6 +608,8 @@ guns.XM1014 = {
     FalloffEnd = 30,
     FalloffMultiplier = 0.5,
 
+    HasMuzzleFlash = true,
+
     AimFOV = 50,
     AimSpreadMultiplier = 0.7,
 
@@ -635,6 +651,8 @@ guns.Glock = {
     FalloffEnd = 100,
     FalloffMultiplier = 0.2,
 
+    HasMuzzleFlash = true,
+
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
 
@@ -674,6 +692,8 @@ guns.Deagle = {
     FalloffEnd = 200,
     FalloffMultiplier = 0.8,
 
+    HasMuzzleFlash = true,
+
     AimFOV = 50,
     AimSpreadMultiplier = 0.1,
 
@@ -705,6 +725,8 @@ guns.BAR = {
     Slot = 3,
     CreditCost = 1,
     CanDrop = true,
+
+    HasMuzzleFlash = true,
 
     Damage = {
         Head = 75,

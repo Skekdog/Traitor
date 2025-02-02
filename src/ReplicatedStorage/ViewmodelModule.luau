@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local MuzzleFlash = require(script.Parent.MuzzleFlash)
 local spring = require(script.Parent.spring)
 
 local module = {}
@@ -254,6 +255,37 @@ function module.Hide(): ()
     if renderCon then
         renderCon:Disconnect()
     end
+end
+
+function module.Recoil(definition: Types.AnyItemDefinition): ()
+    if definition.Kind == "Gun" then
+        local x = definition.RecoilX / 4
+        local y = definition.RecoilY / 4
+
+        if false then --todo: isaiming
+            x /= 2
+            y /= 2
+        end
+
+        armRecoilSpring.p = Vector3.new(x, y, 0)
+        cameraRecoilSpring.p = Vector3.new(y, x, x + y)
+    elseif definition.Kind == "Melee" then
+        module.PlayAnimation(definition.AttackAnimation)
+    end
+end
+
+function module.MuzzleFlash(): ()
+    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
+    if not viewmodel then
+        return
+    end
+
+    local item = viewmodel:FindFirstChild("Item")
+    if not item or not item:IsA("BasePart") then
+        return
+    end
+
+    MuzzleFlash(item)
 end
 
 return module

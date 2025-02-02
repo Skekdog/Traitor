@@ -5,6 +5,7 @@ local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local ViewmodelModule = require(script.Parent.ViewmodelModule)
 
 local player = Players.LocalPlayer
 
@@ -79,6 +80,11 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			if item.Kind == "Gun" then
 				item.Ammo -= 1
 			end
+
+			if item.Kind == "Gun" and item.Definition.HasMuzzleFlash then
+				ViewmodelModule.MuzzleFlash()
+			end
+			ViewmodelModule.Recoil(item.Definition)
 
 			local shots: {CombatTypes.Shot} = {}
 			for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
