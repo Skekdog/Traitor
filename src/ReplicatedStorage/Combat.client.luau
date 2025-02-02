@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
@@ -52,6 +53,12 @@ player.CharacterRemoving:Connect(function()
 	ControlManager.Unregister("Primary Fire")
 end)
 
+local function playEmptyClipSound(): ()
+	local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
+	sound.Parent = SoundService
+	sound:Destroy()
+end
+
 ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	local char = getCharacter()
 	if not item or not char then
@@ -62,16 +69,18 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	ControlManager.Register("Primary Fire", true, function(_, _, input)
 		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
 			task.wait()
-			if item.Kind == "Gun" and item.Ammo <= 0 then
-				print(2)
-				continue
-			end
 
 			if item.Kind == "Melee" or item.Kind == "Gun" then
 				if item.LastAttackTime + item.Definition.AttackInterval > tick() then
 					continue
 				end
 				(item :: Types.GunWeapon).LastAttackTime = tick()
+			end
+
+			if item.Kind == "Gun" and item.Ammo <= 0 then
+				playEmptyClipSound()
+				print(2)
+				continue
 			end
 
 			local head = char:WaitForChild("Head")
