@@ -52,12 +52,28 @@ end
 
 player.CharacterRemoving:Connect(function()
 	ControlManager.Unregister("Primary Fire")
+	ControlManager.Unregister("Reload Weapon")
 end)
 
 local function playEmptyClipSound(): ()
 	local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
 	sound.Parent = SoundService
 	sound:Destroy()
+end
+
+local function tryReloadWeapon(item: Types.GunWeapon): boolean
+	local ammoDefinition = item.Definition.AmmoType
+	if item.Ammo >= ammoDefinition.Capacity then
+		return false
+	end
+
+	local reserve = ClientInventory.GetReserveAmmo(ammoDefinition.Name)
+	if reserve <= 0 then
+		return false
+	end
+
+	ReplicatedStorage.ClientServer.ReloadWeapon:FireServer()
+	return true
 end
 
 local lastAmmoConnection: ClientInventory.AmmoConnection?
@@ -72,12 +88,27 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	local char = getCharacter()
 	if not item or not char then
 		print(1)
-		return ControlManager.Unregister("Primary Fire")
+		ControlManager.Unregister("Primary Fire")
+		ControlManager.Unregister("Reload Weapon")
+		return
 	end
 
 	lastAmmoConnection = ClientInventory.ConnectAmmoChanged(item.Kind, function(ammo)
 		RoundInfoUI.UpdateAmmo(item)
 	end)
+
+	if item.Kind == "Gun" then
+		
+		ControlManager.Register("Reload Weapon", true, function(_, state)
+			if state ~= Enum.UserInputState.End then
+				return Enum.ContextActionResult.Pass
+			end
+
+			return if tryReloadWeapon(item) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+		end)
+	else
+		ControlManager.Unregister("Reload Weapon")
+	end
 
 	ControlManager.Register("Primary Fire", true, function(_, _, input)
 		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
@@ -91,7 +122,9 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			end
 
 			if item.Kind == "Gun" and item.Ammo <= 0 then
-				playEmptyClipSound()
+				if not tryReloadWeapon(item) then
+					playEmptyClipSound()
+				end
 				print(2)
 				continue
 			end

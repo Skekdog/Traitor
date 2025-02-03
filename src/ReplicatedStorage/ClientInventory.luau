@@ -42,6 +42,10 @@ function module.RemoveAmmoChangedConnection(connection: AmmoConnection): ()
 	end
 end
 
+function module.GetReserveAmmo(kind: string): number
+	return module.Ammo[kind] or 0
+end
+
 local function runAmmoChangedCallbacks(): ()
 	for _, v in ammoChangedConnections do
 		task.spawn(v.Callback, module.Ammo[v.Kind])
