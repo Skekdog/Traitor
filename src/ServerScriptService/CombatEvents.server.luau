@@ -25,6 +25,36 @@ ReplicatedStorage.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, ite
 	participant:SetEquippedItem(item)
 end)
 
+ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: unknown): ()
+	if typeof(itemName) ~= "string" then
+		return
+	end
+
+	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
+	if not participant then
+		return
+	end
+
+	local item = participant:GetEquippedItem()
+	if not item or item.Definition.Name ~= itemName or item.Kind ~= "Gun" or item.Definition.Kind ~= "Gun" then
+		return
+	end
+
+	if item.Ammo >= item.Definition.AmmoType.Capacity then
+		return
+	end
+
+	local ammoKind = item.Definition.AmmoType.Name
+	local ourAmmo = participant:GetAmmo(ammoKind)
+	if ourAmmo <= 0 then
+		return
+	end
+
+	local diff = math.min(ourAmmo, item.Definition.AmmoType.Capacity - item.Ammo)
+	participant:SetAmmo(ammoKind, ourAmmo - diff)
+	item.Ammo += diff
+end)
+
 ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, itemName: unknown)
 	if typeof(itemName) ~= "string" then
 		return
