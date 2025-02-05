@@ -96,7 +96,6 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 
 	local char = getCharacter()
 	if not item or not char then
-		print(1)
 		ControlManager.Unregister("Primary Fire")
 		ControlManager.Unregister("Reload Weapon")
 		return
@@ -138,7 +137,6 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				if not tryReloadWeapon(item) then
 					playEmptyClipSound()
 				end
-				print(2)
 				continue
 			end
 
