@@ -129,7 +129,7 @@ local function isPrimaryFireRequest(value: any): boolean
 		return false
 	end
 
-	if typeof(value.Shots) ~= "table" then
+	if typeof(value.Shots) ~= "table" or #value.Shots < 1 then
 		return false
 	end
 
