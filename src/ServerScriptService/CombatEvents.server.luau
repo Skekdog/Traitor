@@ -149,7 +149,6 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, reques
 
 	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
 	if not participant then
-		print("participant not found")
 		return "Dead"
 	end
 
