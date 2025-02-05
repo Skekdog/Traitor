@@ -73,7 +73,15 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	end
 
 	item.IsReloading = true
+	
+	local sound = Instance.new("Sound")
+	sound.SoundId = item.Definition.ReloadSound
+	sound.PlayOnRemove = true
+	sound.Parent = SoundService
+	sound:Destroy()
+
 	ReplicatedStorage.ClientServer.ReloadWeapon:FireServer(item.Definition.Name)
+
 	return true
 end
 
