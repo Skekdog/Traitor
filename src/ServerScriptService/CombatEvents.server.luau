@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CombatTypes = require(ReplicatedStorage.CombatTypes)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local Combat = require(script.Parent.Combat)
 local RoundHandler = require(script.Parent.RoundHandler)
 
@@ -25,6 +26,11 @@ ReplicatedStorage.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, ite
 	participant:SetEquippedItem(item)
 end)
 
+local function finishReloading(plr: Player, item: Types.GunWeapon): ()
+	item.IsReloading = false
+	ReplicatedStorage.ClientServer.ReloadWeapon:FireClient(plr, item.Definition.Name, item.Ammo)
+end
+
 ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: unknown): ()
 	if typeof(itemName) ~= "string" then
 		return
@@ -40,6 +46,10 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 		return
 	end
 
+	if item.IsReloading then
+		return
+	end
+
 	if item.Ammo >= item.Definition.AmmoType.Capacity then
 		return
 	end
@@ -50,11 +60,22 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 		return
 	end
 
+	item.IsReloading = true
+
+	local endTime = workspace:GetServerTimeNow() + item.Definition.ReloadTime
+	while workspace:GetServerTimeNow() < endTime do
+		if participant:GetEquippedItem() ~= item then
+			finishReloading(plr, item)
+			return
+		end
+		task.wait()
+	end
+
 	local diff = math.min(ourAmmo, item.Definition.AmmoType.Capacity - item.Ammo)
 	participant:SetAmmo(ammoKind, ourAmmo - diff)
 	item.Ammo += diff
 
-	ReplicatedStorage.ServerClient.UpdateItemAmmo:FireClient(plr, itemName, item.Ammo)
+	finishReloading(plr, item)
 end)
 
 ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, itemName: unknown)

@@ -324,10 +324,11 @@ ReplicatedStorage.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Connect(func
 	end
 end)
 
-ReplicatedStorage.ServerClient.UpdateItemAmmo.OnClientEvent:Connect(function(itemName: string, amount: number): ()
+ReplicatedStorage.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemName: string, amount: number): ()
 	for _, v in ourInventory.Slots do
 		if v.Definition.Name == itemName then
 			assert(v.Kind == "Gun", "Item is not a gun")
+			v.IsReloading = false
 			v.Ammo = amount
 			runAmmoChangedCallbacks()
 		end

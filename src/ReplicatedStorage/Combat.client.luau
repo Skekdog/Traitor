@@ -72,6 +72,7 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 		return false
 	end
 
+	item.IsReloading = true
 	ReplicatedStorage.ClientServer.ReloadWeapon:FireServer(item.Definition.Name)
 	return true
 end
@@ -119,6 +120,10 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 					continue
 				end
 				(item :: Types.GunWeapon).LastAttackTime = tick()
+			end
+
+			if item.Kind == "Gun" and item.IsReloading then
+				continue
 			end
 
 			if item.Kind == "Gun" and item.Ammo <= 0 then
