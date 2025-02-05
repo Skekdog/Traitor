@@ -72,7 +72,7 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 		return false
 	end
 
-	ReplicatedStorage.ClientServer.ReloadWeapon:FireServer()
+	ReplicatedStorage.ClientServer.ReloadWeapon:FireServer(item.Definition.Name)
 	return true
 end
 

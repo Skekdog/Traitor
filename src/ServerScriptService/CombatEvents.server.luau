@@ -53,6 +53,8 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 	local diff = math.min(ourAmmo, item.Definition.AmmoType.Capacity - item.Ammo)
 	participant:SetAmmo(ammoKind, ourAmmo - diff)
 	item.Ammo += diff
+
+	ReplicatedStorage.ServerClient.UpdateItemAmmo:FireClient(plr, itemName, item.Ammo)
 end)
 
 ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, itemName: unknown)
