@@ -204,13 +204,12 @@ function module.Show(item: Types.AnyItemDefinition): ()
         bobbingSpring:update(dt)
         module.ReloadSpring:update(dt)
 
-        local modifiers = breathingSpring.p + bobbingSpring.p + armRecoilSpring.p
+        local modifiers = breathingSpring.p + bobbingSpring.p + armRecoilSpring.p + module.ReloadSpring.p
 
         local r = cameraRecoilSpring.p
         camera.CFrame *= CFrame.Angles(math.rad(r.X), math.rad(r.Y), math.rad(r.Z))
 
-        local rotation = camera.CFrame * CFrame.Angles(math.rad(180), math.rad(180), math.rad(180))
-        local final = CFrame.new(modifiers) * rotation * CFrame.new(0, -1.75, -0.75);
+        local final = camera.CFrame:ToWorldSpace(CFrame.new(modifiers) * CFrame.new(0, -1.75, -0.75));
         (viewmodel.PrimaryPart :: BasePart).CFrame = final
 
         if item.Kind == "Gun" then

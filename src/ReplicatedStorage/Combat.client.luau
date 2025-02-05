@@ -73,6 +73,8 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	end
 
 	item.IsReloading = true
+
+	ViewmodelModule.ReloadSpring.p = Vector3.new(10, 5, 10)
 	
 	local sound = Instance.new("Sound")
 	sound.SoundId = item.Definition.ReloadSound
