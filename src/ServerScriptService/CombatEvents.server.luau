@@ -54,9 +54,10 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 		return
 	end
 
+	-- take care: we shouldn't store the GetAmmo result, as the player may pick up more ammo whilst reloading
+
 	local ammoKind = item.Definition.AmmoType.Name
-	local ourAmmo = participant:GetAmmo(ammoKind)
-	if ourAmmo <= 0 then
+	if participant:GetAmmo(ammoKind) <= 0 then
 		return
 	end
 
@@ -71,8 +72,8 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 		task.wait()
 	end
 
-	local diff = math.min(ourAmmo, item.Definition.AmmoType.Capacity - item.Ammo)
-	participant:SetAmmo(ammoKind, ourAmmo - diff)
+	local diff = math.clamp(participant:GetAmmo(ammoKind), 0, item.Definition.AmmoType.Capacity - item.Ammo)
+	participant:SetAmmo(ammoKind, participant:GetAmmo(ammoKind) - diff)
 	item.Ammo += diff
 
 	finishReloading(plr, item)
