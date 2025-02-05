@@ -1,6 +1,6 @@
 export type ValidateRaycastResult = "TargetTooFar" | "ShooterTooFar" | "StaticObscured" | "Success" | "OtherError"
 
-export type ValidateItemUsageResult = "Dead" | "NotEnoughAmmo" | "FiringTooFast" | "NotEquipped" | "Success" | "UnknownItem" | "NotInRound" | ValidateRaycastResult
+export type ValidateItemUsageResult = "Reloading" | "Dead" | "NotEnoughAmmo" | "FiringTooFast" | "NotEquipped" | "Success" | "UnknownItem" | "NotInRound" | ValidateRaycastResult
 
 export type Shot = {
 	Destination: Vector3,

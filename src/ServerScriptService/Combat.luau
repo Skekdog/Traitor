@@ -103,6 +103,10 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem): Co
 		return "NotEnoughAmmo"
 	end
 
+	if item.Kind == "Gun" and item.IsReloading then
+		return "Reloading"
+	end
+
 	return "Success"
 end
 
