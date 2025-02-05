@@ -63,7 +63,7 @@ end
 
 local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	local ammoDefinition = item.Definition.AmmoType
-	if item.Ammo >= ammoDefinition.Capacity then
+	if item.Ammo >= ammoDefinition.Capacity or item.IsReloading then
 		return false
 	end
 
