@@ -9,6 +9,7 @@ local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SettingsManager = require(script.Parent.SettingsManager)
+local UIManager = require(script.Parent.UIManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
 
 local player = Players.LocalPlayer
@@ -64,6 +65,8 @@ local function playEmptyClipSound(): ()
 	sound:Destroy()
 end
 
+local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}
+
 local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	local ammoDefinition = item.Definition.AmmoType
 	if item.Ammo >= ammoDefinition.Capacity or item.IsReloading then
@@ -92,7 +95,35 @@ end
 
 local lastAmmoConnection: ClientInventory.AmmoConnection?
 
+local function updateCrosshair(isAiming: boolean): ()
+	local item = ClientInventory.EquippedItem
+	crosshair:ToggleVisible(not not item)
+
+	if not item then
+		return
+	end
+
+	if isAiming and item.Kind == "Gun" and item.Definition.HasScope then
+		return crosshair:ToggleVisible(false)
+	end
+
+	if item.Kind == "Gun" then
+		local spread = item.Definition.Spread * 5 * (if isAiming then item.Definition.AimSpreadMultiplier or 1 else 1)
+        crosshair.Object.Size = UDim2.fromScale(spread, spread)
+    else
+        crosshair.Object.Size = UDim2.new()
+    end
+end
+
+Aim.ConnectAimToggled(function(isAiming): ()
+	updateCrosshair(isAiming)
+end)
+
 ClientInventory.ConnectEquippedItemChanged(function(item): ()
+	updateCrosshair(false)
+
+	Aim.ToggleAim(item, false)
+
 	RoundInfoUI.UpdateAmmo(item)
 
 	if lastAmmoConnection then

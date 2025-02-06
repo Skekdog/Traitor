@@ -13,11 +13,23 @@ function module.IsAiming(): boolean
 	return isAiming
 end
 
-function module.ToggleAim(item: Types.GunWeapon, enabled: boolean?): ()
+local callbacks: {(boolean) -> ()} = {}
+function module.ConnectAimToggled(callback: (boolean) -> ()): ()
+	table.insert(callbacks, callback)
+end
+
+local function runCallbacks(): ()
+	for _, v in callbacks do
+		v(isAiming)
+	end
+end
+
+function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 	isAiming = if enabled == nil then not isAiming else enabled
 
 	local camera = workspace.CurrentCamera
 	if isAiming then
+		assert(item and item.Kind == "Gun", "Must pass a gun when enabling aiming")
 		camera.FieldOfView = item.Definition.AimFOV or 70
 		SetCameraSensitivity((item.Definition.AimFOV or 70) / 70)
 
@@ -38,6 +50,8 @@ function module.ToggleAim(item: Types.GunWeapon, enabled: boolean?): ()
 		ViewmodelModule.StopAnimation("Aim")
 		ViewmodelModule.IsAiming = false
 	end
+
+	runCallbacks()
 end
 
 return module

@@ -4,7 +4,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
 local BulletTracer = require(script.Parent.BulletTracer)
-local ClientInventory = require(script.Parent.ClientInventory)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local ControlManager = require(script.Parent.ControlManager)
 local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
@@ -30,21 +29,6 @@ serverClient.BulletTracer.OnClientEvent:Connect(BulletTracer)
 
 local notice = UIManager.WaitForUI("Notice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Notice)}
 notice:ToggleVisible(true)
-
-local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}
-
-ClientInventory.ConnectEquippedItemChanged(function(item)
-    crosshair:ToggleVisible(not not item)
-    if not item then
-        return
-    end
-
-    if item.Kind == "Gun" then
-        crosshair.Object.Size = UDim2.new(item.Definition.Spread * 5, 0, item.Definition.Spread * 5, 0) -- todo: these values ain't right
-    else
-        crosshair.Object.Size = UDim2.new()
-    end
-end)
 
 serverClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relativeCFrame: CFrame, normal: Vector3)
     local position = part.CFrame:ToWorldSpace(relativeCFrame).Position
