@@ -146,6 +146,11 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
 			task.wait()
 
+			if item.Kind == "Gun" and item.Definition.ScopeRequired and not Aim.IsAiming() then
+				playEmptyClipSound()
+				return Enum.ContextActionResult.Sink -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
+			end
+
 			if item.Kind == "Melee" or item.Kind == "Gun" then
 				if item.LastAttackTime + item.Definition.AttackInterval > tick() then
 					continue
