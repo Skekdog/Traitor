@@ -1,12 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local Aim = require(script.Parent.Aim)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
 local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local SettingsManager = require(script.Parent.SettingsManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
 
 local player = Players.LocalPlayer
@@ -27,11 +29,12 @@ local function deriveTargetPosition(origin: Vector3, spread: Vector3, range: num
 end
 
 local random = Random.new(workspace:GetServerTimeNow())
-local function getSpreadVector(spread: number?): Vector3
-	if not spread then
+local function getSpreadVector(item: Types.AnyItem): Vector3
+	if item.Kind ~= "Gun" then
 		return Vector3.zero
 	end
 
+	local spread = item.Definition.Spread * (if Aim.IsAiming() then item.Definition.AimSpreadMultiplier or 1 else 1)
 	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
 end
 
@@ -100,6 +103,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	if not item or not char then
 		ControlManager.Unregister("Primary Fire")
 		ControlManager.Unregister("Reload Weapon")
+		ControlManager.Unregister("Alternate Fire")
 		return
 	end
 
@@ -108,6 +112,24 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	end)
 
 	if item.Kind == "Gun" then
+
+		ControlManager.Register("Alternate Fire", true, function(_, state)
+			if SettingsManager.GetSetting("Toggle Aim") then
+				if state ~= Enum.UserInputState.End then
+					return Enum.ContextActionResult.Pass
+				end
+
+				Aim.ToggleAim(item)
+				return Enum.ContextActionResult.Sink
+			end
+
+			if state == Enum.UserInputState.Begin or state == Enum.UserInputState.End then
+				Aim.ToggleAim(item, state == Enum.UserInputState.Begin)
+				return Enum.ContextActionResult.Sink
+			end
+
+			return Enum.ContextActionResult.Pass
+		end)
 		
 		ControlManager.Register("Reload Weapon", true, function(_, state)
 			if state ~= Enum.UserInputState.End then
@@ -157,7 +179,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 
 			local shots: {CombatTypes.Shot} = {}
 			for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
-				local spread = getSpreadVector(if item.Kind == "Gun" then item.Definition.Spread else nil)
+				local spread = getSpreadVector(item)
 
 				local origin = head.Position
 				local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread)

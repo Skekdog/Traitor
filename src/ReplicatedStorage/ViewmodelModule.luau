@@ -16,6 +16,7 @@ local breathingSpring = spring.new(1, 10)
 local bobbingSpring = spring.new(10, 1)
 
 module.ReloadSpring = spring.new(7, 0.8)
+module.IsAiming = false
 
 type Viewmodel = typeof(ReplicatedStorage.Viewmodel)
 local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
@@ -261,7 +262,7 @@ function module.Recoil(definition: Types.AnyItemDefinition): ()
         local x = definition.RecoilX / 4
         local y = definition.RecoilY / 4
 
-        if false then --todo: isaiming
+        if module.IsAiming then
             x /= 2
             y /= 2
         end
