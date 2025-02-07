@@ -4,6 +4,7 @@ local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.UIManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
+local WalkSpeed = require(script.Parent.WalkSpeed)
 
 local scopeUi = UIManager.WaitForUI("Scope")
 local isAiming = false
@@ -40,6 +41,8 @@ function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 			scopeUi:ToggleVisible(true)
 		end
 
+		WalkSpeed.SetModifier("Aiming", -4)
+
 		if item.Definition.AimAnimation then
 			ViewmodelModule.PlayAnimation(item.Definition.AimAnimation, "Aim")
 		end
@@ -50,6 +53,8 @@ function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 		SetCameraSensitivity(1)
 
 		scopeUi:ToggleVisible(false)
+
+		WalkSpeed.SetModifier("Aiming", 0)
 
 		ViewmodelModule.StopAnimation("Aim")
 		ViewmodelModule.IsAiming = false
