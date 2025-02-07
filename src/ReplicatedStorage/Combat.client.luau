@@ -39,7 +39,7 @@ local function getSpreadVector(item: Types.AnyItem): Vector3
 	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
 end
 
-local function raycast(char: Model, spread: Vector3): RaycastResult?
+local function raycast(char: Model, spread: Vector3, range: number): RaycastResult?
 	local map = LocalRoundInfo.GetMap()
 	if not map then
 		return
@@ -51,7 +51,7 @@ local function raycast(char: Model, spread: Vector3): RaycastResult?
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
 
-	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (getCenterRay().Direction + spread).Unit * MAX_RANGE, params)
+	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (getCenterRay().Direction + spread).Unit * range, params)
 end
 
 player.CharacterRemoving:Connect(function()
@@ -218,9 +218,9 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				local spread = getSpreadVector(item)
 
 				local origin = head.Position
-				local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread)
+				local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
 
-				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, MAX_RANGE)
+				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
 				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
 				local hitPartCenterPosition = if hitPart then hitPart.Position else nil
 
