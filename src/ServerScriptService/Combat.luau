@@ -142,18 +142,22 @@ local function onPropHit(item: Types.AnyItem, by: Types.Participant, prop: Types
 	})
 end
 
-local function onPartHit(item: Types.AnyItem, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+local function onPartHit(item: Types.AnyItem, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
 	local round = by.Round
 	local map = round:GetMap()
 
 	local victim = tryGetParticipantFromPart(by.Round, hitPart)
 	local prop = round:GetProp(hitPart)
 	if victim then
-		onParticipantHit(item, by, victim, hitPart, hitPosition)
+		return onParticipantHit(item, by, victim, hitPart, hitPosition)
 	elseif hitPart:IsDescendantOf(map.Windows) then
-		onWindowHit(item, by, hitPart, hitPosition)
+		return onWindowHit(item, by, hitPart, hitPosition)
 	elseif prop then
-		onPropHit(item, by, prop, hitPart, hitPosition)
+		return onPropHit(item, by, prop, hitPart, hitPosition)
+	end
+
+	if normal and item.Kind == "Gun" then
+		ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(hitPart, hitPart.CFrame:ToObjectSpace(CFrame.new(hitPosition)), normal)
 	end
 end
 
@@ -201,7 +205,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		end
 
 		if v.HitPart then
-			onPartHit(item, by, v.HitPart, v.Destination)
+			onPartHit(item, by, v.HitPart, v.Destination, v.Normal)
 		end
 	end
 

@@ -114,6 +114,10 @@ local function isShot(value: any): boolean
 		return false
 	end
 
+	if value.Normal ~= nil and typeof(value.Normal) ~= "Vector3" then
+		return false
+	end
+
 	return true
 end
 

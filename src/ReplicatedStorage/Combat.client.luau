@@ -223,11 +223,13 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
 				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
 				local hitPartCenterPosition = if hitPart then hitPart.Position else nil
+				local normal = if raycastResult then raycastResult.Normal else nil
 
 				table.insert(shots, {
 					Destination = targetPosition,
 					HitPart = hitPart,
-					HitPartCenterPosition = hitPartCenterPosition
+					HitPartCenterPosition = hitPartCenterPosition,
+					Normal = normal,
 				})
 			end
 

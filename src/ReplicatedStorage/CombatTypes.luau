@@ -6,6 +6,7 @@ export type Shot = {
 	Destination: Vector3,
 	HitPart: BasePart?,
 	HitPartCenterPosition: Vector3?,
+	Normal: Vector3?,
 }
 			
 export type PrimaryFireRequest = {
