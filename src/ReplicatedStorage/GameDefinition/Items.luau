@@ -795,15 +795,15 @@ grenades.Flashbang = {
     ExplosionInfo = {
         Damage = 0,
         FalloffBegin = 0,
-        FalloffEnd = 0,
+        FalloffEnd = 15,
         Pressure = 10000,
         VisualRadius = 15,
-    },
 
-    BeforeHitParticipant = function(_, _, target: Types.Participant)
-        ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
-        return true
-    end,
+        BeforeHitParticipant = function(_, _, target: Types.Participant)
+            ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
+            return true
+        end,
+    },
 
     FuseTime = 3,
 
@@ -903,7 +903,7 @@ grenades["Smoke Grenade"] = {
     ExplosionInfo = {
         Damage = 0,
         FalloffBegin = 0,
-        FalloffEnd = 0,
+        FalloffEnd = 15,
         Pressure = 10000,
         VisualRadius = 15,
     },
@@ -942,15 +942,15 @@ grenades["Discombobulator"] = {
     ExplosionInfo = {
         Damage = 0,
         FalloffBegin = 0,
-        FalloffEnd = 0,
+        FalloffEnd = 15,
         Pressure = 75000,
         VisualRadius = 15,
-    },
 
-    BeforeHitParticipant = function(_, _, target: Types.Participant)
-        ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
-        return true
-    end,
+        BeforeHitParticipant = function(_, _, target: Types.Participant)
+            ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
+            return true
+        end,
+    },
 
     FuseTime = 3,
 

@@ -20,10 +20,14 @@ local function isOf(part: BasePart, name: string, match: boolean?): boolean?
 	return (part.Name == name) or (part:FindFirstAncestor(name) ~= nil) or (match and (part.Name:match(name) ~= nil))
 end
 
-local function getItemDamage(definition: Types.AnyItemDefinition, hitPart: BasePart): number
-	assert(definition.Kind ~= "Item", "Item has no damage")
+local function getItemDamage(item: Types.AnyWeapon | Types.ExplosionParams, hitPart: BasePart): number
+	assert(item.Kind ~= "Grenade", "Cannot get damage for grenade")
 
-	local dmg = if definition.Kind ~= "Grenade" then definition.Damage else definition.ExplosionInfo.Damage
+	if item.Kind == "ExplosionParams" then
+		return (item.Definition.FalloffEnd - (hitPart.Position - item.Position).Magnitude) / item.Definition.FalloffEnd * item.Definition.Damage
+	end
+
+	local dmg = item.Definition.Damage
 	if typeof(dmg) == "number" then
 		return dmg
 	end
@@ -121,41 +125,61 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.AnyWeapon, by: Types.Participant, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
-	local definition = item.Definition
+local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+	if item.Kind ~= "ExplosionParams" then
+		assert(by, "by must not be nil")
+	end
+
+	local damage = getItemDamage(item, hitPart)
+	local willDie = victim:GetHealth() <= damage
+	local hitFunction = item.Definition.BeforeHitParticipant
+	if hitFunction then
+		if not hitFunction(item :: Types.GunMeleeWeapon, by :: Types.Participant, victim, willDie) then
+			return
+		end
+	end
 
 	victim:TryTakeDamage({
-		Amount = getItemDamage(definition, hitPart),
-		Source = item,
+		Amount = damage,
+		Source = if item.Kind == "ExplosionParams" then "Explode" else item,
 
 		IsHeadshot = hitPart.Name == "Head",
 		Attacker = by,
 	})
 end
 
-local function onWindowHit(item: Types.AnyWeapon, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, hitPart: BasePart, hitPosition: Vector3): ()
 	ShatterGlass(hitPart)
 end
 
-local function onPropHit(item: Types.AnyWeapon, by: Types.Participant, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
 	local health = prop:GetHealth()
 	if not health then
 		return
 	end
 
+	local damage = getItemDamage(item, hitPart)
+	local willDie = prop:GetHealth() <= damage
+	local hitFunction = item.Definition.BeforeHitProp
+	if hitFunction then
+		if not hitFunction(item :: Types.GunMeleeWeapon, by :: Types.Participant, prop, willDie) then
+			return
+		end
+	end
+
 	prop:TryTakeDamage({
-		Amount = getItemDamage(item.Definition, hitPart),
-		Source = item,
+		Amount = getItemDamage(item, hitPart),
+		Source = if item.Kind == "ExplosionParams" then "Explode" else item,
 
 		Attacker = by,
 	})
 end
 
-local function onPartHit(item: Types.AnyWeapon, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
+local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
 	local round = by.Round
 	local map = round:GetMap()
 
-	local victim = tryGetParticipantFromPart(by.Round, hitPart)
+	local victim = tryGetParticipantFromPart(round, hitPart)
 	local prop = round:GetProp(hitPart)
 	if victim then
 		return onParticipantHit(item, by, victim, hitPart, hitPosition)
@@ -168,6 +192,49 @@ local function onPartHit(item: Types.AnyWeapon, by: Types.Participant, hitPart: 
 	if normal and item.Kind == "Gun" then
 		ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(hitPart, hitPart.CFrame:ToObjectSpace(CFrame.new(hitPosition)), normal)
 	end
+end
+
+function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams): ()
+    local explosion = Instance.new("Explosion")
+
+    local info = params.Definition
+
+    explosion.Position = params.Position
+    explosion.BlastRadius = info.VisualRadius
+    explosion.BlastPressure = info.Pressure
+
+    explosion.DestroyJointRadiusPercent = 0
+    explosion.ExplosionType = Enum.ExplosionType.NoCraters
+
+    local folder = workspace:FindFirstChild("Explosions") or Instance.new("Folder")
+    assert(folder:IsA("Folder"), "Explosions is not a folder")
+    folder.Name = "Explosions"
+    folder.Parent = workspace
+
+    explosion.Parent = folder
+
+	local hits: {Types.Participant | Types.Prop} = {}
+    for _, v in workspace:GetPartBoundsInRadius(params.Position, info.FalloffEnd) do
+        local prop = round:GetProp(v)
+		if prop then
+			if table.find(hits, prop) then
+				continue
+			end
+			table.insert(hits, prop)
+			onPropHit(params, params.Attacker, prop, v, v.Position)
+			continue
+		end
+
+		local participant = tryGetParticipantFromPart(round, v)
+		if participant then
+			if table.find(hits, participant) then
+				continue
+			end
+			table.insert(hits, participant)
+			onParticipantHit(params, params.Attacker, participant, v, v.Position)
+			continue
+		end
+    end
 end
 
 function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
@@ -216,7 +283,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 				return validateRaycastResult :: CombatTypes.ValidateRaycastResult
 			end
 
-			if item.Kind ~= "Item" and v.HitPart then
+			if item.Kind ~= "Item" and item.Kind ~= "Grenade" and v.HitPart then
 				onPartHit(item, by, v.HitPart, v.Destination, v.Normal)
 			end
 		end
@@ -237,11 +304,12 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		projectile:Destroy()
 
 		local explosionParams: Types.ExplosionParams = {
-			ExplosionInfo = item.Definition.ExplosionInfo,
+			Kind = "ExplosionParams",
+			Definition = item.Definition.ExplosionInfo,
 			Attacker = by,
-			Position = projectile.Position
+			Position = projectile.Position,
 		}
-		by.Round:CreateExplosion(explosionParams)
+		module.CreateExplosion(by.Round, explosionParams)
 	end
 
 	return "Success"
