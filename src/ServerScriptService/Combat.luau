@@ -121,35 +121,37 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.AnyItem, by: Types.Participant, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+local function onParticipantHit(item: Types.AnyWeapon, by: Types.Participant, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
 	local definition = item.Definition
-	if definition.Kind == "Item" then
-		return
-	end
 
 	victim:TryTakeDamage({
 		Amount = getItemDamage(definition, hitPart),
-		Source = if definition.Kind == "Gun" then "Shot" elseif definition.Kind == "Melee" then definition.DamageKind else "Other",
+		Source = item,
 
 		IsHeadshot = hitPart.Name == "Head",
 		Attacker = by,
 	})
 end
 
-local function onWindowHit(item: Types.AnyItem, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+local function onWindowHit(item: Types.AnyWeapon, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
 	ShatterGlass(hitPart)
 end
 
-local function onPropHit(item: Types.AnyItem, by: Types.Participant, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+local function onPropHit(item: Types.AnyWeapon, by: Types.Participant, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+	local health = prop:GetHealth()
+	if not health then
+		return
+	end
+
 	prop:TryTakeDamage({
 		Amount = getItemDamage(item.Definition, hitPart),
-		Source = if item.Definition.Kind == "Gun" then "Shot" elseif item.Definition.Kind == "Melee" then item.Definition.DamageKind else "Other",
+		Source = item,
 
 		Attacker = by,
 	})
 end
 
-local function onPartHit(item: Types.AnyItem, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
+local function onPartHit(item: Types.AnyWeapon, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
 	local round = by.Round
 	local map = round:GetMap()
 
@@ -214,7 +216,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 				return validateRaycastResult :: CombatTypes.ValidateRaycastResult
 			end
 
-			if v.HitPart then
+			if item.Kind ~= "Item" and v.HitPart then
 				onPartHit(item, by, v.HitPart, v.Destination, v.Normal)
 			end
 		end

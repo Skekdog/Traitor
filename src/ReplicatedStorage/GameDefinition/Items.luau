@@ -26,6 +26,108 @@ end
 
 local bullet = projectiles("Bullet")
 
+local function makeGolden(victim: Types.Participant)
+    local char = assert(victim:GetCharacter(), "Participant has no character")
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local bodyColors = char:FindFirstChildOfClass("BodyColors")
+    if bodyColors then
+        bodyColors:Destroy()
+    end
+
+    if root then
+        local deathSound = root:FindFirstChild("DeathSound") :: Sound?
+        if deathSound then
+            deathSound:Destroy()
+        end
+
+        local sound = Instance.new("Sound")
+        sound.SoundId = weaponSounds("GoldenGunHit")
+        sound.Name = "DeathSound"
+        sound.Parent = root
+    end
+    for _, v in char:GetChildren() do
+        if v:IsA("BasePart") then
+            v.Material = Enum.Material.Metal
+            v.BrickColor = BrickColor.new("Gold")
+        end
+    end
+
+    local shirt = char:FindFirstChildOfClass("Shirt")
+    if shirt then
+        shirt:Destroy()
+    end
+
+    local pants = char:FindFirstChildOfClass("Pants")
+    if pants then
+        pants:Destroy()
+    end
+end
+
+local function burn(attacker: Types.Participant?, target: Types.Participant | Types.Prop?, part: BasePart): ()
+    if not attacker then
+        return
+    end
+
+    local fire = Instance.new("Fire")
+    fire.Size = 10
+    fire.Parent = part
+
+    local burnSound = Instance.new("Sound")
+    burnSound.SoundId = weaponSounds("FlareBurn")
+    burnSound.Parent = part
+
+    local model = part:FindFirstAncestorOfClass("Model")
+    if target and target.Kind == "Prop" then
+        assert(model)
+        model:SetAttribute("Burning", true)
+    end
+
+    if model and model:IsDescendantOf(workspace.Corpses) then
+        model:SetAttribute("Burning", true)
+    end
+
+    local endTime = workspace:GetServerTimeNow() + 10
+    task.spawn(function()
+        while true do
+            if workspace:GetServerTimeNow() > endTime then
+                break
+            end
+
+            local health: number? = if target then (target :: Types.Participant):GetHealth() else nil
+            if health and health < 0 then
+                break
+            end
+            if not part:IsDescendantOf(workspace) then
+                break
+            end
+
+            burnSound:Play()
+
+            if health then
+                (target :: Types.Participant):TryTakeDamage({
+                    Amount = 1,
+                    Attacker = attacker,
+                    Source = "Burn"
+                })
+            end
+
+            task.wait(0.25)
+        end
+        
+        if target and target.Kind == "Prop" then
+            assert(model)
+            model:SetAttribute("Burning", false)
+        end
+
+        burnSound:Destroy()
+        fire:Destroy()
+
+        if not target and model then
+            model:Destroy()
+        end
+    end)
+end
+
 local guns: {[string]: Types.GunWeaponDefinition} = {}
 guns.HUGE = {
     Kind = "Gun" :: "Gun",
@@ -193,63 +295,22 @@ guns["Golden Gun"] = {
     AimFOV = 70,
     AimSpreadMultiplier = 0,
 
-    BeforeHitProp = function(weapon: Types.GunWeapon, attacker: Types.Participant, target: Types.Prop)
+    BeforeHitProp = function(item: Types.AnyWeapon, attacker: Types.Participant, target: Types.Prop)
         target:TryTakeDamage({
             Amount = math.huge,
             Attacker = attacker,
-            Source = "Shot",
+            Source = item,
         })
-        return true
+        return false
     end,
 
-    BeforeHitParticipant = function(weapon: Types.GunWeapon, attacker: Types.Participant, target: Types.Participant)
-        if not attacker then
-            return
-        end
-
-        local function makeGolden(victim: Types.Participant)
-            local char = assert(victim:GetCharacter(), "Participant has no character")
-            local root = char:FindFirstChild("HumanoidRootPart")
-            local bodyColors = char:FindFirstChildOfClass("BodyColors")
-            if bodyColors then
-                bodyColors:Destroy()
-            end
-
-            if root then
-                local deathSound = root:FindFirstChild("DeathSound") :: Sound?
-                if deathSound then
-                    deathSound:Destroy()
-                end
-
-                local sound = Instance.new("Sound")
-                sound.SoundId = weaponSounds("GoldenGunHit")
-                sound.Name = "DeathSound"
-                sound.Parent = root
-            end
-            for _, v in char:GetChildren() do
-                if v:IsA("BasePart") then
-                    v.Material = Enum.Material.Metal
-                    v.BrickColor = BrickColor.new("Gold")
-                end
-            end
-
-            local shirt = char:FindFirstChildOfClass("Shirt")
-            if shirt then
-                shirt:Destroy()
-            end
-
-            local pants = char:FindFirstChildOfClass("Pants")
-            if pants then
-                pants:Destroy()
-            end
-        end
-
+    BeforeHitParticipant = function(item: Types.AnyWeapon, attacker: Types.Participant, target: Types.Participant)
         if attacker:IsDamageJustifiedAgainstParticipant(target) then
             makeGolden(target)
             target:TryTakeDamage({
                 Amount = math.huge,
                 Attacker = attacker,
-                Source = "Shot",
+                Source = item,
                 IsHeadshot = false,
             })
         else
@@ -257,82 +318,17 @@ guns["Golden Gun"] = {
             attacker:TryTakeDamage({
                 Amount = math.huge,
                 Attacker = attacker,
-                Source = "Shot",
+                Source = item,
                 IsHeadshot = false,
             })
         end
 
-        return true
+        return false
     end,
 
     RecoilX = 0.0,
     RecoilY = 0.0,
 }
-
-local function burn(attacker: Types.Participant?, target: Types.Participant | Types.Prop?, part: BasePart): ()
-    if not attacker then
-        return
-    end
-
-    local fire = Instance.new("Fire")
-    fire.Size = 10
-    fire.Parent = part
-
-    local burnSound = Instance.new("Sound")
-    burnSound.SoundId = weaponSounds("FlareBurn")
-    burnSound.Parent = part
-
-    local model = part:FindFirstAncestorOfClass("Model")
-    if target and target.Kind == "Prop" then
-        assert(model)
-        model:SetAttribute("Burning", true)
-    end
-
-    if model and model:IsDescendantOf(workspace.Corpses) then
-        model:SetAttribute("Burning", true)
-    end
-
-    local endTime = workspace:GetServerTimeNow() + 10
-    task.spawn(function()
-        while true do
-            if workspace:GetServerTimeNow() > endTime then
-                break
-            end
-
-            local health: number? = if target then (target :: Types.Participant):GetHealth() else nil
-            if health and health < 0 then
-                break
-            end
-            if not part:IsDescendantOf(workspace) then
-                break
-            end
-
-            burnSound:Play()
-
-            if health then
-                (target :: Types.Participant):TryTakeDamage({
-                    Amount = 1,
-                    Attacker = attacker,
-                    Source = "Burn"
-                })
-            end
-
-            task.wait(0.25)
-        end
-        
-        if target and target.Kind == "Prop" then
-            assert(model)
-            model:SetAttribute("Burning", false)
-        end
-
-        burnSound:Destroy()
-        fire:Destroy()
-
-        if not target and model then
-            model:Destroy()
-        end
-    end)
-end
 
 guns["Flare Gun"] = {
     Kind = "Gun" :: "Gun",
@@ -374,29 +370,20 @@ guns["Flare Gun"] = {
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
-    BeforeHitParticipant = function(weapon: Types.GunWeapon, attacker: Types.Participant, target: Types.Participant)
+    BeforeHitParticipant = function(_, attacker: Types.Participant, target: Types.Participant)
         burn(attacker, target, assert(target:GetCharacter(), "Participant has no character").PrimaryPart :: BasePart)
         return true
     end,
 
-    BeforeHitProp = function(weapon: Types.GunWeapon, attacker: Types.Participant, target: Types.Prop)
-        local part = target.Model
-        if not part or not part:IsA("BasePart") then
-            return false
-        end
-
-        burn(attacker, target, part)
+    BeforeHitProp = function(_, attacker: Types.Participant, target: Types.Prop)
+        burn(attacker, target, target.Model)
         return true
     end,
 
-    BeforeHitCorpse = function(weapon: Types.GunWeapon, attacker: Types.Participant, part: BasePart)
-        if not part.Parent then
-            return false
-        end
-
-        local root = part.Parent:FindFirstChild("HumanoidRootPart")
+    BeforeHitCorpse = function(_, attacker: Types.Participant, target: Model)
+        local root = target:FindFirstChild("HumanoidRootPart")
         if not root or not root:IsA("BasePart") then
-            return false
+            return true
         end
 
         burn(attacker, nil, root)
@@ -574,17 +561,22 @@ guns["Silenced Pistol"] = {
     Projectile = projectiles("SilencedBullet"),
     ProjectileSpeed = 100,
 
-    BeforeHitParticipant = function(_, victim: Types.Participant)
+    BeforeHitParticipant = function(_, _, victim: Types.Participant, willDie: boolean)
+        if not willDie then
+            return true
+        end
+
         local root = assert(victim:GetCharacter(), "Participant has no character").PrimaryPart
         if not root then
-            return
+            return true
         end
 
         local deathSound = root:FindFirstChild("DeathSound") :: Sound?
         if deathSound then
             deathSound.Volume = 0
         end
-        return
+
+        return true
     end,
 
     RecoilX = 0.2,
@@ -808,8 +800,9 @@ grenades.Flashbang = {
         VisualRadius = 15,
     },
 
-    BeforeHitParticipant = function(_, target: Types.Participant)
-        return ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
+    BeforeHitParticipant = function(_, _, target: Types.Participant)
+        ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
+        return true
     end,
 
     FuseTime = 3,
@@ -954,8 +947,9 @@ grenades["Discombobulator"] = {
         VisualRadius = 15,
     },
 
-    BeforeHitParticipant = function(_, target: Types.Participant)
-        return ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
+    BeforeHitParticipant = function(_, _, target: Types.Participant)
+        ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
+        return true
     end,
 
     FuseTime = 3,
