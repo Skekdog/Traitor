@@ -144,7 +144,7 @@ local function setWinnerText(): ()
 	if winnerKind == "Participant" then
 		highlightsPage.Winners.Text = winner .. " wins!"
 	else
-		highlightsPage.Winners.Text = `The {winner:upper()}s win!`
+		highlightsPage.Winners.Text = `The {winner}s win!`
 	end
 end
 

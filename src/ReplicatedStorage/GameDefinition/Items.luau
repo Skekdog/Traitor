@@ -254,7 +254,10 @@ guns.Pistol = {
 guns["Golden Gun"] = {
     Kind = "Gun" :: "Gun",
     Name = "Golden Gun",
-    Description = "One shot. Don't fumble it.",
+    Description = "Instantly kills any enemy. Not recommended for use against friendlies.",
+    Icon = "rbxassetid://10282780102",
+    CreditCost = 1,
+    MaxStock = 1,
 
     Slot = 7,
     CanDrop = true,
@@ -334,6 +337,7 @@ guns["Flare Gun"] = {
     Description = "Will set things it hits on fire. Can be used to burn corpses, preventing others from discovering them.",
     Icon = "rbxassetid://444145395",
     CreditCost = 1,
+    MaxStock = 1,
 
     Slot = 8,
     CanDrop = true,
@@ -439,6 +443,7 @@ guns.AWP = {
     Name = "AWP",
     Description = "A high-powered sniper rifle. Must be scoped in to shoot.",
     Icon = "rbxassetid://4772214897",
+    MaxStock = 1,
     
     Slot = 7,
     CreditCost = 1,
@@ -527,6 +532,9 @@ guns["Silenced Pistol"] = {
     Kind = "Gun" :: "Gun",
     Name = "Silenced Pistol",
     Description = "A Pistol that has had a suppressor fitted to it, making it much quieter. People killed with silenced weapons will not scream.",
+    Icon = "rbxassetid://299432421",
+    CreditCost = 1,
+    MaxStock = 3,
 
     Slot = 7,
     CanDrop = true,
@@ -713,6 +721,7 @@ guns.BAR = {
     Name = "BAR",
     Description = "A powerful mid-range rifle. Slow to reload.",
     Icon = "rbxassetid://10243797417",
+    MaxStock = 3,
 
     Slot = 3,
     CreditCost = 1,
@@ -757,6 +766,9 @@ grenades.Grenade = {
     Kind = "Grenade" :: "Grenade",
     Name = "Grenade",
     Description = "Explodes in a good radius after 5 seconds.",
+    Icon = "rbxassetid://8096856961",
+    CreditCost = 2,
+    MaxStock = 2,
 
     Slot = 7,
     CanDrop = true,
@@ -784,6 +796,7 @@ grenades.Flashbang = {
     Name = "Flashbang",
     Description = "Explodes in a good radius after 3 seconds, blinding and deafening anyone in range.",
     Icon = "rbxassetid://10753198321",
+    MaxStock = 2,
 
     Slot = 8,
     CreditCost = 1,
@@ -1008,6 +1021,10 @@ items["DNA Scanner"] = {
 local radarPoint = ReplicatedStorage:WaitForChild("RadarPoint")
 items.Radar = {
     Kind = "Item" :: "Item",
+    Description = "Reveals the location of all living players every 30 seconds.",
+    CreditCost = 1,
+    MaxStock = 1,
+    Icon = "rbxassetid://62159372",
     Name = "Radar",
 
     HeartbeatClient = function(item: Types.Item)

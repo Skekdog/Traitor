@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local Elimination = require(ReplicatedStorage.GameDefinition.Gamemodes.Elimination)
 local Map = require(ReplicatedStorage.RoundRule.Map)
 local Round = require(ReplicatedStorage.RoundRule.Round)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -51,11 +50,16 @@ local roundCount = -1
 local MAP_VOTE_INTERVAL = 3
 local INTERMISSION_TIME = 15
 
+local gamemodes: {Types.Gamemode} = {}
+for _, v in ReplicatedStorage.GameDefinition.Gamemodes:GetChildren() do
+    table.insert(gamemodes, (require)(v))
+end
+
 local module = {}
 
 local function newRound(): Types.Round
     roundCount += 1
-    local round = Round.new(Elimination)
+    local round = Round.new(gamemodes[math.random(#gamemodes)])
     round:LoadMap(currentMap)
     return round
 end
