@@ -712,7 +712,7 @@ guns.BAR = {
     Kind = "Gun" :: "Gun",
     Name = "BAR",
     Description = "A powerful mid-range rifle. Slow to reload.",
-    Icon = "",
+    Icon = "rbxassetid://10243797417",
 
     Slot = 3,
     CreditCost = 1,
