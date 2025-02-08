@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 local BulletTracer = require(ReplicatedStorage.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.CombatTypes)
+local PlayPositionalSound = require(ReplicatedStorage.PlayPositionalSound)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ShatterGlass = require(ReplicatedStorage.ShatterGlass)
 local module = {}
@@ -210,6 +212,8 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
     assert(folder:IsA("Folder"), "Explosions is not a folder")
     folder.Name = "Explosions"
     folder.Parent = workspace
+
+	PlayPositionalSound(ServerStorage.Explosion, params.Position)
 
     explosion.Parent = folder
 
