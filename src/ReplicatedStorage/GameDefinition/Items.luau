@@ -772,7 +772,13 @@ grenades.Grenade = {
     Projectile = projectiles("Flashbang"),
     HoldAnimation = "rbxassetid://12498620263",
 
-    Damage = 200,
+    ExplosionInfo = {
+        Damage = 200,
+        FalloffBegin = 5,
+        FalloffEnd = 17,
+        Pressure = 50000,
+        VisualRadius = 17,
+    },
 
     FuseTime = 5,
 
@@ -794,7 +800,13 @@ grenades.Flashbang = {
     Projectile = projectiles("Flashbang"),
     HoldAnimation = "rbxassetid://12498620263",
 
-    Damage = 0,
+    ExplosionInfo = {
+        Damage = 0,
+        FalloffBegin = 0,
+        FalloffEnd = 0,
+        Pressure = 10000,
+        VisualRadius = 15,
+    },
 
     BeforeHitParticipant = function(_, target: Types.Participant)
         return ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
@@ -817,7 +829,13 @@ grenades["Incendiary Grenade"] = {
     Projectile = projectiles("Incendiary Grenade"),
     HoldAnimation = "rbxassetid://12498620263",
 
-    Damage = 10,
+    ExplosionInfo = {
+        Damage = 10,
+        FalloffBegin = 0,
+        FalloffEnd = 15,
+        Pressure = 10000,
+        VisualRadius = 15,
+    },
 
     OnExplode = function(weapon: Types.GrenadeWeapon, attacker: Types.Participant, projectile: BasePart)
         if not attacker then
@@ -889,7 +907,13 @@ grenades["Smoke Grenade"] = {
 
     HoldAnimation = "rbxassetid://12498620263",
 
-    Damage = 0,
+    ExplosionInfo = {
+        Damage = 0,
+        FalloffBegin = 0,
+        FalloffEnd = 0,
+        Pressure = 10000,
+        VisualRadius = 15,
+    },
 
     OnExplode = function(weapon: Types.GrenadeWeapon, attacker: Types.Participant, projectile: BasePart)
         local smoke = Instance.new("Smoke")
@@ -922,7 +946,13 @@ grenades["Discombobulator"] = {
     Projectile = projectiles("Discombobulator"),
     HoldAnimation = "rbxassetid://12498620263",
 
-    Damage = 0,
+    ExplosionInfo = {
+        Damage = 0,
+        FalloffBegin = 0,
+        FalloffEnd = 0,
+        Pressure = 75000,
+        VisualRadius = 15,
+    },
 
     BeforeHitParticipant = function(_, target: Types.Participant)
         return ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)

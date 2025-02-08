@@ -23,8 +23,9 @@ end
 local function getItemDamage(definition: Types.AnyItemDefinition, hitPart: BasePart): number
 	assert(definition.Kind ~= "Item", "Item has no damage")
 
-	if typeof(definition.Damage) == "number" then
-		return definition.Damage
+	local dmg = if definition.Kind ~= "Grenade" then definition.Damage else definition.ExplosionInfo.Damage
+	if typeof(dmg) == "number" then
+		return dmg
 	end
 
 	local hitArea: "Body" | "Head" | "Limb" = "Limb"
@@ -36,7 +37,7 @@ local function getItemDamage(definition: Types.AnyItemDefinition, hitPart: BaseP
 		hitArea = "Limb"
 	end
 
-	return definition.Damage[hitArea]
+	return dmg[hitArea]
 end
 
 local function tryGetParticipantFromPart(round: Types.Round, part: BasePart): Types.Participant?
@@ -232,6 +233,13 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 
 		task.wait(item.Definition.FuseTime)
 		projectile:Destroy()
+
+		local explosionParams: Types.ExplosionParams = {
+			ExplosionInfo = item.Definition.ExplosionInfo,
+			Attacker = by,
+			Position = projectile.Position
+		}
+		by.Round:CreateExplosion(explosionParams)
 	end
 
 	return "Success"
