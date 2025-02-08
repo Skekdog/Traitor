@@ -215,36 +215,51 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			end
 			ViewmodelModule.Recoil(item.Definition)
 
-			local shots: {CombatTypes.Shot} = {}
-			for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
-				local spread = getSpreadVector(item)
+			local request: CombatTypes.PrimaryFireRequest
+			if item.Kind == "Melee" or item.Kind == "Gun" then
+				local raycasts: {CombatTypes.RaycastInfo} = {}
+				for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
+					local spread = getSpreadVector(item)
 
-				local origin = head.Position
-				local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
+					local origin = head.Position
+					local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
 
-				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
-				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
-				local hitPartCenterPosition = if hitPart then hitPart.Position else nil
-				local normal = if raycastResult then raycastResult.Normal else nil
+					local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
+					local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
+					local hitPartCenterPosition = if hitPart then hitPart.Position else nil
+					local normal = if raycastResult then raycastResult.Normal else nil
 
-				if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) and not hitPart:IsDescendantOf(workspace.Corpses) then
-					local material = hitPart:GetAttribute("MaterialOverride") or hitPart.Material.Name
-					PlayPositionalSound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
+					if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) and not hitPart:IsDescendantOf(workspace.Corpses) then
+						local material = hitPart:GetAttribute("MaterialOverride") or hitPart.Material.Name
+						PlayPositionalSound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
+					end
+
+					table.insert(raycasts, {
+						Destination = targetPosition,
+						HitPart = hitPart,
+						HitPartCenterPosition = hitPartCenterPosition,
+						Normal = normal,
+					})
 				end
 
-				table.insert(shots, {
-					Destination = targetPosition,
-					HitPart = hitPart,
-					HitPartCenterPosition = hitPartCenterPosition,
-					Normal = normal,
-				})
+				local raycastRequest: CombatTypes.PrimaryFireRaycastRequest = {
+					Kind = "PrimaryFireRaycastRequest" :: "PrimaryFireRaycastRequest",
+					ItemName = item.Definition.Name,
+					Raycasts = raycasts,
+					Origin = head.Position,
+				}
+				request = raycastRequest
+			elseif item.Kind == "Grenade" then
+				local throwRequest: CombatTypes.PrimaryFireThrowRequest = {
+					Kind = "PrimaryFireThrowRequest" :: "PrimaryFireThrowRequest",
+					ItemName = item.Definition.Name,
+					Origin = head.Position,
+					Direction = getCenterRay().Direction,
+				}
+				request = throwRequest
+			else
+				warn("Not implemented")
 			end
-
-			local request: CombatTypes.PrimaryFireRequest = {
-				ItemName = item.Definition.Name,
-				Shots = shots,
-				Origin = head.Position,
-			}
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
 			if result ~= "Success" then

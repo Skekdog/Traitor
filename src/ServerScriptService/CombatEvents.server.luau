@@ -97,7 +97,7 @@ ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, it
 	participant:DropItem(item, true)
 end)
 
-local function isShot(value: any): boolean
+local function isRaycastInfo(value: any): boolean
 	if typeof(value) ~= "table" then
 		return false
 	end
@@ -121,7 +121,23 @@ local function isShot(value: any): boolean
 	return true
 end
 
-local function isPrimaryFireRequest(value: any): boolean
+local function isThrow(value: any): boolean
+	if typeof(value) ~= "Vector3" then
+		return false
+	end
+
+	if value.Magnitude > 1.1 then
+		return false
+	end
+
+	return true
+end
+
+local function isRaycastRequest(value: any): boolean
+	if value.Kind ~= "PrimaryFireRaycastRequest" then
+		return false
+	end
+
 	if typeof(value) ~= "table" then
 		return false
 	end
@@ -134,17 +150,27 @@ local function isPrimaryFireRequest(value: any): boolean
 		return false
 	end
 
-	if typeof(value.Shots) ~= "table" or #value.Shots < 1 then
+	if typeof(value.Raycasts) ~= "table" or #value.Raycasts < 1 then
 		return false
 	end
 
-	for i, v in ipairs(value.Shots) do
-		if not isShot(v) then
+	for i, v in ipairs(value.Raycasts) do
+		if not isRaycastInfo(v) then
 			return false
 		end
 	end
 
 	return true
+end
+
+local function isPrimaryFireRequest(value: any): boolean
+	if value.Kind == "PrimaryFireRaycastRequest" then
+		return isRaycastRequest(value)
+	elseif value.Kind == "PrimaryFireThrowRequest" then
+		return isThrow(value.Direction)
+	else
+		return false
+	end
 end
 
 ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult

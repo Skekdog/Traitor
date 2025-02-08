@@ -94,7 +94,13 @@ local function validateRaycast(item: Types.AnyItem, by: Types.Participant, origi
 	return "Success"
 end
 
-local function validateItemUsage(by: Types.Participant, item: Types.AnyItem): CombatTypes.ValidateItemUsageResult
+local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, requestKind: string): CombatTypes.ValidateItemUsageResult
+	if (item.Kind == "Grenade") and (requestKind :: string ~= "PrimaryFireThrowRequest") then
+		return "OtherError"
+	elseif (item.Kind == "Gun" or item.Kind == "Melee") and (requestKind :: string ~= "PrimaryFireRaycastRequest") then
+		return "OtherError"
+	end
+	
 	if by:GetHealth() <= 0 then
 		return "Dead"
 	end
@@ -167,7 +173,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		return "NotEquipped"
 	end
 
-	local validateItemUsageResult = validateItemUsage(by, item)
+	local validateItemUsageResult = validateItemUsage(by, item, request.Kind)
 	if validateItemUsageResult ~= "Success" then
 		return validateItemUsageResult :: CombatTypes.ValidateItemUsageResult
 	end
@@ -188,25 +194,44 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 
 	if item.Kind == "Gun" then
 		item.Ammo -= 1
+	elseif item.Kind == "Grenade" then
+		by:RemoveItem(item)
 	end
 
-	for i, v in ipairs(request.Shots) do
-		if i > (if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1) then
-			break
+	if request.Kind == "PrimaryFireRaycastRequest" then
+		for i, v in ipairs(request.Raycasts) do
+			if i > (if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1) then
+				break
+			end
+
+			if definition.Kind == "Gun" and definition.Projectile then
+				BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, request.Origin, v.Destination)
+			end
+
+			local validateRaycastResult = validateRaycast(item, by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)
+			if validateRaycastResult ~= "Success" then
+				return validateRaycastResult :: CombatTypes.ValidateRaycastResult
+			end
+
+			if v.HitPart then
+				onPartHit(item, by, v.HitPart, v.Destination, v.Normal)
+			end
+		end
+	elseif request.Kind == "PrimaryFireThrowRequest" then
+		if item.Kind ~= "Grenade" then
+			return "OtherError"
 		end
 
-		if definition.Kind == "Gun" and definition.Projectile then
-			BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, request.Origin, v.Destination)
-		end
+		local projectile = item.Definition.Projectile:Clone()
+		projectile.CFrame = CFrame.lookAlong(request.Origin, request.Direction)
+		projectile.Anchored = false
+		projectile.CollisionGroup = "Grenades"
 
-		local validateRaycastResult = validateRaycast(item, by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)
-		if validateRaycastResult ~= "Success" then
-			return validateRaycastResult :: CombatTypes.ValidateRaycastResult
-		end
+		projectile.Parent = workspace.Projectiles
+		projectile:ApplyImpulse(request.Direction * item.Definition.ProjectileForce)
 
-		if v.HitPart then
-			onPartHit(item, by, v.HitPart, v.Destination, v.Normal)
-		end
+		task.wait(item.Definition.FuseTime)
+		projectile:Destroy()
 	end
 
 	return "Success"
