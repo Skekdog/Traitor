@@ -76,12 +76,11 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
     burnSound.SoundId = weaponSounds("FlareBurn")
     burnSound.Parent = part
 
-    local model = part:FindFirstAncestorOfClass("Model")
     if target and target.Kind == "Prop" then
-        assert(model)
-        model:SetAttribute("Burning", true)
+        part:SetAttribute("Burning", true)
     end
 
+    local model = part:FindFirstAncestorOfClass("Model")
     if model and model:IsDescendantOf(workspace.Corpses) then
         model:SetAttribute("Burning", true)
     end
@@ -115,8 +114,7 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
         end
         
         if target and target.Kind == "Prop" then
-            assert(model)
-            model:SetAttribute("Burning", false)
+            part:SetAttribute("Burning", false)
         end
 
         burnSound:Destroy()
@@ -333,7 +331,9 @@ guns["Golden Gun"] = {
 guns["Flare Gun"] = {
     Kind = "Gun" :: "Gun",
     Name = "Flare Gun",
-    Description = "Ouch fire hot.",
+    Description = "Will set things it hits on fire. Can be used to burn corpses, preventing others from discovering them.",
+    Icon = "rbxassetid://444145395",
+    CreditCost = 1,
 
     Slot = 8,
     CanDrop = true,

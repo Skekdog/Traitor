@@ -58,6 +58,7 @@ local roles: {[string]: Types.RoleDefinition} = {
             Items.AWP,
             Items["Ballistic Vest"],
             Items.BAR,
+            Items["Flare Gun"],
         },
 
         CanSeeMissingInAction = true,
