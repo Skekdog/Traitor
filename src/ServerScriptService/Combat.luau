@@ -310,6 +310,10 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			Position = projectile.Position,
 		}
 		module.CreateExplosion(by.Round, explosionParams)
+
+		if item.Definition.OnExplode then
+			item.Definition.OnExplode(item, by, projectile)
+		end
 	end
 
 	return "Success"
