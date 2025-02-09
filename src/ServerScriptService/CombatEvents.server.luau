@@ -229,8 +229,6 @@ ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, item
 	ReplicatedStorage.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0)
 
 	round:LoadAmmoBox(round:GetMap(), model, amount)
-	
-	model.CFrame = CFrame.lookAlong(head.Position + (head.CFrame.LookVector * 3), head.CFrame.LookVector)
-	model.Parent = round:GetMap().AmmoSpawns
-	model:ApplyImpulse(head.CFrame.LookVector * (model.AssemblyMass * 15))
+
+	participant:TryThrowAssembly(model, 15, round:GetMap().AmmoSpawns)
 end)

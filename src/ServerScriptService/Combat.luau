@@ -297,12 +297,10 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		end
 
 		local projectile = item.Definition.Projectile:Clone()
-		projectile.CFrame = CFrame.lookAlong(request.Origin, request.Direction)
 		projectile.Anchored = false
 		projectile.CollisionGroup = "Grenades"
 
-		projectile.Parent = workspace.Projectiles
-		projectile:ApplyImpulse(request.Direction * item.Definition.ProjectileForce)
+		by:TryThrowAssembly(projectile, 60, workspace.Projectiles, request.Origin, request.Direction)
 
 		task.wait(item.Definition.FuseTime)
 		projectile:Destroy()
