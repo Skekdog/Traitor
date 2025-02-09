@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local Magneto = require(script.Parent.Magneto)
 local Map = require(ReplicatedStorage.RoundRule.Map)
 local Round = require(ReplicatedStorage.RoundRule.Round)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -72,6 +73,7 @@ end
 
 task.spawn(function()
     while true do
+        Magneto.Heartbeat(round)
         if round:GetRoundPhase() ~= "Intermission" then
             task.wait()
             continue
