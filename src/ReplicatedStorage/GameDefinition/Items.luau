@@ -773,7 +773,7 @@ grenades.Grenade = {
     Slot = 7,
     CanDrop = true,
 
-    Projectile = projectiles("Flashbang"),
+    Projectile = projectiles("Grenade"),
     HoldAnimation = "rbxassetid://12498620263",
 
     ExplosionInfo = {
