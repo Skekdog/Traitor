@@ -259,6 +259,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				request = throwRequest
 			else
 				warn("Not implemented")
+				return Enum.ContextActionResult.Sink
 			end
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
