@@ -331,4 +331,29 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 	return "Success"
 end
 
+function module.AlternateFire(by: Types.Participant, request: CombatTypes.AlternateFireRequest): CombatTypes.ValidateItemUsageResult
+	local item = by:GetEquippedItem()
+	if not item or item.Definition.Name ~= request.ItemName then
+		return "NotEquipped"
+	end
+
+	local validateItemUsageResult = validateItemUsage(by, item, request.Kind)
+	if validateItemUsageResult ~= "Success" then
+		return validateItemUsageResult :: CombatTypes.ValidateItemUsageResult
+	end
+
+	if item.Kind ~= "Item" then
+		return "OtherError"
+	end
+
+	local func = (item :: Types.Item).Definition.AlternateFire
+	if not func then
+		return "OtherError"
+	end
+
+	func(item, by, request.Direction)
+
+	return "Success"
+end
+
 return module

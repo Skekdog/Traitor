@@ -205,7 +205,7 @@ local function isAlternateFireRequest(value: any): boolean
 	end
 
 	if value.Kind == "AlternateFireItemRequest" then
-		return isThrow(value)
+		return isThrow(value.Direction)
 	else
 		return false
 	end
@@ -226,7 +226,7 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, reques
 end
 
 ReplicatedStorage.ClientServer.AlternateFire.OnServerInvoke = function(plr, request: CombatTypes.AlternateFireRequest): CombatTypes.ValidateItemUsageResult
-	if not isPrimaryFireRequest(request) then
+	if not isAlternateFireRequest(request) then
 		return "OtherError"
 	end
 

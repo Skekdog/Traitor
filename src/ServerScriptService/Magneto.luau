@@ -207,6 +207,15 @@ function module.AlternateFire(item: Types.Item, participant: Types.Participant, 
     controlledProps[userId] = object
     primaryPart:SetNetworkOwner(participant.Player)
     alignPos.Attachment1 = head:FindFirstChild("MagnetoAttachment") :: Attachment?
+
+    if not alignPos.Attachment1 then
+        local magnetoAttachment = Instance.new("Attachment")
+        magnetoAttachment.Name = "MagnetoAttachment"
+        magnetoAttachment.CFrame = CFrame.new(0, 0, -6)
+        magnetoAttachment.Parent = head
+        alignPos.Attachment1 = magnetoAttachment
+    end
+    
     alignPos.Enabled = true
 end
 
