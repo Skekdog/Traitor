@@ -323,32 +323,30 @@ function module.Heartbeat(round: Types.Round): ()
             stopControllingProp(prop, userId)
             continue
         end
-
-        local primaryPart = if prop:IsA("Model") then prop.PrimaryPart else prop
-        if not primaryPart then -- This can fail presumably when round is destroyed, hence don't assert here
-            continue
-        end
         
-        local distance = plr:DistanceFromCharacter(primaryPart.Position)
+        local distance = plr:DistanceFromCharacter(prop.Position)
         if distance == 0 or distance > 30 then -- 30 is quite high but we want to account for network lag and such
             stopControllingProp(prop, userId)
             continue
         end
 
-        for _, part in prop:GetTouchingParts() do
-            if part.Name:match("Foot") and part:FindFirstAncestorOfClass("Model") == plr.Character then
+        local char = plr.Character
+        if not char then
+            stopControllingProp(prop, userId)
+            continue
+        end
+
+        local params = OverlapParams.new()
+        params.FilterDescendantsInstances = {char}
+        params.FilterType = Enum.RaycastFilterType.Include
+
+        for _, v in workspace:GetPartsInPart(prop) do
+            if v.Name:match("Foot") and v.Parent == char and v.Position.Y > prop.Position.Y then
                 stopControllingProp(prop, userId)
+                continue
             end
         end
     end
 end
-
-task.spawn(function()
-    while true do
-        task.wait()
-
-		
-    end
-end)
 
 return module
