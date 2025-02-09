@@ -64,6 +64,8 @@ local function tryUnequip(item: Types.AnyItem): ()
 		return
 	end
 
+	ControlManager.Unregister("Drop")
+
 	module.EquippedItem = nil
 
 	runItemChangedCallbacks()
@@ -98,14 +100,16 @@ local function tryEquip(item: Types.AnyItem): ()
 
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(item.Definition.Name)
 
-	ControlManager.Register("Drop", true, function(_, state)
-		if state ~= Enum.UserInputState.End then
-			return Enum.ContextActionResult.Pass
-		end
+	if item.Definition.CanDrop then
+		ControlManager.Register("Drop", true, function(_, state)
+			if state ~= Enum.UserInputState.End then
+				return Enum.ContextActionResult.Pass
+			end
 
-		ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name)
-		return Enum.ContextActionResult.Sink
-	end)
+			ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name)
+			return Enum.ContextActionResult.Sink
+		end)
+	end
 
 	runItemChangedCallbacks()
 
