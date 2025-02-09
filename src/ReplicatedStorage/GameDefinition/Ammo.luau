@@ -9,6 +9,7 @@ module.HUGE = {
     Capacity = 250,
     ReserveCapacity = 0,
     Model = NO_PART,
+    CanDrop = false,
 }
 
 module.AWP = {
@@ -17,6 +18,7 @@ module.AWP = {
     Capacity = 4,
     ReserveCapacity = 0,
     Model = NO_PART,
+    CanDrop = false,
 }
 
 module.Flare = {
@@ -25,6 +27,7 @@ module.Flare = {
     Capacity = 6,
     ReserveCapacity = 0,
     Model = NO_PART,
+    CanDrop = false,
 }
 
 module["Golden Bullet"] = {
@@ -33,6 +36,7 @@ module["Golden Bullet"] = {
     Capacity = 1,
     ReserveCapacity = 0,
     Model = NO_PART,
+    CanDrop = false,
 }
 
 module["9mm"] = {
@@ -41,6 +45,7 @@ module["9mm"] = {
     Capacity = 20,
     ReserveCapacity = 60,
     Model = NO_PART,
+    CanDrop = true,
 }
 
 module.Shotgun = {
@@ -49,6 +54,7 @@ module.Shotgun = {
     Capacity = 8,
     ReserveCapacity = 16,
     Model = NO_PART,
+    CanDrop = true,
 }
 
 module.Deagle = {
@@ -57,6 +63,7 @@ module.Deagle = {
     Capacity = 8,
     ReserveCapacity = 32,
     Model = NO_PART,
+    CanDrop = true,
 }
 
 module.SMG1 = {
@@ -65,6 +72,7 @@ module.SMG1 = {
     Capacity = 30,
     ReserveCapacity = 60,
     Model = NO_PART,
+    CanDrop = true,
 }
 
 module.Rifle = {
@@ -73,6 +81,7 @@ module.Rifle = {
     Capacity = 5,
     ReserveCapacity = 10,
     Model = NO_PART,
+    CanDrop = true,
 }
 
 return module
