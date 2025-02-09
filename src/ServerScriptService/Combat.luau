@@ -316,6 +316,16 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		if item.Definition.OnExplode then
 			item.Definition.OnExplode(item, by, projectile)
 		end
+	elseif request.Kind == "PrimaryFireItemRequest" then
+		if item.Kind ~= "Item" then
+			return "OtherError"
+		end
+
+		if not item.Definition.PrimaryFire then
+			return "OtherError"
+		end
+
+		item.Definition.PrimaryFire(item, by, request.Direction)
 	end
 
 	return "Success"

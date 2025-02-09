@@ -14,6 +14,8 @@ export type PrimaryFireBaseRequest = {
 	Origin: Vector3,
 }
 
+export type AlternateFireBaseRequest = PrimaryFireBaseRequest
+
 export type PrimaryFireRaycastRequest = PrimaryFireBaseRequest & {
 	Kind: "PrimaryFireRaycastRequest",
 	Raycasts: {RaycastInfo},
@@ -24,6 +26,18 @@ export type PrimaryFireThrowRequest = PrimaryFireBaseRequest & {
 	Direction: Vector3,
 }
 
-export type PrimaryFireRequest = PrimaryFireRaycastRequest | PrimaryFireThrowRequest
+export type PrimaryFireItemRequest = PrimaryFireBaseRequest & {
+	Kind: "PrimaryFireItemRequest",
+	Direction: Vector3,
+}
+
+export type AlternateFireItemRequest = AlternateFireBaseRequest & {
+	Kind: "AlternateFireItemRequest",
+	Direction: Vector3,
+}
+
+export type PrimaryFireRequest = PrimaryFireRaycastRequest | PrimaryFireThrowRequest | PrimaryFireItemRequest
+
+export type AlternateFireRequest = AlternateFireItemRequest
 
 return nil

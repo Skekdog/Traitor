@@ -141,7 +141,6 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	end)
 
 	if item.Kind == "Gun" then
-
 		ControlManager.Register("Alternate Fire", true, function(_, state)
 			if SettingsManager.GetSetting("Toggle Aim") then
 				if state ~= Enum.UserInputState.End then
@@ -169,6 +168,31 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 		end)
 	else
 		ControlManager.Unregister("Reload Weapon")
+	end
+
+	if item.Kind == "Item" then
+		ControlManager.Register("Alternate Fire", true, function(_, state)
+			if state ~= Enum.UserInputState.End then
+				return Enum.ContextActionResult.Pass
+			end
+
+			local head = char:WaitForChild("Head")
+			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
+
+			local itemRequest: CombatTypes.AlternateFireItemRequest = {
+				Kind = "AlternateFireItemRequest" :: "AlternateFireItemRequest",
+				ItemName = item.Definition.Name,
+				Origin = head.Position,
+				Direction = GetCentreRay().Direction,
+			}
+
+			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.AlternateFire:InvokeServer(itemRequest)
+			if result ~= "Success" then
+				warn("Item alternate fire rejected:", result)
+			end
+
+			return Enum.ContextActionResult.Sink
+		end)
 	end
 
 	ControlManager.Register("Primary Fire", true, function(_, _, input)
@@ -254,8 +278,13 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 				}
 				request = throwRequest
 			else
-				warn("Not implemented")
-				return Enum.ContextActionResult.Sink
+				local itemRequest: CombatTypes.PrimaryFireItemRequest = {
+					Kind = "PrimaryFireItemRequest" :: "PrimaryFireItemRequest",
+					ItemName = item.Definition.Name,
+					Origin = head.Position,
+					Direction = GetCentreRay().Direction,
+				}
+				request = itemRequest
 			end
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)

@@ -97,6 +97,26 @@ ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, it
 	participant:DropItem(item, true)
 end)
 
+local function isPrimaryFireBaseRequest(value: any): boolean
+	if typeof(value) ~= "table" then
+		return false
+	end
+
+	if typeof(value.Origin) ~= "Vector3" then
+		return false
+	end
+
+	if typeof(value.ItemName) ~= "string" then
+		return false
+	end
+
+	return true
+end
+
+local function isAlternateFireBaseRequest(value: any): boolean
+	return isPrimaryFireBaseRequest(value)
+end
+
 local function isRaycastInfo(value: any): boolean
 	if typeof(value) ~= "table" then
 		return false
@@ -164,10 +184,28 @@ local function isRaycastRequest(value: any): boolean
 end
 
 local function isPrimaryFireRequest(value: any): boolean
+	if not isPrimaryFireBaseRequest(value) then
+		return false
+	end
+	
 	if value.Kind == "PrimaryFireRaycastRequest" then
 		return isRaycastRequest(value)
 	elseif value.Kind == "PrimaryFireThrowRequest" then
 		return isThrow(value.Direction)
+	elseif value.Kind == "PrimaryFireItemRequest" then
+		return isThrow(value.Direction)
+	else
+		return false
+	end
+end
+
+local function isAlternateFireRequest(value: any): boolean
+	if not isAlternateFireBaseRequest(value) then
+		return false
+	end
+
+	if value.Kind == "AlternateFireItemRequest" then
+		return isThrow(value)
 	else
 		return false
 	end
@@ -184,6 +222,20 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, reques
 	end
 
 	local result = Combat.PrimaryFire(participant, request)
+	return result :: CombatTypes.ValidateItemUsageResult
+end
+
+ReplicatedStorage.ClientServer.AlternateFire.OnServerInvoke = function(plr, request: CombatTypes.AlternateFireRequest): CombatTypes.ValidateItemUsageResult
+	if not isPrimaryFireRequest(request) then
+		return "OtherError"
+	end
+
+	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
+	if not participant then
+		return "Dead"
+	end
+
+	local result = Combat.AlternateFire(participant, request)
 	return result :: CombatTypes.ValidateItemUsageResult
 end
 
