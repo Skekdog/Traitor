@@ -65,7 +65,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		Health = 100,
 		WalkSpeed = 16,
-		JumpPower = 50,
+		JumpPower = 18,
 
 		Accessories = {},
 		DamageKarmaMultiplier = 1.5,
@@ -88,7 +88,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		Health = 100,
 		WalkSpeed = 16,
-		JumpPower = 50,
+		JumpPower = 18,
 	},
 
 	Detective = {
@@ -123,7 +123,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		Health = 100,
 		WalkSpeed = 16,
-		JumpPower = 50,
+		JumpPower = 18,
 	}
 }
 

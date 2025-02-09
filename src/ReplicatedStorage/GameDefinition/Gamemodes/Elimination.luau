@@ -102,7 +102,7 @@ local gamemode: Types.Gamemode = {
     AvailableItems = Items,
     AvailableAmmo = Ammo,
 
-    StartingItems = {Items.Crowbar},
+    StartingItems = {Items.Crowbar, Items["Magneto Stick"]},
 
     Duration = function(numParticipants: number)
         return 0 + 10 * numParticipants
