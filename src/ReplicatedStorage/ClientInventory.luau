@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(script.Parent.ControlManager)
+local GetCentreRay = require(script.Parent.GetCentreRay)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
 local ThemesManager = require(script.Parent.ThemesManager)
 local UIAnimation = require(script.Parent.UIAnimation)
@@ -64,6 +65,7 @@ local function tryUnequip(item: Types.AnyItem): ()
 		return
 	end
 
+	ControlManager.Unregister("Drop Ammo")
 	ControlManager.Unregister("Drop")
 
 	module.EquippedItem = nil
@@ -99,6 +101,21 @@ local function tryEquip(item: Types.AnyItem): ()
 	module.EquippedItem = item
 
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(item.Definition.Name)
+
+	if item.Kind == "Gun" and item.Definition.AmmoType.CanDrop then
+		ControlManager.Register("Drop Ammo", true, function(_, state)
+			if state ~= Enum.UserInputState.End then
+				return Enum.ContextActionResult.Pass
+			end
+
+			if item.Ammo < item.Definition.AmmoType.Capacity / 4 then
+				return Enum.ContextActionResult.Sink
+			end
+
+			ReplicatedStorage.ClientServer.DropAmmo:FireServer(item.Definition.Name, GetCentreRay().Direction)
+			return Enum.ContextActionResult.Sink
+		end)
+	end
 
 	if item.Definition.CanDrop then
 		ControlManager.Register("Drop", true, function(_, state)
@@ -333,6 +350,16 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemN
 		if v.Definition.Name == itemName then
 			assert(v.Kind == "Gun", "Item is not a gun")
 			v.IsReloading = false
+			v.Ammo = amount
+			runAmmoChangedCallbacks()
+		end
+	end
+end)
+
+ReplicatedStorage.ServerClient.UpdateAmmo.OnClientEvent:Connect(function(itemName: string, amount: number): ()
+	for _, v in ourInventory.Slots do
+		if v.Definition.Name == itemName then
+			assert(v.Kind == "Gun", "Item is not a gun")
 			v.Ammo = amount
 			runAmmoChangedCallbacks()
 		end

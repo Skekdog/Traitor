@@ -186,3 +186,51 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, reques
 	local result = Combat.PrimaryFire(participant, request)
 	return result :: CombatTypes.ValidateItemUsageResult
 end
+
+ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unknown): ()
+	if typeof(itemName) ~= "string" then
+		return
+	end
+
+	local round = RoundHandler.GetRound()
+
+	local participant = round:GetParticipant(plr.Name)
+	if not participant then
+		return
+	end
+
+	local item = participant:GetItems()[itemName]
+	if not item then
+		return
+	end
+
+	if item.Kind ~= "Gun" or not item.Definition.AmmoType.CanDrop then
+		return
+	end
+
+	if item.Ammo < item.Definition.AmmoType.Capacity / 4 then
+		return
+	end
+
+	local char = participant:GetCharacter()
+	if not char then
+		return
+	end
+
+	local head = char:FindFirstChild("Head")
+	if not head or not head:IsA("BasePart") then
+		return
+	end
+
+	local amount = item.Ammo
+	local model = item.Definition.AmmoType.Model:Clone()
+
+	item.Ammo = 0
+	ReplicatedStorage.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0)
+
+	round:LoadAmmoBox(round:GetMap(), model, amount)
+	
+	model.CFrame = CFrame.lookAlong(head.Position + (head.CFrame.LookVector * 3), head.CFrame.LookVector)
+	model.Parent = round:GetMap().AmmoSpawns
+	model:ApplyImpulse(head.CFrame.LookVector * (model.AssemblyMass * 15))
+end)

@@ -8,6 +8,7 @@ local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
 local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
+local GetCentreRay = require(script.Parent.GetCentreRay)
 local HitSounds = require(script.Parent.HitSounds)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SettingsManager = require(script.Parent.SettingsManager)
@@ -22,13 +23,8 @@ local function getCharacter(): Model?
 	return player.Character
 end
 
-local function getCenterRay(): Ray
-    local camera = workspace.CurrentCamera
-    return camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
-end
-
 local function deriveTargetPosition(origin: Vector3, spread: Vector3, range: number): Vector3
-	return origin + (getCenterRay().Direction + spread).Unit * range
+	return origin + (GetCentreRay().Direction + spread).Unit * range
 end
 
 local random = Random.new(workspace:GetServerTimeNow())
@@ -53,7 +49,7 @@ local function raycast(char: Model, spread: Vector3, range: number): RaycastResu
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
 
-	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (getCenterRay().Direction + spread).Unit * range, params)
+	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (GetCentreRay().Direction + spread).Unit * range, params)
 end
 
 player.CharacterRemoving:Connect(function()
@@ -254,7 +250,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 					Kind = "PrimaryFireThrowRequest" :: "PrimaryFireThrowRequest",
 					ItemName = item.Definition.Name,
 					Origin = head.Position,
-					Direction = getCenterRay().Direction,
+					Direction = GetCentreRay().Direction,
 				}
 				request = throwRequest
 			else

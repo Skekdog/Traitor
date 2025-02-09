@@ -1,3 +1,4 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(script.Parent.Parent.RoundRule.Types)
 local module: {[string]: Types.AmmoDefinition} = {}
 
@@ -44,7 +45,7 @@ module["9mm"] = {
     Name = "9mm",
     Capacity = 20,
     ReserveCapacity = 60,
-    Model = NO_PART,
+    Model = ReplicatedStorage.AmmoBoxModels["9mm"],
     CanDrop = true,
 }
 
@@ -53,7 +54,7 @@ module.Shotgun = {
     Name = "Shotgun",
     Capacity = 8,
     ReserveCapacity = 16,
-    Model = NO_PART,
+    Model = ReplicatedStorage.AmmoBoxModels.Shotgun,
     CanDrop = true,
 }
 
@@ -62,7 +63,7 @@ module.Deagle = {
     Name = "Deagle",
     Capacity = 8,
     ReserveCapacity = 32,
-    Model = NO_PART,
+    Model = ReplicatedStorage.AmmoBoxModels.Deagle,
     CanDrop = true,
 }
 
@@ -71,7 +72,7 @@ module.SMG1 = {
     Name = "SMG1",
     Capacity = 30,
     ReserveCapacity = 60,
-    Model = NO_PART,
+    Model = ReplicatedStorage.AmmoBoxModels.SMG1,
     CanDrop = true,
 }
 
@@ -80,7 +81,7 @@ module.Rifle = {
     Name = "Rifle",
     Capacity = 5,
     ReserveCapacity = 10,
-    Model = NO_PART,
+    Model = ReplicatedStorage.AmmoBoxModels.Rifle,
     CanDrop = true,
 }
 
