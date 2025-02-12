@@ -105,8 +105,8 @@ local gamemode: Types.Gamemode = {
     StartingItems = {Items.Crowbar, Items["Magneto Stick"]},
 
     Duration = function(numParticipants: number)
-        return 0 + 10 * numParticipants
-    end,
+		return 120 + 10 * numParticipants
+	end,
 
     Roles = roles,
 
