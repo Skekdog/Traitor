@@ -1,8 +1,11 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(script.Parent.ControlManager)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local ShowAlert = require(script.Parent.ShowAlert)
 local ThemesManager = require(script.Parent.ThemesManager)
 local UIAnimation = require(script.Parent.UIAnimation)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -84,6 +87,67 @@ local function tryUnequip(item: Types.AnyItem): ()
 	ViewmodelModule.Hide()
 end
 
+local function isObscured(origin: Vector3, target: Vector3): boolean
+	local char = Players.LocalPlayer.Character
+	if not char then
+		return true
+	end
+
+	local map = LocalRoundInfo.GetMap()
+	if not map then
+		return true
+	end
+
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {char, map.Bounds}
+	params.FilterType = Enum.RaycastFilterType.Exclude
+
+	local result = workspace:Raycast(origin, target - origin, params)
+	return not not result
+end
+
+local function canDrop(direction: Vector3): boolean
+	local char = Players.LocalPlayer.Character
+	if not char then
+		return false
+	end
+
+	local head = char:FindFirstChild("Head")
+	if not head or not head:IsA("BasePart") then
+		return false
+	end
+
+	local velocityModifier = math.abs(head.AssemblyLinearVelocity:Dot(direction) / (16 * 3))
+    local startPosition = head.Position + (direction * 3) + (head.AssemblyLinearVelocity * velocityModifier)
+	if isObscured(head.Position, startPosition) then
+		ShowAlert("There is no room to drop anything here!")
+		return false
+	end
+
+	return true
+end
+
+local function tryDropItem(item: Types.AnyItem, direction: Vector3): ()
+	if not canDrop(direction) then
+		return
+	end
+
+	ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name)
+end
+
+local function tryDropAmmo(item: Types.GunWeapon, direction: Vector3): ()
+	if not canDrop(direction) then
+		return
+	end
+
+	if item.Ammo < item.Definition.AmmoType.Capacity / 4 then
+		ShowAlert("You do not have enough ammo to drop an ammo box!")
+		return
+	end
+
+	ReplicatedStorage.ClientServer.DropAmmo:FireServer(item.Definition.Name, direction)
+end
+
 local function tryEquip(item: Types.AnyItem): ()
 	if module.EquippedItem then
 		if module.EquippedItem == item then
@@ -108,11 +172,7 @@ local function tryEquip(item: Types.AnyItem): ()
 				return Enum.ContextActionResult.Pass
 			end
 
-			if item.Ammo < item.Definition.AmmoType.Capacity / 4 then
-				return Enum.ContextActionResult.Sink
-			end
-
-			ReplicatedStorage.ClientServer.DropAmmo:FireServer(item.Definition.Name, GetCentreRay().Direction)
+			tryDropAmmo(item, GetCentreRay().Direction)
 			return Enum.ContextActionResult.Sink
 		end)
 	end
@@ -123,7 +183,7 @@ local function tryEquip(item: Types.AnyItem): ()
 				return Enum.ContextActionResult.Pass
 			end
 
-			ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name)
+			tryDropItem(item, GetCentreRay().Direction)
 			return Enum.ContextActionResult.Sink
 		end)
 	end
