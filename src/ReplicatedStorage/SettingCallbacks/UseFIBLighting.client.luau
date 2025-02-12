@@ -12,11 +12,24 @@ SettingCallbacks.Listen(function(settingName: string, value: any)
         return
     end
 
+    Lighting:ClearAllChildren()
+    if value then
+        for _, v in map.FutureLightingModifiers:GetChildren() do
+            v:Clone().Parent = Lighting
+        end
+    end
+
+    for _, v in map.LightingModifiers:GetChildren() do
+        if not Lighting:FindFirstChildOfClass(v.ClassName) then
+            v:Clone().Parent = Lighting
+        end
+    end
+
     for i, v in map.LightingSettings do
         (Lighting :: any)[i] = v
     end
 
-    if value and map.FutureLightingSettings then
+    if value then
         for i, v in map.FutureLightingSettings do
             (Lighting :: any)[i] = v
         end
