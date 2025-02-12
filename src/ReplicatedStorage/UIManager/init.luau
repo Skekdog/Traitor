@@ -1,5 +1,6 @@
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ControlManager = require(script.Parent.ControlManager)
 local ToggleMouseVisible = require(script.Parent.ToggleMouseVisible)
@@ -273,5 +274,72 @@ function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 	until UIManager.TryGetUI(name)
 	return UIManager.GetUI(name)
 end
+
+local orders: {[string]: number} = {
+	Special = 4,
+	Popup = 3,
+	Buttons = 2,
+	HUD = 1,
+}
+
+for layer, order in orders do
+	local screenUi = Instance.new("ScreenGui")
+	screenUi.Name = layer
+	screenUi.IgnoreGuiInset = true
+	screenUi.DisplayOrder = order
+	screenUi.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenUi.ClipToDeviceSafeArea = false
+	screenUi.ResetOnSpawn = false
+
+	if layer == "Buttons" then
+		screenUi.ScreenInsets = Enum.ScreenInsets.None
+	end
+
+	screenUi.Parent = Players.LocalPlayer.PlayerGui
+end
+
+UIManager.RegisterUI(UIManager.UnregisteredUIs.Sidebar)
+
+local function register(object: Instance)
+	if object:GetAttribute("DoNotRegister") then
+		return
+	end
+	
+	UIManager.RegisterUI(object :: GuiObject)
+end
+
+UIManager.UnregisteredUIs.ChildAdded:Connect(register)
+for _, object in UIManager.UnregisteredUIs:GetChildren() do
+	register(object)
+end
+
+ControlManager.Register("Close UI", false, function()
+	for _, v in UIManager.GetUIs("Popup") do
+		if v.Visible and not v.NoClose then
+			v:ToggleVisible(false)
+			return Enum.ContextActionResult.Sink
+		end
+	end
+	return Enum.ContextActionResult.Pass
+end)
+
+ReplicatedStorage:WaitForChild("ServerClient").OpenSettings.OnClientEvent:Connect(function()
+	UIManager.WaitForUI("Settings"):ToggleVisible(true)
+end)
+
+task.spawn(function()
+	local CASui = Players.LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge)
+	assert(CASui and CASui:IsA("ScreenGui"))
+	
+	local CASFrame = CASui:WaitForChild("ContextButtonFrame")
+	assert(CASFrame:IsA("Frame"))
+	
+	CASFrame.Size = UDim2.fromScale(1, 1)
+	CASFrame.Position = UDim2.fromScale(0, 0)
+	CASui.DisplayOrder = 4
+	CASui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
+	CASui.ClipToDeviceSafeArea = false
+	CASui.SafeAreaCompatibility = Enum.SafeAreaCompatibility.FullscreenExtension
+end)
 
 return UIManager

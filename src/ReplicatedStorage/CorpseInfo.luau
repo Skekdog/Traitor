@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetItemDefinition = require(ReplicatedStorage.GetItemDefinition)
 local Types = require(ReplicatedStorage.RoundRule.Types)
-local UIManager = require(script.Parent.Parent)
-local StringWithDeterminer = require(script.Parent.Parent.Parent.StringWithDeterminer)
-local ToRoundTime = require(script.Parent.Parent.Parent.ToRoundTime)
+local UIManager = require(script.Parent.UIManager)
+local StringWithDeterminer = require(script.Parent.StringWithDeterminer)
+local ToRoundTime = require(script.Parent.ToRoundTime)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
 local object = corpseUi.Object.CorpseInfo
