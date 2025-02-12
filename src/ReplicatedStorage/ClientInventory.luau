@@ -117,7 +117,7 @@ local function canDrop(direction: Vector3): boolean
 		return false
 	end
 
-	local velocityModifier = math.abs(head.AssemblyLinearVelocity:Dot(direction) / (16 * 3))
+	local velocityModifier = head.AssemblyLinearVelocity:Dot(direction) / (16 * 3)
     local startPosition = head.Position + (direction * 3) + (head.AssemblyLinearVelocity * velocityModifier)
 	if isObscured(head.Position, startPosition) then
 		ShowAlert("There is no room to drop anything here!")
@@ -132,7 +132,7 @@ local function tryDropItem(item: Types.AnyItem, direction: Vector3): ()
 		return
 	end
 
-	ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name)
+	ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name, direction)
 end
 
 local function tryDropAmmo(item: Types.GunWeapon, direction: Vector3): ()

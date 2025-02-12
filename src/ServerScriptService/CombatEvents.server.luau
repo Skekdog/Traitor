@@ -79,8 +79,16 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 	finishReloading(plr, item)
 end)
 
-ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, itemName: unknown)
+ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
 	if typeof(itemName) ~= "string" then
+		return
+	end
+
+	if typeof(direction) ~= "Vector3" then
+		return
+	end
+
+	if direction.Magnitude > 1.1 then
 		return
 	end
 
@@ -94,7 +102,7 @@ ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, it
 		return
 	end
 
-	participant:DropItem(item, true)
+	participant:DropItem(item, direction)
 end)
 
 local function isPrimaryFireBaseRequest(value: any): boolean
@@ -239,8 +247,16 @@ ReplicatedStorage.ClientServer.AlternateFire.OnServerInvoke = function(plr, requ
 	return result :: CombatTypes.ValidateItemUsageResult
 end
 
-ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unknown): ()
+ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
 	if typeof(itemName) ~= "string" then
+		return
+	end
+
+	if typeof(direction) ~= "Vector3" then
+		return
+	end
+
+	if direction.Magnitude > 1.1 then
 		return
 	end
 
@@ -277,10 +293,12 @@ ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, item
 	local amount = item.Ammo
 	local model = item.Definition.AmmoType.Model:Clone()
 
+	if not participant:TryThrowAssembly(model, 15, round:GetMap().AmmoSpawns, nil, direction) then
+		return
+	end
+
 	item.Ammo = 0
 	ReplicatedStorage.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0)
 
 	round:LoadAmmoBox(round:GetMap(), model, amount)
-
-	participant:TryThrowAssembly(model, 15, round:GetMap().AmmoSpawns)
 end)
