@@ -1,9 +1,37 @@
-local SetSidebarAlignment = require(script.Parent.Parent.SetSidebarAlignment)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIAnimation = require(ReplicatedStorage.UIAnimation)
+local UIManager = require(ReplicatedStorage.UIManager)
 local SettingCallbacks = require(script.Parent.SettingCallbacks)
+
 SettingCallbacks.Listen(function(settingName: string, value: any)
     if settingName ~= "Sidebar Alignment" then
         return
     end
     
-    SetSidebarAlignment(value)
+    local ui = UIManager.WaitForUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
+
+    local position, anchorPoint, textAlignment, paddingProperty
+    if value == "Left" then
+        position = UDim2.new(0, -5, 0.28, 0)
+        anchorPoint = Vector2.new(0, 0)
+        textAlignment = Enum.TextXAlignment.Right
+        paddingProperty = "PaddingRight"
+    elseif value == "Right" then
+        position = UDim2.new(1, 5, 0.28, 0)
+        anchorPoint = Vector2.new(1, 0)
+        textAlignment = Enum.TextXAlignment.Left
+        paddingProperty = "PaddingLeft"
+    else
+        error("Invalid alignment: " .. tostring(value))
+    end
+
+    UIAnimation.Animate(ui, TweenInfo.new(0.1), {Position = position, AnchorPoint = anchorPoint})
+    for _, v in ui:GetChildren() do
+        if not v:IsA("TextButton") then
+            continue
+        end
+
+        v.TextXAlignment = textAlignment;
+        (v :: any).UIPadding[paddingProperty] = UDim.new(0, 8)
+    end
 end)
