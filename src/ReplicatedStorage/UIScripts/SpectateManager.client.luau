@@ -91,7 +91,7 @@ local function switchCameraMode(mode: "Player" | "Freecam")
 
 	uiO.CameraMode.Text = "Camera Mode: " .. currentCameraMode
 
-	if LocalRoundInfo.GetPlayerStatus(plr) == "Spectating" then
+	if LocalRoundInfo.GetPlayerStatus(plr) ~= "Alive" then
 		if currentCameraMode == "Player" then
 			Freecam.StopFreecam()
 		else

@@ -18,8 +18,6 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
-local Settings = UserSettings()
-local GameSettings = Settings.GameSettings
 local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
 
 local LocalPlayer = Players.LocalPlayer
@@ -36,25 +34,8 @@ Workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 	end
 end)
 
-local FFlagUserExitFreecamBreaksWithShiftlock
-do
-    local success, result = pcall(function()
-        return UserSettings():IsUserFeatureEnabled("UserExitFreecamBreaksWithShiftlock")
-    end)
-    FFlagUserExitFreecamBreaksWithShiftlock = success and result
-end
-
-local FFlagUserShowGuiHideToggles
-do
-    local success, result = pcall(function()
-        return UserSettings():IsUserFeatureEnabled("UserShowGuiHideToggles")
-    end)
-    FFlagUserShowGuiHideToggles = success and result
-end
-
 ------------------------------------------------------------------------
 
-local FREECAM_ENABLED_ATTRIBUTE_NAME = "FreecamEnabled"
 local INPUT_PRIORITY = Enum.ContextActionPriority.High.Value
 local REDUCED_INPUT_PRIORITY = Enum.ContextActionPriority.Medium.Value
 
@@ -324,16 +305,6 @@ local function StepFreecam(dt)
 	Camera.FieldOfView = cameraFov
 end
 
-local function CheckMouseLockAvailability()
-	local devAllowsMouseLock = Players.LocalPlayer.DevEnableMouseLock
-	local devMovementModeIsScriptable = Players.LocalPlayer.DevComputerMovementMode == Enum.DevComputerMovementMode.Scriptable
-	local userHasMouseLockModeEnabled = GameSettings.ControlMode == Enum.ControlMode.MouseLockSwitch
-	local userHasClickToMoveEnabled =  GameSettings.ComputerMovementMode == Enum.ComputerMovementMode.ClickToMove
-	local MouseLockAvailable = devAllowsMouseLock and userHasMouseLockModeEnabled and not userHasClickToMoveEnabled and not devMovementModeIsScriptable
-
-	return MouseLockAvailable
-end
-
 ------------------------------------------------------------------------
 
 local PlayerState = {} do
@@ -353,11 +324,7 @@ local PlayerState = {} do
 
         cameraFOV = Camera.FieldOfView
 
-		if FFlagUserExitFreecamBreaksWithShiftlock and CheckMouseLockAvailability() then
-			mouseBehavior = Enum.MouseBehavior.Default
-		else
-			mouseBehavior = UserInputService.MouseBehavior
-		end
+		mouseBehavior = UserInputService.MouseBehavior
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 	end
 
@@ -400,10 +367,6 @@ local function StartFreecam()
 
 	freecamEnabled = true
 
-	if FFlagUserShowGuiHideToggles then
-		script:SetAttribute(FREECAM_ENABLED_ATTRIBUTE_NAME, true)
-	end
-
 	local cameraCFrame = Camera.CFrame
 	cameraRot = Vector2.new(cameraCFrame:toEulerAnglesYXZ())
 	cameraPos = cameraCFrame.p + Vector3.new(1.5, 3, 0)
@@ -426,10 +389,6 @@ local function StopFreecam()
 	end
 
 	freecamEnabled = false
-
-	if FFlagUserShowGuiHideToggles then
-		script:SetAttribute(FREECAM_ENABLED_ATTRIBUTE_NAME, false)
-	end
 
 	Input.StopCapture()
 	RunService:UnbindFromRenderStep("Freecam")
