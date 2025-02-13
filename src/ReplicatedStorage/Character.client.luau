@@ -19,15 +19,28 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
+
+    local root = char:WaitForChild("HumanoidRootPart")
+    assert(root:IsA("BasePart"))
+
+    local death = root:WaitForChild("Died", 1)
     
-    local root = char:WaitForChild("HumanoidRootPart", 2)
-    if root then
-        local death = root:WaitForChild("Died", 1)
-        
-        if death then
-            death:Destroy()
-        end
+    if death then
+        death:Destroy()
     end
+
+    local startHeight = math.huge
+    hum.StateChanged:Connect(function(_, state)
+        if state == Enum.HumanoidStateType.Freefall then
+            startHeight = root.Position.Y
+        elseif state == Enum.HumanoidStateType.Landed then
+            local distance = startHeight - root.Position.Y
+            if distance > 15 then
+                clientServer.Fell:FireServer(startHeight - root.Position.Y)
+            end
+            startHeight = math.huge
+        end
+    end)
 
     local camera = workspace.CurrentCamera
     while char.Parent do

@@ -182,4 +182,22 @@ ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(playe
     return participant:PurchaseItem(item)
 end
 
+ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distance: number)
+    local participant = round:GetParticipant(player.Name)
+    if not participant then
+        return
+    end
+
+    if distance <= 15 then
+        return
+    end
+
+    local damage = (0.5 * (distance - 15) ^ 1.5) * 80 / workspace.Gravity
+
+    participant:TryTakeDamage({
+        Amount = damage,
+        Source = "Fall",
+    })
+end)
+
 return module
