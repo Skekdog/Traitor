@@ -26,6 +26,7 @@ local function getItemDamage(item: Types.AnyWeapon | Types.ExplosionParams, hitP
 	assert(item.Kind ~= "Grenade", "Cannot get damage for grenade")
 
 	if item.Kind == "ExplosionParams" then
+		assert(item.Definition.FalloffEnd ~= 0, "Cannot divide by 0")
 		return (item.Definition.FalloffEnd - (hitPart.Position - item.Position).Magnitude) / item.Definition.FalloffEnd * item.Definition.Damage
 	end
 
