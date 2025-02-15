@@ -68,6 +68,30 @@ module.help = {
 	end
 }
 
+module.setrole = {
+	Name = "setrole",
+	Description = "Sets the role of a player",
+	Arguments = {"player name", "role name"},
+	Execute = function(round, args)
+		local playerName = replaceSubstitute(args[1])
+		local roleName = replaceSubstitute(args[2])
+
+		local participant = round:GetParticipant(playerName)
+		if not participant then
+			return `Participant {playerName} not found`
+		end
+
+		local role = round:GetRoleFromRoleName(roleName)
+		if not role then
+			return `Role {roleName} not found`
+		end
+
+		participant:SetRole(role.Definition)
+
+		return "Role set."
+	end
+}
+
 module.endround = {
 	Name = "endround",
 	Description = "Ends the current round with a victory for the specified role",
