@@ -1,18 +1,12 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local TeleportService = game:GetService("TeleportService")
+local IsAdmin = require(ServerScriptService.DevTools.IsAdmin)
+local PlaceIDs = require(ServerScriptService.DevTools.PlaceIDs)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local RestartServer = require(script.Parent.RestartServer)
 local RoundHandler = require(script.Parent.RoundHandler)
-
--- This is separate from Initialise so that if anything goes badly wrong server restart is still possible.
-
-local meId = 965735486
-local testPlace = 9648179685
-
-local function isAdmin(plr: Player)
-	return plr.UserId == meId or plr.UserId < 0
-end
 
 local function send(message: string): ()
     local round = RoundHandler.GetRound()
@@ -28,19 +22,19 @@ TeleportService.TeleportInitFailed:Connect(function(plr, result, errorMessage)
 end)
 
 local function toTestPlace(plr: Player)
-    if game.PlaceId == testPlace then
+    if game.PlaceId == PlaceIDs.TestPlace then
         return send("You are already in test place, silly.")
     end
 
     local targets = {plr}
-    if isAdmin(plr) then
+    if IsAdmin(plr) then
         targets = Players:GetPlayers()
         send("Teleporting everyone to test place.")
     else
         send(`Teleporting {plr.Name} to test place.`)
     end
 
-    TeleportService:TeleportAsync(testPlace, targets)
+    TeleportService:TeleportAsync(PlaceIDs.TestPlace, targets)
 end
 
 local function pause(): Types.Round?
@@ -121,16 +115,16 @@ Players.PlayerAdded:Connect(function(plr: Player)
 
         if cmd == "!testplace" then
             toTestPlace(plr)
-        elseif cmd == "!pause" and isAdmin(plr) then
+        elseif cmd == "!pause" and IsAdmin(plr) then
             pause()
-        elseif cmd == "!restart" and isAdmin(plr) then
+        elseif cmd == "!restart" and IsAdmin(plr) then
             send("Server restarting...")
             RestartServer(5)
-        elseif cmd == "!pausevictory" and isAdmin(plr) then
+        elseif cmd == "!pausevictory" and IsAdmin(plr) then
             toggleVictory()
         elseif cmd == "!settings" then
             openSettingsForPlayer(plr)
-        elseif cmd == "!endround" and isAdmin(plr) then
+        elseif cmd == "!endround" and IsAdmin(plr) then
             endRound(args[2])
         end
     end)
