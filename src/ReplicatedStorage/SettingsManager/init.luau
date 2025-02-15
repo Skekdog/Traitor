@@ -1,4 +1,6 @@
 local HTTPService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local IsAdmin = require(script.Parent.IsAdmin)
 local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
 
 export type SettingDefinition = {
@@ -459,6 +461,17 @@ module.AvailableSettings = {
 	},
 } :: {SettingDefinition}
 
+local plr = Players.LocalPlayer
+if plr and IsAdmin(plr) then
+	table.insert(module.AvailableSettings, {
+		Name = "Open Console",
+		Tab = "Keybinds",
+		Category = "Menus - Enable the checkbox to make a keybind toggled",
+		Tooltip = "Opens the console.",
+		PossibleValues = "Keybind",
+		Default = {Keycodes = {Enum.KeyCode.Backquote, Enum.KeyCode.ButtonY}, Toggled = true},
+	})
+end
 
 for _, v in module.AvailableSettings do
 	module.Settings[v.Name] = {Value = v.Default, Definition = v}
