@@ -92,6 +92,26 @@ module.setrole = {
 	end
 }
 
+module.kill = {
+	Name = "kill",
+	Description = "Kills the specified player",
+	Arguments = {"player name"},
+	Execute = function(round, args)
+		local playerName = replaceSubstitute(args[1])
+		local participant = round:GetParticipant(playerName)
+		if not participant then
+			return `Participant {playerName} not found`
+		end
+
+		participant:TryTakeDamage({
+			Amount = math.huge,
+			Source = "Other"
+		})
+
+		return "Player killed."
+	end
+}
+
 module.endround = {
 	Name = "endround",
 	Description = "Ends the current round with a victory for the specified role",
