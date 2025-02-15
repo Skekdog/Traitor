@@ -54,12 +54,12 @@ module.help = {
 
 		for _, v in module do
 
-			local args = ""
+			local args = if #v.Arguments == 0 then "" else " "
 			for i, arg in v.Arguments do
 				args ..= `<{arg}>{if i < #v.Arguments then " " else ""}`
 			end
 
-			ret ..= `{v.Name} {args}: {v.Description}\n`
+			ret ..= `{v.Name}{args}: {v.Description}\n`
 		end
 
 		ret = ret:sub(1, -2)
