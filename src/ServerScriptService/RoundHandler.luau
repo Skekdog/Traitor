@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local Exec = require(ServerScriptService.DevTools.Exec)
 local Magneto = require(script.Parent.Magneto)
 local Map = require(ReplicatedStorage.RoundRule.Map)
 local Round = require(ReplicatedStorage.RoundRule.Round)
@@ -199,5 +201,9 @@ ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Playe
         Source = "Fall",
     })
 end)
+
+ReplicatedStorage.ClientServer.Exec.OnServerInvoke = function(plr, command: string): string | true
+    return Exec.Execute(round, command)
+end
 
 return module
