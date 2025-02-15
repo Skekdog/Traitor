@@ -781,6 +781,7 @@ grenades.Grenade = {
     CanDrop = true,
 
     Projectile = projectiles("Grenade"),
+    Model = models("Grenade"),
     HoldAnimation = "rbxassetid://12498620263",
 
     ExplosionInfo = {
@@ -810,6 +811,7 @@ grenades.Flashbang = {
     CanDrop = true,
 
     Projectile = projectiles("Flashbang"),
+    Model = models("Flashbang"),
     HoldAnimation = "rbxassetid://12498620263",
 
     ExplosionInfo = {
@@ -841,6 +843,7 @@ grenades["Incendiary Grenade"] = {
 
     Projectile = projectiles("Incendiary Grenade"),
     HoldAnimation = "rbxassetid://12498620263",
+    Model = models("Incendiary Grenade"),
 
     ExplosionInfo = {
         Damage = 10,
@@ -919,6 +922,7 @@ grenades["Smoke Grenade"] = {
     CanDrop = true,
 
     HoldAnimation = "rbxassetid://12498620263",
+    Model = models("Smoke Grenade"),
 
     ExplosionInfo = {
         Damage = 0,
@@ -958,6 +962,7 @@ grenades["Discombobulator"] = {
 
     Projectile = projectiles("Discombobulator"),
     HoldAnimation = "rbxassetid://12498620263",
+    Model = models("Discombobulator"),
 
     ExplosionInfo = {
         Damage = 0,
