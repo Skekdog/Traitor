@@ -73,6 +73,15 @@ module.help = {
 	end
 }
 
+module.echo = {
+	Name = "echo",
+	Description = "Returns the provided input.",
+	Arguments = {"input"},
+	Execute = function(round, args)
+		return table.concat(args, " ")
+	end
+}
+
 module.luau = {
 	Name = "luau",
 	Description = "Executes Luau code. Includes globals: round, cmds, items",
