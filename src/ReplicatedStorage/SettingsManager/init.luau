@@ -464,7 +464,7 @@ module.AvailableSettings = {
 local plr = Players.LocalPlayer
 if plr and IsAdmin(plr) then
 	table.insert(module.AvailableSettings, {
-		Name = "Open Console",
+		Name = "Console",
 		Tab = "Keybinds",
 		Category = "Menus - Enable the checkbox to make a keybind toggled",
 		Tooltip = "Opens the console.",
