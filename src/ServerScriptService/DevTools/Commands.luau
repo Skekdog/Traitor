@@ -80,9 +80,9 @@ module.luau = {
 	Execute = function(round, args)
 		local code = table.concat(args, " ")
 		
-		local func = loadstring(code)
+		local func = loadstring(code, "")
 		if not func then
-			return "Invalid code"
+			return "ERROR: Invalid syntax."
 		end
 
 		local env = getfenv()
@@ -93,10 +93,10 @@ module.luau = {
 
 		local success, result = pcall(func)
 		if not success then
-			return "Error: " .. result
+			return `ERROR: {result}.`
 		end
 
-		return tostring(result)
+		return tostring(result) or ""
 	end
 }
 
@@ -107,22 +107,22 @@ module.setrole = {
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
 		if not playerName then
-			return "Missing argument 1 player name"
+			return "Missing argument 1 player name."
 		end
 
 		local roleName = processStringArgument(args[2])
 		if not roleName then
-			return "Missing argument 2 role name"
+			return "Missing argument 2 role name."
 		end
 
 		local participant = round:GetParticipant(playerName)
 		if not participant then
-			return `Participant {playerName} not found`
+			return `Participant {playerName} not found.`
 		end
 
 		local role = round:GetRoleFromRoleName(roleName)
 		if not role then
-			return `Role {roleName} not found`
+			return `Role {roleName} not found.`
 		end
 
 		participant:SetRole(role.Definition)
@@ -138,12 +138,12 @@ module.kill = {
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
 		if not playerName then
-			return "Missing argument 1 player name"
+			return "Missing argument 1 player name."
 		end
 
 		local participant = round:GetParticipant(playerName)
 		if not participant then
-			return `Participant {playerName} not found`
+			return `Participant {playerName} not found.`
 		end
 
 		participant:TryTakeDamage({
@@ -162,7 +162,7 @@ module.endround = {
 	Execute = function(round, args)
 		local roleName = args[1]
 		if not roleName then
-			return "Missing argument 1 role name"
+			return "Missing argument 1 role name."
 		end
 
 		if not round:IsInProgress() then
@@ -179,7 +179,7 @@ module.endround = {
 		if success then
 			return "Round ended."
 		else
-			return "Failed to end round: "..err
+			return `Failed to end round: {err}.`
 		end
 	end
 }
@@ -222,12 +222,12 @@ module.map = {
 	Execute = function(round, args)
 		local mapName = processStringArgument(args[1])
 		if not mapName then
-			return "Missing argument 1 map name"
+			return "Missing argument 1 map name."
 		end
 
 		local map = ServerStorage.Maps:FindFirstChild(mapName)
 		if not map then
-			return `Map {mapName} not found`
+			return `Map {mapName} not found.`
 		end
 		assert(map:IsA("ModuleScript"))
 		round:LoadMap(map)
@@ -243,22 +243,22 @@ module.giveitem = {
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
 		if not playerName then
-			return "Missing argument 1 player name"
+			return "Missing argument 1 player name."
 		end
 
 		local itemName = processStringArgument(args[2])
 		if not itemName then
-			return "Missing argument 2 item name"
+			return "Missing argument 2 item name."
 		end
 
 		local participant = round:GetParticipant(playerName)
 		if not participant then
-			return `Participant {playerName} not found`
+			return `Participant {playerName} not found.`
 		end
 
 		local item = round:GetItemDefinition(itemName)
 		if not item then
-			return `Item {itemName} not found`
+			return `Item {itemName} not found.`
 		end
 		participant:GiveItemFromItemDefinition(item)
 
@@ -273,17 +273,17 @@ module.givecredits = {
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
 		if not playerName then
-			return "Missing argument 1 player name"
+			return "Missing argument 1 player name."
 		end
 
 		local amount = processNumberArgument(args[2])
 		if not amount then
-			return "Invalid argument 2 amount"
+			return "Invalid argument 2 amount."
 		end
 
 		local participant = round:GetParticipant(playerName)
 		if not participant then
-			return `Participant {playerName} not found`
+			return `Participant {playerName} not found.`
 		end
 
 		participant:AddCredits(amount)
