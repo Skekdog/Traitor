@@ -71,7 +71,7 @@ module.help = {
 
 module.luau = {
 	Name = "luau",
-	Description = "Executes Luau code",
+	Description = "Executes Luau code. Includes globals: round, cmds, items",
 	Arguments = {"code"},
 	Execute = function(round, args)
 		local code = table.concat(args, " ")
