@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local Items = require(ReplicatedStorage.GameDefinition.Items)
 local RestartServer = require(ServerScriptService.RestartServer)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -83,6 +84,7 @@ module.luau = {
 		local env = getfenv()
 		env["round"] = round
 		env["cmds"] = module
+		env["items"] = Items
 		setfenv(func, env)
 
 		local success, result = pcall(func)
