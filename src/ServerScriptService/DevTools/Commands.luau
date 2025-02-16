@@ -68,6 +68,32 @@ module.help = {
 	end
 }
 
+module.luau = {
+	Name = "luau",
+	Description = "Executes Luau code",
+	Arguments = {"code"},
+	Execute = function(round, args)
+		local code = table.concat(args, " ")
+		
+		local func = loadstring(code)
+		if not func then
+			return "Invalid code"
+		end
+
+		local env = getfenv()
+		env["round"] = round
+		env["cmds"] = module
+		setfenv(func, env)
+
+		local success, result = pcall(func)
+		if not success then
+			return "Error: " .. result
+		end
+
+		return tostring(result)
+	end
+}
+
 module.setrole = {
 	Name = "setrole",
 	Description = "Sets the role of a player",
