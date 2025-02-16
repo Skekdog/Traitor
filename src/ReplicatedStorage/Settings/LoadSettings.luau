@@ -1,0 +1,29 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Settings = require(script.Parent.Settings)
+
+local toLoad: {
+	[string]: Settings.SettingValue,
+	SETTINGS_VERSION: number
+} = ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Wait()
+
+local processedSettings: {string} = {}
+
+if toLoad.SETTINGS_VERSION ~= Settings.SETTINGS_VERSION then
+	print("settings version mismatched, loading defaults")
+else
+	for i, v in toLoad do
+		table.insert(processedSettings, i)
+		Settings.SetSetting(i, v)
+	end
+end
+
+for i, v in Settings.AvailableSettings do
+	assert(v)
+	if table.find(processedSettings, i) then
+		continue
+	end
+
+	Settings.SetSetting(i, v.Default)
+end
+
+return nil

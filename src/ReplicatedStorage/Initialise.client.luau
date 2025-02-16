@@ -18,6 +18,8 @@ local ShowAlert = require(script.Parent.ShowAlert)
 local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
 
+require(script.Parent.Settings.LoadSettings)
+
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
 serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)

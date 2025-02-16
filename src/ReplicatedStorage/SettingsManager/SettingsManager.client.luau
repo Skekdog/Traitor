@@ -1,3 +1,7 @@
+if true then
+	return
+end
+
 local UIS = game:GetService("UserInputService")
 local CAS = game:GetService("ContextActionService")
 local GUI = game:GetService("GuiService")
