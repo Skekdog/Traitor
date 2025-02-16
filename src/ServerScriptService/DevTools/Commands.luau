@@ -9,13 +9,17 @@ export type Command = {
 	Name: string,
 	Description: string,
 	Arguments: {string},
-	Execute: (round: Types.Round, args: {string}) -> string,
+	Execute: (round: Types.Round, args: {string?}) -> string,
 }
 
 local WHITESPACE_SUBSTITUTE = "-"
 
-local function replaceSubstitute(str: string): string
-	return str:gsub(WHITESPACE_SUBSTITUTE, " ")
+local function processStringArgument(str: string?): string?
+	return if str then str:gsub(WHITESPACE_SUBSTITUTE, " ") else nil
+end
+
+local function processNumberArgument(str: string?): number?
+	return if str then tonumber(str) else nil
 end
 
 local endRoundParams: {any}?
@@ -101,8 +105,15 @@ module.setrole = {
 	Description = "Sets the role of a player",
 	Arguments = {"player name", "role name"},
 	Execute = function(round, args)
-		local playerName = replaceSubstitute(args[1])
-		local roleName = replaceSubstitute(args[2])
+		local playerName = processStringArgument(args[1])
+		if not playerName then
+			return "Missing argument 1 player name"
+		end
+
+		local roleName = processStringArgument(args[2])
+		if not roleName then
+			return "Missing argument 2 role name"
+		end
 
 		local participant = round:GetParticipant(playerName)
 		if not participant then
@@ -125,7 +136,11 @@ module.kill = {
 	Description = "Kills the specified player",
 	Arguments = {"player name"},
 	Execute = function(round, args)
-		local playerName = replaceSubstitute(args[1])
+		local playerName = processStringArgument(args[1])
+		if not playerName then
+			return "Missing argument 1 player name"
+		end
+
 		local participant = round:GetParticipant(playerName)
 		if not participant then
 			return `Participant {playerName} not found`
@@ -146,6 +161,9 @@ module.endround = {
 	Arguments = {"role name"},
 	Execute = function(round, args)
 		local roleName = args[1]
+		if not roleName then
+			return "Missing argument 1 role name"
+		end
 
 		if not round:IsInProgress() then
 			return "Round is not in progress."
@@ -202,7 +220,10 @@ module.map = {
 	Description = "Changes the map",
 	Arguments = {"map name"},
 	Execute = function(round, args)
-		local mapName = replaceSubstitute(args[1])
+		local mapName = processStringArgument(args[1])
+		if not mapName then
+			return "Missing argument 1 map name"
+		end
 
 		local map = ServerStorage.Maps:FindFirstChild(mapName)
 		if not map then
@@ -220,8 +241,15 @@ module.giveitem = {
 	Description = "Gives an item to a player",
 	Arguments = {"player name", "item name"},
 	Execute = function(round, args)
-		local playerName = replaceSubstitute(args[1])
-		local itemName = replaceSubstitute(args[2])
+		local playerName = processStringArgument(args[1])
+		if not playerName then
+			return "Missing argument 1 player name"
+		end
+
+		local itemName = processStringArgument(args[2])
+		if not itemName then
+			return "Missing argument 2 item name"
+		end
 
 		local participant = round:GetParticipant(playerName)
 		if not participant then
@@ -243,11 +271,14 @@ module.givecredits = {
 	Description = "Gives credits to a player",
 	Arguments = {"player name", "amount"},
 	Execute = function(round, args)
-		local playerName = replaceSubstitute(args[1])
-		local amount = tonumber(args[2])
+		local playerName = processStringArgument(args[1])
+		if not playerName then
+			return "Missing argument 1 player name"
+		end
 
+		local amount = processNumberArgument(args[2])
 		if not amount then
-			return "Amount must be a number"
+			return "Invalid argument 2 amount"
 		end
 
 		local participant = round:GetParticipant(playerName)
