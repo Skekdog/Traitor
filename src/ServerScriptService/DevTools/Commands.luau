@@ -2,6 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local TeleportService = game:GetService("TeleportService")
+local PlaceIDs = require(script.Parent.PlaceIDs)
 local Items = require(ReplicatedStorage.GameDefinition.Items)
 local RestartServer = require(ServerScriptService.RestartServer)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -108,6 +110,24 @@ module.luau = {
 		end
 
 		return tostring(result) or ""
+	end
+}
+
+module.teleportplace = {
+	Name = "teleportplace",
+	Description = "Teleports everyone to the specified place. Available named places: Imperium, MainPlace, TestPlace",
+	Arguments = {"place name / id"},
+	Execute = function(round, args)
+		local asId = processNumberArgument(args[1])
+		local asName = processStringArgument(args[1])
+		local place = if asId then asId else PlaceIDs[asName]
+
+		if not place then
+			return "Place not found."
+		end
+
+		TeleportService:TeleportAsync(place, Players:GetPlayers())
+		return `Teleporting everyone to {place}.`
 	end
 }
 
