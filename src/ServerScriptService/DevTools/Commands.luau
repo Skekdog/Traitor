@@ -127,7 +127,7 @@ module.setrole = {
 
 		participant:SetRole(role.Definition)
 
-		return "Role set."
+		return `Set {playerName}'s role to {roleName}.`
 	end
 }
 
@@ -151,7 +151,7 @@ module.kill = {
 			Source = "Other"
 		})
 
-		return "Player killed."
+		return `Killed {playerName}.`
 	end
 }
 
@@ -232,7 +232,7 @@ module.map = {
 		assert(map:IsA("ModuleScript"))
 		round:LoadMap(map)
 
-		return "Map loaded."
+		return `Map changed to {mapName}.`
 	end
 }
 
@@ -262,7 +262,7 @@ module.giveitem = {
 		end
 		participant:GiveItemFromItemDefinition(item)
 
-		return "Item given."
+		return `Gave {itemName} to {playerName}.`
 	end
 }
 
@@ -288,7 +288,7 @@ module.givecredits = {
 
 		participant:AddCredits(amount)
 
-		return "Credits given."
+		return `Gave {amount} credits to {playerName}.`
 	end
 }
 
