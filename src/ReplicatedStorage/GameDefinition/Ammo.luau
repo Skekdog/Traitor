@@ -4,6 +4,15 @@ local module: {[string]: Types.AmmoDefinition} = {}
 
 local NO_PART = Instance.new("Part")
 
+module["Super Gun"] = {
+    Kind = "Ammo",
+    Name = "Super Gun",
+    Capacity = 10000,
+    ReserveCapacity = 0,
+    Model = NO_PART,
+    CanDrop = false,
+}
+
 module.HUGE = {
     Kind = "Ammo",
     Name = "HUGE",

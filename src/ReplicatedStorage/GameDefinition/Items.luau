@@ -31,6 +31,23 @@ local function projectiles(name: string): BasePart
     return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
 end
 
+local function modify(base: Types.AnyItemDefinition, name: string, edit: {[string]: any}): Types.AnyItemDefinition
+    local new = table.clone(base)
+    for i, v in edit do
+        new[i] = v
+    end
+
+    new.Name = name
+
+    if base.Model then
+        new.Model = base.Model:Clone()
+        new.Model.Name = name
+        new.Model.Parent = ReplicatedStorage.WeaponModels
+    end
+
+    return new
+end
+
 local bullet = projectiles("Bullet")
 
 local function makeGolden(victim: Types.Participant)
@@ -1106,5 +1123,15 @@ end
 for i, v in items do
     allItems[i] = v
 end
+
+allItems["Super Shotgun"] = modify(guns.XM1014, "Super Shotgun", {
+    AttackInterval = 0,
+    AmmoType = Ammo["Super Gun"]
+})
+
+allItems["Golden Gone"] = modify(guns["Golden Gun"], "Golden Gone", {
+    AttackInterval = 0,
+    AmmoType = Ammo["Super Gun"]
+})
 
 return allItems
