@@ -167,10 +167,6 @@ guns.HUGE = {
         Limb = 5,
     },
 
-    FalloffStart = 35,
-    FalloffEnd = 80,
-    FalloffMultiplier = 0.5,
-
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
@@ -203,10 +199,6 @@ guns.Scout = {
 
     Spread = 0,
     HasMuzzleFlash = true,
-
-    FalloffStart = 180,
-    FalloffEnd = 300,
-    FalloffMultiplier = 0.5,
 
     AimFOV = 30,
     AimSpreadMultiplier = 0.05,
@@ -251,10 +243,6 @@ guns.Pistol = {
     Spread = 0.01,
     HasMuzzleFlash = true,
 
-    FalloffStart = 55,
-    FalloffEnd = 110,
-    FalloffMultiplier = 0.4,
-
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
 
@@ -293,9 +281,6 @@ guns["Golden Gun"] = {
         Body = 0,
         Limb = 0,
     },
-    FalloffStart = 0,
-    FalloffEnd = 0,
-    FalloffMultiplier = 1,
 
     AmmoType = Ammo["Golden Bullet"],
     ReloadSound = "",
@@ -375,10 +360,6 @@ guns["Flare Gun"] = {
     AmmoType = Ammo.Flare,
     ReloadSound = "",
 
-    FalloffStart = 35,
-    FalloffEnd = 80,
-    FalloffMultiplier = 0.5,
-
     HasMuzzleFlash = true,
 
     Spread = 0.015,
@@ -435,10 +416,6 @@ guns.SMG = {
         Limb = 15,
     },
 
-    FalloffStart = 35,
-    FalloffEnd = 80,
-    FalloffMultiplier = 0.5,
-
     Spread = 0.02,
     HasMuzzleFlash = true,
     
@@ -481,10 +458,6 @@ guns.AWP = {
 
     AmmoType = Ammo.AWP,
     ReloadSound = "",
-
-    FalloffStart = 200,
-    FalloffEnd = 400,
-    FalloffMultiplier = 0.5,
 
     HasMuzzleFlash = true,
 
@@ -541,10 +514,6 @@ guns["Assault Rifle"] = {
     AttackSound = firedSounds("Assault Rifle"),
     ReloadSound = reloadSounds("Assault Rifle"),
 
-    FalloffStart = 75,
-    FalloffEnd = 125,
-    FalloffMultiplier = 0.5,
-
     Projectile = bullet,
     ProjectileSpeed = 150,
 
@@ -570,10 +539,6 @@ guns["Silenced Pistol"] = {
     },
 
     Spread = 0.01,
-
-    FalloffStart = 55,
-    FalloffEnd = 110,
-    FalloffMultiplier = 0.4,
 
     HasMuzzleFlash = false,
     
@@ -628,10 +593,6 @@ guns.XM1014 = {
         Limb = 10,
     },
 
-    FalloffStart = 25,
-    FalloffEnd = 30,
-    FalloffMultiplier = 0.5,
-
     HasMuzzleFlash = true,
 
     AimFOV = 50,
@@ -671,10 +632,6 @@ guns.Glock = {
         Limb = 10,
     },
 
-    FalloffStart = 45,
-    FalloffEnd = 100,
-    FalloffMultiplier = 0.2,
-
     HasMuzzleFlash = true,
 
     AimFOV = 70,
@@ -711,10 +668,6 @@ guns.Deagle = {
         Body = 40,
         Limb = 20,
     },
-
-    FalloffStart = 100,
-    FalloffEnd = 200,
-    FalloffMultiplier = 0.8,
 
     HasMuzzleFlash = true,
 
@@ -760,10 +713,6 @@ guns.BAR = {
     },
 
     Spread = 0.02,
-
-    FalloffStart = 50,
-    FalloffEnd = 120,
-    FalloffMultiplier = 0.3,
 
     AttackInterval = 0.1,
     ReloadTime = 2.5,
