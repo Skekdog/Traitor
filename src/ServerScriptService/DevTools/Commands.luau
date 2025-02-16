@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
@@ -84,7 +85,7 @@ module.echo = {
 
 module.luau = {
 	Name = "luau",
-	Description = "Executes Luau code. Includes globals: round, cmds, items",
+	Description = "Executes Luau code. Includes globals: round, cmds, items, players",
 	Arguments = {"code"},
 	Execute = function(round, args)
 		local code = table.concat(args, " ")
@@ -98,6 +99,7 @@ module.luau = {
 		env["round"] = round
 		env["cmds"] = module
 		env["items"] = Items
+		env["players"] = Players
 		setfenv(func, env)
 
 		local success, result = pcall(func)
