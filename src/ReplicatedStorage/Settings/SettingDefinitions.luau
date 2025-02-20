@@ -10,7 +10,6 @@ export type ControlValue = {
 	},
 
 	TouchButton: {
-		Enabled: boolean,
 		Position: UDim2,
 		Scale: number,
 	}?,

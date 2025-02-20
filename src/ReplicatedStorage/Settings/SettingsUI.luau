@@ -15,8 +15,8 @@ local buttonTemplates = ui.Object.Templates
 type BooleanButton = typeof(buttonTemplates.BooleanSetting)
 type ChoiceButton = typeof(buttonTemplates.ChoiceSetting)
 type KeybindButton = typeof(buttonTemplates.KeybindSetting)
-type SelectButton = typeof(buttonTemplates.ButtonSetting)
-type Button = BooleanButton | ChoiceButton | KeybindButton | SelectButton
+type ClickButton = typeof(buttonTemplates.ClickButton)
+type Button = BooleanButton | ChoiceButton | KeybindButton | ClickButton
 
 local function setBooleanValue(button: BooleanButton, definition: SettingDefinitions.BooleanDefinition, value: SettingDefinitions.BooleanValue)
 	Settings.SetSetting(definition.Name, value)
@@ -173,6 +173,11 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 		button = setupChoiceButton(definition, value :: SettingDefinitions.ChoiceValue)
 	elseif definition.Kind == "Control" then
 		button = setupKeybindButton(definition, value :: SettingDefinitions.ControlValue)
+
+		if definition.Default.TouchButton then
+			module.AddClickButton(definition.Name .. " Position", "Touch", "Button Positions", function() end)
+			module.AddClickButton(definition.Name .. " Scale", "Touch", "Button Sizes", function() end)
+		end
 	end
 
 	assert(button, "Unknown definition kind: " .. definition.Kind)
@@ -180,6 +185,15 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 	button.Name = "Setting_" .. definition.Name
 	button.Visible = true
 
+	button.Parent = ui.Object.PageHolder.ScrollingFrame
+end
+
+function module.AddClickButton(label: string, tab: string, category: string, onClick: () -> ()): ()
+	local button = buttonTemplates.ClickButton:Clone()
+	button.Name = "ClickButton_" .. label
+	button.Visible = true
+	button.Label.Text = label
+	button.Activated:Connect(onClick)
 	button.Parent = ui.Object.PageHolder.ScrollingFrame
 end
 
