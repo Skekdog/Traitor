@@ -10,7 +10,7 @@ local toLoad: {
 local processedSettings: {string} = {}
 
 if toLoad.SETTINGS_VERSION ~= Settings.SETTINGS_VERSION then
-	print("settings version mismatched, loading defaults")
+	print(`Settings version mismatched. FromSave: {toLoad.SETTINGS_VERSION}, New: {Settings.SETTINGS_VERSION}`)
 else
 	for i, v in toLoad do
 		table.insert(processedSettings, i)
