@@ -20,7 +20,8 @@ local function setBooleanValue(button: BooleanButton, definition: SettingDefinit
 	UIAnimation.TransitionSwitch(button.Value, value)
 end
 
-local function setupBooleanButton(button: BooleanButton, definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.BooleanValue): BooleanButton
+local function setupBooleanButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.BooleanValue): BooleanButton
+	local button = buttonTemplates.BooleanSetting:Clone()
 	button.Label.Text = definition.Name .. ":"
 
 	button.Activated:Connect(function()
@@ -35,7 +36,7 @@ end
 local function setupButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue)
 	local button: GuiObject?
 	if definition.Kind == "Boolean" then
-		button = setupBooleanButton(buttonTemplates.BooleanSetting:Clone(), definition, value :: SettingDefinitions.BooleanValue)
+		button = setupBooleanButton(definition, value :: SettingDefinitions.BooleanValue)
 	elseif definition.Kind == "Choice" then
 		-- button = setupChoiceButton(buttonTemplates.ChoiceSetting:Clone(), definition, value)
 	elseif definition.Kind == "Keybind" then
