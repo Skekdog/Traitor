@@ -10,26 +10,31 @@ export type KeybindSettingValue = {
 
 export type SettingCallback<T = SettingValue> = (name: string, value: T) -> ()
 
-export type SettingValue = string | boolean | UDim2 | KeybindSettingValue
+export type BooleanValue = boolean
+export type ChoiceValue = string
+export type TouchPositionValue = UDim2
+
+export type SettingValue = BooleanValue | ChoiceValue | TouchPositionValue | KeybindSettingValue
 
 export type SettingDefinition = {
 	Name: string,
 	Tab: string,
 	Category: string,
 } & ({
-	PossibleValues: "Boolean",
+	Kind: "Boolean",
 	Default: boolean,
 	Callback: SettingCallback<boolean>?,
 } | {
+	Kind: "Choice",
 	PossibleValues: {string},
 	Default: string,
 	Callback: SettingCallback<string>?,
 } | {
-	PossibleValues: "TouchPosition",
+	Kind: "TouchPosition",
 	Default: UDim2,
 	Callback: SettingCallback<UDim2>?,
 } | {
-	PossibleValues: "Keybind",
+	Kind: "Keybind",
 	Default: KeybindSettingValue,
 	Callback: SettingCallback<KeybindSettingValue>?,
 })
@@ -37,13 +42,13 @@ export type SettingDefinition = {
 local callbacks = script.Parent.Callbacks
 local availableSettings: {[string]: SettingDefinition?} = {}
 
-if IsAdmin(Players.LocalPlayer) then
+if false and IsAdmin(Players.LocalPlayer) then
 	availableSettings.Console = {
 		Name = "Console",
 		Tab = "Keybinds",
 		Category = "Menus - Enable the checkbox to make a keybind toggled",
 		Tooltip = "Opens the console.",
-		PossibleValues = "Keybind" :: "Keybind",
+		Kind = "Keybind" :: "Keybind",
 		Default = {
 			KBMKeybind = Enum.KeyCode.Backquote,
 			Toggled = true,
@@ -56,7 +61,7 @@ availableSettings.Shadows = {
 	Tab = "Display",
 	Category = "Environment",
 	Tooltip = "Enable or disable global shadows.",
-	PossibleValues = "Boolean" :: "Boolean",
+	Kind = "Boolean" :: "Boolean",
 	Default = true,
 
 	Callback = function(name, value)
@@ -69,7 +74,7 @@ availableSettings["Use FIB Lighting"] = {
 	Tab = "Display",
 	Category = "Environment",
 	Tooltip = "If you have modified your client to use Future lighting, enable this for better map compatibility.",
-	PossibleValues = "Boolean" :: "Boolean",
+	Kind = "Boolean" :: "Boolean",
 	Default = false,
 
 	Callback = function(name, value)
