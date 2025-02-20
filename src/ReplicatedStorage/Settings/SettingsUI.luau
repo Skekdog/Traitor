@@ -1,5 +1,7 @@
 local ContextActionService = game:GetService("ContextActionService")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 local ControlManager = require(ReplicatedStorage.ControlManager)
 local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
@@ -10,7 +12,7 @@ local module = {}
 
 local ui = UIManager.WaitForUI("Settings") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Settings)}
 
-local buttonTemplates = ui.Object.Templates
+local buttonTemplates = ui.Object.Main.Templates
 
 type BooleanButton = typeof(buttonTemplates.BooleanSetting)
 type ChoiceButton = typeof(buttonTemplates.ChoiceSetting)
@@ -165,6 +167,47 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	return frame
 end
 
+local darken = ui.Object.LayoutDarken
+
+local tapCon: RBXScriptConnection?
+local function promptUpdateTouchPosition(control: string): UDim2
+	local lastParams = ControlManager.GetRegisteredInfo(control)
+	print(control)
+	local button = ControlManager.Register(control, true, function() return Enum.ContextActionResult.Pass end)
+
+	assert(button)
+
+	ui.Object.Main.Visible = false
+	--tooltip("", "NONE")
+	--tt.Visible = false
+	darken.Visible = true
+
+	local position: UDim2
+
+	task.wait() -- Waiting is necessary as otherwise the tap is detected when clicking the setting button
+	tapCon = UserInputService.TouchTap:Connect(function(pos)
+		local inset = GuiService:GetGuiInset()
+		position = UDim2.fromOffset(inset.X + pos[1].X, inset.Y + pos[1].Y)
+		button.Position = position
+	end)
+
+	darken.Done.Activated:Wait()
+
+	assert(tapCon)
+	tapCon:Disconnect()
+
+	if lastParams then
+		ControlManager.Register(control, true, lastParams.Callback)
+	else
+		ControlManager.Unregister(control)
+	end
+
+	ui.Object.Main.Visible = true
+	darken.Visible = false
+
+	return position
+end
+
 local function setupForDefinition(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue)
 	local button: GuiObject?
 	if definition.Kind == "Boolean" then
@@ -175,7 +218,13 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 		button = setupKeybindButton(definition, value :: SettingDefinitions.ControlValue)
 
 		if definition.Default.TouchButton then
-			module.AddClickButton(definition.Name .. " Position", "Touch", "Button Positions", function() end)
+			module.AddClickButton(definition.Name .. " Position", "Touch", "Button Positions", function()
+				local pos = promptUpdateTouchPosition(definition.Name)
+				Settings.UpdateControlSetting(definition.Name, {
+					Kind = "TouchPosition",
+					New = pos,
+				})
+			end)
 			module.AddClickButton(definition.Name .. " Scale", "Touch", "Button Sizes", function() end)
 		end
 	end
@@ -185,7 +234,7 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 	button.Name = "Setting_" .. definition.Name
 	button.Visible = true
 
-	button.Parent = ui.Object.PageHolder.ScrollingFrame
+	button.Parent = ui.Object.Main.PageHolder.ScrollingFrame
 end
 
 function module.AddClickButton(label: string, tab: string, category: string, onClick: () -> ()): ()
@@ -194,7 +243,7 @@ function module.AddClickButton(label: string, tab: string, category: string, onC
 	button.Visible = true
 	button.Label.Text = label
 	button.Activated:Connect(onClick)
-	button.Parent = ui.Object.PageHolder.ScrollingFrame
+	button.Parent = ui.Object.Main.PageHolder.ScrollingFrame
 end
 
 function module.AddButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()
