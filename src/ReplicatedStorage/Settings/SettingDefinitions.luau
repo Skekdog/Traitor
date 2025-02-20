@@ -2,10 +2,18 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local IsAdmin = require(ReplicatedStorage.IsAdmin)
 
-export type KeybindSettingValue = {
-	KBMKeybind: Enum.UserInputType | Enum.KeyCode?,
-	ConsoleKeybind: Enum.UserInputType | Enum.KeyCode?,
+export type ControlValue = {
 	Toggled: boolean,
+	Keybind: {
+		KBMKeybind: Enum.UserInputType | Enum.KeyCode?,
+		ConsoleKeybind: Enum.UserInputType | Enum.KeyCode?,
+	},
+
+	TouchButton: {
+		Enabled: boolean,
+		Position: UDim2,
+		Scale: number,
+	}?,
 }
 
 export type SettingCallback<T = SettingValue> = (name: string, value: T) -> ()
@@ -14,7 +22,7 @@ export type BooleanValue = boolean
 export type ChoiceValue = string
 export type TouchPositionValue = UDim2
 
-export type SettingValue = BooleanValue | ChoiceValue | TouchPositionValue | KeybindSettingValue
+export type SettingValue = BooleanValue | ChoiceValue | ControlValue
 
 export type BaseDefinition = {
 	Name: string,
@@ -24,44 +32,41 @@ export type BaseDefinition = {
 
 export type BooleanDefinition = BaseDefinition & {
 	Kind: "Boolean",
-	Default: boolean,
-	Callback: SettingCallback<boolean>?,
+	Default: BooleanValue,
+	Callback: SettingCallback<BooleanValue>?,
 }
 
 export type ChoiceDefinition = BaseDefinition & {
 	Kind: "Choice",
-	PossibleValues: {string},
-	Default: string,
-	Callback: SettingCallback<string>?,
+	PossibleValues: {ChoiceValue},
+	Default: ChoiceValue,
+	Callback: SettingCallback<ChoiceValue>?,
 }
 
-export type TouchPositionDefinition = BaseDefinition & {
-	Kind: "TouchPosition",
-	Default: UDim2,
-	Callback: SettingCallback<UDim2>?,
+export type ControlDefinition = BaseDefinition & {
+	Kind: "Control",
+	Default: ControlValue,
+	SpecifyToggle: boolean?,
+	Callback: SettingCallback<ControlValue>?,
 }
 
-export type KeybindDefinition = BaseDefinition & {
-	Kind: "Keybind",
-	Default: KeybindSettingValue,
-	Callback: SettingCallback<KeybindSettingValue>?,
-}
-
-export type SettingDefinition = BooleanDefinition | ChoiceDefinition | TouchPositionDefinition | KeybindDefinition
+export type SettingDefinition = BooleanDefinition | ChoiceDefinition | ControlDefinition
 
 local callbacks = script.Parent.Callbacks
 local availableSettings: {[string]: SettingDefinition?} = {}
 
-if false and IsAdmin(Players.LocalPlayer) then
+if IsAdmin(Players.LocalPlayer) then
 	availableSettings.Console = {
 		Name = "Console",
 		Tab = "Keybinds",
 		Category = "Menus - Enable the checkbox to make a keybind toggled",
 		Tooltip = "Opens the console.",
-		Kind = "Keybind" :: "Keybind",
+		Kind = "Control" :: "Control",
 		Default = {
-			KBMKeybind = Enum.KeyCode.Backquote,
 			Toggled = true,
+			Keybind = {
+				KBMKeybind = Enum.KeyCode.Backquote,
+			},
 		},
 	}
 end

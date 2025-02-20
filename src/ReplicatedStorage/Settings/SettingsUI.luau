@@ -1,4 +1,7 @@
+local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ControlManager = require(ReplicatedStorage.ControlManager)
+local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
 local UIManager = require(ReplicatedStorage.UIManager)
 local SettingDefinitions = require(script.Parent.SettingDefinitions)
@@ -67,16 +70,109 @@ local function setupChoiceButton(definition: SettingDefinitions.ChoiceDefinition
 	return button
 end
 
-local function setupButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue)
+local function listenForInput(kbm: boolean): Enum.UserInputType | Enum.KeyCode?
+	local inputTypes: {Enum.UserInputType}
+	if kbm then
+		inputTypes = {
+			Enum.UserInputType.MouseButton1,
+			Enum.UserInputType.MouseButton2,
+			Enum.UserInputType.MouseButton3,
+			Enum.UserInputType.Keyboard,
+		}
+	else
+		inputTypes = {
+			Enum.UserInputType.Gamepad1,
+		}
+	end
+
+	local result: Enum.UserInputType | Enum.KeyCode | false?
+	local msg = ScreenMessage("Info", "Press F4 to cancel keybinding.")
+	ContextActionService:BindActionAtPriority("SelectKeybind", function(_, state, input)
+		if state ~= Enum.UserInputState.End then
+			return
+		end
+
+		if (input.KeyCode == Enum.KeyCode.F4) then
+			ScreenMessage("Info", "Cancelled keybinding.")
+			if msg then
+				msg:Destroy()
+			end
+			ContextActionService:UnbindAction("SelectKeybind")
+
+			result = false
+			return
+		end
+
+		if msg then
+			msg:Destroy()
+		end
+
+		ScreenMessage("Success", "Keybinding updated!")
+		ContextActionService:UnbindAction("SelectKeybind")
+
+		result = if input.KeyCode ~= Enum.KeyCode.Unknown then input.KeyCode else input.UserInputType
+		return
+	end, false, 100000, table.unpack(inputTypes))
+
+	while result == nil do
+		task.wait()
+	end
+
+	return if result then result else nil
+end
+
+local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "Controller", key: Enum.UserInputType | Enum.KeyCode): ()
+	local asString = ControlManager.GetStringForKeyCode(key)
+
+	local bind = if kind == "Keyboard" then frame.Keyboard else frame.Controller
+	if asString:sub(1, 11) == "rbxasset://" then
+		local img = bind.KeycodeImage :: ImageLabel
+		img.Image = asString
+		img.Visible = true
+		(bind.Keycode :: TextLabel).Visible = false
+	else
+		(bind.Keycode :: TextLabel).Text = asString;
+		(bind.KeycodeImage :: ImageLabel).Visible = false
+	end
+end
+
+local function setupKeybindButton(definition: SettingDefinitions.ControlDefinition, value: SettingDefinitions.ControlValue): KeybindButton
+	local frame = buttonTemplates.KeybindSetting:Clone()
+	frame.Label.Text = definition.Name .. ":"
+
+	frame.Keyboard.Activated:Connect(function()
+		local key = listenForInput(true)
+		if key then
+			Settings.UpdateControlSetting(definition.Name, {
+				Kind = "KeyboardKeybind",
+				New = key,
+			})
+			updateDisplayedKeybind(frame, "Keyboard", key)
+		end
+	end)
+
+	frame.Controller.Activated:Connect(function()
+		local key = listenForInput(false)
+		if key then
+			Settings.UpdateControlSetting(definition.Name, {
+				Kind = "ControllerKeybind",
+				New = key,
+			})
+			updateDisplayedKeybind(frame, "Controller", key)
+		end
+	end)
+
+	return frame
+end
+
+local function setupForDefinition(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue)
 	local button: GuiObject?
 	if definition.Kind == "Boolean" then
 		button = setupBooleanButton(definition, value :: SettingDefinitions.BooleanValue)
 	elseif definition.Kind == "Choice" then
 		button = setupChoiceButton(definition, value :: SettingDefinitions.ChoiceValue)
-	elseif definition.Kind == "Keybind" then
-		-- button = setupKeybindButton(definition, value)
-	elseif definition.Kind == "TouchPosition" then
-		-- button = setupTouchPositionButton(definition, value)
+	elseif definition.Kind == "Control" then
+		button = setupKeybindButton(definition, value :: SettingDefinitions.ControlValue)
 	end
 
 	assert(button, "Unknown definition kind: " .. definition.Kind)
@@ -88,7 +184,7 @@ local function setupButton(definition: SettingDefinitions.SettingDefinition, val
 end
 
 function module.AddButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()
-	setupButton(definition, value)
+	setupForDefinition(definition, value)
 end
 
 return module
