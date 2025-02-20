@@ -1,8 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local Settings = require(script.Parent.Settings)
 
 local toLoad: {
-	[string]: Settings.SettingValue,
+	[string]: SettingDefinitions.SettingValue,
 	SETTINGS_VERSION: number
 } = ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Wait()
 
@@ -17,7 +18,7 @@ else
 	end
 end
 
-for i, v in Settings.AvailableSettings do
+for i, v in SettingDefinitions do
 	assert(v)
 	if table.find(processedSettings, i) then
 		continue
