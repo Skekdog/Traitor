@@ -16,28 +16,38 @@ export type TouchPositionValue = UDim2
 
 export type SettingValue = BooleanValue | ChoiceValue | TouchPositionValue | KeybindSettingValue
 
-export type SettingDefinition = {
+export type BaseDefinition = {
 	Name: string,
 	Tab: string,
 	Category: string,
-} & ({
+}
+
+export type BooleanDefinition = BaseDefinition & {
 	Kind: "Boolean",
 	Default: boolean,
 	Callback: SettingCallback<boolean>?,
-} | {
+}
+
+export type ChoiceDefinition = BaseDefinition & {
 	Kind: "Choice",
 	PossibleValues: {string},
 	Default: string,
 	Callback: SettingCallback<string>?,
-} | {
+}
+
+export type TouchPositionDefinition = BaseDefinition & {
 	Kind: "TouchPosition",
 	Default: UDim2,
 	Callback: SettingCallback<UDim2>?,
-} | {
+}
+
+export type KeybindDefinition = BaseDefinition & {
 	Kind: "Keybind",
 	Default: KeybindSettingValue,
 	Callback: SettingCallback<KeybindSettingValue>?,
-})
+}
+
+export type SettingDefinition = BooleanDefinition | ChoiceDefinition | TouchPositionDefinition | KeybindDefinition
 
 local callbacks = script.Parent.Callbacks
 local availableSettings: {[string]: SettingDefinition?} = {}
@@ -80,6 +90,16 @@ availableSettings["Use FIB Lighting"] = {
 	Callback = function(name, value)
 		require(callbacks.FIBLighting)(name, value)
 	end
+}
+
+availableSettings["Background Menus"] = {
+	Name = "Background Menus",
+	Tab = "Display",
+	Category = "User Interface",
+	Tooltip = "Closed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
+	PossibleValues = {"Closed", "Stacked"},
+	Kind = "Choice" :: "Choice",
+	Default = "Closed",
 }
 
 return availableSettings

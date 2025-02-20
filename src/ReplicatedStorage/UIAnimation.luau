@@ -210,10 +210,10 @@ end
 local UNDERLINE_TRANSITION_SCALE = 0.125
 local UNDERLINE_TRANSITION_TIME = 0.5
 function module.TransitionUnderline(underline: Frame, target: TextButton)
-	local halfSize = UDim2.new(target.Size.X.Scale * UNDERLINE_TRANSITION_SCALE, 0, underline.Size.Y.Scale, 0)
-	local fullSize = UDim2.new(target.Size.X.Scale / 1.5, 0, underline.Size.Y.Scale, 0)
+	local halfSize = UDim2.fromOffset(target.AbsoluteSize.X * UNDERLINE_TRANSITION_SCALE, underline.AbsoluteSize.Y)
+	local fullSize = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underline.AbsoluteSize.Y)
 	
-	local newPosition = UDim2.fromScale(target.Position.X.Scale + (target.Size.X.Scale / 2), 1)
+	local newPosition = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underline.AbsoluteSize.Y)
 	
 	local halfSizeTween = module.Animate(underline, TweenInfo.new(
 		UNDERLINE_TRANSITION_TIME / 2,
