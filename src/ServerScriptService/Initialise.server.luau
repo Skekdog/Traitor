@@ -30,6 +30,13 @@ local _earlyTesters = { -- These players should be awarded the badge whenever th
 	3106058458
 }
 
+local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
+	ReplicatedStorage.ServerClient.LoadSavedSettings:FireClient(plr, {
+		Settings = profile.Data.Settings,
+		Version = profile.Data.SettingsVersion,
+	})
+end
+
 Players.PlayerAdded:Connect(function(plr): ()
 	if ServerStorage:GetAttribute("ServerLocked") then
 		return plr:Kick("This server is shutting down.")
@@ -39,7 +46,7 @@ Players.PlayerAdded:Connect(function(plr): ()
 	plr:SetAttribute("Score", 0)
 	plr:SetAttribute("TotalScore", 0)
 	if profile then
-        ReplicatedStorage.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
+        sendSavedSettings(plr, profile)
 		plr:SetAttribute("TotalScore", profile.Data.TotalPoints)
     end
 
@@ -62,12 +69,13 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
 	if typeof(options) ~= "string" then
 		return
 	end
-	
+
 	if options:len() > maxSettingsLength then
 		return warn(`Settings length exceeds max {maxSettingsLength} characters!`)
 	end
 
     ProfileManager.UpdateProfile(plr, "Settings", options)
+	ProfileManager.UpdateProfile(plr, "SettingsVersion", ProfileManager.ProfileTemplate.SettingsVersion)
 end)
 
 ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)

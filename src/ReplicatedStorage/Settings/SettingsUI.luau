@@ -275,4 +275,10 @@ function module.AddButton(definition: SettingDefinitions.SettingDefinition, valu
 	setupForDefinition(definition, value)
 end
 
+ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+	if not ui.Object.Visible then
+		Settings.SaveSettings()
+	end
+end)
+
 return module

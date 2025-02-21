@@ -10,19 +10,20 @@ Settings.PopulateDefaults()
 module.ProfileTemplate = {
 	Karma = 1000,
 	Settings = Settings.JSONEncode(),
+	SettingsVersion = Settings.SETTINGS_VERSION,
 	TotalPoints = 0,
 	SpentPoints = 0,
 	PurchasedAccessories = {},
 }
 
-type PlayerData = typeof(module.ProfileTemplate)
-type Profile = ProfileService.Profile & {Data: PlayerData}
+export type PlayerData = typeof(module.ProfileTemplate)
+export type Profile = ProfileService.Profile & {Data: PlayerData}
 
 local profiles: {[Player]: Profile} = {}
 local ProfileStore = ProfileService.GetProfileStore("PlayerData_v2", module.ProfileTemplate)
 
 function module.LoadProfile(plr: Player): Profile?
-    local profile: Profile = ProfileStore:LoadProfileAsync("Player"..plr.UserId)
+    local profile: Profile = ProfileStore:LoadProfileAsync("Player" .. tostring(plr.UserId))
 	if profile then
 		profile:AddUserId(plr.UserId)
 		profile:Reconcile()
@@ -60,7 +61,8 @@ end
 type UpdateProfile =
 	((Player, "Karma", number) -> ()) &
 	((Player, "Settings", string) -> ()) &
-	((Player, "TotalPoints", number) -> ())
+	((Player, "TotalPoints", number) -> ()) &
+	((Player, "SettingsVersion", number) -> ())
 
 module.UpdateProfile = function(plr: Player, key, value): ()
 	if not profiles[plr] then

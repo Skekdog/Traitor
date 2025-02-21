@@ -23,23 +23,19 @@ export type UpdateControlSettingRequest = {
 
 module.SETTINGS_VERSION = 4
 
-local settingValues: {[string]: SettingDefinitions.SettingValue?, SETTINGS_VERSION: number} = {SETTINGS_VERSION = module.SETTINGS_VERSION}
+local settingValues: {[string]: SettingDefinitions.SettingValue?} = {}
 
 function module.GetDefinition(name: string): SettingDefinitions.SettingDefinition
 	return assert(SettingDefinitions[name], `Setting {name} does not exist`)
 end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue
-	assert(name ~= "SETTINGS_VERSION", "SETTINGS_VERSION should not be accessed directly")
-
 	local value = settingValues[name]
 	assert(value ~= nil, `No value found for setting {name}`)
 	return value
 end
 
 function module.SetSetting(name: string, value: SettingDefinitions.SettingValue): ()
-	assert(name ~= "SETTINGS_VERSION", "SETTINGS_VERSION should not be set directly")
-
 	local definition = module.GetDefinition(name)
 
 	assert(typeof(value) == typeof(definition.Default), `Setting {name} must be of type {typeof(definition.Default)}`)
