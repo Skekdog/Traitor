@@ -82,11 +82,8 @@ end
 
 function module.JSONEncode(): string
 	local encoded = Serialisation.SerialiseTable(settingValues)
-	print(encoded)
 	return encoded
 end
-
-task.delay(5, module.JSONEncode)
 
 function module.SaveSettings(): ()
 	assert(RunService:IsClient(), "SaveSettings should only be called from the client")

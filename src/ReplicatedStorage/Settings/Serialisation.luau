@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local module = {}
 
 function module.SerialiseValue(value: any): string
@@ -36,6 +37,52 @@ function module.SerialiseTable(tbl: {[string]: any}): string
 	serialised ..= "}"
 
 	return serialised
+end
+
+local function deserialiseSomeStringValue(value: string): string | EnumItem
+	local split = value:split(".")
+	if #split == 3 then
+		assert(split[1] == "Enum", "Invalid enum value")
+		local enumCategory = assert(Enum[split[2]], "Invalid enum category")
+		local enumItem = assert(enumCategory[split[3]], "Invalid enum item")
+		return enumItem
+	end
+
+	return value
+end
+
+local function deserialiseSomeTableValue(value: {[string | number]: any}): {[string]: any} | UDim2
+	if #value == 4 then
+		return UDim2.new(value[1], value[2], value[3], value[4])
+	end
+	
+	local decoded: {[string]: any} = {}
+	for i, v in value do
+		assert(typeof(i) == "string", "Table key must be a string")
+		decoded[i] = module.DeserialiseJSONValue(v)
+	end
+
+	return decoded
+end
+
+function module.DeserialiseJSONValue(value: any): any
+	if typeof(value) == "string" then
+		return deserialiseSomeStringValue(value)
+	elseif typeof(value) == "table" then
+		return deserialiseSomeTableValue(value)
+	elseif typeof(value) == "number" then
+		return value
+	elseif typeof(value) == "boolean" then
+		return value
+	end
+
+	error("Unable to deserialise value of type: " .. typeof(value))
+end
+
+function module.DeserialiseJSON(json: string): {[string]: any}
+	local fromHttpService = HttpService:JSONDecode(json)
+	local decoded = module.DeserialiseJSONValue(fromHttpService)
+	return decoded
 end
 
 return module
