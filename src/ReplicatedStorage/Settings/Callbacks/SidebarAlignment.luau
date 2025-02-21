@@ -1,14 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
 local UIManager = require(ReplicatedStorage.UIManager)
-local SettingCallbacks = require(script.Parent.SettingCallbacks)
 
-SettingCallbacks.Listen(function(settingName: string, value: any)
-    if settingName ~= "Sidebar Alignment" then
-        return
-    end
-    
-    local ui = UIManager.WaitForUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
+return function(name: string, value: string): ()
+	local ui = UIManager.WaitForUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
 
     local position, anchorPoint, textAlignment, paddingProperty
     if value == "Left" then
@@ -34,4 +29,4 @@ SettingCallbacks.Listen(function(settingName: string, value: any)
         v.TextXAlignment = textAlignment;
         (v :: any).UIPadding[paddingProperty] = UDim.new(0, 8)
     end
-end)
+end
