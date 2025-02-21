@@ -1,3 +1,6 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Serialisation = require(script.Parent.Serialisation)
 local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local module = {}
 
@@ -28,7 +31,7 @@ end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue
 	local value = settingValues[name]
-	assert(value ~= nil, `Setting {name} does not exist`)
+	assert(value ~= nil, `No value found for setting {name}`)
 	return value
 end
 
@@ -65,6 +68,29 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 		assert(definition.SpecifyToggle, `Setting {name} is not a toggle setting`)
 		value.Toggled = request.New
 	end
+end
+
+function module.PopulateDefaults(): ()
+	assert(RunService:IsServer(), "PopulateDefaults should only be called from the server")
+	for name, definition in SettingDefinitions do
+		assert(definition)
+		if module.GetSetting(name) == nil then
+			module.SetSetting(name, definition.Default)
+		end
+	end
+end
+
+function module.JSONEncode(): string
+	local encoded = Serialisation.SerialiseTable(settingValues)
+	print(encoded)
+	return encoded
+end
+
+task.delay(5, module.JSONEncode)
+
+function module.SaveSettings(): ()
+	assert(RunService:IsClient(), "SaveSettings should only be called from the client")
+	ReplicatedStorage.ClientServer.SaveSettings:FireServer()
 end
 
 return module

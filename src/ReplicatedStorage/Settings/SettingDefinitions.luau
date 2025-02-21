@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local IsAdmin = require(ReplicatedStorage.IsAdmin)
 
 export type ControlValue = {
@@ -19,7 +20,6 @@ export type SettingCallback<T = SettingValue> = (name: string, value: T) -> ()
 
 export type BooleanValue = boolean
 export type ChoiceValue = string
-export type TouchPositionValue = UDim2
 
 export type SettingValue = BooleanValue | ChoiceValue | ControlValue
 
@@ -54,7 +54,7 @@ export type SettingDefinition = BooleanDefinition | ChoiceDefinition | ControlDe
 local callbacks = script.Parent.Callbacks
 local availableSettings: {[string]: SettingDefinition?} = {}
 
-if IsAdmin(Players.LocalPlayer) then
+if IsAdmin(Players.LocalPlayer) or RunService:IsServer() then
 	availableSettings.Console = {
 		Name = "Console",
 		Tab = "Keybinds",
