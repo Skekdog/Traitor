@@ -8,7 +8,11 @@ local toLoad: {Settings: string, Version: number} = ReplicatedStorage.ServerClie
 
 local function loadSetting(name: string, value: SettingDefinitions.SettingValue)
 	Settings.SetSetting(name, value)
-	SettingsUI.AddButton(Settings.GetDefinition(name), value)
+
+	local definition = Settings.GetDefinition(name)
+	if not definition.Hidden then
+		SettingsUI.AddButton(definition, value)
+	end
 end
 
 local processedSettings: {string} = {}

@@ -27,6 +27,7 @@ export type BaseDefinition = {
 	Name: string,
 	Tab: string,
 	Category: string,
+	Hidden: boolean?,
 }
 
 export type BooleanDefinition = BaseDefinition & {
@@ -54,26 +55,25 @@ export type SettingDefinition = BooleanDefinition | ChoiceDefinition | ControlDe
 local callbacks = script.Parent.Callbacks
 local availableSettings: {[string]: SettingDefinition?} = {}
 
-if IsAdmin(Players.LocalPlayer) or RunService:IsServer() then
-	availableSettings.Console = {
-		Name = "Console",
-		Tab = "Keybinds",
-		Category = "Menus - Enable the checkbox to make a keybind toggled",
-		Tooltip = "Opens the console.",
-		Kind = "Control" :: "Control",
-		Default = {
-			Toggled = true,
-			Keybind = {
-				KBMKeybind = Enum.KeyCode.Backquote,
-			},
-
-			TouchButton = {
-				Position = UDim2.new(),
-				Scale = 1,
-			}
+availableSettings.Console = {
+	Name = "Console",
+	Tab = "Keybinds",
+	Hidden = RunService:IsServer() or not IsAdmin(Players.LocalPlayer),
+	Category = "Menus - Enable the checkbox to make a keybind toggled",
+	Tooltip = "Opens the console.",
+	Kind = "Control" :: "Control",
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.Backquote,
 		},
-	}
-end
+
+		TouchButton = {
+			Position = UDim2.new(),
+			Scale = 1,
+		}
+	},
+}
 
 availableSettings.Shadows = {
 	Name = "Shadows",
