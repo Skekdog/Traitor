@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local ControlManager = require(ReplicatedStorage.ControlManager)
 local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
+local TextInput = require(ReplicatedStorage.TextInput)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
 local UIManager = require(ReplicatedStorage.UIManager)
 local SettingDefinitions = require(script.Parent.SettingDefinitions)
@@ -138,30 +139,38 @@ local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "
 	end
 end
 
+local function updateKeyboardKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, value: SettingDefinitions.ControlValue): ()
+	local key = listenForInput(true)
+	if key then
+		Settings.UpdateControlSetting(definition.Name, {
+			Kind = "KeyboardKeybind",
+			New = key,
+		})
+		updateDisplayedKeybind(frame, "Keyboard", key)
+	end
+end
+
+local function updateControllerKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, value: SettingDefinitions.ControlValue): ()
+	local key = listenForInput(false)
+	if key then
+		Settings.UpdateControlSetting(definition.Name, {
+			Kind = "ControllerKeybind",
+			New = key,
+		})
+		updateDisplayedKeybind(frame, "Controller", key)
+	end
+end
+
 local function setupKeybindButton(definition: SettingDefinitions.ControlDefinition, value: SettingDefinitions.ControlValue): KeybindButton
 	local frame = buttonTemplates.KeybindSetting:Clone()
 	frame.Label.Text = definition.Name .. ":"
 
 	frame.Keyboard.Activated:Connect(function()
-		local key = listenForInput(true)
-		if key then
-			Settings.UpdateControlSetting(definition.Name, {
-				Kind = "KeyboardKeybind",
-				New = key,
-			})
-			updateDisplayedKeybind(frame, "Keyboard", key)
-		end
+		updateKeyboardKeybind(frame, definition, value)
 	end)
 
 	frame.Controller.Activated:Connect(function()
-		local key = listenForInput(false)
-		if key then
-			Settings.UpdateControlSetting(definition.Name, {
-				Kind = "ControllerKeybind",
-				New = key,
-			})
-			updateDisplayedKeybind(frame, "Controller", key)
-		end
+		updateControllerKeybind(frame, definition, value)
 	end)
 
 	return frame
@@ -208,6 +217,24 @@ local function promptUpdateTouchPosition(control: string): UDim2
 	return position
 end
 
+local function updateTouchPosition(definition: SettingDefinitions.ControlDefinition): ()
+	local pos = promptUpdateTouchPosition(definition.Name)
+	Settings.UpdateControlSetting(definition.Name, {
+		Kind = "TouchPosition",
+		New = pos,
+	})
+end
+
+local function updateTouchScale(definition: SettingDefinitions.ControlDefinition): ()
+	local newScale = TextInput.Create(definition.Name, "Number", "0.5-3", "TouchScale")
+	if newScale then
+		Settings.UpdateControlSetting(definition.Name, {
+			Kind = "TouchScale",
+			New = newScale,
+		})
+	end
+end
+
 local function setupForDefinition(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue)
 	local button: GuiObject?
 	if definition.Kind == "Boolean" then
@@ -219,13 +246,11 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 
 		if definition.Default.TouchButton then
 			module.AddClickButton(definition.Name .. " Position", "Touch", "Button Positions", function()
-				local pos = promptUpdateTouchPosition(definition.Name)
-				Settings.UpdateControlSetting(definition.Name, {
-					Kind = "TouchPosition",
-					New = pos,
-				})
+				updateTouchPosition(definition)
 			end)
-			module.AddClickButton(definition.Name .. " Scale", "Touch", "Button Sizes", function() end)
+			module.AddClickButton(definition.Name .. " Scale", "Touch", "Button Sizes", function()
+				updateTouchScale(definition)
+			end)
 		end
 	end
 
