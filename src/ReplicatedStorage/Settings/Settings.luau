@@ -78,8 +78,8 @@ function module.PopulateDefaults(): ()
 	assert(RunService:IsServer(), "PopulateDefaults should only be called from the server")
 	for name, definition in SettingDefinitions do
 		assert(definition)
-		if module.GetSetting(name) == nil then
-			module.SetSetting(name, definition.Default)
+		if not settingValues[name] then
+			settingValues[name] = definition.Default
 		end
 	end
 end
@@ -91,7 +91,7 @@ end
 
 function module.SaveSettings(): ()
 	assert(RunService:IsClient(), "SaveSettings should only be called from the client")
-	ReplicatedStorage.ClientServer.SaveSettings:FireServer()
+	ReplicatedStorage.ClientServer.SaveSettings:FireServer(module.JSONEncode())
 end
 
 return module
