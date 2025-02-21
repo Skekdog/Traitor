@@ -1,13 +1,13 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SettingsManager = require(ReplicatedStorage.SettingsManager)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local ProfileService = require(script.Parent.ProfileService)
 
 local module = {}
 
 module.ProfileTemplate = {
 	Karma = 1000,
-	Settings = SettingsManager.JSONEncode(),
+	Settings = Settings.JSONEncode(),
 	TotalPoints = 0,
 	SpentPoints = 0,
 	PurchasedAccessories = {},

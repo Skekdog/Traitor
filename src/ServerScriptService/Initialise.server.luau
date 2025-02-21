@@ -57,12 +57,14 @@ Players.PlayerRemoving:Connect(function(plr)
 	ProfileManager.ReleaseProfile(plr)
 end)
 
+local maxSettingsLength = ProfileManager.ProfileTemplate.Settings:len() * 1.2
 ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: unknown)
 	if typeof(options) ~= "string" then
 		return
 	end
-	if options:len() > ProfileManager.ProfileTemplate.Settings:len()*1.2 then
-		return warn("Settings length exceeds maximum "..tostring(ProfileManager.ProfileTemplate.Settings:len()*1.2).." characters!")
+	
+	if options:len() > maxSettingsLength then
+		return warn(`Settings length exceeds max {maxSettingsLength} characters!`)
 	end
 
     ProfileManager.UpdateProfile(plr, "Settings", options)
