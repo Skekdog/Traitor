@@ -2,8 +2,6 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(ReplicatedStorage.Settings.Settings)
 local ControlManager = require(script.Parent.ControlManager)
-local SettingCallback = require(script.Parent.SettingCallbacks.SettingCallbacks)
-
 local boundInstances: {[string]: {Instance}} = {}
 
 type Label = TextLabel | ImageLabel
@@ -104,13 +102,14 @@ local function createLabels(control: string, instance: Instance, position: UDim2
     updateText(control, instance)
 end
 
-SettingCallback.Listen(function(name, value)
-    if boundInstances[name] then
-        for _, v in boundInstances[name] do
-            updateText(name, v)
-        end
-    end
-end)
+warn("Implement keybind hints")
+-- SettingCallback.Listen(function(name, value)
+--     if boundInstances[name] then
+--         for _, v in boundInstances[name] do
+--             updateText(name, v)
+--         end
+--     end
+-- end)
 
 local function loadInstance(instance: Instance): ()
     local control = instance:GetAttribute("Control") :: string?
