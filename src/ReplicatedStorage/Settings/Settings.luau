@@ -37,8 +37,8 @@ end
 
 local settingValues: {[string]: SettingDefinitions.SettingValue?} = {}
 
-function module.GetDefinition(name: string): SettingDefinitions.SettingDefinition
-	return SettingDefinitions[name] or error(`Setting {name} does not exist`)
+function module.GetDefinition(name: string): SettingDefinitions.SettingDefinition?
+	return SettingDefinitions[name]
 end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue
@@ -50,6 +50,7 @@ end
 
 function module.SetSetting(name: string, value: SettingDefinitions.SettingValue): ()
 	local definition = module.GetDefinition(name)
+	assert(definition, `Setting {name} does not exist`)
 
 	assert(typeof(value) == typeof(definition.Default), `Setting {name} must be of type {typeof(definition.Default)}`)
 
@@ -63,6 +64,7 @@ end
 function module.UpdateControlSetting(name: string, request: UpdateControlSettingRequest): ()
 	local definition = module.GetDefinition(name)
 
+	assert(definition, `Setting {name} does not exist`)
 	assert(definition.Kind == "Control", `Setting {name} is not a control setting`)
 
 	local value = module.GetSetting(name) :: SettingDefinitions.ControlValue

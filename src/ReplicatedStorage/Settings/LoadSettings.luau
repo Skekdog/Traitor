@@ -6,6 +6,9 @@ local Settings = require(script.Parent.Settings)
 local toLoad: {Settings: string, Version: number} = ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Wait()
 
 local function loadSetting(name: string, value: SettingDefinitions.SettingValue)
+	if not Settings.GetDefinition(name) then
+		return
+	end
 	Settings.SetSetting(name, value)
 end
 
