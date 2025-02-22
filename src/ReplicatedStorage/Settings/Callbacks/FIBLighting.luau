@@ -8,7 +8,12 @@ return function(name: string, value: boolean): ()
         return
     end
 
-    Lighting:ClearAllChildren()
+    for _, v in Lighting:GetChildren() do
+        if not v:GetAttribute("IgnoreLighting") then
+            v:Destroy()
+        end
+    end
+    
     if value then
         for _, v in map.FutureLightingModifiers:GetChildren() do
             v:Clone().Parent = Lighting

@@ -18,6 +18,9 @@ return function()
 	
 	correction.Name = "FlashbangCorrection"
 	blur.Name = "FlashbangBlur"
+
+	correction:SetAttribute("IgnoreLighting", true)
+	blur:SetAttribute("IgnoreLighting", true)
 	
 	blur.Parent = Lighting
 	correction.Parent = Lighting
