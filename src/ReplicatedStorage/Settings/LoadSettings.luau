@@ -41,7 +41,7 @@ for i, v in SettingDefinitions do
 	assert(v)
 	
 	if not v.Hidden then
-		SettingsUI.AddButton(v, processedSettings[i] or v.Default)
+		SettingsUI.AddButton(v, if processedSettings[i] ~= nil then processedSettings[i] else v.Default)
 	end
 end
 
