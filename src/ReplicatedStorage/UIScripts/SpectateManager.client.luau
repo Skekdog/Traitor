@@ -5,7 +5,6 @@ local plr = Players.LocalPlayer
 local Freecam = require(script.Parent.Parent.Freecam)
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 local uiManager = require(ReplicatedStorage.UIManager)
-local controls = require(ReplicatedStorage.ControlManager)
 
 local camera = workspace.CurrentCamera
 local ui = uiManager.WaitForUI("Spectate")
@@ -64,17 +63,11 @@ LocalRoundInfo.Listen("PlayerStatus", function()
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
 		plr.CameraMode = Enum.CameraMode.Classic
-		
-		controls.Register("Spectate Next", false, spectateFunc)
-		controls.Register("Spectate Previous", false, spectateFunc)
 	else
 		Freecam.StopFreecam()
 		ui:ToggleVisible(false)
 		camera.CameraType = Enum.CameraType.Custom
 		plr.CameraMode = Enum.CameraMode.LockFirstPerson
-		
-		controls.Unregister("Spectate Next")
-		controls.Unregister("Spectate Previous")
 	end
 end)
 
