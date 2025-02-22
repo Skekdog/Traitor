@@ -59,7 +59,6 @@ local function createPage(name: string): ()
 
 	page.LayoutOrder = totalPages
 
-	print(`Created page {name}`)
 	totalPages += 1
 end
 
@@ -76,6 +75,42 @@ local function createTab(name: string): ()
 	tab.Activated:Connect(function()
 		switchToPage(name)
 	end)
+end
+
+local categoryIndex: {[Page]: {[string]: number?}?} = {}
+local function createCategoryLabel(name: string, page: Page): ()
+	local label = templates.CategoryLabel:Clone()
+	label.Text = name
+	label.Name = "CategoryLabel_" .. name
+	label.Visible = true
+	
+	if not categoryIndex[page] then
+		categoryIndex[page] = {}
+	end
+
+	local index = categoryIndex[page]
+	assert(index)
+	
+	local count = 0
+	for _ in index do
+		count += 1
+	end
+
+	local order = count * 1000
+	index[name] = order
+
+	label.LayoutOrder = index[name] :: number
+	label.Parent = page :: any
+
+	return 
+end
+
+local function getLayoutOrderForCategory(category: string, page: Page): number?
+	local index = categoryIndex[page]
+	if not index then
+		return nil
+	end
+	return index[category]
 end
 
 local function setBooleanValue(button: BooleanButton, definition: SettingDefinitions.BooleanDefinition, value: SettingDefinitions.BooleanValue)
@@ -306,7 +341,20 @@ local function setupButton(buttonArg: Button, name: string, tab: string, categor
 		end
 	end
 
-	button.Parent = getPage(tab) :: any or error("No page for tab " .. tab)
+	page = getPage(tab)
+	assert(page)
+
+	local order = getLayoutOrderForCategory(category, page)
+	if not order then
+		createCategoryLabel(category, page)
+	end
+
+	order = getLayoutOrderForCategory(category, page)
+	assert(order)
+
+	button.LayoutOrder = order + 1
+
+	button.Parent = page :: any or error("No page for tab " .. tab)
 end
 
 local function setupForDefinition(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue)
