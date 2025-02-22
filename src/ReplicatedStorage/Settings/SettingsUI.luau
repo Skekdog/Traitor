@@ -13,13 +13,70 @@ local module = {}
 local ui = ReplicatedStorage.UnregisteredUIs.Settings
 module.UI = ui
 
-local buttonTemplates = ui.Main.Templates
+local templates = ui.Main.Templates
 
-type BooleanButton = typeof(buttonTemplates.BooleanSetting)
-type ChoiceButton = typeof(buttonTemplates.ChoiceSetting)
-type KeybindButton = typeof(buttonTemplates.KeybindSetting)
-type ClickButton = typeof(buttonTemplates.ClickButton)
+type BooleanButton = typeof(templates.BooleanSetting)
+type ChoiceButton = typeof(templates.ChoiceSetting)
+type KeybindButton = typeof(templates.KeybindSetting)
+type ClickButton = typeof(templates.ClickButton)
 type Button = BooleanButton | ChoiceButton | KeybindButton | ClickButton
+
+local pageBase = templates.Page
+type Page = typeof(templates.Page)
+
+local pages: {[string]: Page?} = {}
+local currentPage: Page? = nil
+
+local totalPages = 0
+local function getPage(name: string): Page?
+	return pages[name]
+end
+
+local function switchToPage(name: string): ()
+	local newPage = pages[name]
+	assert(newPage, `No page with name {name}`)
+
+	if newPage == currentPage then
+		return
+	end
+
+	if not currentPage then
+		newPage.Visible = true
+		currentPage = newPage
+		return
+	end
+
+	UIAnimation.TransitionUIPage(currentPage, newPage, UDim2.new())
+	currentPage = newPage
+end
+
+local function createPage(name: string): ()
+	local page = pageBase:Clone()
+	page.Name = "Page_" .. name
+	page.Visible = false
+	pages[name] = page
+	page.Parent = ui.Main.PageHolder :: any
+
+	page.LayoutOrder = totalPages
+
+	print(`Created page {name}`)
+	totalPages += 1
+end
+
+local tabBase = templates.Tab
+local function createTab(name: string): ()
+	local tab = tabBase:Clone()
+	tab.Name = "Tab_" .. name
+	tab.Visible = true
+	tab.Text = name
+	tab.Parent = ui.Main.Tabs :: any
+
+	createPage(name)
+
+	tab.Activated:Connect(function()
+		switchToPage(name)
+	end)
+end
 
 local function setBooleanValue(button: BooleanButton, definition: SettingDefinitions.BooleanDefinition, value: SettingDefinitions.BooleanValue)
 	Settings.SetSetting(definition.Name, value)
@@ -27,7 +84,7 @@ local function setBooleanValue(button: BooleanButton, definition: SettingDefinit
 end
 
 local function setupBooleanButton(definition: SettingDefinitions.BooleanDefinition, value: SettingDefinitions.BooleanValue): BooleanButton
-	local button = buttonTemplates.BooleanSetting:Clone()
+	local button = templates.BooleanSetting:Clone()
 	button.Label.Text = definition.Name .. ":"
 
 	button.Activated:Connect(function()
@@ -45,7 +102,7 @@ local function setChoiceValue(button: ChoiceButton, choiceButton: TextButton, de
 end
 
 local function setupChoiceButton(definition: SettingDefinitions.ChoiceDefinition, value: SettingDefinitions.ChoiceValue): ChoiceButton
-	local button = buttonTemplates.ChoiceSetting:Clone()
+	local button = templates.ChoiceSetting:Clone()
 	button.Label.Text = definition.Name .. ":"
 
 	local choiceButton = button.Choices.Choice
@@ -162,7 +219,7 @@ local function updateControllerKeybind(frame: KeybindButton, definition: Setting
 end
 
 local function setupKeybindButton(definition: SettingDefinitions.ControlDefinition, value: SettingDefinitions.ControlValue): KeybindButton
-	local frame = buttonTemplates.KeybindSetting:Clone()
+	local frame = templates.KeybindSetting:Clone()
 	frame.Label.Text = definition.Name .. ":"
 
 	frame.Keyboard.Activated:Connect(function()
@@ -235,8 +292,25 @@ local function updateTouchScale(definition: SettingDefinitions.ControlDefinition
 	end
 end
 
+local function setupButton(buttonArg: Button, name: string, tab: string, category: string, addColon: boolean): ()
+	local button = buttonArg :: ClickButton
+	button.Label.Text = name .. if addColon then ":" else ""
+	button.Name = "Button_" .. name
+	button.Visible = true
+
+	local page = getPage(tab)
+	if not page then
+		createTab(tab)
+		if totalPages == 1 then
+			switchToPage(tab)
+		end
+	end
+
+	button.Parent = getPage(tab) :: any or error("No page for tab " .. tab)
+end
+
 local function setupForDefinition(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue)
-	local button: GuiObject?
+	local button: Button?
 	if definition.Kind == "Boolean" then
 		button = setupBooleanButton(definition, value :: SettingDefinitions.BooleanValue)
 	elseif definition.Kind == "Choice" then
@@ -256,19 +330,13 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 
 	assert(button, "Unknown definition kind: " .. definition.Kind)
 
-	button.Name = "Setting_" .. definition.Name
-	button.Visible = true
-
-	button.Parent = ui.Main.PageHolder.ScrollingFrame
+	setupButton(button :: Button, definition.Name, definition.Tab, definition.Category, true)
 end
 
 function module.AddClickButton(label: string, tab: string, category: string, onClick: () -> ()): ()
-	local button = buttonTemplates.ClickButton:Clone()
-	button.Name = "ClickButton_" .. label
-	button.Visible = true
-	button.Label.Text = label
+	local button = templates.ClickButton:Clone()
+	setupButton(button, label, tab, category, false)
 	button.Activated:Connect(onClick)
-	button.Parent = ui.Main.PageHolder.ScrollingFrame :: any
 end
 
 function module.AddButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()
