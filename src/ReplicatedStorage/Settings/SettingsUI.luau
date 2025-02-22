@@ -152,7 +152,7 @@ local function setupChoiceButton(definition: SettingDefinitions.ChoiceDefinition
 		but.Position = UDim2.fromScale((i - 1) / #definition.PossibleValues + 0.1, 0.5)
 
 		but.Activated:Connect(function()
-			setChoiceValue(button, but, definition, value)
+			setChoiceValue(button, but, definition, choice)
 		end)
 
 		but.Parent = button.Choices
