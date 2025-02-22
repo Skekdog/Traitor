@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SettingsManager = require(script.Parent.SettingsManager)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local IS_SERVER = game:GetService("RunService"):IsServer()
 
 local function createWedgeFragment(properties: GlassProperties, size: Vector3, cframe: CFrame, direction: Vector3)
@@ -106,7 +106,7 @@ return function(glassProperties: BasePart | GlassProperties, direction: Vector3?
     sound.Parent = fragments[1]
     sound:Play()
 
-    if SettingsManager.GetSetting("Keep Shattered Glass") then
+    if Settings.GetSetting("Keep Shattered Glass") then
         return
     end
 

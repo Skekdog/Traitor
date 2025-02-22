@@ -147,15 +147,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	}
 	
 	if self.Layer == "Popup" and not object:GetAttribute("NoKeybind") then
-		ControlManager.Register(self.Name, false, function(act, state, input, toggled)
-			if not toggled then
-				if state == Enum.UserInputState.End then
-					self:ToggleVisible(false)
-				elseif state == Enum.UserInputState.Begin then
-					self:ToggleVisible(true)
-				end
-				return Enum.ContextActionResult.Sink
-			end
+		ControlManager.Register(self.Name, false, function(act, state, input)
 			self:ToggleVisible()
 			return Enum.ContextActionResult.Sink
 		end)

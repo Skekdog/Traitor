@@ -1,7 +1,8 @@
 local CollectionService = game:GetService("CollectionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local ControlManager = require(script.Parent.ControlManager)
 local SettingCallback = require(script.Parent.SettingCallbacks.SettingCallbacks)
-local SettingsManager = require(script.Parent.SettingsManager)
 
 local boundInstances: {[string]: {Instance}} = {}
 
@@ -114,7 +115,7 @@ end)
 local function loadInstance(instance: Instance): ()
     local control = instance:GetAttribute("Control") :: string?
     assert(typeof(control) == "string", "Expected attribute 'Control' to be a string")
-    assert(SettingsManager.Settings[control], "Control not found: " .. control)
+    assert(Settings.GetSetting(control), "Control not found: " .. control)
 
     local position = instance:GetAttribute("Position") :: UDim2?
     assert(typeof(position) == "UDim2" or position == nil, "Expected attribute 'Position' to be a UDim2 or nil")

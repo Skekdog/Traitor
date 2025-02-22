@@ -1,8 +1,11 @@
+require(script.Parent.Settings.LoadSettings)
+
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local BulletTracer = require(script.Parent.BulletTracer)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local ControlManager = require(script.Parent.ControlManager)
@@ -12,13 +15,10 @@ local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
 local KeybindHintManager = require(script.Parent.KeybindHintManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local SettingsManager = require(script.Parent.SettingsManager)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
 local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
-
-require(script.Parent.Settings.LoadSettings)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
@@ -141,7 +141,7 @@ LocalRoundInfo.Listen("Map", function()
             v.CanTouch = true
             v.Touched:Connect(function(part)
                 local char = Players.LocalPlayer.Character
-                if char and part:IsDescendantOf(char) and SettingsManager.GetSetting("Snap to Ladders") and ClimbLadder.SnapCooldown < os.clock() then
+                if char and part:IsDescendantOf(char) and Settings.GetSetting("Snap to Ladders") and ClimbLadder.SnapCooldown < os.clock() then
                     ClimbLadder.SnapCooldown = os.clock() + 3
                     ClimbLadder.Climb(v)
                 end

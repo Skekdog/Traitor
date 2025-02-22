@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local SettingsManager = require(script.Parent.SettingsManager)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 
 local screenMessageFormats = {
 	Standard = {
@@ -89,7 +90,7 @@ return function(format: string, text: string, formatOverrides: {[string]: any}?)
 
 	label.Parent = gui
 
-	local animate = SettingsManager.GetSetting("Animate UI Transitions")
+	local animate = Settings.GetSetting("Animate UI Transitions")
 	if not animate then
 		task.delay(4, function()
 			label:Destroy()

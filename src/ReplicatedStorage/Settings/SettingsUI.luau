@@ -6,14 +6,14 @@ local ControlManager = require(ReplicatedStorage.ControlManager)
 local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
 local TextInput = require(ReplicatedStorage.TextInput)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
-local UIManager = require(ReplicatedStorage.UIManager)
 local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local Settings = require(script.Parent.Settings)
 local module = {}
 
-local ui = UIManager.WaitForUI("Settings") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Settings)}
+local ui = ReplicatedStorage.UIManager.UnregisteredUIs.Settings
+module.UI = ui
 
-local buttonTemplates = ui.Object.Main.Templates
+local buttonTemplates = ui.Main.Templates
 
 type BooleanButton = typeof(buttonTemplates.BooleanSetting)
 type ChoiceButton = typeof(buttonTemplates.ChoiceSetting)
@@ -176,7 +176,7 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	return frame
 end
 
-local darken = ui.Object.LayoutDarken
+local darken = ui.LayoutDarken
 
 local tapCon: RBXScriptConnection?
 local function promptUpdateTouchPosition(control: string): UDim2
@@ -186,7 +186,7 @@ local function promptUpdateTouchPosition(control: string): UDim2
 
 	assert(button)
 
-	ui.Object.Main.Visible = false
+	ui.Main.Visible = false
 	--tooltip("", "NONE")
 	--tt.Visible = false
 	darken.Visible = true
@@ -211,7 +211,7 @@ local function promptUpdateTouchPosition(control: string): UDim2
 		ControlManager.Unregister(control)
 	end
 
-	ui.Object.Main.Visible = true
+	ui.Main.Visible = true
 	darken.Visible = false
 
 	return position
@@ -259,7 +259,7 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 	button.Name = "Setting_" .. definition.Name
 	button.Visible = true
 
-	button.Parent = ui.Object.Main.PageHolder.ScrollingFrame
+	button.Parent = ui.Main.PageHolder.ScrollingFrame
 end
 
 function module.AddClickButton(label: string, tab: string, category: string, onClick: () -> ()): ()
@@ -268,15 +268,15 @@ function module.AddClickButton(label: string, tab: string, category: string, onC
 	button.Visible = true
 	button.Label.Text = label
 	button.Activated:Connect(onClick)
-	button.Parent = ui.Object.Main.PageHolder.ScrollingFrame
+	button.Parent = ui.Main.PageHolder.ScrollingFrame
 end
 
 function module.AddButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()
 	setupForDefinition(definition, value)
 end
 
-ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
-	if not ui.Object.Visible then
+ui:GetPropertyChangedSignal("Visible"):Connect(function()
+	if not ui.Visible then
 		Settings.SaveSettings()
 	end
 end)

@@ -1,32 +1,32 @@
---[[
-	A middleware for CAS:BindAction() that integrates with SettingsManager to manage keybind and other setting changes appropriately.
-	Stylises the Context Action Buttons also and decides if they should be toggled or held.
-]]
+local CollectionService = game:GetService("CollectionService")
+local ContextActionService = game:GetService("ContextActionService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
-local CS = game:GetService("CollectionService")
-local CAS = game:GetService("ContextActionService")
-local UIS = game:GetService("UserInputService")
-local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
-local SettingsManager = require(script.Parent.SettingsManager)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local ThemesManager = require(script.Parent.ThemesManager)
 
 local module = {}
 
-type params = {
+export type ActionCallback = (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult
+export type RegistrationInfo = {
 	ActionName: string,
 	CreateTouchButton: boolean,
-	Callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> Enum.ContextActionResult,
+	Callback: ActionCallback,
 }
-local registered: {[string]: params} = {}
 
-export type InputMethod = "touch" | "keyboard" | "controller"
+export type InputMethod = "Touch" | "Keyboard" | "Controller"
+
+local registered: {[string]: RegistrationInfo} = {}
+
+
 function module.GetPreferredInputMethod(): InputMethod
-	if UIS.GamepadEnabled then
-		return "controller"
-	elseif UIS.KeyboardEnabled then
-		return "keyboard"
-	elseif UIS.TouchEnabled then
-		return "touch"
+	if UserInputService.GamepadEnabled then
+		return "Controller"
+	elseif UserInputService.KeyboardEnabled then
+		return "Keyboard"
+	elseif UserInputService.TouchEnabled then
+		return "Touch"
 	end
 	error("No valid input methods!")
 end
@@ -36,12 +36,12 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 		return "NONE"
 	end
 	if keycode.EnumType == Enum.KeyCode then
-		local img = UIS:GetImageForKeyCode(keycode :: Enum.KeyCode)
+		local img = UserInputService:GetImageForKeyCode(keycode :: Enum.KeyCode)
 		if img ~= "" then
 			return img
 		end
 
-		local str = UIS:GetStringForKeyCode(keycode :: Enum.KeyCode)
+		local str = UserInputService:GetStringForKeyCode(keycode :: Enum.KeyCode)
 		if str ~= "" then
 			if str:sub(1, 6) == "Button" then
 				return `\{{str:sub(7, -1)}\}`
@@ -81,44 +81,45 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 end
 
 function module.SetupTouchButton(actionName)
-	local butt = CAS:GetButton(actionName) :: ImageButton & {ActionTitle: TextLabel}
-	if butt then
-		butt.Position = SettingsManager.GetSetting(actionName.." Position") :: UDim2
-		butt.Size = UDim2.fromScale(0.1, 0.1)
-		butt.AnchorPoint = Vector2.one/2
-
-		Instance.new("UIAspectRatioConstraint", butt)
-		local scale = Instance.new("UIScale")
-		scale.Scale = SettingsManager.GetSetting(actionName.." Scale") :: number
-		scale.Parent = butt
-
-		local actionText = butt.ActionTitle
-		actionText.Text = actionName
-		actionText.Size = UDim2.fromScale(0.9, 1)
-		actionText.Position = UDim2.fromScale(0.5, 0)
-		actionText.AnchorPoint = Vector2.xAxis/2
-		actionText.TextScaled = true
-		CS:AddTag(actionText, "StyledUI")
-
-		CS:AddTag(butt, "StyledUI")
-		butt:SetAttribute("Style", "Primary")
-		butt:SetAttribute("UpdateImage", true)
-
-		ThemesManager.UpdateThemeInstance(butt, nil, true)
-		ThemesManager.UpdateThemeInstance(actionText, nil, true)
+	local butt = ContextActionService:GetButton(actionName) :: ImageButton & {ActionTitle: TextLabel}
+	if not butt then
+		return
 	end
-end
 
-local function isControllerInput(key: Enum.KeyCode | Enum.UserInputType): boolean
-	return key.EnumType == Enum.KeyCode and (key.Name:sub(1, 6) == "Button" or key.Name:sub(1, 4) == "DPad" or key.Name:sub(1, 10) == "Thumbstick")
+	local control = Settings.GetSetting(actionName) :: Settings.ControlValue
+	assert(control.TouchButton, `{actionName} is not a touch control`)
+
+	butt.Position = control.TouchButton.Position
+	butt.Size = UDim2.fromScale(0.1, 0.1)
+	butt.AnchorPoint = Vector2.one/2
+
+	Instance.new("UIAspectRatioConstraint", butt)
+	local scale = Instance.new("UIScale")
+	scale.Scale = control.TouchButton.Scale
+	scale.Parent = butt
+
+	local actionText = butt.ActionTitle
+	actionText.Text = actionName
+	actionText.Size = UDim2.fromScale(0.9, 1)
+	actionText.Position = UDim2.fromScale(0.5, 0)
+	actionText.AnchorPoint = Vector2.xAxis/2
+	actionText.TextScaled = true
+	CollectionService:AddTag(actionText, "StyledUI")
+
+	CollectionService:AddTag(butt, "StyledUI")
+	butt:SetAttribute("Style", "Primary")
+	butt:SetAttribute("UpdateImage", true)
+
+	ThemesManager.UpdateThemeInstance(butt, nil, true)
+	ThemesManager.UpdateThemeInstance(actionText, nil, true)
 end
 
 function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): string
-	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
-	local keybinds = keybindSetting.Keycodes
+	local controlSetting = Settings.GetSetting(actionName) :: Settings.ControlValue
+	local keybinds = controlSetting.Keybind
 
 	local preferred: InputMethod = module.GetPreferredInputMethod()
-	if preferred == "touch" then
+	if preferred == "Touch" then
 		return if blankForTouch then "" else actionName
 	end
 
@@ -126,30 +127,25 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 		return "NONE"
 	end
 
-	for _, key in keybinds do
-		if preferred == "controller" and key:IsA("KeyCode") and isControllerInput(key) then
-			return module.GetStringForKeyCode(key)
-		elseif preferred == "keyboard" and not isControllerInput(key) then
-			return module.GetStringForKeyCode(key)
-		end
+	if preferred == "Controller" and keybinds.ConsoleKeybind then
+		return module.GetStringForKeyCode(keybinds.ConsoleKeybind)
+	elseif preferred == "Keyboard" and keybinds.KBMKeybind then
+		return module.GetStringForKeyCode(keybinds.KBMKeybind)
 	end
 
-	-- If we didn't find our preferred method then we look for the first valid method
-	for _, key in keybinds do
-		if UIS.GamepadEnabled and key:IsA("KeyCode") and isControllerInput(key) then
-			return module.GetStringForKeyCode(key)
-		elseif UIS.KeyboardEnabled and not isControllerInput(key) then
-			return module.GetStringForKeyCode(key)
-		end
+	if UserInputService.GamepadEnabled and keybinds.ConsoleKeybind then
+		return module.GetStringForKeyCode(keybinds.ConsoleKeybind)
+	elseif UserInputService.KeyboardEnabled and keybinds.KBMKeybind then
+		return module.GetStringForKeyCode(keybinds.KBMKeybind)
 	end
 
 	return "NONE"
 end
 
 -- Returns the Button if it was created
-function module.Register(actionName: string, createTouchButton: boolean, callback: (actionName: string, state: Enum.UserInputState, input: InputObject, toggled: boolean) -> Enum.ContextActionResult): ImageButton?
+function module.Register(actionName: string, createTouchButton: boolean, callback: ActionCallback): ImageButton?
 	if registered[actionName] then
-		CAS:UnbindAction(actionName)
+		ContextActionService:UnbindAction(actionName)
 	end
 
 	registered[actionName] =  {
@@ -157,48 +153,44 @@ function module.Register(actionName: string, createTouchButton: boolean, callbac
 		CreateTouchButton = createTouchButton,
 		Callback = callback
 	}
-	local keybindSetting = SettingsManager.GetSetting(actionName) :: SettingsManager.KeybindSetting
-	local keybinds = keybindSetting.Keycodes
 
-	CAS:BindAction(actionName, function(action, state, input)
-		local toggled = keybindSetting.Toggled
-		local show = false
+	local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
 
-		if (toggled) and (state == Enum.UserInputState.End) then
-			show = true
+	local toggled = setting.Toggled
+
+	local binds: {Enum.KeyCode | Enum.UserInputType} = {}
+	if setting.Keybind.ConsoleKeybind then
+		table.insert(binds, setting.Keybind.ConsoleKeybind)
+	end
+
+	if setting.Keybind.KBMKeybind then
+		table.insert(binds, setting.Keybind.KBMKeybind)
+	end
+
+	ContextActionService:BindAction(actionName, function(action, state, input): Enum.ContextActionResult
+		if toggled then
+			if state ~= Enum.UserInputState.End then
+				return Enum.ContextActionResult.Pass
+			end
+		elseif state ~= Enum.UserInputState.Begin and state ~= Enum.UserInputState.End then
+			return Enum.ContextActionResult.Pass
 		end
 
-		if (not toggled) and ((state == Enum.UserInputState.Begin) or (state == Enum.UserInputState.End)) then
-			show = true
-		end
-
-		if show then
-			return callback(action, state, input, toggled)
-		end
-		return Enum.ContextActionResult.Pass
-	end, createTouchButton, table.unpack(keybinds))
+		return callback(action, state, input)
+	end, createTouchButton, table.unpack(binds))
 	
 	module.SetupTouchButton(actionName)
 	
-	return CAS:GetButton(actionName)
+	return ContextActionService:GetButton(actionName)
 end
 
 function module.Unregister(actionName: string)
-	CAS:UnbindAction(actionName)
+	ContextActionService:UnbindAction(actionName)
 	registered[actionName] = nil
 end
 
-function module.GetRegisteredInfo(actionName: string): params?
+function module.GetRegisteredInfo(actionName: string): RegistrationInfo?
 	return registered[actionName]
 end
-
-SettingCallbacks.Listen(function(name, value)
-	if SettingsManager.Settings[name].Definition.PossibleValues == "Keybind" then
-		local info = module.GetRegisteredInfo(name)
-		if info then
-			module.Register(name, info.CreateTouchButton, info.Callback)
-		end
-	end
-end)
 
 return module

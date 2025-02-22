@@ -1,10 +1,11 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local SettingsManager = require(script.Parent.SettingsManager)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 
 local module = {}
 
 function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[string]: any}, noAnimate: boolean?): Tween?
-	local animate = SettingsManager.GetSetting("Animate UI Transitions")
+	local animate = Settings.GetSetting("Animate UI Transitions") :: Settings.BooleanValue
 
 	if not animate or noAnimate then
 		for i, v in properties do
@@ -63,8 +64,8 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			end
 		end
 		
-		local UI_TRANSITION_TIME = if open then 0.2 else tonumber(SettingsManager.GetSetting("Close Speed")) :: number
-		local UI_SCALE_FACTOR = tonumber(SettingsManager.GetSetting("Close Scale")) :: number
+		local UI_TRANSITION_TIME = if open then 0.2 else tonumber(Settings.GetSetting("Close Speed")) :: number
+		local UI_SCALE_FACTOR = tonumber(Settings.GetSetting("Close Scale")) :: number
 		
 		local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
 		

@@ -21,7 +21,19 @@ export type UpdateControlSettingRequest = {
 	New: boolean,
 }
 
+export type BooleanValue = SettingDefinitions.BooleanValue
+export type ChoiceValue = SettingDefinitions.ChoiceValue
+export type ControlValue = SettingDefinitions.ControlValue
+export type SettingValue = SettingDefinitions.SettingValue
+
 module.SETTINGS_VERSION = 4
+module.LOADED = false
+
+local function yieldIfNotLoaded(): ()
+	while not module.LOADED do
+		task.wait()
+	end
+end
 
 local settingValues: {[string]: SettingDefinitions.SettingValue?} = {}
 
@@ -30,6 +42,7 @@ function module.GetDefinition(name: string): SettingDefinitions.SettingDefinitio
 end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue
+	yieldIfNotLoaded()
 	local value = settingValues[name]
 	assert(value ~= nil, `No value found for setting {name}`)
 	return value

@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetDisplayName = require(ReplicatedStorage.RoundRule.GetDisplayName)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local SettingCallbacks = require(script.Parent.SettingCallbacks.SettingCallbacks)
-local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(ReplicatedStorage.UIManager)
 
 local creditPopupUI = UIManager.WaitForUI("Credits") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Credits)}
@@ -20,7 +20,7 @@ LocalRoundInfo.Listen("Map", function()
 	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Authors
 	playerlistUI.Object.Info.RoundInfo.Info.Map.Text = `Map: {GetDisplayName(map)}`
 
-	SettingCallbacks.Fire("Use FIB Lighting", SettingsManager.GetSetting("Use FIB Lighting"))
+	SettingCallbacks.Fire("Use FIB Lighting", Settings.GetSetting("Use FIB Lighting"))
 
 	task.wait(5)
 	creditPopupUI:ToggleVisible(false)

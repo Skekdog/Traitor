@@ -4,6 +4,7 @@ local SoundService = game:GetService("SoundService")
 local PlayPositionalSound = require(ReplicatedStorage.PlayPositionalSound)
 local Aim = require(script.Parent.Aim)
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
 local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
@@ -11,7 +12,6 @@ local ControlManager = require(script.Parent.ControlManager)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local HitSounds = require(script.Parent.HitSounds)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local SettingsManager = require(script.Parent.SettingsManager)
 local UIManager = require(script.Parent.UIManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
 
@@ -142,7 +142,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 
 	if item.Kind == "Gun" then
 		ControlManager.Register("Alternate Fire", true, function(_, state)
-			if SettingsManager.GetSetting("Toggle Aim") then
+			if Settings.GetSetting("Toggle Aim") then
 				if state ~= Enum.UserInputState.End then
 					return Enum.ContextActionResult.Pass
 				end

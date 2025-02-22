@@ -340,7 +340,7 @@ local function selectLowest()
 	return Enum.ContextActionResult.Sink
 end
 
-ControlManager.Register("Next Weapon", false, function()
+ControlManager.Register("Next Item", false, function()
 	if not module.EquippedItem then
 		return selectLowest()
 	end

@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
-local SettingsManager = require(script.Parent.SettingsManager)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 
@@ -13,7 +13,7 @@ local priv = ui.Private
 
 local function fade(label: TextLabel, out: boolean)
 	if out then
-		local animate = SettingsManager.GetSetting("Animate UI Transitions")
+		local animate = Settings.GetSetting("Animate UI Transitions")
 		if animate then
 			TweenService:Create(label, TweenInfo.new(5), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
 		end

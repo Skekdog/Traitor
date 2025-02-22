@@ -86,7 +86,7 @@ availableSettings.Shadows = {
 	Default = true,
 
 	Callback = function(name, value)
-		require(callbacks.Shadows)(name, value)
+		(require)(callbacks.Shadows)(name, value)
 	end,
 }
 
@@ -99,7 +99,7 @@ availableSettings["Use FIB Lighting"] = {
 	Default = false,
 
 	Callback = function(name, value)
-		require(callbacks.FIBLighting)(name, value)
+		(require)(callbacks.FIBLighting)(name, value)
 	end
 }
 
@@ -112,7 +112,7 @@ availableSettings["Item Hints"] = {
 	Default = true,
 
 	Callback = function(name, value)
-		require(callbacks.ShowItemHints)(name, value)
+		(require)(callbacks.ShowItemHints)(name, value)
 	end
 }
 
@@ -126,7 +126,7 @@ availableSettings["Background Menus"] = {
 	Default = "Closed",
 
 	Callback = function(name, value)
-		require(callbacks.BackgroundMenus)(name, value)
+		(require)(callbacks.BackgroundMenus)(name, value)
 	end
 }
 
@@ -139,7 +139,7 @@ availableSettings["Keep Shattered Glass"] = {
 	Default = false,
 
 	Callback = function(name, value)
-		require(callbacks.KeepShatteredGlass)(name, value)
+		(require)(callbacks.KeepShatteredGlass)(name, value)
 	end
 }
 
@@ -153,7 +153,7 @@ availableSettings["Sidebar Alignment"] = {
 	Default = "Right",
 
 	Callback = function(name, value)
-		require(callbacks.SidebarAlignment)(name, value)
+		(require)(callbacks.SidebarAlignment)(name, value)
 	end
 }
 
@@ -166,7 +166,7 @@ availableSettings["Always Show Sidebar"] = {
 	Default = true,
 
 	Callback = function(name, value)
-		require(callbacks.AlwaysShowSidebar)(name, value)
+		(require)(callbacks.AlwaysShowSidebar)(name, value)
 	end
 }
 
