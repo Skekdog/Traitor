@@ -59,7 +59,7 @@ ReplicatedStorage.ServerClient.TriggerMapVote.OnClientEvent:Connect(function(tri
         clone.MapName.Text = v.Name
         clone.Name = v.Name
         clone.Visible = true
-        clone.Parent = screen.Object.Choices
+        clone.Parent = screen.Object.Choices :: any
     
         clone.MouseButton1Click:Connect(function()
             voteFor(clone)

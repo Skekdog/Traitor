@@ -268,7 +268,7 @@ function module.AddClickButton(label: string, tab: string, category: string, onC
 	button.Visible = true
 	button.Label.Text = label
 	button.Activated:Connect(onClick)
-	button.Parent = ui.Main.PageHolder.ScrollingFrame
+	button.Parent = ui.Main.PageHolder.ScrollingFrame :: any
 end
 
 function module.AddButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()

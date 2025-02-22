@@ -119,7 +119,7 @@ local function tryPopulateEquipment(role: Types.Role?): ()
         button.TextLabel.Text = if v.Slot then `[{v.Slot}]` else ""
 
         button.Visible = true
-        button.Parent = list
+        button.Parent = list :: any
 
         button.Activated:Connect(function()
             selectItem(ui, v)

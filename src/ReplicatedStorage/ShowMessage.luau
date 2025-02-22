@@ -44,7 +44,7 @@ local function makeLabel(isTeam: boolean, text: string)
 
 	moveDown(if isTeam then priv else global)
 
-	label.Parent = if isTeam then priv else global
+	label.Parent = if isTeam then priv else global :: any
 
 	UIAnimation.Animate(label, TweenInfo.new(0.45), { Position = UDim2.fromScale(label.Position.X.Scale, 0) })
 

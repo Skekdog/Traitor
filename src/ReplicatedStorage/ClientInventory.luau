@@ -232,7 +232,7 @@ local function tryAddButton(item: Types.AnyItem): ()
 	ThemesManager.UpdateThemeInstance(clone.TextLabel, nil, true)
 
 	clone.Name = "Item " .. item.Definition.Name
-	clone.Parent = ui.Object.Container
+	clone.Parent = ui.Object.Container :: any
 
 	ourInventory.Slots[item.Definition.Slot] = item
 	clone.MouseButton1Click:Connect(function()
