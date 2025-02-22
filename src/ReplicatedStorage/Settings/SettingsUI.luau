@@ -10,7 +10,7 @@ local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local Settings = require(script.Parent.Settings)
 local module = {}
 
-local ui = ReplicatedStorage.UIManager.UnregisteredUIs.Settings
+local ui = ReplicatedStorage.UnregisteredUIs.Settings
 module.UI = ui
 
 local buttonTemplates = ui.Main.Templates
