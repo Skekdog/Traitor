@@ -216,18 +216,26 @@ local function listenForInput(kbm: boolean): Enum.UserInputType | Enum.KeyCode?
 	return if result then result else nil
 end
 
-local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "Controller", key: Enum.UserInputType | Enum.KeyCode): ()
+local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "Controller", key: Enum.UserInputType | Enum.KeyCode?): ()
 	local asString = ControlManager.GetStringForKeyCode(key)
 
 	local bind = if kind == "Keyboard" then frame.Keyboard else frame.Controller
+	local imageLabel = bind.KeycodeImage :: ImageLabel
+	local textLabel = bind.Keycode :: TextLabel
+	
 	if asString:sub(1, 11) == "rbxasset://" then
-		local img = bind.KeycodeImage :: ImageLabel
-		img.Image = asString
-		img.Visible = true
-		(bind.Keycode :: TextLabel).Visible = false
+		imageLabel.Image = asString
+		imageLabel.Visible = true
+
+		textLabel.Visible = false
+	elseif asString ~= "NONE" then
+		imageLabel.Visible = false
+
+		textLabel.Text = asString
+		textLabel.Visible = true
 	else
-		(bind.Keycode :: TextLabel).Text = asString;
-		(bind.KeycodeImage :: ImageLabel).Visible = false
+		imageLabel.Visible = false
+		textLabel.Visible = false
 	end
 end
 
@@ -257,6 +265,9 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	local frame = templates.KeybindSetting:Clone()
 	frame.Label.Text = definition.Name .. ":"
 
+	updateDisplayedKeybind(frame, "Keyboard", value.Keybind.KBMKeybind)
+	updateDisplayedKeybind(frame, "Controller", value.Keybind.ConsoleKeybind)
+
 	frame.Keyboard.Activated:Connect(function()
 		updateKeyboardKeybind(frame, definition, value)
 	end)
@@ -273,7 +284,6 @@ local darken = ui.LayoutDarken
 local tapCon: RBXScriptConnection?
 local function promptUpdateTouchPosition(control: string): UDim2
 	local lastParams = ControlManager.GetRegisteredInfo(control)
-	print(control)
 	local button = ControlManager.Register(control, true, function() return Enum.ContextActionResult.Pass end)
 
 	assert(button)
