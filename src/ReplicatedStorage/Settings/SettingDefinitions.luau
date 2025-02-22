@@ -116,20 +116,6 @@ availableSettings["Item Hints"] = {
 	end
 }
 
-availableSettings["Background Menus"] = {
-	Name = "Background Menus",
-	Tab = "Display",
-	Category = "User Interface",
-	Tooltip = "Closed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
-	PossibleValues = {"Closed", "Stacked"},
-	Kind = "Choice" :: "Choice",
-	Default = "Closed",
-
-	Callback = function(name, value)
-		(require)(callbacks.BackgroundMenus)(name, value)
-	end
-}
-
 availableSettings["Keep Shattered Glass"] = {
 	Name = "Keep Shattered Glass",
 	Tab = "Display",
@@ -177,16 +163,6 @@ availableSettings["Animate UI Transitions"] = {
 	Tooltip = "Controls animation for most UI.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
-}
-
-availableSettings["Background Menus"] = {
-	Name = "Background Menus",
-	Tab = "Display",
-	Category = "User Interface",
-	Tooltip = "Closed - Menus are closed when another is opened.\nStacked - Menus remain open when another is opened.",
-	PossibleValues = {"Closed", "Stacked"},
-	Kind = "Choice" :: "Choice",
-	Default = "Closed",
 }
 
 availableSettings["Snap To Ladders"] = {
