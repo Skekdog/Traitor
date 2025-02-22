@@ -60,7 +60,7 @@ local isLocalAdmin = RunService:IsServer() or IsAdmin(Players.LocalPlayer)
 availableSettings.Console = {
 	Name = "Console",
 	Tab = "Keybinds",
-	Hidden = isLocalAdmin,
+	Hidden = not isLocalAdmin,
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
 	Tooltip = "Opens the console.",
 	Kind = "Control" :: "Control",
@@ -177,30 +177,6 @@ availableSettings["Animate UI Transitions"] = {
 	Tooltip = "Controls animation for most UI.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
-}
-
-availableSettings["Close Scale"] = {
-	Name = "Close Scale",
-	Tab = "Display",
-	Category = "Development",
-	Tooltip = "Intended for dev use only.",
-	PossibleValues = {"0", "0.25", "0.5", "0.75"},
-	Kind = "Choice" :: "Choice",
-	Default = "0.75",
-
-	Hidden = isLocalAdmin,
-}
-
-availableSettings["Close Speed"] = {
-	Name = "Close Speed",
-	Tab = "Display",
-	Category = "Development",
-	Tooltip = "Intended for dev use only.",
-	PossibleValues = {"0.2", "0.3", "0.4", "0.5"},
-	Kind = "Choice" :: "Choice",
-	Default = "0.4",
-
-	Hidden = isLocalAdmin,
 }
 
 availableSettings["Background Menus"] = {

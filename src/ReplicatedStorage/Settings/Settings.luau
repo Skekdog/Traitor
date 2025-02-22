@@ -38,7 +38,7 @@ end
 local settingValues: {[string]: SettingDefinitions.SettingValue?} = {}
 
 function module.GetDefinition(name: string): SettingDefinitions.SettingDefinition
-	return assert(SettingDefinitions[name], `Setting {name} does not exist`)
+	return SettingDefinitions[name] or error(`Setting {name} does not exist`)
 end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue

@@ -64,8 +64,8 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			end
 		end
 		
-		local UI_TRANSITION_TIME = if open then 0.2 else tonumber(Settings.GetSetting("Close Speed")) :: number
-		local UI_SCALE_FACTOR = tonumber(Settings.GetSetting("Close Scale")) :: number
+		local UI_TRANSITION_TIME = 0.2
+		local UI_SCALE_FACTOR = 0.75
 		
 		local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
 		
