@@ -5,7 +5,7 @@ local UIManager = require(script.Parent.UIManager)
 local ui = UIManager.WaitForUI("ItemHint") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.ItemHint)}
 
 return function(primary: string?, alternate: string?)
-    if (not Settings.GetSetting("Show Item Hints")) or (not primary and not alternate) then
+    if (not Settings.GetSetting("Item Hints")) or (not primary and not alternate) then
         return ui:ToggleVisible(false)
     end
 
