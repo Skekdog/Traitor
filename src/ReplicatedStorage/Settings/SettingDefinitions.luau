@@ -69,11 +69,6 @@ availableSettings.Console = {
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Backquote,
 		},
-
-		TouchButton = {
-			Position = UDim2.new(),
-			Scale = 1,
-		},
 	},
 }
 
