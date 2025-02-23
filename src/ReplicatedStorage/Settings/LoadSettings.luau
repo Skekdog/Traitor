@@ -45,6 +45,8 @@ for _, v in SettingDefinitions do
 	end
 end
 
+require(script.Parent.ExtraButtons)
+
 local UIManager = require(ReplicatedStorage.UIManager)
 UIManager.RegisterUI(SettingsUI.UI)
 
