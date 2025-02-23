@@ -27,6 +27,18 @@ type Page = typeof(templates.Page)
 local pages: {[string]: Page?} = {}
 local currentPage: Page? = nil
 
+local tooltipObject = ui.Main.Tooltip
+local function toggleTooltip(tooltip: string?): ()
+	if not tooltip or tooltip == tooltipObject.Text then
+		tooltipObject.Text = ""
+		tooltipObject.Visible = false
+		return
+	end
+
+	tooltipObject.Text = tooltip
+	tooltipObject.Visible = true
+end
+
 local totalPages = 0
 local function getPage(name: string): Page?
 	return pages[name]
@@ -289,8 +301,7 @@ local function promptUpdateTouchPosition(control: string): UDim2
 	assert(button)
 
 	ui.Main.Visible = false
-	--tooltip("", "NONE")
-	--tt.Visible = false
+	toggleTooltip()
 	darken.Visible = true
 
 	local position: UDim2
@@ -337,7 +348,7 @@ local function updateTouchScale(definition: SettingDefinitions.ControlDefinition
 	end
 end
 
-local function setupButton(buttonArg: Button, name: string, tab: string, category: string, addColon: boolean): ()
+local function setupButton(buttonArg: Button, name: string, tab: string, category: string, tooltip: string?, addColon: boolean): ()
 	local button = buttonArg :: ClickButton
 	button.Label.Text = name .. if addColon then ":" else ""
 	button.Name = "Button_" .. name
@@ -362,6 +373,13 @@ local function setupButton(buttonArg: Button, name: string, tab: string, categor
 	order = getLayoutOrderForCategory(category, page)
 	assert(order)
 
+	if tooltip then
+		button.Help.Visible = true
+		button.Help.Activated:Connect(function()
+			toggleTooltip(tooltip)
+		end)
+	end
+
 	button.LayoutOrder = order + 1
 
 	button.Parent = page :: any or error("No page for tab " .. tab)
@@ -377,10 +395,10 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 		button = setupKeybindButton(definition, value :: SettingDefinitions.ControlValue)
 
 		if definition.Default.TouchButton then
-			module.AddClickButton(definition.Name .. " Position", "Touch", "Button Positions", function()
+			module.AddClickButton(definition.Name .. " Position", "Touch", "Button Positions", nil, function()
 				updateTouchPosition(definition)
 			end)
-			module.AddClickButton(definition.Name .. " Scale", "Touch", "Button Sizes", function()
+			module.AddClickButton(definition.Name .. " Scale", "Touch", "Button Sizes", nil, function()
 				updateTouchScale(definition)
 			end)
 		end
@@ -388,12 +406,12 @@ local function setupForDefinition(definition: SettingDefinitions.SettingDefiniti
 
 	assert(button, "Unknown definition kind: " .. definition.Kind)
 
-	setupButton(button :: Button, definition.Name, definition.Tab, definition.Category, true)
+	setupButton(button :: Button, definition.Name, definition.Tab, definition.Category, definition.Tooltip, true)
 end
 
-function module.AddClickButton(label: string, tab: string, category: string, onClick: () -> ()): ()
+function module.AddClickButton(label: string, tab: string, category: string, tooltip: string?, onClick: () -> ()): ()
 	local button = templates.ClickButton:Clone()
-	setupButton(button, label, tab, category, false)
+	setupButton(button, label, tab, category, tooltip, false)
 	button.Activated:Connect(onClick)
 end
 
