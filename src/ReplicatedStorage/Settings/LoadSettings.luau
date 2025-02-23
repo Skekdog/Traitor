@@ -25,23 +25,23 @@ else
 	end
 end
 
-for i, v in SettingDefinitions do
+for _, v in SettingDefinitions do
 	assert(v)
-	if processedSettings[i] ~= nil then
+	if processedSettings[v.Name] ~= nil then
 		continue
 	end
 
-	loadSetting(i, v.Default)
+	loadSetting(v.Name, v.Default)
 end
 
 Settings.LOADED = true
 
 local SettingsUI = require(script.Parent.SettingsUI)
-for i, v in SettingDefinitions do
+for _, v in SettingDefinitions do
 	assert(v)
 	
 	if not v.Hidden then
-		SettingsUI.AddButton(v, if processedSettings[i] ~= nil then processedSettings[i] else v.Default)
+		SettingsUI.AddButton(v, if processedSettings[v.Name] ~= nil then processedSettings[v.Name] else v.Default)
 	end
 end
 

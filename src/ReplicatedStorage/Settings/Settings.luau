@@ -38,7 +38,13 @@ end
 local settingValues: {[string]: SettingDefinitions.SettingValue?} = {}
 
 function module.GetDefinition(name: string): SettingDefinitions.SettingDefinition?
-	return SettingDefinitions[name]
+	for _, definition in SettingDefinitions do
+		if definition.Name == name then
+			return definition
+		end
+	end
+
+	return nil
 end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue
@@ -87,10 +93,10 @@ end
 
 function module.PopulateDefaults(): ()
 	assert(RunService:IsServer(), "PopulateDefaults should only be called from the server")
-	for name, definition in SettingDefinitions do
+	for _, definition in SettingDefinitions do
 		assert(definition)
-		if not settingValues[name] then
-			settingValues[name] = definition.Default
+		if not settingValues[definition.Name] then
+			settingValues[definition.Name] = definition.Default
 		end
 	end
 end

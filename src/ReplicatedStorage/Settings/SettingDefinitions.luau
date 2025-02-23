@@ -53,11 +53,11 @@ export type ControlDefinition = BaseDefinition & {
 export type SettingDefinition = BooleanDefinition | ChoiceDefinition | ControlDefinition
 
 local callbacks = script.Parent.Callbacks
-local availableSettings: {[string]: SettingDefinition?} = {}
+local availableSettings: {SettingDefinition} = {}
 
 local isLocalAdmin = RunService:IsServer() or IsAdmin(Players.LocalPlayer)
 
-availableSettings.Console = {
+table.insert(availableSettings, {
 	Name = "Console",
 	Tab = "Keybinds",
 	Hidden = not isLocalAdmin,
@@ -70,9 +70,9 @@ availableSettings.Console = {
 			KBMKeybind = Enum.KeyCode.Backquote,
 		},
 	},
-}
+})
 
-availableSettings.Shadows = {
+table.insert(availableSettings, {
 	Name = "Shadows",
 	Tab = "Display",
 	Category = "Environment",
@@ -83,9 +83,9 @@ availableSettings.Shadows = {
 	Callback = function(name, value)
 		(require)(callbacks.Shadows)(name, value)
 	end,
-}
+})
 
-availableSettings["Use FIB Lighting"] = {
+table.insert(availableSettings, {
 	Name = "Use FIB Lighting",
 	Tab = "Display",
 	Category = "Environment",
@@ -96,9 +96,9 @@ availableSettings["Use FIB Lighting"] = {
 	Callback = function(name, value)
 		(require)(callbacks.FIBLighting)(name, value)
 	end
-}
+})
 
-availableSettings["Item Hints"] = {
+table.insert(availableSettings, {
 	Name = "Item Hints",
 	Tab = "Display",
 	Category = "User Interface",
@@ -109,9 +109,9 @@ availableSettings["Item Hints"] = {
 	Callback = function(name, value)
 		(require)(callbacks.ShowItemHints)(name, value)
 	end
-}
+})
 
-availableSettings["Keep Shattered Glass"] = {
+table.insert(availableSettings, {
 	Name = "Keep Shattered Glass",
 	Tab = "Display",
 	Category = "Environment",
@@ -122,9 +122,9 @@ availableSettings["Keep Shattered Glass"] = {
 	Callback = function(name, value)
 		(require)(callbacks.KeepShatteredGlass)(name, value)
 	end
-}
+})
 
-availableSettings["Sidebar Alignment"] = {
+table.insert(availableSettings, {
 	Name = "Sidebar Alignment",
 	Tab = "Display",
 	Category = "User Interface",
@@ -136,9 +136,9 @@ availableSettings["Sidebar Alignment"] = {
 	Callback = function(name, value)
 		(require)(callbacks.SidebarAlignment)(name, value)
 	end
-}
+})
 
-availableSettings["Always Show Sidebar"] = {
+table.insert(availableSettings, {
 	Name = "Always Show Sidebar",
 	Tab = "Display",
 	Category = "User Interface",
@@ -149,36 +149,36 @@ availableSettings["Always Show Sidebar"] = {
 	Callback = function(name, value)
 		(require)(callbacks.AlwaysShowSidebar)(name, value)
 	end
-}
+})
 
-availableSettings["Animate UI Transitions"] = {
+table.insert(availableSettings, {
 	Name = "Animate UI Transitions",
 	Tab = "Display",
 	Category = "User Interface",
 	Tooltip = "Controls animation for most UI.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
-}
+})
 
-availableSettings["Snap To Ladders"] = {
+table.insert(availableSettings, {
 	Name = "Snap To Ladders",
 	Tab = "Gameplay",
 	Category = "Gameplay",
 	Tooltip = "If enabled, players will snap to ladders when touching. Ladders can still be climbed manually.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
-}
+})
 
-availableSettings["Toggle Aim"] = {
+table.insert(availableSettings, {
 	Name = "Toggle Aim",
 	Tab = "Gameplay",
 	Category = "Gameplay",
 	Tooltip = "Determines whether Alternate Fire must be held to aim.",
 	Kind = "Boolean" :: "Boolean",
 	Default = false,
-}
+})
 
-availableSettings["Primary Fire"] = {
+table.insert(availableSettings, {
 	Name = "Primary Fire",
 	Tab = "Keybinds",
 	Category = "Items",
@@ -198,9 +198,9 @@ availableSettings["Primary Fire"] = {
 			Scale = 1,
 		},
 	},
-}
+})
 
-availableSettings["Alternate Fire"] = {
+table.insert(availableSettings, {
 	Name = "Alternate Fire",
 	Tab = "Keybinds",
 	Category = "Items",
@@ -220,9 +220,9 @@ availableSettings["Alternate Fire"] = {
 			Scale = 1,
 		},
 	},
-}
+})
 
-availableSettings["Drop Ammo"] = {
+table.insert(availableSettings, {
 	Name = "Drop Ammo",
 	Tab = "Keybinds",
 	Category = "Items",
@@ -241,9 +241,9 @@ availableSettings["Drop Ammo"] = {
 			Scale = 1,
 		},
 	},
-}
+})
 
-availableSettings["Drop"] = {
+table.insert(availableSettings, {
 	Name = "Drop",
 	Tab = "Keybinds",
 	Category = "Items",
@@ -263,9 +263,9 @@ availableSettings["Drop"] = {
 			Scale = 1,
 		},
 	},
-}
+})
 
-availableSettings["Reload Weapon"] = {
+table.insert(availableSettings, {
 	Name = "Reload Weapon",
 	Tab = "Keybinds",
 	Category = "Items",
@@ -285,9 +285,9 @@ availableSettings["Reload Weapon"] = {
 			Scale = 1,
 		},
 	},
-}
+})
 
-availableSettings["Climb Ladder"] = {
+table.insert(availableSettings, {
 	Name = "Climb Ladder",
 	Tab = "Keybinds",
 	Category = "Gameplay",
@@ -306,9 +306,9 @@ availableSettings["Climb Ladder"] = {
 			Scale = 1,
 		},
 	},
-}
+})
 
-availableSettings["Interact"] = {
+table.insert(availableSettings, {
 	Name = "Interact",
 	Tab = "Keybinds",
 	Category = "Gameplay",
@@ -327,10 +327,10 @@ availableSettings["Interact"] = {
 			Position = UDim2.new(),
 			Scale = 1,
 		},
-	}
-}
+	},
+})
 
-availableSettings["Close UI"] = {
+table.insert(availableSettings, {
 	Name = "Close UI",
 	Tab = "Keybinds",
 	Category = "Menus",
@@ -345,9 +345,9 @@ availableSettings["Close UI"] = {
 			ConsoleKeybind = Enum.KeyCode.ButtonB,
 		},
 	},
-}
+})
 
-availableSettings["Next Item"] = {
+table.insert(availableSettings, {
 	Name = "Next Item",
 	Tab = "Keybinds",
 	Category = "Inventory",
@@ -361,153 +361,29 @@ availableSettings["Next Item"] = {
 			ConsoleKeybind = Enum.KeyCode.ButtonY,
 		},
 	},
-}
+})
 
-availableSettings["Slot 1"] = {
-	Name = "Slot 1",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 1.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
+local numberNames = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
 
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.One,
+for i = 1, 9 do
+	table.insert(availableSettings, {
+		Name = "Slot " .. tostring(i),
+		Tab = "Keybinds",
+		Category = "Inventory",
+		Tooltip = `Equips the item in slot {i}.`,
+		Kind = "Control" :: "Control",
+		SpecifyToggle = false,
+
+		Default = {
+			Toggled = true,
+			Keybind = {
+				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]],
+			},
 		},
-	},
-}
+	})
+end
 
-availableSettings["Slot 2"] = {
-	Name = "Slot 2",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 2.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Two,
-		},
-	},
-}
-
-availableSettings["Slot 3"] = {
-	Name = "Slot 3",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 3.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Three,
-		},
-	},
-}
-
-availableSettings["Slot 4"] = {
-	Name = "Slot 4",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 4.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Four,
-		},
-	},
-}
-
-availableSettings["Slot 5"] = {
-	Name = "Slot 5",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 5.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Five,
-		},
-	},
-}
-
-availableSettings["Slot 6"] = {
-	Name = "Slot 6",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 6.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Six,
-		},
-	},
-}
-
-availableSettings["Slot 7"] = {
-	Name = "Slot 7",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 7.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Seven,
-		},
-	},
-}
-
-availableSettings["Slot 8"] = {
-	Name = "Slot 8",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 8.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Eight,
-		},
-	},
-}
-
-availableSettings["Slot 9"] = {
-	Name = "Slot 9",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Equips the item in slot 9.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Nine,
-		},
-	},
-}
-
-availableSettings["Equipment Shop"] = {
+table.insert(availableSettings, {
 	Name = "Equipment Shop",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
@@ -522,9 +398,9 @@ availableSettings["Equipment Shop"] = {
 			ConsoleKeybind = Enum.KeyCode.DPadUp,
 		},
 	},
-}
+})
 
-availableSettings["Playerlist"] = {
+table.insert(availableSettings, {
 	Name = "Playerlist",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
@@ -539,9 +415,9 @@ availableSettings["Playerlist"] = {
 			ConsoleKeybind = Enum.KeyCode.ButtonL3,
 		},
 	},
-}
+})
 
-availableSettings["Settings"] = {
+table.insert(availableSettings, {
 	Name = "Settings",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
@@ -556,9 +432,9 @@ availableSettings["Settings"] = {
 			ConsoleKeybind = Enum.KeyCode.ButtonR3,
 		},
 	},
-}
+})
 
-availableSettings["Highlights"] = {
+table.insert(availableSettings, {
 	Name = "Highlights",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
@@ -572,6 +448,6 @@ availableSettings["Highlights"] = {
 			KBMKeybind = Enum.KeyCode.B,
 		},
 	},
-}
+})
 
 return availableSettings
