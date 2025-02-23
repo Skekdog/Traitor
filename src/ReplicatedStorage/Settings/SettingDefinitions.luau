@@ -27,6 +27,7 @@ export type BaseDefinition = {
 	Name: string,
 	Tab: string,
 	Category: string,
+	Tooltip: string?,
 	Hidden: boolean?,
 }
 
@@ -58,25 +59,9 @@ local availableSettings: {SettingDefinition} = {}
 local isLocalAdmin = RunService:IsServer() or IsAdmin(Players.LocalPlayer)
 
 table.insert(availableSettings, {
-	Name = "Console",
-	Tab = "Keybinds",
-	Hidden = not isLocalAdmin,
-	Category = "Menus - Enable the checkbox to make a keybind toggled",
-	Tooltip = "Opens the console.",
-	Kind = "Control" :: "Control",
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Backquote,
-		},
-	},
-})
-
-table.insert(availableSettings, {
 	Name = "Shadows",
 	Tab = "Display",
 	Category = "Environment",
-	Tooltip = "Enable or disable global shadows.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
 
@@ -102,7 +87,7 @@ table.insert(availableSettings, {
 	Name = "Item Hints",
 	Tab = "Display",
 	Category = "User Interface",
-	Tooltip = "Enables hint text for item controls.",
+	Tooltip = "Enables hint text for equipped item controls.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
 
@@ -128,7 +113,6 @@ table.insert(availableSettings, {
 	Name = "Sidebar Alignment",
 	Tab = "Display",
 	Category = "User Interface",
-	Tooltip = "Left - The sidebar is aligned to the left of the screen.\nRight - The sidebar is aligned to the right of the screen.",
 	PossibleValues = {"Left", "Right"},
 	Kind = "Choice" :: "Choice",
 	Default = "Right",
@@ -142,7 +126,7 @@ table.insert(availableSettings, {
 	Name = "Always Show Sidebar",
 	Tab = "Display",
 	Category = "User Interface",
-	Tooltip = "This setting has no effect if a keyboard is not connected.",
+	Tooltip = "No effect if a keyboard is not connected.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
 
@@ -164,7 +148,7 @@ table.insert(availableSettings, {
 	Name = "Snap To Ladders",
 	Tab = "Gameplay",
 	Category = "Gameplay",
-	Tooltip = "If enabled, players will snap to ladders when touching. Ladders can still be climbed manually.",
+	Tooltip = "If enabled, touching a ladder will automatically begin climbing it. You can still climb ladders manually.",
 	Kind = "Boolean" :: "Boolean",
 	Default = true,
 })
@@ -291,7 +275,6 @@ table.insert(availableSettings, {
 	Name = "Climb Ladder",
 	Tab = "Keybinds",
 	Category = "Gameplay",
-	Tooltip = "Used to climb ladders.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = false,
 
@@ -312,7 +295,7 @@ table.insert(availableSettings, {
 	Name = "Interact",
 	Tab = "Keybinds",
 	Category = "Gameplay",
-	Tooltip = "Used to interact with objects.",
+	Tooltip = "Used to interact with most objects.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = false,
 
@@ -329,6 +312,41 @@ table.insert(availableSettings, {
 		},
 	},
 })
+
+table.insert(availableSettings, {
+	Name = "Next Item",
+	Tab = "Keybinds",
+	Category = "Inventory",
+	Tooltip = "Cycles to the next item. Primarily used with controllers.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			ConsoleKeybind = Enum.KeyCode.ButtonY,
+		},
+	},
+})
+
+local numberNames = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
+
+for i = 1, 9 do
+	table.insert(availableSettings, {
+		Name = "Slot " .. tostring(i),
+		Tab = "Keybinds",
+		Category = "Inventory",
+		Kind = "Control" :: "Control",
+		SpecifyToggle = false,
+
+		Default = {
+			Toggled = true,
+			Keybind = {
+				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]],
+			},
+		},
+	})
+end
 
 table.insert(availableSettings, {
 	Name = "Close UI",
@@ -348,46 +366,25 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Next Item",
+	Name = "Console",
 	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Cycles to the next item. Primarily used for controllers.",
+	Hidden = not isLocalAdmin,
+	Category = "Menus",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = false,
-
 	Default = {
 		Toggled = true,
 		Keybind = {
-			ConsoleKeybind = Enum.KeyCode.ButtonY,
+			KBMKeybind = Enum.KeyCode.Backquote,
 		},
 	},
 })
-
-local numberNames = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
-
-for i = 1, 9 do
-	table.insert(availableSettings, {
-		Name = "Slot " .. tostring(i),
-		Tab = "Keybinds",
-		Category = "Inventory",
-		Tooltip = `Equips the item in slot {i}.`,
-		Kind = "Control" :: "Control",
-		SpecifyToggle = false,
-
-		Default = {
-			Toggled = true,
-			Keybind = {
-				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]],
-			},
-		},
-	})
-end
 
 table.insert(availableSettings, {
 	Name = "Equipment Shop",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
-	Tooltip = "Opens the equipment shop. Only available for certain roles.",
+	Tooltip = "Opens the Equipment Shop. Only certain roles have access to the Equipment Shop.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = true,
 
@@ -404,7 +401,6 @@ table.insert(availableSettings, {
 	Name = "Playerlist",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
-	Tooltip = "Opens the playerlist.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = true,
 
@@ -421,7 +417,6 @@ table.insert(availableSettings, {
 	Name = "Settings",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
-	Tooltip = "Opens the settings page. Can also be opened by typing !settings in chat.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = true,
 
@@ -438,7 +433,6 @@ table.insert(availableSettings, {
 	Name = "Highlights",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
-	Tooltip = "Opens the round highlights.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = true,
 
