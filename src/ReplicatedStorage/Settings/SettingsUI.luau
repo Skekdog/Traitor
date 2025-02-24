@@ -21,6 +21,9 @@ type KeybindButton = typeof(templates.KeybindSetting)
 type ClickButton = typeof(templates.ClickButton)
 type Button = BooleanButton | ChoiceButton | KeybindButton | ClickButton
 
+local CHECKBOX_ON = "rbxassetid://70556080680796"
+local CHECKBOX_OFF = "rbxassetid://101035239747030"
+
 local pageBase = templates.Page
 type Page = typeof(templates.Page)
 
@@ -254,6 +257,22 @@ local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "
 	end
 end
 
+local function updateDisplayedToggle(frame: KeybindButton, value: boolean): ()
+	frame.Toggled.Image = if value then CHECKBOX_ON else CHECKBOX_OFF
+end
+
+local function updateKeybindToggled(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition): ()
+	local current = Settings.GetSetting(definition.Name) :: SettingDefinitions.ControlValue
+
+	local new = not current.Toggled
+	Settings.UpdateControlSetting(definition.Name, {
+		Kind = "Toggled",
+		New = new
+	})
+
+	updateDisplayedToggle(frame, new)
+end
+
 local function updateKeyboardKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, key: Enum.UserInputType | Enum.KeyCode?): ()
 	Settings.UpdateControlSetting(definition.Name, {
 		Kind = "KeyboardKeybind",
@@ -291,6 +310,9 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	updateDisplayedKeybind(frame, "Keyboard", value.Keybind.KBMKeybind)
 	updateDisplayedKeybind(frame, "Controller", value.Keybind.ConsoleKeybind)
 
+	frame.Toggled.Visible = definition.SpecifyToggle or false
+	updateDisplayedToggle(frame, value.Toggled)
+
 	frame.Keyboard.Keycode.Activated:Connect(function()
 		updateKeyboardKeybind(frame, definition, nil)
 	end)
@@ -313,6 +335,10 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 
 	frame.Controller.Activated:Connect(function()
 		promptUpdateControllerKeybind(frame, definition)
+	end)
+
+	frame.Toggled.Activated:Connect(function()
+		updateKeybindToggled(frame, definition)
 	end)
 
 	return frame
