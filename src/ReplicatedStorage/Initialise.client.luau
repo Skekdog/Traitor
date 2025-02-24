@@ -140,7 +140,7 @@ LocalRoundInfo.Listen("Map", function()
             v.CanTouch = true
             v.Touched:Connect(function(part)
                 local char = Players.LocalPlayer.Character
-                if char and part:IsDescendantOf(char) and Settings.GetSetting("Snap to Ladders") and ClimbLadder.SnapCooldown < os.clock() then
+                if char and part:IsDescendantOf(char) and Settings.GetSetting("Snap To Ladders") and ClimbLadder.SnapCooldown < os.clock() then
                     ClimbLadder.SnapCooldown = os.clock() + 3
                     ClimbLadder.Climb(v)
                 end
