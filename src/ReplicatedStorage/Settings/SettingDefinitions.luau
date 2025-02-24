@@ -154,15 +154,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Toggle Aim",
-	Tab = "Gameplay",
-	Category = "Gameplay",
-	Tooltip = "Determines whether Alternate Fire must be held to aim.",
-	Kind = "Boolean" :: "Boolean",
-	Default = false,
-})
-
-table.insert(availableSettings, {
 	Name = "Primary Fire",
 	Tab = "Keybinds",
 	Category = "Items",

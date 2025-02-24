@@ -4,7 +4,6 @@ local SoundService = game:GetService("SoundService")
 local PlayPositionalSound = require(ReplicatedStorage.PlayPositionalSound)
 local Aim = require(script.Parent.Aim)
 local Types = require(ReplicatedStorage.RoundRule.Types)
-local Settings = require(ReplicatedStorage.Settings.Settings)
 local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
 local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
@@ -142,21 +141,12 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 
 	if item.Kind == "Gun" then
 		ControlManager.Register("Alternate Fire", true, function(_, state)
-			if Settings.GetSetting("Toggle Aim") then
-				if state ~= Enum.UserInputState.End then
-					return Enum.ContextActionResult.Pass
-				end
-
-				Aim.ToggleAim(item)
-				return Enum.ContextActionResult.Sink
+			if state ~= Enum.UserInputState.End then
+				return Enum.ContextActionResult.Pass
 			end
 
-			if state == Enum.UserInputState.Begin or state == Enum.UserInputState.End then
-				Aim.ToggleAim(item, state == Enum.UserInputState.Begin)
-				return Enum.ContextActionResult.Sink
-			end
-
-			return Enum.ContextActionResult.Pass
+			Aim.ToggleAim(item)
+			return Enum.ContextActionResult.Sink
 		end)
 		
 		ControlManager.Register("Reload Weapon", true, function(_, state)
