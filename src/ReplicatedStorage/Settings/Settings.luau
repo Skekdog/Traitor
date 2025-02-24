@@ -89,6 +89,10 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 		assert(definition.SpecifyToggle, `Setting {name} is not a toggle setting`)
 		value.Toggled = request.New
 	end
+
+	if definition.Callback then
+		task.spawn(definition.Callback :: SettingDefinitions.SettingCallback, name, value)
+	end
 end
 
 function module.PopulateDefaults(): ()

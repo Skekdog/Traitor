@@ -182,6 +182,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -204,6 +208,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -225,6 +233,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -247,6 +259,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -269,6 +285,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -289,6 +309,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -311,6 +335,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -327,6 +355,10 @@ table.insert(availableSettings, {
 			ConsoleKeybind = Enum.KeyCode.ButtonY,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 local numberNames = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
@@ -345,6 +377,10 @@ for i = 1, 9 do
 				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]],
 			},
 		},
+
+		Callback = function(name: string, value: ControlValue)
+			(require)(callbacks.Keybind)(name, value)
+		end,
 	})
 end
 
@@ -363,6 +399,10 @@ table.insert(availableSettings, {
 			ConsoleKeybind = Enum.KeyCode.ButtonB,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -378,6 +418,10 @@ table.insert(availableSettings, {
 			KBMKeybind = Enum.KeyCode.Backquote,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -395,6 +439,10 @@ table.insert(availableSettings, {
 			ConsoleKeybind = Enum.KeyCode.DPadUp,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -411,6 +459,10 @@ table.insert(availableSettings, {
 			ConsoleKeybind = Enum.KeyCode.ButtonL3,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -427,6 +479,10 @@ table.insert(availableSettings, {
 			ConsoleKeybind = Enum.KeyCode.ButtonR3,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -442,6 +498,10 @@ table.insert(availableSettings, {
 			KBMKeybind = Enum.KeyCode.B,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 return availableSettings

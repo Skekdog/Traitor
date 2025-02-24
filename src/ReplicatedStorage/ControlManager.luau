@@ -3,6 +3,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local SettingDefinitions = require(ReplicatedStorage.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Settings.Settings)
 local ThemesManager = require(script.Parent.ThemesManager)
 
@@ -191,6 +192,14 @@ end
 
 function module.GetRegisteredInfo(actionName: string): RegistrationInfo?
 	return registered[actionName]
+end
+
+function module.TryUpdateRegisteredAction(name: string, value: SettingDefinitions.ControlValue): ()
+	print(name, value)
+	local info = module.GetRegisteredInfo(name)
+	if info then
+		module.Register(name, info.CreateTouchButton, info.Callback)
+	end
 end
 
 return module
