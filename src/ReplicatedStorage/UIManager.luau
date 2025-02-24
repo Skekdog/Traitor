@@ -46,6 +46,7 @@ export type UI = {
 local registeredUIs: {UI} = {}
 
 UIManager.UnregisteredUIs = script.Parent.UnregisteredUIs
+UIManager.GuiInset = inset
 
 local function tryMakeCursorVisible(): ()
 	for _, v in registeredUIs do

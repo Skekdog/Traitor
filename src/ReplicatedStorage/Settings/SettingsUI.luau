@@ -482,6 +482,11 @@ function module.AddButton(definition: SettingDefinitions.SettingDefinition, valu
 	setupForDefinition(definition, value)
 end
 
+function module.AdjustForInset(inset: Vector2): ()
+	ui.LayoutDarken.Hint.Position = UDim2.new(0, inset.X, 0, inset.Y)
+	ui.LayoutDarken.Done.Position = UDim2.new(0.5, inset.X, 0.1, inset.Y)
+end
+
 ui:GetPropertyChangedSignal("Visible"):Connect(function()
 	if not ui.Visible then
 		Settings.SaveSettings()
