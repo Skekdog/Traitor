@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Map = require(script.Parent.RoundRule.Map)
 local Role = require(script.Parent.RoundRule.Role)
@@ -24,6 +23,8 @@ type RoundEvent = {
     WasSelfDefense: boolean?,
     WasCorrectKill: boolean?,
 }
+
+--todo: all of this memory is leaky lol
 
 function module.Listen(name: CallbackName, callback: () -> (), runImmediately: boolean?): ()
     if not listeners[name] then
@@ -186,58 +187,34 @@ replicatedData:GetAttributeChangedSignal("AdvanceTime"):Connect(function()
     runCallbacks("AdvanceTime")
 end)
 
-local playerStatuses: {[Player]: Types.ParticipantStatus?} = {}
-function module.GetPlayerStatus(player: Player): Types.ParticipantStatus
-    return playerStatuses[player] or "Spectating"
-end
-
-local function getPlayerFromName(name: string): Player?
-    for _, player in Players:GetPlayers() do
-        if player.Name == name then
-            return player
-        end
-    end
-
-    return nil
+local playerStatuses: {[string]: Types.ParticipantStatus?} = {}
+function module.GetPlayerStatus(name: string): Types.ParticipantStatus
+    return playerStatuses[name] or "Spectating"
 end
 
 remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(name: string, status: Types.ParticipantStatus?)
-    local player = getPlayerFromName(name)
-    if not player then
-        return
-    end
-
-    playerStatuses[player] = status
+    playerStatuses[name] = status
     runCallbacks("PlayerStatus")
 end)
 
-local playerRoles: {[Player]: Types.Role?} = {}
-function module.GetPlayerRole(player: Player): Types.Role?
-    return playerRoles[player]
+local playerRoles: {[string]: Types.Role?} = {}
+function module.GetPlayerRole(name: string): Types.Role?
+    return playerRoles[name]
 end
 
 remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: string?)
-    local player = getPlayerFromName(name)
-    if not player then
-        return
-    end
-
-    playerRoles[player] = getRoleFromName(roleName)
+    playerRoles[name] = getRoleFromName(roleName)
     runCallbacks("PlayerRole")
 end)
 
-function module.GetPlayerScores(): {[Player]: Types.ScoreTable}
-    local playerScores: {[Player]: Types.ScoreTable} = {}
+function module.GetPlayerScores(): {[string]: Types.ScoreTable}
+    local playerScores: {[string]: Types.ScoreTable} = {}
     for _, v in replicatedData.Scores:GetChildren() do
         if v:IsA("StringValue") then
-            local player = getPlayerFromName(v.Name)
-            if not player then
-                continue
-            end
-
-            playerScores[player] = {}
+            local name = v.Name
+            playerScores[name] = {}
             for reason, value in v:GetAttributes() do
-                playerScores[player][reason] = value :: number
+                playerScores[name][reason] = value :: number
             end
         end
     end

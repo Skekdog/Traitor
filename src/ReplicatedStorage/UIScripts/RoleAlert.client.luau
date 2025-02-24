@@ -9,7 +9,7 @@ local ui = UIManager.WaitForUI("RoleAlert")
 local UI = ui.Object :: typeof(UIManager.UnregisteredUIs.RoleAlert)
 
 LocalRoundInfo.Listen("PlayerRole", function()
-	local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer)
+	local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
 	if role then
 		local sound = Instance.new("Sound")
 		sound.SoundId = role.Definition.Sound

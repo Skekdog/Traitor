@@ -12,7 +12,7 @@ local validPhases: {Types.RoundPhase} = {"Waiting", "Preparing"}
 local wasJoinClicked = false
 
 local function shouldMakeVisible(): boolean
-	return not wasJoinClicked and table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil and LocalRoundInfo.GetPlayerStatus(Players.LocalPlayer) == "Spectating"
+	return not wasJoinClicked and table.find(validPhases, LocalRoundInfo.GetRoundPhase()) ~= nil and LocalRoundInfo.GetPlayerStatus(Players.LocalPlayer.Name) == "Spectating"
 end
 
 this.Object.MouseButton1Click:Connect(function()

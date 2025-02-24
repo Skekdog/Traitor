@@ -31,7 +31,7 @@ local function showPlayerInfo(char: Model)
         return
     end
 
-	local role = LocalRoundInfo.GetPlayerRole(plr)
+	local role = LocalRoundInfo.GetPlayerRole(plr.Name)
 	playerInfo:FindFirstChild("Name").Text = plr.Name
 
 	local healthPercent = health / hum.MaxHealth * 100
@@ -86,7 +86,7 @@ local corpseHint = crosshairInfoUI.SearchCorpseHint
 local function showCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
-	if LocalRoundInfo.GetPlayerStatus(plr) == "Alive" then
+	if LocalRoundInfo.GetPlayerStatus(plr.Name) == "Alive" then
 		if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
 			return
 		end	
@@ -95,7 +95,7 @@ local function showCorpseHint(char: Model)
 	if char:GetAttribute("Unidentified") then
 		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body`
 	else
-		local role = LocalRoundInfo.GetPlayerRole(plr)
+		local role = LocalRoundInfo.GetPlayerRole(plr.Name)
 		if not role then
 			return
 		end

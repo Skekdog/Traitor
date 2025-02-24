@@ -129,7 +129,7 @@ end
 
 local lastRole: Types.Role?
 LocalRoundInfo.Listen("PlayerRole", function()
-    local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer)
+    local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
     if lastRole ~= role then
         lastRole = role
         tryPopulateEquipment(role)

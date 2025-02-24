@@ -14,8 +14,8 @@ local function highlight(player: Player, role: Types.Role)
 end
 
 local function tryHighlightPlayer(player: Player): ()
-    local ownRole = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer)
-    local theirRole = LocalRoundInfo.GetPlayerRole(player)
+    local ownRole = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
+    local theirRole = LocalRoundInfo.GetPlayerRole(player.Name)
     if not ownRole or not theirRole or not ownRole.Definition.HighlightedRoles then
         return
     end

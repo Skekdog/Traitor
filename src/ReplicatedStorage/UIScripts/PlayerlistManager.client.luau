@@ -53,7 +53,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 		return
 	end
 
-	local status = LocalRoundInfo.GetPlayerStatus(plr)
+	local status = LocalRoundInfo.GetPlayerStatus(plr.Name)
 
 	local marksVisible = (status == "Alive") and (plr ~= Players.LocalPlayer)
 	for _, v in clone.Marks:GetChildren() do
@@ -70,7 +70,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 
 	movePlr(plr, status :: any)
 
-	local role = LocalRoundInfo.GetPlayerRole(plr)
+	local role = LocalRoundInfo.GetPlayerRole(plr.Name)
 	if not role then
 		clone.Username:SetAttribute("KeepText")
 		ThemesManager.UpdateThemeInstance(clone.Username)

@@ -80,7 +80,7 @@ local function populateScores(): ()
 		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 
-		usernameLabel.Text = "@" .. i.Name
+		usernameLabel.Text = "@" .. i
 
 		local total = calculateTotalScore(v)
 		totalLabel.Text = total.." Total"
