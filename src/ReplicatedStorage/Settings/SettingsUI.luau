@@ -384,6 +384,10 @@ local function promptUpdateTouchPosition(control: string): UDim2
 end
 
 local function updateTouchPosition(definition: SettingDefinitions.ControlDefinition): ()
+	if not UserInputService.TouchEnabled then
+		return ScreenMessage("Info", "Touchscreen is not enabled on this device.")
+	end
+
 	local pos = promptUpdateTouchPosition(definition.Name)
 	Settings.UpdateControlSetting(definition.Name, {
 		Kind = "TouchPosition",
@@ -392,6 +396,10 @@ local function updateTouchPosition(definition: SettingDefinitions.ControlDefinit
 end
 
 local function updateTouchScale(definition: SettingDefinitions.ControlDefinition): ()
+	if not UserInputService.TouchEnabled then
+		return ScreenMessage("Info", "Touchscreen is not enabled on this device.")
+	end
+	
 	local newScale = TextInput.Create(definition.Name, "Number", "0.5-3", "TouchScale")
 	if newScale then
 		Settings.UpdateControlSetting(definition.Name, {
