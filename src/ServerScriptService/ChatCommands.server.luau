@@ -1,22 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TeleportService = game:GetService("TeleportService")
 local IsAdmin = require(ReplicatedStorage.IsAdmin)
 local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
+local SafeTeleport = require(ReplicatedStorage.SafeTeleport)
 local RoundHandler = require(script.Parent.RoundHandler)
 
 local function send(message: string): ()
     local round = RoundHandler.GetRound()
     round:SendMessage(Players:GetPlayers(), message, "Chat")
 end
-
-TeleportService.TeleportInitFailed:Connect(function(plr, result, errorMessage)
-    if result == Enum.TeleportResult.Unauthorized then
-        send("Teleport failed because at least 1 player is not authorised.")
-    else
-        send(`Teleport failed: {errorMessage}`)
-    end
-end)
 
 local function toTestPlace(plr: Player)
     if game.PlaceId == PlaceIDs.TestPlace then
@@ -31,7 +23,7 @@ local function toTestPlace(plr: Player)
         send(`Teleporting {plr.Name} to test place.`)
     end
 
-    TeleportService:TeleportAsync(PlaceIDs.TestPlace, targets)
+    SafeTeleport(PlaceIDs.TestPlace, targets)
 end
 
 local function openSettingsForPlayer(plr: Player): ()
