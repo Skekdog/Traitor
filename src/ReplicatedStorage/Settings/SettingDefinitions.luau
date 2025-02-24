@@ -178,8 +178,8 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.new(),
-			Scale = 1,
+			Position = UDim2.fromOffset(50, 100),
+			Scale = 2,
 		},
 	},
 
@@ -204,7 +204,7 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.new(),
+			Position = UDim2.fromOffset(120, 100),
 			Scale = 1,
 		},
 	},
@@ -229,7 +229,7 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.new(),
+			Position = UDim2.fromOffset(50, 250),
 			Scale = 1,
 		},
 	},
@@ -255,7 +255,7 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.new(),
+			Position = UDim2.fromOffset(50, 200),
 			Scale = 1,
 		},
 	},
@@ -281,7 +281,7 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.new(),
+			Position = UDim2.fromOffset(100, 250),
 			Scale = 1,
 		},
 	},
@@ -305,7 +305,7 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.new(),
+			Position = UDim2.fromOffset(100, 200),
 			Scale = 1,
 		},
 	},
@@ -331,7 +331,7 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.new(),
+			Position = UDim2.fromOffset(100, 150),
 			Scale = 1,
 		},
 	},
