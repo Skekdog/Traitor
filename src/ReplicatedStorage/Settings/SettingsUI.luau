@@ -347,7 +347,7 @@ end
 local darken = ui.LayoutDarken
 
 local tapCon: RBXScriptConnection?
-local function promptUpdateTouchPosition(control: string): UDim2
+local function promptUpdateTouchPosition(control: string): UDim2?
 	local lastParams = ControlManager.GetRegisteredInfo(control)
 	local button = ControlManager.Register(control, true, function() return Enum.ContextActionResult.Pass end)
 
@@ -357,13 +357,13 @@ local function promptUpdateTouchPosition(control: string): UDim2
 	toggleTooltip()
 	darken.Visible = true
 
-	local position: UDim2
+	local position: UDim2?
 
 	task.wait() -- Waiting is necessary as otherwise the tap is detected when clicking the setting button
 	tapCon = UserInputService.TouchTap:Connect(function(pos)
 		local inset = GuiService:GetGuiInset()
 		position = UDim2.fromOffset(inset.X + pos[1].X, inset.Y + pos[1].Y)
-		button.Position = position
+		button.Position = assert(position)
 	end)
 
 	darken.Done.Activated:Wait()
@@ -389,10 +389,12 @@ local function updateTouchPosition(definition: SettingDefinitions.ControlDefinit
 	end
 
 	local pos = promptUpdateTouchPosition(definition.Name)
-	Settings.UpdateControlSetting(definition.Name, {
-		Kind = "TouchPosition",
-		New = pos,
-	})
+	if pos then
+		Settings.UpdateControlSetting(definition.Name, {
+			Kind = "TouchPosition",
+			New = pos,
+		})
+	end
 end
 
 local function updateTouchScale(definition: SettingDefinitions.ControlDefinition): ()
