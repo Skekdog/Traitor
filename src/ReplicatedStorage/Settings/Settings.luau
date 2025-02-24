@@ -6,10 +6,10 @@ local module = {}
 
 export type UpdateControlSettingRequest = {
 	Kind: "KeyboardKeybind",
-	New: Enum.UserInputType | Enum.KeyCode,
+	New: Enum.UserInputType | Enum.KeyCode?,
 } | {
 	Kind: "ControllerKeybind",
-	New: Enum.UserInputType | Enum.KeyCode,
+	New: Enum.UserInputType | Enum.KeyCode?,
 } | {
 	Kind: "TouchPosition",
 	New: UDim2,

@@ -232,8 +232,14 @@ local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "
 	local asString = ControlManager.GetStringForKeyCode(key)
 
 	local bind = if kind == "Keyboard" then frame.Keyboard else frame.Controller
-	local imageLabel = bind.KeycodeImage :: ImageLabel
-	local textLabel = bind.Keycode :: TextLabel
+	local imageLabel = bind.KeycodeImage :: ImageButton
+	local textLabel = bind.Keycode :: TextButton
+
+	if not key then
+		textLabel.Visible = false
+		imageLabel.Visible = false
+		return
+	end
 	
 	if asString:sub(1, 11) == "rbxasset://" then
 		imageLabel.Image = asString
@@ -245,31 +251,36 @@ local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "
 
 		textLabel.Text = asString
 		textLabel.Visible = true
-	else
-		imageLabel.Visible = false
-		textLabel.Visible = false
 	end
 end
 
-local function updateKeyboardKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, value: SettingDefinitions.ControlValue): ()
+local function updateKeyboardKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, key: Enum.UserInputType | Enum.KeyCode?): ()
+	Settings.UpdateControlSetting(definition.Name, {
+		Kind = "KeyboardKeybind",
+		New = key,
+	})
+	updateDisplayedKeybind(frame, "Keyboard", key)
+end
+
+local function promptUpdateKeyboardKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition): ()
 	local key = listenForInput(true)
 	if key then
-		Settings.UpdateControlSetting(definition.Name, {
-			Kind = "KeyboardKeybind",
-			New = key,
-		})
-		updateDisplayedKeybind(frame, "Keyboard", key)
+		updateKeyboardKeybind(frame, definition, key)
 	end
 end
 
-local function updateControllerKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, value: SettingDefinitions.ControlValue): ()
+local function updateControllerKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, key: Enum.UserInputType | Enum.KeyCode?): ()
+	Settings.UpdateControlSetting(definition.Name, {
+		Kind = "ControllerKeybind",
+		New = key,
+	})
+	updateDisplayedKeybind(frame, "Controller", key)
+end
+
+local function promptUpdateControllerKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition): ()
 	local key = listenForInput(false)
 	if key then
-		Settings.UpdateControlSetting(definition.Name, {
-			Kind = "ControllerKeybind",
-			New = key,
-		})
-		updateDisplayedKeybind(frame, "Controller", key)
+		updateControllerKeybind(frame, definition, key)
 	end
 end
 
@@ -280,12 +291,28 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	updateDisplayedKeybind(frame, "Keyboard", value.Keybind.KBMKeybind)
 	updateDisplayedKeybind(frame, "Controller", value.Keybind.ConsoleKeybind)
 
+	frame.Keyboard.Keycode.Activated:Connect(function()
+		updateKeyboardKeybind(frame, definition, nil)
+	end)
+
+	frame.Keyboard.KeycodeImage.Activated:Connect(function()
+		updateKeyboardKeybind(frame, definition, nil)
+	end)
+
+	frame.Controller.Keycode.Activated:Connect(function()
+		updateControllerKeybind(frame, definition, nil)
+	end)
+
+	frame.Controller.KeycodeImage.Activated:Connect(function()
+		updateControllerKeybind(frame, definition, nil)
+	end)
+
 	frame.Keyboard.Activated:Connect(function()
-		updateKeyboardKeybind(frame, definition, value)
+		promptUpdateKeyboardKeybind(frame, definition)
 	end)
 
 	frame.Controller.Activated:Connect(function()
-		updateControllerKeybind(frame, definition, value)
+		promptUpdateControllerKeybind(frame, definition)
 	end)
 
 	return frame
