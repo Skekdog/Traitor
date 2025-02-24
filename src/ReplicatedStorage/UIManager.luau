@@ -132,8 +132,11 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			end)
 			
 			if self.Sidebar then
-				local sb = UIManager.GetUI("Sidebar").Object; -- Ambiguous syntax means we need a semicolon here, day ruined
-				(sb :: any)[self.Name]:Destroy()
+				local sb = UIManager.GetUI("Sidebar").Object
+				local sbButton = sb:FindFirstChild(self.Name)
+				if sbButton then
+					sbButton:Destroy()
+				end
 			end
 			
 			table.remove(registeredUIs, table.find(registeredUIs, self))
