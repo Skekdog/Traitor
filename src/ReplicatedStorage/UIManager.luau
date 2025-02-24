@@ -2,6 +2,8 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local SettingDefinitions = require(ReplicatedStorage.Settings.SettingDefinitions)
+local Settings = require(ReplicatedStorage.Settings.Settings)
 local ControlManager = require(script.Parent.ControlManager)
 local ToggleMouseVisible = require(script.Parent.ToggleMouseVisible)
 local UIAnimation = require(script.Parent.UIAnimation)
@@ -145,7 +147,20 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	
 	if self.Layer == "Popup" and not object:GetAttribute("NoKeybind") then
 		ControlManager.Register(self.Name, false, function(act, state, input)
-			self:ToggleVisible()
+			local isToggled = (Settings.GetSetting(self.Name) :: SettingDefinitions.ControlValue).Toggled
+			
+			if isToggled then
+				if state == Enum.UserInputState.End then
+					self:ToggleVisible()
+				end
+			else
+				if state == Enum.UserInputState.Begin then
+					self:ToggleVisible(true)
+				elseif state == Enum.UserInputState.End then
+					self:ToggleVisible(false)
+				end
+			end
+
 			return Enum.ContextActionResult.Sink
 		end)
 	end
