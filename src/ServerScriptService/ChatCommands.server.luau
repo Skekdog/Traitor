@@ -1,9 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local TeleportService = game:GetService("TeleportService")
 local IsAdmin = require(ReplicatedStorage.IsAdmin)
-local PlaceIDs = require(ServerScriptService.DevTools.PlaceIDs)
+local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
 local RoundHandler = require(script.Parent.RoundHandler)
 
 local function send(message: string): ()
