@@ -195,7 +195,6 @@ function module.GetRegisteredInfo(actionName: string): RegistrationInfo?
 end
 
 function module.TryUpdateRegisteredAction(name: string, value: SettingDefinitions.ControlValue): ()
-	print(name, value)
 	local info = module.GetRegisteredInfo(name)
 	if info then
 		module.Register(name, info.CreateTouchButton, info.Callback)
