@@ -151,12 +151,12 @@ module.setrole = {
 			return `Participant {playerName} not found.`
 		end
 
-		local role = round:GetRoleFromRoleName(roleName)
-		if not role then
+		local success, result = pcall(round.GetRoleFromRoleName, round, roleName)
+		if not success then
 			return `Role {roleName} not found.`
 		end
 
-		participant:SetRole(role.Definition)
+		participant:SetRole(result.Definition)
 
 		return `Set {playerName}'s role to {roleName}.`
 	end
