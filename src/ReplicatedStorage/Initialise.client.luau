@@ -1,4 +1,5 @@
 require(script.Parent.Settings.LoadSettings)
+require(script.Parent.KeybindHintManager)
 
 local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
@@ -13,7 +14,6 @@ local CreateEmptyPart = require(script.Parent.CreateEmptyPart)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
-local KeybindHintManager = require(script.Parent.KeybindHintManager)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
@@ -25,7 +25,6 @@ local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
 
 ThemesManager.UpdateTheme("Dark")
-KeybindHintManager()
 
 serverClient.BulletTracer.OnClientEvent:Connect(BulletTracer)
 

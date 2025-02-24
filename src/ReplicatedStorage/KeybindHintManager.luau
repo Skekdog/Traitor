@@ -1,5 +1,6 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SettingDefinitions = require(ReplicatedStorage.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Settings.Settings)
 local ControlManager = require(script.Parent.ControlManager)
 local boundInstances: {[string]: {Instance}} = {}
@@ -102,15 +103,6 @@ local function createLabels(control: string, instance: Instance, position: UDim2
     updateText(control, instance)
 end
 
-warn("Implement keybind hints")
--- SettingCallback.Listen(function(name, value)
---     if boundInstances[name] then
---         for _, v in boundInstances[name] do
---             updateText(name, v)
---         end
---     end
--- end)
-
 local function loadInstance(instance: Instance): ()
     local control = instance:GetAttribute("Control") :: string?
     assert(typeof(control) == "string", "Expected attribute 'Control' to be a string")
@@ -142,6 +134,16 @@ for _, v in CollectionService:GetTagged("ControlHint") do
     loadInstance(v)
 end
 
-return function(): ()
-    return
+local module = {}
+
+function module.TryUpdateKeybind(name: string, value: SettingDefinitions.ControlValue): ()
+    if not boundInstances[name] then
+        return
+    end
+
+    for _, v in boundInstances[name] do
+        updateText(name, v)
+    end
 end
+
+return module
