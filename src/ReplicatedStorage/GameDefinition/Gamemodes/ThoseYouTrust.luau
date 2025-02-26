@@ -96,7 +96,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Name = "Detective",
 		Description = "Spy HQ has been infilitrated by Traitors. Work with the Innocents to survive.",
 		Color = Color3.fromRGB(0, 0, 255),
-		Sound = "rbxassetid://9042819926",
+		Sound = "rbxassetid://9042823666",
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
 
