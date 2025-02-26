@@ -175,6 +175,11 @@ local function getWinner(round: Types.Round): Types.Role?
 	local traitors, innocents = 0, 0
 	for _, v in round:GetParticipants() do
 		assert(v)
+
+		if not v:IsAlive() then
+			continue
+		end
+
 		local role = v:GetRole()
 		if role == round:GetRoleFromRoleName("Innocent") or role == round:GetRoleFromRoleName("Detective") then
 			innocents += 1
