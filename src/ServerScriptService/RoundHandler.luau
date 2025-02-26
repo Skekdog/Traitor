@@ -54,8 +54,14 @@ local MAP_VOTE_INTERVAL = 3
 local INTERMISSION_TIME = 15
 
 local gamemodes: {Types.Gamemode} = {}
-for _, v in ReplicatedStorage.GameDefinition.Gamemodes:GetChildren() do
-    table.insert(gamemodes, (require)(v))
+
+local forcedGamemode: string? = nil
+if forcedGamemode then
+    table.insert(gamemodes, (require)((ReplicatedStorage.GameDefinition.Gamemodes :: any)[forcedGamemode]))
+else
+    for _, v in ReplicatedStorage.GameDefinition.Gamemodes:GetChildren() do
+        table.insert(gamemodes, (require)(v))
+    end
 end
 
 local module = {}
