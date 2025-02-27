@@ -9,7 +9,7 @@ local remotes = ReplicatedStorage.RoundRule.Remotes
 
 local listeners: {[string]: {() -> ()}?} = {}
 
-type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole" | "Winner" | "WinnerKind" | "StartTime"
+type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole" | "Winner" | "WinnerKind" | "StartTime" | "Corpse"
 
 type RoundHighlight = {
     Title: string,
@@ -205,6 +205,16 @@ end
 remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: string?)
     playerRoles[name] = getRoleFromName(roleName)
     runCallbacks("PlayerRole")
+end)
+
+local corpses: {[string]: Types.CorpseView?} = {}
+function module.GetCorpse(name: string): Types.CorpseView?
+    return corpses[name]
+end
+
+remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(name: string, corpse: Types.CorpseView?)
+    corpses[name] = corpse
+    runCallbacks("Corpse")
 end)
 
 function module.GetPlayerScores(): {[string]: Types.ScoreTable}
