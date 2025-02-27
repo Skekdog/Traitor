@@ -273,6 +273,11 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		by:RemoveItem(item)
 	end
 
+	if definition.Kind == "Melee" then
+		local id = assert(tonumber((definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(definition.HoldAnimation))
+		by:TryPlayAnimation(id, "MeleeAttack")
+	end
+
 	if request.Kind == "PrimaryFireRaycastRequest" then
 		for i, v in ipairs(request.Raycasts) do
 			if i > (if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1) then
