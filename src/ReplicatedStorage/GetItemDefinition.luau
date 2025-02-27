@@ -5,7 +5,7 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 
 assert(RunService:IsClient(), "GetItemDefinition should only be called on the client")
 
-local function GetItemDefinition(name: string): Types.AnyItemDefinition
+local function GetItemDefinition(name: string): Types.AnyItemDefinition?
     local map = LocalRoundInfo.GetMap()
     if map and map.AvailableItems[name] then
         return map.AvailableItems[name]
@@ -16,7 +16,7 @@ local function GetItemDefinition(name: string): Types.AnyItemDefinition
         return gamemode.AvailableItems[name]
     end
 
-    error(`Item {name} does not exist in map or gamemode`)
+    return nil
 end
 
 return GetItemDefinition

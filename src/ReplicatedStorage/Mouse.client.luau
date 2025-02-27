@@ -8,6 +8,7 @@ local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShowAlert = require(script.Parent.ShowAlert)
 local UIManager = require(script.Parent.UIManager)
+local ViewCorpse = require(script.Parent.ViewCorpse)
 
 local plr = Players.LocalPlayer
 local camera = workspace.CurrentCamera
@@ -184,6 +185,8 @@ ControlManager.Register("Interact", true, function(action, state, input)
 			return Enum.ContextActionResult.Pass
 		end
 		
+		ViewCorpse(model)
+
 		return Enum.ContextActionResult.Sink
 	end
 

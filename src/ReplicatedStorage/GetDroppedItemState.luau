@@ -41,7 +41,7 @@ local function GetDroppedItemState(instance: Instance): ItemState | AmmoState
 
     return {
         Kind = "ItemState",
-        Definition = GetItemDefinition(instance.Name),
+        Definition = assert(GetItemDefinition(instance.Name), "Item not found: " .. instance.Name),
         StoredAmmo = storedAmmo,
         AmmoType = ammoType,
     }

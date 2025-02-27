@@ -208,6 +208,30 @@ ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Playe
     })
 end)
 
+ReplicatedStorage.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown): Types.CorpseView?
+    if typeof(body) ~= "Instance" or not body:IsA("Model") then
+        return nil
+    end
+
+    local participant = round:GetParticipant(plr.Name)
+    if not participant then
+        return nil
+    end
+
+    local otherParticipant = round:GetParticipant(body.Name)
+    if not otherParticipant then
+        return nil
+    end
+
+    local success = participant:TryViewOtherParticipantCorpse(otherParticipant)
+    if success then
+        local corpse = assert(otherParticipant:GetCorpse())
+        return corpse.CorpseView
+    end
+
+    return nil
+end
+
 ReplicatedStorage.ClientServer.Exec.OnServerInvoke = function(plr, command: string): string | true
     return Exec.Execute(round, command)
 end
