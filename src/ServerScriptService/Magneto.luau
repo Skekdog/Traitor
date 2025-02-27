@@ -1,7 +1,5 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
-local PlayAnimation = require(ServerScriptService.PlayAnimation)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local module = {}
@@ -48,7 +46,6 @@ local function stopControllingProp(prop: BasePart, userId: number, stoppedHoldin
     end)
 
     if plr and not stoppedHoldingStick then
-        PlayAnimation(plr, 13269497293, "MagnetoAnimation")
         serverClient.PlayViewmodelAnimation:FireClient(plr, 13269497293)
     end
 
@@ -172,7 +169,7 @@ function module.AlternateFire(item: Types.Item, participant: Types.Participant, 
         alignPos.Parent = object
     end
 
-    PlayAnimation(participant.Player, 13269497293, "MagnetoAnimation")
+    participant:TryPlayAnimation(13269497293, "MagnetoAnimation")
     serverClient.PlayViewmodelAnimation:FireClient(participant.Player, 13269497293)
 
     local activeHolder = object:FindFirstChild("ActiveHolder") :: NumberValue or Instance.new("NumberValue")
