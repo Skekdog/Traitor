@@ -35,7 +35,7 @@ local function yieldIfNotLoaded(): ()
 	end
 end
 
-local settingValues: {[string]: SettingDefinitions.SettingValue?} = {}
+local settingValues: {[string]: SettingDefinitions.SettingValue?, SETTINGS_VERSION: number} = {SETTINGS_VERSION = module.SETTINGS_VERSION}
 
 function module.GetDefinition(name: string): SettingDefinitions.SettingDefinition?
 	for _, definition in SettingDefinitions do

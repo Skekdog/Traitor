@@ -10,7 +10,6 @@ Settings.PopulateDefaults()
 module.ProfileTemplate = {
 	Karma = 1000,
 	Settings = Settings.JSONEncode(),
-	SettingsVersion = Settings.SETTINGS_VERSION,
 	TotalPoints = 0,
 	SpentPoints = 0,
 	PurchasedAccessories = {},
@@ -61,8 +60,7 @@ end
 type UpdateProfile =
 	((Player, "Karma", number) -> ()) &
 	((Player, "Settings", string) -> ()) &
-	((Player, "TotalPoints", number) -> ()) &
-	((Player, "SettingsVersion", number) -> ())
+	((Player, "TotalPoints", number) -> ())
 
 module.UpdateProfile = function(plr: Player, key, value): ()
 	if not profiles[plr] then

@@ -31,10 +31,7 @@ local _earlyTesters = { -- These players should be awarded the badge whenever th
 }
 
 local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
-	ReplicatedStorage.ServerClient.LoadSavedSettings:FireClient(plr, {
-		Settings = profile.Data.Settings,
-		Version = profile.Data.SettingsVersion,
-	})
+	ReplicatedStorage.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
 end
 
 Players.PlayerAdded:Connect(function(plr): ()
@@ -75,7 +72,6 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
 	end
 
     ProfileManager.UpdateProfile(plr, "Settings", options)
-	ProfileManager.UpdateProfile(plr, "SettingsVersion", ProfileManager.ProfileTemplate.SettingsVersion)
 end)
 
 ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)

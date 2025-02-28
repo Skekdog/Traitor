@@ -1,9 +1,16 @@
+local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Serialisation = require(script.Parent.Serialisation)
 local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local Settings = require(script.Parent.Settings)
 
-local toLoad: {Settings: string, Version: number} = ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Wait()
+local toLoad: string = ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Wait()
+local loadedVersion: number?
+
+do
+	local httpDecoded = HttpService:JSONDecode(toLoad)
+	loadedVersion = httpDecoded.SETTINGS_VERSION
+end
 
 local function loadSetting(name: string, value: SettingDefinitions.SettingValue)
 	if not Settings.GetDefinition(name) then
@@ -14,10 +21,10 @@ end
 
 local processedSettings: {[string]: Settings.SettingValue} = {}
 
-if toLoad.Version ~= Settings.SETTINGS_VERSION then
-	print(`Settings version mismatched. FromSave: {toLoad.Version}, New: {Settings.SETTINGS_VERSION}`)
+if loadedVersion ~= Settings.SETTINGS_VERSION then
+	print(`Settings version mismatched. FromSave: {loadedVersion}, New: {Settings.SETTINGS_VERSION}`)
 else
-	local decoded = Serialisation.DeserialiseJSON(toLoad.Settings)
+	local decoded = Serialisation.DeserialiseJSON(toLoad)
 
 	for i, v in decoded do
 		processedSettings[i] = v
