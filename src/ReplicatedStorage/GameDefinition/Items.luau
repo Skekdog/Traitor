@@ -2,8 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local Ammo = require(script.Parent.Ammo)
-local CreateEmptyPart = require(script.Parent.Parent.CreateEmptyPart)
 local Types = require(script.Parent.Parent.RoundRule.Types)
 
 local Magneto = {}

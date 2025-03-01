@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local PlayPositionalSound = require(ReplicatedStorage.PlayPositionalSound)
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Aim = require(script.Parent.Aim)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
@@ -241,7 +241,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 
 					if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) and not hitPart:IsDescendantOf(workspace.Corpses) then
 						local material = hitPart:GetAttribute("MaterialOverride") or hitPart.Material.Name
-						PlayPositionalSound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
+						PlaySound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
 					end
 
 					table.insert(raycasts, {
