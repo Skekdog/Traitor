@@ -1,15 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local ServerScriptService = game:GetService("ServerScriptService")
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local Ammo = require(script.Parent.Ammo)
 local Types = require(script.Parent.Parent.RoundRule.Types)
-
-local Magneto = {}
-if RunService:IsServer() then
-    Magneto = require(ServerScriptService.Magneto)
-end
 
 local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
@@ -1007,9 +1000,6 @@ items["Magneto Stick"] = {
 
     PrimaryHint = "Push Prop",
     AlternateHint = "Grab Prop",
-
-    PrimaryFire = Magneto.PrimaryFire,
-    AlternateFire = Magneto.AlternateFire,
 }
 
 items["DNA Scanner"] = {
