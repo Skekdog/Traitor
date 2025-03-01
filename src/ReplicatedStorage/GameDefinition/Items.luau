@@ -319,7 +319,8 @@ guns["Golden Gun"] = {
     AimFOV = 70,
     AimSpreadMultiplier = 0,
 
-    BeforeHitProp = function(item: Types.AnyWeapon, target: Types.Prop, params: Types.DamageParams): boolean
+    BeforeHitProp = function(item: Types.ItemBeforeHit, target: Types.Prop, params: Types.DamageParams): boolean
+        assert(item.Kind == "Gun")
         if target.Kind ~= "MapProp" then
             return false
         end
@@ -333,7 +334,8 @@ guns["Golden Gun"] = {
         return false
     end,
 
-    BeforeHitParticipant = function(item: Types.AnyWeapon, target: Types.Participant, params: Types.DamageParams): boolean
+    BeforeHitParticipant = function(item: Types.ItemBeforeHit, target: Types.Participant, params: Types.DamageParams): boolean
+        assert(item.Kind == "Gun")
         local attacker = params.Attacker
         assert(attacker)
 

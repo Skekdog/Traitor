@@ -4,6 +4,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local BulletTracer = require(ReplicatedStorage.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.CombatTypes)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
+local RunBeforeHit = require(ReplicatedStorage.RoundRule.RunBeforeHit)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ShatterGlass = require(ReplicatedStorage.ShatterGlass)
 local module = {}
@@ -141,7 +142,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		Attacker = by,
 	}
 	
-	if item.Kind ~= "ExplosionParams" and not item:RunBeforeHit((by :: Types.Participant).Round, hitPart, params) then
+	if not RunBeforeHit(item, (by :: Types.Participant).Round, hitPart, params) then
 		return
 	end
 
@@ -165,7 +166,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 		Attacker = by,
 	}
 
-	if item.Kind ~= "ExplosionParams" and not item:RunBeforeHit((by :: Types.Participant).Round, hitPart, params) then
+	if not RunBeforeHit(item, (by :: Types.Participant).Round, hitPart, params) then
 		return
 	end
 
