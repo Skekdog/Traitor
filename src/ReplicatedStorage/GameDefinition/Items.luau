@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local Types = require(script.Parent.Parent.RoundRule.Types)
 
@@ -873,10 +875,7 @@ grenades["Incendiary Grenade"] = {
                         continue
                     end
 
-                    local sound = ReplicatedStorage.WeaponSounds.FlareBurn:Clone()
-                    sound.PlayOnRemove = true
-                    sound.Parent = v
-                    sound:Destroy()
+                    PlaySound(ReplicatedStorage.WeaponSounds.FlareBurn, nil, v, {SoundGroup = SoundService.AllSounds :: SoundGroup})
                     participant:TryTakeDamage({
                         Amount = 1,
                         Source = "Burn",

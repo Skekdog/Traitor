@@ -1,6 +1,8 @@
 local Lighting = game:GetService("Lighting")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 
 local tweenStart = TweenInfo.new(0.15)
 local tweenFinish = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 4)
@@ -42,10 +44,5 @@ return function()
 	tween:Play()
 	TweenService:Create(blur, tweenStart, {Size = 48}):Play()
 
-	local ring = Instance.new("Sound")
-	ring.SoundId = "rbxassetid://223471024"
-	ring.Volume = 2
-	ring.PlayOnRemove = true
-	ring.Parent = SoundService
-	ring:Destroy()
+	PlaySound("rbxassetid://223471024", nil, nil)
 end

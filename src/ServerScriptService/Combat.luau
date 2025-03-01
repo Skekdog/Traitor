@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local SoundService = game:GetService("SoundService")
 local BulletTracer = require(ReplicatedStorage.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.CombatTypes)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
@@ -221,7 +222,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
     folder.Name = "Explosions"
     folder.Parent = workspace
 
-	PlaySound(ServerStorage.Explosion, params.Position)
+	PlaySound(ServerStorage.Explosion, params.Position, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
     explosion.Parent = folder
 
@@ -267,11 +268,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			return "ShooterTooFar"
 		end
 
-		local sound = Instance.new("Sound")
-		sound.SoundId = definition.AttackSound
-		sound.PlayOnRemove = true
-		sound.Parent = char.PrimaryPart
-		sound:Destroy()
+		PlaySound(definition.AttackSound, nil, char.PrimaryPart, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 	end
 
 	if item.Kind == "Gun" then

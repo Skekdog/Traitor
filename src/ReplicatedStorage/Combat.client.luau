@@ -57,9 +57,7 @@ player.CharacterRemoving:Connect(function()
 end)
 
 local function playEmptyClipSound(): ()
-	local sound = ReplicatedStorage.WeaponSounds.EmptyClip:Clone()
-	sound.Parent = SoundService
-	sound:Destroy()
+	PlaySound(ReplicatedStorage.WeaponSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 end
 
 local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}
@@ -79,11 +77,7 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 
 	ViewmodelModule.ReloadSpring.p = Vector3.new(10, 5, 10)
 	
-	local sound = Instance.new("Sound")
-	sound.SoundId = item.Definition.ReloadSound
-	sound.PlayOnRemove = true
-	sound.Parent = SoundService
-	sound:Destroy()
+	PlaySound(item.Definition.ReloadSound, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
 	ReplicatedStorage.ClientServer.ReloadWeapon:FireServer(item.Definition.Name)
 
