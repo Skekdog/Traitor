@@ -87,9 +87,29 @@ local function makeGolden(victim: Types.Participant)
     end
 end
 
-local function burn(attacker: Types.Participant?, target: Types.Participant | Types.Prop?, part: BasePart): ()
-    if not attacker then
-        return
+local function burn(attacker: Types.Participant, target: Types.Participant | Types.Prop): ()
+    local part: BasePart
+    if target.Kind == "Participant" then
+        local character = target:GetCharacter()
+        if not character then
+            return
+        end
+
+        local root = character.PrimaryPart
+        if not root then
+            return
+        end
+
+        part = root
+    elseif target.Kind == "MapProp" or target.Kind == "AmmoProp" or target.Kind == "ItemProp" then
+        part = target.Model
+    elseif target.Kind == "CorpseProp" then
+        local root = target.Model.PrimaryPart
+        if not root then
+            return
+        end
+
+        part = root
     end
 
     local fire = Instance.new("Fire")
@@ -100,13 +120,10 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
     burnSound.SoundId = weaponSounds("FlareBurn")
     burnSound.Parent = part
 
-    if target and target.Kind == "Prop" then
+    if target.Kind == "MapProp" then
         part:SetAttribute("Burning", true)
-    end
-
-    local model = part:FindFirstAncestorOfClass("Model")
-    if model and model:IsDescendantOf(workspace.Corpses) then
-        model:SetAttribute("Burning", true)
+    elseif target.Kind == "CorpseProp" then
+        target.Model:SetAttribute("Burning", true)
     end
 
     local endTime = workspace:GetServerTimeNow() + 10
@@ -137,15 +154,15 @@ local function burn(attacker: Types.Participant?, target: Types.Participant | Ty
             task.wait(0.25)
         end
         
-        if target and target.Kind == "Prop" then
+        if target.Kind == "MapProp" then
             part:SetAttribute("Burning", false)
         end
 
         burnSound:Destroy()
         fire:Destroy()
 
-        if not target and model then
-            model:Destroy()
+        if target.Kind == "CorpseProp" then
+            target.Model:Destroy()
         end
     end)
 end
@@ -305,7 +322,12 @@ guns["Golden Gun"] = {
     AimFOV = 70,
     AimSpreadMultiplier = 0,
 
-    BeforeHitProp = function(item: Types.AnyWeapon, attacker: Types.Participant, target: Types.Prop)
+    BeforeHitProp = function(item: Types.AnyWeapon, target: Types.Prop, params: Types.DamageParams): boolean
+        if target.Kind ~= "MapProp" then
+            return false
+        end
+        
+        local attacker = params.Attacker
         target:TryTakeDamage({
             Amount = math.huge,
             Attacker = attacker,
@@ -314,7 +336,10 @@ guns["Golden Gun"] = {
         return false
     end,
 
-    BeforeHitParticipant = function(item: Types.AnyWeapon, attacker: Types.Participant, target: Types.Participant)
+    BeforeHitParticipant = function(item: Types.AnyWeapon, target: Types.Participant, params: Types.DamageParams): boolean
+        local attacker = params.Attacker
+        assert(attacker)
+
         if attacker:IsDamageJustifiedAgainstParticipant(target) then
             makeGolden(target)
             target:TryTakeDamage({
@@ -379,23 +404,18 @@ guns["Flare Gun"] = {
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
-    BeforeHitParticipant = function(_, attacker: Types.Participant, target: Types.Participant)
-        burn(attacker, target, assert(target:GetCharacter(), "Participant has no character").PrimaryPart :: BasePart)
+    BeforeHitParticipant = function(_, target: Types.Participant, params: Types.DamageParams): boolean
+        local attacker = params.Attacker
+        assert(attacker)
+        burn(attacker, target)
         return true
     end,
 
-    BeforeHitProp = function(_, attacker: Types.Participant, target: Types.Prop)
-        burn(attacker, target, target.Model)
-        return true
-    end,
+    BeforeHitProp = function(_, target: Types.Prop, params: Types.DamageParams): boolean
+        local attacker = params.Attacker
+        assert(attacker)
 
-    BeforeHitCorpse = function(_, attacker: Types.Participant, target: Model)
-        local root = target:FindFirstChild("HumanoidRootPart")
-        if not root or not root:IsA("BasePart") then
-            return true
-        end
-
-        burn(attacker, nil, root)
+        burn(attacker, target)
         return true
     end,
 
@@ -558,7 +578,8 @@ guns["Silenced Pistol"] = {
     Projectile = projectiles("SilencedBullet"),
     ProjectileSpeed = 100,
 
-    BeforeHitParticipant = function(_, _, victim: Types.Participant, willDie: boolean)
+    BeforeHitParticipant = function(_, victim: Types.Participant, params: Types.DamageParams): boolean
+        local willDie = params.Amount >= victim:GetHealth()
         if not willDie then
             return true
         end
@@ -787,7 +808,7 @@ grenades.Flashbang = {
         Pressure = 10000,
         VisualRadius = 15,
 
-        BeforeHitParticipant = function(_, _, target: Types.Participant)
+        BeforeHitParticipant = function(_, target: Types.Participant): boolean
             ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
             return true
         end,
@@ -937,7 +958,7 @@ grenades["Discombobulator"] = {
         Pressure = 75000,
         VisualRadius = 15,
 
-        BeforeHitParticipant = function(_, _, target: Types.Participant)
+        BeforeHitParticipant = function(_, target: Types.Participant): boolean
             ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
             return true
         end,
