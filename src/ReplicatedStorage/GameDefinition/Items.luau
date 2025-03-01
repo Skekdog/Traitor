@@ -133,6 +133,12 @@ local function burn(attacker: Types.Participant, target: Types.Participant | Typ
                 break
             end
 
+            task.wait(0.25)
+
+            if target.Kind ~= "Participant" and target.Kind ~= "MapProp" then
+                continue
+            end
+
             local health: number? = if target then (target :: Types.Participant):GetHealth() else nil
             if health and health < 0 then
                 break
@@ -150,8 +156,6 @@ local function burn(attacker: Types.Participant, target: Types.Participant | Typ
                     Source = "Burn"
                 })
             end
-
-            task.wait(0.25)
         end
         
         if target.Kind == "MapProp" then

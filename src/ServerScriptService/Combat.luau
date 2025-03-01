@@ -153,15 +153,6 @@ local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, b
 end
 
 local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
-	if prop.Kind ~= "MapProp" then
-		return
-	end
-
-	local health = prop:GetHealth()
-	if not health then
-		return
-	end
-
 	local damage = getItemDamage(item, hitPart)
 	local params = {
 		Amount = damage,
@@ -171,6 +162,15 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	}
 
 	if item.Kind ~= "ExplosionParams" and not item:RunBeforeHit((by :: Types.Participant).Round, hitPart, params) then
+		return
+	end
+
+	if prop.Kind ~= "MapProp" then
+		return
+	end
+	
+	local health = prop:GetHealth()
+	if not health then
 		return
 	end
 
