@@ -134,21 +134,18 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	end
 
 	local damage = getItemDamage(item, hitPart)
-	local willDie = victim:GetHealth() <= damage
-	local hitFunction = item.Definition.BeforeHitParticipant
-	if hitFunction then
-		if not hitFunction(item :: Types.GunMeleeWeapon, by :: Types.Participant, victim, willDie) then
-			return
-		end
-	end
-
-	victim:TryTakeDamage({
+	local params = {
 		Amount = damage,
-		Source = if item.Kind == "ExplosionParams" then "Explode" else item,
-
+		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
 		IsHeadshot = hitPart.Name == "Head",
 		Attacker = by,
-	})
+	}
+	
+	if item.Kind ~= "ExplosionParams" and not item:RunBeforeHit((by :: Types.Participant).Round, hitPart, params) then
+		return
+	end
+
+	victim:TryTakeDamage(params)
 end
 
 local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, hitPart: BasePart, hitPosition: Vector3): ()
@@ -156,26 +153,28 @@ local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, b
 end
 
 local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+	if prop.Kind ~= "MapProp" then
+		return
+	end
+
 	local health = prop:GetHealth()
 	if not health then
 		return
 	end
 
 	local damage = getItemDamage(item, hitPart)
-	local willDie = prop:GetHealth() <= damage
-	local hitFunction = item.Definition.BeforeHitProp
-	if hitFunction then
-		if not hitFunction(item :: Types.GunMeleeWeapon, by :: Types.Participant, prop, willDie) then
-			return
-		end
-	end
-
-	prop:TryTakeDamage({
-		Amount = getItemDamage(item, hitPart),
-		Source = if item.Kind == "ExplosionParams" then "Explode" else item,
+	local params = {
+		Amount = damage,
+		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
 
 		Attacker = by,
-	})
+	}
+
+	if item.Kind ~= "ExplosionParams" and not item:RunBeforeHit((by :: Types.Participant).Round, hitPart, params) then
+		return
+	end
+
+	prop:TryTakeDamage(params)
 end
 
 local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
