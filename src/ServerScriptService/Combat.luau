@@ -153,6 +153,10 @@ local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, b
 end
 
 local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+	if item.Kind ~= "ExplosionParams" then
+		assert(by, "by must not be nil")
+	end
+
 	local damage = getItemDamage(item, hitPart)
 	local params = {
 		Amount = damage,
@@ -182,7 +186,10 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	local map = round:GetMap()
 
 	local victim = tryGetParticipantFromPart(round, hitPart)
-	local prop = round:GetProp(hitPart)
+
+	local model = hitPart:FindFirstAncestorOfClass("Model")
+	local prop = round:GetProp(if model then model else hitPart)
+
 	if victim then
 		return onParticipantHit(item, by, victim, hitPart, hitPosition)
 	elseif hitPart:IsDescendantOf(map.Windows) then
