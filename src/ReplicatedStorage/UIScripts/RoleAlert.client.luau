@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
-local GetDisplayName = require(ReplicatedStorage.RoundRule.GetDisplayName)
+local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
 local UIManager = require(ReplicatedStorage.UIManager)
 
 local ui = UIManager.WaitForUI("RoleAlert") 

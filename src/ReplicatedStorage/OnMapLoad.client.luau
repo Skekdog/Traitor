@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetDisplayName = require(ReplicatedStorage.RoundRule.GetDisplayName)
+local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
 local FIBLighting = require(ReplicatedStorage.Settings.Callbacks.FIBLighting)
 local Settings = require(ReplicatedStorage.Settings.Settings)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
