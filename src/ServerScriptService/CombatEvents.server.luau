@@ -303,5 +303,5 @@ ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, item
 	local prop = round:LoadProp(model, "AmmoProp")
 	assert(prop.Kind == "AmmoProp")
 
-	prop.AmmoBox.Ammo = amount
+	prop.AmmoBox:SetAmmo(amount)
 end)
