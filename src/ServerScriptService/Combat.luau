@@ -130,7 +130,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -143,18 +143,18 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		Attacker = by,
 	}
 	
-	if not RunBeforeHit(item, (by :: Types.Participant).Round, hitPart, params) then
+	if not RunBeforeHit(item, round, hitPart, params) then
 		return
 	end
 
 	victim:TryTakeDamage(params)
 end
 
-local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, hitPart: BasePart, hitPosition: Vector3): ()
+local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, hitPart: BasePart, hitPosition: Vector3): ()
 	ShatterGlass(hitPart)
 end
 
-local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -167,7 +167,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 		Attacker = by,
 	}
 
-	if not RunBeforeHit(item, (by :: Types.Participant).Round, hitPart, params) then
+	if not RunBeforeHit(item, round, hitPart, params) then
 		return
 	end
 
@@ -193,11 +193,11 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	local prop = round:GetProp(if model then model else hitPart)
 
 	if victim then
-		return onParticipantHit(item, by, victim, hitPart, hitPosition)
+		return onParticipantHit(item, round, by, victim, hitPart, hitPosition)
 	elseif hitPart:IsDescendantOf(map.Windows) then
-		return onWindowHit(item, by, hitPart, hitPosition)
+		return onWindowHit(item, round, by, hitPart, hitPosition)
 	elseif prop then
-		return onPropHit(item, by, prop, hitPart, hitPosition)
+		return onPropHit(item, round, by, prop, hitPart, hitPosition)
 	end
 
 	if normal and item.Kind == "Gun" then
@@ -234,7 +234,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, prop)
-			onPropHit(params, params.Attacker, prop, v, v.Position)
+			onPropHit(params, round, params.Attacker, prop, v, v.Position)
 			continue
 		end
 
@@ -244,7 +244,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, participant)
-			onParticipantHit(params, params.Attacker, participant, v, v.Position)
+			onParticipantHit(params, round, params.Attacker, participant, v, v.Position)
 			continue
 		end
     end
