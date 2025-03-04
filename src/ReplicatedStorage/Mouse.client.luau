@@ -71,7 +71,7 @@ local function showPlayerInfo(char: Model)
 	playerInfo.Karma.TextColor3 = Color3.new(1, 0.4, 0):Lerp(Color3.new(1, 1, 1), (karma - 600) / 400)
 
 	if role then
-		playerInfo.Role.Text = role:GetFormattedName()
+		playerInfo.Role.Text = role:GetFormattedRoleName()
 	else
 		playerInfo.Role.Text = ""
 	end

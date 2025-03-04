@@ -1,5 +1,8 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local GetItemDefinition = require(ReplicatedStorage.GetItemDefinition)
+local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.UIManager)
 local StringWithDeterminer = require(script.Parent.StringWithDeterminer)
@@ -151,15 +154,22 @@ return function(corpseInfo: Types.CorpseView?)
         object.KillList.Visible = false
     end
 
-    -- corpseUi.Object.Title.Text = `@{corpseInfo.FormattedName}'s Corpse | {corpseInfo.Role.FormattedName}`
+    local name = corpseInfo.Name
+    local role = LocalRoundInfo.GetPlayerRole(name)
+    
+    if role then
+        corpseUi.Object.Title.Text = `@{role:GetFormattedPlayerName(name)}'s Corpse | {role:GetFormattedRoleName()}`
+        local determiner = StringWithDeterminer(GetDisplayName(role.Definition)):split(" ")[1]
+        object.Avatar:SetAttribute("Description", `This is the body of {role:GetFormattedPlayerName(name)}. They were {determiner} {role:GetFormattedRoleName()}.`)
+    else
+        corpseUi.Object.Title.Text = `@{name}'s Corpse`
+        object.Avatar:SetAttribute("Description", `This is the body of {name}.`)
+    end
 
-    -- local determinerRole = StringWithDeterminer(corpseInfo.Role.Name):split(" ")[1]
-    -- object.Avatar:SetAttribute("Description", `This is the body of {corpseInfo.FormattedName}. They were {determinerRole} {corpseInfo.Role.FormattedName}.`)
-
-    -- task.defer(function()
-    --     local thumbnail = Players:GetUserThumbnailAsync(corpseInfo.Player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-    --     object.Avatar.Image = thumbnail
-    -- end)
+    task.defer(function()
+        local thumbnail = Players:GetUserThumbnailAsync(corpseInfo.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+        object.Avatar.Image = thumbnail
+    end)
 
     corpseUi:ToggleVisible(true)
 end
