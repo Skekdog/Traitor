@@ -47,7 +47,7 @@ end)
 LocalRoundInfo.Listen("PlayerRole", function()
     local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
     if role then
-        roundInfo.TopBar.Role.Text = role:GetFormattedName()
+        roundInfo.TopBar.Role.Text = role:GetFormattedRoleName()
     else
         roundInfo.TopBar.Role.Text = "Spectator"
     end
