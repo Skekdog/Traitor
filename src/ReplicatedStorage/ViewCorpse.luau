@@ -5,7 +5,7 @@ local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local function ViewCorpse(body: Model): ()
 	local corpse = LocalRoundInfo.GetCorpse(body.Name)
 	if not corpse then
-		corpse = ReplicatedStorage.ClientServer.GetCorpseInfo:InvokeServer(body)
+		corpse = ReplicatedStorage.ClientServer.GetCorpseInfo:InvokeServer(body, false)
 		if not corpse then
 			return
 		end
