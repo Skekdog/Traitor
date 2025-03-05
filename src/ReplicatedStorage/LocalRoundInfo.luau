@@ -212,8 +212,8 @@ function module.GetCorpse(name: string): Types.CorpseView?
     return corpses[name]
 end
 
-remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(name: string, corpse: Types.CorpseView?)
-    corpses[name] = corpse
+remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.CorpseView)
+    corpses[corpse.Name] = corpse
     runCallbacks("Corpse")
 end)
 
