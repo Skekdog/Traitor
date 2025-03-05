@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+local Role = require(ReplicatedStorage.RoundRule.Role)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ToRoundTime = require(ReplicatedStorage.ToRoundTime)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
@@ -141,10 +142,13 @@ local function setWinnerText(): ()
 	local winner, winnerKind = LocalRoundInfo.GetWinner(), LocalRoundInfo.GetWinnerKind()
 	assert(winner and winnerKind, "No winner")
 
+	local gamemode = assert(LocalRoundInfo.GetGamemode(), "No gamemode")
+	local winnerRole = if winnerKind == "Participant" then assert(LocalRoundInfo.GetPlayerRole(winner), "Winning participant has no role") else Role.fromDefinition(gamemode.Roles[winner])
+
 	if winnerKind == "Participant" then
-		highlightsPage.Winners.Text = winner .. " wins!"
+		highlightsPage.Winners.Text = winnerRole:GetFormattedString(winner) .. " wins!"
 	else
-		highlightsPage.Winners.Text = `The {winner}s win!`
+		highlightsPage.Winners.Text = `The {winnerRole:GetFormattedString(winner .. "s")} win!`
 	end
 end
 
