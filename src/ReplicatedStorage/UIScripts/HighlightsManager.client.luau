@@ -81,7 +81,12 @@ local function populateScores(): ()
 		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 
-		usernameLabel.Text = "@" .. i
+		local role = LocalRoundInfo.GetPlayerRole(i)
+		if role then
+			usernameLabel.Text = role:GetFormattedString("@" .. i)
+		else
+			usernameLabel.Text = "@" .. i
+		end
 
 		local total = calculateTotalScore(v)
 		totalLabel.Text = total.." Total"
@@ -91,7 +96,7 @@ local function populateScores(): ()
 		for reason, value in v do
 			assert(value)
 			local reasonFrame = scoreList.Template:Clone()
-			reasonFrame.Text = reason .. (if value > 0 then " +" else " -") .. math.abs(value)
+			reasonFrame.Text = reason:gsub("_", " ") .. (if value > 0 then " +" else " -") .. math.abs(value)
 			reasonFrame.Name = reason
 			reasonFrame.Visible = true
 			reasonFrame.Parent = scoreList
