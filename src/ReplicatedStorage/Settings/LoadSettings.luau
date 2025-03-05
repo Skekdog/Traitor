@@ -55,7 +55,11 @@ end
 require(script.Parent.ExtraButtons)
 
 local UIManager = require(ReplicatedStorage.UIManager)
-UIManager.RegisterUI(SettingsUI.UI)
+local ui = UIManager.RegisterUI(SettingsUI.UI)
+
+ReplicatedStorage.ServerClient.OpenSettings.OnClientEvent:Connect(function()
+	ui:ToggleVisible(true)
+end)
 
 SettingsUI.AdjustForInset(UIManager.GuiInset)
 

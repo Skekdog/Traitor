@@ -327,10 +327,6 @@ ControlManager.Register("Close UI", false, function()
 	return Enum.ContextActionResult.Pass
 end)
 
-ReplicatedStorage:WaitForChild("ServerClient").OpenSettings.OnClientEvent:Connect(function()
-	UIManager.WaitForUI("Settings"):ToggleVisible(true)
-end)
-
 task.spawn(function()
 	local CASui = Players.LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge)
 	assert(CASui and CASui:IsA("ScreenGui"))
