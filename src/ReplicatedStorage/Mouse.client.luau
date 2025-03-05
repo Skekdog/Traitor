@@ -100,13 +100,12 @@ local function showCorpseHint(char: Model)
 	if char:GetAttribute("Unidentified") then
 		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body`
 	else
-		local role = LocalRoundInfo.GetPlayerRole(plr.Name)
+		local role = LocalRoundInfo.GetPlayerRole(char.Name)
 		if not role then
 			return
 		end
 
-		local formattedName = `<font color='#{role.Definition.Color:ToHex()}'>{plr.Name}</font>`
-		corpseHint.Text = `{formattedName}'s Body`
+		corpseHint.Text = `{role:GetFormattedString(char.Name)}'s Body`
 	end
 	corpseHint.Visible = true
 end
