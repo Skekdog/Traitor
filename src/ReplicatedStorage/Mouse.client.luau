@@ -38,13 +38,13 @@ local function showPlayerInfo(char: Model)
 	local healthPercent = health / hum.MaxHealth * 100
 	local healthText = ""
 
-	if healthPercent >= 80 then
+	if healthPercent > 80 then
 		healthText = "Healthy"
-	elseif healthPercent >= 60 then
+	elseif healthPercent > 60 then
 		healthText = "Hurt"
-	elseif healthPercent >= 40 then
+	elseif healthPercent > 40 then
 		healthText = "Wounded"
-	elseif healthPercent >= 20 then
+	elseif healthPercent > 20 then
 		healthText = "Badly Wounded"
 	else
 		healthText = "Near Death"
@@ -55,15 +55,15 @@ local function showPlayerInfo(char: Model)
 
 	local karma = 1000
 	local karmaText = ""
-	if karma >= 900 then
+	if karma > 900 then
 		karmaText = "Reputable"
-	elseif karma >= 800 then
+	elseif karma > 800 then
 		karmaText = "Crude"
-	elseif karma >= 700 then
+	elseif karma > 700 then
 		karmaText = "Trigger-Happy"
-	elseif karma >= 600 then
+	elseif karma > 600 then
 		karmaText = "Dangerous"
-	elseif karma >= 500 then
+	elseif karma > 500 then
 		karmaText = "Liability"
 	end
 
@@ -80,7 +80,7 @@ local function showPlayerInfo(char: Model)
 	local mark = plr:GetAttribute("Mark") :: string?
 	playerInfo.Mark.Text = mark or ""
 	playerInfo.Mark.TextColor3 = plr:GetAttribute("MarkColour") :: Color3 or Color3.new(0, 0, 0)
-	
+
 	playerInfo.Mark.Visible = not not mark
 
 	playerInfo.Visible = true
