@@ -94,7 +94,7 @@ local function showCorpseHint(char: Model)
 	if LocalRoundInfo.GetPlayerStatus(plr.Name) == "Alive" then
 		if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
 			return
-		end	
+		end
 	end
 
 	if char:GetAttribute("Unidentified") then
@@ -105,7 +105,7 @@ local function showCorpseHint(char: Model)
 			return
 		end
 
-		corpseHint.Text = `{role:GetFormattedString(char.Name)}'s Body`
+		corpseHint.Text = `{role:GetFormattedString(char.Name .. "'s")} Body`
 	end
 	corpseHint.Visible = true
 end
