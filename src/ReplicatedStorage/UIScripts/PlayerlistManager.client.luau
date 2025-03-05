@@ -5,6 +5,7 @@ local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ThemesManager = require(ReplicatedStorage.ThemesManager)
 local UIManager = require(ReplicatedStorage.UIManager)
+local ViewCorpse = require(ReplicatedStorage.ViewCorpse)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local info = ui.Info
@@ -96,7 +97,7 @@ local function createPlr(plr: Player)
 	end)
 
 	clone.Visible = true
-	clone.Name = "Player-"..plr.Name
+	clone.Name = "Player-" .. plr.Name
 	clone.Parent = list :: any
 
 	for _, v in clone.Marks:GetChildren() :: {any} do
@@ -111,7 +112,7 @@ local function createPlr(plr: Player)
 	clone.MouseButton1Click:Connect(function()
 		local order = (clone.LayoutOrder // 1000) * 1000
 		if order == layoutOrders["Dead"] or order == layoutOrders["Missing"] then
-			-- CorpseInfo(roundHandlerEvents.SearchCorpse:InvokeServer(plr.Name))
+			ViewCorpse(plr)
 		end
 	end)
 

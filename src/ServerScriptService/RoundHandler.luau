@@ -207,7 +207,7 @@ ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Playe
 end)
 
 ReplicatedStorage.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown, covert: unknown): Types.CorpseView?
-    if typeof(body) ~= "Instance" or not body:IsA("Model") then
+    if typeof(body) ~= "Instance" or (not body:IsA("Model") and not body:IsA("Player")) then
         return nil
     end
 
@@ -218,6 +218,10 @@ ReplicatedStorage.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body
     local participant = round:GetParticipant(plr.Name)
     if not participant then
         return nil
+    end
+
+    if participant:GetStatus() == "Alive" and not body:IsA("Model") then
+        return nil -- if alive then we need to find a body to view corpse info. Spectators don't need to do that
     end
 
     local otherParticipant = round:GetParticipant(body.Name)
