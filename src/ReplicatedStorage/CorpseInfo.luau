@@ -158,9 +158,9 @@ return function(corpseInfo: Types.CorpseView?)
     local role = LocalRoundInfo.GetPlayerRole(name)
     
     if role then
-        corpseUi.Object.Title.Text = `@{role:GetFormattedPlayerName(name)}'s Corpse | {role:GetFormattedRoleName()}`
+        corpseUi.Object.Title.Text = `@{role:GetFormattedString(name)}'s Corpse | {role:GetFormattedRoleName()}`
         local determiner = StringWithDeterminer(GetDisplayName(role.Definition)):split(" ")[1]
-        object.Avatar:SetAttribute("Description", `This is the body of {role:GetFormattedPlayerName(name)}. They were {determiner} {role:GetFormattedRoleName()}.`)
+        object.Avatar:SetAttribute("Description", `This is the body of {role:GetFormattedString(name)}. They were {determiner} {role:GetFormattedRoleName()}.`)
     else
         corpseUi.Object.Title.Text = `@{name}'s Corpse`
         object.Avatar:SetAttribute("Description", `This is the body of {name}.`)
