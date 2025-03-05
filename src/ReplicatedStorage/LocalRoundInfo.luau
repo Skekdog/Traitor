@@ -24,8 +24,6 @@ type RoundEvent = {
     WasCorrectKill: boolean?,
 }
 
---todo: all of this memory is leaky lol
-
 function module.Listen(name: CallbackName, callback: () -> (), runImmediately: boolean?): ()
     if not listeners[name] then
         listeners[name] = {}
@@ -231,6 +229,18 @@ function module.GetPlayerScores(): {[string]: Types.ScoreTable}
 
     return playerScores
 end
+
+remotes.Reset.OnClientEvent:Connect(function()
+    credits = 0
+    playerStatuses = {}
+    playerRoles = {}
+    corpses = {}
+
+    runCallbacks("PlayerStatus")
+    runCallbacks("PlayerRole")
+    runCallbacks("Corpse")
+    runCallbacks("Credits")
+end)
 
 local map: Types.Map?
 local mapScript = workspace:FindFirstChild("Map")
