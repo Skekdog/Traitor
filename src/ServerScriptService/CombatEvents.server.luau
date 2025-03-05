@@ -79,7 +79,7 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 	finishReloading(plr, item)
 end)
 
-ReplicatedStorage.ClientServer.DropWeapon.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
+ReplicatedStorage.ClientServer.DropItem.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
 	if typeof(itemName) ~= "string" then
 		return
 	end

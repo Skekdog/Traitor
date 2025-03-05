@@ -132,7 +132,7 @@ local function tryDropItem(item: Types.AnyItem, direction: Vector3): ()
 		return
 	end
 
-	ReplicatedStorage.ClientServer.DropWeapon:FireServer(item.Definition.Name, direction)
+	ReplicatedStorage.ClientServer.DropItem:FireServer(item.Definition.Name, direction)
 end
 
 local function tryDropAmmo(item: Types.GunWeapon, direction: Vector3): ()
