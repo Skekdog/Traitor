@@ -69,6 +69,8 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
 
+	clone.SearchedIcon.Visible = not not LocalRoundInfo.GetCorpse(plr.Name)
+
 	movePlr(plr, status :: any)
 
 	local role = LocalRoundInfo.GetPlayerRole(plr.Name)
@@ -91,6 +93,8 @@ local function createPlr(plr: Player)
 	clone.Karma.Text = tostring(clientServer.GetKarma:InvokeServer(plr))
 	clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
+
+	clone.SearchedIcon.Visible = not not LocalRoundInfo.GetCorpse(plr.Name)
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
@@ -192,6 +196,12 @@ end, true)
 LocalRoundInfo.Listen("PlayerStatus", function()
 	for _, v in Players:GetPlayers() do
 		updatePlr(v, findPlr(v.Name) or createPlr(v))
+	end
+end, true)
+
+LocalRoundInfo.Listen("Corpse", function()
+	for _, v in Players:GetPlayers() do
+		updatePlr(v, findPlr(v.Name))
 	end
 end, true)
 
