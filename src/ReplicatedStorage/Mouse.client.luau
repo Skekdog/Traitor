@@ -147,6 +147,11 @@ RunService.PostSimulation:Connect(function()
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
 		params.FilterDescendantsInstances = {cameraSubject.Parent}
 	end
+
+	local map = LocalRoundInfo.GetMap()
+	if map then
+		params:AddToFilter(map.Bounds)
+	end
 	
     local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
 	-- 10000 distance because we should still be able to see players. Corpses can be viewed from distance 10, so we include that as a check there.
@@ -159,7 +164,6 @@ RunService.PostSimulation:Connect(function()
         interactTarget = result.Instance
         assert(interactTarget)
 
-		local map = LocalRoundInfo.GetMap()
 		if map then
 			if interactTarget:IsDescendantOf(map.ItemSpawns) or interactTarget:IsDescendantOf(map.AmmoSpawns) then
 				showItemHint(interactTarget)
