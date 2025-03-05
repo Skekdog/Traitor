@@ -72,12 +72,16 @@ local function showPlayerInfo(char: Model)
 
 	if role then
 		playerInfo.Role.Text = role:GetFormattedRoleName()
+		playerInfo.Role.Visible = true
 	else
-		playerInfo.Role.Text = ""
+		playerInfo.Role.Visible = false
 	end
 
-	playerInfo.Mark.Text = plr:GetAttribute("Mark") :: string or ""
+	local mark = plr:GetAttribute("Mark") :: string?
+	playerInfo.Mark.Text = mark or ""
 	playerInfo.Mark.TextColor3 = plr:GetAttribute("MarkColour") :: Color3 or Color3.new(0, 0, 0)
+	
+	playerInfo.Mark.Visible = not not mark
 
 	playerInfo.Visible = true
 	return true
