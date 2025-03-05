@@ -114,9 +114,20 @@ local function showItemHint(instance: Instance)
 	local ammo = if state.AmmoType then GetAmmoDefinition(state.AmmoType) else nil
 	local maxAmmo = if ammo then ammo.Capacity else nil
 
-	itemHint.Frame.ItemName.Text = if ammo and state.Kind == "AmmoState" then (ammo.DisplayName or ammo.Name) .. " Ammo" else GetDisplayName(state.Definition)
-	itemHint.Frame.AmmoAvailable.Text = if state.StoredAmmo then `{state.StoredAmmo} / {maxAmmo}` else ""
-	itemHint.Frame.AmmoType.Text = if ammo and state.Kind ~= "AmmoState" then GetDisplayName(ammo) .. " Ammo" else ""
+	local frame = itemHint.Frame
+	frame.ItemName.Text = if ammo and state.Kind == "AmmoState" then (ammo.DisplayName or ammo.Name) .. " Ammo" else GetDisplayName(state.Definition)
+	frame.AmmoAvailable.Text = if state.StoredAmmo then `{state.StoredAmmo} / {maxAmmo}` else ""
+	frame.AmmoType.Text = if ammo and state.Kind ~= "AmmoState" then GetDisplayName(ammo) .. " Ammo" else ""
+
+	local count = 1
+	if state.StoredAmmo then
+		count += 1
+	end
+	if ammo and state.Kind ~= "AmmoState" then
+		count += 1
+	end
+
+	itemHint.Border.Size = UDim2.fromScale(0.025, 0.333 * count)
 
 	itemHint.Adornee = instance
 	itemHint.Enabled = true
