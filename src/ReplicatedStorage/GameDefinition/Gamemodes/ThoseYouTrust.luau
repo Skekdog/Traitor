@@ -86,6 +86,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 		AwardCreditsToRolesOnDeath = {},
 		DamageKarmaMultiplier = 1,
 
+		RevealedRoles = {"Detective"},
+
 		Health = 100,
 		WalkSpeed = 16,
 		JumpPower = 18,
@@ -120,6 +122,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		Accessories = {},
 		DamageKarmaMultiplier = 1,
+
+		RevealedRoles = {"Detective"},
 
 		Health = 100,
 		WalkSpeed = 16,
