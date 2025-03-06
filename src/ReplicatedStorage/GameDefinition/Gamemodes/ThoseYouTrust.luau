@@ -88,6 +88,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		RevealedRoles = {"Detective"},
 
+		ScoreForFindingBodies = 1,
+
 		Health = 100,
 		WalkSpeed = 16,
 		JumpPower = 18,
@@ -124,6 +126,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 		DamageKarmaMultiplier = 1,
 
 		RevealedRoles = {"Detective"},
+
+		ScoreForFindingBodies = 1,
 
 		Health = 100,
 		WalkSpeed = 16,
