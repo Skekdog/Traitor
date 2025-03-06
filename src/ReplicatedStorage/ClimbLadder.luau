@@ -15,6 +15,7 @@ local function setStates(hum: Humanoid, enabled: boolean): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, enabled)
     hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, enabled)
     hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, not enabled)
+    hum:ChangeState(if enabled then Enum.HumanoidStateType.Freefall else Enum.HumanoidStateType.Climbing)
     hum.PlatformStand = not enabled
     hum.AutoRotate = enabled
 end

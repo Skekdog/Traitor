@@ -39,6 +39,8 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
                 clientServer.Fell:FireServer(startHeight - root.Position.Y)
             end
             startHeight = math.huge
+        elseif state == Enum.HumanoidStateType.Climbing then
+            startHeight = math.huge
         end
     end)
 
