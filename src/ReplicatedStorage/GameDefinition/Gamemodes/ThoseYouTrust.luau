@@ -60,6 +60,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		CanTeamChat = true,
 		CanSeeMissingInAction = true,
 
+		Allies = {"Traitor"},
 		RevealedRoles = {"Detective", "Traitor"},
 		HighlightedRoles = {"Traitor"},
 
@@ -86,6 +87,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		AwardCreditsToRolesOnDeath = {},
 		DamageKarmaMultiplier = 1,
 
+		Allies = {"Innocent", "Detective"},
 		RevealedRoles = {"Detective"},
 
 		ScoreForFindingBodies = 1,
@@ -125,6 +127,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Accessories = {},
 		DamageKarmaMultiplier = 1,
 
+		Allies = {"Innocent", "Detective"},
 		RevealedRoles = {"Detective"},
 
 		ScoreForFindingBodies = 1,
