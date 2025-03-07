@@ -11,10 +11,10 @@ local function tryGetAnimator(): Animator?
     return hum:FindFirstChildOfClass("Animator")
 end
 
-function module.TryPlayAnimation(id: number, name: string): ()
+function module.TryPlayAnimation(id: number, name: string): AnimationTrack?
 	local animator = tryGetAnimator()
     if not animator then
-        return
+        return nil
     end
 
     local animation = Instance.new("Animation")
@@ -24,6 +24,8 @@ function module.TryPlayAnimation(id: number, name: string): ()
     track.Name = name
 
     track:Play()
+
+    return track
 end
 
 function module.TryStopAnimation(name: string): ()
