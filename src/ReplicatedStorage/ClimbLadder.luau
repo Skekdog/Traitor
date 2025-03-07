@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local LocalCharacter = require(script.Parent.LocalCharacter)
 
 local module = {}
 module.SnapCooldown = 0
@@ -23,17 +24,17 @@ end
 function module.Climb(ladder: BasePart): ()
     module.StopClimbing()
 
-    local char = Players.LocalPlayer.Character
+    local char = LocalCharacter.GetCharacter()
     if not char then
         return
     end
 
-    local root = char.PrimaryPart
+    local root = LocalCharacter.GetRootPart()
     if not root then
         return
     end
 
-    local hum = char:FindFirstChildOfClass("Humanoid")
+    local hum = LocalCharacter.GetHumanoid()
     if not hum then
         return
     end
@@ -104,17 +105,12 @@ function module.StopClimbing(): ()
         coroutine.close(thread)
     end
 
-    local char = Players.LocalPlayer.Character
-    if not char then
-        return
-    end
-
-    local root = char.PrimaryPart
+    local root = LocalCharacter.GetRootPart()
     if not root then
         return
     end
 
-    local hum = char:FindFirstChildOfClass("Humanoid")
+    local hum = LocalCharacter.GetHumanoid()
     if not hum then
         return
     end

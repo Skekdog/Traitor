@@ -1,6 +1,6 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local LocalCharacter = require(script.Parent.LocalCharacter)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local MuzzleFlash = require(script.Parent.MuzzleFlash)
@@ -109,7 +109,7 @@ function module.Show(item: Types.AnyItemDefinition): ()
     end
 
     local camera = workspace.CurrentCamera
-    local char = Players.LocalPlayer.Character
+    local char = LocalCharacter.GetCharacter()
     if not char then
         return
     end

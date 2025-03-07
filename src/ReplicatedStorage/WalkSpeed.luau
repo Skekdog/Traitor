@@ -1,16 +1,13 @@
-local Players = game:GetService("Players")
+local LocalCharacter = require(script.Parent.LocalCharacter)
 local module = {}
 
 local modifiers: {[string]: number} = {}
 
 local function updateWalkSpeed(): ()
-	local char = Players.LocalPlayer.Character
-	if not char then
+	local hum = LocalCharacter.GetHumanoid()
+	if not hum then
 		return
 	end
-
-	local hum = char:WaitForChild("Humanoid")
-	assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
 
 	local speed = 16
 	for _, v in modifiers do

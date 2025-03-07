@@ -14,6 +14,7 @@ local ControlManager = require(script.Parent.ControlManager)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
+local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
@@ -139,7 +140,7 @@ LocalRoundInfo.Listen("Map", function()
         if v.Name == "Ladder" then
             v.CanTouch = true
             v.Touched:Connect(function(part)
-                local char = Players.LocalPlayer.Character
+                local char = LocalCharacter.GetCharacter()
                 if char and part:IsDescendantOf(char) and Settings.GetSetting("Snap To Ladders") and ClimbLadder.SnapCooldown < os.clock() then
                     ClimbLadder.SnapCooldown = os.clock() + 3
                     ClimbLadder.Climb(v)
@@ -151,12 +152,7 @@ end, true)
 
 local function onLocalCharacterAdded(char: Model): ()
     ControlManager.Register("Climb Ladder", true, function()
-        local char = Players.LocalPlayer.Character
-        if not char then
-            return Enum.ContextActionResult.Pass
-        end
-    
-        local root = char.PrimaryPart
+        local root = LocalCharacter.GetRootPart()
         if not root then
             return Enum.ContextActionResult.Pass
         end
@@ -189,8 +185,9 @@ end
 Players.LocalPlayer.CharacterAdded:Connect(onLocalCharacterAdded)
 Players.LocalPlayer.CharacterRemoving:Connect(onLocalCharacterRemoved)
 
-if Players.LocalPlayer.Character then
-    onLocalCharacterAdded(Players.LocalPlayer.Character)
+local char = LocalCharacter.GetCharacter()
+if char then
+    onLocalCharacterAdded(char)
 end
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)

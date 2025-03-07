@@ -1,9 +1,9 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(script.Parent.ControlManager)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
+local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShowAlert = require(script.Parent.ShowAlert)
 local ThemesManager = require(script.Parent.ThemesManager)
@@ -88,7 +88,7 @@ local function tryUnequip(item: Types.AnyItem): ()
 end
 
 local function isObscured(origin: Vector3, target: Vector3): boolean
-	local char = Players.LocalPlayer.Character
+	local char = LocalCharacter.GetCharacter()
 	if not char then
 		return true
 	end
@@ -107,13 +107,8 @@ local function isObscured(origin: Vector3, target: Vector3): boolean
 end
 
 local function canDrop(direction: Vector3): boolean
-	local char = Players.LocalPlayer.Character
-	if not char then
-		return false
-	end
-
-	local head = char:FindFirstChild("Head")
-	if not head or not head:IsA("BasePart") then
+	local head = LocalCharacter.GetHead()
+	if not head then
 		return false
 	end
 

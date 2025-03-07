@@ -18,4 +18,15 @@ function module.GetRootPart(): BasePart?
 	return if hum then hum.RootPart else nil
 end
 
+function module.GetHead(): BasePart?
+	local char = module.GetCharacter()
+	if not char then
+		return nil
+	end
+
+	local head = char:FindFirstChild("Head")
+	
+	return if head and head:IsA("BasePart") then head else nil
+end
+
 return module
