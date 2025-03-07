@@ -10,6 +10,7 @@ local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local HitSounds = require(script.Parent.HitSounds)
+local LocalAnimation = require(script.Parent.LocalAnimation)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
@@ -212,6 +213,11 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			if item.Kind == "Gun" then
 				item.Ammo -= 1
 				RoundInfoUI.UpdateAmmo(item)
+			end
+
+			if item.Kind == "Melee" then
+				local id = assert(tonumber((item.Definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(item.Definition.HoldAnimation))
+				LocalAnimation.TryPlayAnimation(id, "MeleeAttack")
 			end
 
 			if item.Kind == "Gun" and item.Definition.HasMuzzleFlash then
