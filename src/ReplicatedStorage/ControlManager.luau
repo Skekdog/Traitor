@@ -201,4 +201,37 @@ function module.TryUpdateRegisteredAction(name: string, value: SettingDefinition
 	end
 end
 
+local function isKeyActive(key: Enum.KeyCode | Enum.UserInputType): boolean
+	if key then
+		if key:IsA("KeyCode") then
+			if UserInputService:IsKeyDown(key) then
+				return true
+			end
+		else
+			if UserInputService:IsMouseButtonPressed(key) then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+function module.IsActionActive(actionName: string): boolean
+	local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
+
+	local kbmKey = setting.Keybind.KBMKeybind
+	local consoleKey = setting.Keybind.ConsoleKeybind
+
+	if kbmKey and isKeyActive(kbmKey) then
+		return true
+	end
+
+	if consoleKey and isKeyActive(consoleKey) then
+		return true
+	end
+
+	return false
+end
+
 return module
