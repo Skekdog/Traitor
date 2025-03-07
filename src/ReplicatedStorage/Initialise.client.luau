@@ -11,6 +11,7 @@ local Settings = require(ReplicatedStorage.Settings.Settings)
 local BulletTracer = require(script.Parent.BulletTracer)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local ControlManager = require(script.Parent.ControlManager)
+local Crouch = require(script.Parent.Crouch)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
@@ -175,6 +176,11 @@ local function onLocalCharacterAdded(char: Model): ()
         end
     
         return Enum.ContextActionResult.Pass
+    end)
+
+    ControlManager.Register("Crouch", true, function()
+        Crouch.ToggleCrouching()
+        return Enum.ContextActionResult.Sink
     end)
 end
 

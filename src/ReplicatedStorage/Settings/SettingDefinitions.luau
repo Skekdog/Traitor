@@ -154,6 +154,31 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Crouch",
+	Tab = "Keybinds",
+	Category = "Movement",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.LeftControl,
+			ConsoleKeybind = nil,
+		},
+
+		TouchButton = {
+			Position = UDim2.fromOffset(0, 0),
+			Scale = 1,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
 	Name = "Primary Fire",
 	Tab = "Keybinds",
 	Category = "Items",
