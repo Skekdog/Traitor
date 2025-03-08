@@ -123,19 +123,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Always Show Sidebar",
-	Tab = "Display",
-	Category = "User Interface",
-	Tooltip = "No effect if a keyboard is not connected.",
-	Kind = "Boolean" :: "Boolean",
-	Default = true,
-
-	Callback = function(name, value)
-		(require)(callbacks.AlwaysShowSidebar)(name, value)
-	end
-})
-
-table.insert(availableSettings, {
 	Name = "Animate UI Transitions",
 	Tab = "Display",
 	Category = "User Interface",
