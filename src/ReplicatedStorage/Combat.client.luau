@@ -107,7 +107,7 @@ local function updateCrosshair(isAiming: boolean): ()
     end
 end
 
-Aim.ConnectAimToggled(function(isAiming): ()
+Aim.AimEvent:Connect(function(isAiming)
 	updateCrosshair(isAiming)
 end)
 

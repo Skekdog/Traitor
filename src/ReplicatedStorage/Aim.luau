@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local Connection = require(script.Parent.Connection)
 local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.UIManager)
@@ -15,16 +16,7 @@ function module.IsAiming(): boolean
 	return isAiming
 end
 
-local callbacks: {(boolean) -> ()} = {}
-function module.ConnectAimToggled(callback: (boolean) -> ()): ()
-	table.insert(callbacks, callback)
-end
-
-local function runCallbacks(): ()
-	for _, v in callbacks do
-		v(isAiming)
-	end
-end
+module.AimEvent = Connection.new((nil :: any) :: boolean)
 
 function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 	isAiming = if enabled == nil then not isAiming else enabled
@@ -60,7 +52,7 @@ function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 		ViewmodelModule.IsAiming = false
 	end
 
-	runCallbacks()
+	module.AimEvent:Invoke(isAiming)
 end
 
 return module
