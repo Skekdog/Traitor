@@ -164,7 +164,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.LeftControl,
-			ConsoleKeybind = nil,
+			ConsoleKeybind = Enum.KeyCode.ButtonR3,
 		},
 
 		TouchButton = {
@@ -242,6 +242,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Z,
+			ConsoleKeybind = Enum.KeyCode.DPadRight,
 		},
 
 		TouchButton = {
@@ -492,7 +493,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.G,
-			ConsoleKeybind = Enum.KeyCode.ButtonR3,
+			ConsoleKeybind = Enum.KeyCode.DPadLeft,
 		},
 	},
 
