@@ -1,11 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ControlManager = require(script.Parent.ControlManager)
 local CorpseInfo = require(script.Parent.CorpseInfo)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local function ViewCorpse(player: Model | Player): ()
 	local corpse = LocalRoundInfo.GetCorpse(player.Name)
 	if not corpse then
-		corpse = ReplicatedStorage.ClientServer.GetCorpseInfo:InvokeServer(player, false)
+		corpse = ReplicatedStorage.ClientServer.GetCorpseInfo:InvokeServer(player, ControlManager.IsActionActive("Crouch"))
 		if not corpse then
 			return
 		end

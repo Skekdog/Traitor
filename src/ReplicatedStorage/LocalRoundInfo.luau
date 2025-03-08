@@ -210,7 +210,11 @@ function module.GetCorpse(name: string): Types.CorpseView?
     return corpses[name]
 end
 
-remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.CorpseView)
+remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.CorpseView, covert: boolean)
+    if covert then
+        return
+    end
+    
     corpses[corpse.Name] = corpse
     runCallbacks("Corpse")
 end)
