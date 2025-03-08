@@ -11,12 +11,17 @@ local function LocalTeleport(placeId: number): ()
     TeleportService:Teleport(placeId)
 end
 
-local function SafeTeleport(placeId: number, players: {Player}, options: TeleportOptions?): (boolean, TeleportAsyncResult)
+local function SafeTeleport(placeId: number, players: {Player}, options: TeleportOptions?): (boolean, TeleportAsyncResult | string)
+    if RunService:IsStudio() then
+        warn("Cannot teleport in Studio")
+        return false, "Cannot teleport in Studio"
+    end
+
     if IS_CLIENT then
         assert(#players == 0, "Client teleports cannot specify players")
         assert(options == nil, "Client teleports cannot have options")
         LocalTeleport(placeId)
-        return nil :: any, nil :: any
+        return true, "Success"
     end
 
     local attemptIndex = 0
