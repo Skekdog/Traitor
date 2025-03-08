@@ -55,7 +55,7 @@ ReplicatedStorage.ServerClient.TriggerMapVote.OnClientEvent:Connect(function(tri
 
     for _, v: ClientMapInfo in votableMaps do
         local clone = screen.Object.Sample:Clone()
-        clone.Image = v.Icons["16:9"] or "rbxassetid://78464994818646"
+        clone.Image = v.Icons["16:9"] or "rbxassetid://116876920061584"
         clone.MapName.Text = v.Name
         clone.Name = v.Name
         clone.Visible = true
