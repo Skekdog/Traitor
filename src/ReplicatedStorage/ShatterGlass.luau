@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Settings = require(ReplicatedStorage.Settings.Settings)
 local IS_SERVER = game:GetService("RunService"):IsServer()
 
@@ -98,13 +100,12 @@ return function(glassProperties: BasePart | GlassProperties, direction: Vector3?
         end
     end
 
-    local sound = Instance.new("Sound")
-    sound.SoundId = "rbxassetid://"..tostring(sounds[math.random(1, #sounds)])
-    sound.RollOffMaxDistance = 50
-    sound.RollOffMinDistance = 10
-    sound.RollOffMode = Enum.RollOffMode.Linear
-    sound.Parent = fragments[1]
-    sound:Play()
+    PlaySound(sounds, glassCFrame.Position, nil, {
+        RollOffMaxDistance = 50,
+        RollOffMinDistance = 10,
+        RollOffMode = Enum.RollOffMode.Linear,
+        SoundGroup = SoundService.AllSounds :: SoundGroup,
+    })
 
     if Settings.GetSetting("Keep Shattered Glass") then
         return
