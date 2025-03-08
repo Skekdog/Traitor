@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ConfirmationPrompt = require(ReplicatedStorage.ConfirmationPrompt)
 local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
 local SafeTeleport = require(ReplicatedStorage.SafeTeleport)
+local UIManager = require(ReplicatedStorage.UIManager)
 local SettingsUI = require(script.Parent.SettingsUI)
 
 local function promptTeleport(name: string, placeId: number): ()
@@ -27,5 +28,9 @@ else
 		promptTeleport("Test Place", PlaceIDs.TestPlace)
 	end)
 end
+
+SettingsUI.AddClickButton("View Notice", "Other", "Those You Trust", nil, function()
+	UIManager.WaitForUI("Notice"):ToggleVisible(true)
+end)
 
 return nil
