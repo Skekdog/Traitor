@@ -63,7 +63,9 @@ function module.Climb(ladder: BasePart): ()
     local ladderHeight = ladder.Size.Y / 2
     ladderAttachment.Position = Vector3.new(0, math.clamp(ladder.CFrame:PointToObjectSpace(root.Position).Y, -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight), 0)
 
-    char:PivotTo(CFrame.new(char:GetPivot().Position))
+    local worldRot = ladderAttachment.WorldOrientation
+    char:PivotTo(CFrame.new(char:GetPivot().Position) * CFrame.Angles(0, math.rad(worldRot.Y + 180), 0))
+    -- note: we add 180 because that's what the ladders in mesa monocraft demand, so it's probably a tt standard
 
     alignPos.Attachment1 = ladderAttachment
     alignPos.Enabled = true
