@@ -7,4 +7,14 @@ SettingsUI.AddClickButton("Imperium", "Other", "Other Games", "Imperium is a Mon
 	SafeTeleport(PlaceIDs.Imperium, {})
 end)
 
+if game.PlaceId == PlaceIDs.TestPlace then
+	SettingsUI.AddClickButton("Main Place", "Other", "Those You Trust", "Return to the main place.", function()
+		SafeTeleport(PlaceIDs.MainPlace, {})
+	end)
+else
+	SettingsUI.AddClickButton("Test Place", "Other", "Those You Trust", "Testing place for new features and updates. Things are likely to break, and may impact main game save data. Join at your own risk!", function()
+		SafeTeleport(PlaceIDs.TestPlace, {})
+	end)
+end
+
 return nil
