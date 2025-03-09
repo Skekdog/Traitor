@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local JumpPower = require(script.Parent.JumpPower)
 local LocalAnimation = require(script.Parent.LocalAnimation)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 local WalkSpeed = require(script.Parent.WalkSpeed)
@@ -20,6 +21,7 @@ function module.ToggleCrouching(enabled: boolean?): ()
 	local hum = LocalCharacter.GetHumanoid()
 	if hum then
 		hum.CameraOffset = Vector3.new(0, if isCrouching then -0.9 else 0, 0)
+		JumpPower.SetModifier("Crouching", not isCrouching)
 	end
 
 	if isCrouching then
