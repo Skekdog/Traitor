@@ -3,7 +3,6 @@ require(script.Parent.KeybindHintManager)
 
 require(script.Parent.OnHitClient)
 require(script.Parent.MakeBulletHole)
-require(script.Parent.Discombobulate)
 require(script.Parent.ShowAlert)
 require(script.Parent.BulletTracer)
 require(script.Parent.ShatterGlass)

@@ -820,11 +820,6 @@ grenades.Flashbang = {
         FalloffEnd = 15,
         Pressure = 10000,
         VisualRadius = 15,
-
-        BeforeHitParticipant = function(_, _, target: Types.Participant): boolean
-            ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
-            return true
-        end,
     },
 
     OnHitClient = function()
@@ -1000,12 +995,11 @@ grenades["Discombobulator"] = {
         FalloffEnd = 15,
         Pressure = 75000,
         VisualRadius = 15,
-
-        BeforeHitParticipant = function(_, _, target: Types.Participant): boolean
-            ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
-            return true
-        end,
     },
+    
+    OnHitClient = function()
+        workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Inverse()
+    end,
 
     FuseTime = 3,
 
