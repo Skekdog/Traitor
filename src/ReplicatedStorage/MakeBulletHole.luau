@@ -2,8 +2,31 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 
-ReplicatedStorage.ServerClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relativeCFrame: CFrame, normal: Vector3)
-    local position = part.CFrame:ToWorldSpace(relativeCFrame).Position
+local function tryFadeBulletHole(impactHole: BasePart, impactDecal: Decal, weld: WeldConstraint): ()
+	if not impactHole:IsDescendantOf(workspace) then
+		return
+	end
+
+	local tween = TweenService:Create(impactDecal, TweenInfo.new(5), {Transparency = 1})
+	tween.Completed:Connect(function()
+		if not impactHole:IsDescendantOf(workspace) then
+			return
+		end
+		weld:Destroy()
+		impactHole:Destroy()
+	end)
+
+	impactHole.Destroying:Once(function()
+		if tween.PlaybackState == Enum.PlaybackState.Playing then
+			tween:Cancel()
+		end
+	end)
+
+	tween:Play()
+end
+
+local function createImpactHole(part: BasePart, relativeCFrame: CFrame, normal: Vector3): (BasePart, Decal, WeldConstraint)
+	local position = part.CFrame:ToWorldSpace(relativeCFrame).Position
     local impactHole = CreateEmptyPart(CFrame.lookAt(position, position + normal))
     impactHole.Anchored = false
     impactHole.Size = Vector3.new(0.5, 0.5, 0.1)
@@ -16,30 +39,16 @@ ReplicatedStorage.ServerClient.MakeBulletHole.OnClientEvent:Connect(function(par
     weld.Part0 = part
     weld.Part1 = impactHole
     weld.Parent = part
-
-    task.delay(5, function()
-        if not impactHole:IsDescendantOf(workspace) then
-            return
-        end
-        local tween = TweenService:Create(impactDecal, TweenInfo.new(5), {Transparency = 1})
-        tween.Completed:Connect(function()
-            if not impactHole:IsDescendantOf(workspace) then
-                return
-            end
-            weld:Destroy()
-            impactHole:Destroy()
-        end)
-
-        impactHole.Destroying:Once(function()
-            if tween.PlaybackState == Enum.PlaybackState.Playing then
-                tween:Cancel()
-            end
-        end)
-
-        tween:Play()
-    end)
     
     impactHole.Parent = part
+
+	return impactHole, impactDecal, weld
+end
+
+ReplicatedStorage.ServerClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relativeCFrame: CFrame, normal: Vector3)
+	local impactHole, impactDecal, weld = createImpactHole(part, relativeCFrame, normal)
+	task.wait(5)
+	tryFadeBulletHole(impactHole, impactDecal, weld)	
 end)
 
 return nil
