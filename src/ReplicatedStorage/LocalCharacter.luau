@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local Connection = require(script.Parent.Connection)
 
 local module = {}
 
@@ -28,5 +29,17 @@ function module.GetHead(): BasePart?
 	
 	return if head and head:IsA("BasePart") then head else nil
 end
+
+module.CharacterAdded = Connection.new((nil :: any) :: Model)
+module.HumanoidAdded = Connection.new((nil :: any) :: Humanoid)
+
+plr.CharacterAdded:Connect(function(char)
+	module.CharacterAdded:Invoke(char)
+
+	local hum = char:WaitForChild("Humanoid")
+	assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
+
+	module.HumanoidAdded:Invoke(hum)
+end)
 
 return module
