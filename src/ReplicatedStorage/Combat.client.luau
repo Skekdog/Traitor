@@ -124,7 +124,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	end)
 
 	if item.Kind == "Gun" then
-		ControlManager.Register("Alternate Fire", true, function(_, state)
+		ControlManager.Register("Alternate Fire", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
 			end
@@ -133,7 +133,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			return Enum.ContextActionResult.Sink
 		end)
 		
-		ControlManager.Register("Reload Weapon", true, function(_, state)
+		ControlManager.Register("Reload Weapon", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
 			end
@@ -145,7 +145,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	end
 
 	if item.Kind == "Item" then
-		ControlManager.Register("Alternate Fire", true, function(_, state)
+		ControlManager.Register("Alternate Fire", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
 			end
@@ -176,7 +176,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 		end)
 	end
 
-	ControlManager.Register("Primary Fire", true, function(_, _, input)
+	ControlManager.Register("Primary Fire", function(_, _, input)
 		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
 			task.wait()
 

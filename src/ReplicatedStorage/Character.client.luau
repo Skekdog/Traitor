@@ -29,7 +29,7 @@ local function initSnapToLadder(root: BasePart): ()
 end
 
 local function registerClimbLadder(root: BasePart): ()
-    ControlManager.Register("Climb Ladder", true, function()
+    ControlManager.Register("Climb Ladder", function()
         local root = LocalCharacter.GetRootPart()
         if not root then
             return Enum.ContextActionResult.Pass
@@ -57,7 +57,7 @@ local function registerClimbLadder(root: BasePart): ()
 end
 
 local function registerCrouch(): ()
-    ControlManager.Register("Crouch", true, function()
+    ControlManager.Register("Crouch", function()
         Crouch.ToggleCrouching()
         return Enum.ContextActionResult.Sink
     end)

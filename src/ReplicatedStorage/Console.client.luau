@@ -10,7 +10,7 @@ end
 
 local console = UIManager.RegisterUI(UIManager.UnregisteredUIs.Console) :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Console)}
 
-ControlManager.Register("Console", false, function()
+ControlManager.Register("Console", function()
 	console:ToggleVisible()
 
 	if console.Visible then

@@ -29,7 +29,7 @@ end
 
 local UIManager = {}
 
-export type Layer = "Special" |"Popup" | "Button" | "HUD"
+export type Layer = "Special" | "Popup" | "Buttons" | "HUD" | "ActionButtons"
 
 export type UI = {
 	Name: string, -- Unique identifier
@@ -146,7 +146,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	}
 	
 	if self.Layer == "Popup" and not object:GetAttribute("NoKeybind") then
-		ControlManager.Register(self.Name, false, function(act, state, input)
+		ControlManager.Register(self.Name, function(act, state, input)
 			local isToggled = (Settings.GetSetting(self.Name) :: SettingDefinitions.ControlValue).Toggled
 			
 			if isToggled then
@@ -279,14 +279,15 @@ function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 	return UIManager.GetUI(name)
 end
 
-local orders: {[string]: number} = {
+local orders: {[Layer]: number} = {
+	ActionButtons = 5,
 	Special = 4,
 	Popup = 3,
 	Buttons = 2,
 	HUD = 1,
 }
 
-for layer, order in orders do
+for layer: Layer, order in orders do
 	local screenUi = Instance.new("ScreenGui")
 	screenUi.Name = layer
 	screenUi.IgnoreGuiInset = true
@@ -294,6 +295,7 @@ for layer, order in orders do
 	screenUi.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	screenUi.ClipToDeviceSafeArea = false
 	screenUi.ResetOnSpawn = false
+	screenUi.ScreenInsets = if layer == "ActionButtons" then Enum.ScreenInsets.DeviceSafeInsets else Enum.ScreenInsets.None
 
 	if layer == "Buttons" then
 		screenUi.ScreenInsets = Enum.ScreenInsets.None
@@ -317,7 +319,7 @@ for _, object in UIManager.UnregisteredUIs:GetChildren() do
 	register(object)
 end
 
-ControlManager.Register("Close UI", false, function()
+ControlManager.Register("Close UI", function()
 	for _, v in UIManager.GetUIs("Popup") do
 		if v.Visible and not v.NoClose then
 			v:ToggleVisible(false)
@@ -325,21 +327,6 @@ ControlManager.Register("Close UI", false, function()
 		end
 	end
 	return Enum.ContextActionResult.Pass
-end)
-
-task.spawn(function()
-	local CASui = Players.LocalPlayer.PlayerGui:WaitForChild("ContextActionGui", math.huge)
-	assert(CASui and CASui:IsA("ScreenGui"))
-	
-	local CASFrame = CASui:WaitForChild("ContextButtonFrame")
-	assert(CASFrame:IsA("Frame"))
-	
-	CASFrame.Size = UDim2.fromScale(1, 1)
-	CASFrame.Position = UDim2.fromScale(0, 0)
-	CASui.DisplayOrder = 4
-	CASui.ScreenInsets = Enum.ScreenInsets.DeviceSafeInsets
-	CASui.ClipToDeviceSafeArea = false
-	CASui.SafeAreaCompatibility = Enum.SafeAreaCompatibility.FullscreenExtension
 end)
 
 return UIManager

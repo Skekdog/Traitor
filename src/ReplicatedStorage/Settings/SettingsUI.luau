@@ -349,7 +349,7 @@ local darken = ui.LayoutDarken
 local tapCon: RBXScriptConnection?
 local function promptUpdateTouchPosition(control: string): UDim2?
 	local lastParams = ControlManager.GetRegisteredInfo(control)
-	local button = ControlManager.Register(control, true, function() return Enum.ContextActionResult.Pass end)
+	local button = ControlManager.Register(control, function() return Enum.ContextActionResult.Pass end)
 
 	assert(button)
 
@@ -372,7 +372,7 @@ local function promptUpdateTouchPosition(control: string): UDim2?
 	tapCon:Disconnect()
 
 	if lastParams then
-		ControlManager.Register(control, true, lastParams.Callback)
+		ControlManager.Register(control, lastParams.Callback)
 	else
 		ControlManager.Unregister(control)
 	end

@@ -177,7 +177,7 @@ local function tryEquip(item: Types.AnyItem): ()
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(item.Definition.Name)
 
 	if item.Kind == "Gun" and item.Definition.AmmoType.CanDrop then
-		ControlManager.Register("Drop Ammo", true, function(_, state)
+		ControlManager.Register("Drop Ammo", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
 			end
@@ -188,7 +188,7 @@ local function tryEquip(item: Types.AnyItem): ()
 	end
 
 	if item.Definition.CanDrop then
-		ControlManager.Register("Drop", true, function(_, state)
+		ControlManager.Register("Drop", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
 			end
@@ -324,7 +324,7 @@ local function addItem(item: Types.AnyItem): ()
 end
 
 for i = 1, 9 do
-	ControlManager.Register("Slot " .. i, false, function()
+	ControlManager.Register("Slot " .. i, function()
 		local item = ourInventory.Slots[i]
 		if item then
 			tryEquip(item)
@@ -355,7 +355,7 @@ local function selectLowest()
 	return Enum.ContextActionResult.Sink
 end
 
-ControlManager.Register("Next Item", false, function()
+ControlManager.Register("Next Item", function()
 	if not module.EquippedItem then
 		return selectLowest()
 	end
