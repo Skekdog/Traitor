@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local Connection = require(script.Parent.Connection)
+local JumpPower = require(script.Parent.JumpPower)
 local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.UIManager)
@@ -20,6 +21,8 @@ module.AimEvent = Connection.new((nil :: any) :: boolean)
 
 function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 	isAiming = if enabled == nil then not isAiming else enabled
+
+	JumpPower.SetModifier("Aiming", not isAiming)
 
 	local camera = workspace.CurrentCamera
 	if isAiming then
