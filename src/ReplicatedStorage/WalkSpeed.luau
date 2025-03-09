@@ -1,4 +1,6 @@
+local Players = game:GetService("Players")
 local LocalCharacter = require(script.Parent.LocalCharacter)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local module = {}
 
 local modifiers: {[string]: number} = {}
@@ -9,7 +11,9 @@ local function updateWalkSpeed(): ()
 		return
 	end
 
-	local speed = 16
+	local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
+	local speed = if role then role.Definition.WalkSpeed else 16
+	
 	for _, v in modifiers do
 		speed += v
 	end
