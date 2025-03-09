@@ -8,6 +8,7 @@ export type Connection<T...> = {
 
 	Connect: (Connection<T...>, callback: Callback<T...>) -> ConnectionId,
 	Disconnect: (Connection<T...>, ConnectionId) -> (),
+	Wait: (Connection<T...>) -> T...,
 
 	Invoke: (Connection<T...>, T...) -> (),
 }
@@ -19,6 +20,19 @@ local function Connect<T...>(connection: Connection<T...>, callback: (T...) -> (
 	connection._callbacks[index] = callback
 
 	return index
+end
+
+local function Wait<T...>(connection: Connection<T...>): T...
+	local values = nil
+	connection:Connect(function(...: any)
+		values = {...}
+	end)
+
+	while values == nil do
+		task.wait()
+	end
+
+	return table.unpack(values)
 end
 
 local function Disconnect<T...>(connection: Connection<T...>, index: ConnectionId): ()
@@ -37,6 +51,8 @@ function module.new<T...>(...: T...): Connection<T...>
 
 		Connect = Connect,
 		Disconnect = Disconnect,
+		Wait = Wait,
+
 		Invoke = Invoke,
 	}
 end
