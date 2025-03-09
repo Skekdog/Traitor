@@ -334,11 +334,11 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			return "OtherError"
 		end
 
-		if not item.Definition.PrimaryFire then
+		if not item.Definition.PrimaryFireServer then
 			return "OtherError"
 		end
 
-		item.Definition.PrimaryFire(item, by, request.Direction)
+		item.Definition.PrimaryFireServer(item, "Primary", request.Origin, request.Direction, by)
 	end
 
 	return "Success"
@@ -359,12 +359,12 @@ function module.AlternateFire(by: Types.Participant, request: CombatTypes.Altern
 		return "OtherError"
 	end
 
-	local func = (item :: Types.Item).Definition.AlternateFire
+	local func = (item :: Types.Item).Definition.AlternateFireServer
 	if not func then
 		return "OtherError"
 	end
 
-	func(item, by, request.Direction)
+	func(item, "Alternate", request.Origin, request.Direction, by)
 
 	return "Success"
 end
