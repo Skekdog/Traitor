@@ -37,18 +37,20 @@ local function setCallbacks(actionName: string, button: ActionButton, callback: 
 end
 
 function module.ShowActionButton(actionName: string, callback: (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult): ActionButton
+	local control = Settings.GetSetting(actionName) :: Settings.ControlValue
+	assert(control.TouchButton, `{actionName} is not a touch control`)
+
 	local button = module.GetButton(actionName)
 	if button then
 		setCallbacks(actionName, button, callback)
+		button.Position = control.TouchButton.Position
+		button.UIScale.Scale = control.TouchButton.Scale
 		button.Visible = true
 		return button
 	end
 
 	button = baseButton:Clone()
 	assert(button)
-
-	local control = Settings.GetSetting(actionName) :: Settings.ControlValue
-	assert(control.TouchButton, `{actionName} is not a touch control`)
 
 	button.Position = control.TouchButton.Position
 	button.UIScale.Scale = control.TouchButton.Scale

@@ -115,7 +115,7 @@ function module.Register(actionName: string, callback: ActionCallback): ActionBu
 
 	registered[actionName] =  {
 		ActionName = actionName,
-		Callback = callback
+		Callback = callback,
 	}
 
 	local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
