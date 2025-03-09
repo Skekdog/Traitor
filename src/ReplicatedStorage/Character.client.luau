@@ -1,11 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local JumpPower = require(script.Parent.JumpPower)
 local WalkSpeed = require(script.Parent.WalkSpeed)
 
 local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
 
 Players.LocalPlayer.CharacterAdded:Connect(function(char: Model)
     WalkSpeed.Reset()
+    JumpPower.Reset()
+    
     local hum = char:WaitForChild("Humanoid")
     assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
 
