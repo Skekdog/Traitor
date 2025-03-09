@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Settings = require(ReplicatedStorage.Settings.Settings)
+
 local IS_SERVER = game:GetService("RunService"):IsServer()
 
 local function createWedgeFragment(properties: GlassProperties, size: Vector3, cframe: CFrame, direction: Vector3)
@@ -33,7 +34,7 @@ end
 
 local sounds = {2612674531, 9103909576, 9116264426, 9113850847, 9119918457}
 
-type GlassProperties = {
+export type GlassProperties = {
     CFrame: CFrame,
     Size: Vector3,
 
@@ -45,25 +46,27 @@ type GlassProperties = {
     Reflectance: number,
 }
 
-return function(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
-    if IS_SERVER then
-        assert(typeof(glassProperties) == "Instance")
+local function shatterServer(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
+    assert(typeof(glassProperties) == "Instance")
 
-        local properties = {
-            CFrame = glassProperties.CFrame,
-            Size = glassProperties.Size,
+    local properties = {
+        CFrame = glassProperties.CFrame,
+        Size = glassProperties.Size,
 
-            Material = glassProperties.Material,
-            MaterialVariant = glassProperties.MaterialVariant,
+        Material = glassProperties.Material,
+        MaterialVariant = glassProperties.MaterialVariant,
 
-            Color = glassProperties.Color,
-            Transparency = glassProperties.Transparency,
-            Reflectance = glassProperties.Reflectance,
-        }
+        Color = glassProperties.Color,
+        Transparency = glassProperties.Transparency,
+        Reflectance = glassProperties.Reflectance,
+    }
 
-        ReplicatedStorage.ServerClient.ShatterGlass:FireAllClients(properties, direction)
-        return glassProperties:Destroy()
-    end
+    ReplicatedStorage.ServerClient.ShatterGlass:FireAllClients(properties, direction)
+
+    glassProperties:Destroy()
+end
+
+local function shatterClient(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
     assert(typeof(glassProperties) == "table")
 
     local cols = math.max(1, math.floor(glassProperties.Size.X / 3))
@@ -118,3 +121,16 @@ return function(glassProperties: BasePart | GlassProperties, direction: Vector3?
         table.clear(fragments)
     end)
 end
+
+local function ShatterGlass(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
+    if IS_SERVER then
+        return shatterServer(glassProperties, direction)
+    end
+    shatterClient(glassProperties, direction)
+end
+
+if not IS_SERVER then
+    ReplicatedStorage.ServerClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
+end
+
+return ShatterGlass

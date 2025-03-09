@@ -8,7 +8,6 @@ local StarterGui = game:GetService("StarterGui")
 local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local ShatterGlass = require(script.Parent.ShatterGlass)
 local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
 
@@ -16,10 +15,9 @@ require(script.Parent.MakeBulletHole)
 require(script.Parent.Discombobulate)
 require(script.Parent.ShowAlert)
 require(script.Parent.BulletTracer)
+require(script.Parent.ShatterGlass)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
-
-serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
 
 ThemesManager.UpdateTheme("Dark")
 
