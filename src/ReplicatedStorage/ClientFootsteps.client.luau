@@ -3,6 +3,7 @@
 -- Get services
 local Players = game:GetService("Players")
 local soundService = game:GetService("SoundService")
+local Crouch = require(script.Parent.Crouch)
 local FootstepIDs = require(script.Parent.FootstepIDs)
 
 -- Create sound variables
@@ -71,7 +72,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(character)
 
     -- check if the player is moving and not climbing
     humanoid.Running:Connect(function(speed)
-        if humanoid.MoveDirection.Magnitude > 0 and speed > 0 and humanoid:GetState() ~= Enum.HumanoidStateType.Climbing then
+        if humanoid.MoveDirection.Magnitude > 0 and speed > 0 and humanoid:GetState() ~= Enum.HumanoidStateType.Climbing and not Crouch.IsCrouching() then
             getSoundProperties(humanoid)
             update()
             currentSound.Playing = true

@@ -40,7 +40,7 @@ Players.PlayerAdded:Connect(function(player)
 
         -- check if the player is moving and not climbing
         humanoid.Running:Connect(function(speed)
-            if humanoid.MoveDirection.Magnitude > 0 and speed > 0 and humanoid:GetState() ~= Enum.HumanoidStateType.Climbing then
+            if humanoid.MoveDirection.Magnitude > 0 and speed > 0 and humanoid:GetState() ~= Enum.HumanoidStateType.Climbing and not humanoid:GetAttribute("IsCrouching") then
                 getSoundProperties(humanoid, (getFloorMaterial(humanoid)))
                 update(currentSound, getSoundProperties(humanoid, (getFloorMaterial(humanoid))))
                 currentSound.Playing = true
