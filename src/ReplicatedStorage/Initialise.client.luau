@@ -6,7 +6,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local BulletTracer = require(script.Parent.BulletTracer)
-local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
@@ -16,6 +15,7 @@ local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
 
 require(script.Parent.MakeBulletHole)
+require(script.Parent.Discombobulate)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
@@ -77,7 +77,6 @@ for _, player in Players:GetPlayers() do
     removeFootsteps(player)
 end
 
-serverClient.Discombobulate.OnClientEvent:Connect(Discombobulate)
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
 serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
 
