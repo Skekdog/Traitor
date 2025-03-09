@@ -1038,6 +1038,12 @@ items["Magneto Stick"] = {
     Model = models("Magneto Stick"),
     HoldAnimation = "rbxassetid://10247423634",
 
+    PrimaryFireClient = print,
+    AlternateFireClient = print,
+
+    PrimaryFireServer = print,
+    AlternateFireServer = print,
+
     PrimaryHint = "Push Prop",
     AlternateHint = "Grab Prop",
 }

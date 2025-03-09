@@ -22,7 +22,7 @@ type ItemButton = typeof(sampleButton)
 export type AmmoCallback = (amount: number?) -> ()
 export type AmmoConnection = {Kind: string, Callback: AmmoCallback}
 
-local ourInventory: {Passive: {Types.AnyItem}, Slots: {[number]: Types.AnyItem}} = {Passive = {}, Slots = {}}
+local ourInventory: {Passive: {Types.AnyItem}, Slots: {[number]: Types.AnyItem}, [number]: never} = {Passive = {}, Slots = {}}
 local ourAmmo: {[string]: number?} = {}
 
 module.EquippedItem = nil :: Types.AnyItem?
@@ -244,7 +244,6 @@ local function tryAddButton(item: Types.AnyItem): ()
 	clone.Name = "Item " .. item.Definition.Name
 	clone.Parent = ui.Object.Container :: any
 
-	ourInventory.Slots[item.Definition.Slot] = item
 	clone.MouseButton1Click:Connect(function()
 		tryEquip(item)
 	end)
@@ -316,7 +315,12 @@ end
 local function addItem(item: Types.AnyItem): ()
 	(item :: {Definition: Types.AnyItemDefinition}).Definition = assert(GetItemDefinition(item.Definition.Name), "Item exists on server but not client")
 	tryAddButton(item)
-	table.insert(ourInventory, item)
+	
+	if item.Definition.Slot then
+		ourInventory.Slots[item.Definition.Slot] = item
+	else
+		table.insert(ourInventory.Passive, item)
+	end
 end
 
 for i = 1, 9 do
