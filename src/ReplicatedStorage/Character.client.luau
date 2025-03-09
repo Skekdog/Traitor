@@ -1,9 +1,74 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Settings = require(ReplicatedStorage.Settings.Settings)
+local ClimbLadder = require(script.Parent.ClimbLadder)
+local ControlManager = require(script.Parent.ControlManager)
+local Crouch = require(script.Parent.Crouch)
 local JumpPower = require(script.Parent.JumpPower)
 local LocalCharacter = require(script.Parent.LocalCharacter)
+local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local WalkSpeed = require(script.Parent.WalkSpeed)
 
 local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
+
+local function initSnapToLadder(root: BasePart): ()
+    root.Touched:Connect(function(part)
+        local map = LocalRoundInfo.GetMap()
+        if not map then
+            return
+        end
+
+        if part.Name ~= "Ladder" or not part:IsDescendantOf(map.Bounds) then
+            return
+        end
+        
+        if Settings.GetSetting("Snap To Ladders") and ClimbLadder.SnapCooldown < os.clock() then
+            ClimbLadder.SnapCooldown = os.clock() + 3
+            ClimbLadder.Climb(part)
+        end
+    end)
+end
+
+local function registerClimbLadder(root: BasePart): ()
+    ControlManager.Register("Climb Ladder", true, function()
+        local root = LocalCharacter.GetRootPart()
+        if not root then
+            return Enum.ContextActionResult.Pass
+        end
+    
+        local map = LocalRoundInfo.GetMap()
+        if not map then
+            return Enum.ContextActionResult.Pass
+        end
+    
+        local bounds = map.Bounds
+        if not bounds then
+            return Enum.ContextActionResult.Pass
+        end
+    
+        for _, v in root:GetTouchingParts() do
+            if v.Name == "Ladder" and v:IsDescendantOf(bounds) then
+                ClimbLadder.Climb(v)
+                return Enum.ContextActionResult.Sink
+            end
+        end
+    
+        return Enum.ContextActionResult.Pass
+    end)
+end
+
+local function registerCrouch(): ()
+    ControlManager.Register("Crouch", true, function()
+        Crouch.ToggleCrouching()
+        return Enum.ContextActionResult.Sink
+    end)
+end
+
+local function unregisterAll(): ()
+    ControlManager.Unregister("Climb Ladder")
+    ControlManager.Unregister("Crouch")
+end
+
+LocalCharacter.CharacterRemoving:Connect(unregisterAll)
 
 LocalCharacter.HumanoidAdded:Connect(function(hum)
     WalkSpeed.Reset()
@@ -25,6 +90,11 @@ LocalCharacter.HumanoidAdded:Connect(function(hum)
 
     local root = char:WaitForChild("HumanoidRootPart")
     assert(root:IsA("BasePart"), "HumanoidRootPart is not a Part")
+
+    registerClimbLadder(root)
+    registerCrouch()
+
+    initSnapToLadder(root)
 
     local startHeight = math.huge
     hum.StateChanged:Connect(function(_, state)

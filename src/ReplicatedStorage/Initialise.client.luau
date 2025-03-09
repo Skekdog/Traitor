@@ -7,15 +7,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TweenService = game:GetService("TweenService")
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
-local Settings = require(ReplicatedStorage.Settings.Settings)
 local BulletTracer = require(script.Parent.BulletTracer)
-local ClimbLadder = require(script.Parent.ClimbLadder)
-local ControlManager = require(script.Parent.ControlManager)
-local Crouch = require(script.Parent.Crouch)
 local Discombobulate = require(script.Parent.Discombobulate)
 local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
-local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShatterGlass = require(script.Parent.ShatterGlass)
 local ShowAlert = require(script.Parent.ShowAlert)
@@ -125,75 +120,5 @@ end
 serverClient.Discombobulate.OnClientEvent:Connect(Discombobulate)
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
 serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
-
-LocalRoundInfo.Listen("Map", function()
-    local map = LocalRoundInfo.GetMap()
-    if not map then
-        return
-    end
-
-    local bounds = map.Bounds
-
-    for _, v in bounds:GetChildren() do
-        if not v:IsA("BasePart") then
-            continue
-        end
-        if v.Name == "Ladder" then
-            v.CanTouch = true
-            v.Touched:Connect(function(part)
-                local char = LocalCharacter.GetCharacter()
-                if char and part:IsDescendantOf(char) and Settings.GetSetting("Snap To Ladders") and ClimbLadder.SnapCooldown < os.clock() then
-                    ClimbLadder.SnapCooldown = os.clock() + 3
-                    ClimbLadder.Climb(v)
-                end
-            end)
-        end
-    end
-end, true)
-
-local function onLocalCharacterAdded(char: Model): ()
-    ControlManager.Register("Climb Ladder", true, function()
-        local root = LocalCharacter.GetRootPart()
-        if not root then
-            return Enum.ContextActionResult.Pass
-        end
-    
-        local map = LocalRoundInfo.GetMap()
-        if not map then
-            return Enum.ContextActionResult.Pass
-        end
-    
-        local bounds = map.Bounds
-        if not bounds then
-            return Enum.ContextActionResult.Pass
-        end
-    
-        for _, v in root:GetTouchingParts() do
-            if v.Name == "Ladder" and v:IsDescendantOf(bounds) then
-                ClimbLadder.Climb(v)
-                return Enum.ContextActionResult.Sink
-            end
-        end
-    
-        return Enum.ContextActionResult.Pass
-    end)
-
-    ControlManager.Register("Crouch", true, function()
-        Crouch.ToggleCrouching()
-        return Enum.ContextActionResult.Sink
-    end)
-end
-
-local function onLocalCharacterRemoved(char: Model): ()
-    ControlManager.Unregister("Climb Ladder")
-end
-
-Players.LocalPlayer.CharacterAdded:Connect(onLocalCharacterAdded)
-Players.LocalPlayer.CharacterRemoving:Connect(onLocalCharacterRemoved)
-
-local char = LocalCharacter.GetCharacter()
-if char then
-    onLocalCharacterAdded(char)
-end
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)

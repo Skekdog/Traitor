@@ -33,6 +33,8 @@ end
 module.CharacterAdded = Connection.new((nil :: any) :: Model)
 module.HumanoidAdded = Connection.new((nil :: any) :: Humanoid)
 
+module.CharacterRemoving = Connection.new((nil :: any) :: Model)
+
 plr.CharacterAdded:Connect(function(char)
 	module.CharacterAdded:Invoke(char)
 
@@ -40,6 +42,10 @@ plr.CharacterAdded:Connect(function(char)
 	assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
 
 	module.HumanoidAdded:Invoke(hum)
+end)
+
+plr.CharacterRemoving:Connect(function(char)
+	module.CharacterRemoving:Invoke(char)
 end)
 
 return module
