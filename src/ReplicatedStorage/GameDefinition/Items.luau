@@ -321,7 +321,7 @@ guns["Golden Gun"] = {
     AimFOV = 70,
     AimSpreadMultiplier = 0,
 
-    BeforeHitProp = function(item: Types.ItemBeforeHit, target: Types.Prop, params: Types.DamageParams): boolean
+    BeforeHitProp = function(item: Types.ItemBeforeHit, _, target: Types.Prop, params: Types.DamageParams): boolean
         assert(item.Kind == "Gun")
         if target.Kind ~= "MapProp" then
             return false
@@ -336,7 +336,7 @@ guns["Golden Gun"] = {
         return false
     end,
 
-    BeforeHitParticipant = function(item: Types.ItemBeforeHit, target: Types.Participant, params: Types.DamageParams): boolean
+    BeforeHitParticipant = function(item: Types.ItemBeforeHit, _, target: Types.Participant, params: Types.DamageParams): boolean
         assert(item.Kind == "Gun")
         local attacker = params.Attacker
         assert(attacker)
@@ -405,14 +405,14 @@ guns["Flare Gun"] = {
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
-    BeforeHitParticipant = function(_, target: Types.Participant, params: Types.DamageParams): boolean
+    BeforeHitParticipant = function(_, _, target: Types.Participant, params: Types.DamageParams): boolean
         local attacker = params.Attacker
         assert(attacker)
         burn(attacker, target)
         return true
     end,
 
-    BeforeHitProp = function(_, target: Types.Prop, params: Types.DamageParams): boolean
+    BeforeHitProp = function(_, _, target: Types.Prop, params: Types.DamageParams): boolean
         local attacker = params.Attacker
         assert(attacker)
 
@@ -579,7 +579,7 @@ guns["Silenced Pistol"] = {
     Projectile = projectiles("SilencedBullet"),
     ProjectileSpeed = 100,
 
-    BeforeHitParticipant = function(_, victim: Types.Participant, params: Types.DamageParams): boolean
+    BeforeHitParticipant = function(_, _, victim: Types.Participant, params: Types.DamageParams): boolean
         local willDie = params.Amount >= victim:GetHealth()
         if not willDie then
             return true
@@ -809,7 +809,7 @@ grenades.Flashbang = {
         Pressure = 10000,
         VisualRadius = 15,
 
-        BeforeHitParticipant = function(_, target: Types.Participant): boolean
+        BeforeHitParticipant = function(_, _, target: Types.Participant): boolean
             ReplicatedStorage.ServerClient.Flashbang:FireClient(target.Player)
             return true
         end,
@@ -956,7 +956,7 @@ grenades["Discombobulator"] = {
         Pressure = 75000,
         VisualRadius = 15,
 
-        BeforeHitParticipant = function(_, target: Types.Participant): boolean
+        BeforeHitParticipant = function(_, _, target: Types.Participant): boolean
             ReplicatedStorage.ServerClient.Discombobulate:FireClient(target.Player)
             return true
         end,
