@@ -5,7 +5,7 @@ local SoundService = game:GetService("SoundService")
 local BulletTracer = require(ReplicatedStorage.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.CombatTypes)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-local RunBeforeHit = require(ReplicatedStorage.RoundRule.RunBeforeHit)
+local ExplosionParams = require(ReplicatedStorage.RoundRule.ExplosionParams)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ShatterGlass = require(ReplicatedStorage.ShatterGlass)
 local module = {}
@@ -143,7 +143,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		Attacker = by,
 	}
 	
-	if not RunBeforeHit(item, round, hitPart, params) then
+	if not item:RunBeforeHit(round, hitPart, params) then
 		return
 	end
 
@@ -167,7 +167,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		Attacker = by,
 	}
 
-	if not RunBeforeHit(item, round, hitPart, params) then
+	if not item:RunBeforeHit(round, hitPart, params) then
 		return
 	end
 
@@ -315,12 +315,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		task.wait(item.Definition.FuseTime)
 		projectile:Destroy()
 
-		local explosionParams: Types.ExplosionParams = {
-			Kind = "ExplosionParams",
-			Definition = item.Definition.ExplosionInfo,
-			Attacker = by,
-			Position = projectile.Position,
-		}
+		local explosionParams = ExplosionParams.new(item.Definition.ExplosionInfo, projectile.Position, by)
 		module.CreateExplosion(by.Round, explosionParams)
 
 		if item.Definition.OnExplode then
