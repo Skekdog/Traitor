@@ -17,6 +17,7 @@ require(script.Parent.ShowAlert)
 require(script.Parent.BulletTracer)
 require(script.Parent.ShatterGlass)
 require(script.Parent.CorpseCollisionFix)
+require(script.Parent.RemoveDefaultFootsteps)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
@@ -47,20 +48,6 @@ LocalRoundInfo.Listen("PlayerRole", function()
         end
     end
 end, true)
-
-local function removeFootsteps(player: Player)
-    if player == Players.LocalPlayer then
-        return
-    end
-    player.CharacterAdded:Connect(function(char: Model)
-        char:WaitForChild("HumanoidRootPart"):WaitForChild("Running"):Destroy()
-    end)
-end
-
-Players.PlayerAdded:Connect(removeFootsteps)
-for _, player in Players:GetPlayers() do
-    removeFootsteps(player)
-end
 
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
 
