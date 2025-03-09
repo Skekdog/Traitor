@@ -45,10 +45,12 @@ local function createImpactHole(part: BasePart, relativeCFrame: CFrame, normal: 
 	return impactHole, impactDecal, weld
 end
 
-ReplicatedStorage.ServerClient.MakeBulletHole.OnClientEvent:Connect(function(part: BasePart, relativeCFrame: CFrame, normal: Vector3)
+local function MakeBulletHole(part: BasePart, relativeCFrame: CFrame, normal: Vector3): ()
 	local impactHole, impactDecal, weld = createImpactHole(part, relativeCFrame, normal)
 	task.wait(5)
 	tryFadeBulletHole(impactHole, impactDecal, weld)	
-end)
+end
 
-return nil
+ReplicatedStorage.ServerClient.MakeBulletHole.OnClientEvent:Connect(MakeBulletHole)
+
+return MakeBulletHole
