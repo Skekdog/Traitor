@@ -130,7 +130,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3): ()
+local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -145,6 +145,14 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	
 	if not item:RunBeforeHit(round, hitPart, params) then
 		return
+	end
+
+	if item.Kind ~= "ExplosionParams" then
+		item:RunOnHitClient(victim, hitPart)
+	end
+
+	if grenade then
+		grenade:RunOnHitClient(victim, hitPart)
 	end
 
 	victim:TryTakeDamage(params)
@@ -205,7 +213,7 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	end
 end
 
-function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams): ()
+function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, grenade: Types.GrenadeWeapon?): ()
     local explosion = Instance.new("Explosion")
 
     local info = params.Definition
@@ -244,7 +252,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, participant)
-			onParticipantHit(params, round, params.Attacker, participant, v, v.Position)
+			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade)
 			continue
 		end
     end
@@ -316,7 +324,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		projectile:Destroy()
 
 		local explosionParams = ExplosionParams.new(item.Definition.ExplosionInfo, projectile.Position, by)
-		module.CreateExplosion(by.Round, explosionParams)
+		module.CreateExplosion(by.Round, explosionParams, item)
 
 		if item.Definition.OnExplode then
 			item.Definition.OnExplode(item, by, projectile)

@@ -1,6 +1,8 @@
+local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local TweenService = game:GetService("TweenService")
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
@@ -44,6 +46,16 @@ local function modify(base: Types.AnyItemDefinition, name: string, edit: {[strin
 end
 
 local bullet = projectiles("Bullet")
+
+local flashbangEqualiser = Instance.new("EqualizerSoundEffect")
+flashbangEqualiser.Name = "FlashbangEffect"
+flashbangEqualiser.HighGain = -8
+flashbangEqualiser.LowGain = 10
+flashbangEqualiser.MidGain = -20
+flashbangEqualiser.Enabled = true
+
+local flashbangTweenStart = TweenInfo.new(0.15)
+local flashbangTweenFinish = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 4)
 
 local function makeGolden(victim: Types.Participant)
     local char = assert(victim:GetCharacter(), "Participant has no character")
@@ -814,6 +826,39 @@ grenades.Flashbang = {
             return true
         end,
     },
+
+    OnHitClient = function()
+        local correction = Instance.new("ColorCorrectionEffect")
+        local blur = Instance.new("BlurEffect")
+
+        correction.Name = "FlashbangCorrection"
+        blur.Name = "FlashbangBlur"
+
+        correction:SetAttribute("IgnoreLighting", true)
+        blur:SetAttribute("IgnoreLighting", true)
+
+        blur.Parent = Lighting
+        correction.Parent = Lighting
+
+        local equaliser = Instance.fromExisting(flashbangEqualiser)
+        equaliser.Parent = SoundService:FindFirstChild("AllSounds")
+
+        local tween = TweenService:Create(correction, flashbangTweenStart, {Brightness = 0.8})
+        tween.Completed:Once(function()
+            local endTween = TweenService:Create(correction, flashbangTweenFinish, {Brightness = 0})
+            endTween.Completed:Once(function()
+                blur:Destroy()
+                correction:Destroy()
+                equaliser:Destroy()
+            end)
+            endTween:Play()
+            TweenService:Create(blur, flashbangTweenFinish, {Size = 0}):Play()
+        end)
+        tween:Play()
+        TweenService:Create(blur, flashbangTweenStart, {Size = 48}):Play()
+
+        PlaySound("rbxassetid://223471024", nil, nil)
+    end,
 
     FuseTime = 3,
 
