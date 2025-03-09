@@ -314,6 +314,7 @@ local function removeItem(itemName: string): ()
 end
 
 local function addItem(item: Types.AnyItem): ()
+	(item :: {Definition: Types.AnyItemDefinition}).Definition = assert(GetItemDefinition(item.Definition.Name), "Item exists on server but not client")
 	tryAddButton(item)
 	table.insert(ourInventory, item)
 end

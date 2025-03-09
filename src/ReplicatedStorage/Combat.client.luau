@@ -164,12 +164,19 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			local head = char:WaitForChild("Head")
 			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
+			local origin = head.Position
+			local direction = GetCentreRay().Direction
+
 			local itemRequest: CombatTypes.AlternateFireItemRequest = {
 				Kind = "AlternateFireItemRequest" :: "AlternateFireItemRequest",
 				ItemName = item.Definition.Name,
-				Origin = head.Position,
-				Direction = GetCentreRay().Direction,
+				Origin = origin,
+				Direction = direction,
 			}
+
+			if item.Definition.AlternateFireClient then
+				item.Definition.AlternateFireClient(item, "Alternate", origin, direction)
+			end
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.AlternateFire:InvokeServer(itemRequest)
 			if result ~= "Success" then
@@ -225,13 +232,15 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			end
 			ViewmodelModule.Recoil(item.Definition)
 
+			local origin = head.Position
+			local direction = GetCentreRay().Direction
+
 			local request: CombatTypes.PrimaryFireRequest
 			if item.Kind == "Melee" or item.Kind == "Gun" then
 				local raycasts: {CombatTypes.RaycastInfo} = {}
 				for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
 					local spread = getSpreadVector(item)
 
-					local origin = head.Position
 					local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
 
 					local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
@@ -256,25 +265,31 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 					Kind = "PrimaryFireRaycastRequest" :: "PrimaryFireRaycastRequest",
 					ItemName = item.Definition.Name,
 					Raycasts = raycasts,
-					Origin = head.Position,
+					Origin = origin,
 				}
 				request = raycastRequest
 			elseif item.Kind == "Grenade" then
 				local throwRequest: CombatTypes.PrimaryFireThrowRequest = {
 					Kind = "PrimaryFireThrowRequest" :: "PrimaryFireThrowRequest",
 					ItemName = item.Definition.Name,
-					Origin = head.Position,
-					Direction = GetCentreRay().Direction,
+					Origin = origin,
+					Direction = direction,
 				}
 				request = throwRequest
-			else
+			elseif item.Kind == "Item" then
 				local itemRequest: CombatTypes.PrimaryFireItemRequest = {
 					Kind = "PrimaryFireItemRequest" :: "PrimaryFireItemRequest",
 					ItemName = item.Definition.Name,
-					Origin = head.Position,
-					Direction = GetCentreRay().Direction,
+					Origin = origin,
+					Direction = direction,
 				}
 				request = itemRequest
+
+				if item.Definition.PrimaryFireClient then
+					item.Definition.PrimaryFireClient(item, "Primary", origin, direction)
+				end
+			else
+				error("Unknown item kind: " .. item.Kind)
 			end
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
