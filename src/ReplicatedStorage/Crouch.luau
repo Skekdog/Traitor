@@ -9,6 +9,19 @@ local track: AnimationTrack?
 
 local module = {}
 
+local function adjustTrackSpeed(): ()
+	if not track then
+		return
+	end
+
+	local hum = LocalCharacter.GetHumanoid()
+	if not hum then
+		return
+	end
+
+	track:AdjustSpeed(if hum.MoveDirection.Magnitude > 0 then hum.WalkSpeed / 16 else 0)
+end
+
 function module.IsCrouching(): boolean
 	return isCrouching
 end
@@ -27,6 +40,7 @@ function module.ToggleCrouching(enabled: boolean?): ()
 
 	if isCrouching then
 		track = LocalAnimation.TryPlayAnimation(94335137129691, "Crouch")
+		adjustTrackSpeed()
 	else
 		LocalAnimation.TryStopAnimation("Crouch")
 		track = nil
@@ -38,11 +52,7 @@ Players.LocalPlayer.CharacterAdded:Connect(function(char)
 	assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
 
 	hum:GetPropertyChangedSignal("MoveDirection"):Connect(function()
-		if not track then
-			return
-		end
-
-		track:AdjustSpeed(if hum.MoveDirection.Magnitude > 0 then hum.WalkSpeed / 16 else 0)
+		adjustTrackSpeed()
 	end)
 end)
 
