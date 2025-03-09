@@ -1,9 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ProfileManager = require(script.Parent.ProfileManager)
-
 require(script.Parent.SetupPlayer)
 require(script.Parent.SaveData)
+require(script.Parent.GetKarma)
 
 ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)
 	local char = plr.Character
@@ -23,13 +22,5 @@ ReplicatedStorage.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y:
 	y = math.clamp(y, -1.4, 1.4)
 	neck.C0 = CFrame.new(neck.C0.Position) * CFrame.Angles(y, 0, 0)
 end)
-
-ReplicatedStorage.ClientServer.GetKarma.OnServerInvoke = function(plr, target: unknown)
-	if typeof(target) ~= "Instance" or not target:IsA("Player") then
-		return
-	end
-	local profile = ProfileManager.GetProfile(plr)
-	return if profile then profile.Karma else 1000
-end
 
 require(script.Parent.RoundHandler)
