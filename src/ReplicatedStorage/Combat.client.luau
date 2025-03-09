@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
@@ -11,17 +10,12 @@ local ControlManager = require(script.Parent.ControlManager)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local HitSounds = require(script.Parent.HitSounds)
 local LocalAnimation = require(script.Parent.LocalAnimation)
+local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
 
-local player = Players.LocalPlayer
-
 local MAX_RANGE = 10000
-
-local function getCharacter(): Model?
-	return player.Character
-end
 
 local function deriveTargetPosition(origin: Vector3, spread: Vector3, range: number): Vector3
 	return origin + (GetCentreRay().Direction + spread).Unit * range
@@ -51,11 +45,6 @@ local function raycast(char: Model, spread: Vector3, range: number): RaycastResu
 
 	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (GetCentreRay().Direction + spread).Unit * range, params)
 end
-
-player.CharacterRemoving:Connect(function()
-	ControlManager.Unregister("Primary Fire")
-	ControlManager.Unregister("Reload Weapon")
-end)
 
 local function playEmptyClipSound(): ()
 	PlaySound(ReplicatedStorage.WeaponSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
@@ -122,7 +111,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 		ClientInventory.RemoveAmmoChangedConnection(lastAmmoConnection)
 	end
 
-	local char = getCharacter()
+	local char = LocalCharacter.GetCharacter()
 	if not item or not char then
 		ControlManager.Unregister("Primary Fire")
 		ControlManager.Unregister("Reload Weapon")
