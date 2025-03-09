@@ -16,6 +16,7 @@ require(script.Parent.Discombobulate)
 require(script.Parent.ShowAlert)
 require(script.Parent.BulletTracer)
 require(script.Parent.ShatterGlass)
+require(script.Parent.CorpseCollisionFix)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
@@ -23,18 +24,6 @@ ThemesManager.UpdateTheme("Dark")
 
 local notice = UIManager.WaitForUI("Notice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Notice)}
 notice:ToggleVisible(true)
-
--- shitty problems require shitty solutions - Sun Tzu, the art of war
-workspace.Corpses.ChildAdded:Connect(function(child)
-    while child.Parent do
-        for _, v in child:GetDescendants() do
-            if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
-                v.CanCollide = true
-            end
-        end
-        task.wait()
-    end
-end)
 
 LocalRoundInfo.Listen("Phase", function()
     if LocalRoundInfo.GetRoundPhase() == "Waiting" then
