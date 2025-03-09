@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(script.Parent.ControlManager)
 local GetCentreRay = require(script.Parent.GetCentreRay)
@@ -31,6 +32,20 @@ local itemChangedConnections: {(item: Types.AnyItem?) -> ()} = {}
 function module.ConnectEquippedItemChanged(callback: (item: Types.AnyItem?) -> ()): ()
 	table.insert(itemChangedConnections, callback)
 end
+
+RunService.Heartbeat:Connect(function(dt)
+	for _, v in ourInventory.Passive do
+		if v.Kind == "Item" and v.Definition.HeartbeatClient then
+			v.Definition.HeartbeatClient(v, dt)
+		end
+	end
+
+	for _, v in ourInventory.Slots do
+		if v.Kind == "Item" and v.Definition.HeartbeatClient then
+			v.Definition.HeartbeatClient(v, dt)
+		end
+	end
+end)
 
 local ammoChangedConnections: {AmmoConnection} = {}
 function module.ConnectAmmoChanged(kind: string, callback: AmmoCallback): ()
