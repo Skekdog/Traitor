@@ -5,7 +5,6 @@ local CollectionService = game:GetService("CollectionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
-local BulletTracer = require(script.Parent.BulletTracer)
 local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
@@ -16,14 +15,13 @@ local UIManager = require(script.Parent.UIManager)
 require(script.Parent.MakeBulletHole)
 require(script.Parent.Discombobulate)
 require(script.Parent.ShowAlert)
+require(script.Parent.BulletTracer)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
 serverClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
 
 ThemesManager.UpdateTheme("Dark")
-
-serverClient.BulletTracer.OnClientEvent:Connect(BulletTracer)
 
 local notice = UIManager.WaitForUI("Notice") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Notice)}
 notice:ToggleVisible(true)
