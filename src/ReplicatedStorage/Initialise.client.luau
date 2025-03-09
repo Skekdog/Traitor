@@ -10,12 +10,12 @@ local Flashbang = require(script.Parent.Flashbang)
 local HighlightPlayer = require(script.Parent.HighlightPlayer)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShatterGlass = require(script.Parent.ShatterGlass)
-local ShowAlert = require(script.Parent.ShowAlert)
 local ThemesManager = require(script.Parent.ThemesManager)
 local UIManager = require(script.Parent.UIManager)
 
 require(script.Parent.MakeBulletHole)
 require(script.Parent.Discombobulate)
+require(script.Parent.ShowAlert)
 
 local serverClient = ReplicatedStorage:WaitForChild("ServerClient")
 
@@ -78,6 +78,5 @@ for _, player in Players:GetPlayers() do
 end
 
 serverClient.Flashbang.OnClientEvent:Connect(Flashbang)
-serverClient.SendAlert.OnClientEvent:Connect(ShowAlert)
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
