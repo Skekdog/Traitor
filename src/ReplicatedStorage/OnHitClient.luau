@@ -15,4 +15,6 @@ local function OnHitClient(itemName: string, hitPart: BasePart?): ()
 	item.OnHitClient(item :: Types.ItemDefinitionOnHitClient, hitPart)
 end
 
+ReplicatedStorage.RoundRule.Remotes.RunOnHitClient.OnClientEvent:Connect(OnHitClient)
+
 return OnHitClient
