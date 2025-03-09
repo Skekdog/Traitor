@@ -70,10 +70,7 @@ end
 
 LocalCharacter.CharacterRemoving:Connect(unregisterAll)
 
-LocalCharacter.HumanoidAdded:Connect(function(hum)
-    WalkSpeed.Reset()
-    JumpPower.Reset()
-
+local function setHumanoidStates(hum: Humanoid): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
@@ -84,18 +81,9 @@ LocalCharacter.HumanoidAdded:Connect(function(hum)
     hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
+end
 
-    local char = hum.Parent
-    assert(char, "Humanoid has no Character")
-
-    local root = char:WaitForChild("HumanoidRootPart")
-    assert(root:IsA("BasePart"), "HumanoidRootPart is not a Part")
-
-    registerClimbLadder(root)
-    registerCrouch()
-
-    initSnapToLadder(root)
-
+local function initFallDamage(hum: Humanoid, root: BasePart): ()
     local startHeight = math.huge
     hum.StateChanged:Connect(function(_, state)
         if state == Enum.HumanoidStateType.Freefall then
@@ -110,12 +98,9 @@ LocalCharacter.HumanoidAdded:Connect(function(hum)
             startHeight = math.huge
         end
     end)
+end
 
-    local neck = char:WaitForChild("Head"):WaitForChild("Neck")
-    assert(neck:IsA("Motor6D"), "Neck is not a Motor6D")
-
-    local camera = workspace.CurrentCamera
-
+local function initRemoveDeathSound(root: BasePart): ()
     local death = root:FindFirstChild("Died")
     if death then
         death:Destroy()
@@ -128,6 +113,13 @@ LocalCharacter.HumanoidAdded:Connect(function(hum)
             end
         end)
     end
+end
+
+local function initHeadTilt(char: Model): ()
+    local neck = char:WaitForChild("Head"):WaitForChild("Neck")
+    assert(neck:IsA("Motor6D"), "Neck is not a Motor6D")
+
+    local camera = workspace.CurrentCamera
 
     local y = camera.CFrame:ToOrientation()
     while neck:IsDescendantOf(char) do
@@ -145,4 +137,25 @@ LocalCharacter.HumanoidAdded:Connect(function(hum)
         y = newY
         clientServer.RotateHead:FireServer(y)
     end
+end
+
+LocalCharacter.HumanoidAdded:Connect(function(hum)
+    WalkSpeed.Reset()
+    JumpPower.Reset()
+
+    setHumanoidStates(hum)
+
+    local char = hum.Parent
+    assert(char and char:IsA("Model"), "Humanoid has no Character")
+
+    local root = char:WaitForChild("HumanoidRootPart")
+    assert(root:IsA("BasePart"), "HumanoidRootPart is not a Part")
+
+    registerClimbLadder(root)
+    registerCrouch()
+
+    initSnapToLadder(root)
+    initFallDamage(hum, root)
+    initRemoveDeathSound(root)
+    initHeadTilt(char)
 end)
