@@ -2,17 +2,13 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
-local ControlManager = require(script.Parent.ControlManager)
 local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
 local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local ShowAlert = require(script.Parent.ShowAlert)
 local UIManager = require(script.Parent.UIManager)
-local ViewCorpse = require(script.Parent.ViewCorpse)
 
 local module = {}
 
-local plr = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
 local crosshairInfoUI = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(UIManager.UnregisteredUIs.CrosshairInfo)
@@ -186,36 +182,6 @@ RunService.PostSimulation:Connect(function()
         return
     end
     module.InteractTarget = nil
-end)
-
-ControlManager.Register("Interact", function(action, state, input)
-    if not module.InteractTarget then
-        return Enum.ContextActionResult.Pass
-    end
-	local map = LocalRoundInfo.GetMap()
-
-	if not map then
-		return Enum.ContextActionResult.Pass
-	end
-
-	local model = module.InteractTarget:FindFirstAncestorOfClass("Model")
-	if model and model:IsDescendantOf(workspace.Corpses) then
-		if model:GetAttribute("Burning") then
-			ShowAlert("Ouch! This corpse is on fire!")
-			return Enum.ContextActionResult.Pass
-		end
-		
-		ViewCorpse(model)
-
-		return Enum.ContextActionResult.Sink
-	end
-
-	local char = plr.Character
-	if not char then
-		return Enum.ContextActionResult.Pass
-	end
-	
-	return Enum.ContextActionResult.Pass
 end)
 
 return module
