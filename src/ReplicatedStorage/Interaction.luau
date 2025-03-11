@@ -7,6 +7,7 @@ local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Mouse = require(script.Parent.Mouse)
 local ShowAlert = require(script.Parent.ShowAlert)
+local StandardDoor = require(script.Parent.StandardDoor)
 local ViewCorpse = require(script.Parent.ViewCorpse)
 
 local module = {}
@@ -21,6 +22,11 @@ local function interactCorpse(corpse: Model): boolean
 	
 	ViewCorpse(corpse)
 
+	return true
+end
+
+local function interactDoor(door: BasePart): boolean
+	StandardDoor(door)
 	return true
 end
 
@@ -58,6 +64,10 @@ function module.TryInteract(target: Instance?): boolean
 	local char = LocalCharacter.GetCharacter()
 	if not char then
 		return false
+	end
+
+	if target:IsA("BasePart") and target.Parent and target.Parent.Name == "Doors" and target:IsDescendantOf(map.DynamicMap) then
+		return interactDoor(target)
 	end
 	
 	return false
