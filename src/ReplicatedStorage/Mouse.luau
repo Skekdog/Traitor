@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
 local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
 local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
 local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
@@ -14,7 +13,7 @@ local camera = workspace.CurrentCamera
 local crosshairInfoUI = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(UIManager.UnregisteredUIs.CrosshairInfo)
 local playerInfo = crosshairInfoUI.PlayerInfo
 
-local function showPlayerInfo(char: Model)
+function module.ShowPlayerInfo(char: Model)
 	local plr = Players:GetPlayerFromCharacter(char)
 	if not plr then
         return
@@ -86,7 +85,7 @@ local function showPlayerInfo(char: Model)
 end
 
 local corpseHint = crosshairInfoUI.SearchCorpseHint
-local function showCorpseHint(char: Model)
+function module.ShowCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
 	if LocalRoundInfo.GetPlayerStatus(plr.Name) == "Alive" then
@@ -109,7 +108,7 @@ local function showCorpseHint(char: Model)
 end
 
 local itemHint = workspace:WaitForChild("ItemHintGui")
-local function showItemHint(instance: Instance)
+function module.ShowItemHint(instance: Instance)
 	local state = GetDroppedItemState(instance)
 
 	local ammo = if state.AmmoType then GetAmmoDefinition(state.AmmoType) else nil
@@ -134,54 +133,10 @@ local function showItemHint(instance: Instance)
 	itemHint.Enabled = true
 end
 
-local params = RaycastParams.new()
-params.IgnoreWater = true
-params.FilterType = Enum.RaycastFilterType.Exclude
-params.CollisionGroup = "Raycasts"
-
-module.InteractTarget = nil :: Instance?
-RunService.PostSimulation:Connect(function()
-	local cameraSubject = workspace.CurrentCamera.CameraSubject
-	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
-		params.FilterDescendantsInstances = {cameraSubject.Parent}
-	end
-
-	local map = LocalRoundInfo.GetMap()
-	if map then
-		params:AddToFilter(map.Bounds)
-	end
-	
-    local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
-	-- 10000 distance because we should still be able to see players. Corpses can be viewed from distance 10, so we include that as a check there.
-
+function module.Reset(): ()
 	playerInfo.Visible = false
 	corpseHint.Visible = false
 	itemHint.Enabled = false
-	
-    if result then
-        module.InteractTarget = result.Instance
-        assert(module.InteractTarget)
-
-		if map then
-			if module.InteractTarget:IsDescendantOf(map.ItemSpawns) or module.InteractTarget:IsDescendantOf(map.AmmoSpawns) then
-				showItemHint(module.InteractTarget)
-			end
-		end
-
-        local char = module.InteractTarget:FindFirstAncestorOfClass("Model")
-        if not char then
-            return
-        end
-
-        if char:IsDescendantOf(workspace.Corpses) then
-            showCorpseHint(char)
-        elseif char:IsDescendantOf(workspace.Characters) then
-            showPlayerInfo(char)
-        end
-
-        return
-    end
-    module.InteractTarget = nil
-end)
+end
 
 return module

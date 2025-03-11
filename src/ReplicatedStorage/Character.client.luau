@@ -28,34 +28,6 @@ local function initSnapToLadder(root: BasePart): ()
     end)
 end
 
-local function registerClimbLadder(root: BasePart): ()
-    ControlManager.Register("Climb Ladder", function()
-        local root = LocalCharacter.GetRootPart()
-        if not root then
-            return Enum.ContextActionResult.Pass
-        end
-    
-        local map = LocalRoundInfo.GetMap()
-        if not map then
-            return Enum.ContextActionResult.Pass
-        end
-    
-        local bounds = map.Bounds
-        if not bounds then
-            return Enum.ContextActionResult.Pass
-        end
-    
-        for _, v in root:GetTouchingParts() do
-            if v.Name == "Ladder" and v:IsDescendantOf(bounds) then
-                ClimbLadder.Climb(v)
-                return Enum.ContextActionResult.Sink
-            end
-        end
-    
-        return Enum.ContextActionResult.Pass
-    end)
-end
-
 local function registerCrouch(): ()
     ControlManager.Register("Crouch", function()
         Crouch.ToggleCrouching()
@@ -64,7 +36,6 @@ local function registerCrouch(): ()
 end
 
 local function unregisterAll(): ()
-    ControlManager.Unregister("Climb Ladder")
     ControlManager.Unregister("Crouch")
 end
 
@@ -151,7 +122,6 @@ LocalCharacter.HumanoidAdded:Connect(function(hum)
     local root = char:WaitForChild("HumanoidRootPart")
     assert(root:IsA("BasePart"), "HumanoidRootPart is not a Part")
 
-    registerClimbLadder(root)
     registerCrouch()
 
     initSnapToLadder(root)
