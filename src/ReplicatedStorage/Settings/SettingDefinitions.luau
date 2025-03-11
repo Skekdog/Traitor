@@ -296,30 +296,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Climb Ladder",
-	Tab = "Keybinds",
-	Category = "Gameplay",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.E,
-		},
-
-		TouchButton = {
-			Position = UDim2.fromOffset(100, 200),
-			Scale = 1,
-		},
-	},
-
-	Callback = function(name: string, value: ControlValue)
-		(require)(callbacks.Keybind)(name, value)
-	end,
-})
-
-table.insert(availableSettings, {
 	Name = "Interact",
 	Tab = "Keybinds",
 	Category = "Gameplay",

@@ -1,4 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ClimbLadder = require(script.Parent.ClimbLadder)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local ControlManager = require(script.Parent.ControlManager)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
@@ -21,6 +24,22 @@ local function interactCorpse(corpse: Model): boolean
 	return true
 end
 
+local function tryClimbLadder(map: Types.Map): boolean
+	local root = LocalCharacter.GetRootPart()
+	if not root then
+		return false
+	end
+
+	for _, v in root:GetTouchingParts() do
+		if v.Name == "Ladder" and v:IsDescendantOf(map.Bounds) then
+			ClimbLadder.Climb(v)
+			return true
+		end
+	end
+
+	return false
+end
+
 function module.TryInteract(target: Instance?): boolean
 	local map = LocalRoundInfo.GetMap()
 	if not map then
@@ -28,7 +47,7 @@ function module.TryInteract(target: Instance?): boolean
 	end
 
 	if not target then
-		return false
+		return tryClimbLadder(map)
 	end
 
 	local model = target:FindFirstAncestorOfClass("Model")
@@ -69,8 +88,28 @@ RunService.PostSimulation:Connect(function()
 	-- 10000 distance because we should still be able to see players. Corpses can be viewed from distance 10, so we include that as a check there.
 
 	Mouse.Reset()
+
+	local validAncestors = {workspace.Characters :: Folder, workspace.Corpses}
+	if map then
+		table.insert(validAncestors, map.ItemSpawns)
+		table.insert(validAncestors, map.AmmoSpawns)
+		table.insert(validAncestors, map.DynamicMap)
+	end
+
+	module.InteractTarget = nil
 	
     if result then
+		local isValid = false
+		for _, v in validAncestors do
+			if result.Instance:IsDescendantOf(v) then
+				isValid = true
+			end
+		end
+
+		if not isValid then
+			return
+		end
+
         module.InteractTarget = result.Instance
         assert(module.InteractTarget)
 
@@ -90,10 +129,7 @@ RunService.PostSimulation:Connect(function()
         elseif char:IsDescendantOf(workspace.Characters) then
             Mouse.ShowPlayerInfo(char)
         end
-
-        return
     end
-    module.InteractTarget = nil
 end)
 
 return module
