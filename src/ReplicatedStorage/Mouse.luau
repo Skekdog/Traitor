@@ -10,6 +10,8 @@ local ShowAlert = require(script.Parent.ShowAlert)
 local UIManager = require(script.Parent.UIManager)
 local ViewCorpse = require(script.Parent.ViewCorpse)
 
+local module = {}
+
 local plr = Players.LocalPlayer
 local camera = workspace.CurrentCamera
 
@@ -141,7 +143,7 @@ params.IgnoreWater = true
 params.FilterType = Enum.RaycastFilterType.Exclude
 params.CollisionGroup = "Raycasts"
 
-local interactTarget: Instance?
+module.InteractTarget = nil :: Instance?
 RunService.PostSimulation:Connect(function()
 	local cameraSubject = workspace.CurrentCamera.CameraSubject
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
@@ -161,16 +163,16 @@ RunService.PostSimulation:Connect(function()
 	itemHint.Enabled = false
 	
     if result then
-        interactTarget = result.Instance
-        assert(interactTarget)
+        module.InteractTarget = result.Instance
+        assert(module.InteractTarget)
 
 		if map then
-			if interactTarget:IsDescendantOf(map.ItemSpawns) or interactTarget:IsDescendantOf(map.AmmoSpawns) then
-				showItemHint(interactTarget)
+			if module.InteractTarget:IsDescendantOf(map.ItemSpawns) or module.InteractTarget:IsDescendantOf(map.AmmoSpawns) then
+				showItemHint(module.InteractTarget)
 			end
 		end
 
-        local char = interactTarget:FindFirstAncestorOfClass("Model")
+        local char = module.InteractTarget:FindFirstAncestorOfClass("Model")
         if not char then
             return
         end
@@ -183,11 +185,11 @@ RunService.PostSimulation:Connect(function()
 
         return
     end
-    interactTarget = nil
+    module.InteractTarget = nil
 end)
 
 ControlManager.Register("Interact", function(action, state, input)
-    if not interactTarget then
+    if not module.InteractTarget then
         return Enum.ContextActionResult.Pass
     end
 	local map = LocalRoundInfo.GetMap()
@@ -196,7 +198,7 @@ ControlManager.Register("Interact", function(action, state, input)
 		return Enum.ContextActionResult.Pass
 	end
 
-	local model = interactTarget:FindFirstAncestorOfClass("Model")
+	local model = module.InteractTarget:FindFirstAncestorOfClass("Model")
 	if model and model:IsDescendantOf(workspace.Corpses) then
 		if model:GetAttribute("Burning") then
 			ShowAlert("Ouch! This corpse is on fire!")
@@ -215,3 +217,5 @@ ControlManager.Register("Interact", function(action, state, input)
 	
 	return Enum.ContextActionResult.Pass
 end)
+
+return module
