@@ -27,6 +27,8 @@ local CHECKBOX_OFF = "rbxassetid://101035239747030"
 local pageBase = templates.Page
 type Page = typeof(templates.Page)
 
+type TabButton = typeof(templates.Tab)
+
 local pages: {[string]: Page?} = {}
 local currentPage: Page? = nil
 
@@ -47,9 +49,16 @@ local function getPage(name: string): Page?
 	return pages[name]
 end
 
+local tabs: {[string]: TabButton?} = {}
+local function getTab(name: string): TabButton?
+	return tabs[name]
+end
+
 local function switchToPage(name: string): ()
 	local newPage = pages[name]
 	assert(newPage, `No page with name {name}`)
+
+	UIAnimation.TransitionUnderline(ui.Main.Tabs.Underline, assert(getTab(name)))
 
 	if newPage == currentPage then
 		return
@@ -83,13 +92,15 @@ local function createTab(name: string): ()
 	tab.Name = "Tab_" .. name
 	tab.Visible = true
 	tab.Text = name
-	tab.Parent = ui.Main.Tabs :: any
+	tab.Parent = ui.Main.Tabs.Tabs :: any
 
 	createPage(name)
 
 	tab.Activated:Connect(function()
 		switchToPage(name)
 	end)
+
+	tabs[name] = tab
 end
 
 local categoryIndex: {[Page]: {[string]: number?}?} = {}
