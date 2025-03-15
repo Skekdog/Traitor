@@ -164,7 +164,8 @@ local function pushPropClient(prop: Types.DataModelProp): ()
 		return
 	end
 
-	part:ApplyImpulse(Vector3.new(0, 100, 0))
+	local centreRay = GetCentreRay()
+	part:ApplyImpulseAtPosition(centreRay.Direction * ((ALIGNMENT_POWER_PER_UNIT_MASS * part.AssemblyMass) / 500), part:GetClosestPointOnSurface(centreRay.Origin))
 end
 
 local function getPropClient(origin: Vector3, direction: Vector3): Types.DataModelProp?
