@@ -7,7 +7,7 @@ local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
 
 local ALIGNMENT_POWER_PER_UNIT_MASS = 2500
-local ALIGNMENT_DAMPING = 100
+local ALIGNMENT_DAMPING_PER_UNIT_MASS = 50
 local ALIGNMENT_DEPTH = 6
 
 local function models(name: string): BasePart
@@ -147,7 +147,7 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 	local alignPosition = Instance.new("BodyPosition")
 	alignPosition.P = targetPower
 	alignPosition.MaxForce = Vector3.one * targetPower / 3
-	alignPosition.D = ALIGNMENT_DAMPING
+	alignPosition.D = ALIGNMENT_DAMPING_PER_UNIT_MASS * part.AssemblyMass
 	alignPosition.Parent = getPrimaryPart(prop)
 	currentGrabClient = alignPosition
 
