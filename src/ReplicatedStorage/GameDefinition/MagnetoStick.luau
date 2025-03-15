@@ -206,6 +206,12 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 
 	stopControllingPropClient()
 
+	local LocalAnimation = require(ReplicatedStorage.LocalAnimation)
+	local ViewmodelModule = require(ReplicatedStorage.ViewmodelModule)
+
+	LocalAnimation.TryPlayAnimation(13269497293, "Magneto")
+	ViewmodelModule.PlayAnimation("rbxassetid://13269497293", "Magneto")
+
 	if not isClientControlling(prop) then
 		startControllingPropClient(prop)
 	end
