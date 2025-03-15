@@ -88,9 +88,15 @@ local function tryUnequip(item: Types.AnyItem): ()
 
 	module.EquippedItem = nil
 
-	runItemChangedCallbacks()
-
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(nil)
+
+	ViewmodelModule.Hide()
+
+	if item.Kind == "Item" and item.Definition.OnUnequipClient then
+		item.Definition.OnUnequipClient(item)
+	end
+
+	runItemChangedCallbacks()
 
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
 	if not button then
@@ -98,8 +104,6 @@ local function tryUnequip(item: Types.AnyItem): ()
 	end
 
 	button.BackgroundTransparency = 0.75
-
-	ViewmodelModule.Hide()
 end
 
 local function isObscured(origin: Vector3, target: Vector3): boolean
@@ -166,12 +170,6 @@ local function tryEquip(item: Types.AnyItem): ()
 		tryUnequip(module.EquippedItem)
 	end
 
-	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
-	if not button then
-		return
-	end
-
-	button.BackgroundTransparency = 0.25
 	module.EquippedItem = item
 
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(item.Definition.Name)
@@ -198,9 +196,19 @@ local function tryEquip(item: Types.AnyItem): ()
 		end)
 	end
 
+	ViewmodelModule.Show(item.Definition)
+
+	if item.Kind == "Item" and item.Definition.OnEquipClient then
+		item.Definition.OnEquipClient(item)
+	end
 	runItemChangedCallbacks()
 
-	ViewmodelModule.Show(item.Definition)
+	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
+	if not button then
+		return
+	end
+
+	button.BackgroundTransparency = 0.25
 end
 
 local INV_BUTTON_SIZE = 0.065
