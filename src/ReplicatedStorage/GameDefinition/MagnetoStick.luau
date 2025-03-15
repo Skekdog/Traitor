@@ -40,6 +40,20 @@ local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
 	return model
 end
 
+local function isPropSmallEnough(prop: Types.DataModelProp): boolean
+	local part = getPrimaryPart(prop)
+	if not part then
+		return false
+	end
+
+	local size = part.Size
+	if part.AssemblyMass > 160 or (size.X * size.Y * size.Z) > 50 or size.X > 5 or size.Y > 5 or size.Z > 5 then
+		return false
+	end
+
+	return true
+end
+
 type NetworkOwnerParameter = Player | "Auto"
 local function setNetworkOwnerOfPart(part: BasePart, owner: NetworkOwnerParameter): ()
 	if not part:IsDescendantOf(workspace) then
@@ -139,6 +153,10 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 
 	local part = getPrimaryPart(prop)
 	if not part then
+		return
+	end
+
+	if not isPropSmallEnough(part) then
 		return
 	end
 
@@ -344,6 +362,10 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 	stopControllingPropServer(participant)
 
 	if mode == "Alternate" then
+		if not isPropSmallEnough(part) then
+			return
+		end
+
 		local controllerObject = getControllerObject(part)
 		if not controllerObject then
 			local newObject = Instance.new("IntValue")
