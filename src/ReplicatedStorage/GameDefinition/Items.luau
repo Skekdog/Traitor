@@ -6,6 +6,7 @@ local TweenService = game:GetService("TweenService")
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
+local MagnetoStick = require(script.Parent.MagnetoStick)
 local Types = require(script.Parent.Parent.RoundRule.Types)
 
 local function models(name: string): BasePart
@@ -1029,24 +1030,7 @@ melees.Crowbar = {
 }
 
 local items: {[string]: Types.ItemDefinition} = {}
-items["Magneto Stick"] = {
-    Kind = "Item" :: "Item",
-    Name = "Magneto Stick",
-    Slot = 5,
-    CanDrop = false,
-
-    Model = models("Magneto Stick"),
-    HoldAnimation = "rbxassetid://10247423634",
-
-    PrimaryFireClient = print,
-    AlternateFireClient = print,
-
-    PrimaryFireServer = print,
-    AlternateFireServer = print,
-
-    PrimaryHint = "Push Prop",
-    AlternateHint = "Grab Prop",
-}
+items["Magneto Stick"] = MagnetoStick
 
 items["DNA Scanner"] = {
     Kind = "Item" :: "Item",
