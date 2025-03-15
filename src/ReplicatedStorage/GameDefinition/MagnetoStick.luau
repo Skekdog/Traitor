@@ -40,14 +40,21 @@ local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
 	return model
 end
 
-local function isPropSmallEnough(prop: Types.DataModelProp): boolean
-	local part = getPrimaryPart(prop)
-	if not part then
+local function isPropSmallEnough(part: BasePart): boolean
+	local size = part.Size
+	if part.AssemblyMass > 160 or (size.X * size.Y * size.Z) > 50 or size.X > 5 or size.Y > 5 or size.Z > 5 then
 		return false
 	end
 
-	local size = part.Size
-	if part.AssemblyMass > 160 or (size.X * size.Y * size.Z) > 50 or size.X > 5 or size.Y > 5 or size.Z > 5 then
+	return true
+end
+
+local function canGrab(part: BasePart): boolean
+	if not isPropSmallEnough(part) then
+		return false
+	end
+
+	if part:GetAttribute("NoGrab") then
 		return false
 	end
 
@@ -156,7 +163,7 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 		return
 	end
 
-	if not isPropSmallEnough(part) then
+	if not canGrab(part) then
 		return
 	end
 
@@ -362,7 +369,7 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 	stopControllingPropServer(participant)
 
 	if mode == "Alternate" then
-		if not isPropSmallEnough(part) then
+		if not canGrab(part) then
 			return
 		end
 
