@@ -236,6 +236,16 @@ local function onUnequipServer(_, participant: Types.Participant): ()
 	stopControllingPropServer(participant)
 end
 
+local function isPartTouchingPart(part1: BasePart, part2: BasePart): boolean
+	for _, v in workspace:GetPartsInPart(part1) do
+		if v == part2 then
+			return true
+		end
+	end
+
+	return false
+end
+
 local heartbeatClient: (item: Types.Item, dt: number) -> () = function(): ()
 	if not currentGrabClient then
 		return
@@ -243,6 +253,28 @@ local heartbeatClient: (item: Types.Item, dt: number) -> () = function(): ()
 
 	local part = currentGrabClient.Parent
 	assert(part and part:IsA("BasePart"), "Part must be a BasePart")
+
+	local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
+
+	local char = LocalCharacter.GetCharacter()
+	if not char then
+		return
+	end
+
+	local leftFoot = char:FindFirstChild("LeftFoot")
+	local rightFoot = char:FindFirstChild("RightFoot")
+
+	if leftFoot and leftFoot:IsA("BasePart") then
+		if isPartTouchingPart(leftFoot, part) then
+			return stopControllingPropClient()
+		end
+	end
+
+	if rightFoot and rightFoot:IsA("BasePart") then
+		if isPartTouchingPart(rightFoot, part) then
+			return stopControllingPropClient()
+		end
+	end
 	
 	local distance = Players.LocalPlayer:DistanceFromCharacter(part.Position)
 	if distance == 0 or distance > MAX_DISTANCE then
