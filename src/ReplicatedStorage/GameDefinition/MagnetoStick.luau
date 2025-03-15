@@ -249,7 +249,7 @@ local function isPartTouchingPart(part1: BasePart, part2: BasePart): boolean
 	return false
 end
 
-local heartbeatClient: (item: Types.Item, dt: number) -> () = function(): ()
+local preSimulationClient: (item: Types.Item, dt: number) -> () = function(): ()
 	if not currentGrabClient then
 		return
 	end
@@ -379,7 +379,7 @@ local item: Types.ItemDefinition = {
 	OnUnequipClient = onUnequipClient,
 	OnUnequipServer = onUnequipServer,
 
-	HeartbeatClient = heartbeatClient,
+	PreSimulationClient = preSimulationClient,
 
     PrimaryHint = "Push Prop",
     AlternateHint = "Grab Prop",

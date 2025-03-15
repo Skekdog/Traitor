@@ -33,18 +33,38 @@ function module.ConnectEquippedItemChanged(callback: (item: Types.AnyItem?) -> (
 	table.insert(itemChangedConnections, callback)
 end
 
-RunService.Heartbeat:Connect(function(dt)
+local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "PreAnimation" | "PreRender" | "PreSimulation" | "PostSimulation"): ()
 	for _, v in ourInventory.Passive do
-		if v.Kind == "Item" and v.Definition.HeartbeatClient then
-			v.Definition.HeartbeatClient(v, dt)
+		if v.Kind == "Item" and v.Definition[schedulerEvent .. "Client"] then
+			v.Definition[schedulerEvent .. "Client"](v, dt)
 		end
 	end
 
 	for _, v in ourInventory.Slots do
-		if v.Kind == "Item" and v.Definition.HeartbeatClient then
-			v.Definition.HeartbeatClient(v, dt)
+		if v.Kind == "Item" and v.Definition[schedulerEvent .. "Client"] then
+			v.Definition[schedulerEvent .. "Client"](v, dt)
 		end
 	end
+end
+
+RunService.Heartbeat:Connect(function(dt: number)
+	runScheduledCallbacks(dt, "Heartbeat")
+end)
+
+RunService.PreAnimation:Connect(function(dt: number)
+	runScheduledCallbacks(dt, "PreAnimation")
+end)
+
+RunService.PreRender:Connect(function(dt: number)
+	runScheduledCallbacks(dt, "PreRender")
+end)
+
+RunService.PreSimulation:Connect(function(dt: number)
+	runScheduledCallbacks(dt, "PreSimulation")
+end)
+
+RunService.PostSimulation:Connect(function(dt: number)
+	runScheduledCallbacks(dt, "PostSimulation")
 end)
 
 local ammoChangedConnections: {AmmoConnection} = {}
