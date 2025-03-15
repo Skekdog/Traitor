@@ -34,6 +34,10 @@ end
 
 type NetworkOwnerParameter = Player | "Auto"
 local function setNetworkOwnerOfPart(part: BasePart, owner: NetworkOwnerParameter): ()
+	if not part:IsDescendantOf(workspace) then
+		return
+	end
+	
 	if owner == "Auto" then
 		return part:SetNetworkOwnershipAuto()
 	end
@@ -47,15 +51,6 @@ local function setNetworkOwnerOfProp(prop: Types.Prop, owner: NetworkOwnerParame
 		return
 	end
 	setNetworkOwnerOfPart(part, owner)
-end
-
-local function stopControllingPropClient(): ()
-	if not currentGrabClient then
-		return
-	end
-
-	currentGrabClient:Destroy()
-	currentGrabClient = nil
 end
 
 local function getControllerObject(part: BasePart): IntValue?
@@ -75,6 +70,36 @@ local function getController(part: BasePart): Player?
 
 	local player = Players:GetPlayerByUserId(controllerObject.Value)
 	return player
+end
+
+local function stopControllingPropClient(): ()
+	if not currentGrabClient then
+		return
+	end
+
+	currentGrabClient:Destroy()
+	currentGrabClient = nil
+end
+
+local function stopControllingPropServer(participant: Types.Participant): ()
+	local prop = serverGrabbedProps[participant]
+	if not prop then
+		return
+	end
+
+	local part = getPrimaryPart(prop)
+	if not part then
+		return
+	end
+
+	local controllerObject = getControllerObject(part)
+	if controllerObject then
+		controllerObject.Value = 0
+	end
+
+	setNetworkOwnerOfPart(part, "Auto")
+
+	serverGrabbedProps[participant] = nil
 end
 
 local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
@@ -191,10 +216,7 @@ local function onUnequipClient(): ()
 end
 
 local function onUnequipServer(_, participant: Types.Participant): ()
-	local grabbed = serverGrabbedProps[participant]
-	if grabbed then
-		setNetworkOwnerOfProp(grabbed, "Auto")
-	end
+	stopControllingPropServer(participant)
 end
 
 local heartbeatClient: (item: Types.Item, dt: number) -> () = function(): ()
@@ -270,6 +292,8 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 			newObject.Value = participant.Player.UserId
 			newObject.Parent = part
 		end
+
+		serverGrabbedProps[participant] = prop
 	end
 
 	setNetworkOwnerOfProp(prop, participant.Player)
