@@ -6,7 +6,7 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
 
-local ALIGNMENT_POWER = 12500
+local ALIGNMENT_POWER_PER_UNIT_MASS = 2500
 local ALIGNMENT_DAMPING = 100
 local ALIGNMENT_DEPTH = 4
 
@@ -127,8 +127,13 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 		return
 	end
 
+	local part = getPrimaryPart(prop)
+	if not part then
+		return
+	end
+
 	local alignPosition = Instance.new("BodyPosition")
-	alignPosition.P = ALIGNMENT_POWER
+	alignPosition.P = ALIGNMENT_POWER_PER_UNIT_MASS * part.AssemblyMass
 	alignPosition.D = ALIGNMENT_DAMPING
 	alignPosition.Parent = getPrimaryPart(prop)
 	currentGrabClient = alignPosition
