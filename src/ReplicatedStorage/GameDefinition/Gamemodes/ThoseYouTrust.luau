@@ -232,10 +232,6 @@ local gamemode: Types.Gamemode = {
 
 	RequiredSlayVotes = 2,
 
-	DefaultVictor = function(gamemode: Types.Gamemode, round: Types.Round): Types.Victor
-		return round:GetRoleFromRoleName("Traitor")
-	end,
-
 	TimeoutVictor = function(gamemode: Types.Gamemode, round: Types.Round): Types.Victor
 		return round:GetRoleFromRoleName("Innocent")
 	end,

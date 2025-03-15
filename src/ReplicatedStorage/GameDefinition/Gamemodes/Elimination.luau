@@ -86,7 +86,6 @@ local gamemode: Types.Gamemode = {
 
     MinimumPlayers = 1,
 
-    DefaultVictor = getBestParticipant,
     TimeoutVictor = getBestParticipant,
     TimeoutMusic = timeoutVictoryMusic,
 
