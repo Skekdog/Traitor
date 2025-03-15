@@ -37,7 +37,7 @@ local function setNetworkOwnerOfPart(part: BasePart, owner: NetworkOwnerParamete
 	if not part:IsDescendantOf(workspace) then
 		return
 	end
-	
+
 	if owner == "Auto" then
 		return part:SetNetworkOwnershipAuto()
 	end
@@ -275,23 +275,29 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 		return
 	end
 
-	if not canControl(prop) then
-		return
-	end
-
 	local part = getPrimaryPart(prop)
 	if not part then
 		return
 	end
+
+	if not canControl(prop) then
+		return stopControllingPropServer(participant)
+	end
+
+	stopControllingPropServer(participant)
 
 	if mode == "Alternate" then
 		local controllerObject = getControllerObject(part)
 		if not controllerObject then
 			local newObject = Instance.new("IntValue")
 			newObject.Name = "MagnetoController"
-			newObject.Value = participant.Player.UserId
 			newObject.Parent = part
+
+			controllerObject = newObject
 		end
+
+		assert(controllerObject)
+		controllerObject.Value = participant.Player.UserId
 
 		serverGrabbedProps[participant] = prop
 	end
