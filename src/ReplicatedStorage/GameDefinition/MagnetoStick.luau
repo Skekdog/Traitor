@@ -220,12 +220,12 @@ local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
 end
 
 local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): ()
+	stopControllingPropClient()
+
 	local prop = getPropClient(origin, direction)
 	if not prop then
 		return
 	end
-
-	stopControllingPropClient()
 
 	if not isClientControlling(prop) then
 		startControllingPropClient(prop)
