@@ -8,7 +8,7 @@ local MAX_DISTANCE = 15
 
 local ALIGNMENT_POWER_PER_UNIT_MASS = 2500
 local ALIGNMENT_DAMPING = 100
-local ALIGNMENT_DEPTH = 4
+local ALIGNMENT_DEPTH = 6
 
 local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
