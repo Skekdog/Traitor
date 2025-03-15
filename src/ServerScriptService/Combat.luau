@@ -155,7 +155,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		grenade:RunOnHitClient(victim, hitPart)
 	end
 
-	victim:TryTakeDamage(params)
+	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
 local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, hitPart: BasePart, hitPosition: Vector3): ()
