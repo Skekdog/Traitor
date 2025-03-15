@@ -257,6 +257,15 @@ local heartbeatClient: (item: Types.Item, dt: number) -> () = function(): ()
 	local part = currentGrabClient.Parent
 	assert(part and part:IsA("BasePart"), "Part must be a BasePart")
 
+	local distance = Players.LocalPlayer:DistanceFromCharacter(part.Position)
+	if distance == 0 or distance > MAX_DISTANCE then
+		return stopControllingPropClient()
+	end
+
+	if not part:IsDescendantOf(workspace) then
+		return stopControllingPropClient()
+	end
+
 	local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
 
 	local char = LocalCharacter.GetCharacter()
@@ -277,11 +286,6 @@ local heartbeatClient: (item: Types.Item, dt: number) -> () = function(): ()
 		if isPartTouchingPart(rightFoot, part) then
 			return stopControllingPropClient()
 		end
-	end
-	
-	local distance = Players.LocalPlayer:DistanceFromCharacter(part.Position)
-	if distance == 0 or distance > MAX_DISTANCE then
-		return stopControllingPropClient()
 	end
 
 	currentGrabClient.Position = GetCentreRay(ALIGNMENT_DEPTH).Origin
