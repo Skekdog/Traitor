@@ -142,8 +142,11 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 		return
 	end
 
+	local targetPower = part.AssemblyMass * ALIGNMENT_POWER_PER_UNIT_MASS
+
 	local alignPosition = Instance.new("BodyPosition")
-	alignPosition.P = ALIGNMENT_POWER_PER_UNIT_MASS * part.AssemblyMass
+	alignPosition.P = targetPower
+	alignPosition.MaxForce = Vector3.one * targetPower / 3
 	alignPosition.D = ALIGNMENT_DAMPING
 	alignPosition.Parent = getPrimaryPart(prop)
 	currentGrabClient = alignPosition
