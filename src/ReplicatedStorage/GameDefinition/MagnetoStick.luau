@@ -17,6 +17,14 @@ end
 local serverGrabbedProps: {[Types.Participant]: Types.Prop?} = {}
 local currentGrabClient: BodyPosition?
 
+local function animate(): ()
+	local LocalAnimation = require(ReplicatedStorage.LocalAnimation)
+	local ViewmodelModule = require(ReplicatedStorage.ViewmodelModule)
+
+	LocalAnimation.TryPlayAnimation(13269497293, "Magneto")
+	ViewmodelModule.PlayAnimation("rbxassetid://13269497293", "Magneto")
+end
+
 local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
 	local model: Types.DataModelProp
 	if typeof(prop) == "table" then
@@ -79,6 +87,8 @@ local function stopControllingPropClient(): ()
 
 	currentGrabClient:Destroy()
 	currentGrabClient = nil
+
+	animate()
 end
 
 local function stopControllingPropServer(participant: Types.Participant): ()
@@ -137,6 +147,8 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 	alignPosition.D = ALIGNMENT_DAMPING
 	alignPosition.Parent = getPrimaryPart(prop)
 	currentGrabClient = alignPosition
+
+	animate()
 end
 
 local function pushPropClient(prop: Types.DataModelProp): ()
@@ -210,12 +222,6 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 	end
 
 	stopControllingPropClient()
-
-	local LocalAnimation = require(ReplicatedStorage.LocalAnimation)
-	local ViewmodelModule = require(ReplicatedStorage.ViewmodelModule)
-
-	LocalAnimation.TryPlayAnimation(13269497293, "Magneto")
-	ViewmodelModule.PlayAnimation("rbxassetid://13269497293", "Magneto")
 
 	if not isClientControlling(prop) then
 		startControllingPropClient(prop)
