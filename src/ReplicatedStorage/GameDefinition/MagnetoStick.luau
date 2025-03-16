@@ -10,11 +10,15 @@ local ALIGNMENT_POWER_PER_UNIT_MASS = 2500
 local ALIGNMENT_DAMPING_PER_UNIT_MASS = 50
 local ALIGNMENT_DEPTH = 6
 
+local PROP_DAMAGE_TIME = 5
+
 local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
 local serverGrabbedProps: {[Types.Participant]: Types.Prop?} = {}
+local serverLastHeldBy: {[Types.MapProp]: {By: Types.Participant, At: number}?} = {}
+
 local currentGrabClient: BodyPosition?
 
 local function animate(): ()
@@ -39,6 +43,45 @@ local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
 
 	return model
 end
+
+local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
+	local lastHolder = serverLastHeldBy[prop]
+	if not lastHolder or lastHolder.At + PROP_DAMAGE_TIME < workspace:GetServerTimeNow() then
+		return
+	end
+
+	local part = getPrimaryPart(prop)
+	if not part then
+		return
+	end
+
+	local energy = 0.5 * part.AssemblyMass * (part.AssemblyLinearVelocity.Magnitude ^ 2)
+	if energy < 2000 then
+		return
+	end
+
+	local damage = (energy - 2000) / 1000
+	local params: Types.DamageParams = {
+		Amount = damage,
+		Source = "Crush",
+		Attacker = lastHolder.By,
+	}
+
+	prop:TryTakeDamage(params)
+
+	local char = otherPart:FindFirstAncestorOfClass("Model")
+	if not char then
+		return
+	end
+
+	local participant = prop.Round:GetParticipant(char.Name)
+	if not participant then
+		return
+	end
+
+	participant:TryTakeDamage(params)
+end
+
 
 local function isPropSmallEnough(part: BasePart): boolean
 	local size = part.Size
@@ -131,6 +174,17 @@ local function stopControllingPropServer(participant: Types.Participant): ()
 	setNetworkOwnerOfPart(part, "Auto")
 
 	serverGrabbedProps[participant] = nil
+
+	if prop.Kind == "MapProp" then
+		serverLastHeldBy[prop] = {By = participant, At = workspace:GetServerTimeNow()}
+		part.Touched:Connect(function(otherPart)
+			onPropTouchedServer(prop, otherPart)
+		end)
+
+		part.Destroying:Once(function()
+			serverLastHeldBy[prop] = nil
+		end)
+	end
 end
 
 local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
