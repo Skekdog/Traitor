@@ -165,12 +165,14 @@ local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
 	participant:TryTakeDamage(params)
 end
 
-local function stopControllingPropClient(): ()
+local function stopControllingPropClient(doNotFireServer: boolean?): ()
 	if not currentGrabClient then
 		return
 	end
 
-	stopControllingPropRemote:FireServer()
+	if not doNotFireServer then
+		stopControllingPropRemote:FireServer()
+	end
 
 	currentGrabClient:Destroy()
 	currentGrabClient = nil
@@ -240,6 +242,7 @@ local function isControlledBy(prop: Types.DataModelProp, player: Player): boolea
 	end
 
 	local controller = getController(part)
+	print(controller, player)
 	return controller == player
 end
 
@@ -335,7 +338,7 @@ local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
 end
 
 local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): ()
-	stopControllingPropClient()
+	stopControllingPropClient(true)
 
 	local prop = getPropClient(origin, direction)
 	if not prop then
@@ -348,7 +351,7 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 end
 
 local function onUnequipClient(): ()
-	stopControllingPropClient()
+	stopControllingPropClient(true)
 end
 
 local function onUnequipServer(_, participant: Types.Participant): ()
@@ -452,7 +455,11 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 		return
 	end
 
-	if mode == "Primary" and isControlledBy(part, participant.Player) then
+	print(isControlledBy(part, participant.Player))
+	if isControlledBy(part, participant.Player) then
+		if mode == "Alternate" then
+			stopControllingPropServer(participant.Player)
+		end
 		return
 	end
 
