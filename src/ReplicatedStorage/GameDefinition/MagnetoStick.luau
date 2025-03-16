@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local GetCentreRay = require(ReplicatedStorage.GetCentreRay)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -12,12 +13,23 @@ local ALIGNMENT_DEPTH = 6
 
 local PROP_DAMAGE_TIME = 5
 
+local stopControllingPropRemote: RemoteEvent
+if RunService:IsServer() then
+	stopControllingPropRemote = Instance.new("RemoteEvent")
+	stopControllingPropRemote.Name = "StopControllingProp"
+	stopControllingPropRemote.Parent = script
+else
+	local found = script:WaitForChild("StopControllingProp")
+	assert(found:IsA("RemoteEvent"), "StopControllingProp must be a RemoteEvent")
+	stopControllingPropRemote = found
+end
+
 local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
-local serverGrabbedProps: {[Types.Participant]: Types.Prop?} = {}
-local serverLastHeldBy: {[Types.MapProp]: {By: Types.Participant, At: number}?} = {}
+local serverGrabbedProps: {[Player]: Types.Prop?} = {}
+local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
 
 local currentGrabClient: BodyPosition?
 
@@ -50,6 +62,11 @@ local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
 		return
 	end
 
+	local lastHolderParticipant = prop.Round:GetParticipant(lastHolder.By.Name)
+	if not lastHolderParticipant then
+		return
+	end
+
 	local part = getPrimaryPart(prop)
 	if not part then
 		return
@@ -64,7 +81,7 @@ local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
 	local params: Types.DamageParams = {
 		Amount = damage,
 		Source = "Crush",
-		Attacker = lastHolder.By,
+		Attacker = lastHolderParticipant,
 	}
 
 	prop:TryTakeDamage(params)
@@ -149,14 +166,16 @@ local function stopControllingPropClient(): ()
 		return
 	end
 
+	stopControllingPropRemote:FireServer()
+
 	currentGrabClient:Destroy()
 	currentGrabClient = nil
 
 	animate()
 end
 
-local function stopControllingPropServer(participant: Types.Participant): ()
-	local prop = serverGrabbedProps[participant]
+local function stopControllingPropServer(player: Player): ()
+	local prop = serverGrabbedProps[player]
 	if not prop then
 		return
 	end
@@ -173,10 +192,10 @@ local function stopControllingPropServer(participant: Types.Participant): ()
 
 	setNetworkOwnerOfPart(part, "Auto")
 
-	serverGrabbedProps[participant] = nil
+	serverGrabbedProps[player] = nil
 
 	if prop.Kind == "MapProp" then
-		serverLastHeldBy[prop] = {By = participant, At = workspace:GetServerTimeNow()}
+		serverLastHeldBy[prop] = {By = player, At = workspace:GetServerTimeNow()}
 		part.Touched:Connect(function(otherPart)
 			onPropTouchedServer(prop, otherPart)
 		end)
@@ -185,6 +204,12 @@ local function stopControllingPropServer(participant: Types.Participant): ()
 			serverLastHeldBy[prop] = nil
 		end)
 	end
+end
+
+if RunService:IsServer() then
+	stopControllingPropRemote.OnServerEvent:Connect(function(player)
+		stopControllingPropServer(player)
+	end)
 end
 
 local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
@@ -316,7 +341,7 @@ local function onUnequipClient(): ()
 end
 
 local function onUnequipServer(_, participant: Types.Participant): ()
-	stopControllingPropServer(participant)
+	stopControllingPropServer(participant.Player)
 end
 
 local function isPartTouchingPart(part1: BasePart, part2: BasePart): boolean
@@ -417,10 +442,10 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 	end
 
 	if not canControl(prop) then
-		return stopControllingPropServer(participant)
+		return stopControllingPropServer(participant.Player)
 	end
 
-	stopControllingPropServer(participant)
+	stopControllingPropServer(participant.Player)
 
 	if mode == "Alternate" then
 		if not canGrab(part) then
@@ -439,7 +464,7 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 		assert(controllerObject)
 		controllerObject.Value = participant.Player.UserId
 
-		serverGrabbedProps[participant] = prop
+		serverGrabbedProps[participant.Player] = prop
 	end
 
 	setNetworkOwnerOfProp(prop, participant.Player)
