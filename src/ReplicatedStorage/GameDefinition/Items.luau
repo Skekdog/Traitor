@@ -6,6 +6,7 @@ local TweenService = game:GetService("TweenService")
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
+local FlareGun = require(script.Parent.FlareGun)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local Types = require(script.Parent.Parent.RoundRule.Types)
 
@@ -93,90 +94,6 @@ local function makeGolden(victim: Types.Participant)
     if pants then
         pants:Destroy()
     end
-end
-
-local function burn(attacker: Types.Participant, target: Types.Participant | Types.Prop): ()
-    local part: BasePart
-    if target.Kind == "Participant" then
-        local character = target:GetCharacter()
-        if not character then
-            return
-        end
-
-        local root = character.PrimaryPart
-        if not root then
-            return
-        end
-
-        part = root
-    elseif target.Kind == "MapProp" or target.Kind == "AmmoProp" or target.Kind == "ItemProp" then
-        part = target.Model
-    elseif target.Kind == "CorpseProp" then
-        local root = target.Model.PrimaryPart
-        if not root then
-            return
-        end
-
-        part = root
-    end
-
-    local fire = Instance.new("Fire")
-    fire.Size = 10
-    fire.Parent = part
-
-    local burnSound = Instance.new("Sound")
-    burnSound.SoundId = weaponSounds("FlareBurn")
-    burnSound.Parent = part
-
-    if target.Kind == "MapProp" then
-        part:SetAttribute("Burning", true)
-    elseif target.Kind == "CorpseProp" then
-        target.Model:SetAttribute("Burning", true)
-    end
-
-    local endTime = workspace:GetServerTimeNow() + 10
-    task.spawn(function()
-        while true do
-            if workspace:GetServerTimeNow() > endTime then
-                break
-            end
-
-            task.wait(0.25)
-
-            if target.Kind ~= "Participant" and target.Kind ~= "MapProp" then
-                continue
-            end
-
-            local health: number? = if target then (target :: Types.Participant):GetHealth() else nil
-            if health and health < 0 then
-                break
-            end
-            if not part:IsDescendantOf(workspace) then
-                break
-            end
-
-            burnSound:Play()
-
-            if health then
-                (target :: Types.Participant):TryTakeDamage({
-                    Amount = 1,
-                    Attacker = attacker,
-                    Source = "Burn"
-                })
-            end
-        end
-        
-        if target.Kind == "MapProp" then
-            part:SetAttribute("Burning", false)
-        end
-
-        burnSound:Destroy()
-        fire:Destroy()
-
-        if target.Kind == "CorpseProp" then
-            target.Model:Destroy()
-        end
-    end)
 end
 
 local guns: {[string]: Types.GunWeaponDefinition} = {}
@@ -379,63 +296,7 @@ guns["Golden Gun"] = {
     RecoilY = 0.0,
 }
 
-guns["Flare Gun"] = {
-    Kind = "Gun" :: "Gun",
-    Name = "Flare Gun",
-    Description = "Will set things it hits on fire. Can be used to burn corpses, preventing others from discovering them.",
-    Icon = "rbxassetid://444145395",
-    CreditCost = 1,
-    MaxStock = 1,
-
-    Slot = 8,
-    CanDrop = true,
-
-    Damage = {
-        Head = 15,
-        Body = 10,
-        Limb = 5,
-    },
-
-    AmmoType = Ammo.Flare,
-    ReloadSound = "",
-
-    HasMuzzleFlash = true,
-
-    Spread = 0.015,
-    
-    AttackInterval = 0.25,
-    ReloadTime = 0,
-    MagazineSize = 6,
-
-    Model = models("Flare Gun"),
-    HoldAnimation = "rbxassetid://9253211833",
-    AimAnimation = "rbxassetid://18691552315",
-    AttackSound = firedSounds("Flare Gun"),
-
-    Projectile = projectiles("Flare"),
-    ProjectileSpeed = 140,
-
-    AimFOV = 60,
-    AimSpreadMultiplier = 0.3,
-
-    BeforeHitParticipant = function(_, _, target: Types.Participant, params: Types.DamageParams): boolean
-        local attacker = params.Attacker
-        assert(attacker)
-        burn(attacker, target)
-        return true
-    end,
-
-    BeforeHitProp = function(_, _, target: Types.Prop, params: Types.DamageParams): boolean
-        local attacker = params.Attacker
-        assert(attacker)
-
-        burn(attacker, target)
-        return true
-    end,
-
-    RecoilX = 0.8,
-    RecoilY = 1.2,
-}
+guns["Flare Gun"] = FlareGun
 
 guns.SMG = {
     Kind = "Gun" :: "Gun",
