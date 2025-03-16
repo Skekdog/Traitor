@@ -214,6 +214,13 @@ if RunService:IsServer() then
 	stopControllingPropRemote.OnServerEvent:Connect(function(player)
 		stopControllingPropServer(player)
 	end)
+
+	Players.PlayerRemoving:Connect(function(player)
+		stopControllingPropServer(player)
+		if serverGrabbedProps[player] then
+			serverGrabbedProps[player] = nil
+		end
+	end)
 end
 
 local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
