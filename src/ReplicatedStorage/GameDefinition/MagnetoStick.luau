@@ -242,7 +242,6 @@ local function isControlledBy(prop: Types.DataModelProp, player: Player): boolea
 	end
 
 	local controller = getController(part)
-	print(controller, player)
 	return controller == player
 end
 
@@ -455,7 +454,6 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 		return
 	end
 
-	print(isControlledBy(part, participant.Player))
 	if isControlledBy(part, participant.Player) then
 		if mode == "Alternate" then
 			stopControllingPropServer(participant.Player)
