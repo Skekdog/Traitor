@@ -226,14 +226,14 @@ local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
 	return not controller
 end
 
-local function isClientControlling(prop: Types.DataModelProp): boolean
+local function isControlledBy(prop: Types.DataModelProp, player: Player): boolean
 	local part = getPrimaryPart(prop)
 	if not part then
 		return false
 	end
 
 	local controller = getController(part)
-	return controller == Players.LocalPlayer
+	return controller == player
 end
 
 local function startControllingPropClient(prop: Types.DataModelProp): ()
@@ -335,7 +335,7 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 		return
 	end
 
-	if not isClientControlling(prop) then
+	if not isControlledBy(prop, Players.LocalPlayer) then
 		startControllingPropClient(prop)
 	end
 end
@@ -442,6 +442,10 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 
 	local part = getPrimaryPart(prop)
 	if not part then
+		return
+	end
+
+	if mode == "Primary" and isControlledBy(part, participant.Player) then
 		return
 	end
 
