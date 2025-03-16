@@ -56,50 +56,6 @@ local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
 	return model
 end
 
-local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
-	local lastHolder = serverLastHeldBy[prop]
-	if not lastHolder or lastHolder.At + PROP_DAMAGE_TIME < workspace:GetServerTimeNow() then
-		return
-	end
-
-	local lastHolderParticipant = prop.Round:GetParticipant(lastHolder.By.Name)
-	if not lastHolderParticipant then
-		return
-	end
-
-	local part = getPrimaryPart(prop)
-	if not part then
-		return
-	end
-
-	local energy = 0.5 * part.AssemblyMass * (part.AssemblyLinearVelocity.Magnitude ^ 2)
-	if energy < 2000 then
-		return
-	end
-
-	local damage = (energy - 2000) / 1000
-	local params: Types.DamageParams = {
-		Amount = damage,
-		Source = "Crush",
-		Attacker = lastHolderParticipant,
-	}
-
-	prop:TryTakeDamage(params)
-
-	local char = otherPart:FindFirstAncestorOfClass("Model")
-	if not char then
-		return
-	end
-
-	local participant = prop.Round:GetParticipant(char.Name)
-	if not participant then
-		return
-	end
-
-	participant:TryTakeDamage(params)
-end
-
-
 local function isPropSmallEnough(part: BasePart): boolean
 	local size = part.Size
 	if part.AssemblyMass > 160 or (size.X * size.Y * size.Z) > 50 or size.X > 5 or size.Y > 5 or size.Z > 5 then
@@ -159,6 +115,54 @@ local function getController(part: BasePart): Player?
 
 	local player = Players:GetPlayerByUserId(controllerObject.Value)
 	return player
+end
+
+local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
+	local part = getPrimaryPart(prop)
+	if not part then
+		return
+	end
+
+	local currentHolder = getController(part)
+	if currentHolder then
+		return
+	end
+
+	local lastHolder = serverLastHeldBy[prop]
+	if not lastHolder or lastHolder.At + PROP_DAMAGE_TIME < workspace:GetServerTimeNow() then
+		return
+	end
+
+	local lastHolderParticipant = prop.Round:GetParticipant(lastHolder.By.Name)
+	if not lastHolderParticipant then
+		return
+	end
+
+	local energy = 0.5 * part.AssemblyMass * (part.AssemblyLinearVelocity.Magnitude ^ 2)
+	if energy < 2000 then
+		return
+	end
+
+	local damage = (energy - 2000) / 1000
+	local params: Types.DamageParams = {
+		Amount = damage,
+		Source = "Crush",
+		Attacker = lastHolderParticipant,
+	}
+
+	prop:TryTakeDamage(params)
+
+	local char = otherPart:FindFirstAncestorOfClass("Model")
+	if not char then
+		return
+	end
+
+	local participant = prop.Round:GetParticipant(char.Name)
+	if not participant or participant == lastHolderParticipant then
+		return
+	end
+
+	participant:TryTakeDamage(params)
 end
 
 local function stopControllingPropClient(): ()
