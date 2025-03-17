@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ClimbLadder = require(script.Parent.ClimbLadder)
@@ -14,7 +15,18 @@ local module = {}
 
 module.InteractTarget = nil :: Instance?
 
+local function distanceCheck(target: Vector3, maxDistance: number): boolean
+	local distance = Players.LocalPlayer:DistanceFromCharacter(target)
+	return distance ~= 0 and distance <= maxDistance
+end
+
 local function interactCorpse(corpse: Model): boolean
+	if LocalRoundInfo.GetPlayerStatus(Players.LocalPlayer.Name) ~= "Alive" then
+		if not distanceCheck(corpse:GetPivot().Position, 10) then
+			return false
+		end
+	end
+
 	if corpse:GetAttribute("Burning") then
 		ShowAlert("Ouch! This corpse is on fire!")
 		return true
@@ -26,7 +38,14 @@ local function interactCorpse(corpse: Model): boolean
 end
 
 local function interactDoor(door: BasePart): boolean
-	StandardDoor(door)
+	if not distanceCheck(door.Position, 10) then
+		return false
+	end
+	local request: StandardDoor.ClientInteraction = {
+		Kind = "ClientInteraction" :: "ClientInteraction",
+		Door = door,
+	}
+	StandardDoor(request)
 	return true
 end
 

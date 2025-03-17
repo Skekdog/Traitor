@@ -1,49 +1,140 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local IS_SERVER = RunService:IsServer()
 
-return function(door: BasePart): ()
+type BaseDoorRequest = {
+    Door: BasePart,
+}
+
+export type ClientInteraction = BaseDoorRequest & {
+    Kind: "ClientInteraction",
+}
+
+type BaseReceive = BaseDoorRequest & {
+    Open: boolean,
+}
+
+export type ServerReceive = BaseReceive & {
+    Kind: "ServerReceive",
+}
+
+export type ClientReceive = BaseReceive & {
+    Kind: "ClientReceive",
+    TargetAngle: number,
+    OriginalCFrame: CFrame,
+}
+
+export type DoorRequest = ClientInteraction | ServerReceive | ClientReceive
+
+local function findOrCreateAngleValue(door: BasePart): NumberValue
+    local angle = door:FindFirstChild("DoorAngle")
+    if not angle then
+        local newAngle = Instance.new("NumberValue")
+        newAngle.Name = "DoorAngle"
+        newAngle.Parent = door
+        angle = newAngle
+    end
+    assert(angle and angle:IsA("NumberValue"), "DoorAngle must be a NumberValue")
+    return angle
+end
+
+local function StandardDoor(request: DoorRequest): ()
+    if IS_SERVER then
+        assert(request.Kind == "ServerReceive", "Expected ServerReceive")
+    else
+        assert(request.Kind == "ClientInteraction" or request.Kind == "ClientReceive", "Expected ClientInteraction or ClientReceive")
+    end
+
+    local door = request.Door
     if door:GetAttribute("Opening") then
         return
     end
 
     door:SetAttribute("Opening", true)
 
-    local angle = door:FindFirstChild("DoorAngle") :: NumberValue or Instance.new("NumberValue")
-    if not angle.Parent then
-        angle.Name = "DoorAngle"
-        angle.Parent = door
-    end
+    local angle = findOrCreateAngleValue(door)
 
-    assert(angle:IsA("NumberValue"), "DoorAngle must be a NumberValue")
-
-    local open = not door:GetAttribute("Open")
+    local open = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
     door:SetAttribute("Open", open)
 
-    local initialCFrame = door.CFrame
+    local initialCFrame = if request.Kind == "ClientReceive" then request.OriginalCFrame else door.CFrame
 
     local hingeCFrame = initialCFrame * CFrame.new(door.Size.X / -2, 0, 0)
     local offset = hingeCFrame:Inverse() * initialCFrame
 
-    local sounds = {}
-    for _, v in door:GetChildren() do
-        if v:IsA("Sound") and v.Name == if open then "OpenSound" else "CloseSound" then
-            table.insert(sounds, v)
+    if not IS_SERVER then
+        local sounds = {}
+        for _, v in door:GetChildren() do
+            if v:IsA("Sound") and v.Name == if open then "OpenSound" else "CloseSound" then
+                table.insert(sounds, v)
+            end
         end
+        sounds[math.random(1, #sounds)]:Play()
     end
-    sounds[math.random(1, #sounds)]:Play()
 
     task.delay(1, door.SetAttribute, door, "Opening", false)
 
-    local targetAngle = if open then 90 else if IS_SERVER then -90 else 0
     if IS_SERVER then
-        door.CFrame = hingeCFrame * CFrame.Angles(0, math.rad(targetAngle), 0) * offset
+        local targetAngle = if open then 90 else -90
+        local targetCFrame = hingeCFrame * CFrame.Angles(0, math.rad(targetAngle), 0) * offset
+
+        door.CFrame = targetCFrame
+
+        local clientReceive: ClientReceive = {
+            Kind = "ClientReceive" :: "ClientReceive",
+            Door = door,
+            Open = open,
+            TargetAngle = if open then 90 else 0,
+            OriginalCFrame = initialCFrame,
+        }
+        ReplicatedStorage.ClientServer.OpenDoor:FireAllClients(clientReceive)
         return
     end
+
+    local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if open then 90 else 0
+
+    ReplicatedStorage.ClientServer.OpenDoor:FireServer(door, open)
 
     TweenService:Create(angle, TweenInfo.new(1, Enum.EasingStyle.Linear), {Value = targetAngle}):Play()
     RunService.PreSimulation:Connect(function()
         door.CFrame = hingeCFrame * CFrame.Angles(0, math.rad(angle.Value), 0) * offset
     end)
 end
+
+if IS_SERVER then
+    ReplicatedStorage.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, open: unknown): ()
+        if typeof(door) ~= "Instance" or not door:IsA("BasePart") then
+            return
+        end
+
+        if typeof(open) ~= "boolean" then
+            return
+        end
+
+        local ServerScriptService = game:GetService("ServerScriptService")
+        local RoundHandler = require(ServerScriptService.RoundHandler)
+        if not door.Parent or door.Parent.Name ~= "Doors" or not door:IsDescendantOf(RoundHandler.GetRound():GetMap().DynamicMap) then
+            return
+        end
+
+        local distance = plr:DistanceFromCharacter(door.Position)
+        if distance == 0 or distance > 15 then
+            return
+        end
+
+        local request: ServerReceive = {
+            Kind = "ServerReceive" :: "ServerReceive",
+            Door = door,
+            Open = open,
+        }
+        StandardDoor(request)
+    end)
+end
+
+if not IS_SERVER then
+    ReplicatedStorage.ClientServer.OpenDoor.OnClientEvent:Connect(StandardDoor)
+end
+
+return StandardDoor
