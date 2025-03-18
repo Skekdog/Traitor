@@ -5,6 +5,7 @@ local TeleportService = game:GetService("TeleportService")
 local Items = require(ReplicatedStorage.GameDefinition.Items)
 local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local NoClip = require(script.Parent.NoClip)
 
 export type BaseCommand = {
 	Name: string,
@@ -125,6 +126,17 @@ module.luauserver = {
 		end
 
 		return tostring(result) or ""
+	end
+}
+
+module.noclip = {
+	Name = "noclip",
+	Description = "Toggles noclip on/off",
+	Environment = "Client" :: "Client",
+	Arguments = {},
+	Execute = function(player: Player, args: Args)
+		NoClip.Toggle()
+		return "Noclip toggled."
 	end
 }
 
