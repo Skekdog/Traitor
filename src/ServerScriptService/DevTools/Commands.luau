@@ -8,9 +8,11 @@ local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
 local RestartServer = require(ServerScriptService.RestartServer)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
+export type CommandEnviroment = "Server" | "Client"
 export type Command = {
 	Name: string,
 	Description: string,
+	Environment: CommandEnviroment,
 	Arguments: {string},
 	Execute: (round: Types.Round, args: {string?}) -> string,
 }
@@ -56,6 +58,7 @@ local module: {[string]: Command} = {}
 module.help = {
 	Name = "help",
 	Description = "Lists all commands",
+	Environment = "Client",
 	Arguments = {},
 	Execute = function()
 		local ret = "Commands:\n"
@@ -78,16 +81,18 @@ module.help = {
 
 module.echo = {
 	Name = "echo",
-	Description = "Returns the provided input.",
+	Description = "Returns the provided input",
+	Environment = "Client",
 	Arguments = {"input"},
 	Execute = function(round, args)
 		return table.concat(args, " ")
 	end
 }
 
-module.luau = {
-	Name = "luau",
-	Description = "Executes Luau code. Includes globals: round, cmds, items, players",
+module.luauserver = {
+	Name = "luauserver",
+	Description = "Executes Luau code server-side. Includes globals: round, cmds, items, players",
+	Environment = "Server",
 	Arguments = {"code"},
 	Execute = function(round, args)
 		local code = table.concat(args, " ")
@@ -116,6 +121,7 @@ module.luau = {
 module.teleportplace = {
 	Name = "teleportplace",
 	Description = "Teleports everyone to the specified place. Available named places: Imperium, MainPlace, TestPlace",
+	Environment = "Server",
 	Arguments = {"place name / id"},
 	Execute = function(round, args)
 		local asId = processNumberArgument(args[1])
@@ -134,6 +140,7 @@ module.teleportplace = {
 module.setrole = {
 	Name = "setrole",
 	Description = "Sets the role of a player",
+	Environment = "Server",
 	Arguments = {"player name", "role name"},
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
@@ -165,6 +172,7 @@ module.setrole = {
 module.kill = {
 	Name = "kill",
 	Description = "Kills the specified player",
+	Environment = "Server",
 	Arguments = {"player name"},
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
@@ -189,6 +197,7 @@ module.kill = {
 module.endround = {
 	Name = "endround",
 	Description = "Ends the current round with a victory for the specified role",
+	Environment = "Server",
 	Arguments = {"role name"},
 	Execute = function(round, args)
 		local roleName = args[1]
@@ -218,6 +227,7 @@ module.endround = {
 module.pause = {
 	Name = "pause",
 	Description = "Pauses or unpauses the round",
+	Environment = "Server",
 	Arguments = {},
 	Execute = function(round)
 		if round:GetRoundPhase() == "Intermission" or round:GetRoundPhase() == "Waiting" then
@@ -232,6 +242,7 @@ module.pause = {
 module.togglevictory = {
 	Name = "togglevictory",
 	Description = "Enables or disables victory",
+	Environment = "Server",
 	Arguments = {},
 	Execute = toggleVictory
 }
@@ -239,6 +250,7 @@ module.togglevictory = {
 module.restart = {
 	Name = "restart",
 	Description = "Restarts the server",
+	Environment = "Server",
 	Arguments = {},
 	Execute = function(round)
 		RestartServer(5)
@@ -249,6 +261,7 @@ module.restart = {
 module.map = {
 	Name = "map",
 	Description = "Changes the map",
+	Environment = "Server",
 	Arguments = {"map name"},
 	Execute = function(round, args)
 		local mapName = processStringArgument(args[1])
@@ -270,6 +283,7 @@ module.map = {
 module.giveitem = {
 	Name = "giveitem",
 	Description = "Gives an item to a player",
+	Environment = "Server",
 	Arguments = {"player name", "item name"},
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
@@ -300,6 +314,7 @@ module.giveitem = {
 module.givecredits = {
 	Name = "givecredits",
 	Description = "Gives credits to a player",
+	Environment = "Server",
 	Arguments = {"player name", "amount"},
 	Execute = function(round, args)
 		local playerName = processStringArgument(args[1])
