@@ -1,21 +1,31 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local Items = require(ReplicatedStorage.GameDefinition.Items)
 local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
-local RestartServer = require(ServerScriptService.RestartServer)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
-export type CommandEnviroment = "Server" | "Client"
-export type Command = {
+export type BaseCommand = {
 	Name: string,
 	Description: string,
-	Environment: CommandEnviroment,
 	Arguments: {string},
-	Execute: (round: Types.Round, args: {string?}) -> string,
 }
+
+export type ClientCommand = BaseCommand & {
+	Environment: "Client",
+	Execute: (player: Player, args: Args) -> string,
+}
+
+export type ServerCommand = BaseCommand & {
+	Environment: "Server",
+	Execute: (round: Round, args: Args) -> string,
+}
+
+export type Command = ClientCommand | ServerCommand
+
+type Round = Types.Round
+type Args = {string?}
 
 local WHITESPACE_SUBSTITUTE = "-"
 
@@ -58,7 +68,7 @@ local module: {[string]: Command} = {}
 module.help = {
 	Name = "help",
 	Description = "Lists all commands",
-	Environment = "Client",
+	Environment = "Client" :: "Client",
 	Arguments = {},
 	Execute = function()
 		local ret = "Commands:\n"
@@ -82,9 +92,9 @@ module.help = {
 module.echo = {
 	Name = "echo",
 	Description = "Returns the provided input",
-	Environment = "Client",
+	Environment = "Client" :: "Client",
 	Arguments = {"input"},
-	Execute = function(round, args)
+	Execute = function(_, args: Args)
 		return table.concat(args, " ")
 	end
 }
@@ -92,9 +102,9 @@ module.echo = {
 module.luauserver = {
 	Name = "luauserver",
 	Description = "Executes Luau code server-side. Includes globals: round, cmds, items, players",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"code"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: Args)
 		local code = table.concat(args, " ")
 		
 		local func = loadstring(code, "")
@@ -121,9 +131,9 @@ module.luauserver = {
 module.teleportplace = {
 	Name = "teleportplace",
 	Description = "Teleports everyone to the specified place. Available named places: Imperium, MainPlace, TestPlace",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"place name / id"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: Args)
 		local asId = processNumberArgument(args[1])
 		local asName = processStringArgument(args[1])
 		local place = if asId then asId else PlaceIDs[asName]
@@ -140,9 +150,9 @@ module.teleportplace = {
 module.setrole = {
 	Name = "setrole",
 	Description = "Sets the role of a player",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"player name", "role name"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: Args)
 		local playerName = processStringArgument(args[1])
 		if not playerName then
 			return "Missing argument 1 player name."
@@ -172,9 +182,9 @@ module.setrole = {
 module.kill = {
 	Name = "kill",
 	Description = "Kills the specified player",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"player name"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: Args)
 		local playerName = processStringArgument(args[1])
 		if not playerName then
 			return "Missing argument 1 player name."
@@ -197,9 +207,9 @@ module.kill = {
 module.endround = {
 	Name = "endround",
 	Description = "Ends the current round with a victory for the specified role",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"role name"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: Args)
 		local roleName = args[1]
 		if not roleName then
 			return "Missing argument 1 role name."
@@ -227,7 +237,7 @@ module.endround = {
 module.pause = {
 	Name = "pause",
 	Description = "Pauses or unpauses the round",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {},
 	Execute = function(round)
 		if round:GetRoundPhase() == "Intermission" or round:GetRoundPhase() == "Waiting" then
@@ -242,7 +252,7 @@ module.pause = {
 module.togglevictory = {
 	Name = "togglevictory",
 	Description = "Enables or disables victory",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {},
 	Execute = toggleVictory
 }
@@ -250,9 +260,12 @@ module.togglevictory = {
 module.restart = {
 	Name = "restart",
 	Description = "Restarts the server",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {},
 	Execute = function(round)
+		local ServerScriptService = game:GetService("ServerScriptService")
+		local RestartServer = require(ServerScriptService.RestartServer)
+
 		RestartServer(5)
 		return "Server restarting..."
 	end
@@ -261,9 +274,9 @@ module.restart = {
 module.map = {
 	Name = "map",
 	Description = "Changes the map",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"map name"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: Args)
 		local mapName = processStringArgument(args[1])
 		if not mapName then
 			return "Missing argument 1 map name."
@@ -283,9 +296,9 @@ module.map = {
 module.giveitem = {
 	Name = "giveitem",
 	Description = "Gives an item to a player",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"player name", "item name"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: {string?})
 		local playerName = processStringArgument(args[1])
 		if not playerName then
 			return "Missing argument 1 player name."
@@ -314,9 +327,9 @@ module.giveitem = {
 module.givecredits = {
 	Name = "givecredits",
 	Description = "Gives credits to a player",
-	Environment = "Server",
+	Environment = "Server" :: "Server",
 	Arguments = {"player name", "amount"},
-	Execute = function(round, args)
+	Execute = function(round: Round, args: Args)
 		local playerName = processStringArgument(args[1])
 		if not playerName then
 			return "Missing argument 1 player name."

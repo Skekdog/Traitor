@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local Commands = require(script.Parent.Commands)
@@ -5,11 +6,7 @@ local IsAdmin = require(script.Parent.IsAdmin)
 
 local module = {}
 
-function module.Execute(player: Player, round: Types.Round, command: string): string
-	if not IsAdmin(player) then
-		return "You are not an admin!"
-	end
-	
+function module.ParseCommand(command: string): {Command: Commands.Command?, Args: {string}}
 	local split = command:split(" ")
 	local cmdName = split[1]
 
@@ -17,11 +14,45 @@ function module.Execute(player: Player, round: Types.Round, command: string): st
 	table.move(split, 2, #split, 1, args)
 
 	local cmd = Commands[cmdName]
-	if not cmd then
-		return `Command {cmdName} not found.`
+
+	return {
+		Command = cmd,
+		Args = args,
+	}
+end
+
+function module.ClientExecute(command: string): string
+	if not IsAdmin(Players.LocalPlayer) then
+		return "You are not an admin!"
 	end
 
-	return cmd.Execute(round, args)
+	local parsed = module.ParseCommand(command)
+	if not parsed.Command then
+		return `Command {parsed.Args[1]} not found.`
+	end
+
+	if parsed.Command.Environment == "Client" then
+		return parsed.Command.Execute(Players.LocalPlayer, parsed.Args)
+	end
+
+	return ReplicatedStorage.ClientServer.Exec:InvokeServer(command)
+end
+
+function module.ServerExecute(player: Player, round: Types.Round, command: string): string
+	if not IsAdmin(player) then
+		return "You are not an admin!"
+	end
+	
+	local parsed = module.ParseCommand(command)
+	if not parsed.Command then
+		return `Command {parsed.Args[1]} not found.`
+	end
+
+	if parsed.Command.Environment ~= "Server" then
+		return `Command {parsed.Command.Name} is not a server command.`
+	end
+
+	return parsed.Command.Execute(round, parsed.Args)
 end
 
 return module

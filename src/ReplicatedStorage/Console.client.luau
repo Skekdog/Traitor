@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Exec = require(ReplicatedStorage.DevTools.Exec)
 local ControlManager = require(script.Parent.ControlManager)
 local IsAdmin = require(script.Parent.DevTools.IsAdmin)
 local UIManager = require(script.Parent.UIManager)
@@ -27,7 +28,7 @@ object.Input.FocusLost:Connect(function(enterPressed)
 		return
 	end
 
-	object.Output.Text = ReplicatedStorage.ClientServer.Exec:InvokeServer(object.Input.Text)
+	object.Output.Text = Exec.ClientExecute(object.Input.Text)
 end)
 
 object.Input:GetPropertyChangedSignal("Text"):Connect(function()

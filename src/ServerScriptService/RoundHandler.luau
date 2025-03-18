@@ -242,7 +242,7 @@ ReplicatedStorage.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body
 end
 
 ReplicatedStorage.ClientServer.Exec.OnServerInvoke = function(plr, command: string): string | true
-    return Exec.Execute(plr, round, command)
+    return Exec.ServerExecute(plr, round, command)
 end
 
 return module
