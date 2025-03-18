@@ -5,7 +5,6 @@ local TeleportService = game:GetService("TeleportService")
 local Items = require(ReplicatedStorage.GameDefinition.Items)
 local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
 local Types = require(ReplicatedStorage.RoundRule.Types)
-local NoClip = require(script.Parent.NoClip)
 
 export type BaseCommand = {
 	Name: string,
@@ -135,8 +134,21 @@ module.noclip = {
 	Environment = "Client" :: "Client",
 	Arguments = {},
 	Execute = function(player: Player, args: Args)
+		local NoClip = require(script.Parent.NoClip)
 		NoClip.Toggle()
 		return "Noclip toggled."
+	end
+}
+
+module.freecam = {
+	Name = "freecam",
+	Description = "Toggles freecam on/off",
+	Environment = "Client" :: "Client",
+	Arguments = {},
+	Execute = function(player: Player, args: Args)
+		local Freecam = require(ReplicatedStorage.Freecam)
+		Freecam.ToggleFreecam()
+		return "Freecam toggled."
 	end
 }
 
@@ -276,6 +288,7 @@ module.restart = {
 	Arguments = {},
 	Execute = function(round)
 		local ServerScriptService = game:GetService("ServerScriptService")
+
 		local RestartServer = require(ServerScriptService.RestartServer)
 
 		RestartServer(5)

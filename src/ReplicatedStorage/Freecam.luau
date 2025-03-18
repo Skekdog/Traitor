@@ -360,7 +360,7 @@ local function runCallbacks(): ()
 	end
 end
 
-local function StartFreecam()
+local function StartFreecam(): ()
 	if freecamEnabled then
 		return
 	end
@@ -383,7 +383,7 @@ local function StartFreecam()
 	runCallbacks()
 end
 
-local function StopFreecam()
+local function StopFreecam(): ()
 	if not freecamEnabled then
 		return
 	end
@@ -397,7 +397,16 @@ local function StopFreecam()
 	runCallbacks()
 end
 
+local function ToggleFreecam(): ()
+	if freecamEnabled then
+		StopFreecam()
+	else
+		StartFreecam()
+	end
+end
+
 return {
+	ToggleFreecam = ToggleFreecam,
 	StartFreecam = StartFreecam,
 	StopFreecam = StopFreecam,
 	ListenFreecamChanged = ListenFreecamChanged,
