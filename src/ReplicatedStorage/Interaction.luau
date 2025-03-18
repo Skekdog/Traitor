@@ -21,7 +21,7 @@ local function distanceCheck(target: Vector3, maxDistance: number): boolean
 end
 
 local function interactCorpse(corpse: Model): boolean
-	if LocalRoundInfo.GetPlayerStatus(Players.LocalPlayer.Name) ~= "Alive" then
+	if LocalRoundInfo.GetPlayerStatus(Players.LocalPlayer.Name) == "Alive" then
 		if not distanceCheck(corpse:GetPivot().Position, 10) then
 			return false
 		end
