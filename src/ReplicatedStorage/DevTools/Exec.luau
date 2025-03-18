@@ -1,10 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local Commands = require(script.Parent.Commands)
+local IsAdmin = require(script.Parent.IsAdmin)
 
 local module = {}
 
-function module.Execute(round: Types.Round, command: string): string
+function module.Execute(player: Player, round: Types.Round, command: string): string
+	if not IsAdmin(player) then
+		return "You are not an admin!"
+	end
+	
 	local split = command:split(" ")
 	local cmdName = split[1]
 
