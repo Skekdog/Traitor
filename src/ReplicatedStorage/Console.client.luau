@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ControlManager = require(script.Parent.ControlManager)
-local IsAdmin = require(script.Parent.IsAdmin)
+local IsAdmin = require(script.Parent.DevTools.IsAdmin)
 local UIManager = require(script.Parent.UIManager)
 
 if not IsAdmin(Players.LocalPlayer) then
