@@ -54,8 +54,6 @@ local function StandardDoor(request: DoorRequest): ()
         return
     end
 
-    door:SetAttribute("Opening", true)
-
     local open = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
     door:SetAttribute("Open", open)
 
@@ -95,8 +93,13 @@ local function StandardDoor(request: DoorRequest): ()
                 ReplicatedStorage.ClientServer.OpenDoor:FireClient(v, clientReceive)
             end
         end
+
+        door:SetAttribute("Opening", true)
+
         return
     end
+
+    door:SetAttribute("Opening", true)
 
     local angle = findOrCreateAngleValue(door)
     local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if open then 90 else 0
