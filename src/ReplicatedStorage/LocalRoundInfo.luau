@@ -259,8 +259,9 @@ if mapScript then
     end
 end
 
-workspace.ChildAdded:Connect(function(child)
-    if not child:IsA("ModuleScript") or child.Name ~= "Map" then
+remotes.MapLoaded.OnClientEvent:Connect(function()
+    local child = workspace:FindFirstChild("Map")
+    if not child or not child:IsA("ModuleScript") then
         return
     end
 
@@ -268,7 +269,15 @@ workspace.ChildAdded:Connect(function(child)
         child.ChildAdded:Wait()
     end
 
-    map = Map.fromModuleScript(child)
+    local newMap = Map.fromModuleScript(child)
+    map = newMap
+
+    child.Destroying:Once(function()
+        if map == newMap then
+            map = nil
+        end
+    end)
+
     runCallbacks("Map")
 end)
 
