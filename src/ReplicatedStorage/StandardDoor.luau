@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -18,6 +19,7 @@ type BaseReceive = BaseDoorRequest & {
 
 export type ServerReceive = BaseReceive & {
     Kind: "ServerReceive",
+    Player: Player,
 }
 
 export type ClientReceive = BaseReceive & {
@@ -54,8 +56,6 @@ local function StandardDoor(request: DoorRequest): ()
 
     door:SetAttribute("Opening", true)
 
-    local angle = findOrCreateAngleValue(door)
-
     local open = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
     door:SetAttribute("Open", open)
 
@@ -76,7 +76,7 @@ local function StandardDoor(request: DoorRequest): ()
 
     task.delay(1, door.SetAttribute, door, "Opening", false)
 
-    if IS_SERVER then
+    if request.Kind == "ServerReceive" then
         local targetAngle = if open then 90 else -90
         local targetCFrame = hingeCFrame * CFrame.Angles(0, math.rad(targetAngle), 0) * offset
 
@@ -89,10 +89,16 @@ local function StandardDoor(request: DoorRequest): ()
             TargetAngle = if open then 90 else 0,
             OriginalCFrame = initialCFrame,
         }
-        ReplicatedStorage.ClientServer.OpenDoor:FireAllClients(clientReceive)
+
+        for _, v in Players:GetPlayers() do
+            if v ~= request.Player then
+                ReplicatedStorage.ClientServer.OpenDoor:FireClient(v, clientReceive)
+            end
+        end
         return
     end
 
+    local angle = findOrCreateAngleValue(door)
     local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if open then 90 else 0
 
     ReplicatedStorage.ClientServer.OpenDoor:FireServer(door, open)
@@ -126,6 +132,7 @@ if IS_SERVER then
 
         local request: ServerReceive = {
             Kind = "ServerReceive" :: "ServerReceive",
+            Player = plr,
             Door = door,
             Open = open,
         }
