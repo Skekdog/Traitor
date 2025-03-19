@@ -31,6 +31,7 @@ end
 
 local serverGrabbedProps: {[Player]: Types.Prop?} = {}
 local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
+local serverTouchedConnections: {[Types.MapProp]: RBXScriptConnection?} = {}
 
 local currentGrabClient: AlignPosition?
 
@@ -118,7 +119,7 @@ local function getController(part: BasePart): Player?
 	return player
 end
 
-local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
+local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart, con: RBXScriptConnection): ()
 	local part = getPrimaryPart(prop)
 	if not part then
 		return
@@ -131,7 +132,8 @@ local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
 
 	local lastHolder = serverLastHeldBy[prop]
 	if not lastHolder or lastHolder.At + PROP_DAMAGE_TIME < workspace:GetServerTimeNow() then
-		return
+		serverTouchedConnections[prop] = nil
+		return con:Disconnect()
 	end
 
 	local lastHolderParticipant = prop.Round:GetParticipant(lastHolder.By.Name)
@@ -201,13 +203,16 @@ local function stopControllingPropServer(player: Player): ()
 
 	serverGrabbedProps[player] = nil
 
-	if prop.Kind == "MapProp" then
+	if prop.Kind == "MapProp" and not serverTouchedConnections[prop] then
 		serverLastHeldBy[prop] = {By = player, At = workspace:GetServerTimeNow()}
-		part.Touched:Connect(function(otherPart)
-			onPropTouchedServer(prop, otherPart)
+		local con: RBXScriptConnection
+		con = part.Touched:Connect(function(otherPart)
+			onPropTouchedServer(prop, otherPart, con)
 		end)
+		serverTouchedConnections[prop] = con
 
 		part.Destroying:Once(function()
+			serverTouchedConnections[prop] = nil
 			serverLastHeldBy[prop] = nil
 		end)
 	end
