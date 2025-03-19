@@ -350,7 +350,7 @@ local function getPropClient(origin: Vector3, direction: Vector3): Types.DataMod
 		return nil
 	end
 
-	return part
+	return model
 end
 
 local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
@@ -370,6 +370,7 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 	end
 
 	if not isControlledBy(prop, Players.LocalPlayer) then
+		print(getPrimaryPart(prop), prop)
 		startControllingPropClient(prop)
 	end
 end
