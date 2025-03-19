@@ -7,8 +7,9 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
 
-local ALIGNMENT_POWER_PER_UNIT_MASS = 2500
-local ALIGNMENT_DAMPING_PER_UNIT_MASS = 50
+local PUSH_FORCE_PER_UNIT_MASS = 1000
+
+local ALIGNMENT_RESPONSIVENESS = 200
 local ALIGNMENT_DEPTH = 6
 
 local PROP_DAMAGE_TIME = 5
@@ -31,7 +32,7 @@ end
 local serverGrabbedProps: {[Player]: Types.Prop?} = {}
 local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
 
-local currentGrabClient: BodyPosition?
+local currentGrabClient: AlignPosition?
 
 local function animate(): ()
 	local LocalAnimation = require(ReplicatedStorage.LocalAnimation)
@@ -245,6 +246,21 @@ local function isControlledBy(prop: Types.DataModelProp, player: Player): boolea
 	return controller == player
 end
 
+local function createOrFindAttachment(prop: Types.DataModelProp): Attachment
+	local part = assert(getPrimaryPart(prop), "No primary part")
+
+	local attachment = part:FindFirstChild("MagnetoAttachment")
+	if not attachment then
+		local newAttachment = Instance.new("Attachment")
+		newAttachment.Name = "MagnetoAttachment"
+		newAttachment.Parent = part
+		attachment = newAttachment
+	end
+
+	assert(attachment and attachment:IsA("Attachment"), "Attachment is not an Attachment")
+	return attachment
+end
+
 local function startControllingPropClient(prop: Types.DataModelProp): ()
 	if not canControl(prop) then
 		return
@@ -259,13 +275,17 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 		return
 	end
 
-	local targetPower = part.AssemblyMass * ALIGNMENT_POWER_PER_UNIT_MASS
+	local alignPosition = Instance.new("AlignPosition")
+	alignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment
+	alignPosition.ForceLimitMode = Enum.ForceLimitMode.Magnitude
+	alignPosition.ReactionForceEnabled = false
+	alignPosition.ApplyAtCenterOfMass = true
+	alignPosition.Responsiveness = ALIGNMENT_RESPONSIVENESS
+	alignPosition.MaxForce = part.AssemblyMass * ALIGNMENT_RESPONSIVENESS * 200
 
-	local alignPosition = Instance.new("BodyPosition")
-	alignPosition.P = targetPower
-	alignPosition.MaxForce = Vector3.one * targetPower / 3
-	alignPosition.D = ALIGNMENT_DAMPING_PER_UNIT_MASS * part.AssemblyMass
+	alignPosition.Attachment0 = createOrFindAttachment(prop)
 	alignPosition.Parent = getPrimaryPart(prop)
+
 	currentGrabClient = alignPosition
 
 	animate()
@@ -282,7 +302,7 @@ local function pushPropClient(prop: Types.DataModelProp): ()
 	end
 
 	local centreRay = GetCentreRay()
-	part:ApplyImpulseAtPosition(centreRay.Direction * ((ALIGNMENT_POWER_PER_UNIT_MASS * part.AssemblyMass) / 500), part:GetClosestPointOnSurface(centreRay.Origin))
+	part:ApplyImpulseAtPosition(centreRay.Direction * ((PUSH_FORCE_PER_UNIT_MASS * part.AssemblyMass) / 500), part:GetClosestPointOnSurface(centreRay.Origin))
 end
 
 local function getPropClient(origin: Vector3, direction: Vector3): Types.DataModelProp?
@@ -446,6 +466,9 @@ end
 local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
 	local prop = getPropServer(participant, origin, direction)
 	if not prop then
+		if mode == "Alternate" then
+			stopControllingPropServer(participant.Player)
+		end
 		return
 	end
 
