@@ -62,6 +62,7 @@ local function setHealth(hum: Humanoid)
     UIAnimation.Slider(roundInfo.Frame.HealthBar.Background, false, hum.Health, hum.MaxHealth)
 end
 
+local healthCon: RBXScriptConnection?
 local function onCameraUpdated(): ()
     local subject = workspace.Camera.CameraSubject
     if not subject or not subject:IsA("Humanoid") or not subject:IsDescendantOf(workspace) then
@@ -79,6 +80,14 @@ local function onCameraUpdated(): ()
 
     showHealth(true)
     setHealth(subject)
+
+    if healthCon then
+        healthCon:Disconnect()
+    end
+
+    healthCon = subject.HealthChanged:Connect(function()
+        setHealth(subject)
+    end)
 end
 
 workspace.Camera:GetPropertyChangedSignal("CameraSubject"):Connect(onCameraUpdated)
