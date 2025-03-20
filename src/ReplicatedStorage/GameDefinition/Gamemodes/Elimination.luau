@@ -84,7 +84,7 @@ local function tryEndRound(round: Types.Round): ()
         assert(v)
         if v:IsAlive() then
             if survivor then
-                return print("Multiple survivors")
+                return
             end
             survivor = v
         end
