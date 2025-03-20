@@ -6,7 +6,13 @@ local IsAdmin = require(script.Parent.IsAdmin)
 
 local module = {}
 
-function module.ParseCommand(command: string): {Command: Commands.Command?, Args: {string}}
+export type ParsedCommand = {
+	Command: Commands.Command?,
+	ParsedName: string,
+	Args: {string},
+}
+
+function module.ParseCommand(command: string): ParsedCommand
 	local split = command:split(" ")
 	local cmdName = split[1]
 
@@ -17,6 +23,7 @@ function module.ParseCommand(command: string): {Command: Commands.Command?, Args
 
 	return {
 		Command = cmd,
+		ParsedName = cmdName,
 		Args = args,
 	}
 end
@@ -28,7 +35,7 @@ function module.ClientExecute(command: string): string
 
 	local parsed = module.ParseCommand(command)
 	if not parsed.Command then
-		return `Command {parsed.Args[1]} not found.`
+		return `Command {parsed.ParsedName} not found.`
 	end
 
 	if parsed.Command.Environment == "Client" then
