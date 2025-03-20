@@ -216,13 +216,16 @@ local function tryEndRound(round: Types.Round): ()
 end
 
 local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
-	local corpse = assert(victim:GetCorpse())
-	local attacker = corpse.Killer
+	local corpse = victim:GetCorpse()
 
-	if attacker then
-		awardScoreForKill(attacker, victim)
+	if corpse then
+		local attacker = corpse.Killer
+
+		if attacker then
+			awardScoreForKill(attacker, victim)
+		end
 	end
-
+	
 	if deferVictoryCheck then
 		task.defer(tryEndRound, victim.Round)
 	else
