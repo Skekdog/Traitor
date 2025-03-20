@@ -4,7 +4,7 @@ local Items = require(script.Parent.Parent.Items)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
 
 local function getBestParticipant(_: unknown, round: Types.Round): Types.Participant
-    local bestScore, bestParticipant: Types.Participant? = -1, nil
+    local bestScore, bestParticipant: Types.Participant? = -math.huge, nil
     for _, participant in round:GetParticipants() do
         assert(participant)
 
@@ -84,7 +84,7 @@ local function tryEndRound(round: Types.Round): ()
         assert(v)
         if v:IsAlive() then
             if survivor then
-                return
+                return print("Multiple survivors")
             end
             survivor = v
         end
@@ -129,6 +129,16 @@ local gamemode: Types.Gamemode = {
     Roles = roles,
 
     OnDeath = function(gamemode: Types.Gamemode, participant: Types.Participant, deferVictoryCheck: boolean)
+        local corpse = participant:GetCorpse()
+        local attacker = if corpse then corpse.Killer else nil
+        if attacker then
+            if attacker == participant then
+                attacker:AddScore("Suicide", -2)
+            else
+                attacker:AddScore("Killed Player", 1)
+            end
+        end
+
         if deferVictoryCheck then
             task.defer(tryEndRound, participant.Round)
         else
