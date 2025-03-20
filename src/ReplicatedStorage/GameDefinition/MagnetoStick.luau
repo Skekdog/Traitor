@@ -7,8 +7,9 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
 
-local ALIGNMENT_POWER_PER_UNIT_MASS = 2500
-local ALIGNMENT_DAMPING_PER_UNIT_MASS = 50
+local PUSH_FORCE_PER_UNIT_MASS = 1000
+
+local ALIGNMENT_RESPONSIVENESS = 200
 local ALIGNMENT_DEPTH = 6
 
 local PROP_DAMAGE_TIME = 5
@@ -30,8 +31,9 @@ end
 
 local serverGrabbedProps: {[Player]: Types.Prop?} = {}
 local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
+local serverTouchedConnections: {[Types.MapProp]: RBXScriptConnection?} = {}
 
-local currentGrabClient: BodyPosition?
+local currentGrabClient: AlignPosition?
 
 local function animate(): ()
 	local LocalAnimation = require(ReplicatedStorage.LocalAnimation)
@@ -41,13 +43,27 @@ local function animate(): ()
 	ViewmodelModule.PlayAnimation("rbxassetid://13269497293", "Magneto")
 end
 
-local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
+local function getPrimaryInstance(prop: Types.Prop | Types.DataModelProp): Types.DataModelProp
 	local model: Types.DataModelProp
 	if typeof(prop) == "table" then
 		model = prop.Model
 	else
 		model = prop
 	end
+
+	local instance: Types.DataModelProp = model
+	if model:IsDescendantOf(workspace.Corpses) then
+		local foundModel = model:FindFirstAncestorOfClass("Model")
+		if foundModel and foundModel:IsDescendantOf(workspace.Corpses) then
+			instance = foundModel
+		end
+	end
+
+	return instance
+end
+
+local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
+	local model = getPrimaryInstance(prop)
 
 	if model:IsA("Model") then
 		return model.PrimaryPart
@@ -98,8 +114,8 @@ local function setNetworkOwnerOfProp(prop: Types.Prop, owner: NetworkOwnerParame
 	setNetworkOwnerOfPart(part, owner)
 end
 
-local function getControllerObject(part: BasePart): IntValue?
-	local controllerObject = part:FindFirstChild("MagnetoController")
+local function getControllerObject(prop: Types.DataModelProp): IntValue?
+	local controllerObject = prop:FindFirstChild("MagnetoController")
 	if not controllerObject or not controllerObject:IsA("IntValue") then
 		return nil
 	end
@@ -107,8 +123,8 @@ local function getControllerObject(part: BasePart): IntValue?
 	return controllerObject
 end
 
-local function getController(part: BasePart): Player?
-	local controllerObject = getControllerObject(part)
+local function getController(prop: Types.DataModelProp): Player?
+	local controllerObject = getControllerObject(prop)
 	if not controllerObject then
 		return nil
 	end
@@ -117,20 +133,26 @@ local function getController(part: BasePart): Player?
 	return player
 end
 
-local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart): ()
+local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart, con: RBXScriptConnection): ()
 	local part = getPrimaryPart(prop)
 	if not part then
 		return
 	end
 
-	local currentHolder = getController(part)
+	local instance = getPrimaryInstance(prop)
+	if not instance then
+		return
+	end
+
+	local currentHolder = getController(instance)
 	if currentHolder then
 		return
 	end
 
 	local lastHolder = serverLastHeldBy[prop]
 	if not lastHolder or lastHolder.At + PROP_DAMAGE_TIME < workspace:GetServerTimeNow() then
-		return
+		serverTouchedConnections[prop] = nil
+		return con:Disconnect()
 	end
 
 	local lastHolderParticipant = prop.Round:GetParticipant(lastHolder.By.Name)
@@ -191,7 +213,7 @@ local function stopControllingPropServer(player: Player): ()
 		return
 	end
 
-	local controllerObject = getControllerObject(part)
+	local controllerObject = getControllerObject(getPrimaryInstance(prop))
 	if controllerObject then
 		controllerObject.Value = 0
 	end
@@ -200,13 +222,16 @@ local function stopControllingPropServer(player: Player): ()
 
 	serverGrabbedProps[player] = nil
 
-	if prop.Kind == "MapProp" then
+	if prop.Kind == "MapProp" and not serverTouchedConnections[prop] then
 		serverLastHeldBy[prop] = {By = player, At = workspace:GetServerTimeNow()}
-		part.Touched:Connect(function(otherPart)
-			onPropTouchedServer(prop, otherPart)
+		local con: RBXScriptConnection
+		con = part.Touched:Connect(function(otherPart)
+			onPropTouchedServer(prop, otherPart, con)
 		end)
+		serverTouchedConnections[prop] = con
 
 		part.Destroying:Once(function()
+			serverTouchedConnections[prop] = nil
 			serverLastHeldBy[prop] = nil
 		end)
 	end
@@ -226,27 +251,30 @@ if RunService:IsServer() then
 end
 
 local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
-	local part = getPrimaryPart(prop)
-	if not part then
-		return false
-	end
-
-	local controller = getController(part)
+	local controller = getController(getPrimaryInstance(prop))
 	return not controller
 end
 
 local function isControlledBy(prop: Types.DataModelProp, player: Player): boolean
-	local part = getPrimaryPart(prop)
-	if not part then
-		return false
-	end
-
-	local controller = getController(part)
+	local controller = getController(getPrimaryInstance(prop))
 	return controller == player
 end
 
-local function startControllingPropClient(prop: Types.DataModelProp): ()
-	if not canControl(prop) then
+local function createOrFindAttachment(prop: BasePart): Attachment
+	local attachment = prop:FindFirstChild("MagnetoAttachment")
+	if not attachment then
+		local newAttachment = Instance.new("Attachment")
+		newAttachment.Name = "MagnetoAttachment"
+		newAttachment.Parent = prop
+		attachment = newAttachment
+	end
+
+	assert(attachment and attachment:IsA("Attachment"), "Attachment is not an Attachment")
+	return attachment
+end
+
+local function startControllingPropClient(prop: BasePart): ()
+	if not canControl(getPrimaryInstance(prop)) then
 		return
 	end
 
@@ -259,20 +287,24 @@ local function startControllingPropClient(prop: Types.DataModelProp): ()
 		return
 	end
 
-	local targetPower = part.AssemblyMass * ALIGNMENT_POWER_PER_UNIT_MASS
+	local alignPosition = Instance.new("AlignPosition")
+	alignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment
+	alignPosition.ForceLimitMode = Enum.ForceLimitMode.Magnitude
+	alignPosition.ReactionForceEnabled = false
+	alignPosition.ApplyAtCenterOfMass = true
+	alignPosition.Responsiveness = ALIGNMENT_RESPONSIVENESS
+	alignPosition.MaxForce = part.AssemblyMass * ALIGNMENT_RESPONSIVENESS * 200
 
-	local alignPosition = Instance.new("BodyPosition")
-	alignPosition.P = targetPower
-	alignPosition.MaxForce = Vector3.one * targetPower / 3
-	alignPosition.D = ALIGNMENT_DAMPING_PER_UNIT_MASS * part.AssemblyMass
-	alignPosition.Parent = getPrimaryPart(prop)
+	alignPosition.Attachment0 = createOrFindAttachment(prop)
+	alignPosition.Parent = prop
+
 	currentGrabClient = alignPosition
 
 	animate()
 end
 
 local function pushPropClient(prop: Types.DataModelProp): ()
-	if not canControl(prop) then
+	if not canControl(getPrimaryInstance(prop)) then
 		return
 	end
 	
@@ -282,10 +314,10 @@ local function pushPropClient(prop: Types.DataModelProp): ()
 	end
 
 	local centreRay = GetCentreRay()
-	part:ApplyImpulseAtPosition(centreRay.Direction * ((ALIGNMENT_POWER_PER_UNIT_MASS * part.AssemblyMass) / 500), part:GetClosestPointOnSurface(centreRay.Origin))
+	part:ApplyImpulseAtPosition(centreRay.Direction * ((PUSH_FORCE_PER_UNIT_MASS * part.AssemblyMass) / 500), part:GetClosestPointOnSurface(centreRay.Origin))
 end
 
-local function getPropClient(origin: Vector3, direction: Vector3): Types.DataModelProp?
+local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 	local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
 	local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 
@@ -316,15 +348,6 @@ local function getPropClient(origin: Vector3, direction: Vector3): Types.DataMod
 		return nil
 	end
 
-	local model: Types.DataModelProp? = part
-	if part:IsDescendantOf(workspace.Corpses) then
-		model = part:FindFirstAncestorOfClass("Model")
-	end
-
-	if not model then
-		return nil
-	end
-
 	return part
 end
 
@@ -344,7 +367,7 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 		return
 	end
 
-	if not isControlledBy(prop, Players.LocalPlayer) then
+	if not isControlledBy(getPrimaryInstance(prop), Players.LocalPlayer) then
 		startControllingPropClient(prop)
 	end
 end
@@ -446,6 +469,9 @@ end
 local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
 	local prop = getPropServer(participant, origin, direction)
 	if not prop then
+		if mode == "Alternate" then
+			stopControllingPropServer(participant.Player)
+		end
 		return
 	end
 
@@ -454,14 +480,14 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 		return
 	end
 
-	if isControlledBy(part, participant.Player) then
+	if isControlledBy(getPrimaryInstance(prop), participant.Player) then
 		if mode == "Alternate" then
 			stopControllingPropServer(participant.Player)
 		end
 		return
 	end
 
-	if not canControl(prop) then
+	if not canControl(getPrimaryInstance(prop)) then
 		return stopControllingPropServer(participant.Player)
 	end
 
@@ -472,11 +498,11 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 			return
 		end
 
-		local controllerObject = getControllerObject(part)
+		local controllerObject = getControllerObject(getPrimaryInstance(prop))
 		if not controllerObject then
 			local newObject = Instance.new("IntValue")
 			newObject.Name = "MagnetoController"
-			newObject.Parent = part
+			newObject.Parent = getPrimaryInstance(prop)
 
 			controllerObject = newObject
 		end

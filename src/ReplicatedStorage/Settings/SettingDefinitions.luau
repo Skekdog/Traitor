@@ -155,7 +155,7 @@ table.insert(availableSettings, {
 		},
 
 		TouchButton = {
-			Position = UDim2.fromOffset(0, 0),
+			Position = UDim2.fromOffset(100, 200),
 			Scale = 1,
 		},
 	},
