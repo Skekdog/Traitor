@@ -89,16 +89,6 @@ module.help = {
 	end
 }
 
-module.echo = {
-	Name = "echo",
-	Description = "Returns the provided input",
-	Environment = "Client" :: "Client",
-	Arguments = {"input"},
-	Execute = function(_, args: Args)
-		return table.concat(args, " ")
-	end
-}
-
 module.luauserver = {
 	Name = "luauserver",
 	Description = "Executes Luau code server-side. Includes globals: round, cmds, items, players",
