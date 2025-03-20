@@ -208,7 +208,14 @@ local function getWinner(round: Types.Round): Types.Role?
 	return nil
 end
 
-local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant): ()
+local function tryEndRound(round: Types.Round): ()
+	local winner = getWinner(round)
+	if winner then
+		round:EndRound(winner)
+	end
+end
+
+local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
 	local corpse = assert(victim:GetCorpse())
 	local attacker = corpse.Killer
 
@@ -216,9 +223,10 @@ local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant): ()
 		awardScoreForKill(attacker, victim)
 	end
 
-	local winner = getWinner(victim.Round)
-	if winner then
-		victim.Round:EndRound(winner)
+	if deferVictoryCheck then
+		task.defer(tryEndRound, victim.Round)
+	else
+		tryEndRound(victim.Round)
 	end
 end
 

@@ -3,7 +3,7 @@ local Ammo = require(script.Parent.Parent.Ammo)
 local Items = require(script.Parent.Parent.Items)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
 
-local function getBestParticipant(gamemode: Types.Gamemode, round: Types.Round): Types.Participant
+local function getBestParticipant(_: unknown, round: Types.Round): Types.Participant
     local bestScore, bestParticipant: Types.Participant? = -1, nil
     for _, participant in round:GetParticipants() do
         assert(participant)
@@ -78,6 +78,25 @@ local roles: {[string]: Types.RoleDefinition} = {
     }
 }
 
+local function tryEndRound(round: Types.Round): ()
+    local survivor: Types.Participant?
+    for _, v in round:GetParticipants() do
+        assert(v)
+        if v:IsAlive() then
+            if survivor then
+                return
+            end
+            survivor = v
+        end
+    end
+
+    if survivor then
+        round:EndRound(survivor)
+    else
+        round:EndRound(getBestParticipant(nil, round))
+    end
+end
+
 local gamemode: Types.Gamemode = {
     Name = "Elimination",
     Description = "Last player standing wins",
@@ -109,22 +128,11 @@ local gamemode: Types.Gamemode = {
 
     Roles = roles,
 
-    OnDeath = function(gamemode: Types.Gamemode, participant: Types.Participant)
-        local survivor: Types.Participant?
-        for _, v in participant.Round:GetParticipants() do
-            assert(v)
-            if v:IsAlive() then
-                if survivor then
-                    return
-                end
-                survivor = v
-            end
-        end
-
-        if survivor then
-            participant.Round:EndRound(survivor)
+    OnDeath = function(gamemode: Types.Gamemode, participant: Types.Participant, deferVictoryCheck: boolean)
+        if deferVictoryCheck then
+            task.defer(tryEndRound, participant.Round)
         else
-            participant.Round:EndRound(getBestParticipant(gamemode, participant.Round))
+            tryEndRound(participant.Round)
         end
     end,
 
