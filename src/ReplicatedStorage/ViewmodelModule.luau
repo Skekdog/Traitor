@@ -194,10 +194,11 @@ function module.Show(item: Types.AnyItemDefinition): ()
         cameraRecoilSpring:update(1 / 60)
         armRecoilSpring:update(1 / 60)
 
-        local isMoving = hum.MoveDirection:Dot(hum.MoveDirection) > 0
+        local isMoving = hum.MoveDirection.Magnitude > 0
         
         if isMoving then
-            bobbingSpring.target = Vector3.new(math.sin(timeNow * 7) * 0.1, math.sin(timeNow * 10) * 0.1, 0)
+            local speedModifier = hum.WalkSpeed / 16
+            bobbingSpring.target = Vector3.new(math.sin(timeNow * 7 * speedModifier) * 0.1, math.sin(timeNow * 10 * speedModifier) * 0.1, 0) * speedModifier
         else
             bobbingSpring.target = Vector3.zero
         end
