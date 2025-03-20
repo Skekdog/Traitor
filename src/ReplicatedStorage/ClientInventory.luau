@@ -4,6 +4,7 @@ local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(script.Parent.ControlManager)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
+local ItemHint = require(script.Parent.ItemHint)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local ShowAlert = require(script.Parent.ShowAlert)
@@ -102,6 +103,8 @@ local function tryUnequip(item: Types.AnyItem): ()
 	if module.EquippedItem ~= item then
 		return
 	end
+	
+	ItemHint()
 
 	ControlManager.Unregister("Drop Ammo")
 	ControlManager.Unregister("Drop")
@@ -191,6 +194,10 @@ local function tryEquip(item: Types.AnyItem): ()
 	end
 
 	module.EquippedItem = item
+
+	if item.Kind == "Item" then
+		ItemHint(item.Definition.PrimaryHint, item.Definition.AlternateHint)
+	end
 
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(item.Definition.Name)
 
