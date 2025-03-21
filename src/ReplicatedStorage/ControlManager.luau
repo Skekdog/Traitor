@@ -18,7 +18,6 @@ export type InputMethod = "Touch" | "Keyboard" | "Controller"
 
 local registered: {[string]: RegistrationInfo} = {}
 
-
 function module.GetPreferredInputMethod(): InputMethod
 	if UserInputService.GamepadEnabled then
 		return "Controller"
@@ -196,6 +195,11 @@ function module.IsActionActive(actionName: string): boolean
 	end
 
 	if consoleKey and isKeyActive(consoleKey) then
+		return true
+	end
+
+	local button = ActionButton.GetButton(actionName)
+	if button and button.GuiState == Enum.GuiState.Press then
 		return true
 	end
 
