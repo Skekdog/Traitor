@@ -139,7 +139,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	local params = {
 		Amount = damage,
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
-		IsHeadshot = hitPart.Name == "Head",
+		IsHeadshot = isOf(hitPart, "Head"),
 		Attacker = by,
 	}
 	
