@@ -127,6 +127,10 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 		return "Reloading"
 	end
 
+	if item.Kind == "Grenade" and by.Round:IsPreGame() then
+		return "PreGame"
+	end
+
 	return "Success"
 end
 
@@ -284,8 +288,6 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 
 	if item.Kind == "Gun" then
 		item.Ammo -= 1
-	elseif item.Kind == "Grenade" then
-		by:RemoveItem(item)
 	end
 
 	if definition.Kind == "Melee" then
@@ -316,6 +318,8 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		if item.Kind ~= "Grenade" then
 			return "OtherError"
 		end
+
+		by:RemoveItem(item)
 
 		local projectile = item.Definition.Projectile:Clone()
 		projectile.Anchored = false

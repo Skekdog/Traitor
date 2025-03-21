@@ -282,7 +282,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			end
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
-			if result ~= "Success" then
+			if result ~= "Success" and result ~= "PreGame" then
 				warn("Hit rejected:", result)
 			end
 		end
