@@ -8,7 +8,7 @@ local boundInstances: {[string]: {Instance}} = {}
 type Label = TextLabel | ImageLabel
 
 local function setTextForTextLabel(text: string, label: TextLabel): ()
-    if text == "" or text == "NONE" then
+    if text == "" then
         label.Text = ""
         return
     end
@@ -106,7 +106,9 @@ end
 local function loadInstance(instance: Instance): ()
     local control = instance:GetAttribute("Control") :: string?
     assert(typeof(control) == "string", "Expected attribute 'Control' to be a string")
-    assert(Settings.GetSetting(control), "Control not found: " .. control)
+
+    local definition = Settings.GetDefinition(control)
+    assert(definition, "Control not found: " .. control)
 
     local position = instance:GetAttribute("Position") :: UDim2?
     assert(typeof(position) == "UDim2" or position == nil, "Expected attribute 'Position' to be a UDim2 or nil")

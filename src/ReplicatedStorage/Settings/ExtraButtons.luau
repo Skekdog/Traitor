@@ -29,8 +29,8 @@ else
 	end)
 end
 
-SettingsUI.AddClickButton("View Notice", "Other", "Those You Trust", nil, function()
-	UIManager.WaitForUI("Notice"):ToggleVisible(true)
+SettingsUI.AddClickButton("View Welcome", "Other", "Those You Trust", nil, function()
+	UIManager.WaitForUI("Welcome"):ToggleVisible(true)
 end)
 
 return nil
