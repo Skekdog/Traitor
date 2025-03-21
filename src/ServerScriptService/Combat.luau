@@ -155,6 +155,9 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		grenade:RunOnHitClient(victim, hitPart)
 	end
 
+	if victim.Round:IsPreGame() then
+		return
+	end
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
