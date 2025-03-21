@@ -83,6 +83,7 @@ local function createTab(name: string): ()
 	tab.Name = "Tab_" .. name
 	tab.Visible = true
 	tab.Text = name
+	tab.LayoutOrder = totalPages
 	tab.Parent = ui.Main.Tabs :: any
 
 	createPage(name)

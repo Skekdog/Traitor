@@ -37,12 +37,9 @@ ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Connect(function(
 	end
 
 	local SettingsUI = require(script.Parent.SettingsUI)
-	for i, v in values do
-		local definition = Settings.GetDefinition(i)
-		assert(definition)
-
-		if not definition.Hidden then
-			SettingsUI.AddButton(definition, v)
+	for i, v in SettingDefinitions do
+		if not v.Hidden then
+			SettingsUI.AddButton(v, values[v.Name])
 		end
 	end
 
