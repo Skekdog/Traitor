@@ -126,7 +126,7 @@ module.noclip = {
 	Execute = function(player: Player, args: Args)
 		local NoClip = require(script.Parent.NoClip)
 		local enabled = NoClip.Enable()
-		return `NoClip {if enabled then "enabled" else "disabled"}.`
+		return `Noclip {if enabled then "enabled" else "disabled"}.`
 	end
 }
 
