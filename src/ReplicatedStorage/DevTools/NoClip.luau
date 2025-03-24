@@ -1,77 +1,62 @@
---!nonstrict
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--- @CloneTrooper1019, 2015
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local FreeInput = require(ReplicatedStorage.FreeInput)
+local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
 
-local c = workspace.CurrentCamera
-local player = game.Players.LocalPlayer
-local userInput = game:GetService("UserInputService")
+local module = {}
 
-local selected = false
-local speed = 60
-local lastUpdate = 0
+local SPEED = 1
 
-function getNextMovement(deltaTime)
-	local nextMove = Vector3.new()
-	-- Left/Right
-	if userInput:IsKeyDown("A") or userInput:IsKeyDown("Left") then
-		nextMove = Vector3.new(-1,0,0)
-	elseif userInput:IsKeyDown("D") or userInput:IsKeyDown("Right") then
-		nextMove = Vector3.new(1,0,0)
+local isEnabled = false
+
+local function tryMove(dt: number): ()
+	if not isEnabled then
+		return
 	end
-	-- Forward/Back
-	if userInput:IsKeyDown("W") or userInput:IsKeyDown("Up") then
-		nextMove = nextMove + Vector3.new(0,0,-1)
-	elseif userInput:IsKeyDown("S") or userInput:IsKeyDown("Down") then
-		nextMove = nextMove + Vector3.new(0,0,1)
+
+	local char = LocalCharacter.GetCharacter()
+	if not char then
+		return
 	end
-	-- Up/Down
-	if userInput:IsKeyDown("Space") then
-		nextMove = nextMove + Vector3.new(0,1,0)
-	elseif userInput:IsKeyDown("LeftControl") then
-		nextMove = nextMove + Vector3.new(0,-1,0)
-	end
-	return CFrame.new( nextMove * (speed * deltaTime) )
+
+	local currentPosition = char:GetPivot().Position
+	local lookVector = workspace.CurrentCamera.CFrame.LookVector
+
+	local movement = FreeInput.GetVelocity(dt)
+	local newCFrame = CFrame.new(currentPosition, currentPosition + lookVector) * CFrame.new(movement * SPEED)
+
+	char:PivotTo(newCFrame)
 end
 
-function onSelected()
-	local char = player.Character
-	if char then
-		local humanoid = char:WaitForChild("Humanoid")
-		local root = char:WaitForChild("HumanoidRootPart")
-		selected = true
-		root.Anchored = true
-		lastUpdate = tick()
-		humanoid.PlatformStand = true
-		while selected and char:IsDescendantOf(workspace) do
-			wait()
-			local delta = tick()-lastUpdate
-			local look = (c.Focus.p-c.CoordinateFrame.p).unit
-			local move = getNextMovement(delta)
-			local pos = root.Position
-			root.CFrame = CFrame.new(pos,pos+look) * move
-			lastUpdate = tick()
-		end
-		root.Anchored = false
-		root.Velocity = Vector3.new()
-		humanoid.PlatformStand = false
+local function trySetupCharacter(): ()
+	local root = LocalCharacter.GetRootPart()
+	local hum = LocalCharacter.GetHumanoid()
+
+	if not root or not hum then
+		return
+	end
+
+	root.Anchored = isEnabled
+	hum.PlatformStand = isEnabled
+
+	if not isEnabled then
+		root.AssemblyLinearVelocity = Vector3.zero
 	end
 end
 
-function onDeselected()
-	selected = false
-end
+RunService.PreSimulation:Connect(tryMove)
 
-local function toggle()
-	if selected then
-		onDeselected()
+function module.Enable(enabled: boolean?): boolean
+	isEnabled = if enabled == nil then not isEnabled else enabled
+	trySetupCharacter()
+
+	if isEnabled then
+		FreeInput.StartCapture()
 	else
-		onSelected()
+		FreeInput.StopCapture()
 	end
+
+	return isEnabled
 end
 
-return {
-	Start = onSelected,
-	Stop = onDeselected,
-	Toggle = toggle,
-}
+return module

@@ -5,20 +5,17 @@
 ------------------------------------------------------------------------
 
 local pi    = math.pi
-local abs   = math.abs
 local clamp = math.clamp
 local exp   = math.exp
 local rad   = math.rad
-local sign  = math.sign
 local sqrt  = math.sqrt
 local tan   = math.tan
 
-local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
-local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
+local FreeInput = require(script.Parent.FreeInput)
 
 local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then
@@ -36,9 +33,6 @@ end)
 
 ------------------------------------------------------------------------
 
-local INPUT_PRIORITY = Enum.ContextActionPriority.High.Value
-local REDUCED_INPUT_PRIORITY = Enum.ContextActionPriority.Medium.Value
-
 local NAV_GAIN = Vector3.new(1, 1, 1)*64
 local PAN_GAIN = Vector2.new(0.75, 1)*8
 local FOV_GAIN = 300
@@ -48,8 +42,6 @@ local PITCH_LIMIT = rad(90)
 while Camera.ViewportSize.Magnitude < 10 do
 	task.wait()
 end
-
-local MOBILE_PAN_SENSITIVITY_MULTIPLIER = 4
 
 local VEL_STIFFNESS = 100.0 -- normal value is 1.5
 local PAN_STIFFNESS = 100.0 -- normal value is 1.0
@@ -103,193 +95,10 @@ local fovSpring = Spring.new(FOV_STIFFNESS, 0)
 
 ------------------------------------------------------------------------
 
-local Input = {} do
-	local thumbstickCurve do
-		local K_CURVATURE = 2.0
-		local K_DEADZONE = 0.15
-
-		local function fCurve(x)
-			return (exp(K_CURVATURE*x) - 1)/(exp(K_CURVATURE) - 1)
-		end
-
-		local function fDeadzone(x)
-			return fCurve((x - K_DEADZONE)/(1 - K_DEADZONE))
-		end
-
-		function thumbstickCurve(x)
-			return sign(x)*clamp(fDeadzone(abs(x)), 0, 1)
-		end
-	end
-
-	local gamepad = {
-		ButtonX = 0,
-		ButtonY = 0,
-		DPadDown = 0,
-		DPadUp = 0,
-		ButtonL2 = 0,
-		ButtonR2 = 0,
-		Thumbstick1 = Vector2.new(),
-		Thumbstick2 = Vector2.new(),
-	}
-
-	local keyboard = {
-		W = 0,
-		A = 0,
-		S = 0,
-		D = 0,
-		E = 0,
-		Q = 0,
-		Up = 0,
-		Down = 0,
-		LeftShift = 0,
-		RightShift = 0,
-	}
-
-	local mouse = {
-		Delta = Vector2.new(),
-		MouseWheel = 0,
-	}
-
-	local NAV_GAMEPAD_SPEED  = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
-	local NAV_KEYBOARD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
-	local PAN_MOUSE_SPEED    = Vector2.new(1, 1)*(pi/64)
-	local PAN_GAMEPAD_SPEED  = Vector2.new(1, 1)*(pi/8)
-	local FOV_WHEEL_SPEED    = 1.5 -- normal value is 1.0
-	local FOV_GAMEPAD_SPEED  = 0.25
-	local NAV_ADJ_SPEED      = 0.75
-	local NAV_SHIFT_MUL      = 0.25
-
-	local navSpeed = 1
-
-	function Input.Vel(dt)
-		navSpeed = clamp(navSpeed + dt*(keyboard.Up - keyboard.Down)*NAV_ADJ_SPEED, 0.01, 4)
-
-		local kGamepad = Vector3.new(
-			thumbstickCurve(gamepad.Thumbstick1.X),
-			thumbstickCurve(gamepad.ButtonR2) - thumbstickCurve(gamepad.ButtonL2),
-			thumbstickCurve(-gamepad.Thumbstick1.Y)
-		)*NAV_GAMEPAD_SPEED
-
-		local kKeyboard = Vector3.new(
-			keyboard.D - keyboard.A,
-			keyboard.E - keyboard.Q,
-			keyboard.S - keyboard.W
-		)*NAV_KEYBOARD_SPEED
-
-		local kTouch = Controls:GetMoveVector() :: Vector3
-
-		local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
-
-		return (kGamepad + kKeyboard + kTouch)*(navSpeed*(shift and NAV_SHIFT_MUL or 1))
-	end
-
-	function Input.Pan(dt)
-		local kGamepad = Vector2.new(
-			thumbstickCurve(gamepad.Thumbstick2.Y),
-			thumbstickCurve(-gamepad.Thumbstick2.X)
-		)*PAN_GAMEPAD_SPEED
-		local kMouse = mouse.Delta*PAN_MOUSE_SPEED / dt / 60
-		mouse.Delta = Vector2.new()
-		return kGamepad + kMouse
-	end
-
-	function Input.Fov(dt)
-		local kGamepad = (gamepad.ButtonX - gamepad.ButtonY)*FOV_GAMEPAD_SPEED
-		local kMouse = mouse.MouseWheel*FOV_WHEEL_SPEED
-		mouse.MouseWheel = 0
-		return kGamepad + kMouse
-	end
-
-	do
-		local function Keypress(action, state, input)
-			keyboard[input.KeyCode.Name] = state == Enum.UserInputState.Begin and 1 or 0
-			return Enum.ContextActionResult.Sink
-		end
-
-		local function GpButton(action, state, input)
-			gamepad[input.KeyCode.Name] = state == Enum.UserInputState.Begin and 1 or 0
-			return Enum.ContextActionResult.Sink
-		end
-
-		local function MousePan(action, state, input)
-			local delta = input.Delta
-			mouse.Delta = Vector2.new(-delta.y, -delta.x)
-			return Enum.ContextActionResult.Sink
-		end
-
-		local function Thumb(action, state, input)
-			gamepad[input.KeyCode.Name] = input.Position
-			return Enum.ContextActionResult.Sink
-		end
-
-		local function Trigger(action, state, input)
-			gamepad[input.KeyCode.Name] = input.Position.z
-			return Enum.ContextActionResult.Sink
-		end
-
-		local function MouseWheel(action, state, input)
-			mouse[input.UserInputType.Name] = -input.Position.z
-			return Enum.ContextActionResult.Sink
-		end
-
-		local function TouchPan(action, state, input)
-			local delta = input.Delta
-
-			-- Assume this is just a tap
-			if delta.Magnitude < 1 then
-				return Enum.ContextActionResult.Pass
-			end
-
-			mouse.Delta = Vector2.new(-delta.y, -delta.x) * MOBILE_PAN_SENSITIVITY_MULTIPLIER
-			return Enum.ContextActionResult.Sink
-		end
-
-		local function Zero(t)
-			for k, v in pairs(t) do
-				t[k] = v*0
-			end
-		end
-
-		function Input.StartCapture()
-			ContextActionService:BindActionAtPriority("FreecamKeyboard", Keypress, false, INPUT_PRIORITY,
-				Enum.KeyCode.W,
-				Enum.KeyCode.A,
-				Enum.KeyCode.S,
-				Enum.KeyCode.D,
-				Enum.KeyCode.E,
-				Enum.KeyCode.Q,
-				Enum.KeyCode.Up, Enum.KeyCode.Down
-			)
-			ContextActionService:BindActionAtPriority("FreecamMousePan",          MousePan,    false, INPUT_PRIORITY,         Enum.UserInputType.MouseMovement)
-			ContextActionService:BindActionAtPriority("FreecamTouchPan",          TouchPan,    false, REDUCED_INPUT_PRIORITY, Enum.UserInputType.Touch)
-			ContextActionService:BindActionAtPriority("FreecamMouseWheel",        MouseWheel,  false, INPUT_PRIORITY,         Enum.UserInputType.MouseWheel)
-			ContextActionService:BindActionAtPriority("FreecamGamepadButton",     GpButton,    false, INPUT_PRIORITY,         Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY)
-			ContextActionService:BindActionAtPriority("FreecamGamepadTrigger",    Trigger,     false, INPUT_PRIORITY,         Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonL2)
-			ContextActionService:BindActionAtPriority("FreecamGamepadThumbstick", Thumb,       false, INPUT_PRIORITY,         Enum.KeyCode.Thumbstick1, Enum.KeyCode.Thumbstick2)
-		end
-
-		function Input.StopCapture()
-			navSpeed = 1
-			Zero(gamepad)
-			Zero(keyboard)
-			Zero(mouse)
-			ContextActionService:UnbindAction("FreecamKeyboard")
-			ContextActionService:UnbindAction("FreecamMousePan")
-			ContextActionService:UnbindAction("FreecamTouchPan")
-			ContextActionService:UnbindAction("FreecamMouseWheel")
-			ContextActionService:UnbindAction("FreecamGamepadButton")
-			ContextActionService:UnbindAction("FreecamGamepadTrigger")
-			ContextActionService:UnbindAction("FreecamGamepadThumbstick")
-		end
-	end
-end
-
-------------------------------------------------------------------------
-
 local function StepFreecam(dt)
-	local vel = velSpring:Update(dt, Input.Vel(dt))
-	local pan = panSpring:Update(dt, Input.Pan(dt))
-	local fov = fovSpring:Update(dt, Input.Fov(dt))
+	local vel = velSpring:Update(dt, FreeInput.GetVelocity(dt))
+	local pan = panSpring:Update(dt, FreeInput.GetCameraPan(dt))
+	local fov = fovSpring:Update(dt, FreeInput.GetFov(dt))
 
 	local zoomFactor = sqrt(tan(rad(70/2))/tan(rad(cameraFov/2)))
 
@@ -378,7 +187,7 @@ local function StartFreecam(): ()
 
 	PlayerState.Push()
 	RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, StepFreecam)
-	Input.StartCapture()
+	FreeInput.StartCapture()
 
 	runCallbacks()
 end
@@ -390,7 +199,7 @@ local function StopFreecam(): ()
 
 	freecamEnabled = false
 
-	Input.StopCapture()
+	FreeInput.StopCapture()
 	RunService:UnbindFromRenderStep("Freecam")
 	PlayerState.Pop()
 

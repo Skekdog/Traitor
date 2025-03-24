@@ -125,7 +125,7 @@ module.noclip = {
 	Arguments = {},
 	Execute = function(player: Player, args: Args)
 		local NoClip = require(script.Parent.NoClip)
-		NoClip.Toggle()
+		NoClip.Enable()
 		return "Noclip toggled."
 	end
 }
