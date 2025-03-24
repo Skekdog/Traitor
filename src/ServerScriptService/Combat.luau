@@ -52,12 +52,12 @@ end
 local function tryGetParticipantFromPart(round: Types.Round, part: BasePart): Types.Participant?
 	local model = part:FindFirstAncestorOfClass("Model")
 	if not model then
-		return
+		return nil
 	end
 
 	local player = Players:GetPlayerFromCharacter(model)
 	if not player then
-		return
+		return nil
 	end
 
 	return round:GetParticipant(player.Name)
