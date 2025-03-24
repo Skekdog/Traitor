@@ -99,18 +99,13 @@ end)
 local params = RaycastParams.new()
 params.IgnoreWater = true
 params.FilterType = Enum.RaycastFilterType.Exclude
-params.CollisionGroup = "Raycasts"
+params.CollisionGroup = "MouseInfoRay"
 
 RunService.PostSimulation:Connect(function()
 	local camera = workspace.CurrentCamera
 	local cameraSubject = camera.CameraSubject
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
-		params.FilterDescendantsInstances = {cameraSubject.Parent}
-	end
-
-	local map = LocalRoundInfo.GetMap()
-	if map then
-		params:AddToFilter(map.Bounds)
+		params:AddToFilter(cameraSubject.Parent)
 	end
 	
     local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
@@ -119,6 +114,7 @@ RunService.PostSimulation:Connect(function()
 	Mouse.Reset()
 
 	local validAncestors = {workspace.Characters :: Folder, workspace.Corpses}
+	local map = LocalRoundInfo.GetMap()
 	if map then
 		table.insert(validAncestors, map.ItemSpawns)
 		table.insert(validAncestors, map.AmmoSpawns)
