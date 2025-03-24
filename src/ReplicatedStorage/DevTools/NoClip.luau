@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local FreeInput = require(ReplicatedStorage.FreeInput)
@@ -28,10 +29,7 @@ local function tryMove(dt: number): ()
 	char:PivotTo(newCFrame)
 end
 
-local function trySetupCharacter(): ()
-	local root = LocalCharacter.GetRootPart()
-	local hum = LocalCharacter.GetHumanoid()
-
+local function trySetupCharacter(root: BasePart, hum: Humanoid): ()
 	if not root or not hum then
 		return
 	end
@@ -47,8 +45,14 @@ end
 RunService.PreSimulation:Connect(tryMove)
 
 function module.Enable(enabled: boolean?): boolean
+	local root = LocalCharacter.GetRootPart()
+	local hum = LocalCharacter.GetHumanoid()
+	if not root or not hum then
+		return false
+	end
+
 	isEnabled = if enabled == nil then not isEnabled else enabled
-	trySetupCharacter()
+	trySetupCharacter(root, hum)
 
 	if isEnabled then
 		FreeInput.StartCapture()
@@ -58,5 +62,9 @@ function module.Enable(enabled: boolean?): boolean
 
 	return isEnabled
 end
+
+Players.LocalPlayer.CharacterRemoving:Connect(function()
+	module.Enable(false)
+end)
 
 return module
