@@ -45,6 +45,10 @@ end
 RunService.PreSimulation:Connect(tryMove)
 
 function module.Enable(enabled: boolean?): boolean
+	if isEnabled == enabled then
+		return isEnabled
+	end
+
 	local root = LocalCharacter.GetRootPart()
 	local hum = LocalCharacter.GetHumanoid()
 	if not root or not hum then
