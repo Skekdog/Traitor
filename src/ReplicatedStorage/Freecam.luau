@@ -176,7 +176,7 @@ local Input = {} do
 			keyboard.S - keyboard.W
 		)*NAV_KEYBOARD_SPEED
 
-		local kTouch = Controls:GetMoveVector()
+		local kTouch = Controls:GetMoveVector() :: Vector3
 
 		local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
 
