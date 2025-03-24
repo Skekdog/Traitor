@@ -125,8 +125,8 @@ module.noclip = {
 	Arguments = {},
 	Execute = function(player: Player, args: Args)
 		local NoClip = require(script.Parent.NoClip)
-		NoClip.Enable()
-		return "Noclip toggled."
+		local enabled = NoClip.Enable()
+		return `NoClip {if enabled then "enabled" else "disabled"}.`
 	end
 }
 
@@ -137,8 +137,8 @@ module.freecam = {
 	Arguments = {},
 	Execute = function(player: Player, args: Args)
 		local Freecam = require(ReplicatedStorage.Freecam)
-		Freecam.ToggleFreecam()
-		return "Freecam toggled."
+		local enabled = Freecam.ToggleFreecam()
+		return `Freecam {if enabled then "enabled" else "disabled"}.`
 	end
 }
 

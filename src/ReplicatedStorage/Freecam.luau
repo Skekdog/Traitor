@@ -206,12 +206,13 @@ local function StopFreecam(): ()
 	runCallbacks()
 end
 
-local function ToggleFreecam(): ()
+local function ToggleFreecam(): boolean
 	if freecamEnabled then
 		StopFreecam()
 	else
 		StartFreecam()
 	end
+	return freecamEnabled
 end
 
 return {
