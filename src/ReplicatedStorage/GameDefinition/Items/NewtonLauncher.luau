@@ -1,7 +1,27 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Ammo = require(script.Parent.Ammo)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local Types = require(ReplicatedStorage.RoundRule.Types)
+
+local flingRemote: RemoteEvent
+if RunService:IsServer() then
+	flingRemote = Instance.new("RemoteEvent")
+	flingRemote.Name = "Fling"
+	flingRemote.Parent = script
+else
+	local found = script:WaitForChild("Fling")
+	assert(found:IsA("RemoteEvent"), "Fling must be a RemoteEvent")
+	flingRemote = found
+end
+
+local function fling(part: BasePart, force: Vector3): ()
+    part:ApplyImpulse(force)
+end
+
+if RunService:IsClient() then
+    flingRemote.OnClientEvent:Connect(fling)
+end
 
 local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit: Types.Participant | Types.Prop, params: Types.DamageParams): boolean
 	assert(weapon.Kind == "Gun")
@@ -28,7 +48,14 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
         MagnetoStick.SetLastHeldBy(hit, attacker.Player)
     end
 
-	part:ApplyImpulse(char:GetPivot().LookVector * 1000 * part.AssemblyMass / 18)
+    local force = char:GetPivot().LookVector * 1000 * part.AssemblyMass / 18
+
+    local owner = part:GetNetworkOwner()
+    if owner then
+        flingRemote:FireClient(owner, part, force)
+    else
+        fling(part, force)
+    end
 
 	return true
 end
