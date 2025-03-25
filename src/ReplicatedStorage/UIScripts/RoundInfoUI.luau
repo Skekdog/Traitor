@@ -115,8 +115,20 @@ function module.UpdateAmmo(item: Types.AnyItem?): ()
         return
     end
 
+    local currentAmmo: string | number = item.Ammo
+    if currentAmmo == math.huge then
+        currentAmmo = "∞"
+    end
+
+    local maxAmmo: string | number = item.Definition.AmmoType.Capacity
+    if maxAmmo == math.huge then
+        maxAmmo = "∞"
+    end
+
+    local reserveString = if item.Definition.AmmoType.ReserveCapacity == 0 then "" else ` + {ClientInventory.GetReserveAmmo(item.Definition.AmmoType.Name)}`
+
     roundInfo.Frame.AmmoBar.Visible = true
-    roundInfo.Frame.AmmoBar.AmmoLabel.Text = `{item.Ammo} / {item.Definition.AmmoType.Capacity} + {ClientInventory.Ammo[item.Definition.AmmoType.Name] or 0}`
+    roundInfo.Frame.AmmoBar.AmmoLabel.Text = `{currentAmmo} / {maxAmmo}{reserveString}`
     UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, item.Ammo, item.Definition.AmmoType.Capacity)
 end
 
