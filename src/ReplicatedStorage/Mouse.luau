@@ -109,6 +109,7 @@ end
 
 local itemHint = workspace:WaitForChild("ItemHintGui")
 function module.ShowItemHint(instance: Instance)
+	instance = instance:FindFirstAncestorWhichIsA("BasePart") or instance
 	local state = GetDroppedItemState(instance)
 
 	local ammo = if state.AmmoType then GetAmmoDefinition(state.AmmoType) else nil
