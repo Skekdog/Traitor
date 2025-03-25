@@ -166,50 +166,55 @@ local item: Types.GunWeaponDefinition = {
     RecoilY = 1.2,
 }
 
-task.spawn(function()
-	while true do
-		local dt = task.wait(0.1)
-		local toRemove: {Types.MapProp} = {}
-		for _, prop in burningProps do
-			if not prop.Model:GetAttribute("Burning") or not prop.Model:IsDescendantOf(workspace) then
-				table.insert(toRemove, prop)
-				continue
-			end
-	
-			local burnedParticipants: {Types.Participant} = {}
-			for _, v in workspace:GetPartsInPart(prop.Model) do
-				local model = v:FindFirstAncestorOfClass("Model")
-				if not model then
-					continue
-				end
-	
-				local participant = prop.Round:GetParticipant(model.Name)
-				if not participant then
-					continue
-				end
-			
-				if table.find(burnedParticipants, participant) then
-					continue
-				end
-	
-				table.insert(burnedParticipants, participant)
-	
-				participant:TryTakeDamage({
-					Amount = 1 * dt * 10,
-					Source = "Burn",
-				})
-	
-				PlaySound(weaponSounds("FlareBurn"), nil, v, {SoundGroup = SoundService.AllSounds :: SoundGroup})
-			end
-		end
+local function doBurnDamage(): ()
+    local toRemove: {Types.MapProp} = {}
+    for _, prop in burningProps do
+        if not prop.Model:GetAttribute("Burning") or not prop.Model:IsDescendantOf(workspace) then
+            table.insert(toRemove, prop)
+            continue
+        end
 
-		for _, v in toRemove do
-			table.remove(burningProps, table.find(burningProps, v))
-		end
-	end
-end)
+        local burnedParticipants: {Types.Participant} = {}
+        for _, v in workspace:GetPartsInPart(prop.Model) do
+            local model = v:FindFirstAncestorOfClass("Model")
+            if not model then
+                continue
+            end
+
+            local participant = prop.Round:GetParticipant(model.Name)
+            if not participant then
+                continue
+            end
+        
+            if table.find(burnedParticipants, participant) then
+                continue
+            end
+
+            table.insert(burnedParticipants, participant)
+
+            participant:TryTakeDamage({
+                Amount = 1,
+                Source = "Burn",
+            })
+
+            PlaySound(weaponSounds("FlareBurn"), nil, v, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+        end
+    end
+
+    for _, v in toRemove do
+        table.remove(burningProps, table.find(burningProps, v))
+    end
+end
+
+local elapsedTime = 0
 RunService.Heartbeat:Connect(function(dt)
-	
+    elapsedTime += dt
+    if elapsedTime < 0.1 then
+        return
+    end
+
+    elapsedTime = 0
+    doBurnDamage()
 end)
 
 return item
