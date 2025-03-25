@@ -28,7 +28,7 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
         MagnetoStick.SetLastHeldBy(hit, attacker.Player)
     end
 
-	part:ApplyImpulse(char:GetPivot().LookVector * Vector3.new(10, 1, 10) * 100 * part.AssemblyMass / 18)
+	part:ApplyImpulse(char:GetPivot().LookVector * 1000 * part.AssemblyMass / 18)
 
 	return true
 end
