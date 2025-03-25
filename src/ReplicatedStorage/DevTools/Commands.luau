@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
-local Items = require(ReplicatedStorage.GameDefinition.Items)
+local Items = require(ReplicatedStorage.GameDefinition.Items.Items)
 local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 

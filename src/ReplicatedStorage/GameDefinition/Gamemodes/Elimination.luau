@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Ammo = require(script.Parent.Parent.Ammo)
-local Items = require(script.Parent.Parent.Items)
+local Ammo = require(script.Parent.Parent.Items.Ammo)
+local Items = require(script.Parent.Parent.Items.Items)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
 
 local function getBestParticipant(_: unknown, round: Types.Round): Types.Participant

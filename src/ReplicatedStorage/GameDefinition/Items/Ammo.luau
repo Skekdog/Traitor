@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Types = require(script.Parent.Parent.RoundRule.Types)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 local module: {[string]: Types.AmmoDefinition} = {}
 
 local NO_PART = Instance.new("Part")

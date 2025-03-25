@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Ammo = require(ReplicatedStorage.GameDefinition.Ammo)
-local Items = require(ReplicatedStorage.GameDefinition.Items)
+local Ammo = require(ReplicatedStorage.GameDefinition.Items.Ammo)
+local Items = require(ReplicatedStorage.GameDefinition.Items.Items)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local traitorMusic: {Sound} = {}

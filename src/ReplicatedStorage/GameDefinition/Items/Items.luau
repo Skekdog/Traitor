@@ -8,7 +8,7 @@ local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local FlareGun = require(script.Parent.FlareGun)
 local MagnetoStick = require(script.Parent.MagnetoStick)
-local Types = require(script.Parent.Parent.RoundRule.Types)
+local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
