@@ -50,7 +50,7 @@ local item: Types.GunWeaponDefinition = {
         Limb = 1,
     },
 
-    Spread = 0.02,
+    Spread = 0,
 
     AttackInterval = 2,
     ReloadTime = 0,
@@ -58,7 +58,6 @@ local item: Types.GunWeaponDefinition = {
 
     Model = ReplicatedStorage.WeaponModels["Newton Launcher"],
     HoldAnimation = "rbxassetid://10247380824",
-    AimAnimation = "rbxassetid://18691831450",
     AttackSound = "rbxassetid://8561500387",
     ReloadSound = "",
 
