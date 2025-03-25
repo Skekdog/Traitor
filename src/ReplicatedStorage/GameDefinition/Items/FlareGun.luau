@@ -21,13 +21,21 @@ local function weaponSounds(name: string): string
     return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
 end
 
-local burningProps: {Types.MapProp} = {}
+type BurnTarget = Types.Participant | Types.Prop
+type BurnInfo = {
+    LastBurn: number,
+    BurnUntil: number,
+    FireEffect: Fire,
+    Attacker: Types.Participant?,
+}
 
-local function burn(attacker: Types.Participant, target: Types.Participant | Types.Prop): ()
-    if table.find(burningProps, target :: Types.MapProp) then
+local burningThings: {[BurnTarget]: BurnInfo} = {}
+
+local function burn(attacker: Types.Participant, target: BurnTarget): ()
+    if target.Kind ~= "Participant" and burningThings[target] then
         return
     end
-    
+
     local part: BasePart
     if target.Kind == "Participant" then
         local character = target:GetCharacter()
@@ -62,54 +70,104 @@ local function burn(attacker: Types.Participant, target: Types.Participant | Typ
 
     if target.Kind == "MapProp" then
         part:SetAttribute("Burning", true)
-		table.insert(burningProps, target)
     elseif target.Kind == "CorpseProp" then
         target.Model:SetAttribute("Burning", true)
     end
+    
+    burningThings[target] = {
+        LastBurn = tick(),
+        BurnUntil = tick() + 10,
+        FireEffect = fire,
+        Attacker = attacker,
+    }
+end
 
-    local endTime = workspace:GetServerTimeNow() + 10
-    task.spawn(function()
-        while true do
-            if workspace:GetServerTimeNow() > endTime then
-                break
-            end
+local function stopBurning(target: BurnTarget): ()
+    local info = burningThings[target]
+    assert(info, "Attempt to stop burning thing which is not burning")
 
-            task.wait(0.25)
+    burningThings[target] = nil
 
-            if target.Kind ~= "Participant" and target.Kind ~= "MapProp" then
-                continue
-            end
+    info.FireEffect:Destroy()
 
-            local health: number? = if target then (target :: Types.Participant):GetHealth() else nil
-            if health and health < 0 then
-                break
-            end
-            if not part:IsDescendantOf(workspace) then
-                break
-            end
-
-            burnSound:Play()
-
-            if health then
-                (target :: Types.Participant):TryTakeDamage({
-                    Amount = 1,
-                    Attacker = attacker,
-                    Source = "Burn"
-                })
-            end
-        end
-        
-        if target.Kind == "MapProp" then
-            part:SetAttribute("Burning", false)
-        end
-
-        burnSound:Destroy()
-        fire:Destroy()
+    if target.Kind ~= "Participant" then
+        target.Model:SetAttribute("Burning", false)
 
         if target.Kind == "CorpseProp" then
             target.Model:Destroy()
         end
-    end)
+    end
+end
+
+local function burnTouchingParticipants(prop: Types.MapProp): ()
+    local burnedParticipants: {Types.Participant} = {}
+    for _, v in workspace:GetPartsInPart(prop.Model) do
+        local model = v:FindFirstAncestorOfClass("Model")
+        if not model then
+            continue
+        end
+
+        local participant = prop.Round:GetParticipant(model.Name)
+        if not participant then
+            continue
+        end
+
+        if table.find(burnedParticipants, participant) then
+            continue
+        end
+
+        table.insert(burnedParticipants, participant)
+
+        participant:TryTakeDamage({
+            Amount = 1,
+            Source = "Burn",
+        })
+    end
+end
+
+local function burnThing(target: BurnTarget, info: BurnInfo): ()
+    local timeNow = tick()
+    if timeNow > info.BurnUntil then
+        return stopBurning(target)
+    end
+
+    local model = if target.Kind == "Participant" then target:GetCharacter() else target.Model
+    if not model or not model:IsDescendantOf(workspace) then
+        return stopBurning(target)
+    end
+
+    if timeNow < info.LastBurn + 0.25 then
+        return
+    end
+    
+    info.LastBurn = timeNow
+
+    PlaySound(weaponSounds("FlareBurn"), nil, model, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+
+    if target.Kind == "Participant" or target.Kind == "MapProp" then
+        local health = (target :: Types.MapProp):GetHealth()
+        if health and health <= 0 then
+            return stopBurning(target)
+        end
+
+        if target.Kind == "MapProp" then
+            burnTouchingParticipants(target)
+        end
+
+        if health then
+            (target :: Types.MapProp):TryTakeDamage({
+                Amount = 1,
+                Source = "Burn",
+                Attacker = info.Attacker,
+            })
+        end
+    end
+end
+
+local function burnHeartbeat(): ()
+    for target, info in burningThings do
+        burnThing(target, info)
+    end
 end
 
 local item: Types.GunWeaponDefinition = {
@@ -170,55 +228,15 @@ local item: Types.GunWeaponDefinition = {
     RecoilY = 1.2,
 }
 
-local function doBurnDamage(): ()
-    local toRemove: {Types.MapProp} = {}
-    for _, prop in burningProps do
-        if not prop.Model:GetAttribute("Burning") or not prop.Model:IsDescendantOf(workspace) then
-            table.insert(toRemove, prop)
-            continue
-        end
-
-        local burnedParticipants: {Types.Participant} = {}
-        for _, v in workspace:GetPartsInPart(prop.Model) do
-            local model = v:FindFirstAncestorOfClass("Model")
-            if not model then
-                continue
-            end
-
-            local participant = prop.Round:GetParticipant(model.Name)
-            if not participant then
-                continue
-            end
-        
-            if table.find(burnedParticipants, participant) then
-                continue
-            end
-
-            table.insert(burnedParticipants, participant)
-
-            participant:TryTakeDamage({
-                Amount = 1,
-                Source = "Burn",
-            })
-
-            PlaySound(weaponSounds("FlareBurn"), nil, v, {SoundGroup = SoundService.AllSounds :: SoundGroup})
-        end
-    end
-
-    for _, v in toRemove do
-        table.remove(burningProps, table.find(burningProps, v))
-    end
-end
-
 local elapsedTime = 0
 RunService.Heartbeat:Connect(function(dt)
     elapsedTime += dt
-    if elapsedTime < 0.1 then
+    if elapsedTime < 0.05 then
         return
     end
 
     elapsedTime = 0
-    doBurnDamage()
+    burnHeartbeat()
 end)
 
 return item
