@@ -37,7 +37,7 @@ local item: Types.GunWeaponDefinition = {
 	Kind = "Gun" :: "Gun",
     Name = "Newton Launcher",
     Description = "Flings anyone who is hit. Low inherent damage, but can be used to crush others with props or throw them off high ledges.",
-    Icon = "rbxassetid://10243797417",
+    Icon = "rbxassetid://1491877109",
 
 	Slot = 8,
     MaxStock = 2,
