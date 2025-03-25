@@ -47,7 +47,7 @@ local item: Types.GunWeaponDefinition = {
 
     Spread = 0.02,
 
-    AttackInterval = 1.6,
+    AttackInterval = 2,
     ReloadTime = 0,
     AmmoType = Ammo["Newton"],
 
