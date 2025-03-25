@@ -14,6 +14,17 @@ local ALIGNMENT_DEPTH = 6
 
 local PROP_DAMAGE_TIME = 5
 
+local module = {}
+
+local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
+function module.SetLastHeldBy(prop: Types.MapProp, by: Player?): ()
+	if not by then
+		serverLastHeldBy[prop] = nil
+	else
+		serverLastHeldBy[prop] = {By = by, At = workspace:GetServerTimeNow()}
+	end
+end
+
 local stopControllingPropRemote: RemoteEvent
 if RunService:IsServer() then
 	stopControllingPropRemote = Instance.new("RemoteEvent")
@@ -30,7 +41,6 @@ local function models(name: string): BasePart
 end
 
 local serverGrabbedProps: {[Player]: Types.Prop?} = {}
-local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
 local serverTouchedConnections: {[Types.MapProp]: RBXScriptConnection?} = {}
 
 local currentGrabClient: AlignPosition?
@@ -223,7 +233,7 @@ local function stopControllingPropServer(player: Player): ()
 	serverGrabbedProps[player] = nil
 
 	if prop.Kind == "MapProp" and not serverTouchedConnections[prop] then
-		serverLastHeldBy[prop] = {By = player, At = workspace:GetServerTimeNow()}
+		module.SetLastHeldBy(prop, player)
 		local con: RBXScriptConnection
 		con = part.Touched:Connect(function(otherPart)
 			onPropTouchedServer(prop, otherPart, con)
@@ -232,7 +242,7 @@ local function stopControllingPropServer(player: Player): ()
 
 		part.Destroying:Once(function()
 			serverTouchedConnections[prop] = nil
-			serverLastHeldBy[prop] = nil
+			module.SetLastHeldBy(prop)
 		end)
 	end
 end
@@ -540,4 +550,6 @@ local item: Types.ItemDefinition = {
     AlternateHint = "Grab Prop",
 }
 
-return item
+module.Item = item
+
+return module

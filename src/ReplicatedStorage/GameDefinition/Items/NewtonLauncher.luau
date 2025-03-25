@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Ammo = require(script.Parent.Ammo)
+local MagnetoStick = require(script.Parent.MagnetoStick)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit: Types.Participant | Types.Prop, params: Types.DamageParams): boolean
@@ -23,7 +24,11 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 		return true
 	end
 
-	part:ApplyImpulse(char:GetPivot().LookVector * Vector3.new(10, 1, 10) * 100)
+    if hit.Kind == "MapProp" then
+        MagnetoStick.SetLastHeldBy(hit, attacker.Player)
+    end
+
+	part:ApplyImpulse(char:GetPivot().LookVector * Vector3.new(10, 1, 10) * 100 * part.AssemblyMass / 18)
 
 	return true
 end

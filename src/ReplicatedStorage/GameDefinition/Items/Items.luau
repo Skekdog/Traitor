@@ -895,7 +895,7 @@ melees.Crowbar = {
 }
 
 local items: {[string]: Types.ItemDefinition} = {}
-items["Magneto Stick"] = MagnetoStick
+items["Magneto Stick"] = MagnetoStick.Item
 
 items["DNA Scanner"] = {
     Kind = "Item" :: "Item",
