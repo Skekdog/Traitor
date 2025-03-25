@@ -48,7 +48,16 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
         MagnetoStick.SetLastHeldBy(hit, attacker.Player)
     end
 
-    local force = char:GetPivot().LookVector * 1000 * part.AssemblyMass / 18
+    local lookVector = char:GetPivot().LookVector
+    lookVector = Vector3.new(lookVector.X, 1, lookVector.Z)
+
+    local force = lookVector * 1000 * part.AssemblyMass / 18
+
+    if hit.Kind == "Participant" then
+        force *= Vector3.new(2, 1, 2)
+    end
+
+    print(force)
 
     local owner = part:GetNetworkOwner()
     if owner then
@@ -63,7 +72,7 @@ end
 local item: Types.GunWeaponDefinition = {
 	Kind = "Gun" :: "Gun",
     Name = "Newton Launcher",
-    Description = "Flings anyone who is hit. Low inherent damage, but can be used to crush others with props or throw them off high ledges.",
+    Description = "Flings anything it hits. Low inherent damage, but can be used to crush others with props or throw them off high ledges.",
     Icon = "rbxassetid://1491877109",
 
 	Slot = 8,
