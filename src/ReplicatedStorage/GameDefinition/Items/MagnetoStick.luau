@@ -17,13 +17,7 @@ local PROP_DAMAGE_TIME = 5
 local module = {}
 
 local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
-function module.SetLastHeldBy(prop: Types.MapProp, by: Player?): ()
-	if not by then
-		serverLastHeldBy[prop] = nil
-	else
-		serverLastHeldBy[prop] = {By = by, At = workspace:GetServerTimeNow()}
-	end
-end
+local serverTouchedConnections: {[Types.MapProp]: RBXScriptConnection?} = {}
 
 local stopControllingPropRemote: RemoteEvent
 if RunService:IsServer() then
@@ -41,7 +35,6 @@ local function models(name: string): BasePart
 end
 
 local serverGrabbedProps: {[Player]: Types.Prop?} = {}
-local serverTouchedConnections: {[Types.MapProp]: RBXScriptConnection?} = {}
 
 local currentGrabClient: AlignPosition?
 
@@ -212,6 +205,26 @@ local function stopControllingPropClient(doNotFireServer: boolean?): ()
 	animate()
 end
 
+function module.SetLastHeldBy(prop: Types.MapProp, by: Player?): ()
+	if not by then
+		serverLastHeldBy[prop] = nil
+	else
+		serverLastHeldBy[prop] = {By = by, At = workspace:GetServerTimeNow()}
+		if not serverTouchedConnections[prop] then
+			local con: RBXScriptConnection
+			con = prop.Model.Touched:Connect(function(otherPart)
+				onPropTouchedServer(prop, otherPart, con)
+			end)
+			serverTouchedConnections[prop] = con
+
+			prop.Model.Destroying:Once(function()
+				serverTouchedConnections[prop] = nil
+				module.SetLastHeldBy(prop)
+			end)
+		end
+	end
+end
+
 local function stopControllingPropServer(player: Player): ()
 	local prop = serverGrabbedProps[player]
 	if not prop then
@@ -234,16 +247,6 @@ local function stopControllingPropServer(player: Player): ()
 
 	if prop.Kind == "MapProp" and not serverTouchedConnections[prop] then
 		module.SetLastHeldBy(prop, player)
-		local con: RBXScriptConnection
-		con = part.Touched:Connect(function(otherPart)
-			onPropTouchedServer(prop, otherPart, con)
-		end)
-		serverTouchedConnections[prop] = con
-
-		part.Destroying:Once(function()
-			serverTouchedConnections[prop] = nil
-			module.SetLastHeldBy(prop)
-		end)
 	end
 end
 
