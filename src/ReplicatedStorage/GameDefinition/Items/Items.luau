@@ -8,6 +8,7 @@ local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local FlareGun = require(script.Parent.FlareGun)
 local MagnetoStick = require(script.Parent.MagnetoStick)
+local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Radar = require(script.Parent.Radar)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -630,6 +631,8 @@ guns.BAR = {
     RecoilX = 0.6,
     RecoilY = 1.8,
 }
+
+guns["Newton Launcher"] = NewtonLauncher
 
 local grenades: {[string]: Types.GrenadeWeaponDefinition} = {}
 grenades.Grenade = {

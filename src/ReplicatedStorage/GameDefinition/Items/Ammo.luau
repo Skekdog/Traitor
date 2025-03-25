@@ -94,4 +94,13 @@ module.Rifle = {
     CanDrop = true,
 }
 
+module.Newton = {
+    Kind = "Ammo",
+    Name = "Newton",
+    Capacity = math.huge,
+    ReserveCapacity = 0,
+    Model = NO_PART,
+    CanDrop = false,
+}
+
 return module
