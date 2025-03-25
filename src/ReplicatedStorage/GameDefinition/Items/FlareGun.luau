@@ -24,6 +24,10 @@ end
 local burningProps: {Types.MapProp} = {}
 
 local function burn(attacker: Types.Participant, target: Types.Participant | Types.Prop): ()
+    if table.find(burningProps, target :: Types.MapProp) then
+        return
+    end
+    
     local part: BasePart
     if target.Kind == "Participant" then
         local character = target:GetCharacter()
@@ -131,7 +135,7 @@ local item: Types.GunWeaponDefinition = {
     HasMuzzleFlash = true,
 
     Spread = 0.015,
-    
+
     AttackInterval = 0.25,
     ReloadTime = 0,
     MagazineSize = 6,
