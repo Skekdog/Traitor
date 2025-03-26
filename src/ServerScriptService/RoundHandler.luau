@@ -52,22 +52,43 @@ local MAP_VOTE_INTERVAL = 3
 local INTERMISSION_TIME = 15
 
 local gamemodes: {Types.Gamemode} = {}
-
-local forcedGamemode: string? = nil
-if forcedGamemode then
-    table.insert(gamemodes, (require)((ReplicatedStorage.GameDefinition.Gamemodes :: any)[forcedGamemode]))
-else
-    for _, v in ReplicatedStorage.GameDefinition.Gamemodes:GetChildren() do
-        table.insert(gamemodes, (require)(v))
-    end
+for _, v in ReplicatedStorage.GameDefinition.Gamemodes:GetChildren() do
+    table.insert(gamemodes, (require)(v))
 end
 
 local module = {}
 
+local forcedGamemode = nil :: Types.Gamemode?
+
+function module.TrySetForcedGamemode(gamemode: string?): boolean
+    if not gamemode then
+        module.ForcedGamemode = nil
+        return true
+    end
+
+    local found: Types.Gamemode?
+    for _, v in gamemodes do
+        if v.Name == gamemode then
+            found = v
+            break
+        end
+    end
+
+    if not found then
+        return false
+    end
+
+    forcedGamemode = found
+    return true
+end
+
 local function newRound(): Types.Round
     roundCount += 1
-    local round = Round.new(gamemodes[math.random(#gamemodes)])
+
+    local gamemode = if forcedGamemode then forcedGamemode else gamemodes[math.random(#gamemodes)]
+    local round = Round.new(gamemode)
     round:LoadMap(currentMap)
+
     return round
 end
 

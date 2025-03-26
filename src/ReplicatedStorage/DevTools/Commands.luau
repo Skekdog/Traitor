@@ -350,6 +350,22 @@ module.restart = {
 	end
 }
 
+module.forcegamemode = {
+	Name = "forcegamemode",
+	Description = "Forces the next round to use the specified gamemode",
+	Environment = "Server" :: "Server",
+	Arguments = {"gamemode name"},
+	Execute = function(_, round: Round, args: Args): string
+		local gamemodeName = processStringArgument(args[1])
+
+		local ServerScriptService = game:GetService("ServerScriptService")
+		local RoundHandler = (require)(ServerScriptService.RoundHandler)
+		local result = RoundHandler.TrySetForcedGamemode(gamemodeName)
+
+		return if result then `Set forced gamemode to {gamemodeName}.` else `Gamemode {gamemodeName} not found.`
+	end
+}
+
 module.map = {
 	Name = "map",
 	Description = "Changes the map",
