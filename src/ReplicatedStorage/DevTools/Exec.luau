@@ -59,7 +59,7 @@ function module.ServerExecute(player: Player, round: Types.Round, command: strin
 		return `Command {parsed.Command.Name} is not a server command.`
 	end
 
-	return parsed.Command.Execute(round, parsed.Args)
+	return parsed.Command.Execute(player, round, parsed.Args)
 end
 
 return module

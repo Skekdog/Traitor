@@ -19,7 +19,7 @@ export type ClientCommand = BaseCommand & {
 
 export type ServerCommand = BaseCommand & {
 	Environment: "Server",
-	Execute: (round: Round, args: Args) -> string,
+	Execute: (executor: Player, round: Round, args: Args) -> string,
 }
 
 export type Command = ClientCommand | ServerCommand
@@ -37,6 +37,36 @@ local function processNumberArgument(str: string?): number?
 	return if str then tonumber(str) else nil
 end
 
+local function processPlayerArgument(executor: Player, str: string?): {Player}?
+	if not str then
+		return {executor}
+	end
+
+	if str == "@a" then
+		return Players:GetPlayers()
+	elseif str == "@s" then
+		return {executor}
+	elseif str == "@r" then
+		local players = Players:GetPlayers()
+		return {players[math.random(#players)]}
+	end
+
+	local player = Players:FindFirstChild(str)
+	if player and player:IsA("Player") then
+		return {player}
+	end
+
+	return nil
+end
+
+local function getPlayersString(players: {Player}): string
+	local ret = ""
+	for _, player in players do
+		ret ..= `{player.Name}{if player ~= players[#players] then ", " else ""}`
+	end
+	return ret
+end
+
 local endRoundParams: {any}?
 local normalEndRound: (...any) -> ()
 
@@ -44,7 +74,7 @@ local function disabledEndRound(...: any): ()
     endRoundParams = {...}
 end
 
-local function toggleVictory(round: Types.Round): string
+local function toggleVictory(_: any, round: Types.Round): string
     if not round:IsInProgress() then
         return "Round is not in progress."
     end
@@ -71,7 +101,7 @@ module.help = {
 	Environment = "Client" :: "Client",
 	Arguments = {},
 	Execute = function()
-		local ret = "Commands:\n"
+		local ret = "Players can be specified using name, @s, @a, or @r.\nCommands:\n"
 
 		for _, v in module do
 
@@ -94,7 +124,7 @@ module.luauserver = {
 	Description = "Executes Luau code server-side. Includes globals: round, cmds, items, players",
 	Environment = "Server" :: "Server",
 	Arguments = {"code"},
-	Execute = function(round: Round, args: Args)
+	Execute = function(_, round: Round, args: Args)
 		local code = table.concat(args, " ")
 		
 		local func = loadstring(code, "")
@@ -144,10 +174,10 @@ module.freecam = {
 
 module.teleportplace = {
 	Name = "teleportplace",
-	Description = "Teleports everyone to the specified place. Available named places: Imperium, MainPlace, TestPlace",
+	Description = "Teleports specified players to the specified place. Available named places: Imperium, MainPlace, TestPlace",
 	Environment = "Server" :: "Server",
-	Arguments = {"place name / id"},
-	Execute = function(round: Round, args: Args)
+	Arguments = {"place name / id", "players"},
+	Execute = function(executor: Player, round: Round, args: Args)
 		local asId = processNumberArgument(args[1])
 		local asName = processStringArgument(args[1])
 		local place = if asId then asId else PlaceIDs[asName]
@@ -156,65 +186,74 @@ module.teleportplace = {
 			return "Place not found."
 		end
 
-		TeleportService:TeleportAsync(place, Players:GetPlayers())
-		return `Teleporting everyone to {place}.`
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
+		end
+
+		TeleportService:TeleportAsync(place, players)
+		return `Teleporting {getPlayersString(players)} to {place}.`
 	end
 }
 
 module.setrole = {
 	Name = "setrole",
-	Description = "Sets the role of a player",
+	Description = "Sets the roles of players",
 	Environment = "Server" :: "Server",
-	Arguments = {"player name", "role name"},
-	Execute = function(round: Round, args: Args)
-		local playerName = processStringArgument(args[1])
-		if not playerName then
-			return "Missing argument 1 player name."
+	Arguments = {"role name", "players"},
+	Execute = function(executor: Player, round: Round, args: Args)
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
 		end
 
-		local roleName = processStringArgument(args[2])
+		local roleName = processStringArgument(args[1])
 		if not roleName then
-			return "Missing argument 2 role name."
+			return "Missing argument 1 role name."
 		end
 
-		local participant = round:GetParticipant(playerName)
-		if not participant then
-			return `Participant {playerName} not found.`
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local success, result = pcall(round.GetRoleFromRoleName, round, roleName)
+			if not success then
+				return `Role {roleName} not found.`
+			end
+
+			participant:SetRole(result.Definition)
 		end
 
-		local success, result = pcall(round.GetRoleFromRoleName, round, roleName)
-		if not success then
-			return `Role {roleName} not found.`
-		end
-
-		participant:SetRole(result.Definition)
-
-		return `Set {playerName}'s role to {roleName}.`
+		return `Set roles of {getPlayersString(players)} to {roleName}.`
 	end
 }
 
 module.kill = {
 	Name = "kill",
-	Description = "Kills the specified player",
+	Description = "Kills the specified players",
 	Environment = "Server" :: "Server",
 	Arguments = {"player name"},
-	Execute = function(round: Round, args: Args)
-		local playerName = processStringArgument(args[1])
-		if not playerName then
-			return "Missing argument 1 player name."
+	Execute = function(executor: Player, round: Round, args: Args)
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return `Player {args[1]} not found.`
 		end
 
-		local participant = round:GetParticipant(playerName)
-		if not participant then
-			return `Participant {playerName} not found.`
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			participant:TryTakeDamage({
+				Amount = math.huge,
+				Source = "Other"
+			})
 		end
 
-		participant:TryTakeDamage({
-			Amount = math.huge,
-			Source = "Other"
-		})
-
-		return `Killed {playerName}.`
+		return `Killed {getPlayersString(players)}.`
 	end
 }
 
@@ -223,7 +262,7 @@ module.endround = {
 	Description = "Ends the current round with a victory for the specified role",
 	Environment = "Server" :: "Server",
 	Arguments = {"role name"},
-	Execute = function(round: Round, args: Args)
+	Execute = function(_, round: Round, args: Args)
 		local roleName = args[1]
 		if not roleName then
 			return "Missing argument 1 role name."
@@ -236,7 +275,7 @@ module.endround = {
 		local success, err = pcall(function()
 			round:EndRound(round:GetRoleFromRoleName(roleName))
 			if round.EndRound == disabledEndRound then
-				toggleVictory(round)
+				toggleVictory(nil, round)
 			end
 		end)
 
@@ -253,7 +292,7 @@ module.pause = {
 	Description = "Pauses or unpauses the round",
 	Environment = "Server" :: "Server",
 	Arguments = {},
-	Execute = function(round)
+	Execute = function(_, round: Types.Round)
 		if round:GetRoundPhase() == "Intermission" or round:GetRoundPhase() == "Waiting" then
 			return "Cannot pause during intermission or waiting phase."
 		end
@@ -276,7 +315,7 @@ module.restart = {
 	Description = "Restarts the server",
 	Environment = "Server" :: "Server",
 	Arguments = {},
-	Execute = function(round)
+	Execute = function()
 		local ServerScriptService = game:GetService("ServerScriptService")
 
 		local RestartServer = require(ServerScriptService.RestartServer)
@@ -291,7 +330,7 @@ module.map = {
 	Description = "Changes the map",
 	Environment = "Server" :: "Server",
 	Arguments = {"map name"},
-	Execute = function(round: Round, args: Args)
+	Execute = function(_, round: Round, args: Args)
 		local mapName = processStringArgument(args[1])
 		if not mapName then
 			return "Missing argument 1 map name."
@@ -310,59 +349,63 @@ module.map = {
 
 module.giveitem = {
 	Name = "giveitem",
-	Description = "Gives an item to a player",
+	Description = "Gives an item to players",
 	Environment = "Server" :: "Server",
-	Arguments = {"player name", "item name"},
-	Execute = function(round: Round, args: {string?})
-		local playerName = processStringArgument(args[1])
-		if not playerName then
-			return "Missing argument 1 player name."
+	Arguments = {"item name", "players"},
+	Execute = function(executor: Player, round: Round, args: {string?})
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
 		end
 
-		local itemName = processStringArgument(args[2])
+		local itemName = processStringArgument(args[1])
 		if not itemName then
-			return "Missing argument 2 item name."
+			return "Missing argument 1 item name."
 		end
 
-		local participant = round:GetParticipant(playerName)
-		if not participant then
-			return `Participant {playerName} not found.`
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local item = round:GetItemDefinition(itemName)
+			if not item then
+				return `Item {itemName} not found.`
+			end
+			participant:GiveItemFromItemDefinition(item)
 		end
 
-		local item = round:GetItemDefinition(itemName)
-		if not item then
-			return `Item {itemName} not found.`
-		end
-		participant:GiveItemFromItemDefinition(item)
-
-		return `Gave {itemName} to {playerName}.`
+		return `Gave {itemName} to {getPlayersString(players)}.`
 	end
 }
 
 module.givecredits = {
 	Name = "givecredits",
-	Description = "Gives credits to a player",
+	Description = "Gives credits to players",
 	Environment = "Server" :: "Server",
-	Arguments = {"player name", "amount"},
-	Execute = function(round: Round, args: Args)
-		local playerName = processStringArgument(args[1])
-		if not playerName then
-			return "Missing argument 1 player name."
+	Arguments = {"amount", "players"},
+	Execute = function(executor: Player, round: Round, args: Args)
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
 		end
 
-		local amount = processNumberArgument(args[2])
+		local amount = processNumberArgument(args[1])
 		if not amount then
-			return "Invalid argument 2 amount."
+			return "Invalid argument 1 amount."
 		end
 
-		local participant = round:GetParticipant(playerName)
-		if not participant then
-			return `Participant {playerName} not found.`
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			participant:AddCredits(amount)
 		end
 
-		participant:AddCredits(amount)
-
-		return `Gave {amount} credits to {playerName}.`
+		return `Gave {amount} credits to {getPlayersString(players)}.`
 	end
 }
 
