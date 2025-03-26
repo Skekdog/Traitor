@@ -94,9 +94,9 @@ module.Rifle = {
     CanDrop = true,
 }
 
-module.Newton = {
+module.Infinite = {
     Kind = "Ammo",
-    Name = "Newton",
+    Name = "Infinite",
     Capacity = math.huge,
     ReserveCapacity = 0,
     Model = NO_PART,

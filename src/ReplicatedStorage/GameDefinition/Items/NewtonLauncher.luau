@@ -88,7 +88,7 @@ local item: Types.GunWeaponDefinition = {
 
     AttackInterval = 2,
     ReloadTime = 0,
-    AmmoType = Ammo["Newton"],
+    AmmoType = Ammo["Infinite"],
 
     Model = ReplicatedStorage.WeaponModels["Newton Launcher"],
     HoldAnimation = "rbxassetid://10247380824",

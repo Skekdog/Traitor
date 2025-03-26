@@ -117,7 +117,8 @@ function module.UpdateAmmo(item: Types.AnyItem?): ()
 
     local currentAmmo: string | number = item.Ammo
     if currentAmmo == math.huge then
-        currentAmmo = "∞"
+        roundInfo.Frame.AmmoBar.Visible = false
+        return
     end
 
     local maxAmmo: string | number = item.Definition.AmmoType.Capacity
