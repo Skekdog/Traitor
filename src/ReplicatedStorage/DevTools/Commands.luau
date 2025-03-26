@@ -310,6 +310,31 @@ module.togglevictory = {
 	Execute = toggleVictory
 }
 
+module.respawn = {
+	Name = "respawn",
+	Description = "Respawns the specified players",
+	Environment = "Server" :: "Server",
+	Arguments = {"players"},
+	Execute = function(executor: Player, round: Types.Round, args: Args): string
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return `Player {args[1]} not found.`
+		end
+
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			round:RemoveParticipant(participant, true)
+			round:AddPlayer(player, false)
+		end
+
+		return "Respawned " .. getPlayersString(players)
+	end
+}
+
 module.restart = {
 	Name = "restart",
 	Description = "Restarts the server",
