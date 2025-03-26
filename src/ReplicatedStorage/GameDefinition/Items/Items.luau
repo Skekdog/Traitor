@@ -591,6 +591,48 @@ guns.Deagle = {
     RecoilY = 1.2,
 }
 
+guns.UMP = {
+    Kind = "Gun" :: "Gun",
+    Name = "UMP",
+    Description = "A weak weapon standalone, but loaded with discombobulation. Targets will be disorientated when hit. Uses SMG rounds.",
+    Icon = "",
+
+    MaxStock = 2,
+    CreditCost = 1,
+    CanDrop = true,
+    Slot = 7,
+
+    HasMuzzleFlash = true,
+
+    Damage = {
+        Head = 25,
+        Body = 15,
+        Limb = 10,
+    },
+
+    Spread = 0.01,
+
+    AttackInterval = 0.1,
+    ReloadTime = 1.5,
+    AmmoType = Ammo["SMG1"],
+
+    Model = models("UMP"),
+    HoldAnimation = "rbxassetid://10247380824",
+    AimAnimation = "rbxassetid://18691831450",
+    AttackSound = firedSounds("UMP"),
+    ReloadSound = reloadSounds("UMP"),
+
+    Projectile = bullet,
+    ProjectileSpeed = 150,
+
+    OnHitClient = function()
+        workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Inverse()
+    end,
+
+    RecoilX = 0.75,
+    RecoilY = 1.75,
+}
+
 guns.BAR = {
     Kind = "Gun" :: "Gun",
     Name = "BAR",
@@ -908,7 +950,6 @@ items["DNA Scanner"] = {
 
     PrimaryHint = "Scan Identified Body",
 }
-
 
 items.Radar = Radar
 
