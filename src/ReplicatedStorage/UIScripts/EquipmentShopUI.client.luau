@@ -45,16 +45,12 @@ local function selectItem(ui: ShopUI, item: Types.AnyItemDefinition?): ()
     updateCredits(ui, item.CreditCost)
 end
 
+local function errorMessage(message: string): ()
+    ScreenMessage("Error", message)
+end
+
 local function notEnoughCredits(): ()
-    ScreenMessage("Error", "You don't have enough credits to buy this.")
-end
-
-local function slotOccupied(): ()
-    ScreenMessage("Error", "This slot is already occupied.")
-end
-
-local function notInStock(): ()
-    ScreenMessage("Error", "This item is out of stock.")
+    errorMessage("You don't have enough credits to buy this.")
 end
 
 local function tryPurchase(): ()
@@ -70,11 +66,13 @@ local function tryPurchase(): ()
     if response == "NotEnoughCredits" then
         notEnoughCredits()
     elseif response == "NotInStock" then
-        notInStock()
+        errorMessage("This item is out of stock.")
     elseif response == "SlotOccupied" then
-        slotOccupied()
+        errorMessage(`You already have an item in slot {selectedItem.Slot}.`)
+    elseif response == "NotInRound" then
+        errorMessage("You are dead.")
     elseif response ~= "Success" then
-        ScreenMessage("Error", "An unknown error occurred.")
+        errorMessage("An unknown error occurred.")
     end
 
     local ui = UIManager.TryGetUI("Equipment Shop") :: ShopUI?
