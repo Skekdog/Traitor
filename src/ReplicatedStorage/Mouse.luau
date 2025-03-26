@@ -107,6 +107,16 @@ function module.ShowCorpseHint(char: Model)
 	corpseHint.Visible = true
 end
 
+local function makeLabelVisible(label: TextLabel, visible: boolean, text: string, lastCount: number): number
+	if visible then
+		label.Text = text
+		label.Visible = true
+		return lastCount + 1
+	end
+	label.Visible = false
+	return lastCount
+end
+
 local itemHint = workspace:WaitForChild("ItemHintGui")
 function module.ShowItemHint(instance: Instance)
 	instance = instance:FindFirstAncestorWhichIsA("BasePart") or instance
@@ -116,17 +126,17 @@ function module.ShowItemHint(instance: Instance)
 	local maxAmmo = if ammo then ammo.Capacity else nil
 
 	local frame = itemHint.Frame
-	frame.ItemName.Text = if ammo and state.Kind == "AmmoState" then (ammo.DisplayName or ammo.Name) .. " Ammo" else GetDisplayName(state.Definition)
-	frame.AmmoAvailable.Text = if state.StoredAmmo then `{state.StoredAmmo} / {maxAmmo}` else ""
-	frame.AmmoType.Text = if ammo and state.Kind ~= "AmmoState" then GetDisplayName(ammo) .. " Ammo" else ""
 
 	local count = 1
-	if state.StoredAmmo then
-		count += 1
-	end
-	if ammo and state.Kind ~= "AmmoState" then
-		count += 1
-	end
+
+	local displayAmmoAvailable = not not (state.StoredAmmo and state.StoredAmmo ~= math.huge)
+	local displayAmmoType = not not (ammo and state.Kind ~= "AmmoState") and ammo.Capacity ~= math.huge
+
+	local ammoTypeText = if ammo then GetDisplayName(ammo) .. " Ammo" else ""
+
+	frame.ItemName.Text = if ammo and state.Kind == "AmmoState" then (ammo.DisplayName or ammo.Name) .. " Ammo" else GetDisplayName(state.Definition)
+	count = makeLabelVisible(frame.AmmoAvailable, displayAmmoAvailable, `{state.StoredAmmo} / {maxAmmo}`, count)
+	count = makeLabelVisible(frame.AmmoType, displayAmmoType, ammoTypeText, count)
 
 	itemHint.Border.Size = UDim2.fromScale(0.025, 0.333 * count)
 
