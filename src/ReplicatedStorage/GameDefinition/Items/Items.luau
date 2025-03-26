@@ -595,7 +595,7 @@ guns.UMP = {
     Kind = "Gun" :: "Gun",
     Name = "UMP",
     Description = "A weak weapon standalone, but loaded with discombobulation. Targets will be disorientated when hit. Uses SMG rounds.",
-    Icon = "",
+    Icon = "rbxassetid://8482220999",
 
     MaxStock = 2,
     CreditCost = 1,
