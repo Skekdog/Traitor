@@ -124,14 +124,16 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	end)
 
 	if item.Kind == "Gun" then
-		ControlManager.Register("Alternate Fire", function(_, state)
-			if state ~= Enum.UserInputState.End then
-				return Enum.ContextActionResult.Pass
-			end
+		if item.Definition.AimAnimation then
+			ControlManager.Register("Alternate Fire", function(_, state)
+				if state ~= Enum.UserInputState.End then
+					return Enum.ContextActionResult.Pass
+				end
 
-			Aim.ToggleAim(item)
-			return Enum.ContextActionResult.Sink
-		end)
+				Aim.ToggleAim(item)
+				return Enum.ContextActionResult.Sink
+			end)
+		end
 		
 		ControlManager.Register("Reload Weapon", function(_, state)
 			if state ~= Enum.UserInputState.End then
