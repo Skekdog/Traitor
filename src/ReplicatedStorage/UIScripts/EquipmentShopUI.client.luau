@@ -115,6 +115,7 @@ local function tryPopulateEquipment(role: Types.Role?): ()
         button.Image = v.Icon or ""
 
         button.TextLabel.Text = if v.Slot then `[{v.Slot}]` else ""
+        button.TextLabel.Visible = not not v.Slot
 
         button.Visible = true
         button.Parent = list :: any
