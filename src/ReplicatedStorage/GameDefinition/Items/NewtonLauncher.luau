@@ -57,8 +57,6 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
         force *= Vector3.new(2, 1, 2)
     end
 
-    print(force)
-
     local owner = part:GetNetworkOwner()
     if owner then
         flingRemote:FireClient(owner, part, force)
