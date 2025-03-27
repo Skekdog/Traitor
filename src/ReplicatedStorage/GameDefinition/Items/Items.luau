@@ -9,6 +9,7 @@ local Ammo = require(script.Parent.Ammo)
 local FlareGun = require(script.Parent.FlareGun)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
+local Poltergeist = require(script.Parent.Poltergeist)
 local Radar = require(script.Parent.Radar)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -675,6 +676,7 @@ guns.BAR = {
 }
 
 guns["Newton Launcher"] = NewtonLauncher
+guns["Poltergeist"] = Poltergeist
 
 local grenades: {[string]: Types.GrenadeWeaponDefinition} = {}
 grenades.Grenade = {

@@ -94,6 +94,15 @@ module.Rifle = {
     CanDrop = true,
 }
 
+module.Poltergeist = {
+    Kind = "Ammo",
+    Name = "Poltergeist",
+    Capacity = 6,
+    ReserveCapacity = 0,
+    Model = NO_PART,
+    CanDrop = false,
+}
+
 module.Infinite = {
     Kind = "Ammo",
     Name = "Infinite",
