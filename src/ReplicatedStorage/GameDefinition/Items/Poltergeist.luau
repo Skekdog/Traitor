@@ -77,6 +77,21 @@ local item: Types.GunWeaponDefinition = {
 		else
 			item.Definition.LaserColor = Color3.new(1, 0, 0)
 		end
+	end,
+	
+	BeforePrimaryFireClient = function(item: Types.GunWeapon, targets: {BasePart}): boolean
+		local part = targets[1]
+		local map = workspace:FindFirstChild("Map")
+		if not map then
+			return false
+		end
+
+		local props = map:FindFirstChild("Props")
+		if not props then
+			return false
+		end
+
+		return part and part:IsDescendantOf(props)
 	end
 }
 

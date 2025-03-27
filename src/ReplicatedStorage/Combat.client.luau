@@ -208,21 +208,6 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			local head = char:WaitForChild("Head")
 			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
-			if item.Kind == "Gun" then
-				item.Ammo -= 1
-				RoundInfoUI.UpdateAmmo(item)
-			end
-
-			if item.Kind == "Melee" then
-				local id = assert(tonumber((item.Definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(item.Definition.HoldAnimation))
-				LocalAnimation.TryPlayAnimation(id, "MeleeAttack")
-			end
-
-			if item.Kind == "Gun" and item.Definition.HasMuzzleFlash then
-				ViewmodelModule.MuzzleFlash()
-			end
-			ViewmodelModule.Recoil(item.Definition)
-
 			local origin = head.Position
 			local direction = GetCentreRay().Direction
 
@@ -250,6 +235,19 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 						HitPartCenterPosition = hitPartCenterPosition,
 						Normal = normal,
 					})
+				end
+
+				if item.Kind == "Gun" and item.Definition.BeforePrimaryFireClient then
+					local parts: {BasePart} = {}
+					for _, v in raycasts do
+						if v.HitPart then
+							table.insert(parts, v.HitPart)
+						end
+					end
+
+					if not item.Definition.BeforePrimaryFireClient(item, parts) then
+						continue
+					end
 				end
 
 				local raycastRequest: CombatTypes.PrimaryFireRaycastRequest = {
@@ -282,6 +280,21 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 			else
 				error("Unknown item kind: " .. item.Kind)
 			end
+
+			if item.Kind == "Gun" then
+				item.Ammo -= 1
+				RoundInfoUI.UpdateAmmo(item)
+			end
+
+			if item.Kind == "Melee" then
+				local id = assert(tonumber((item.Definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(item.Definition.HoldAnimation))
+				LocalAnimation.TryPlayAnimation(id, "MeleeAttack")
+			end
+
+			if item.Kind == "Gun" and item.Definition.HasMuzzleFlash then
+				ViewmodelModule.MuzzleFlash()
+			end
+			ViewmodelModule.Recoil(item.Definition)
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
 			if result ~= "Success" and result ~= "PreGame" then
