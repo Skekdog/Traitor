@@ -11,7 +11,8 @@ local item: Types.ItemDefinition = {
     Icon = "rbxassetid://62159372",
     Name = "Radar",
 
-    HeartbeatClient = function(item: Types.Item)
+    HeartbeatClient = function(item: Types.AnyItem)
+        assert(item.Kind == "Item")
         local lastScan: number = item.Extras.LastScan or 0
 
         local timeNow = workspace:GetServerTimeNow()

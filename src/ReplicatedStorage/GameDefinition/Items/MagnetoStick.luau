@@ -403,7 +403,7 @@ local function isPartTouchingPart(part1: BasePart, part2: BasePart): boolean
 	return false
 end
 
-local preSimulationClient: (item: Types.Item, dt: number) -> () = function(): ()
+local preSimulationClient: (item: Types.AnyItem, dt: number) -> () = function(): ()
 	if not currentGrabClient then
 		return
 	end

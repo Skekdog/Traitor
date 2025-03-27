@@ -46,6 +46,13 @@ local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "
 			v.Definition[schedulerEvent .. "Client"](v, dt)
 		end
 	end
+
+	local item = module.EquippedItem
+	if item and item.Kind == "Gun" then
+		if item.Definition[schedulerEvent .. "Client"] then
+			item.Definition[schedulerEvent .. "Client"](item, dt)
+		end
+	end
 end
 
 RunService.Heartbeat:Connect(function(dt: number)

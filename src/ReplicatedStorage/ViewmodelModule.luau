@@ -30,9 +30,7 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     end
 
     local attachment = item:FindFirstChild("LaserAttachment", true)
-    if not attachment or not attachment:IsA("Attachment") then
-        return
-    end
+    assert(attachment and attachment:IsA("Attachment"), "Missing laser attachment")
 
     local laser = item:FindFirstChild("Laser") :: typeof(ReplicatedStorage.Laser)?
     local ball = item:FindFirstChild("Ball") :: Part?
@@ -48,7 +46,6 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
         ball.CastShadow = false
         ball.Transparency = 0.2
         ball.Material = Enum.Material.Neon
-        ball.Color = gun.LaserColor
 
         ball.CanCollide = false
         ball.CanTouch = false
@@ -66,17 +63,20 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     end
     assert(ball)
 
+    ball.Color = gun.LaserColor
+
     if not laser then
         laser = ReplicatedStorage.Laser:Clone()
         assert(laser)
 
-        laser.Color = gun.LaserColor
         laser.Material = Enum.Material.Neon
 
         laser.Parent = item
     end
 
     assert(laser)
+
+    laser.Color = gun.LaserColor
 
     local camera = workspace.CurrentCamera
     local direction = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2, 1).Direction * 10000
