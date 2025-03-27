@@ -1,16 +1,21 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
 local SoundService = game:GetService("SoundService")
 
 local LocalCharacter
 local GetCentreRay
+local Combat
 if RunService:IsClient() then
 	LocalCharacter = require(ReplicatedStorage.LocalCharacter)
 	GetCentreRay = require(ReplicatedStorage.GetCentreRay)
+else
+	Combat = require(ServerScriptService.Combat)
 end
 
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
+local ExplosionParams = require(ReplicatedStorage.RoundRule.ExplosionParams)
 local Ammo = require(script.Parent.Ammo)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
@@ -161,7 +166,23 @@ local function doPropPolt(prop: Types.MapProp, info: PoltInfo): ()
 	local direction = (prop.Model.Position - root.Position).Unit
 	NewtonLauncher.Fling(prop.Model, -direction * 1000 * prop.Model.AssemblyMass / 18)
 
-	PlaySound(if info.PoltPhase == #phaseAdvanceTimes then 648433302 else 7129285090, nil, prop.Model, {
+	if info.PoltPhase == #phaseAdvanceTimes then
+		local params = ExplosionParams.new({
+			Damage = 10,
+			FalloffBegin = 0,
+			FalloffEnd = 15,
+			Pressure = 50000,
+			VisualRadius = 15,
+			
+			BeforeHitParticipant = function(_, _, hitParticipant: Types.Participant): boolean
+				return hitParticipant ~= info.Attacker
+			end,
+		}, prop.Model.Position, info.Attacker)
+		Combat.CreateExplosion(prop.Round, params)
+		return
+	end
+
+	PlaySound(7129285090, nil, prop.Model, {
 		SoundGroup = SoundService.AllSounds :: SoundGroup,
 		Volume = 0.5,
 		RollOffMinDistance = 10,
