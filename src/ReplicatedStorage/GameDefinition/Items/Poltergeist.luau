@@ -24,6 +24,53 @@ local function raycast(char: Model, range: number): RaycastResult?
 	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, GetCentreRay().Direction.Unit * range, params)
 end
 
+local function preRenderClient(item: Types.AnyItem, dt: number): ()
+	assert(item.Kind == "Gun")
+	local map = workspace:FindFirstChild("Map")
+	if not map then
+		return
+	end
+
+	local props = map:FindFirstChild("Props")
+	if not props then
+		return
+	end
+
+	local result = raycast(assert(LocalCharacter.GetCharacter()), MAX_RANGE)
+	if not result then
+		return
+	end
+
+	if result.Instance:IsDescendantOf(props) then
+		item.Definition.LaserColor = Color3.new(0, 1, 0)
+	else
+		item.Definition.LaserColor = Color3.new(1, 0, 0)
+	end
+end
+
+local function beforePrimaryFireClient(item: Types.GunWeapon, targets: {BasePart}): boolean
+	local part = targets[1]
+	local map = workspace:FindFirstChild("Map")
+	if not map then
+		return false
+	end
+
+	local props = map:FindFirstChild("Props")
+	if not props then
+		return false
+	end
+
+	return part and part:IsDescendantOf(props)
+end
+
+local function beforeHitAnything(_, round: Types.Round, hitPart: BasePart): boolean
+	return hitPart:IsDescendantOf(round:GetMap().Props)
+end
+
+local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop): boolean
+	return true
+end
+
 local item: Types.GunWeaponDefinition = {
 	Kind = "Gun" :: "Gun",
 	Name = "Poltergeist",
@@ -55,44 +102,11 @@ local item: Types.GunWeaponDefinition = {
 	RecoilX = 0,
 	RecoilY = 0,
 
-	PreRenderClient = function(item: Types.AnyItem, dt: number): ()
-		assert(item.Kind == "Gun")
-		local map = workspace:FindFirstChild("Map")
-		if not map then
-			return
-		end
+	PreRenderClient = preRenderClient,
+	BeforePrimaryFireClient = beforePrimaryFireClient,
 
-		local props = map:FindFirstChild("Props")
-		if not props then
-			return
-		end
-
-		local result = raycast(assert(LocalCharacter.GetCharacter()), MAX_RANGE)
-		if not result then
-			return
-		end
-
-		if result.Instance:IsDescendantOf(props) then
-			item.Definition.LaserColor = Color3.new(0, 1, 0)
-		else
-			item.Definition.LaserColor = Color3.new(1, 0, 0)
-		end
-	end,
-	
-	BeforePrimaryFireClient = function(item: Types.GunWeapon, targets: {BasePart}): boolean
-		local part = targets[1]
-		local map = workspace:FindFirstChild("Map")
-		if not map then
-			return false
-		end
-
-		local props = map:FindFirstChild("Props")
-		if not props then
-			return false
-		end
-
-		return part and part:IsDescendantOf(props)
-	end
+	BeforeHitAnything = beforeHitAnything,
+	BeforeHitProp = beforeHitProp,
 }
 
 return item
