@@ -675,7 +675,7 @@ guns.BAR = {
     RecoilY = 1.8,
 }
 
-guns["Newton Launcher"] = NewtonLauncher
+guns["Newton Launcher"] = NewtonLauncher.Item
 guns["Poltergeist"] = Poltergeist
 
 local grenades: {[string]: Types.GrenadeWeaponDefinition} = {}

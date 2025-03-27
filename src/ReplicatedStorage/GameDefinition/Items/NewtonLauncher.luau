@@ -15,12 +15,21 @@ else
 	flingRemote = found
 end
 
-local function fling(part: BasePart, force: Vector3): ()
+local module = {}
+
+function module.Fling(part: BasePart, force: Vector3): ()
+    if RunService:IsServer() then
+        local owner = part:GetNetworkOwner()
+        if owner then
+            return flingRemote:FireClient(owner, part, force)
+        end
+    end
+
     part:ApplyImpulse(force)
 end
 
 if RunService:IsClient() then
-    flingRemote.OnClientEvent:Connect(fling)
+    flingRemote.OnClientEvent:Connect(module.Fling)
 end
 
 local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit: Types.Participant | Types.Prop, params: Types.DamageParams): boolean
@@ -61,7 +70,7 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
     if owner then
         flingRemote:FireClient(owner, part, force)
     else
-        fling(part, force)
+        module.Fling(part, force)
     end
 
 	return true
@@ -105,4 +114,6 @@ local item: Types.GunWeaponDefinition = {
 	BeforeHitProp = beforeHit,
 }
 
-return item
+module.Item = item
+
+return module

@@ -1,6 +1,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 
 local LocalCharacter
 local GetCentreRay
@@ -9,7 +10,10 @@ if RunService:IsClient() then
 	GetCentreRay = require(ReplicatedStorage.GetCentreRay)
 end
 
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
+local MagnetoStick = require(script.Parent.MagnetoStick)
+local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local MAX_RANGE = 10000
@@ -67,8 +71,112 @@ local function beforeHitAnything(_, round: Types.Round, hitPart: BasePart): bool
 	return hitPart:IsDescendantOf(round:GetMap().Props)
 end
 
-local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop): boolean
+type PoltInfo = {
+	LastTime: number,
+	PoltPhase: number,
+	Attacker: Types.Participant,
+}
+
+local poltedProps: {[Types.MapProp]: PoltInfo} = {}
+
+local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop, params: Types.DamageParams): boolean
+	assert(params.Attacker)
+
+	if hitProp.Kind ~= "MapProp" then
+		return false
+	end
+
+	local info = poltedProps[hitProp]
+	if info then
+		return false
+	end
+
+	info = {
+		LastTime = 0,
+		PoltPhase = 1,
+		Attacker = params.Attacker,
+	}
+
+	poltedProps[hitProp] = info
+
 	return true
+end
+
+local phaseAdvanceTimes = {
+	[1] = 1,
+	[2] = 1.5,
+	[3] = 1.5,
+	[4] = 0.8,
+	[5] = 0.8,
+	[6] = 0.8,
+}
+
+local function doPropPolt(prop: Types.MapProp, info: PoltInfo): ()
+	if not prop.Model:IsDescendantOf(workspace) then
+		poltedProps[prop] = nil
+		return
+	end
+
+	local now = tick()
+	if now - info.LastTime < phaseAdvanceTimes[info.PoltPhase] then
+		return
+	end
+
+	info.LastTime = now
+	info.PoltPhase += 1
+
+	if info.PoltPhase > #phaseAdvanceTimes then
+		poltedProps[prop] = nil
+		return
+	end
+
+	local nearestParticipant: Types.Participant?
+	local nearestDistance = math.huge
+
+	for _, participant in prop.Round:GetParticipants() do
+		assert(participant)
+		local distance = participant.Player:DistanceFromCharacter(prop.Model.Position)
+		if distance ~= 0 and distance < nearestDistance then
+			nearestDistance = distance
+			nearestParticipant = participant
+		end
+	end
+
+	if not nearestParticipant then
+		return
+	end
+
+	local character = nearestParticipant:GetCharacter()
+	if not character then
+		return
+	end
+
+	local root = character.PrimaryPart
+	if not root then
+		return
+	end
+
+	MagnetoStick.SetLastHeldBy(prop)
+
+	local direction = (prop.Model.Position - root.Position).Unit
+	NewtonLauncher.Fling(prop.Model, -direction * 1000 * prop.Model.AssemblyMass / 18)
+
+	PlaySound(if info.PoltPhase == #phaseAdvanceTimes then 648433302 else 7129285090, nil, prop.Model, {
+		SoundGroup = SoundService.AllSounds :: SoundGroup,
+		Volume = 0.5,
+		RollOffMinDistance = 10,
+		RollOffMaxDistance = 25,
+	})
+end
+
+local function heartbeat()
+	for prop, info in poltedProps do
+		doPropPolt(prop, info)
+	end
+end
+
+if RunService:IsServer() then
+	RunService.Heartbeat:Connect(heartbeat)
 end
 
 local item: Types.GunWeaponDefinition = {
