@@ -156,7 +156,7 @@ local function doPropPolt(prop: Types.MapProp, info: PoltInfo): ()
 		return
 	end
 
-	MagnetoStick.SetLastHeldBy(prop)
+	MagnetoStick.SetLastHeldBy(prop, info.Attacker.Player)
 
 	local direction = (prop.Model.Position - root.Position).Unit
 	NewtonLauncher.Fling(prop.Model, -direction * 1000 * prop.Model.AssemblyMass / 18)
