@@ -31,6 +31,9 @@ local controls: {ControlInfo} = {
 		Control = "Interact",
 	},
 	{
+		Control = "Flashlight",
+	},
+	{
 		Control = "Playerlist",
 	},
 	{

@@ -296,6 +296,32 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Flashlight",
+	Tab = "Keybinds",
+	Category = "Gameplay",
+	Tooltip = "Toggles the flashlight which you always have on your character.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.F,
+			ConsoleKeybind = Enum.KeyCode.ButtonL1,
+		},
+
+		TouchButton = {
+			Position = UDim2.fromOffset(50, 150),
+			Scale = 1,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
 	Name = "Interact",
 	Tab = "Keybinds",
 	Category = "Gameplay",
@@ -306,7 +332,7 @@ table.insert(availableSettings, {
 	Default = {
 		Toggled = true,
 		Keybind = {
-			KBMKeybind = Enum.KeyCode.F,
+			KBMKeybind = Enum.KeyCode.E,
 			ConsoleKeybind = Enum.KeyCode.ButtonA,
 		},
 
