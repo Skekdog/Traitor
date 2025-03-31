@@ -64,32 +64,33 @@ LocalCharacter.CharacterRemoving:Connect(function()
 	ControlManager.Unregister("Flashlight")
 end)
 
+local function onCameraCFrameChanged(): ()
+	if not enabled then
+		return
+	end
+
+	local root = LocalCharacter.GetRootPart()
+	if not root then
+		return
+	end
+
+	local attachment = tryGetAttachment(root)
+	if not attachment then
+		return
+	end
+
+	local x = workspace.CurrentCamera.CFrame:ToOrientation()
+	attachment.CFrame = CFrame.new(attachment.CFrame.Position) * CFrame.fromEulerAnglesYXZ(x, 0, 0)
+end
+
 local lastCameraCon: RBXScriptConnection?
 local function listenToCamera(): ()
-	local camera = workspace.CurrentCamera
-
 	if lastCameraCon then
 		lastCameraCon:Disconnect()
 	end
 
-	lastCameraCon = camera:GetPropertyChangedSignal("CFrame"):Connect(function()
-		if not enabled then
-			return
-		end
-	
-		local root = LocalCharacter.GetRootPart()
-		if not root then
-			return
-		end
-	
-		local attachment = tryGetAttachment(root)
-		if not attachment then
-			return
-		end
-	
-		local x = workspace.CurrentCamera.CFrame:ToOrientation()
-		attachment.CFrame = CFrame.new(attachment.CFrame.Position) * CFrame.fromEulerAnglesYXZ(x, 0, 0)
-	end)
+	lastCameraCon = workspace.CurrentCamera:GetPropertyChangedSignal("CFrame"):Connect(onCameraCFrameChanged)
+	onCameraCFrameChanged()
 end
 workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(listenToCamera)
 listenToCamera()
