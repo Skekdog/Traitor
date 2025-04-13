@@ -85,6 +85,10 @@ local function isPropSmallEnough(part: BasePart): boolean
 end
 
 local function canGrab(part: BasePart): boolean
+	if part:IsGrounded() then
+		return false
+	end
+	
 	if not isPropSmallEnough(part) then
 		return false
 	end

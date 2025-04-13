@@ -17,6 +17,10 @@ end
 
 local module = {}
 
+function module.CanFling(part: BasePart): boolean
+    return not part:IsGrounded()
+end
+
 function module.Fling(part: BasePart, force: Vector3): ()
     if RunService:IsServer() then
         local owner = part:GetNetworkOwner()
@@ -44,6 +48,10 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 	if not part then
 		return true
 	end
+
+    if not module.CanFling(part) then
+        return true
+    end
 
 	local attacker = params.Attacker
 	assert(attacker)

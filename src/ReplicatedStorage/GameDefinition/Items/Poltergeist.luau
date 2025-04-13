@@ -50,7 +50,8 @@ local function preRenderClient(item: Types.AnyItem, dt: number): ()
 		return
 	end
 
-	if result.Instance:IsDescendantOf(props) then
+	local instance = result.Instance :: BasePart
+	if instance:IsDescendantOf(props) and NewtonLauncher.CanFling(instance) then
 		item.Definition.LaserColor = Color3.new(0, 1, 0)
 	else
 		item.Definition.LaserColor = Color3.new(1, 0, 0)
@@ -69,7 +70,7 @@ local function beforePrimaryFireClient(item: Types.GunWeapon, targets: {BasePart
 		return false
 	end
 
-	return part and part:IsDescendantOf(props)
+	return part and part:IsDescendantOf(props) and NewtonLauncher.CanFling(part)
 end
 
 local function beforeHitAnything(_, round: Types.Round, hitPart: BasePart): boolean
@@ -88,6 +89,10 @@ local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop, params:
 	assert(params.Attacker)
 
 	if hitProp.Kind ~= "MapProp" then
+		return false
+	end
+
+	if not NewtonLauncher.CanFling(hitProp.Model) then
 		return false
 	end
 
