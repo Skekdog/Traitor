@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local Discombobulate = require(ReplicatedStorage.Discombobulate)
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
@@ -626,9 +627,7 @@ guns.UMP = {
     Projectile = bullet,
     ProjectileSpeed = 150,
 
-    OnHitClient = function()
-        workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Inverse()
-    end,
+    OnHitClient = Discombobulate,
 
     RecoilX = 0.75,
     RecoilY = 1.75,
@@ -907,9 +906,7 @@ grenades["Discombobulator"] = {
         VisualRadius = 15,
     },
     
-    OnHitClient = function()
-        workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame:Inverse()
-    end,
+    OnHitClient = Discombobulate,
 
     FuseTime = 3,
 
