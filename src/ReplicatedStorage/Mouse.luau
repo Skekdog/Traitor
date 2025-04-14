@@ -130,7 +130,7 @@ function module.ShowItemHint(instance: Instance)
 	local count = 1
 
 	local displayAmmoAvailable = not not (state.StoredAmmo and state.StoredAmmo ~= math.huge)
-	local displayAmmoType = not not (ammo and state.Kind ~= "AmmoState") and ammo.Capacity ~= math.huge
+	local displayAmmoType = not not (ammo and state.Kind ~= "AmmoState") and ammo.Capacity ~= math.huge and ammo.ReserveCapacity ~= 0
 
 	local ammoTypeText = if ammo then GetDisplayName(ammo) .. " Ammo" else ""
 
