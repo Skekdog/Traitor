@@ -94,7 +94,7 @@ end
 
 ControlManager.Register("Interact", function(action, state, input)
 	return if module.TryInteract(module.InteractTarget) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
-end)
+end, Enum.ContextActionPriority.High.Value + 1)
 
 local params = RaycastParams.new()
 params.IgnoreWater = true

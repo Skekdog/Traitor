@@ -11,6 +11,7 @@ local module = {}
 export type ActionCallback = (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult
 export type RegistrationInfo = {
 	ActionName: string,
+	Priority: number,
 	Callback: ActionCallback,
 }
 
@@ -107,7 +108,10 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 end
 
 -- Returns the Button if it was created
-function module.Register(actionName: string, callback: ActionCallback): ActionButton.ActionButton?
+function module.Register(actionName: string, callback: ActionCallback, priority: number?): ActionButton.ActionButton?
+	priority = priority or Enum.ContextActionPriority.Medium.Value
+	assert(priority)
+
 	if registered[actionName] then
 		ContextActionService:UnbindAction(actionName)
 	end
@@ -115,6 +119,7 @@ function module.Register(actionName: string, callback: ActionCallback): ActionBu
 	registered[actionName] =  {
 		ActionName = actionName,
 		Callback = callback,
+		Priority = priority,
 	}
 
 	local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
@@ -142,7 +147,7 @@ function module.Register(actionName: string, callback: ActionCallback): ActionBu
 		return callback(action, state, input)
 	end
 
-	ContextActionService:BindAction(actionName, runCallback, false, table.unpack(binds))
+	ContextActionService:BindActionAtPriority(actionName, runCallback, false, priority, table.unpack(binds))
 	
 	if module.GetPreferredInputMethod() == "Touch" and setting.TouchButton then
 		return ActionButton.ShowActionButton(actionName, runCallback)
@@ -164,7 +169,7 @@ end
 function module.TryUpdateRegisteredAction(name: string, value: SettingDefinitions.ControlValue): ()
 	local info = module.GetRegisteredInfo(name)
 	if info then
-		module.Register(name, info.Callback)
+		module.Register(name, info.Callback, info.Priority)
 	end
 end
 
