@@ -166,10 +166,33 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 end
 
 function module.TransitionSwitch(target: GuiObject, disabled: boolean)
-	disabled = not disabled
-	local switch = target:FindFirstChild("Switch") :: TextLabel
-    module.Animate(switch, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {Position = UDim2.fromScale(disabled and 0.9 or 0.1, 0.5)})
-	module.Animate(target,
+	disabled = not disabled -- ???
+	local switch = target:FindFirstChild("Switch")
+
+	assert(switch and switch:IsA("TextLabel"))
+
+	local lastPosTween = switch:FindFirstChild("PositionTween")
+	local lastColourTween = switch:FindFirstChild("ColourTween")
+
+	if lastPosTween then
+		assert(lastPosTween:IsA("Tween"))
+		lastPosTween:Cancel()
+		lastPosTween:Destroy()
+	end
+
+	if lastColourTween then
+		assert(lastColourTween:IsA("Tween"))
+		lastColourTween:Cancel()
+		lastColourTween:Destroy()
+	end
+
+    local posTween = module.Animate(switch, TweenInfo.new(0.25, Enum.EasingStyle.Quad),
+		{
+			Position = UDim2.fromScale(if disabled then 0.9 else 0.1, 0.5)
+		}
+	)
+
+	local colourTween = module.Animate(target,
 		TweenInfo.new(
 			0.25,
 			Enum.EasingStyle.Quad
@@ -177,8 +200,18 @@ function module.TransitionSwitch(target: GuiObject, disabled: boolean)
 			BackgroundColor3 = disabled and Color3.fromRGB(189, 0, 0) or Color3.fromRGB(47, 189, 47)
 		}
 	)
+
+	if posTween then
+		posTween.Name = "PositionTween"
+		posTween.Parent = switch
+	end
+
+	if colourTween then
+		colourTween.Name = "ColourTween"
+		colourTween.Parent = switch
+	end
 	
-	switch.Text = disabled and "O" or "I"
+	switch.Text = if disabled then "O" else "I"
 end
 
 local pageTransitionTweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Exponential, Enum.EasingDirection.In)
