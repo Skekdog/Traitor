@@ -93,6 +93,12 @@ function module.TryInteract(target: Instance?): boolean
 end
 
 ControlManager.Register("Interact", function(action, state, input)
+	-- Sink inputs if we are starting to hold the interact key down, unless there is nothing to interact with
+	-- This is so that interacting with corpses is not really messy when spectating in freecam (the default interact key is also the move up key)
+	if state ~= Enum.UserInputState.End then
+		return if module.InteractTarget then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+	end
+
 	return if module.TryInteract(module.InteractTarget) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
 end, Enum.ContextActionPriority.High.Value + 1)
 

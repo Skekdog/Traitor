@@ -330,7 +330,7 @@ table.insert(availableSettings, {
 	SpecifyToggle = false,
 
 	Default = {
-		Toggled = true,
+		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.E,
 			ConsoleKeybind = Enum.KeyCode.ButtonA,
