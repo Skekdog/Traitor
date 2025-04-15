@@ -6,6 +6,10 @@ local RoundHandler = require(script.Parent.RoundHandler)
 local function replicateTo(player: Player): ()
 	local round = RoundHandler.GetRound()
 
+	if round.RoundEndMusic then
+		Replication.ReplicateRoundEndMusic(player, round.RoundEndMusic.Music, round.RoundEndMusic.StartedAt)
+	end
+
 	for _, v in round:GetParticipants() do
 		assert(v)
 		Replication.ReplicatePlayerStatus(player, v, v:GetStatus())
