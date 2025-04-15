@@ -30,6 +30,7 @@ local function createImpactHole(part: BasePart, relativeCFrame: CFrame, normal: 
     local impactHole = CreateEmptyPart(CFrame.lookAt(position, position + normal))
     impactHole.Anchored = false
     impactHole.Size = Vector3.new(0.5, 0.5, 0.1)
+	impactHole.CFrame *= CFrame.Angles(0, 0, math.rad(math.random(360)))
     
     local impactDecal = Instance.new("Decal")
     impactDecal.Texture = "rbxassetid://130624105"
@@ -48,7 +49,7 @@ end
 local function MakeBulletHole(part: BasePart, relativeCFrame: CFrame, normal: Vector3): ()
 	local impactHole, impactDecal, weld = createImpactHole(part, relativeCFrame, normal)
 	task.wait(5)
-	tryFadeBulletHole(impactHole, impactDecal, weld)	
+	tryFadeBulletHole(impactHole, impactDecal, weld)
 end
 
 ReplicatedStorage.ServerClient.MakeBulletHole.OnClientEvent:Connect(MakeBulletHole)
