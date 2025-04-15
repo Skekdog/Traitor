@@ -388,6 +388,20 @@ module.map = {
 	end
 }
 
+module.listitems = {
+	Name = "listitems",
+	Description = "Lists all items",
+	Environment = "Client" :: "Client",
+	Arguments = {},
+	Execute = function(): string
+		local ret = ""
+		for _, v in Items do
+			ret ..= (if ret == "" then "" else "\n") .. v.Name
+		end
+		return ret
+	end
+}
+
 module.giveitem = {
 	Name = "giveitem",
 	Description = "Gives an item to players",
