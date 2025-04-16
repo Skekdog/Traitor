@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local Items = require(ReplicatedStorage.GameDefinition.Items.Items)
@@ -284,6 +285,25 @@ module.endround = {
 		else
 			return `Failed to end round: {err}.`
 		end
+	end
+}
+
+module.skipphase = {
+	Name = "skipphase",
+	Description = "Skips the current round phase",
+	Environment = "Server" :: "Server",
+	Arguments = {},
+	Execute = function(_, round: Round): string
+		local currentPhase: Types.RoundPhase = round:GetRoundPhase()
+		if currentPhase == "Intermission" then
+			return "Cannot skip intermission phase."
+		end
+
+		round.ElapsedPhaseTime = math.huge
+		RunService.Heartbeat:Wait()
+		RunService.Heartbeat:Wait()
+
+		return `Skipped {currentPhase} phase to {round:GetRoundPhase()}.`
 	end
 }
 
