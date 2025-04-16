@@ -190,16 +190,16 @@ tabs.ScoresButton.MouseButton1Click:Connect(function() showTab("Scores") end)
 
 showTab("Highlights")
 
-local function onSoundServiceChildAdded(child: Instance)
-	if child:IsA("Sound") and child:GetAttribute("IsRoundVictoryMusic") then
+local function onRoundEndMusicChildAdded(child: Instance)
+	if child:IsA("Sound") then
 		child.SoundGroup = SoundService.RoundEndMusic
 		highlightsPage.Music.Text.Text = child.Name
 	end
 end
 
-SoundService.ChildAdded:Connect(onSoundServiceChildAdded)
-for _, v in SoundService:GetChildren() do
-	onSoundServiceChildAdded(v)
+SoundService.RoundEndMusic.ChildAdded:Connect(onRoundEndMusicChildAdded)
+for _, v in SoundService.RoundEndMusic:GetChildren() do
+	onRoundEndMusicChildAdded(v)
 end
 
 local muteMusicButton = highlightsPage.Music.Mute 
