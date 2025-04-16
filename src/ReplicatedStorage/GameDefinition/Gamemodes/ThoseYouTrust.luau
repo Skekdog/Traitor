@@ -24,6 +24,19 @@ for _, v in ReplicatedStorage.VictoryMusic.Timeout:GetChildren() do
 	end
 end
 
+local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
+	if isTimeout then
+		return timeoutMusic[math.random(#timeoutMusic)]
+	end
+	
+	assert(victor.Kind == "Role")
+
+	if victor.Definition.Name == "Traitor" then
+		return traitorMusic[math.random(#traitorMusic)]
+	end
+	return innocentMusic[math.random(#innocentMusic)]
+end
+
 local roles: {[string]: Types.RoleDefinition} = {
 	Traitor = {
 		Kind = "RoleDefinition",
@@ -36,7 +49,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Allegiance = {Kind = "Role", Role = "Traitor"},
 
 		VictoryText = "The dastardly Traitors have won the round!",
-		VictoryMusic = traitorMusic,
 
 		ShouldAnnounceDisconnect = true,
 		CanStealCreditsFromCorpses = true,
@@ -83,7 +95,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
 		VictoryText = "The lovable Innocents have won the round!",
-		VictoryMusic = innocentMusic,
 
 		Accessories = {},
 		AwardCreditsToRolesOnDeath = {},
@@ -250,7 +261,7 @@ local gamemode: Types.Gamemode = {
 		return round:GetRoleFromRoleName("Innocent")
 	end,
 
-	TimeoutMusic = timeoutMusic,
+	GetRoundEndMusic = getVictoryMusic,
 
 	EnableFriendlyFire = true,
 	EnableKarma = true,

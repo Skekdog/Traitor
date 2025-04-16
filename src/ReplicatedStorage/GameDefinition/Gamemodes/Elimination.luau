@@ -37,6 +37,13 @@ for _, v in ReplicatedStorage.VictoryMusic.Timeout:GetChildren() do
     end
 end
 
+local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
+    if isTimeout then
+        return timeoutVictoryMusic[math.random(#timeoutVictoryMusic)]
+    end
+    return competitorVictoryMusic[math.random(#competitorVictoryMusic)]
+end
+
 local roles: {[string]: Types.RoleDefinition} = {
     Competitor = {
         Kind = "RoleDefinition",
@@ -47,7 +54,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         Allegiance = {Kind = "Solo"},
 
-        VictoryMusic = competitorVictoryMusic,
         VictoryText = "Everyone is dead!",
 
         StartingItems = {Items.Radar},
@@ -109,7 +115,7 @@ local gamemode: Types.Gamemode = {
     MinimumPlayers = 1,
 
     TimeoutVictor = getBestParticipant,
-    TimeoutMusic = timeoutVictoryMusic,
+    GetRoundEndMusic = getVictoryMusic,
 
     AssignRoles = function(gamemode: Types.Gamemode, participants: {Types.Participant})
         for _, v in participants do
