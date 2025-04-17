@@ -45,7 +45,7 @@ local function preRenderClient(item: Types.AnyItem, dt: number): ()
 		return
 	end
 
-	local result = raycast(assert(LocalCharacter.GetCharacter()), MAX_RANGE)
+	local result = raycast(assert(LocalCharacter.Character()), MAX_RANGE)
 	if not result then
 		return
 	end

@@ -23,17 +23,17 @@ end
 function module.Climb(ladder: BasePart): ()
     module.StopClimbing()
 
-    local char = LocalCharacter.GetCharacter()
+    local char = LocalCharacter.Character()
     if not char then
         return
     end
 
-    local root = LocalCharacter.GetRootPart()
+    local root = LocalCharacter.RootPart()
     if not root then
         return
     end
 
-    local hum = LocalCharacter.GetHumanoid()
+    local hum = LocalCharacter.Humanoid()
     if not hum then
         return
     end
@@ -106,12 +106,12 @@ function module.StopClimbing(): ()
         coroutine.close(thread)
     end
 
-    local root = LocalCharacter.GetRootPart()
+    local root = LocalCharacter.RootPart()
     if not root then
         return
     end
 
-    local hum = LocalCharacter.GetHumanoid()
+    local hum = LocalCharacter.Humanoid()
     if not hum then
         return
     end

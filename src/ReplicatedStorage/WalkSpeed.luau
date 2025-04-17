@@ -6,7 +6,7 @@ local module = {}
 local modifiers: {[string]: number} = {}
 
 local function updateWalkSpeed(): ()
-	local hum = LocalCharacter.GetHumanoid()
+	local hum = LocalCharacter.Humanoid()
 	if not hum then
 		return
 	end

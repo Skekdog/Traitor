@@ -1,51 +1,38 @@
 local Players = game:GetService("Players")
-local Connection = require(script.Parent.Connection)
+local DynamicValue = require(script.Parent.DynamicValue)
 
 local module = {}
 
 local plr = Players.LocalPlayer
 
-function module.GetCharacter(): Model?
-	return plr.Character
-end
+module.Character = DynamicValue.new(nil :: Model?)
+module.Humanoid = DynamicValue.new(nil :: Humanoid?)
+module.RootPart = DynamicValue.new(nil :: BasePart?)
+module.Head = DynamicValue.new(nil :: BasePart?)
 
-function module.GetHumanoid(): Humanoid?
-	local char = module.GetCharacter()
-	return if char then char:FindFirstChildOfClass("Humanoid") else nil
-end
+plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
+	local char = plr.Character
 
-function module.GetRootPart(): BasePart?
-	local hum = module.GetHumanoid()
-	return if hum then hum.RootPart else nil
-end
+	module.Character:SetValue(char)
 
-function module.GetHead(): BasePart?
-	local char = module.GetCharacter()
 	if not char then
-		return nil
+		module.Humanoid:SetValue(nil)
+		module.RootPart:SetValue(nil)
+		module.Head:SetValue(nil)
+		return
 	end
-
-	local head = char:FindFirstChild("Head")
-	
-	return if head and head:IsA("BasePart") then head else nil
-end
-
-module.CharacterAdded = Connection.new((nil :: any) :: Model)
-module.HumanoidAdded = Connection.new((nil :: any) :: Humanoid)
-
-module.CharacterRemoving = Connection.new((nil :: any) :: Model)
-
-plr.CharacterAdded:Connect(function(char)
-	module.CharacterAdded:Invoke(char)
 
 	local hum = char:WaitForChild("Humanoid")
 	assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
 
-	module.HumanoidAdded:Invoke(hum)
-end)
+	module.Humanoid:SetValue(hum)
 
-plr.CharacterRemoving:Connect(function(char)
-	module.CharacterRemoving:Invoke(char)
+	module.RootPart:SetValue(hum.RootPart)
+	
+	local head = char:WaitForChild("Head")
+	assert(head:IsA("BasePart"), "Head is not a BasePart")
+
+	module.Head:SetValue(head)
 end)
 
 return module

@@ -137,7 +137,7 @@ local function tryUnequip(item: Types.AnyItem): ()
 end
 
 local function isObscured(origin: Vector3, target: Vector3): boolean
-	local char = LocalCharacter.GetCharacter()
+	local char = LocalCharacter.Character()
 	if not char then
 		return true
 	end
@@ -156,7 +156,7 @@ local function isObscured(origin: Vector3, target: Vector3): boolean
 end
 
 local function canDrop(direction: Vector3): boolean
-	local head = LocalCharacter.GetHead()
+	local head = LocalCharacter.Head()
 	if not head then
 		return false
 	end

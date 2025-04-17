@@ -96,7 +96,7 @@ local function updateCrosshair(isAiming: boolean): ()
     end
 end
 
-Aim.AimEvent:Connect(function(isAiming)
+Aim.IsAiming:Connect(function(isAiming)
 	updateCrosshair(isAiming)
 end)
 
@@ -111,7 +111,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 		ClientInventory.RemoveAmmoChangedConnection(lastAmmoConnection)
 	end
 
-	local char = LocalCharacter.GetCharacter()
+	local char = LocalCharacter.Character()
 	if not item or not char then
 		ControlManager.Unregister("Primary Fire")
 		ControlManager.Unregister("Reload Weapon")

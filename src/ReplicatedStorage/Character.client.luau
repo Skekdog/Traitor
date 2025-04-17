@@ -39,7 +39,11 @@ local function unregisterAll(): ()
     ControlManager.Unregister("Crouch")
 end
 
-LocalCharacter.CharacterRemoving:Connect(unregisterAll)
+LocalCharacter.Character:Connect(function(char)
+    if not char then
+        unregisterAll()
+    end
+end)
 
 local function setHumanoidStates(hum: Humanoid): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
@@ -110,7 +114,11 @@ local function initHeadTilt(char: Model): ()
     end
 end
 
-LocalCharacter.HumanoidAdded:Connect(function(hum)
+LocalCharacter.Humanoid:Connect(function(hum)
+    if not hum then
+        return
+    end
+    
     WalkSpeed.Reset()
     JumpPower.Reset()
 

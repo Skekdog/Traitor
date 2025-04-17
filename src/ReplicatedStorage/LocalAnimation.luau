@@ -3,7 +3,7 @@ local LocalCharacter = require(script.Parent.LocalCharacter)
 local module = {}
 
 local function tryGetAnimator(): Animator?
-    local hum = LocalCharacter.GetHumanoid()
+    local hum = LocalCharacter.Humanoid()
     if not hum then
         return nil
     end

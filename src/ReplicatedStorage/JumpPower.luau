@@ -7,7 +7,7 @@ local modifiers: {[string]: boolean} = {}
 local module = {}
 
 local function setJumpPower(): ()
-	local hum = LocalCharacter.GetHumanoid()
+	local hum = LocalCharacter.Humanoid()
 	if not hum then
 		return
 	end

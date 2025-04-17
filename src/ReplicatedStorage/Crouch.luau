@@ -14,7 +14,7 @@ local function adjustTrackSpeed(): ()
 		return
 	end
 
-	local hum = LocalCharacter.GetHumanoid()
+	local hum = LocalCharacter.Humanoid()
 	if not hum then
 		return
 	end
@@ -31,7 +31,7 @@ function module.ToggleCrouching(enabled: boolean?): ()
 
 	WalkSpeed.SetModifier("Crouching", if isCrouching then -6 else 0)
 
-	local hum = LocalCharacter.GetHumanoid()
+	local hum = LocalCharacter.Humanoid()
 	if hum then
 		hum.CameraOffset = Vector3.new(0, if isCrouching then -0.9 else 0, 0)
 		JumpPower.SetModifier("Crouching", not isCrouching)

@@ -109,7 +109,7 @@ function module.Show(item: Types.AnyItemDefinition): ()
     end
 
     local camera = workspace.CurrentCamera
-    local char = LocalCharacter.GetCharacter()
+    local char = LocalCharacter.Character()
     if not char then
         return
     end

@@ -50,7 +50,7 @@ local function interactDoor(door: BasePart): boolean
 end
 
 local function tryClimbLadder(map: Types.Map): boolean
-	local root = LocalCharacter.GetRootPart()
+	local root = LocalCharacter.RootPart()
 	if not root then
 		return false
 	end
@@ -80,7 +80,7 @@ function module.TryInteract(target: Instance?): boolean
 		return interactCorpse(model)
 	end
 
-	local char = LocalCharacter.GetCharacter()
+	local char = LocalCharacter.Character()
 	if not char then
 		return false
 	end

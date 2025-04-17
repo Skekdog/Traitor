@@ -44,7 +44,7 @@ local enabled = false
 local function enableFlashlight(): Enum.ContextActionResult
 	enabled = not enabled
 
-	local root = LocalCharacter.GetRootPart()
+	local root = LocalCharacter.RootPart()
 	if not root then
 		enabled = false
 		return Enum.ContextActionResult.Pass
@@ -56,12 +56,12 @@ local function enableFlashlight(): Enum.ContextActionResult
 	return Enum.ContextActionResult.Sink
 end
 
-LocalCharacter.CharacterAdded:Connect(function(char: Model)
+LocalCharacter.Character:Connect(function(char)
+	if not char then
+		ControlManager.Unregister("Flashlight")
+		return
+	end
 	ControlManager.Register("Flashlight", enableFlashlight)
-end)
-
-LocalCharacter.CharacterRemoving:Connect(function()
-	ControlManager.Unregister("Flashlight")
 end)
 
 local function onCameraCFrameChanged(): ()
@@ -69,7 +69,7 @@ local function onCameraCFrameChanged(): ()
 		return
 	end
 
-	local root = LocalCharacter.GetRootPart()
+	local root = LocalCharacter.RootPart()
 	if not root then
 		return
 	end

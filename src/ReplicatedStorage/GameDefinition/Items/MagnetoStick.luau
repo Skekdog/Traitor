@@ -338,7 +338,7 @@ local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 	local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
 	local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 
-	local char = LocalCharacter.GetCharacter()
+	local char = LocalCharacter.Character()
 	if not char then
 		return nil
 	end
@@ -426,7 +426,7 @@ local preSimulationClient: (item: Types.AnyItem, dt: number) -> () = function():
 
 	local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
 
-	local char = LocalCharacter.GetCharacter()
+	local char = LocalCharacter.Character()
 	if not char then
 		return
 	end

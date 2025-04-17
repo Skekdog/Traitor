@@ -15,7 +15,7 @@ local function tryMove(dt: number): ()
 		return
 	end
 
-	local char = LocalCharacter.GetCharacter()
+	local char = LocalCharacter.Character()
 	if not char then
 		return
 	end
@@ -49,8 +49,8 @@ function module.Enable(enabled: boolean?): boolean
 		return isEnabled
 	end
 
-	local root = LocalCharacter.GetRootPart()
-	local hum = LocalCharacter.GetHumanoid()
+	local root = LocalCharacter.RootPart()
+	local hum = LocalCharacter.Humanoid()
 	if not root or not hum then
 		return false
 	end
