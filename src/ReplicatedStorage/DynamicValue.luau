@@ -2,7 +2,7 @@
 export type ConnectionId = never
 export type Callback<T> = (T) -> ()
 
-export type DynamicValue<T> = {
+export type DynamicValue<T> = typeof(setmetatable({} :: {
 	_value: T,
 	GetValue: (DynamicValue<T>) -> T,
 	SetValue: (DynamicValue<T>, value: T) -> (),
@@ -11,7 +11,9 @@ export type DynamicValue<T> = {
 	Connect: (DynamicValue<T>, callback: Callback<T>) -> ConnectionId,
 	Disconnect: (DynamicValue<T>, connectionId: ConnectionId) -> (),
 	Wait: (DynamicValue<T>) -> T,
-}
+}, {} :: {
+	__call: (self: DynamicValue<T>) -> T
+}))
 
 local function Connect<T>(self: DynamicValue<T>, callback: Callback<T>): ConnectionId
 	local key = newproxy()
@@ -58,7 +60,7 @@ end
 local module = {}
 
 function module.new<T>(initialValue: T): DynamicValue<T>
-	return {
+	return setmetatable({
 		_value = initialValue,
 		GetValue = GetValue,
 		SetValue = SetValue,
@@ -67,7 +69,11 @@ function module.new<T>(initialValue: T): DynamicValue<T>
 		Connect = Connect,
 		Disconnect = Disconnect,
 		Wait = Wait,
-	}
+	}, {
+		__call = function(self: DynamicValue<T>): T
+			return self:GetValue()
+		end
+	})
 end
 
 return module
