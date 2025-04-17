@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local Connection = require(script.Parent.Connection)
+local DynamicValue = require(script.Parent.DynamicValue)
 local JumpPower = require(script.Parent.JumpPower)
 local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -9,18 +9,13 @@ local ViewmodelModule = require(script.Parent.ViewmodelModule)
 local WalkSpeed = require(script.Parent.WalkSpeed)
 
 local scopeUi = UIManager.WaitForUI("Scope")
-local isAiming = false
 
 local module = {}
 
-function module.IsAiming(): boolean
-	return isAiming
-end
-
-module.AimEvent = Connection.new((nil :: any) :: boolean)
+module.IsAiming = DynamicValue.new(false)
 
 function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
-	isAiming = if enabled == nil then not isAiming else enabled
+	local isAiming = not module.IsAiming()
 
 	JumpPower.SetModifier("Aiming", not isAiming)
 
@@ -55,7 +50,7 @@ function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 		ViewmodelModule.IsAiming = false
 	end
 
-	module.AimEvent:Invoke(isAiming)
+	module.IsAiming:SetValue(if enabled == nil then isAiming else enabled)
 end
 
 return module
