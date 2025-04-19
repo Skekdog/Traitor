@@ -15,7 +15,7 @@ local module = {}
 module.IsAiming = DynamicValue.new(false)
 
 function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
-	local isAiming = not module.IsAiming()
+	local isAiming = if enabled == nil then not module.IsAiming() else enabled
 
 	JumpPower.SetModifier("Aiming", not isAiming)
 
@@ -50,7 +50,7 @@ function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
 		ViewmodelModule.IsAiming = false
 	end
 
-	module.IsAiming:SetValue(if enabled == nil then isAiming else enabled)
+	module.IsAiming:SetValue(isAiming)
 end
 
 return module
