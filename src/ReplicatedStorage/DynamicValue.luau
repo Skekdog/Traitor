@@ -53,7 +53,7 @@ local function SetValue<T>(self: DynamicValue<T>, value: T): ()
 	self._value = value
 
 	for _, callback in self._connections do
-		callback(value)
+		task.spawn(callback, value)
 	end
 end
 
