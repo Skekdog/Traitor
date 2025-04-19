@@ -44,7 +44,7 @@ local function spectateFunc(action, state)
 	return Enum.ContextActionResult.Sink
 end
 
-local currentCameraMode: "Player" | "Freecam" = "Freecam"
+local currentCameraMode: "Player" | "Freecam" = "Player"
 LocalRoundInfo.Listen("PlayerStatus", function()
 	local isSpectating = LocalRoundInfo.GetPlayerStatus(plr.Name) ~= "Alive"
 	-- Do not early return here because we need to set camera properties always
@@ -96,4 +96,4 @@ end
 uiO.CameraMode.Activated:Connect(function()
 	switchCameraMode(if currentCameraMode == "Player" then "Freecam" else "Player")
 end)
-switchCameraMode("Freecam")
+switchCameraMode("Player")
