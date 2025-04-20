@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
 local ControlManager = require(script.Parent.ControlManager)
+local DynamicValue = require(script.Parent.DynamicValue)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
 local ItemHint = require(script.Parent.ItemHint)
@@ -20,19 +21,11 @@ local module = {}
 local sampleButton = ui.Object.Sample
 type ItemButton = typeof(sampleButton)
 
-export type AmmoCallback = (amount: number?) -> ()
-export type AmmoConnection = {Kind: string, Callback: AmmoCallback}
-
 local ourInventory: {Passive: {Types.AnyItem}, Slots: {[number]: Types.AnyItem}, [number]: never} = {Passive = {}, Slots = {}}
-local ourAmmo: {[string]: number?} = {}
+local ourAmmo: DynamicValue.DynamicValue<{[string]: number?}> = DynamicValue.new({})
 
-module.EquippedItem = nil :: Types.AnyItem?
+module.EquippedItem = DynamicValue.new(nil :: Types.AnyItem?)
 module.Ammo = ourAmmo
-
-local itemChangedConnections: {(item: Types.AnyItem?) -> ()} = {}
-function module.ConnectEquippedItemChanged(callback: (item: Types.AnyItem?) -> ()): ()
-	table.insert(itemChangedConnections, callback)
-end
 
 local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "PreAnimation" | "PreRender" | "PreSimulation" | "PostSimulation"): ()
 	for _, v in ourInventory.Passive do
@@ -47,7 +40,7 @@ local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "
 		end
 	end
 
-	local item = module.EquippedItem
+	local item = module.EquippedItem()
 	if item and item.Kind == "Gun" then
 		if item.Definition[schedulerEvent .. "Client"] then
 			item.Definition[schedulerEvent .. "Client"](item, dt)
@@ -75,39 +68,12 @@ RunService.PostSimulation:Connect(function(dt: number)
 	runScheduledCallbacks(dt, "PostSimulation")
 end)
 
-local ammoChangedConnections: {AmmoConnection} = {}
-function module.ConnectAmmoChanged(kind: string, callback: AmmoCallback): ()
-	local st = {Kind = kind, Callback = callback}
-	table.insert(ammoChangedConnections, st)
-	return st
-end
-
-function module.RemoveAmmoChangedConnection(connection: AmmoConnection): ()
-	local index = table.find(ammoChangedConnections, connection)
-	if index then
-		table.remove(ammoChangedConnections, index)
-	end
-end
-
 function module.GetReserveAmmo(kind: string): number
-	return module.Ammo[kind] or 0
-end
-
-local function runAmmoChangedCallbacks(): ()
-	for _, v in ammoChangedConnections do
-		task.spawn(v.Callback, module.Ammo[v.Kind])
-	end
-end
-
-local function runItemChangedCallbacks(): ()
-	for _, v in itemChangedConnections do
-		task.spawn(v, module.EquippedItem)
-	end
-	runAmmoChangedCallbacks()
+	return module.Ammo()[kind] or 0
 end
 
 local function tryUnequip(item: Types.AnyItem): ()
-	if module.EquippedItem ~= item then
+	if module.EquippedItem() ~= item then
 		return
 	end
 	
@@ -115,8 +81,6 @@ local function tryUnequip(item: Types.AnyItem): ()
 
 	ControlManager.Unregister("Drop Ammo")
 	ControlManager.Unregister("Drop")
-
-	module.EquippedItem = nil
 
 	ReplicatedStorage.ClientServer.EquipItem:FireServer(nil)
 
@@ -126,7 +90,7 @@ local function tryUnequip(item: Types.AnyItem): ()
 		item.Definition.OnUnequipClient(item)
 	end
 
-	runItemChangedCallbacks()
+	module.EquippedItem:SetValue(nil)
 
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
 	if not button then
@@ -193,14 +157,13 @@ local function tryDropAmmo(item: Types.GunWeapon, direction: Vector3): ()
 end
 
 local function tryEquip(item: Types.AnyItem): ()
-	if module.EquippedItem then
-		if module.EquippedItem == item then
+	local equippedItem = module.EquippedItem()
+	if equippedItem then
+		if equippedItem == item then
 			return tryUnequip(item)
 		end
-		tryUnequip(module.EquippedItem)
+		tryUnequip(equippedItem)
 	end
-
-	module.EquippedItem = item
 
 	if item.Kind == "Item" then
 		ItemHint(item.Definition.PrimaryHint, item.Definition.AlternateHint)
@@ -235,7 +198,8 @@ local function tryEquip(item: Types.AnyItem): ()
 	if item.Kind == "Item" and item.Definition.OnEquipClient then
 		item.Definition.OnEquipClient(item)
 	end
-	runItemChangedCallbacks()
+
+	module.EquippedItem:SetValue(item)
 
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
 	if not button then
@@ -331,8 +295,9 @@ local function tryRemoveButton(itemName: string)
 end
 
 local function removeItem(itemName: string): ()
-	if module.EquippedItem and module.EquippedItem.Definition.Name == itemName then
-		tryUnequip(module.EquippedItem)
+	local equippedItem = module.EquippedItem()
+	if equippedItem and equippedItem.Definition.Name == itemName then
+		tryUnequip(equippedItem)
 	end
 	
 	local item = GetItemDefinition(itemName)
@@ -398,11 +363,12 @@ local function selectLowest()
 end
 
 ControlManager.Register("Next Item", function()
-	if not module.EquippedItem then
+	local equippedItem = module.EquippedItem()
+	if not equippedItem then
 		return selectLowest()
 	end
 
-	local selectedSlot = module.EquippedItem.Definition.Slot
+	local selectedSlot = equippedItem.Definition.Slot
 	if not selectedSlot then
 		return Enum.ContextActionResult.Pass
 	end
@@ -451,12 +417,12 @@ ReplicatedStorage.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Connect(func
 	if mode == "Update" then
 		assert(typeof(kind) == "string", "Kind must be a string")
 		assert(typeof(amount) == "number", "Amount must be a number")
-		module.Ammo[kind] = amount
-		runAmmoChangedCallbacks()
+
+		module.Ammo()[kind] = amount
+		module.Ammo:Invoke()
 	elseif mode == "Reset" then
 		assert(typeof(kind) == "nil", "Kind must be nil")
-		module.Ammo = {}
-		runAmmoChangedCallbacks()
+		module.Ammo:SetValue({})
 	else
 		error("Invalid mode")
 	end
@@ -468,7 +434,7 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemN
 			assert(v.Kind == "Gun", "Item is not a gun")
 			v.IsReloading = false
 			v.Ammo = amount
-			runAmmoChangedCallbacks()
+			module.Ammo:Invoke()
 		end
 	end
 end)
@@ -478,7 +444,7 @@ ReplicatedStorage.ServerClient.UpdateAmmo.OnClientEvent:Connect(function(itemNam
 		if v.Definition.Name == itemName then
 			assert(v.Kind == "Gun", "Item is not a gun")
 			v.Ammo = amount
-			runAmmoChangedCallbacks()
+			module.Ammo:Invoke()
 		end
 	end
 end)

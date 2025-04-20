@@ -7,6 +7,7 @@ local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
 local ClientInventory = require(script.Parent.ClientInventory)
 local CombatTypes = require(script.Parent.CombatTypes)
 local ControlManager = require(script.Parent.ControlManager)
+local DynamicValue = require(script.Parent.DynamicValue)
 local GetCentreRay = require(script.Parent.GetCentreRay)
 local HitSounds = require(script.Parent.HitSounds)
 local LocalAnimation = require(script.Parent.LocalAnimation)
@@ -74,10 +75,10 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	return true
 end
 
-local lastAmmoConnection: ClientInventory.AmmoConnection?
+local lastAmmoConnection: DynamicValue.ConnectionId?
 
 local function updateCrosshair(isAiming: boolean): ()
-	local item = ClientInventory.EquippedItem
+	local item = ClientInventory.EquippedItem()
 	crosshair:ToggleVisible(not not item)
 
 	if not item then
@@ -100,7 +101,7 @@ Aim.IsAiming:Connect(function(isAiming)
 	updateCrosshair(isAiming)
 end)
 
-ClientInventory.ConnectEquippedItemChanged(function(item): ()
+ClientInventory.EquippedItem:Connect(function(item): ()
 	updateCrosshair(false)
 
 	Aim.ToggleAim(item, false)
@@ -108,7 +109,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	RoundInfoUI.UpdateAmmo(item)
 
 	if lastAmmoConnection then
-		ClientInventory.RemoveAmmoChangedConnection(lastAmmoConnection)
+		ClientInventory.Ammo:Disconnect(lastAmmoConnection)
 	end
 
 	local char = LocalCharacter.Character()
@@ -119,7 +120,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 		return
 	end
 
-	lastAmmoConnection = ClientInventory.ConnectAmmoChanged(item.Kind, function(ammo)
+	lastAmmoConnection = ClientInventory.Ammo:Connect(function()
 		RoundInfoUI.UpdateAmmo(item)
 	end)
 
@@ -179,7 +180,7 @@ ClientInventory.ConnectEquippedItemChanged(function(item): ()
 	end
 
 	ControlManager.Register("Primary Fire", function(_, _, input)
-		while ClientInventory.EquippedItem == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
+		while ClientInventory.EquippedItem() == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
 			task.wait()
 
 			if item.Kind == "Gun" and item.Definition.ScopeRequired and not Aim.IsAiming() then
