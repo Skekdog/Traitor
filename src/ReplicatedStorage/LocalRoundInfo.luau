@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Connection = require(script.Parent.Connection)
+local DynamicValue = require(script.Parent.DynamicValue)
 local Map = require(script.Parent.RoundRule.Map)
 local Role = require(script.Parent.RoundRule.Role)
 local Types = require(script.Parent.RoundRule.Types)
@@ -235,7 +235,7 @@ function module.GetPlayerScores(): {[string]: Types.ScoreTable}
     return playerScores
 end
 
-module.OnReset = Connection.new()
+module.OnReset = DynamicValue.new(nil)
 
 remotes.Reset.OnClientEvent:Connect(function()
     credits = 0
