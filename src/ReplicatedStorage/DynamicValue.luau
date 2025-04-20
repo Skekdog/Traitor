@@ -15,9 +15,18 @@ export type DynamicValue<T> = typeof(setmetatable({} :: {
 	__call: (self: DynamicValue<T>) -> T
 }))
 
-local function Connect<T>(self: DynamicValue<T>, callback: Callback<T>): ConnectionId
+local function runCallback<T>(callback: Callback<T>, value: T): ()
+	task.spawn(callback, value)
+end
+
+local function Connect<T>(self: DynamicValue<T>, callback: Callback<T>, runImmediately: boolean?): ConnectionId
 	local key = newproxy()
 	self._connections[key] = callback
+
+	if runImmediately then
+		runCallback(callback, self._value)
+	end
+
 	return key
 end
 
@@ -53,7 +62,7 @@ local function SetValue<T>(self: DynamicValue<T>, value: T): ()
 	self._value = value
 
 	for _, callback in self._connections do
-		task.spawn(callback, value)
+		runCallback(callback, value)
 	end
 end
 
