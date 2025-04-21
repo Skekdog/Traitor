@@ -468,8 +468,8 @@ guns["Silenced Pistol"] = {
             return true
         end
 
-        local deathSound = root:FindFirstChild("DeathSound") :: Sound?
-        if deathSound then
+        local deathSound = root:FindFirstChild("DeathSound")
+        if deathSound and deathSound:IsA("Sound") then
             deathSound.Volume = 0
         end
 

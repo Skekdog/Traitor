@@ -137,6 +137,16 @@ local gamemode: Types.Gamemode = {
 
     Roles = roles,
 
+    DeathSounds = {
+		"rbxassetid://9125652432",
+		"rbxassetid://9125651099",
+		"rbxassetid://9125651607",
+		"rbxassetid://9125652452",
+		"rbxassetid://9125651373",
+		"rbxassetid://9125652147",
+		"rbxassetid://9125652675"
+	},
+
     OnDeath = function(gamemode: Types.Gamemode, participant: Types.Participant, deferVictoryCheck: boolean)
         local corpse = participant:GetCorpse()
         local attacker = if corpse then corpse.Killer else nil
