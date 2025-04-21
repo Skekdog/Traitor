@@ -75,7 +75,7 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	return true
 end
 
-local lastAmmoConnection: DynamicValue.ConnectionId?
+local lastAmmoConnection: DynamicValue.Connection<typeof(ClientInventory.Ammo:GetValue())>?
 
 local function updateCrosshair(isAiming: boolean): ()
 	local item = ClientInventory.EquippedItem()
@@ -109,7 +109,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 	RoundInfoUI.UpdateAmmo(item)
 
 	if lastAmmoConnection then
-		ClientInventory.Ammo:Disconnect(lastAmmoConnection)
+		lastAmmoConnection:Disconnect()
 	end
 
 	local char = LocalCharacter.Character()
