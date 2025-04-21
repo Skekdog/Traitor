@@ -165,7 +165,7 @@ module.xray = {
 
 		local enabled = not (map.StaticMap:GetAttribute("XRayEnabled") :: boolean?)
 		map.StaticMap:SetAttribute("XRayEnabled", enabled)
-		
+
 		for _, instance in map.StaticMap:GetDescendants() do
 			if not instance:IsA("BasePart") and not instance:IsA("Texture") then
 				continue
@@ -186,6 +186,36 @@ module.xray = {
 
 		return `XRay {if enabled then "enabled" else "disabled"}.`
 	end
+}
+
+module.showbounds = {
+	Name = "showbounds",
+	Description = "Toggles showing of map bounds",
+	Environment = "Client" :: "Client",
+	Arguments = {},
+	Execute = function(): string
+		local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+		local map = LocalRoundInfo.Map()
+
+		if not map then
+			return "No map loaded."
+		end
+
+		local enabled = not (map.StaticMap:GetAttribute("ShowBounds") :: boolean?)
+		map.StaticMap:SetAttribute("ShowBounds", enabled)
+
+		for _, instance in map.Bounds:GetDescendants() do
+			if not instance:IsA("BasePart") then
+				continue
+			end
+
+			instance.Material = Enum.Material.ForceField
+			instance.Color = Color3.new(1, 0, 1)
+			instance.Transparency = if enabled then 0 else 1
+		end
+
+		return `ShowBounds {if enabled then "enabled" else "disabled"}.`
+	end,
 }
 
 module.noclip = {
