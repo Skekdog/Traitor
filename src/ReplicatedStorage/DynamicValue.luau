@@ -16,7 +16,8 @@ export type DynamicValue<T> = typeof(setmetatable({} :: {
 	SetValue: (DynamicValue<T>, value: T) -> (),
 
 	_connections: {[ConnectionId]: Callback<T>},
-	Connect: (DynamicValue<T>, callback: Callback<T>) -> Connection<T>,
+	Connect: (DynamicValue<T>, callback: Callback<T>, runImmediately: boolean?) -> Connection<T>,
+	Once: (DynamicValue<T>, callback: Callback<T>) -> Connection<T>,
 	Wait: (DynamicValue<T>) -> T,
 
 	Invoke: (DynamicValue<T>) -> (),
@@ -48,6 +49,15 @@ local function Connect<T>(self: DynamicValue<T>, callback: Callback<T>, runImmed
 		IsConnected = true,
 		Disconnect = Disconnect,
 	}
+end
+
+local function Once<T>(self: DynamicValue<T>, callback: Callback<T>): Connection<T>
+	local connection
+	connection = self:Connect(function(value)
+		connection:Disconnect()
+		callback(value)
+	end)
+	return connection
 end
 
 local function Wait<T>(self: DynamicValue<T>): T
@@ -95,6 +105,7 @@ function module.new<T>(initialValue: T): DynamicValue<T>
 
 		_connections = {},
 		Connect = Connect,
+		Once = Once,
 		Wait = Wait,
 
 		Invoke = Invoke,
