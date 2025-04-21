@@ -8,8 +8,6 @@ local pi    = math.pi
 local clamp = math.clamp
 local exp   = math.exp
 local rad   = math.rad
-local sqrt  = math.sqrt
-local tan   = math.tan
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -35,7 +33,6 @@ end)
 
 local NAV_GAIN = Vector3.new(1, 1, 1)*64
 local PAN_GAIN = Vector2.new(0.75, 1)*8
-local FOV_GAIN = 300
 
 local PITCH_LIMIT = rad(90)
 
@@ -45,7 +42,6 @@ end
 
 local VEL_STIFFNESS = 100.0 -- normal value is 1.5
 local PAN_STIFFNESS = 100.0 -- normal value is 1.0
-local FOV_STIFFNESS = 100.0 -- normal value is 4.0
 
 ------------------------------------------------------------------------
 
@@ -87,31 +83,24 @@ end
 
 local cameraPos = Vector3.new()
 local cameraRot = Vector2.new()
-local cameraFov = 0
 
 local velSpring = Spring.new(VEL_STIFFNESS, Vector3.new())
 local panSpring = Spring.new(PAN_STIFFNESS, Vector2.new())
-local fovSpring = Spring.new(FOV_STIFFNESS, 0)
 
 ------------------------------------------------------------------------
 
 local function StepFreecam(dt)
 	local vel = velSpring:Update(dt, FreeInput.GetVelocity(dt))
 	local pan = panSpring:Update(dt, FreeInput.GetCameraPan(dt))
-	local fov = fovSpring:Update(dt, FreeInput.GetFov(dt))
 
-	local zoomFactor = sqrt(tan(rad(70/2))/tan(rad(cameraFov/2)))
-
-	cameraFov = clamp(cameraFov + fov*FOV_GAIN*(dt/zoomFactor), 1, 120)
-	cameraRot = cameraRot + pan*PAN_GAIN*(dt/zoomFactor)
+	cameraRot = cameraRot + pan*PAN_GAIN*(dt)
 	cameraRot = Vector2.new(clamp(cameraRot.x, -PITCH_LIMIT, PITCH_LIMIT), cameraRot.y%(2*pi))
 
 	local cameraCFrame = CFrame.new(cameraPos)*CFrame.fromOrientation(cameraRot.x, cameraRot.y, 0)*CFrame.new(vel*NAV_GAIN*dt)
 	cameraPos = cameraCFrame.p
 
 	Camera.CFrame = cameraCFrame
-	Camera.Focus = cameraCFrame 
-	Camera.FieldOfView = cameraFov
+	Camera.Focus = cameraCFrame
 end
 
 ------------------------------------------------------------------------
@@ -121,7 +110,6 @@ local PlayerState = {} do
 	local cameraType
 	local cameraFocus
 	local cameraCFrame
-    local cameraFOV
 
 	-- Save state and set up for freecam
 	function PlayerState.Push()
@@ -130,8 +118,6 @@ local PlayerState = {} do
 
 		cameraCFrame = Camera.CFrame
 		cameraFocus = Camera.Focus
-
-        cameraFOV = Camera.FieldOfView
 
 		mouseBehavior = UserInputService.MouseBehavior
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
@@ -150,9 +136,6 @@ local PlayerState = {} do
 
 		UserInputService.MouseBehavior = mouseBehavior
 		mouseBehavior = nil
-
-        Camera.FieldOfView = cameraFOV
-        cameraFOV = nil
 	end
 end
 
@@ -179,11 +162,9 @@ local function StartFreecam(): ()
 	local cameraCFrame = Camera.CFrame
 	cameraRot = Vector2.new(cameraCFrame:toEulerAnglesYXZ())
 	cameraPos = cameraCFrame.p + Vector3.new(1.5, 3, 0)
-	cameraFov = Camera.FieldOfView
 
 	velSpring:Reset(Vector3.new())
 	panSpring:Reset(Vector2.new())
-	fovSpring:Reset(0)
 
 	PlayerState.Push()
 	RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, StepFreecam)
