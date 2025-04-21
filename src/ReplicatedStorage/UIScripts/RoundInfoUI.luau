@@ -44,15 +44,22 @@ LocalRoundInfo.Paused:Connect(function(_paused)
     paused = _paused
 end)
 
-LocalRoundInfo.PlayerRoles:Connect(function(roles)
-    local roleValue = roles[Players.LocalPlayer.Name]
+local function setRoleText(): ()
+    local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
     local role = if roleValue then roleValue() else nil
-    if role then
+
+    local statusValue = LocalRoundInfo.PlayerStatuses()[Players.LocalPlayer.Name]
+    local status: Types.ParticipantStatus = if statusValue then statusValue() else "Spectating"
+
+    if role and status == "Alive" then
         roundInfo.TopBar.Role.Text = role:GetFormattedRoleName()
     else
         roundInfo.TopBar.Role.Text = "Spectator"
     end
-end)
+end
+
+LocalRoundInfo.PlayerRoles:Connect(setRoleText)
+LocalRoundInfo.PlayerStatuses:Connect(setRoleText)
 
 local function showHealth(show: boolean): ()
     roundInfo.Frame.HealthBar.Visible = show
