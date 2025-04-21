@@ -12,5 +12,8 @@ return function(primary: string?, alternate: string?)
     ui.Object.Primary.HintLabel.Text = primary or ""
     ui.Object.Alternate.HintLabel.Text = alternate or ""
 
+    ui.Object.Primary.Visible = not not primary
+    ui.Object.Alternate.Visible = not not alternate
+
     ui:ToggleVisible(true)
 end
