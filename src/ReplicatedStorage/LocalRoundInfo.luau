@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DynamicValue = require(script.Parent.DynamicValue)
+local InstanceSignal = require(script.Parent.InstanceSignal)
 local Map = require(script.Parent.RoundRule.Map)
 local Role = require(script.Parent.RoundRule.Role)
 local Types = require(script.Parent.RoundRule.Types)
@@ -7,8 +8,6 @@ local module = {}
 
 local replicatedData = ReplicatedStorage.RoundRule.ReplicatedData
 local remotes = ReplicatedStorage.RoundRule.Remotes
-
-local listeners: {[string]: {() -> ()}?} = {}
 
 type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole" | "Winner" | "WinnerKind" | "StartTime" | "Corpse"
 
@@ -25,70 +24,34 @@ type RoundEvent = {
     WasCorrectKill: boolean?,
 }
 
-function module.Listen(name: CallbackName, callback: () -> (), runImmediately: boolean?): ()
-    if not listeners[name] then
-        listeners[name] = {}
-    end
-
-    table.insert(listeners[name] :: {}, callback)
-
-    if runImmediately then
-        task.defer(callback)
-    end
-end
-
-local function runCallbacks(name: CallbackName): ()
-    if not listeners[name] then
-        return
-    end
-
-    for _, callback in listeners[name] :: {() -> ()} do
-        callback()
-    end
-end
-
-local gamemode: Types.Gamemode?
-function module.GetGamemode()
-    return gamemode
-end
-
-local function onGamemodeChanged()
-    local name = replicatedData:GetAttribute("Gamemode") :: string?
+module.Gamemode = DynamicValue.new(nil :: Types.Gamemode?)
+InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connect(function(name: string?)
     if not name then
-        gamemode = nil
-        return runCallbacks("Gamemode")
+        module.Gamemode:SetValue()
+        return
     end
 
     local object = ReplicatedStorage.GameDefinition.Gamemodes:FindFirstChild(name)
     if object then
-        gamemode = (require)(object)
+        module.Gamemode:SetValue((require)(object))
     else
-        gamemode = nil
+        module.Gamemode:SetValue()
     end
-
-    runCallbacks("Gamemode")
-end
-
-replicatedData:GetAttributeChangedSignal("Gamemode"):Connect(onGamemodeChanged)
-onGamemodeChanged()
+end, true)
 
 local function getRoleFromName(name: string?): Types.Role?
     if not name then
         return nil
     end
     
+	local gamemode = module.Gamemode()
     assert(gamemode, "Gamemode is not loaded")
     return Role.fromDefinition(gamemode.Roles[name] or error("Role not found"))
 end
 
-local credits: number = 0
-function module.GetCredits(): number
-    return credits
-end
-
+module.Credits = DynamicValue.new(0)
 remotes.UpdateCredits.OnClientEvent:Connect(function(value: number?)
-    credits = value or 0
-    runCallbacks("Credits")
+    module.Credits:SetValue(value or 0)
 end)
 
 function module.GetRoundHighlights(): {RoundHighlight}
@@ -126,98 +89,69 @@ function module.GetOrderedRoundEvents(): {RoundEvent}
     return events
 end
 
-local roundPhase: Types.RoundPhase = replicatedData:GetAttribute("Phase") :: Types.RoundPhase? or "Waiting"
-function module.GetRoundPhase(): Types.RoundPhase
-    return roundPhase
+module.RoundPhase = DynamicValue.new("Waiting" :: Types.RoundPhase)
+InstanceSignal.ListenAttribute(replicatedData, "Phase", "Waiting" :: Types.RoundPhase):Connect(function(phase: string?)
+	module.RoundPhase:SetValue(phase or "Waiting")
+end, true)
+
+module.AdvanceTime = DynamicValue.new(nil :: number?)
+InstanceSignal.ListenAttribute(replicatedData, "AdvanceTime", 0 :: number?):Connect(function(advanceTime)
+	module.AdvanceTime:SetValue(advanceTime)
+end, true)
+
+module.Winner = DynamicValue.new(nil :: string?)
+InstanceSignal.ListenAttribute(replicatedData, "Winner", nil :: string?):Connect(function(winner)
+	module.Winner:SetValue(winner)
+end, true)
+
+module.WinnerKind = DynamicValue.new(nil :: "Role" | "Participant"?)
+InstanceSignal.ListenAttribute(replicatedData, "WinnerKind", nil :: "Role" | "Participant"?):Connect(function(winnerKind)
+	module.WinnerKind:SetValue(winnerKind)
+end, true)
+
+module.Paused = DynamicValue.new(false)
+InstanceSignal.ListenAttribute(replicatedData, "Paused", false):Connect(function(paused)
+	module.Paused:SetValue(paused)
+end, true)
+
+module.StartTime = DynamicValue.new(nil :: number?)
+InstanceSignal.ListenAttribute(replicatedData, "StartTime", nil :: number?):Connect(function(startTime)
+	module.StartTime:SetValue(startTime)
+end, true)
+
+local function createOrSetDynamicValue<T>(tbl: {[string]: DynamicValue.DynamicValue<T>?}, name: string, value: T): DynamicValue.DynamicValue<T>
+	local dynamicValue = tbl[name]
+	if not dynamicValue then
+		dynamicValue = DynamicValue.new(value)
+		tbl[name] = dynamicValue
+		assert(dynamicValue)
+		return dynamicValue
+	else
+		dynamicValue:SetValue(value)
+		return dynamicValue
+	end
 end
 
-local advanceTime: number? = replicatedData:GetAttribute("AdvanceTime") :: number?
-function module.GetAdvanceTime(): number?
-    return advanceTime
-end
-
-local winner: string? = replicatedData:GetAttribute("Winner") :: string?
-function module.GetWinner(): string?
-    return winner
-end
-
-local winnerKind: "Role" | "Participant"? = replicatedData:GetAttribute("WinnerKind") :: "Role" | "Participant"?
-function module.GetWinnerKind(): "Role" | "Participant"?
-    return winnerKind
-end
-
-local paused: boolean = replicatedData:GetAttribute("Paused") :: boolean
-function module.IsPaused(): boolean
-    return paused
-end
-
-local startTime: number? = replicatedData:GetAttribute("StartTime") :: number?
-function module.GetRoundStartTime(): number?
-    return startTime
-end
-
-replicatedData:GetAttributeChangedSignal("Winner"):Connect(function()
-    winner = replicatedData:GetAttribute("Winner") :: string?
-    runCallbacks("Winner")
-end)
-
-replicatedData:GetAttributeChangedSignal("WinnerKind"):Connect(function()
-    winnerKind = replicatedData:GetAttribute("WinnerKind") :: "Role" | "Participant"?
-    runCallbacks("WinnerKind")
-end)
-
-replicatedData:GetAttributeChangedSignal("Phase"):Connect(function()
-    roundPhase = replicatedData:GetAttribute("Phase") :: Types.RoundPhase? or "Waiting"
-    runCallbacks("Phase")
-end)
-
-replicatedData:GetAttributeChangedSignal("Paused"):Connect(function()
-    paused = replicatedData:GetAttribute("Paused") :: boolean
-    runCallbacks("Paused")
-end)
-
-replicatedData:GetAttributeChangedSignal("StartTime"):Connect(function()
-    startTime = replicatedData:GetAttribute("StartTime") :: number?
-    runCallbacks("StartTime")
-end)
-
-replicatedData:GetAttributeChangedSignal("AdvanceTime"):Connect(function()
-    advanceTime = replicatedData:GetAttribute("AdvanceTime") :: number?
-    runCallbacks("AdvanceTime")
-end)
-
-local playerStatuses: {[string]: Types.ParticipantStatus?} = {}
-function module.GetPlayerStatus(name: string): Types.ParticipantStatus
-    return playerStatuses[name] or "Spectating"
-end
-
+module.PlayerStatuses = DynamicValue.new({} :: {[string]: DynamicValue.DynamicValue<Types.ParticipantStatus>?})
 remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(name: string, status: Types.ParticipantStatus?)
-    playerStatuses[name] = status
-    runCallbacks("PlayerStatus")
+	createOrSetDynamicValue(module.PlayerStatuses() :: {[string]: DynamicValue.DynamicValue<Types.ParticipantStatus & any>?}, name, status or "Spectating")
+	module.PlayerStatuses:Invoke()
 end)
 
-local playerRoles: {[string]: Types.Role?} = {}
-function module.GetPlayerRole(name: string): Types.Role?
-    return playerRoles[name]
-end
-
+module.PlayerRoles = DynamicValue.new({} :: {[string]: DynamicValue.DynamicValue<Types.Role?>?})
 remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: string?)
-    playerRoles[name] = getRoleFromName(roleName)
-    runCallbacks("PlayerRole")
+	createOrSetDynamicValue(module.PlayerRoles(), name, getRoleFromName(roleName))
+	module.PlayerRoles:Invoke()
 end)
 
-local corpses: {[string]: Types.CorpseView?} = {}
-function module.GetCorpse(name: string): Types.CorpseView?
-    return corpses[name]
-end
-
+module.PlayerCorpses = DynamicValue.new({} :: {[string]: DynamicValue.DynamicValue<Types.CorpseView>?})
 remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.CorpseView, covert: boolean)
     if covert then
         return
     end
-    
-    corpses[corpse.Name] = corpse
-    runCallbacks("Corpse")
+
+	createOrSetDynamicValue(module.PlayerCorpses(), corpse.Name, corpse)
+	module.PlayerCorpses:Invoke()
 end)
 
 function module.GetPlayerScores(): {[string]: Types.ScoreTable}
@@ -238,15 +172,10 @@ end
 module.OnReset = DynamicValue.new(nil)
 
 remotes.Reset.OnClientEvent:Connect(function()
-    credits = 0
-    playerStatuses = {}
-    playerRoles = {}
-    corpses = {}
-
-    runCallbacks("PlayerStatus")
-    runCallbacks("PlayerRole")
-    runCallbacks("Corpse")
-    runCallbacks("Credits")
+	module.Credits:SetValue(0)
+	module.PlayerStatuses:SetValue({})
+	module.PlayerRoles:SetValue({})
+    module.PlayerCorpses:SetValue({})
 
     module.OnReset:Invoke()
 end)
@@ -259,6 +188,8 @@ if mapScript then
     end
 end
 
+module.Map = DynamicValue.new(map)
+
 remotes.MapLoaded.OnClientEvent:Connect(function()
     local child = workspace:FindFirstChild("Map")
     if not child or not child:IsA("ModuleScript") then
@@ -270,19 +201,13 @@ remotes.MapLoaded.OnClientEvent:Connect(function()
     end
 
     local newMap = Map.fromModuleScript(child)
-    map = newMap
+    module.Map:SetValue(newMap)
 
     child.Destroying:Once(function()
         if map == newMap then
-            map = nil
+            module.Map:SetValue()
         end
     end)
-
-    runCallbacks("Map")
 end)
-
-function module.GetMap(): Types.Map?
-    return map
-end
 
 return module
