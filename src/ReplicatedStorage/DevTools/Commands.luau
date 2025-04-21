@@ -149,6 +149,45 @@ module.luauserver = {
 	end
 }
 
+module.xray = {
+	Name = "xray",
+	Description = "Turns all static map parts semi-transparent.",
+	Environment = "Client" :: "Client",
+	Arguments = {},
+
+	Execute = function(): string
+		local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+		local map = LocalRoundInfo.Map()
+
+		if not map then
+			return "No map loaded."
+		end
+
+		local enabled = not (map.StaticMap:GetAttribute("XRayEnabled") :: boolean?)
+		map.StaticMap:SetAttribute("XRayEnabled", enabled)
+		
+		for _, instance in map.StaticMap:GetDescendants() do
+			if not instance:IsA("BasePart") and not instance:IsA("Texture") then
+				continue
+			end
+
+			local part = instance :: BasePart -- typechecker kludge
+
+			if enabled then
+				part:SetAttribute("OriginalTransparency", instance.Transparency)
+				part.Transparency = 0.75
+			else
+				local originalTransparency = part:GetAttribute("OriginalTransparency") :: number?
+				if originalTransparency then
+					part.Transparency = originalTransparency
+				end
+			end
+		end
+
+		return `XRay {if enabled then "enabled" else "disabled"}.`
+	end
+}
+
 module.noclip = {
 	Name = "noclip",
 	Description = "Toggles noclip on/off",
