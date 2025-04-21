@@ -155,7 +155,8 @@ return function(corpseInfo: Types.CorpseView?)
     end
 
     local name = corpseInfo.Name
-    local role = LocalRoundInfo.GetPlayerRole(name)
+    local roleValue = LocalRoundInfo.PlayerRoles()[name]
+    local role = if roleValue then roleValue() else nil
     
     if role then
         corpseUi.Object.Title.Text = `{role:GetFormattedString(`@{name}'s`)} Corpse | {role:GetFormattedRoleName()}`

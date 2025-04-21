@@ -343,7 +343,7 @@ local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 		return nil
 	end
 
-	local map = LocalRoundInfo.GetMap()
+	local map = LocalRoundInfo.Map()
 	if not map then
 		return nil
 	end

@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 
 return function(name: string, value: boolean): ()
-	local map = LocalRoundInfo.GetMap()
+	local map = LocalRoundInfo.Map()
     if not map then
         return
     end

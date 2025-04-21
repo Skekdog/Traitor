@@ -12,7 +12,7 @@ local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.Un
 
 local module = {}
 
-local timeTarget = LocalRoundInfo.GetAdvanceTime()
+local timeTarget = LocalRoundInfo.AdvanceTime()
 local paused = false
 local lastTime = ""
 local function updateTimer(time: number)
@@ -35,17 +35,18 @@ task.spawn(function()
     end
 end)
 
-LocalRoundInfo.Listen("AdvanceTime", function()
-    timeTarget = LocalRoundInfo.GetAdvanceTime()
+LocalRoundInfo.AdvanceTime:Connect(function(advanceTime)
+    timeTarget = advanceTime
 end)
 
-LocalRoundInfo.Listen("Paused", function()
+LocalRoundInfo.Paused:Connect(function(_paused)
     lastTime = roundInfo.TopBar.Timer.Text
-    paused = LocalRoundInfo.IsPaused()
+    paused = _paused
 end)
 
-LocalRoundInfo.Listen("PlayerRole", function()
-    local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
+LocalRoundInfo.PlayerRoles:Connect(function(roles)
+    local roleValue = roles[Players.LocalPlayer.Name]
+    local role = if roleValue then roleValue() else nil
     if role then
         roundInfo.TopBar.Role.Text = role:GetFormattedRoleName()
     else

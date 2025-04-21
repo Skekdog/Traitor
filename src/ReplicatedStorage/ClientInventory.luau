@@ -106,7 +106,7 @@ local function isObscured(origin: Vector3, target: Vector3): boolean
 		return true
 	end
 
-	local map = LocalRoundInfo.GetMap()
+	local map = LocalRoundInfo.Map()
 	if not map then
 		return true
 	end

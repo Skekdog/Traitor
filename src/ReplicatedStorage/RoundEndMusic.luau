@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local Types = require(ReplicatedStorage.RoundRule.Types)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local function fadeOut(music: Sound): ()
@@ -28,8 +27,7 @@ ReplicatedStorage.RoundRule.Remotes.RoundEndMusic.OnClientEvent:Connect(function
 	music:Resume()
 end)
 
-LocalRoundInfo.Listen("Phase", function()
-	local phase: Types.RoundPhase = LocalRoundInfo.GetRoundPhase()
+LocalRoundInfo.RoundPhase:Connect(function(phase)
 	if phase ~= "Preparing" then
 		return
 	end

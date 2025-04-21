@@ -16,11 +16,11 @@ local isPurchaseConnected: boolean = false
 local function updateCredits(ui: ShopUI?, requiredCredits: number?): ()
     ui = ui or UIManager.TryGetUI("Equipment Shop") :: ShopUI?
     if ui then
-        local credits = LocalRoundInfo.GetCredits()
+        local credits = LocalRoundInfo.Credits()
         ui.Object.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
         ui.Object.CurrentCredits.TextColor3 = if credits >= (requiredCredits or 0) then goodColour else badColour
         ui.Object.Purchase.TextColor3 = if requiredCredits and credits >= requiredCredits then goodColour else badColour
-        ui.Object.CreditCost.TextColor3 = if LocalRoundInfo.GetCredits() >= (requiredCredits or 0) then goodColour else badColour
+        ui.Object.CreditCost.TextColor3 = if LocalRoundInfo.Credits() >= (requiredCredits or 0) then goodColour else badColour
     end
 end
 
@@ -58,7 +58,7 @@ local function tryPurchase(): ()
         return
     end
 
-    if LocalRoundInfo.GetCredits() < (selectedItem.CreditCost or 0) then
+    if LocalRoundInfo.Credits() < (selectedItem.CreditCost or 0) then
         return notEnoughCredits()
     end
 
@@ -127,12 +127,15 @@ local function tryPopulateEquipment(role: Types.Role?): ()
 end
 
 local lastRole: Types.Role?
-LocalRoundInfo.Listen("PlayerRole", function()
-    local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
+LocalRoundInfo.PlayerRoles:Connect(function(roles)
+    local roleValue = roles[Players.LocalPlayer.Name]
+    local role = if roleValue then roleValue() else nil
     if lastRole ~= role then
         lastRole = role
         tryPopulateEquipment(role)
     end
 end)
 
-LocalRoundInfo.Listen("Credits", updateCredits)
+LocalRoundInfo.Credits:Connect(function(credits)
+    updateCredits()
+end)

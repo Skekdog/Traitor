@@ -19,7 +19,8 @@ local function setJumpPower(): ()
 		end
 	end
 
-	local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
+	local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
+	local role = if roleValue then roleValue() else nil
 	hum.JumpPower = if role then role.Definition.JumpPower else 18
 end
 

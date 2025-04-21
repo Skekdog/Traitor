@@ -15,7 +15,8 @@ local function ParseRoleString(str: string): string
 		local playerName = str:sub(finish1 + 1, start2 - 1)
 		assert(playerName ~= "", "Missing player name for role string: " .. str)
 
-		local role = LocalRoundInfo.GetPlayerRole(playerName)
+		local roleValue = LocalRoundInfo.PlayerRoles()[playerName]
+		local role = if roleValue then roleValue() else nil
 
 		local replaceWith = playerName
 		if role then

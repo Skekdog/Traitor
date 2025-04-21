@@ -54,7 +54,8 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 		return
 	end
 
-	local status = LocalRoundInfo.GetPlayerStatus(plr.Name)
+	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
+	local status = if statusValue then statusValue() else nil
 
 	local marksVisible = (status == "Alive") and (plr ~= Players.LocalPlayer)
 	for _, v in clone.Marks:GetChildren() do
@@ -69,11 +70,12 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
 
-	clone.SearchedIcon.Visible = not not LocalRoundInfo.GetCorpse(plr.Name)
+	clone.SearchedIcon.Visible = not not LocalRoundInfo.PlayerCorpses()[plr.Name]
 
 	movePlr(plr, status :: any)
 
-	local role = LocalRoundInfo.GetPlayerRole(plr.Name)
+	local roleValue = LocalRoundInfo.PlayerRoles()[plr.Name]
+	local role = if roleValue then roleValue() else nil
 	if not role then
 		clone.Username:SetAttribute("KeepText")
 		ThemesManager.UpdateThemeInstance(clone.Username)
@@ -94,7 +96,7 @@ local function createPlr(plr: Player)
 	clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
 
-	clone.SearchedIcon.Visible = not not LocalRoundInfo.GetCorpse(plr.Name)
+	clone.SearchedIcon.Visible = not not LocalRoundInfo.PlayerCorpses()[plr.Name]
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
@@ -187,26 +189,25 @@ end
 
 Players.PlayerRemoving:Connect(removePlr)
 
-LocalRoundInfo.Listen("PlayerRole", function()
+LocalRoundInfo.PlayerRoles:Connect(function()
 	for _, v in Players:GetPlayers() do
 		updatePlr(v, findPlr(v.Name) or createPlr(v))
 	end
 end, true)
 
-LocalRoundInfo.Listen("PlayerStatus", function()
+LocalRoundInfo.PlayerStatuses:Connect(function()
 	for _, v in Players:GetPlayers() do
 		updatePlr(v, findPlr(v.Name) or createPlr(v))
 	end
 end, true)
 
-LocalRoundInfo.Listen("Corpse", function()
+LocalRoundInfo.PlayerCorpses:Connect(function()
 	for _, v in Players:GetPlayers() do
 		updatePlr(v, findPlr(v.Name))
 	end
 end, true)
 
-LocalRoundInfo.Listen("Gamemode", function()
-	local gamemode = LocalRoundInfo.GetGamemode()
+LocalRoundInfo.Gamemode:Connect(function(gamemode)
 	if not gamemode then
 		return
 	end

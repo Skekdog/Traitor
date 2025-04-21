@@ -35,7 +35,7 @@ local function populateEvents(): ()
 		end
 	end
 
-	local roundStartTime = LocalRoundInfo.GetRoundStartTime() or error("Round start time not found")
+	local roundStartTime = LocalRoundInfo.StartTime() or error("Round start time not found")
 	for _, v in LocalRoundInfo.GetOrderedRoundEvents() do
 		local event = eventTemplate:Clone()
 		event.Name = v.Description
@@ -81,7 +81,8 @@ local function populateScores(): ()
 		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 
-		local role = LocalRoundInfo.GetPlayerRole(i)
+		local roleValue = LocalRoundInfo.PlayerRoles()[i]
+		local role = if roleValue then roleValue() else nil
 		if role then
 			usernameLabel.Text = role:GetFormattedString("@" .. i)
 		else
@@ -144,11 +145,11 @@ local function setHighlights(): ()
 end
 
 local function setWinnerText(): ()
-	local winner, winnerKind = LocalRoundInfo.GetWinner(), LocalRoundInfo.GetWinnerKind()
+	local winner, winnerKind = LocalRoundInfo.Winner(), LocalRoundInfo.WinnerKind()
 	assert(winner and winnerKind, "No winner")
 
-	local gamemode = assert(LocalRoundInfo.GetGamemode(), "No gamemode")
-	local winnerRole = if winnerKind == "Participant" then assert(LocalRoundInfo.GetPlayerRole(winner), "Winning participant has no role") else Role.fromDefinition(gamemode.Roles[winner])
+	local gamemode = assert(LocalRoundInfo.Gamemode(), "No gamemode")
+	local winnerRole = if winnerKind == "Participant" then assert(assert(LocalRoundInfo.PlayerRoles()[winner])(), "Winning participant has no role") else Role.fromDefinition(gamemode.Roles[winner])
 
 	if winnerKind == "Participant" then
 		highlightsPage.Winners.Text = winnerRole:GetFormattedString(winner) .. " wins!"
@@ -157,8 +158,7 @@ local function setWinnerText(): ()
 	end
 end
 
-LocalRoundInfo.Listen("Phase", function()
-	local phase = LocalRoundInfo.GetRoundPhase()
+LocalRoundInfo.RoundPhase:Connect(function(phase)
 	if phase ~= "Highlights" then
 		return
 	end

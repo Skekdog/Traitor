@@ -82,7 +82,7 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     local direction = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2, 1).Direction * 10000
 
     local rayParams = RaycastParams.new()
-    local map = LocalRoundInfo.GetMap()
+    local map = LocalRoundInfo.Map()
     if map then
         rayParams:AddToFilter(map.Bounds)
     end

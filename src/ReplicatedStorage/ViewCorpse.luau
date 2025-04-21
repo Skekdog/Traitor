@@ -4,7 +4,8 @@ local CorpseInfo = require(script.Parent.CorpseInfo)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local function ViewCorpse(player: Model | Player): ()
-	local corpse = LocalRoundInfo.GetCorpse(player.Name)
+	local corpseValue = LocalRoundInfo.PlayerCorpses()[player.Name]
+	local corpse = if corpseValue then corpseValue() else nil
 	if not corpse then
 		corpse = ReplicatedStorage.ClientServer.GetCorpseInfo:InvokeServer(player, ControlManager.IsActionActive("Crouch"))
 		if not corpse then

@@ -10,8 +10,9 @@ local ui = UIManager.WaitForUI("RoleAlert")
 local UI = ui.Object :: typeof(UIManager.UnregisteredUIs.RoleAlert)
 
 local lastRole: string?
-LocalRoundInfo.Listen("PlayerRole", function()
-	local role = LocalRoundInfo.GetPlayerRole(Players.LocalPlayer.Name)
+LocalRoundInfo.PlayerRoles:Connect(function(roles)
+	local roleValue = roles[Players.LocalPlayer.Name]
+	local role = if roleValue then roleValue() else nil
 	if not role then
 		lastRole = nil
 		return

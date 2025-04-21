@@ -8,8 +8,7 @@ local UIManager = require(ReplicatedStorage.UIManager)
 local creditPopupUI = UIManager.WaitForUI("Credits") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Credits)}
 local playerlistUI = UIManager.WaitForUI("Playerlist") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Playerlist)}
 
-LocalRoundInfo.Listen("Map", function()
-	local map = LocalRoundInfo.GetMap()
+LocalRoundInfo.Map:Connect(function(map)
 	if not map then
 		return
 	end

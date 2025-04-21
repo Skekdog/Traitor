@@ -21,7 +21,8 @@ local function distanceCheck(target: Vector3, maxDistance: number): boolean
 end
 
 local function interactCorpse(corpse: Model): boolean
-	if LocalRoundInfo.GetPlayerStatus(Players.LocalPlayer.Name) == "Alive" then
+	local statusValue = LocalRoundInfo.PlayerStatuses()[Players.LocalPlayer.Name]
+	if (if statusValue then statusValue() else "Spectating") == "Alive" then
 		if not distanceCheck(corpse:GetPivot().Position, 10) then
 			return false
 		end
@@ -66,7 +67,7 @@ local function tryClimbLadder(map: Types.Map): boolean
 end
 
 function module.TryInteract(target: Instance?): boolean
-	local map = LocalRoundInfo.GetMap()
+	local map = LocalRoundInfo.Map()
 	if not map then
 		return false
 	end
@@ -120,7 +121,7 @@ RunService.PostSimulation:Connect(function()
 	Mouse.Reset()
 
 	local validAncestors = {workspace.Characters :: Folder, workspace.Corpses}
-	local map = LocalRoundInfo.GetMap()
+	local map = LocalRoundInfo.Map()
 	if map then
 		table.insert(validAncestors, map.ItemSpawns)
 		table.insert(validAncestors, map.AmmoSpawns)

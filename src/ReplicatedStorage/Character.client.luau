@@ -12,7 +12,7 @@ local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
 
 local function initSnapToLadder(root: BasePart): ()
     root.Touched:Connect(function(part)
-        local map = LocalRoundInfo.GetMap()
+        local map = LocalRoundInfo.Map()
         if not map then
             return
         end

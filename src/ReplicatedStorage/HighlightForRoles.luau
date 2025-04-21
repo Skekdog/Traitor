@@ -5,7 +5,7 @@ local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local module = {}
 
-LocalRoundInfo.Listen("PlayerRole", function()
+LocalRoundInfo.PlayerRoles:Connect(function(roles)
     for _, v in Players:GetPlayers() do
         if v ~= Players.LocalPlayer then
             HighlightPlayer(v)

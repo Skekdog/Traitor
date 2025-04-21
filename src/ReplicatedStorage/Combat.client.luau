@@ -33,7 +33,7 @@ local function getSpreadVector(item: Types.AnyItem): Vector3
 end
 
 local function raycast(char: Model, spread: Vector3, range: number): RaycastResult?
-	local map = LocalRoundInfo.GetMap()
+	local map = LocalRoundInfo.Map()
 	if not map then
 		return
 	end

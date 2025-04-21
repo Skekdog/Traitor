@@ -6,12 +6,12 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 assert(RunService:IsClient(), "GetAmmoDefinition should only be called on the client")
 
 local function GetAmmoDefinition(name: string): Types.AmmoDefinition
-    local map = LocalRoundInfo.GetMap()
+    local map = LocalRoundInfo.Map()
     if map and map.AvailableAmmo[name] then
         return map.AvailableAmmo[name]
     end
 
-    local gamemode = LocalRoundInfo.GetGamemode()
+    local gamemode = LocalRoundInfo.Gamemode()
     if gamemode and gamemode.AvailableAmmo[name] then
         return gamemode.AvailableAmmo[name]
     end
