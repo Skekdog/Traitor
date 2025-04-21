@@ -90,7 +90,7 @@ function module.ShowCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
 	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
-	local status = if statusValue then statusValue() else nil
+	local status = if statusValue then statusValue() else "Spectating"
 	if status == "Alive" then
 		if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
 			return

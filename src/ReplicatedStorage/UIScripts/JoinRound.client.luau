@@ -13,7 +13,7 @@ local wasJoinClicked = false
 
 local function shouldMakeVisible(): boolean
 	local statusValue = LocalRoundInfo.PlayerStatuses()[Players.LocalPlayer.Name]
-	local status = if statusValue then statusValue() else nil
+	local status = if statusValue then statusValue() else "Spectating"
 	return not wasJoinClicked and table.find(validPhases, LocalRoundInfo.RoundPhase()) ~= nil and status == "Spectating"
 end
 
