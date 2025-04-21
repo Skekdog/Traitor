@@ -51,7 +51,7 @@ local function shatterServer(glassProperties: BasePart | GlassProperties, direct
 
     local properties = {
         CFrame = glassProperties.CFrame,
-        Size = glassProperties.Size,
+        Size = glassProperties.Size * Vector3.new(0.9, 0.9, 0.05),
 
         Material = glassProperties.Material,
         MaterialVariant = glassProperties.MaterialVariant,
