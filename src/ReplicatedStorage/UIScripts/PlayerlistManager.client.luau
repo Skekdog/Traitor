@@ -55,7 +55,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 	end
 
 	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
-	local status = if statusValue then statusValue() else nil
+	local status = if statusValue then statusValue() else "Spectating"
 
 	local marksVisible = (status == "Alive") and (plr ~= Players.LocalPlayer)
 	for _, v in clone.Marks:GetChildren() do
@@ -72,7 +72,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 
 	clone.SearchedIcon.Visible = not not LocalRoundInfo.PlayerCorpses()[plr.Name]
 
-	movePlr(plr, status :: any)
+	movePlr(plr, status :: Types.ParticipantStatus)
 
 	local roleValue = LocalRoundInfo.PlayerRoles()[plr.Name]
 	local role = if roleValue then roleValue() else nil
