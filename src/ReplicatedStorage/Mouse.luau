@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
 local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
 local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
+local GetInteractableDefinition = require(script.Parent.GetInteractableDefinition)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 
@@ -108,6 +109,24 @@ function module.ShowCorpseHint(char: Model)
 
 		corpseHint.Text = `{role:GetFormattedString(char.Name .. "'s")} Body`
 	end
+	corpseHint.Visible = true
+end
+
+function module.ShowInteractableHint(interactable: BasePart): ()
+	local plr = Players.LocalPlayer
+	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
+	local status = if statusValue then statusValue() else "Spectating"
+
+	if status ~= "Alive" then
+		return
+	end
+
+	local definition = GetInteractableDefinition(interactable.Name)
+	if not definition then
+		return
+	end
+
+	corpseHint.Text = definition.Name
 	corpseHint.Visible = true
 end
 

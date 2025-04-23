@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local C4 = require(ReplicatedStorage.GameDefinition.Interactables.C4)
 local Ammo = require(ReplicatedStorage.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.GameDefinition.Items.Items)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -268,6 +269,10 @@ local gamemode: Types.Gamemode = {
 
 	AvailableAmmo = Ammo,
 	AvailableItems = Items,
+
+	InteractableDefinitions = {
+		C4 = C4,
+	},
 
 	StartingItems = {
 		Items.Crowbar,

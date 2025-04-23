@@ -125,43 +125,47 @@ RunService.PostSimulation:Connect(function()
 	if map then
 		table.insert(validAncestors, map.ItemSpawns)
 		table.insert(validAncestors, map.AmmoSpawns)
-		table.insert(validAncestors, map.DynamicMap)
+		table.insert(validAncestors, map.Interactables)
 	end
 
 	module.InteractTarget = nil
+
+	if not result then
+		return
+	end
 	
-    if result then
-		local isValid = false
-		for _, v in validAncestors do
-			if result.Instance:IsDescendantOf(v) then
-				isValid = true
-			end
+	local isValid = false
+	for _, v in validAncestors do
+		if result.Instance:IsDescendantOf(v) then
+			isValid = true
 		end
+	end
 
-		if not isValid then
-			return
+	if not isValid then
+		return
+	end
+
+	module.InteractTarget = result.Instance
+	assert(module.InteractTarget)
+
+	if map then
+		if module.InteractTarget:IsDescendantOf(map.ItemSpawns) or module.InteractTarget:IsDescendantOf(map.AmmoSpawns) then
+			return Mouse.ShowItemHint(module.InteractTarget)
+		elseif module.InteractTarget:IsDescendantOf(map.Interactables) then
+			return Mouse.ShowInteractableHint(module.InteractTarget :: BasePart)
 		end
+	end
 
-        module.InteractTarget = result.Instance
-        assert(module.InteractTarget)
+	local char = module.InteractTarget:FindFirstAncestorOfClass("Model")
+	if not char then
+		return
+	end
 
-		if map then
-			if module.InteractTarget:IsDescendantOf(map.ItemSpawns) or module.InteractTarget:IsDescendantOf(map.AmmoSpawns) then
-				Mouse.ShowItemHint(module.InteractTarget)
-			end
-		end
-
-        local char = module.InteractTarget:FindFirstAncestorOfClass("Model")
-        if not char then
-            return
-        end
-
-        if char:IsDescendantOf(workspace.Corpses) then
-            Mouse.ShowCorpseHint(char)
-        elseif char:IsDescendantOf(workspace.Characters) then
-            Mouse.ShowPlayerInfo(char)
-        end
-    end
+	if char:IsDescendantOf(workspace.Corpses) then
+		return Mouse.ShowCorpseHint(char)
+	elseif char:IsDescendantOf(workspace.Characters) then
+		return Mouse.ShowPlayerInfo(char)
+	end
 end)
 
 return module
