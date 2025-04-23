@@ -301,6 +301,10 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 			if result ~= "Success" and result ~= "PreGame" then
 				warn("Hit rejected:", result)
 			end
+
+			if item.Kind == "Gun" and item.Ammo == 0 then
+				tryReloadWeapon(item)
+			end
 		end
 
 		return Enum.ContextActionResult.Sink
