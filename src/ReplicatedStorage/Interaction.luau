@@ -63,7 +63,7 @@ local function interactInteractable(interactablePart: BasePart, input: InputObje
 	end
 
 	if definition.IsContinuousInteraction then
-		while input and input.UserInputState ~= Enum.UserInputState.End do
+		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(interactablePart.Position, definition.InteractionRange) do
 			definition.OnInteractClient(interactable)
 			task.wait()
 		end
