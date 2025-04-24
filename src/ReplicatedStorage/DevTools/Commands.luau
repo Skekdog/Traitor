@@ -491,6 +491,45 @@ module.listitems = {
 	end
 }
 
+module.spawninteractable = {
+	Name = "spawninteractable",
+	Description = "Spawns an interactable",
+	Environment = "Server" :: "Server",
+	Arguments = {"interactable", "spawn at players"},
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local interactableName = processStringArgument(args[1])
+		if not interactableName then
+			return "Missing argument 1 interactable name."
+		end
+
+		local definition = round:GetInteractableDefinition(interactableName)
+		if not definition then
+			return `Interactable {interactableName} not found.`
+		end
+
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
+		end
+
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local char = participant:GetCharacter()
+			if not char then
+				continue
+			end
+
+			round:AddInteractable(definition).Object.Position = char:GetPivot().Position
+		end
+
+		return `Spawned {interactableName} at {getPlayersString(players)}.`
+	end
+}
+
 module.giveitem = {
 	Name = "giveitem",
 	Description = "Gives an item to players",
