@@ -50,6 +50,23 @@ local function interactDoor(door: BasePart): boolean
 	return true
 end
 
+local function interactInteractable(interactablePart: BasePart): boolean
+	local interactable = LocalRoundInfo.Interactables()[interactablePart]
+	if not interactable then
+		return false
+	end
+
+	local definition = interactable.Definition
+
+	if not distanceCheck(interactablePart.Position, definition.InteractionRange) then
+		return false
+	end
+
+	definition.OnInteractClient(interactable)
+
+	return true
+end
+
 local function tryClimbLadder(map: Types.Map): boolean
 	local root = LocalCharacter.RootPart()
 	if not root then
@@ -88,6 +105,10 @@ function module.TryInteract(target: Instance?): boolean
 
 	if target:IsA("BasePart") and target.Parent and target.Parent.Name == "Doors" and target:IsDescendantOf(map.DynamicMap) then
 		return interactDoor(target)
+	end
+
+	if target:IsA("BasePart") and target:IsDescendantOf(map.Interactables) then
+		interactInteractable(target)
 	end
 	
 	return false

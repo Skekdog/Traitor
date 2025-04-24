@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Interactable = require(ReplicatedStorage.RoundRule.Interactable)
 local DynamicValue = require(script.Parent.DynamicValue)
 local InstanceSignal = require(script.Parent.InstanceSignal)
 local Map = require(script.Parent.RoundRule.Map)
@@ -169,6 +170,40 @@ function module.GetPlayerScores(): {[string]: Types.ScoreTable}
     return playerScores
 end
 
+do
+    local map: Types.Map?
+    local mapScript = workspace:FindFirstChild("Map")
+    if mapScript then
+        if mapScript:IsA("ModuleScript") then
+            map = Map.fromModuleScript(mapScript)
+        end
+    end
+
+    module.Map = DynamicValue.new(map)
+end
+
+module.Interactables = DynamicValue.new({} :: {[Instance]: Types.Interactable?})
+
+local function loadInteractable(instance: Instance): ()
+    local GetInteractableDefinition = (require)(script.Parent.GetInteractableDefinition)
+    local definition = GetInteractableDefinition(instance.Name)
+    if not definition then
+        return
+    end
+    module.Interactables()[instance] = Interactable.new(definition)
+end
+
+module.Map:Connect(function(map)
+    if not map then
+        return
+    end
+    map.Interactables.ChildAdded:Connect(loadInteractable)
+
+    for _, v in map.Interactables:GetChildren() do
+        loadInteractable(v)
+    end
+end, true)
+
 module.OnReset = DynamicValue.new(nil)
 
 remotes.Reset.OnClientEvent:Connect(function()
@@ -176,19 +211,10 @@ remotes.Reset.OnClientEvent:Connect(function()
 	module.PlayerStatuses:SetValue({})
 	module.PlayerRoles:SetValue({})
     module.PlayerCorpses:SetValue({})
+    module.Interactables:SetValue({})
 
     module.OnReset:Invoke()
 end)
-
-local map: Types.Map?
-local mapScript = workspace:FindFirstChild("Map")
-if mapScript then
-    if mapScript:IsA("ModuleScript") then
-        map = Map.fromModuleScript(mapScript)
-    end
-end
-
-module.Map = DynamicValue.new(map)
 
 remotes.MapLoaded.OnClientEvent:Connect(function()
     local child = workspace:FindFirstChild("Map")
@@ -204,7 +230,7 @@ remotes.MapLoaded.OnClientEvent:Connect(function()
     module.Map:SetValue(newMap)
 
     child.Destroying:Once(function()
-        if map == newMap then
+        if module.Map() == newMap then
             module.Map:SetValue()
         end
     end)
