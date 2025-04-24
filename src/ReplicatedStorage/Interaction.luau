@@ -50,7 +50,7 @@ local function interactDoor(door: BasePart): boolean
 	return true
 end
 
-local function interactInteractable(interactablePart: BasePart): boolean
+local function interactInteractable(interactablePart: BasePart, input: InputObject?): boolean
 	local interactable = LocalRoundInfo.Interactables()[interactablePart]
 	if not interactable then
 		return false
@@ -62,7 +62,16 @@ local function interactInteractable(interactablePart: BasePart): boolean
 		return false
 	end
 
-	definition.OnInteractClient(interactable)
+	if definition.IsContinuousInteraction then
+		while input and input.UserInputState ~= Enum.UserInputState.End do
+			definition.OnInteractClient(interactable)
+			task.wait()
+		end
+	else
+		if not input or input.UserInputState == Enum.UserInputState.End then
+			definition.OnInteractClient(interactable)
+		end
+	end
 
 	return true
 end
@@ -83,13 +92,16 @@ local function tryClimbLadder(map: Types.Map): boolean
 	return false
 end
 
-function module.TryInteract(target: Instance?): boolean
+function module.TryInteract(target: Instance?, input: InputObject?): boolean
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return false
 	end
 
 	if not target then
+		if input and input.UserInputState ~= Enum.UserInputState.End then
+			return false
+		end
 		return tryClimbLadder(map)
 	end
 
@@ -104,24 +116,21 @@ function module.TryInteract(target: Instance?): boolean
 	end
 
 	if target:IsA("BasePart") and target.Parent and target.Parent.Name == "Doors" and target:IsDescendantOf(map.DynamicMap) then
+		if input and input.UserInputState ~= Enum.UserInputState.End then
+			return false
+		end
 		return interactDoor(target)
 	end
 
 	if target:IsA("BasePart") and target:IsDescendantOf(map.Interactables) then
-		interactInteractable(target)
+		interactInteractable(target, input)
 	end
 	
 	return false
 end
 
 ControlManager.Register("Interact", function(action, state, input)
-	-- Sink inputs if we are starting to hold the interact key down, unless there is nothing to interact with
-	-- This is so that interacting with corpses is not really messy when spectating in freecam (the default interact key is also the move up key)
-	if state ~= Enum.UserInputState.End then
-		return if module.InteractTarget then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
-	end
-
-	return if module.TryInteract(module.InteractTarget) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+	return if module.TryInteract(module.InteractTarget, input) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
 end, Enum.ContextActionPriority.High.Value + 1)
 
 local params = RaycastParams.new()
@@ -147,6 +156,7 @@ RunService.PostSimulation:Connect(function()
 		table.insert(validAncestors, map.ItemSpawns)
 		table.insert(validAncestors, map.AmmoSpawns)
 		table.insert(validAncestors, map.Interactables)
+		table.insert(validAncestors, map.DynamicMap)
 	end
 
 	module.InteractTarget = nil
