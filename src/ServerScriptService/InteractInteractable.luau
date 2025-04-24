@@ -18,6 +18,10 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 		return
 	end
 
+	if not interactable.Definition.OnInteractServer then
+		return
+	end
+
 	if player:DistanceFromCharacter(interactablePart.Position) > interactable.Definition.InteractionRange * 1.1 then
 		return
 	end

@@ -51,7 +51,9 @@ local function interactDoor(door: BasePart): boolean
 end
 
 local function interactInteractable(interactable: Types.Interactable): ()
-	interactable.Definition.OnInteractClient(interactable)
+	if interactable.Definition.OnInteractClient then
+		interactable.Definition.OnInteractClient(interactable)
+	end
 	ReplicatedStorage.ClientServer.InteractInteractable:FireServer(interactable.Object)
 end
 
