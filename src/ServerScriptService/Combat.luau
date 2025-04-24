@@ -29,7 +29,7 @@ local function getItemDamage(item: Types.AnyWeapon | Types.ExplosionParams, hitP
 
 	if item.Kind == "ExplosionParams" then
 		assert(item.Definition.FalloffEnd ~= 0, "Cannot divide by 0")
-		return (item.Definition.FalloffEnd - (hitPart.Position - item.Position).Magnitude) / item.Definition.FalloffEnd * item.Definition.Damage
+		return ((item.Definition.FalloffEnd - math.max((hitPart.Position - item.Position).Magnitude - item.Definition.FalloffBegin, 0)) / item.Definition.FalloffEnd) * item.Definition.Damage
 	end
 
 	local dmg = item.Definition.Damage
