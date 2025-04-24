@@ -34,6 +34,10 @@ if RunService:IsClient() then
 		local explodeAt = c4.Object:GetAttribute("ExplodesAt") :: number?
 		if explodeAt then
 			local timeLeft = explodeAt - workspace:GetServerTimeNow()
+			if timeLeft < 0 then
+				timeLeft = 0
+			end
+			
 			local minutes = math.floor(timeLeft / 60)
 			local seconds = timeLeft % 60
 			timer.Text = string.format("%02d:%02d", minutes, seconds)
@@ -92,7 +96,7 @@ if RunService:IsServer() then
 	local function isArmed(c4: Types.Interactable): boolean
 		return c4.Extras.ArmId ~= nil
 	end
-	
+
 	local function disarm(c4: Types.Interactable): ()
 		c4.Extras.ArmId = nil
 		c4.Extras.ArmedBy = nil
