@@ -89,22 +89,38 @@ if RunService:IsServer() then
 		return item
 	end
 
-	local function tryExplode(c4: Types.Interactable): ()
+	local function isArmed(c4: Types.Interactable): boolean
+		return c4.Extras.ArmId ~= nil
+	end
+	
+	local function disarm(c4: Types.Interactable): ()
+		c4.Extras.ArmId = nil
+		c4.Extras.ArmedBy = nil
+		c4.Extras.SafeWires = nil
+		c4.Object:SetAttribute("ExplodesAt", nil)
+	end
+
+	local function destroy(c4: Types.Interactable): ()
+		disarm(c4)
+		c4.Object:Destroy()
+	end
+
+	local function tryExplode(c4: Types.Interactable, armId: any): ()
 		local armedBy: Types.Participant? = c4.Extras.ArmedBy
 		if not armedBy then
 			return
 		end
 
-		if c4.Extras.ArmId ~= c4.Extras.ArmId then
+		if armId ~= c4.Extras.ArmId then
 			return
 		end
 
+		destroy(c4)
 		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(explosionInfo, c4.Object.Position, armedBy))
 	end
 
 	local function tryArm(c4: Types.Interactable, participant: Types.Participant, duration: number): ()
-		local explodeAt = c4.Object:GetAttribute("ExplodesAt") :: number?
-		if explodeAt then
+		if isArmed(c4) then
 			return
 		end
 
@@ -118,7 +134,44 @@ if RunService:IsServer() then
 		end
 
 		c4.Object:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
-		task.delay(duration, tryExplode, c4)
+		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)
+	end
+
+	local function tryDisarm(c4: Types.Interactable, participant: Types.Participant, cutWire: number): ()
+		if not isArmed(c4) then
+			return
+		end
+
+		if participant == c4.Extras.ArmedBy or table.find(c4.Extras.SafeWires, cutWire) then
+			return disarm(c4)
+		end
+		tryExplode(c4)
+	end
+
+	local function tryDestroy(c4: Types.Interactable): ()
+		if isArmed(c4) then
+			return
+		end
+
+		destroy(c4)
+	end
+
+	local function tryTake(c4: Types.Interactable, participant: Types.Participant): ()
+		if isArmed(c4) then
+			return
+		end
+
+		local c4Item = participant.Round:GetItemDefinition(c4.Definition.Name)
+		if not c4Item then
+			return warn("Could not find C4 item")
+		end
+
+		if c4Item.Slot and participant:IsItemSlotOccupied(c4Item.Slot) then
+			return
+		end
+
+		participant:GiveItemFromItemDefinition(c4Item)
+		destroy(c4)
 	end
 
 	remote.OnServerEvent:Connect(function(player: Player, instance: Instance, action: unknown, explodeAtOrWireCut: unknown): ()
@@ -149,11 +202,11 @@ if RunService:IsServer() then
 		if action == "Arm" then
 			tryArm(c4, participant, explodeAtOrWireCut)
 		elseif action == "CutWire" then
-			
+			tryDisarm(c4, participant, explodeAtOrWireCut)
 		elseif action == "Take" then
-			
+			tryTake(c4, participant)
 		elseif action == "Destroy" then
-			
+			tryDestroy(c4)
 		end
 	end)
 end
