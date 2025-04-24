@@ -37,7 +37,7 @@ if RunService:IsClient() then
 			if timeLeft < 0 then
 				timeLeft = 0
 			end
-			
+
 			local minutes = math.floor(timeLeft / 60)
 			local seconds = timeLeft % 60
 			timer.Text = string.format("%02d:%02d", minutes, seconds)
@@ -123,7 +123,11 @@ if RunService:IsServer() then
 		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(explosionInfo, c4.Object.Position, armedBy))
 	end
 
-	local function tryArm(c4: Types.Interactable, participant: Types.Participant, duration: number): ()
+	local function tryArm(c4: Types.Interactable, participant: Types.Participant, duration: number?): ()
+		if not duration then
+			return
+		end
+
 		if isArmed(c4) then
 			return
 		end
@@ -141,7 +145,11 @@ if RunService:IsServer() then
 		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)
 	end
 
-	local function tryDisarm(c4: Types.Interactable, participant: Types.Participant, cutWire: number): ()
+	local function tryDisarm(c4: Types.Interactable, participant: Types.Participant, cutWire: number?): ()
+		if not cutWire then
+			return
+		end
+
 		if not isArmed(c4) then
 			return
 		end
@@ -149,7 +157,7 @@ if RunService:IsServer() then
 		if participant == c4.Extras.ArmedBy or table.find(c4.Extras.SafeWires, cutWire) then
 			return disarm(c4)
 		end
-		tryExplode(c4)
+		tryExplode(c4, c4.Extras.ArmId)
 	end
 
 	local function tryDestroy(c4: Types.Interactable): ()
@@ -179,7 +187,7 @@ if RunService:IsServer() then
 	end
 
 	remote.OnServerEvent:Connect(function(player: Player, instance: Instance, action: unknown, explodeAtOrWireCut: unknown): ()
-		if typeof(action) ~= "string" or typeof(explodeAtOrWireCut) ~= "number" then
+		if typeof(action) ~= "string" or (typeof(explodeAtOrWireCut) ~= "number" and typeof(explodeAtOrWireCut) ~= "nil") then
 			return
 		end
 
@@ -215,6 +223,58 @@ if RunService:IsServer() then
 	end)
 end
 
+local function isArmedClient(c4: Types.Interactable): boolean
+	return c4.Object:GetAttribute("ExplodesAt") ~= nil
+end
+
+local currentC4: Types.Interactable
+local isFirstInit = true
+local function showC4Menu(c4: Types.Interactable, show: boolean): ()
+	currentC4 = c4
+
+	local UIManager = require(ReplicatedStorage.UIManager)
+	local WalkSpeed = require(ReplicatedStorage.WalkSpeed)
+	local JumpPower = require(ReplicatedStorage.JumpPower)
+	local ui = UIManager.WaitForUI("C4Menu") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.C4Menu)}
+
+	ui.Object.Wires.Visible = isArmedClient(c4)
+	ui.Object.Arm.Visible = not isArmedClient(c4)
+
+	WalkSpeed.SetModifier("C4Menu", if show then -math.huge else 0)
+	JumpPower.SetModifier("C4Menu", not show)
+
+	if isFirstInit then
+		ui.Object.SidePanel.Buttons.Arm.MouseButton1Click:Connect(function()
+			remote:FireServer(currentC4.Object, "Arm", 10)
+		end)
+
+		ui.Object.SidePanel.Buttons:FindFirstChild("Destroy").Activated:Connect(function()
+			remote:FireServer(currentC4.Object, "Destroy")
+		end)
+
+		ui.Object.SidePanel.Buttons.Take.Activated:Connect(function()
+			remote:FireServer(currentC4.Object, "Take")
+		end)
+
+		ui.Object.SidePanel.Buttons.Close.Activated:Connect(function()
+			showC4Menu(currentC4, false)
+		end)
+
+		for _, v in ui.Object.Wires.Wires:GetChildren() do
+			if v:IsA("TextButton") then
+				v.Activated:Connect(function()
+					showC4Menu(c4, false)
+					remote:FireServer(currentC4.Object, "CutWire", tonumber(v.Name:sub(5, 5)))
+				end)
+			end
+		end
+
+		isFirstInit = false
+	end
+
+	ui:ToggleVisible(show)
+end
+
 local interactable: Types.InteractableDefinition = {
 	Name = "C4",
 
@@ -224,11 +284,7 @@ local interactable: Types.InteractableDefinition = {
 	InteractionRange = 7.5,
 
 	OnInteractClient = function(object: Types.Interactable): ()
-		if object.Object:GetAttribute("ExplodesAt") then
-			return
-		end
-
-		remote:FireServer(object.Object, "Arm", 10)
+		showC4Menu(object, true)
 	end,
 
 	OnLoadClient = function(object: Types.Interactable): ()
