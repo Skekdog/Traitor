@@ -122,7 +122,7 @@ function module.ShowInteractableHint(interactable: BasePart): ()
 	end
 
 	local definition = GetInteractableDefinition(interactable.Name)
-	if not definition then
+	if not definition or plr:DistanceFromCharacter(interactable.Position) > definition.InteractionRange then
 		return
 	end
 
