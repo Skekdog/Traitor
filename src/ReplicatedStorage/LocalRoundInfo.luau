@@ -186,11 +186,17 @@ module.Interactables = DynamicValue.new({} :: {[Instance]: Types.Interactable?})
 
 local function loadInteractable(instance: Instance): ()
     local GetInteractableDefinition = (require)(script.Parent.GetInteractableDefinition)
-    local definition = GetInteractableDefinition(instance.Name)
+    local definition: Types.InteractableDefinition = GetInteractableDefinition(instance.Name)
     if not definition then
         return
     end
-    module.Interactables()[instance] = Interactable.new(definition, instance :: BasePart)
+
+    local interactable = Interactable.new(definition, instance :: BasePart)
+    module.Interactables()[instance] = interactable
+
+    if definition.OnLoadClient then
+        definition.OnLoadClient(interactable)
+    end
 end
 
 module.Map:Connect(function(map)

@@ -16,6 +16,14 @@ local interactable: Types.InteractableDefinition = {
 	OnInteractServer = function(object: Types.Interactable, participant: Types.Participant): ()
 		print("Server C4 interaction:", object.Object.Name, participant.Player.Name)
 	end,
+
+	OnLoadClient = function(object: Types.Interactable): ()
+		print("Client C4 loaded:", object.Object.Name)
+	end,
+
+	OnLoadServer = function(object: Types.Interactable): ()
+		print("Server C4 loaded:", object.Object.Name)
+	end,
 }
 
 return interactable
