@@ -50,7 +50,12 @@ local function interactDoor(door: BasePart): boolean
 	return true
 end
 
-local function interactInteractable(interactablePart: BasePart, input: InputObject?): boolean
+local function interactInteractable(interactable: Types.Interactable): ()
+	interactable.Definition.OnInteractClient(interactable)
+	ReplicatedStorage.ClientServer.InteractInteractable:FireServer(interactable.Object)
+end
+
+local function tryInteractInteractable(interactablePart: BasePart, input: InputObject?): boolean
 	local interactable = LocalRoundInfo.Interactables()[interactablePart]
 	if not interactable then
 		return false
@@ -64,12 +69,12 @@ local function interactInteractable(interactablePart: BasePart, input: InputObje
 
 	if definition.IsContinuousInteraction then
 		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(interactablePart.Position, definition.InteractionRange) do
-			definition.OnInteractClient(interactable)
+			interactInteractable(interactable)
 			task.wait()
 		end
 	else
 		if not input or input.UserInputState == Enum.UserInputState.End then
-			definition.OnInteractClient(interactable)
+			interactInteractable(interactable)
 		end
 	end
 
@@ -123,7 +128,7 @@ function module.TryInteract(target: Instance?, input: InputObject?): boolean
 	end
 
 	if target:IsA("BasePart") and target:IsDescendantOf(map.Interactables) then
-		interactInteractable(target, input)
+		tryInteractInteractable(target, input)
 	end
 	
 	return false

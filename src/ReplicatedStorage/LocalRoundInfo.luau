@@ -190,7 +190,7 @@ local function loadInteractable(instance: Instance): ()
     if not definition then
         return
     end
-    module.Interactables()[instance] = Interactable.new(definition)
+    module.Interactables()[instance] = Interactable.new(definition, instance :: BasePart)
 end
 
 module.Map:Connect(function(map)
