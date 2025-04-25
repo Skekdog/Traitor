@@ -965,6 +965,38 @@ items["Ballistic Vest"] = {
     end,
 }
 
+local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+    local round = participant.Round
+
+    local interactableDefinition = round:GetInteractableDefinition(item.Definition.Name)
+    assert(interactableDefinition, "Could not find interactable definition for " .. item.Definition.Name)
+
+    local interactable = round:AddInteractable(interactableDefinition)
+    local success = participant:TryThrowAssembly(interactable.Object, 10)
+
+    if not success then
+        round._interactables[interactable.Object] = nil
+        interactable.Object:Destroy()
+        return
+    end
+
+    participant:RemoveItem(item)
+end
+
+items.C4 = {
+    Kind = "Item" :: "Item",
+    Name = "C4",
+    Slot = 7,
+    CanDrop = true,
+
+    CreditCost = 1,
+
+    PrimaryHint = "Throw C4",
+    AlternateHint = "Plant C4",
+
+    PrimaryFireServer = throwInteractable,
+}
+
 local allItems: {[string]: Types.AnyItemDefinition} = {}
 
 for i, v in guns do
