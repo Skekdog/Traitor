@@ -12,6 +12,7 @@ type C4 = Types.Interactable & {
 		ArmedBy: Types.Participant?,
 		SafeWires: {number}?,
 		ArmDurationClient: number?,
+		BeganBeepingClient: boolean?,
 		[any]: never,
 	}
 }
@@ -145,6 +146,8 @@ end
 
 local c4s: {[Instance]: C4} = {}
 if RunService:IsClient() then
+	local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
+
 	local function forEachC4(c4: C4): ()
 		local timerPart = c4.Object:FindFirstChild("TimerPart")
 		if not timerPart then
@@ -176,6 +179,16 @@ if RunService:IsClient() then
 
 			if currentC4 == c4 and ui.Visible then
 				ui.Object.SidePanel.Timer.Text = getTimerText(timeLeft)
+			end
+
+			if not c4.Extras.BeganBeepingClient and timeLeft <= 5 then
+				c4.Extras.BeganBeepingClient = true
+				PlaySound(6992631696, nil, c4.Object, {
+					Volume = 1.5,
+					RollOffMinDistance = 10,
+					RollOffMaxDistance = 40,
+					PlaybackRegion = NumberRange.new(2.5, 7.5),
+				})
 			end
 		else
 			timer.Text = ""
