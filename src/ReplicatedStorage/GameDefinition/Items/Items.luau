@@ -965,13 +965,16 @@ items["Ballistic Vest"] = {
     end,
 }
 
+local function createInteractableForItem(item: Types.Item, round: Types.Round): Types.Interactable
+    local interactableDefinition = round:GetInteractableDefinition(item.Definition.Name)
+    assert(interactableDefinition, "Could not find interactable definition for " .. item.Definition.Name)
+    return round:AddInteractable(interactableDefinition)
+end
+
 local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
     local round = participant.Round
 
-    local interactableDefinition = round:GetInteractableDefinition(item.Definition.Name)
-    assert(interactableDefinition, "Could not find interactable definition for " .. item.Definition.Name)
-
-    local interactable = round:AddInteractable(interactableDefinition)
+    local interactable = createInteractableForItem(item, round)
     local success = participant:TryThrowAssembly(interactable.Object, 10)
 
     if not success then
@@ -995,6 +998,36 @@ items.C4 = {
     AlternateHint = "Plant C4",
 
     PrimaryFireServer = throwInteractable,
+    AlternateFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+        local params = RaycastParams.new()
+        params.CollisionGroup = "WeaponHitTargets"
+        params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles}
+        params.FilterType = Enum.RaycastFilterType.Exclude
+
+        local result = workspace:Raycast(origin, direction * 10, params)
+        if not result then
+            return
+        end
+
+		local map = participant.Round:GetMap()
+
+		if not result.Instance:IsDescendantOf(map.StaticMap) then
+			return
+		end
+
+		local interactable = createInteractableForItem(item, participant.Round)
+		local object = interactable.Object
+
+		object.CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal) * CFrame.Angles(math.rad(-90), 0, 0)
+		object.CFrame += result.Normal / 4
+
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = result.Instance :: BasePart
+		weld.Part1 = object
+		weld.Parent = object
+
+		participant:RemoveItem(item)
+    end
 }
 
 local allItems: {[string]: Types.AnyItemDefinition} = {}
