@@ -6,6 +6,16 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 local MIN_ARM_DURATION = 10
 local MAX_ARM_DURATION = 360
 
+type C4 = Types.Interactable & {
+	Extras: {
+		ArmId: never?,
+		ArmedBy: Types.Participant?,
+		SafeWires: {number}?,
+		ArmDurationClient: number?,
+		[any]: never,
+	}
+}
+
 local function getTimerText(timeLeft: number): string
 	if timeLeft < 0 then
 		timeLeft = 0
@@ -29,18 +39,18 @@ else
 	remote = found
 end
 
-local currentC4: Types.Interactable?
+local currentC4: C4?
 local function getC4Menu()
 	local UIManager = require(ReplicatedStorage.UIManager)
 	local ui = UIManager.WaitForUI("C4Menu") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.C4Menu)}
 	return ui
 end
 
-local function isArmedClient(c4: Types.Interactable): boolean
+local function isArmedClient(c4: C4): boolean
 	return c4.Object:GetAttribute("ExplodesAt") ~= nil
 end
 
-local function setDuration(c4: Types.Interactable, percent: number): ()
+local function setDuration(c4: C4, percent: number): ()
 	local ui = getC4Menu()
 	local sliderBar = ui.Object.Arm.Arm.SliderBar
 
@@ -48,11 +58,11 @@ local function setDuration(c4: Types.Interactable, percent: number): ()
 	sliderBar.Slider.Position = UDim2.fromScale(percent, 0.5)
 	ui.Object.SidePanel.Timer.Text = getTimerText(duration)
 
-	c4.Extras.ArmDuration = duration
+	c4.Extras.ArmDurationClient = duration
 end
 
 local isFirstInit = true
-local function showC4Menu(c4: Types.Interactable, show: boolean): ()
+local function showC4Menu(c4: C4, show: boolean): ()
 	currentC4 = c4
 	assert(currentC4)
 
@@ -81,7 +91,7 @@ local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 	if isFirstInit then
 		buttons.Arm.MouseButton1Click:Connect(function()
 			showC4Menu(currentC4, false)
-			remote:FireServer(currentC4.Object, "Arm", currentC4.Extras.ArmDuration or error("ArmDuration is nil"))
+			remote:FireServer(currentC4.Object, "Arm", currentC4.Extras.ArmDurationClient or error("ArmDurationClient is nil"))
 		end)
 
 		buttons:FindFirstChild("Destroy").Activated:Connect(function()
@@ -133,9 +143,9 @@ local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 	ui:ToggleVisible(show)
 end
 
-local c4s: {[Instance]: Types.Interactable} = {}
+local c4s: {[Instance]: C4} = {}
 if RunService:IsClient() then
-	local function forEachC4(c4: Types.Interactable): ()
+	local function forEachC4(c4: C4): ()
 		local timerPart = c4.Object:FindFirstChild("TimerPart")
 		if not timerPart then
 			return
@@ -173,7 +183,7 @@ if RunService:IsClient() then
 	end
 
 	RunService.Heartbeat:Connect(function()
-		local toRemove: {Types.Interactable} = {}
+		local toRemove: {C4} = {}
 
 		for _, c4 in c4s do
 			if not c4.Object:IsDescendantOf(workspace) then
@@ -219,23 +229,23 @@ if RunService:IsServer() then
 		return item
 	end
 
-	local function isArmed(c4: Types.Interactable): boolean
+	local function isArmed(c4: C4): boolean
 		return c4.Extras.ArmId ~= nil
 	end
 
-	local function disarm(c4: Types.Interactable): ()
+	local function disarm(c4: C4): ()
 		c4.Extras.ArmId = nil
 		c4.Extras.ArmedBy = nil
 		c4.Extras.SafeWires = nil
 		c4.Object:SetAttribute("ExplodesAt", nil)
 	end
 
-	local function destroy(c4: Types.Interactable): ()
+	local function destroy(c4: C4): ()
 		disarm(c4)
 		c4.Object:Destroy()
 	end
 
-	local function tryExplode(c4: Types.Interactable, armId: any): ()
+	local function tryExplode(c4: C4, armId: any): ()
 		local armedBy: Types.Participant? = c4.Extras.ArmedBy
 		if not armedBy then
 			return
@@ -249,7 +259,7 @@ if RunService:IsServer() then
 		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(explosionInfo, c4.Object.Position, armedBy))
 	end
 
-	local function tryArm(c4: Types.Interactable, participant: Types.Participant, duration: number?): ()
+	local function tryArm(c4: C4, participant: Types.Participant, duration: number?): ()
 		if not duration then
 			return
 		end
@@ -271,7 +281,7 @@ if RunService:IsServer() then
 		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)
 	end
 
-	local function tryDisarm(c4: Types.Interactable, participant: Types.Participant, cutWire: number?): ()
+	local function tryDisarm(c4: C4, participant: Types.Participant, cutWire: number?): ()
 		if not cutWire then
 			return
 		end
@@ -286,7 +296,7 @@ if RunService:IsServer() then
 		tryExplode(c4, c4.Extras.ArmId)
 	end
 
-	local function tryDestroy(c4: Types.Interactable): ()
+	local function tryDestroy(c4: C4): ()
 		if isArmed(c4) then
 			return
 		end
@@ -294,7 +304,7 @@ if RunService:IsServer() then
 		destroy(c4)
 	end
 
-	local function tryTake(c4: Types.Interactable, participant: Types.Participant): ()
+	local function tryTake(c4: C4, participant: Types.Participant): ()
 		if isArmed(c4) then
 			return
 		end
@@ -357,15 +367,15 @@ local interactable: Types.InteractableDefinition = {
 	IsContinuousInteraction = false,
 	InteractionRange = 7.5,
 
-	OnInteractClient = function(object: Types.Interactable): ()
+	OnInteractClient = function(object: C4): ()
 		showC4Menu(object, true)
 	end,
 
-	OnLoadClient = function(object: Types.Interactable): ()
+	OnLoadClient = function(object: C4): ()
 		c4s[object.Object] = object
 	end,
 
-	OnLoadServer = function(object: Types.Interactable): ()
+	OnLoadServer = function(object: C4): ()
 		c4s[object.Object] = object
 		object.Object.AncestryChanged:Connect(function()
 			if not object.Object:IsDescendantOf(workspace) then
