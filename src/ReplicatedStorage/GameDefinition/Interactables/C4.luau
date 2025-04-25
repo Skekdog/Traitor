@@ -267,9 +267,13 @@ if RunService:IsServer() then
 		if armId ~= c4.Extras.ArmId then
 			return
 		end
+		
+		local sound = Instance.new("Sound")
+		sound.SoundId = "rbxassetid://252142019"
+		sound.Volume = 1
 
 		destroy(c4)
-		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(explosionInfo, c4.Object.Position, armedBy))
+		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(explosionInfo, c4.Object.Position, armedBy), nil, sound)
 	end
 
 	local function tryArm(c4: C4, participant: Types.Participant, duration: number?): ()

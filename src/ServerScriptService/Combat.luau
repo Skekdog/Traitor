@@ -220,7 +220,7 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	end
 end
 
-function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, grenade: Types.GrenadeWeapon?): ()
+function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, grenade: Types.GrenadeWeapon?, sound: Sound?): ()
     local explosion = Instance.new("Explosion")
 
     local info = params.Definition
@@ -237,7 +237,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
     folder.Name = "Explosions"
     folder.Parent = workspace
 
-	PlaySound(ServerStorage.Explosion, params.Position, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+	PlaySound(sound or ServerStorage.Explosion, params.Position, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
     explosion.Parent = folder
 
