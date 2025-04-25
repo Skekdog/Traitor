@@ -328,7 +328,7 @@ if RunService:IsServer() then
 	end
 
 	local function tryArm(c4: C4, participant: Types.Participant, duration: number?): ()
-		if not duration then
+		if not duration or duration < MIN_ARM_DURATION or duration > MAX_ARM_DURATION then
 			return
 		end
 
