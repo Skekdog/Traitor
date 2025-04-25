@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 
 local MIN_ARM_DURATION = 10
 local MAX_ARM_DURATION = 360
@@ -114,6 +116,10 @@ local function showC4Menu(c4: C4, show: boolean): ()
 				v.Activated:Connect(function()
 					showC4Menu(currentC4, false)
 					remote:FireServer(currentC4.Object, "CutWire", tonumber(v.Name:sub(5, 5)))
+					PlaySound(9118822196, nil, SoundService, {
+						Volume = 1.5,
+						PlaybackRegion = NumberRange.new(0.11, 60000),
+					})
 				end)
 			end
 		end
@@ -146,8 +152,6 @@ end
 
 local c4s: {[Instance]: C4} = {}
 if RunService:IsClient() then
-	local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-
 	local function forEachC4(c4: C4): ()
 		local timerPart = c4.Object:FindFirstChild("TimerPart")
 		if not timerPart then
