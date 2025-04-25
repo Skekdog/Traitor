@@ -64,6 +64,10 @@ local function setDuration(c4: C4, percent: number): ()
 	c4.Extras.ArmDurationClient = duration
 end
 
+local function playBeep(): ()
+	PlaySound(9117060347, nil, SoundService)
+end
+
 local isFirstInit = true
 local function showC4Menu(c4: C4, show: boolean): ()
 	currentC4 = c4
@@ -94,6 +98,7 @@ local function showC4Menu(c4: C4, show: boolean): ()
 	if isFirstInit then
 		buttons.Arm.MouseButton1Click:Connect(function()
 			showC4Menu(currentC4, false)
+			playBeep()
 			remote:FireServer(currentC4.Object, "Arm", currentC4.Extras.ArmDurationClient or error("ArmDurationClient is nil"))
 		end)
 
@@ -120,6 +125,7 @@ local function showC4Menu(c4: C4, show: boolean): ()
 						Volume = 1.5,
 						PlaybackRegion = NumberRange.new(0.11, 60000),
 					})
+					playBeep()
 				end)
 			end
 		end
@@ -153,8 +159,8 @@ end
 local c4s: {[Instance]: C4} = {}
 if RunService:IsClient() then
 	local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
-	local function playBeep(c4: C4): ()
 
+	local function playAboutToExplodeBeeps(c4: C4): ()
 		local part = CreateEmptyPart(c4.Object.CFrame)
 		local weld = Instance.new("WeldConstraint")
 		weld.Part0 = c4.Object
@@ -205,7 +211,7 @@ if RunService:IsClient() then
 			end
 
 			if not c4.Extras.BeganBeepingClient and timeLeft <= 5 then
-				playBeep(c4)
+				playAboutToExplodeBeeps(c4)
 			end
 		else
 			timer.Text = ""
