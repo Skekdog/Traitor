@@ -3,6 +3,21 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
+local MIN_ARM_DURATION = 10
+local MAX_ARM_DURATION = 360
+
+local function getTimerText(timeLeft: number): string
+	if timeLeft < 0 then
+		timeLeft = 0
+	end
+
+	local minutes = math.floor(timeLeft / 60)
+	local seconds = timeLeft % 60
+
+	local text = string.format("%02d:%02d", minutes, seconds)
+	return text
+end
+
 local remote: RemoteEvent
 if RunService:IsServer() then
 	remote = Instance.new("RemoteEvent")
@@ -25,6 +40,17 @@ local function isArmedClient(c4: Types.Interactable): boolean
 	return c4.Object:GetAttribute("ExplodesAt") ~= nil
 end
 
+local function setDuration(c4: Types.Interactable, percent: number): ()
+	local ui = getC4Menu()
+	local sliderBar = ui.Object.Arm.Arm.SliderBar
+
+	local duration = math.lerp(MIN_ARM_DURATION, MAX_ARM_DURATION, percent)
+	sliderBar.Slider.Position = UDim2.fromScale(percent, 0.5)
+	ui.Object.SidePanel.Timer.Text = getTimerText(duration)
+
+	c4.Extras.ArmDuration = duration
+end
+
 local isFirstInit = true
 local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 	currentC4 = c4
@@ -41,8 +67,8 @@ local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 		ui.Object.Arm.Visible = not isArmedClient(c4)
 	end
 
-	if not isArmedClient(c4) then
-		ui.Object.SidePanel.Timer.Text = "00:00"
+	if show and not isArmedClient(currentC4) then
+		setDuration(currentC4, 0)
 	end
 
 	WalkSpeed.SetModifier("C4Menu", if show then -math.huge else 0)
@@ -55,7 +81,7 @@ local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 	if isFirstInit then
 		buttons.Arm.MouseButton1Click:Connect(function()
 			showC4Menu(currentC4, false)
-			remote:FireServer(currentC4.Object, "Arm", 10)
+			remote:FireServer(currentC4.Object, "Arm", currentC4.Extras.ArmDuration or error("ArmDuration is nil"))
 		end)
 
 		buttons:FindFirstChild("Destroy").Activated:Connect(function()
@@ -80,6 +106,26 @@ local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 				end)
 			end
 		end
+
+		local sliderBar = getC4Menu().Object.Arm.Arm.SliderBar
+		local function tryMoveSlider(input: InputObject): ()
+			local inputType = input.UserInputType
+			if inputType ~= Enum.UserInputType.MouseButton1 and inputType ~= Enum.UserInputType.Touch and inputType ~= Enum.UserInputType.MouseMovement then
+				return
+			end
+
+			if inputType == Enum.UserInputType.MouseMovement and sliderBar.GuiState ~= Enum.GuiState.Press then
+				return
+			end
+
+			local percent = math.clamp(input.Position.X - sliderBar.AbsolutePosition.X, 0, sliderBar.AbsoluteSize.X) / sliderBar.AbsoluteSize.X
+			setDuration(currentC4, percent)
+		end
+
+		setDuration(currentC4, 0)
+
+		sliderBar.InputChanged:Connect(tryMoveSlider)
+		sliderBar.InputBegan:Connect(tryMoveSlider)
 
 		isFirstInit = false
 	end
@@ -116,18 +162,10 @@ if RunService:IsClient() then
 		local explodeAt = c4.Object:GetAttribute("ExplodesAt") :: number?
 		if explodeAt then
 			local timeLeft = explodeAt - workspace:GetServerTimeNow()
-			if timeLeft < 0 then
-				timeLeft = 0
-			end
-
-			local minutes = math.floor(timeLeft / 60)
-			local seconds = timeLeft % 60
-
-			local text = string.format("%02d:%02d", minutes, seconds)
-			timer.Text = text
+			timer.Text = getTimerText(timeLeft)
 
 			if currentC4 == c4 and ui.Visible then
-				ui.Object.SidePanel.Timer.Text = text
+				ui.Object.SidePanel.Timer.Text = getTimerText(timeLeft)
 			end
 		else
 			timer.Text = ""
