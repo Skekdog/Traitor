@@ -152,6 +152,25 @@ end
 
 local c4s: {[Instance]: C4} = {}
 if RunService:IsClient() then
+	local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
+	local function playBeep(c4: C4): ()
+
+		local part = CreateEmptyPart(c4.Object.CFrame)
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = c4.Object
+		weld.Part1 = part
+		part.Name = "SoundPart"
+		part.Parent = c4.Object
+
+		c4.Extras.BeganBeepingClient = true
+		PlaySound(6992631696, nil, part, {
+			Volume = 1.5,
+			RollOffMinDistance = 10,
+			RollOffMaxDistance = 40,
+			PlaybackRegion = NumberRange.new(2.5, 7.5),
+		})
+	end
+
 	local function forEachC4(c4: C4): ()
 		local timerPart = c4.Object:FindFirstChild("TimerPart")
 		if not timerPart then
@@ -186,16 +205,17 @@ if RunService:IsClient() then
 			end
 
 			if not c4.Extras.BeganBeepingClient and timeLeft <= 5 then
-				c4.Extras.BeganBeepingClient = true
-				PlaySound(6992631696, nil, c4.Object, {
-					Volume = 1.5,
-					RollOffMinDistance = 10,
-					RollOffMaxDistance = 40,
-					PlaybackRegion = NumberRange.new(2.5, 7.5),
-				})
+				playBeep(c4)
 			end
 		else
 			timer.Text = ""
+
+			local soundPart = c4.Object:FindFirstChild("SoundPart")
+			if soundPart then
+				soundPart:Destroy()
+			end
+
+			c4.Extras.BeganBeepingClient = false
 		end
 	end
 
