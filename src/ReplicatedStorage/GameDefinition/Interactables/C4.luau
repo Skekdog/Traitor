@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -20,6 +21,72 @@ local function getC4Menu()
 	return ui
 end
 
+local function isArmedClient(c4: Types.Interactable): boolean
+	return c4.Object:GetAttribute("ExplodesAt") ~= nil
+end
+
+local isFirstInit = true
+local function showC4Menu(c4: Types.Interactable, show: boolean): ()
+	currentC4 = c4
+	assert(currentC4)
+
+	local WalkSpeed = require(ReplicatedStorage.WalkSpeed)
+	local JumpPower = require(ReplicatedStorage.JumpPower)
+
+	local ui = getC4Menu()
+	local buttons = ui.Object.SidePanel.Buttons
+
+	if show then
+		ui.Object.Wires.Visible = isArmedClient(c4)
+		ui.Object.Arm.Visible = not isArmedClient(c4)
+	end
+
+	if not isArmedClient(c4) then
+		ui.Object.SidePanel.Timer.Text = "00:00"
+	end
+
+	WalkSpeed.SetModifier("C4Menu", if show then -math.huge else 0)
+	JumpPower.SetModifier("C4Menu", not show)
+
+	buttons.Arm.Visible = not isArmedClient(c4)
+	buttons.Take.Visible = not isArmedClient(c4)
+	buttons:FindFirstChild("Destroy").Visible = not isArmedClient(c4)
+
+	if isFirstInit then
+		buttons.Arm.MouseButton1Click:Connect(function()
+			showC4Menu(currentC4, false)
+			remote:FireServer(currentC4.Object, "Arm", 10)
+		end)
+
+		buttons:FindFirstChild("Destroy").Activated:Connect(function()
+			showC4Menu(currentC4, false)
+			remote:FireServer(currentC4.Object, "Destroy")
+		end)
+
+		buttons.Take.Activated:Connect(function()
+			showC4Menu(currentC4, false)
+			remote:FireServer(currentC4.Object, "Take")
+		end)
+
+		buttons.Close.Activated:Connect(function()
+			showC4Menu(currentC4, false)
+		end)
+
+		for _, v in ui.Object.Wires.Wires:GetChildren() do
+			if v:IsA("TextButton") then
+				v.Activated:Connect(function()
+					showC4Menu(currentC4, false)
+					remote:FireServer(currentC4.Object, "CutWire", tonumber(v.Name:sub(5, 5)))
+				end)
+			end
+		end
+
+		isFirstInit = false
+	end
+
+	ui:ToggleVisible(show)
+end
+
 local c4s: {[Instance]: Types.Interactable} = {}
 if RunService:IsClient() then
 	local function forEachC4(c4: Types.Interactable): ()
@@ -38,6 +105,14 @@ if RunService:IsClient() then
 			return
 		end
 
+		local ui = getC4Menu()
+		if currentC4 == c4 and ui.Visible then
+			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Object.Position)
+			if distance == 0 or distance > c4.Definition.InteractionRange then
+				showC4Menu(c4, false)
+			end
+		end
+
 		local explodeAt = c4.Object:GetAttribute("ExplodesAt") :: number?
 		if explodeAt then
 			local timeLeft = explodeAt - workspace:GetServerTimeNow()
@@ -51,8 +126,8 @@ if RunService:IsClient() then
 			local text = string.format("%02d:%02d", minutes, seconds)
 			timer.Text = text
 
-			if currentC4 == c4 then
-				getC4Menu().Object.SidePanel.Timer.Text = text
+			if currentC4 == c4 and ui.Visible then
+				ui.Object.SidePanel.Timer.Text = text
 			end
 		else
 			timer.Text = ""
@@ -234,72 +309,6 @@ if RunService:IsServer() then
 			tryDestroy(c4)
 		end
 	end)
-end
-
-local function isArmedClient(c4: Types.Interactable): boolean
-	return c4.Object:GetAttribute("ExplodesAt") ~= nil
-end
-
-local isFirstInit = true
-local function showC4Menu(c4: Types.Interactable, show: boolean): ()
-	currentC4 = c4
-	assert(currentC4)
-
-	local WalkSpeed = require(ReplicatedStorage.WalkSpeed)
-	local JumpPower = require(ReplicatedStorage.JumpPower)
-
-	local ui = getC4Menu()
-	local buttons = ui.Object.SidePanel.Buttons
-
-	if show then
-		ui.Object.Wires.Visible = isArmedClient(c4)
-		ui.Object.Arm.Visible = not isArmedClient(c4)
-	end
-
-	if not isArmedClient(c4) then
-		ui.Object.SidePanel.Timer.Text = "00:00"
-	end
-
-	WalkSpeed.SetModifier("C4Menu", if show then -math.huge else 0)
-	JumpPower.SetModifier("C4Menu", not show)
-
-	buttons.Arm.Visible = not isArmedClient(c4)
-	buttons.Take.Visible = not isArmedClient(c4)
-	buttons:FindFirstChild("Destroy").Visible = not isArmedClient(c4)
-
-	if isFirstInit then
-		buttons.Arm.MouseButton1Click:Connect(function()
-			showC4Menu(currentC4, false)
-			remote:FireServer(currentC4.Object, "Arm", 10)
-		end)
-
-		buttons:FindFirstChild("Destroy").Activated:Connect(function()
-			showC4Menu(currentC4, false)
-			remote:FireServer(currentC4.Object, "Destroy")
-		end)
-
-		buttons.Take.Activated:Connect(function()
-			showC4Menu(currentC4, false)
-			remote:FireServer(currentC4.Object, "Take")
-		end)
-
-		buttons.Close.Activated:Connect(function()
-			showC4Menu(currentC4, false)
-		end)
-
-		for _, v in ui.Object.Wires.Wires:GetChildren() do
-			if v:IsA("TextButton") then
-				v.Activated:Connect(function()
-					showC4Menu(c4, false)
-					remote:FireServer(currentC4.Object, "CutWire", tonumber(v.Name:sub(5, 5)))
-				end)
-			end
-		end
-
-		isFirstInit = false
-	end
-
-	ui:ToggleVisible(show)
 end
 
 local interactable: Types.InteractableDefinition = {
