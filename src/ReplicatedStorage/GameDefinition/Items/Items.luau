@@ -996,6 +996,9 @@ items.C4 = {
     Slot = 7,
     CanDrop = true,
 
+    Description = "Explodes in a massive radius after a set timer.",
+    Icon = "rbxassetid://17229908151",
+
 	Model = interactableModels("C4"),
 
     CreditCost = 1,
