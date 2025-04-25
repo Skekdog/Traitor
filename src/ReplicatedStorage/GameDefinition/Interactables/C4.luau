@@ -5,7 +5,7 @@ local SoundService = game:GetService("SoundService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 
-local MIN_ARM_DURATION = 10
+local MIN_ARM_DURATION = 45
 local MAX_ARM_DURATION = 360
 
 local WIRE_COUNT = 6
