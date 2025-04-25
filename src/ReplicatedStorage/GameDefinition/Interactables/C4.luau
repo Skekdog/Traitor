@@ -350,7 +350,7 @@ if RunService:IsServer() then
 	end
 
 	local function tryDisarm(c4: C4, participant: Types.Participant, cutWire: number?): ()
-		if not cutWire then
+		if not cutWire or cutWire < 1 or cutWire > WIRE_COUNT then
 			return
 		end
 
