@@ -237,26 +237,37 @@ local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 	local JumpPower = require(ReplicatedStorage.JumpPower)
 	local ui = UIManager.WaitForUI("C4Menu") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.C4Menu)}
 
-	ui.Object.Wires.Visible = isArmedClient(c4)
-	ui.Object.Arm.Visible = not isArmedClient(c4)
+	local buttons = ui.Object.SidePanel.Buttons
+
+	if show then
+		ui.Object.Wires.Visible = isArmedClient(c4)
+		ui.Object.Arm.Visible = not isArmedClient(c4)
+	end
 
 	WalkSpeed.SetModifier("C4Menu", if show then -math.huge else 0)
 	JumpPower.SetModifier("C4Menu", not show)
 
+	buttons.Arm.Visible = not isArmedClient(c4)
+	buttons.Take.Visible = not isArmedClient(c4)
+	buttons:FindFirstChild("Destroy").Visible = not isArmedClient(c4)
+
 	if isFirstInit then
-		ui.Object.SidePanel.Buttons.Arm.MouseButton1Click:Connect(function()
+		buttons.Arm.MouseButton1Click:Connect(function()
+			showC4Menu(currentC4, false)
 			remote:FireServer(currentC4.Object, "Arm", 10)
 		end)
 
-		ui.Object.SidePanel.Buttons:FindFirstChild("Destroy").Activated:Connect(function()
+		buttons:FindFirstChild("Destroy").Activated:Connect(function()
+			showC4Menu(currentC4, false)
 			remote:FireServer(currentC4.Object, "Destroy")
 		end)
 
-		ui.Object.SidePanel.Buttons.Take.Activated:Connect(function()
+		buttons.Take.Activated:Connect(function()
+			showC4Menu(currentC4, false)
 			remote:FireServer(currentC4.Object, "Take")
 		end)
 
-		ui.Object.SidePanel.Buttons.Close.Activated:Connect(function()
+		buttons.Close.Activated:Connect(function()
 			showC4Menu(currentC4, false)
 		end)
 
