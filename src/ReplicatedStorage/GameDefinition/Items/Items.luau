@@ -18,6 +18,10 @@ local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
+local function interactableModels(name: string): BasePart
+	return ReplicatedStorage:WaitForChild("InteractableModels"):WaitForChild(name) :: BasePart
+end
+
 local function weaponSounds(name: string): string
     return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
 end
@@ -991,6 +995,8 @@ items.C4 = {
     Name = "C4",
     Slot = 7,
     CanDrop = true,
+
+	Model = interactableModels("C4"),
 
     CreditCost = 1,
 
