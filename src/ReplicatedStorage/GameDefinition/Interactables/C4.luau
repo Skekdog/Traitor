@@ -260,7 +260,18 @@ local explosionInfo: Types.ExplosionInfo = {
 	FalloffBegin = 40,
 	FalloffEnd = 80,
 	Pressure = 100000,
-	VisualRadius = 10,
+	VisualRadius = 25,
+
+	IgnoreKarma = true,
+	IgnoreSelfDefense = true,
+}
+
+local reducedExplosionInfo: Types.ExplosionInfo = {
+	Damage = 100,
+	FalloffBegin = 20,
+	FalloffEnd = 50,
+	Pressure = 500000,
+	VisualRadius = 20,
 
 	IgnoreKarma = true,
 	IgnoreSelfDefense = true,
@@ -298,7 +309,7 @@ if RunService:IsServer() then
 		c4.Object:Destroy()
 	end
 
-	local function tryExplode(c4: C4, armId: any): ()
+	local function tryExplode(c4: C4, armId: any, reducedPower: boolean?): ()
 		local armedBy: Types.Participant? = c4.Extras.ArmedBy
 		if not armedBy then
 			return
@@ -313,7 +324,7 @@ if RunService:IsServer() then
 		sound.Volume = 1
 
 		destroy(c4)
-		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(explosionInfo, c4.Object.Position, armedBy), nil, sound)
+		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Object.Position, armedBy), nil, sound)
 	end
 
 	local function tryArm(c4: C4, participant: Types.Participant, duration: number?): ()
@@ -350,7 +361,7 @@ if RunService:IsServer() then
 		if participant == c4.Extras.ArmedBy or not table.find(c4.Extras.DangerousWires, cutWire) then
 			return disarm(c4)
 		end
-		tryExplode(c4, c4.Extras.ArmId)
+		tryExplode(c4, c4.Extras.ArmId, true)
 	end
 
 	local function tryDestroy(c4: C4): ()
