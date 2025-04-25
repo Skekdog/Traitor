@@ -13,6 +13,13 @@ else
 	remote = found
 end
 
+local currentC4: Types.Interactable?
+local function getC4Menu()
+	local UIManager = require(ReplicatedStorage.UIManager)
+	local ui = UIManager.WaitForUI("C4Menu") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.C4Menu)}
+	return ui
+end
+
 local c4s: {[Instance]: Types.Interactable} = {}
 if RunService:IsClient() then
 	local function forEachC4(c4: Types.Interactable): ()
@@ -40,7 +47,13 @@ if RunService:IsClient() then
 
 			local minutes = math.floor(timeLeft / 60)
 			local seconds = timeLeft % 60
-			timer.Text = string.format("%02d:%02d", minutes, seconds)
+
+			local text = string.format("%02d:%02d", minutes, seconds)
+			timer.Text = text
+
+			if currentC4 == c4 then
+				getC4Menu().Object.SidePanel.Timer.Text = text
+			end
 		else
 			timer.Text = ""
 		end
@@ -227,21 +240,24 @@ local function isArmedClient(c4: Types.Interactable): boolean
 	return c4.Object:GetAttribute("ExplodesAt") ~= nil
 end
 
-local currentC4: Types.Interactable
 local isFirstInit = true
 local function showC4Menu(c4: Types.Interactable, show: boolean): ()
 	currentC4 = c4
+	assert(currentC4)
 
-	local UIManager = require(ReplicatedStorage.UIManager)
 	local WalkSpeed = require(ReplicatedStorage.WalkSpeed)
 	local JumpPower = require(ReplicatedStorage.JumpPower)
-	local ui = UIManager.WaitForUI("C4Menu") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.C4Menu)}
 
+	local ui = getC4Menu()
 	local buttons = ui.Object.SidePanel.Buttons
 
 	if show then
 		ui.Object.Wires.Visible = isArmedClient(c4)
 		ui.Object.Arm.Visible = not isArmedClient(c4)
+	end
+
+	if not isArmedClient(c4) then
+		ui.Object.SidePanel.Timer.Text = "00:00"
 	end
 
 	WalkSpeed.SetModifier("C4Menu", if show then -math.huge else 0)
