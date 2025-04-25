@@ -318,6 +318,10 @@ if RunService:IsServer() then
 		if armId ~= c4.Extras.ArmId then
 			return
 		end
+
+		if not c4.Object:IsDescendantOf(workspace) then
+			return
+		end
 		
 		local sound = Instance.new("Sound")
 		sound.SoundId = "rbxassetid://252142019"
