@@ -8,11 +8,13 @@ local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local MIN_ARM_DURATION = 10
 local MAX_ARM_DURATION = 360
 
+local WIRE_COUNT = 6
+
 type C4 = Types.Interactable & {
 	Extras: {
 		ArmId: never?,
 		ArmedBy: Types.Participant?,
-		SafeWires: {number}?,
+		DangerousWires: {number}?,
 		ArmDurationClient: number?,
 		BeganBeepingClient: boolean?,
 		[any]: never,
@@ -29,6 +31,11 @@ local function getTimerText(timeLeft: number): string
 
 	local text = string.format("%02d:%02d", minutes, seconds)
 	return text
+end
+
+local function getDangerousWireCountForDuration(duration: number): number
+	local percent = (duration - MIN_ARM_DURATION) / (MAX_ARM_DURATION - MIN_ARM_DURATION) + 1 / WIRE_COUNT
+	return math.clamp(math.floor(WIRE_COUNT * percent), 1, WIRE_COUNT - 1)
 end
 
 local remote: RemoteEvent
@@ -60,6 +67,9 @@ local function setDuration(c4: C4, percent: number): ()
 	local duration = math.lerp(MIN_ARM_DURATION, MAX_ARM_DURATION, percent)
 	sliderBar.Slider.Position = UDim2.fromScale(percent, 0.5)
 	ui.Object.SidePanel.Timer.Text = getTimerText(duration)
+
+	local dangerousCount = getDangerousWireCountForDuration(duration)
+	ui.Object.Arm.Arm.DangerousWires.Text = `{dangerousCount} wire{if dangerousCount ~= 1 then "s" else ""} will be deadly`
 
 	c4.Extras.ArmDurationClient = duration
 end
@@ -279,7 +289,7 @@ if RunService:IsServer() then
 	local function disarm(c4: C4): ()
 		c4.Extras.ArmId = nil
 		c4.Extras.ArmedBy = nil
-		c4.Extras.SafeWires = nil
+		c4.Extras.DangerousWires = nil
 		c4.Object:SetAttribute("ExplodesAt", nil)
 	end
 
@@ -317,11 +327,11 @@ if RunService:IsServer() then
 
 		c4.Extras.ArmId = newproxy()
 		c4.Extras.ArmedBy = participant
-		c4.Extras.SafeWires = {}
+		c4.Extras.DangerousWires = {}
 
 		local wiresCopy = table.clone(wires)
-		for i = 1, 5 do
-			table.insert(c4.Extras.SafeWires, pickAndRemove(wiresCopy))
+		for i = 1, getDangerousWireCountForDuration(duration) do
+			table.insert(c4.Extras.DangerousWires, pickAndRemove(wiresCopy))
 		end
 
 		c4.Object:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
@@ -337,7 +347,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		if participant == c4.Extras.ArmedBy or table.find(c4.Extras.SafeWires, cutWire) then
+		if participant == c4.Extras.ArmedBy or not table.find(c4.Extras.DangerousWires, cutWire) then
 			return disarm(c4)
 		end
 		tryExplode(c4, c4.Extras.ArmId)
