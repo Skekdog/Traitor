@@ -2,8 +2,10 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClientInventory = require(ReplicatedStorage.ClientInventory)
 local Freecam = require(ReplicatedStorage.Freecam)
+local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
 local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local ShowMessage = require(ReplicatedStorage.ShowMessage)
 local ToRoundTime = require(ReplicatedStorage.ToRoundTime)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
 local UIManager = require(ReplicatedStorage.UIManager)
@@ -60,6 +62,19 @@ end
 
 LocalRoundInfo.PlayerRoles:Connect(setRoleText)
 LocalRoundInfo.PlayerStatuses:Connect(setRoleText)
+
+local function updateFreeKillStatus(): ()
+    local hasReason = not not LocalRoundInfo.FreeKill()
+    local hasCharacter = not not LocalCharacter.Character()
+    roundInfo.FreeKill.Visible = hasCharacter and hasReason
+end
+
+LocalRoundInfo.FreeKill:Connect(function(reason)
+    ShowMessage(`Because you {reason}, you are now a free kill!`, "Chat")
+    updateFreeKillStatus()
+end)
+
+LocalCharacter.Character:Connect(updateFreeKillStatus)
 
 local function showHealth(show: boolean): ()
     roundInfo.Frame.HealthBar.Visible = show

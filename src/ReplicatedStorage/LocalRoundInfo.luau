@@ -55,6 +55,11 @@ remotes.UpdateCredits.OnClientEvent:Connect(function(value: number?)
     module.Credits:SetValue(value or 0)
 end)
 
+module.FreeKill = DynamicValue.new(nil :: string?)
+remotes.FreeKill.OnClientEvent:Connect(function(reason: string?)
+    module.FreeKill:SetValue(reason)
+end)
+
 function module.GetRoundHighlights(): {RoundHighlight}
     local highlights: {RoundHighlight} = {}
     for _, v in replicatedData.Highlights:GetChildren() do
@@ -218,6 +223,7 @@ remotes.Reset.OnClientEvent:Connect(function()
 	module.PlayerRoles:SetValue({})
     module.PlayerCorpses:SetValue({})
     module.Interactables:SetValue({})
+    module.FreeKill:SetValue()
 
     module.OnReset:Invoke()
 end)

@@ -300,6 +300,32 @@ module.setrole = {
 	end
 }
 
+module.setfreekill = {
+	Name = "setfreekill",
+	Description = "Sets free kill reason for the specified players",
+	Environment = "Server" :: "Server",
+	Arguments = {"reason / nil", "players"},
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
+		end
+
+		local reason = processStringArgument(args[1])
+
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			participant:SetFreeKill(if reason == "nil" then nil else reason)
+		end
+
+		return `Set free kill reason of {getPlayersString(players)} to {reason}.`
+	end
+}
+
 module.kill = {
 	Name = "kill",
 	Description = "Kills the specified players",
