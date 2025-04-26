@@ -126,7 +126,7 @@ function module.ShowInteractableHint(interactable: BasePart): ()
 		return
 	end
 
-	corpseHint.Text = definition.Name
+	corpseHint.Text = GetDisplayName(definition)
 	corpseHint.Visible = true
 end
 
