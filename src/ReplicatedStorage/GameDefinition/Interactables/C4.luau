@@ -338,6 +338,8 @@ if RunService:IsServer() then
 		local sound = Instance.new("Sound")
 		sound.SoundId = "rbxassetid://252142019"
 		sound.Volume = 1
+		sound.RollOffMinDistance = if reducedPower then 35 else 70
+		sound.RollOffMaxDistance = if reducedPower then 70 else 240
 
 		destroy(c4)
 		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Object.Position, armedBy), nil, sound)
