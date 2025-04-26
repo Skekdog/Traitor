@@ -1010,6 +1010,7 @@ items.C4 = {
     Icon = "rbxassetid://17229908151",
 
 	Model = interactableModels("C4"),
+    HoldAnimation = "rbxassetid://92236433436790",
 
     CreditCost = 1,
 
