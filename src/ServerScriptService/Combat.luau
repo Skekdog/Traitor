@@ -140,12 +140,18 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	end
 
 	local damage = getItemDamage(item, hitPart)
-	local params = {
+	local params: Types.DamageParams = {
 		Amount = damage,
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
 		IsHeadshot = isOf(hitPart, "Head"),
 		Attacker = by,
 	}
+
+	if item.Kind == "ExplosionParams" then
+		params.IgnoreKarma = item.Definition.IgnoreKarma
+		params.IgnoreScore = item.Definition.IgnoreScore
+		params.IgnoreSelfDefense = item.Definition.IgnoreSelfDefense
+	end
 	
 	if not item:RunBeforeHit(round, hitPart, params) then
 		return
