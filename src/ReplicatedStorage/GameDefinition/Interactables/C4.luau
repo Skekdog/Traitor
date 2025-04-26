@@ -92,6 +92,15 @@ local function showC4Menu(c4: C4, show: boolean): ()
 	if show then
 		ui.Object.Wires.Visible = isArmedClient(c4)
 		ui.Object.Arm.Visible = not isArmedClient(c4)
+
+		for _, v in ui.Object.Wires.Wires:GetChildren() do
+			if not v:IsA("TextButton") then
+				continue
+			end
+
+			local uiGradient = assert(v:FindFirstChildOfClass("UIGradient"))
+			uiGradient.Transparency = NumberSequence.new(0)
+		end
 	end
 
 	if show and not isArmedClient(currentC4) then
@@ -129,6 +138,9 @@ local function showC4Menu(c4: C4, show: boolean): ()
 		for _, v in ui.Object.Wires.Wires:GetChildren() do
 			if v:IsA("TextButton") then
 				v.Activated:Connect(function()
+					local gradient = assert(v:FindFirstChildOfClass("UIGradient"))
+					gradient.Transparency = NumberSequence.new(0.9)
+
 					showC4Menu(currentC4, false)
 					remote:FireServer(currentC4.Object, "CutWire", tonumber(v.Name:sub(5, 5)))
 					PlaySound(9118822196, nil, SoundService, {
