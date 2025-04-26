@@ -76,6 +76,27 @@ end)
 
 LocalCharacter.Character:Connect(updateFreeKillStatus)
 
+local function showFreeKillIgnoreReason(show: boolean): ()
+    local hasReason = not not LocalRoundInfo.FreeKill()
+    local hasCharacter = not not LocalCharacter.Character()
+    roundInfo.FreeKill.Visible = hasCharacter and (show or hasReason)
+end
+
+ClientInventory.EquippedItem:Connect(function(item)
+    if not item then
+        return showFreeKillIgnoreReason(false)
+    end
+
+    local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
+    local role = if roleValue then roleValue() else nil
+
+    if item.Definition.IsBadGuyItem and (not role or not role.Definition.IsBadGuys) then
+        return showFreeKillIgnoreReason(true)
+    end
+
+    showFreeKillIgnoreReason(false)
+end)
+
 local function showHealth(show: boolean): ()
     roundInfo.Frame.HealthBar.Visible = show
 end
