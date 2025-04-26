@@ -70,7 +70,9 @@ local function updateFreeKillStatus(): ()
 end
 
 LocalRoundInfo.FreeKill:Connect(function(reason)
-    ShowMessage(`Because you {reason}, you are now a free kill!`, "Chat")
+    if reason then
+        ShowMessage(`Because you {reason}, you are now a free kill!`, "Chat")
+    end
     updateFreeKillStatus()
 end)
 
