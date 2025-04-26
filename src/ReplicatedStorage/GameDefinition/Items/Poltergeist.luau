@@ -211,6 +211,8 @@ local item: Types.GunWeaponDefinition = {
 	Description = "Attaches thrusters to props, blasting them towards others.",
 	Icon = "rbxassetid://103677163409705",
 
+	IsBadGuyItem = true,
+
 	Model = ReplicatedStorage.WeaponModels.Poltergeist,
 
 	LaserColor = Color3.new(),

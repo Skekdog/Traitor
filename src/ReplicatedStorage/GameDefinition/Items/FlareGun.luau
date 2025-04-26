@@ -178,6 +178,8 @@ local item: Types.GunWeaponDefinition = {
     CreditCost = 1,
     MaxStock = 1,
 
+    IsBadGuyItem = true,
+
     Slot = 8,
     CanDrop = true,
 

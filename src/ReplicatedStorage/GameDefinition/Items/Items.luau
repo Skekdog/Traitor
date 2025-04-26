@@ -349,6 +349,8 @@ guns.AWP = {
     Icon = "rbxassetid://4772214897",
     MaxStock = 1,
     
+    IsBadGuyItem = true,
+    
     Slot = 7,
     CreditCost = 1,
     CanDrop = true,
@@ -431,6 +433,8 @@ guns["Silenced Pistol"] = {
     Icon = "rbxassetid://299432421",
     CreditCost = 1,
     MaxStock = 3,
+
+    IsBadGuyItem = true,
 
     Slot = 7,
     CanDrop = true,
@@ -644,6 +648,8 @@ guns.BAR = {
     Icon = "rbxassetid://10243797417",
     MaxStock = 3,
 
+    IsBadGuyItem = true,
+
     Slot = 3,
     CreditCost = 1,
     CanDrop = true,
@@ -689,6 +695,8 @@ grenades.Grenade = {
     Icon = "rbxassetid://8096856961",
     CreditCost = 2,
     MaxStock = 2,
+
+    IsBadGuyItem = true,
 
     Slot = 7,
     CanDrop = true,
@@ -995,6 +1003,8 @@ items.C4 = {
     Name = "C4",
     Slot = 7,
     CanDrop = true,
+
+    IsBadGuyItem = true,
 
     Description = "Explodes in a massive radius after a set timer.",
     Icon = "rbxassetid://17229908151",
