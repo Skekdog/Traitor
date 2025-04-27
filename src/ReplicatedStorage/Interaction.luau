@@ -70,7 +70,7 @@ local function tryInteractInteractable(interactablePart: BasePart, input: InputO
 	end
 
 	if definition.IsContinuousInteraction then
-		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(interactablePart.Position, definition.InteractionRange) do
+		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(interactablePart.Position, definition.InteractionRange) and module.InteractTarget == interactablePart do
 			interactInteractable(interactable)
 			task.wait()
 		end
