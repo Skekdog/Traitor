@@ -13,6 +13,8 @@ type HealthStationServer = Types.Interactable & {
 		Charge: number?,
 		HealQueue: {Types.Participant}?,
 		HealSound: Sound?,
+		NoChargeSound: Sound?,
+		[any]: nil,
 	}
 }
 
@@ -47,6 +49,16 @@ local function OnLoadServer(interactable: HealthStationServer): ()
 	healSound.Parent = interactable.Object
 
 	interactable.Extras.HealSound = healSound
+
+	local noChargeSound = Instance.new("Sound")
+	noChargeSound.SoundId = ""
+	noChargeSound.RollOffMinDistance = 5
+	noChargeSound.RollOffMaxDistance = 15
+	noChargeSound.PlaybackRegionsEnabled = true
+	noChargeSound.PlaybackRegion = NumberRange.new(0.2, 1.19)
+	noChargeSound.Parent = interactable.Object
+
+	interactable.Extras.NoChargeSound = noChargeSound
 end
 
 local function heal(station: HealthStationServer, participant: Types.Participant): ()
@@ -65,7 +77,14 @@ RunService.Heartbeat:Connect(function()
 	local shouldRecharge = tick() - lastRecharge > RECHARGE_INTERVAL
 	local shouldHeal = tick() - lastHeal > HEAL_INTERVAL
 
+	local toRemove: {HealthStationServer} = {}
+
 	for _, station in stations do
+		if not station.Object:IsDescendantOf(workspace) then
+			table.insert(toRemove, station)
+			continue
+		end
+
 		if shouldRecharge then
 			setCharge(station, station.Extras.Charge + RECHARGE_AMOUNT)
 		end
@@ -86,6 +105,10 @@ RunService.Heartbeat:Connect(function()
 		end
 
 		station.Extras.HealQueue = {}
+	end
+
+	for _, station in toRemove do
+		table.remove(stations, table.find(stations, station) or error("station not found"))
 	end
 
 	if shouldRecharge then
