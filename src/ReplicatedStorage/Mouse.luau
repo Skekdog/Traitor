@@ -86,6 +86,7 @@ function module.ShowPlayerInfo(char: Model)
 end
 
 local interactableFrame = crosshairInfoUI:FindFirstChild("Interactable")
+local interactableHint = interactableFrame.HintText
 local corpseHint = interactableFrame.InteractableName
 function module.ShowCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
@@ -110,10 +111,10 @@ function module.ShowCorpseHint(char: Model)
 		corpseHint.Text = `{role:GetFormattedString(char.Name .. "'s")} Body`
 	end
 
+	interactableHint.Visible = false
 	interactableFrame.Visible = true
 end
 
-local interactableHint = interactableFrame.HintText
 function module.ShowInteractableHint(interactablePart: BasePart): ()
 	local plr = Players.LocalPlayer
 	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
