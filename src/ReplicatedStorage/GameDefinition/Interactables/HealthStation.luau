@@ -28,7 +28,14 @@ end
 local function OnInteractServer(interactable: HealthStationServer, participant: Types.Participant): ()
 	local charge = interactable.Extras.Charge or MAX_CHARGE
 	local humanoid = participant:GetHumanoid()
-	if not humanoid or charge <= 0 or participant:GetHealth() >= humanoid.MaxHealth then
+	if not humanoid or participant:GetHealth() >= humanoid.MaxHealth then
+		return
+	end
+
+	if charge < HEAL_AMOUNT then
+		if not interactable.Extras.NoChargeSound.IsPlaying then
+			interactable.Extras.NoChargeSound:Play()
+		end
 		return
 	end
 
@@ -51,11 +58,9 @@ local function OnLoadServer(interactable: HealthStationServer): ()
 	interactable.Extras.HealSound = healSound
 
 	local noChargeSound = Instance.new("Sound")
-	noChargeSound.SoundId = ""
+	noChargeSound.SoundId = "rbxassetid://72729349003330"
 	noChargeSound.RollOffMinDistance = 5
 	noChargeSound.RollOffMaxDistance = 15
-	noChargeSound.PlaybackRegionsEnabled = true
-	noChargeSound.PlaybackRegion = NumberRange.new(0.2, 1.19)
 	noChargeSound.Parent = interactable.Object
 
 	interactable.Extras.NoChargeSound = noChargeSound
