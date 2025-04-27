@@ -75,6 +75,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Newton Launcher"],
 			Items["Poltergeist"],
 			Items["C4"],
+			Items["DeathStation"],
 		},
 
 		CanTeamChat = true,
@@ -135,6 +136,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Radar"],
 			Items["Flashbang"],
 			Items["UMP"],
+			Items["HealthStation"],
 		},
 
 		AwardCreditsToRolesOnDeath = {

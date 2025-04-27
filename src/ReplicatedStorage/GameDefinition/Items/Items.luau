@@ -1050,6 +1050,42 @@ items.C4 = {
     end
 }
 
+items.HealthStation = {
+    Kind = "Item" :: "Item",
+    Name = "HealthStation",
+    DisplayName = "Health Station",
+    Slot = 8,
+    CanDrop = true,
+
+    Description = "Can be used by anyone to restore health, with a slow recharge.",
+    Icon = "rbxassetid://93284379186217",
+    IsPixelIcon = true,
+
+    CreditCost = 1,
+    MaxStock = 1,
+
+    PrimaryHint = "Deploy Health Station",
+    PrimaryFireServer = throwInteractable,
+}
+
+items.DeathStation = {
+    Kind = "Item" :: "Item",
+    Name = "DeathStation",
+    DisplayName = "Death Station",
+    Slot = 8,
+    CanDrop = true,
+
+    Description = "Visually mimics a health station. Can be used by good guys to die.",
+    Icon = "rbxassetid://109445031317494",
+    IsPixelIcon = true,
+
+    CreditCost = 1,
+    MaxStock = 1,
+
+    PrimaryHint = "Deploy Death Station",
+    PrimaryFireServer = throwInteractable,
+}
+
 local allItems: {[string]: Types.AnyItemDefinition} = {}
 
 for i, v in guns do

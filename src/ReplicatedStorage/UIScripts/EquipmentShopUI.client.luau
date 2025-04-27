@@ -113,6 +113,7 @@ local function tryPopulateEquipment(role: Types.Role?): ()
         local button = ui.Object.EquipmentEntry:Clone()
         button.Name = v.Name
         button.Image = v.Icon or ""
+        button.ResampleMode = if v.IsPixelIcon then Enum.ResamplerMode.Pixelated else Enum.ResamplerMode.Default
 
         button.TextLabel.Text = if v.Slot then `[{v.Slot}]` else ""
         button.TextLabel.Visible = not not v.Slot
