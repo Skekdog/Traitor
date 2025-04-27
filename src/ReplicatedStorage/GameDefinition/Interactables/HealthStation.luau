@@ -5,7 +5,8 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 local MAX_CHARGE = 200
 local HEAL_INTERVAL = 0.5
 local HEAL_AMOUNT = 1
-local RECHARGE_RATE = 1
+local RECHARGE_INTERVAL = 2.5
+local RECHARGE_AMOUNT = 1
 
 type HealthStationServer = Types.Interactable & {
 	Extras: {
@@ -16,6 +17,11 @@ type HealthStationServer = Types.Interactable & {
 }
 
 local stations: {HealthStationServer} = {}
+
+local function setCharge(interactable: HealthStationServer, charge: number): ()
+	interactable.Extras.Charge = math.clamp(charge, 0, MAX_CHARGE)
+	interactable.Object:SetAttribute("Charge", interactable.Extras.Charge)
+end
 
 local function OnInteractServer(interactable: HealthStationServer, participant: Types.Participant): ()
 	local charge = interactable.Extras.Charge or MAX_CHARGE
@@ -28,7 +34,7 @@ local function OnInteractServer(interactable: HealthStationServer, participant: 
 end
 
 local function OnLoadServer(interactable: HealthStationServer): ()
-	interactable.Extras.Charge = MAX_CHARGE
+	setCharge(interactable, MAX_CHARGE)
 	interactable.Extras.HealQueue = {}
 	table.insert(stations, interactable)
 
@@ -46,7 +52,7 @@ end
 local function heal(station: HealthStationServer, participant: Types.Participant): ()
 	participant.Extras.HealthStationLastHealedAt = tick()
 	participant:SetHealth(participant:GetHealth() + HEAL_AMOUNT)
-	station.Extras.Charge = math.clamp(station.Extras.Charge - HEAL_AMOUNT, 0, MAX_CHARGE)
+	setCharge(station, station.Extras.Charge - HEAL_AMOUNT)
 
 	if not station.Extras.HealSound.IsPlaying then
 		station.Extras.HealSound:Play()
@@ -56,12 +62,12 @@ end
 local lastRecharge = 0
 local lastHeal = 0
 RunService.Heartbeat:Connect(function()
-	local shouldRecharge = tick() - lastRecharge > RECHARGE_RATE
+	local shouldRecharge = tick() - lastRecharge > RECHARGE_INTERVAL
 	local shouldHeal = tick() - lastHeal > HEAL_INTERVAL
-	
+
 	for _, station in stations do
 		if shouldRecharge then
-			station.Extras.Charge = math.clamp(station.Extras.Charge + RECHARGE_RATE, 0, MAX_CHARGE) -- clamp instead of min because then we can have negative recharge if we really want to
+			setCharge(station, station.Extras.Charge + RECHARGE_AMOUNT)
 		end
 
 		if shouldHeal then
@@ -91,6 +97,18 @@ RunService.Heartbeat:Connect(function()
 	end
 end)
 
+local function updateCharge(interactable: Types.Interactable): ()
+	local charge = interactable.Object:GetAttribute("Charge") :: number?
+	interactable.HintTextClient = `Charge: {charge} / {MAX_CHARGE}`
+end
+
+local function OnLoadClient(interactable: Types.Interactable): ()
+	interactable.Object:GetAttributeChangedSignal("Charge"):Connect(function()
+		updateCharge(interactable)
+	end)
+	updateCharge(interactable)
+end
+
 local interactable: Types.InteractableDefinition = {
 	Name = "HealthStation",
 	DisplayName = "Health Station",
@@ -102,6 +120,8 @@ local interactable: Types.InteractableDefinition = {
 
 	OnInteractServer = OnInteractServer,
 	OnLoadServer = OnLoadServer,
+
+	OnLoadClient = OnLoadClient,
 }
 
 return interactable

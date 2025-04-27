@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
 local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
 local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
-local GetInteractableDefinition = require(script.Parent.GetInteractableDefinition)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(script.Parent.UIManager)
 
@@ -86,7 +85,8 @@ function module.ShowPlayerInfo(char: Model)
 	return true
 end
 
-local corpseHint = crosshairInfoUI.SearchCorpseHint
+local interactableFrame = crosshairInfoUI:FindFirstChild("Interactable")
+local corpseHint = interactableFrame.InteractableName
 function module.ShowCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
@@ -109,10 +109,12 @@ function module.ShowCorpseHint(char: Model)
 
 		corpseHint.Text = `{role:GetFormattedString(char.Name .. "'s")} Body`
 	end
-	corpseHint.Visible = true
+
+	interactableFrame.Visible = true
 end
 
-function module.ShowInteractableHint(interactable: BasePart): ()
+local interactableHint = interactableFrame.HintText
+function module.ShowInteractableHint(interactablePart: BasePart): ()
 	local plr = Players.LocalPlayer
 	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
 	local status = if statusValue then statusValue() else "Spectating"
@@ -121,13 +123,26 @@ function module.ShowInteractableHint(interactable: BasePart): ()
 		return
 	end
 
-	local definition = GetInteractableDefinition(interactable.Name)
-	if not definition or plr:DistanceFromCharacter(interactable.Position) > definition.InteractionRange then
+	local interactable = LocalRoundInfo.Interactables()[interactablePart]
+	if not interactable then
+		return
+	end
+
+	local definition = interactable.Definition
+	if not definition or plr:DistanceFromCharacter(interactablePart.Position) > definition.InteractionRange then
 		return
 	end
 
 	corpseHint.Text = GetDisplayName(definition)
-	corpseHint.Visible = true
+
+	if interactable.HintTextClient then
+		interactableHint.Text = interactable.HintTextClient
+		interactableHint.Visible = true
+	else
+		interactableHint.Visible = false
+	end
+
+	interactableFrame.Visible = true
 end
 
 local function makeLabelVisible(label: TextLabel, visible: boolean, text: string, lastCount: number): number
@@ -169,8 +184,8 @@ end
 
 function module.Reset(): ()
 	playerInfo.Visible = false
-	corpseHint.Visible = false
 	itemHint.Enabled = false
+	interactableFrame.Visible = false
 end
 
 return module
