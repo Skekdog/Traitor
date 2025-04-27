@@ -21,6 +21,7 @@ local flavourTexts: {[Types.GeneralDamageSource]: string} = {
     Bludgeon = "The body is bruised and battered. Evidently some blunt-force trauma was at hand.",
     Crush = "Many of their bones are broken. It seems the impact of a heavy object killed them.",
 	Magic = "Otherworldly forces brought about this spy's death.",
+    Poison = "A strong chemical odor suggests that poison was the cause of this spy's demise.",
     Other = "It is unclear how this spy met their fate.",
 }
 
@@ -38,6 +39,7 @@ local flavourImages: {[Types.GeneralDamageSource]: string} = {
     Bludgeon = "rbxassetid://15819411457",
     Crush = "rbxassetid://953809995",
     Magic = "rbxassetid://15244435410",
+    Poison = "rbxassetid://79725625736870",
     Other = "rbxassetid://17079244437"
 }
 

@@ -2,11 +2,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
-local MAX_CHARGE = 200
-local HEAL_INTERVAL = 0.5
-local HEAL_AMOUNT = 1
-local RECHARGE_INTERVAL = 2.5
-local RECHARGE_AMOUNT = 1
+local module = {}
+module.MAX_CHARGE = 200
+module.HEAL_INTERVAL = 0.5
+module.HEAL_AMOUNT = 1
+module.RECHARGE_INTERVAL = 2.5
+module.RECHARGE_AMOUNT = 1
 
 type HealthStationServer = Types.Interactable & {
 	Extras: {
@@ -21,18 +22,18 @@ type HealthStationServer = Types.Interactable & {
 local stations: {HealthStationServer} = {}
 
 local function setCharge(interactable: HealthStationServer, charge: number): ()
-	interactable.Extras.Charge = math.clamp(charge, 0, MAX_CHARGE)
+	interactable.Extras.Charge = math.clamp(charge, 0, module.MAX_CHARGE)
 	interactable.Object:SetAttribute("Charge", interactable.Extras.Charge)
 end
 
 local function OnInteractServer(interactable: HealthStationServer, participant: Types.Participant): ()
-	local charge = interactable.Extras.Charge or MAX_CHARGE
+	local charge = interactable.Extras.Charge or module.MAX_CHARGE
 	local humanoid = participant:GetHumanoid()
 	if not humanoid or participant:GetHealth() >= humanoid.MaxHealth then
 		return
 	end
 
-	if charge < HEAL_AMOUNT then
+	if charge < module.HEAL_AMOUNT then
 		if not interactable.Extras.NoChargeSound.IsPlaying then
 			interactable.Extras.NoChargeSound:Play()
 		end
@@ -43,7 +44,7 @@ local function OnInteractServer(interactable: HealthStationServer, participant: 
 end
 
 local function OnLoadServer(interactable: HealthStationServer): ()
-	setCharge(interactable, MAX_CHARGE)
+	setCharge(interactable, module.MAX_CHARGE)
 	interactable.Extras.HealQueue = {}
 	table.insert(stations, interactable)
 
@@ -68,8 +69,8 @@ end
 
 local function heal(station: HealthStationServer, participant: Types.Participant): ()
 	participant.Extras.HealthStationLastHealedAt = tick()
-	participant:SetHealth(participant:GetHealth() + HEAL_AMOUNT)
-	setCharge(station, station.Extras.Charge - HEAL_AMOUNT)
+	participant:SetHealth(participant:GetHealth() + module.HEAL_AMOUNT)
+	setCharge(station, station.Extras.Charge - module.HEAL_AMOUNT)
 
 	if not station.Extras.HealSound.IsPlaying then
 		station.Extras.HealSound:Play()
@@ -79,8 +80,8 @@ end
 local lastRecharge = 0
 local lastHeal = 0
 RunService.Heartbeat:Connect(function()
-	local shouldRecharge = tick() - lastRecharge > RECHARGE_INTERVAL
-	local shouldHeal = tick() - lastHeal > HEAL_INTERVAL
+	local shouldRecharge = tick() - lastRecharge > module.RECHARGE_INTERVAL
+	local shouldHeal = tick() - lastHeal > module.HEAL_INTERVAL
 
 	local toRemove: {HealthStationServer} = {}
 
@@ -91,7 +92,7 @@ RunService.Heartbeat:Connect(function()
 		end
 
 		if shouldRecharge then
-			setCharge(station, station.Extras.Charge + RECHARGE_AMOUNT)
+			setCharge(station, station.Extras.Charge + module.RECHARGE_AMOUNT)
 		end
 
 		if shouldHeal then
@@ -127,7 +128,7 @@ end)
 
 local function updateCharge(interactable: Types.Interactable): ()
 	local charge = interactable.Object:GetAttribute("Charge") :: number?
-	interactable.HintTextClient = `Charge: {charge} / {MAX_CHARGE}`
+	interactable.HintTextClient = `Charge: {charge} / {module.MAX_CHARGE}`
 end
 
 local function OnLoadClient(interactable: Types.Interactable): ()
@@ -152,4 +153,6 @@ local interactable: Types.InteractableDefinition = {
 	OnLoadClient = OnLoadClient,
 }
 
-return interactable
+module.Interactable = interactable
+
+return module
