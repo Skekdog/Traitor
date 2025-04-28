@@ -1111,7 +1111,7 @@ items.Decoy = {
     MaxStock = 1,
 
     Description = "When placed, overrides your shown position on radars. Can be destroyed.",
-    Icon = "",
+    Icon = "rbxassetid://96906503847712",
 
     AlternateHint = "Plant Decoy",
 
