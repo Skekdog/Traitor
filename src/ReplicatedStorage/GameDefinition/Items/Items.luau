@@ -998,6 +998,38 @@ local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate"
     participant:RemoveItem(item)
 end
 
+local function plantInteractable(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant): (Types.Interactable?, RaycastResult?, WeldConstraint?)
+    local params = RaycastParams.new()
+    params.CollisionGroup = "WeaponHitTargets"
+    params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles}
+    params.FilterType = Enum.RaycastFilterType.Exclude
+
+    local result = workspace:Raycast(origin, direction * 10, params)
+    if not result then
+        return nil
+    end
+
+    local map = participant.Round:GetMap()
+
+    if not result.Instance:IsDescendantOf(map.StaticMap) then
+        return nil
+    end
+
+    local interactable = createInteractableForItem(item, participant.Round)
+    local object = interactable.Object
+
+    object.CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal)
+
+    local weld = Instance.new("WeldConstraint")
+    weld.Part0 = result.Instance :: BasePart
+    weld.Part1 = object
+    weld.Parent = object
+
+    participant:RemoveItem(item)
+
+    return interactable, result, weld
+end
+
 items.C4 = {
     Kind = "Item" :: "Item",
     Name = "C4",
@@ -1019,34 +1051,17 @@ items.C4 = {
 
     PrimaryFireServer = throwInteractable,
     AlternateFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
-        local params = RaycastParams.new()
-        params.CollisionGroup = "WeaponHitTargets"
-        params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles}
-        params.FilterType = Enum.RaycastFilterType.Exclude
-
-        local result = workspace:Raycast(origin, direction * 10, params)
-        if not result then
+        local interactable, result, weld = plantInteractable(item, origin, direction, participant)
+        if not interactable or not result or not weld then
             return
         end
 
-		local map = participant.Round:GetMap()
+        local object = interactable.Object
 
-		if not result.Instance:IsDescendantOf(map.StaticMap) then
-			return
-		end
-
-		local interactable = createInteractableForItem(item, participant.Round)
-		local object = interactable.Object
-
-		object.CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal) * CFrame.Angles(math.rad(-90), 0, 0)
+        weld.Enabled = false
+        object.CFrame *= CFrame.Angles(math.rad(-90), 0, 0)
 		object.CFrame += result.Normal / 4
-
-		local weld = Instance.new("WeldConstraint")
-		weld.Part0 = result.Instance :: BasePart
-		weld.Part1 = object
-		weld.Parent = object
-
-		participant:RemoveItem(item)
+        weld.Enabled = true
     end
 }
 
@@ -1084,6 +1099,35 @@ items.DeathStation = {
 
     PrimaryHint = "Deploy Death Station",
     PrimaryFireServer = throwInteractable,
+}
+
+items.Decoy = {
+    Kind = "Item" :: "Item",
+    Name = "Decoy",
+    Slot = 8,
+    CanDrop = false,
+
+    CreditCost = 1,
+    MaxStock = 1,
+
+    Description = "When placed, overrides your shown position on radars. Can be destroyed.",
+    Icon = "",
+
+    AlternateHint = "Plant Decoy",
+
+    AlternateFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+        local interactable, _, weld = plantInteractable(item, origin, direction, participant)
+        if not interactable or not weld then
+            return
+        end
+
+        local object = interactable.Object
+        weld.Enabled = false
+        object.CFrame *= CFrame.new(0, 0, -interactable.Object.Size.Z / 2)
+        weld.Enabled = true
+
+        interactable.Object:SetAttribute("Player", participant.Player.Name)
+    end
 }
 
 local allItems: {[string]: Types.AnyItemDefinition} = {}

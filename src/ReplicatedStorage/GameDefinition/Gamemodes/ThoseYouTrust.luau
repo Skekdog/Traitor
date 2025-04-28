@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local C4 = require(ReplicatedStorage.GameDefinition.Interactables.C4)
 local DeathStation = require(ReplicatedStorage.GameDefinition.Interactables.DeathStation)
+local Decoy = require(ReplicatedStorage.GameDefinition.Interactables.Decoy)
 local HealthStation = require(ReplicatedStorage.GameDefinition.Interactables.HealthStation)
 local Ammo = require(ReplicatedStorage.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.GameDefinition.Items.Items)
@@ -281,6 +282,7 @@ local gamemode: Types.Gamemode = {
 		C4 = C4,
 		HealthStation = HealthStation.Interactable,
 		DeathStation = DeathStation,
+		Decoy = Decoy.Interactable,
 	},
 
 	StartingItems = {
