@@ -7,6 +7,9 @@ local GREY_COLOUR = Color3.new(0.5, 0.5, 0.5)
 
 local radarPoint = ReplicatedStorage:WaitForChild("RadarPoint")
 local function markPosition(cFrame: CFrame, grey: boolean?): ()
+    local noZRot = CFrame.Angles(cFrame.Rotation.X, cFrame.Rotation.Y, 0)
+    cFrame = CFrame.new(cFrame.Position) * noZRot
+    
     local clone = radarPoint:Clone()
     clone:PivotTo(cFrame)
 
