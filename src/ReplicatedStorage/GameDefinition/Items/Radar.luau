@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 local Decoy = require(script.Parent.Parent.Interactables.Decoy)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -9,7 +10,7 @@ local radarPoint = ReplicatedStorage:WaitForChild("RadarPoint")
 local function markPosition(cFrame: CFrame, grey: boolean?): ()
     local noZRot = CFrame.Angles(cFrame.Rotation.X, cFrame.Rotation.Y, 0)
     cFrame = CFrame.new(cFrame.Position) * noZRot
-    
+
     local clone = radarPoint:Clone()
     clone:PivotTo(cFrame)
 
@@ -43,7 +44,10 @@ local function HeartbeatClient(item: Types.AnyItem): ()
     local decoyPlayers: {Player} = {}
     for _, v in Decoy.ActiveDecoysClient do
         table.insert(decoyPlayers, v.Extras.Player)
-        markPosition(v.Object.CFrame, true)
+
+        local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
+        local role = if roleValue then roleValue() else nil
+        markPosition(v.Object.CFrame, if role then role.Definition.IsBadGuys else false)
     end
 
     for _, v in Players:GetPlayers() do
