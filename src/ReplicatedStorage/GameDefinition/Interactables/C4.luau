@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
+local DynamicValue = require(ReplicatedStorage.DynamicValue)
 
 local MIN_ARM_DURATION = 45
 local MAX_ARM_DURATION = 360
@@ -180,7 +181,7 @@ local function showC4Menu(c4: C4, show: boolean): ()
 	ui:ToggleVisible(show)
 end
 
-local c4s: {[Instance]: C4} = {}
+local c4s = DynamicValue.new({} :: {[Instance]: C4})
 if RunService:IsClient() then
 	local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 
@@ -252,7 +253,7 @@ if RunService:IsClient() then
 	RunService.Heartbeat:Connect(function()
 		local toRemove: {C4} = {}
 
-		for _, c4 in c4s do
+		for _, c4 in c4s() do
 			if not c4.Object:IsDescendantOf(workspace) then
 				table.insert(toRemove, c4)
 				continue
@@ -480,14 +481,18 @@ local interactable: Types.InteractableDefinition = {
 	end,
 
 	OnLoadClient = function(object: C4): ()
-		c4s[object.Object] = object
+		c4s()[object.Object] = object
+		c4s:Invoke()
 	end,
 
 	OnLoadServer = function(object: C4): ()
-		c4s[object.Object] = object
+		c4s()[object.Object] = object
+		c4s:Invoke()
+
 		object.Object.AncestryChanged:Connect(function()
 			if not object.Object:IsDescendantOf(workspace) then
-				c4s[object.Object] = nil
+				c4s()[object.Object] = nil
+				c4s:Invoke()
 			end
 		end)
 	end,
