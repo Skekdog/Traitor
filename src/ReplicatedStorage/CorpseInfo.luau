@@ -75,10 +75,14 @@ local function getFlavourText(deathType: Types.NamedDamageSource): string?
 end
 
 local information = corpseUi.Object.Information
+local function onIconClicked(icon: Instance)
+    information.Text = icon:GetAttribute("Description") :: string
+end
+
 for _, v in object:GetChildren() do
     if v:IsA("ImageButton") then
-        v.MouseButton1Click:Connect(function()
-            information.Text = v:GetAttribute("Description") :: string
+        v.Activated:Connect(function()
+            onIconClicked(v)
         end)
     end
 end
@@ -163,12 +167,17 @@ return function(corpseInfo: Types.CorpseView?)
     end
 
     for _, v in corpseInfo.AdditionalIcons do
-        local baseIcon = object.FreeKill:Clone()
-        baseIcon.Image = v.Icon
-        baseIcon:SetAttribute("Description", v.Description)
-        baseIcon.Name = "AdditionalIcon_" .. v.Name
-        baseIcon.Visible = true
-        baseIcon.Parent = object
+        local icon = object.FreeKill:Clone()
+        icon.Image = v.Icon
+        icon:SetAttribute("Description", v.Description)
+        icon.Name = "AdditionalIcon_" .. v.Name
+        icon.ScaleType = Enum.ScaleType.Fit
+        icon.Visible = true
+        icon.Parent = object
+
+        icon.Activated:Connect(function()
+            onIconClicked(icon)
+        end)
     end
 
     local name = corpseInfo.Name
