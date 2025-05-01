@@ -1,6 +1,5 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
 local Decoy = require(script.Parent.Parent.Interactables.Decoy)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -43,6 +42,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
 
     local decoyPlayers: {Player} = {}
     for _, v in Decoy.ActiveDecoysClient do
+        local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
         table.insert(decoyPlayers, v.Extras.Player)
 
         local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
