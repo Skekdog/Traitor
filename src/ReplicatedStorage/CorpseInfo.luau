@@ -88,6 +88,12 @@ return function(corpseInfo: Types.CorpseView?)
         return
     end
 
+    for _, v in object:GetChildren() do
+        if v.Name:split("_")[1] == "AdditionalIcon" then
+            v:Destroy()
+        end
+    end
+
     information.Text = "Click on an icon to reveal detailed information."
 
     object.MurderWeapon.TextLabel.Text = corpseInfo.DamageSource
@@ -154,6 +160,15 @@ return function(corpseInfo: Types.CorpseView?)
         object.KillList.Visible = true
     else
         object.KillList.Visible = false
+    end
+
+    for _, v in corpseInfo.AdditionalIcons do
+        local baseIcon = object.FreeKill:Clone()
+        baseIcon.Image = v.Icon
+        baseIcon:SetAttribute("Description", v.Description)
+        baseIcon.Name = "AdditionalIcon_" .. v.Name
+        baseIcon.Visible = true
+        baseIcon.Parent = object
     end
 
     local name = corpseInfo.Name
