@@ -368,6 +368,14 @@ if RunService:IsServer() then
 			table.insert(c4.Extras.DangerousWires, pickAndRemove(wiresCopy))
 		end
 
+		local safeWire = wiresCopy[1]
+
+		participant:AddCorpseIcon({
+			Name = "C4Defusal",
+			Icon = "rbxassetid://17229908151",
+			Description = `You find a note on their corpse saying that wire {safeWire} will defuse a C4.`,
+		})
+
 		c4.Object:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
 		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)
 	end
