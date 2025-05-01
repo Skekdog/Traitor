@@ -10,6 +10,8 @@ local MAX_ARM_DURATION = 360
 
 local WIRE_COUNT = 6
 
+local TEXT_HIGHLIGHT_COLOUR = Color3.fromRGB(66, 135, 245)
+
 type C4 = Types.Interactable & {
 	Extras: {
 		ArmId: never?,
@@ -289,6 +291,10 @@ local reducedExplosionInfo: Types.ExplosionInfo = {
 	IgnoreSelfDefense = true,
 }
 
+local function highlightText(text: string): string
+	return `<font color='#{TEXT_HIGHLIGHT_COLOUR:ToHex()}'>{text}</font>`
+end
+
 if RunService:IsServer() then
 	local ServerScriptService = game:GetService("ServerScriptService")
 	local ExplosionParams = require(ReplicatedStorage.RoundRule.ExplosionParams)
@@ -373,7 +379,7 @@ if RunService:IsServer() then
 		participant:AddCorpseIcon({
 			Name = "C4Defusal",
 			Icon = "rbxassetid://17229908151",
-			Description = `You find a note on their corpse saying that wire {safeWire} will defuse a C4.`,
+			Description = `You find a note on their corpse saying that {highlightText("wire " .. safeWire)} will defuse a C4.`,
 		})
 
 		c4.Object:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
