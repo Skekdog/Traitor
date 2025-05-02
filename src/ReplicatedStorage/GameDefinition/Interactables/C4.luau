@@ -13,6 +13,28 @@ local WIRE_COUNT = 6
 
 local TEXT_HIGHLIGHT_COLOUR = Color3.fromRGB(66, 135, 245)
 
+local explosionInfo: Types.ExplosionInfo = {
+	Damage = 100,
+	FalloffBegin = 40,
+	FalloffEnd = 80,
+	Pressure = 100000,
+	VisualRadius = 25,
+
+	IgnoreKarma = true,
+	IgnoreSelfDefense = true,
+}
+
+local reducedExplosionInfo: Types.ExplosionInfo = {
+	Damage = 100,
+	FalloffBegin = 20,
+	FalloffEnd = 50,
+	Pressure = 500000,
+	VisualRadius = 20,
+
+	IgnoreKarma = true,
+	IgnoreSelfDefense = true,
+}
+
 type C4 = Types.Interactable & {
 	Extras: {
 		ArmId: never?,
@@ -21,7 +43,7 @@ type C4 = Types.Interactable & {
 		ArmDurationClient: number?,
 		BeganBeepingClient: boolean?,
 		[any]: never,
-	}
+	},
 }
 
 local function getTimerText(timeLeft: number): string
@@ -184,6 +206,19 @@ end
 local c4s = DynamicValue.new({} :: {[Instance]: C4})
 if RunService:IsClient() then
 	local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
+	
+	local isBadGuy = false
+
+	local function updateMarkerVisibility(): ()
+		for _, c4 in c4s() do
+			local marker = c4.Object:FindFirstChild("Marker")
+			if marker and marker:IsA("BillboardGui") then
+				marker.Enabled = isBadGuy
+			end
+		end
+	end
+
+	c4s:Connect(updateMarkerVisibility)
 
 	local function playAboutToExplodeBeeps(c4: C4): ()
 		local part = CreateEmptyPart(c4.Object.CFrame)
@@ -248,9 +283,52 @@ if RunService:IsClient() then
 
 			c4.Extras.BeganBeepingClient = false
 		end
+
+		if isBadGuy then
+			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Object.Position)
+			if distance == 0 then
+				distance = (workspace.CurrentCamera.CFrame.Position - c4.Object.Position).Magnitude
+			end
+
+			local marker = c4.Object:FindFirstChild("Marker")
+			if not marker or not marker:IsA("BillboardGui") then
+				return
+			end
+
+			local border = marker:FindFirstChild("Border")
+			if not border or not border:IsA("ImageLabel") then
+				return
+			end
+
+			local distanceLabel = marker:FindFirstChild("Distance")
+			if not distanceLabel or not distanceLabel:IsA("TextLabel") then
+				return
+			end
+
+			local colour: Color3
+			if distance > explosionInfo.FalloffEnd then
+				colour = Color3.new(0, 1, 0)
+			elseif distance > explosionInfo.FalloffBegin then
+				colour = Color3.new(1, 1, 0)
+			else
+				colour = Color3.new(1, 0, 0)
+			end
+
+			border.ImageColor3 = colour
+			distanceLabel.TextColor3 = colour
+
+			distanceLabel.Text = tostring(math.round(distance))
+		end
 	end
 
 	RunService.Heartbeat:Connect(function()
+		local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+
+		local roleObject = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
+		local role = if roleObject then roleObject() else nil
+
+		isBadGuy = if role then role.Definition.IsBadGuys or false else false
+
 		local toRemove: {C4} = {}
 
 		for _, c4 in c4s() do
@@ -263,34 +341,13 @@ if RunService:IsClient() then
 		end
 
 		for _, remove in toRemove do
-			c4s[remove.Object] = nil
+			c4s()[remove.Object] = nil
 		end
+		c4s:Invoke()
 	end)
 end
 
 local wires = {1, 2, 3, 4, 5, 6}
-
-local explosionInfo: Types.ExplosionInfo = {
-	Damage = 100,
-	FalloffBegin = 40,
-	FalloffEnd = 80,
-	Pressure = 100000,
-	VisualRadius = 25,
-
-	IgnoreKarma = true,
-	IgnoreSelfDefense = true,
-}
-
-local reducedExplosionInfo: Types.ExplosionInfo = {
-	Damage = 100,
-	FalloffBegin = 20,
-	FalloffEnd = 50,
-	Pressure = 500000,
-	VisualRadius = 20,
-
-	IgnoreKarma = true,
-	IgnoreSelfDefense = true,
-}
 
 local function highlightText(text: string): string
 	return `<font color='#{TEXT_HIGHLIGHT_COLOUR:ToHex()}'>{text}</font>`
@@ -436,7 +493,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		local c4 = c4s[instance]
+		local c4 = c4s()[instance]
 		if not c4 then
 			return
 		end
