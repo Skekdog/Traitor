@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Participant = require(ReplicatedStorage.RoundRule.Participant)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -6,6 +7,17 @@ local module = {}
 
 local MAX_KILL_DISTANCE = 60
 local MAX_KILL_TRACE_DURATION = 120
+
+local remote: RemoteEvent
+if RunService:IsServer() then
+	remote = Instance.new("RemoteEvent")
+	remote.Name = "DNARemote"
+	remote.Parent = script
+else
+	local found = script:WaitForChild("DNARemote")
+	assert(found:IsA("RemoteEvent"), "DNARemote must be a RemoteEvent")
+	remote = found
+end
 
 function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?): ()
 	local traces = object.Extras.DNATraces or {}
