@@ -175,7 +175,7 @@ local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, r
 	ShatterGlass(hitPart)
 end
 
-local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3): ()
+local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -192,16 +192,16 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		return
 	end
 
-	if prop.Kind ~= "MapProp" then
+	if prop.Kind ~= "MapProp" and prop.Kind ~= "Interactable" then
 		return
 	end
-	
-	local health = prop:GetHealth()
+
+	local health = (prop :: Types.MapProp):GetHealth()
 	if not health then
 		return
 	end
 
-	prop:TryTakeDamage(params)
+	(prop :: Types.MapProp):TryTakeDamage(params)
 end
 
 local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
@@ -212,13 +212,16 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 
 	local model = hitPart:FindFirstAncestorOfClass("Model")
 	local prop = round:GetProp(if model then model else hitPart)
+	local interactable = round:GetInteractable(hitPart)
+
+	local propLike = prop or interactable
 
 	if victim then
 		return onParticipantHit(item, round, by, victim, hitPart, hitPosition)
 	elseif hitPart:IsDescendantOf(map.Windows) then
 		return onWindowHit(item, round, by, hitPart, hitPosition)
-	elseif prop then
-		return onPropHit(item, round, by, prop, hitPart, hitPosition)
+	elseif propLike then
+		return onPropHit(item, round, by, propLike, hitPart, hitPosition)
 	end
 
 	if normal and item.Kind == "Gun" then
@@ -247,7 +250,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 
     explosion.Parent = folder
 
-	local hits: {Types.Participant | Types.Prop} = {}
+	local hits: {Types.Participant | Types.Prop | Types.Interactable} = {}
     for _, v in workspace:GetPartBoundsInRadius(params.Position, info.FalloffEnd) do
         local prop = round:GetProp(v)
 		if prop then
@@ -256,6 +259,16 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 			end
 			table.insert(hits, prop)
 			onPropHit(params, round, params.Attacker, prop, v, v.Position)
+			continue
+		end
+
+		local interactable = round:GetInteractable(v)
+		if interactable then
+			if table.find(hits, interactable) then
+				continue
+			end
+			table.insert(hits, interactable)
+			onPropHit(params, round, params.Attacker, interactable, v, v.Position)
 			continue
 		end
 
