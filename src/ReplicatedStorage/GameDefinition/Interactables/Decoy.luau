@@ -70,6 +70,20 @@ local function OnInteractServer(interactable: Decoy, participant: Types.Particip
 	participant:GiveItemFromItemDefinition(decoyItem)
 end
 
+local function BeforeTakeDamage(interactable: Decoy, params: Types.DamageParams?): boolean
+	if not params then
+		return false
+	end
+
+	local attacker = params.Attacker
+	if not attacker then
+		return false
+	end
+
+	local role = attacker:GetRole()
+	return if role then not role.Definition.IsBadGuys else false
+end
+
 local interactable: Types.InteractableDefinition = {
 	Name = "Decoy",
 
@@ -80,6 +94,8 @@ local interactable: Types.InteractableDefinition = {
 
 	OnLoadClient = OnLoadClient,
 	OnInteractServer = OnInteractServer,
+
+	BeforeTakeDamage = BeforeTakeDamage,
 }
 
 module.Interactable = interactable
