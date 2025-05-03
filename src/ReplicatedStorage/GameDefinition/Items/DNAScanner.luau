@@ -103,7 +103,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local source: Types.DamageSource = params.Source
-	local isEligible = true-- source == "Shot" or source == "Bludgeon" or source == "Stab" or if typeof(source) == "table" then source.Kind == "Gun" or source.Kind == "Melee" else false
+	local isEligible = source == "Shot" or source == "Bludgeon" or source == "Stab" or if typeof(source) == "table" then source.Kind == "Gun" or source.Kind == "Melee" else false
 	if not isEligible then
 		return
 	end
