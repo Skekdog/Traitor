@@ -213,7 +213,7 @@ if RunService:IsClient() then
 		for _, c4 in c4s() do
 			local marker = c4.Object:FindFirstChild("Marker")
 			if marker and marker:IsA("BillboardGui") then
-				marker.Enabled = isBadGuy
+				marker.Enabled = isBadGuy and isArmedClient(c4)
 			end
 		end
 	end
