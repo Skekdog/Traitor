@@ -94,7 +94,7 @@ type Participant = Types.Participant & IHasDNATraces
 local originalOnDeath = Participant.OnDeath
 local function patchedOnDeath(participant: Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
 	remote:FireClient(participant.Player)
-	
+
 	local attacker = params.Attacker
 	if not attacker then
 		return
@@ -121,9 +121,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
-	module.AddDNATrace(participant, attacker, duration, "rbxassetid://17229908151", char)
-
-	module.AddDNATrace(participant, participant, duration, "rbxassetid://17229908151", char)
+	module.AddDNATrace(participant, attacker, duration, "rbxassetid://1043921089", char)
 
 	participant:AddCorpseIcon({
 		Name = "DNATrace",
