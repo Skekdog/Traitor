@@ -181,8 +181,13 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 	if (item.Kind == "Item" and (item.Definition.PrimaryFireClient or item.Definition.PrimaryFireServer)) or item.Kind == "Grenade" or item.Kind == "Gun" or item.Kind == "Melee" then
 		ControlManager.Register("Primary Fire", function(_, _, input)
-			while ClientInventory.EquippedItem() == item and (if item.Kind == "Item" and item.Definition.PrimaryToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End) and input.UserInputState ~= Enum.UserInputState.Cancel do
+			local stop = false
+			while not stop and ClientInventory.EquippedItem() == item and (if item.Kind == "Item" and item.Definition.PrimaryToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End) and input.UserInputState ~= Enum.UserInputState.Cancel do
 				task.wait()
+
+				if item.Kind == "Item" and item.Definition.PrimaryToggled and input.UserInputState == Enum.UserInputState.End then
+					stop = true
+				end
 
 				if item.Kind == "Gun" and item.Definition.ScopeRequired and not Aim.IsAiming() then
 					playEmptyClipSound()
