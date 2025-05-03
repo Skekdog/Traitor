@@ -442,7 +442,7 @@ local DNAScanner = require(ReplicatedStorage.GameDefinition.Items.DNAScanner)
 		})
 
 		DNAScanner.RemoveDNATraces(c4)
-		DNAScanner.AddDNATrace(c4, participant, nil, "rbxassetid://17229908151")
+		DNAScanner.AddDNATrace(c4, participant, nil, "rbxassetid://17229908151", c4.Object)
 
 		c4.Object:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
 		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)

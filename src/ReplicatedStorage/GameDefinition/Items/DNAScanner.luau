@@ -33,22 +33,23 @@ else
 	remote = found
 end
 
-local function hasEquivalentTrace(t: {IHasTarget}, trace: IHasTarget): boolean
+local function hasEquivalentTrace(t: {IHasTarget & IHasObject}, trace: IHasTarget & IHasObject): boolean
 	for _, existingTrace in t do
-		if existingTrace.Target == trace.Target then
+		if existingTrace.Target == trace.Target and existingTrace.Object == trace.Object then
 			return true
 		end
 	end
 	return false
 end
 
-function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?, icon: string): ()
+function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?, icon: string, instance: Instance): ()
 	local traces = object.Extras.DNATraces or {}
 
 	local trace: DNATrace = {
 		ExpiresAt = if duration then workspace:GetServerTimeNow() + duration else nil,
 		Target = target.Player.Name,
 		Icon = icon,
+		Object = instance,
 	}
 
 	if hasEquivalentTrace(traces, trace) then
@@ -71,15 +72,19 @@ export type IHasDNATraces = {
 	},
 }
 
+type IHasObject = {
+	Object: Instance,
+}
+
 type IHasTarget = {
 	Target: string
 }
 
-type SampledTrace = IHasTarget & {
+type SampledTrace = IHasTarget & IHasObject & {
 	Icon: string,
 }
 
-type DNATrace = IHasTarget & {
+type DNATrace = IHasTarget & IHasObject & {
 	ExpiresAt: number?,
 	Icon: string,
 }
@@ -114,9 +119,9 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
-	module.AddDNATrace(participant, attacker, duration, "rbxassetid://17229908151")
+	module.AddDNATrace(participant, attacker, duration, "rbxassetid://17229908151", char)
 
-	module.AddDNATrace(participant, participant, duration, "rbxassetid://17229908151")
+	module.AddDNATrace(participant, participant, duration, "rbxassetid://17229908151", char)
 
 	participant:AddCorpseIcon({
 		Name = "DNATrace",
@@ -175,6 +180,7 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 		table.insert(samples, {
 			Target = trace.Target,
 			Icon = trace.Icon,
+			Object = trace.Object,
 		})
 	end
 
