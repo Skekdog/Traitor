@@ -131,6 +131,19 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	})
 end
 
+local originalDropItem = Participant.DropItem
+local function patchedDropItem(participant: Types.Participant, item: Types.AnyItem, throwDirection: Vector3?): ()
+	if not item.Definition.CanDrop or not item.Model then
+		return
+	end
+	module.AddDNATrace(item, participant, nil, item.Definition.Icon or "rbxassetid://4795275417", item.Model)
+end
+
+Participant.DropItem = function(participant: Types.Participant, item: Types.AnyItem, throwDirection: Vector3?): ()
+	patchedDropItem(participant, item, throwDirection)
+	originalDropItem(participant, item, throwDirection)
+end
+
 Participant.OnDeath = function(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
 	patchedOnDeath(participant, params, deferVictoryCheck)
 	originalOnDeath(participant, params, deferVictoryCheck)
