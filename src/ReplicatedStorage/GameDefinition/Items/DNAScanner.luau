@@ -10,6 +10,9 @@ local MAX_KILL_TRACE_DURATION = 120
 
 local MAX_SCAN_RANGE = 7.5
 
+local RECHARGE_RATE = 2
+local currentCharge = 100
+
 local remote: RemoteEvent
 if RunService:IsServer() then
 	remote = Instance.new("RemoteEvent")
@@ -131,6 +134,10 @@ end
 if RunService:IsClient() then
 	remote.OnClientEvent:Connect(print)
 end
+
+RunService.Heartbeat:Connect(function(dt)
+	currentCharge = math.min(currentCharge + RECHARGE_RATE * dt, 100)
+end)
 
 local item: Types.ItemDefinition = {
 	Kind = "Item" :: "Item",
