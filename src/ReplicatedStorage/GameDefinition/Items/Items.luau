@@ -1124,6 +1124,7 @@ items.Decoy = {
         weld.Enabled = true
 
         interactable.Object:SetAttribute("Player", participant.Player.Name)
+        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://96906503847712", interactable.Object)
     end
 }
 
