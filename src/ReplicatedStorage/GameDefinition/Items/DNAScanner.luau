@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Participant = require(ReplicatedStorage.RoundRule.Participant)
@@ -10,8 +11,13 @@ local MAX_KILL_TRACE_DURATION = 120
 
 local MAX_SCAN_RANGE = 7.5
 
+local CHARGE_DEPLETION_PER_STUD = 0.5
+
 local RECHARGE_RATE = 2
 local currentCharge = 100
+
+local clientAvailableTraces: {SampledTrace} = {}
+local clientCurrentTrace: SampledTrace?
 
 local remote: RemoteEvent
 if RunService:IsServer() then
@@ -33,12 +39,13 @@ local function hasEquivalentTrace(t: {DNATrace}, trace: DNATrace): boolean
 	return false
 end
 
-function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?): ()
+function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?, icon: string): ()
 	local traces = object.Extras.DNATraces or {}
 
 	local trace: DNATrace = {
 		ExpiresAt = if duration then workspace:GetServerTimeNow() + duration else nil,
 		Target = target.Player.Name,
+		Icon = icon,
 	}
 
 	if hasEquivalentTrace(traces, trace) then
@@ -57,9 +64,15 @@ export type IHasDNATraces = {
 	},
 }
 
+type SampledTrace = {
+	Target: string,
+	Icon: string,
+}
+
 type DNATrace = {
 	ExpiresAt: number?,
 	Target: string,
+	Icon: string,
 }
 
 type Participant = Types.Participant & IHasDNATraces
@@ -92,7 +105,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
-	module.AddDNATrace(participant, attacker, duration)
+	module.AddDNATrace(participant, attacker, duration, "")
 
 	participant:AddCorpseIcon({
 		Name = "DNATrace",
@@ -142,20 +155,65 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 		end
 	end
 
-	if not object then
+	if not object or not object.Extras.DNATraces then
 		return
 	end
 
-	remote:FireClient(participant.Player, object.Extras.DNATraces)
+	local samples: {SampledTrace} = {}
+	for _, trace in object.Extras.DNATraces do
+		table.insert(samples, {
+			Target = trace.Target,
+			Icon = trace.Icon,
+		})
+	end
+
+	remote:FireClient(participant.Player, samples)
+end
+
+local function resetClient(): ()
+	clientAvailableTraces = {}
+	clientCurrentTrace = nil
+	currentCharge = 100
 end
 
 if RunService:IsClient() then
-	remote.OnClientEvent:Connect(print)
-end
+	remote.OnClientEvent:Connect(function(traces: {SampledTrace}?)
+		if not traces then
+			return resetClient()
+		end
 
-RunService.Heartbeat:Connect(function(dt)
-	currentCharge = math.min(currentCharge + RECHARGE_RATE * dt, 100)
-end)
+		for _, trace in traces do
+			table.insert(clientAvailableTraces, trace)
+		end
+
+		if not clientCurrentTrace then
+			clientCurrentTrace = traces[1]
+		end
+	end)
+
+	RunService.Heartbeat:Connect(function(dt)
+		currentCharge = math.min(currentCharge + RECHARGE_RATE * dt, 100)
+	
+		if not clientCurrentTrace or currentCharge < 100 then
+			return
+		end
+	
+		local targetCharacter = workspace.Characters:FindFirstChild(clientCurrentTrace.Target) or workspace.Corpses:FindFirstChild(clientCurrentTrace.Target)
+		if not targetCharacter or not targetCharacter:IsA("Model") then
+			return
+		end
+	
+		local distance = Players.LocalPlayer:DistanceFromCharacter(targetCharacter:GetPivot().Position)
+		if distance == 0 then
+			return
+		end
+	
+		local deplete = CHARGE_DEPLETION_PER_STUD * distance
+		currentCharge = math.max(currentCharge - deplete, 0)
+	
+		print(currentCharge, targetCharacter:GetPivot().Position)
+	end)
+end
 
 local item: Types.ItemDefinition = {
 	Kind = "Item" :: "Item",
