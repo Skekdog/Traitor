@@ -138,6 +138,20 @@ local function OnLoadClient(interactable: Types.Interactable): ()
 	updateCharge(interactable)
 end
 
+local function BeforeTakeDamage(interactable: HealthStationServer, params: Types.DamageParams?): boolean
+	if not params then
+		return false
+	end
+
+	local attacker = params.Attacker
+	if not attacker then
+		return false
+	end
+
+	local role = attacker:GetRole()
+	return if role then role.Definition.IsBadGuys or false else false
+end
+
 local interactable: Types.InteractableDefinition = {
 	Name = "HealthStation",
 	DisplayName = "Health Station",
@@ -151,6 +165,8 @@ local interactable: Types.InteractableDefinition = {
 	OnLoadServer = OnLoadServer,
 
 	OnLoadClient = OnLoadClient,
+
+	BeforeTakeDamage = BeforeTakeDamage,
 }
 
 module.Interactable = interactable

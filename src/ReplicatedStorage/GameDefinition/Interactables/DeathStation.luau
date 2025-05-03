@@ -39,6 +39,20 @@ local function OnLoadClient(interactable: Types.Interactable): ()
 	interactable.HintTextClient = `Charge: {HealthStation.MAX_CHARGE} / {HealthStation.MAX_CHARGE}`
 end
 
+local function BeforeTakeDamage(interactable: DeathStationServer, params: Types.DamageParams?): boolean
+	if not params then
+		return false
+	end
+
+	local attacker = params.Attacker
+	if not attacker then
+		return false
+	end
+
+	local role = attacker:GetRole()
+	return if role then not role.Definition.IsBadGuys else false
+end
+
 local interactable: Types.InteractableDefinition = {
 	Name = "DeathStation",
 	DisplayName = "Health Station",
@@ -52,6 +66,8 @@ local interactable: Types.InteractableDefinition = {
 	OnLoadServer = OnLoadServer,
 
 	OnLoadClient = OnLoadClient,
+
+	BeforeTakeDamage = BeforeTakeDamage,
 }
 
 return interactable
