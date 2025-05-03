@@ -24,23 +24,41 @@ else
 	remote = found
 end
 
+local function hasEquivalentTrace(t: {DNATrace}, trace: DNATrace): boolean
+	for _, existingTrace in t do
+		if existingTrace.Target == trace.Target then
+			return true
+		end
+	end
+	return false
+end
+
 function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?): ()
 	local traces = object.Extras.DNATraces or {}
-	table.insert(traces, {
+
+	local trace: DNATrace = {
 		ExpiresAt = if duration then workspace:GetServerTimeNow() + duration else nil,
 		Target = target.Player.Name,
-	})
+	}
+
+	if hasEquivalentTrace(traces, trace) then
+		return
+	end
+
+	table.insert(traces, trace)
+
 	object.Extras.DNATraces = traces
 end
 
 export type IHasDNATraces = {
 	Extras: {
 		DNATraces: {DNATrace}?,
+		[any]: never,
 	},
 }
 
 type DNATrace = {
-	ExpiresAt: number,
+	ExpiresAt: number?,
 	Target: string,
 }
 
