@@ -50,7 +50,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 		return
 	end
 
-	if attacker:HasSelfDefenseAgainstParticipant(participant) then
+	if attacker:HasSelfDefenseAgainstParticipant(participant) or participant:IsFreeKill() then
 		return
 	end
 
