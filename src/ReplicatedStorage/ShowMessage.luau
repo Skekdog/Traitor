@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
-local ParseRoleString = require(script.Parent.ParseRoleString)
+local FullParse = require(ReplicatedStorage.ParseString.FullParse)
 local UIAnimation = require(script.Parent.UIAnimation)
 local UIManager = require(script.Parent.UIManager)
 local Types = require(ReplicatedStorage.RoundRule.Types)
@@ -56,7 +56,7 @@ end
 local chatChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
 
 return function(msg: string, kind: Types.MessageKind)
-	msg = ParseRoleString(msg)
+	msg = FullParse(msg)
 	if kind == "Chat" then
 		chatChannel:DisplaySystemMessage(msg)
 	else

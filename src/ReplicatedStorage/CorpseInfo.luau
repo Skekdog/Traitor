@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local GetItemDefinition = require(ReplicatedStorage.GetItemDefinition)
+local FullParse = require(ReplicatedStorage.ParseString.FullParse)
 local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIManager = require(script.Parent.UIManager)
@@ -125,18 +126,6 @@ return function(corpseInfo: Types.CorpseView?)
     object.Headshot.Visible = corpseInfo.WasHeadshot or false
     object.SD.Visible = corpseInfo.WasSelfDefense or false
 
-    object.DNADuration.Visible = corpseInfo.DNAExpiry ~= nil
-
-    if corpseInfo.DNAExpiry then
-        object.DNADuration.TextLabel.Text = ToRoundTime(timeNow, corpseInfo.DNAExpiry)
-
-        if timeNow < corpseInfo.DNAExpiry then
-            object.DNADuration:SetAttribute("Description", "The killer left a sample of their DNA on the body. Use a DNA Scanner to find them.")
-        else
-            object.DNADuration:SetAttribute("Description", "The killer's DNA sample has expired.\n\"There is nothing we can do.\" - Napoleon")
-        end
-    end
-
     local equipment = corpseInfo.EquipmentList
     local equipmentText = "You find"
     if #equipment > 0 then
@@ -179,11 +168,11 @@ return function(corpseInfo: Types.CorpseView?)
     for _, v in corpseInfo.AdditionalIcons do
         local icon = object.MurderWeapon:Clone()
         icon.Image = v.Icon
-        icon:SetAttribute("Description", v.Description)
+        icon:SetAttribute("Description", FullParse(v.Description))
         icon.Name = "AdditionalIcon_" .. v.Name
         icon.ScaleType = Enum.ScaleType.Fit
         icon.Visible = true
-        icon.TextLabel.Text = v.DisplayText or ""
+        icon.TextLabel.Text = if v.DisplayText then FullParse(v.DisplayText) else ""
         icon.Parent = object
 
         icon.Activated:Connect(function()

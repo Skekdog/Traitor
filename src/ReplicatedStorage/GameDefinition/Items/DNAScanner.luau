@@ -46,7 +46,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local source: Types.DamageSource = params.Source
-	local isEligible = source == "Shot" or source == "Bludgeon" or source == "Stab" or if typeof(source) == "table" then source.Kind == "Gun" or source.Kind == "Melee" else false
+	local isEligible = true-- source == "Shot" or source == "Bludgeon" or source == "Stab" or if typeof(source) == "table" then source.Kind == "Gun" or source.Kind == "Melee" else false
 	if not isEligible then
 		return
 	end
@@ -57,12 +57,13 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
-	module.AddDNATrace(participant, attacker, workspace:GetServerTimeNow() + duration)
+	module.AddDNATrace(participant, attacker, duration)
 
 	participant:AddCorpseIcon({
 		Name = "DNATrace",
 		Icon = "rbxassetid://135886260297010",
 		Description = "Traces of the killer's DNA are on the body. Use a DNA Scanner to track them.",
+		DisplayText = `[TIMEUNTIL-{tostring(workspace:GetServerTimeNow() + duration)}]`,
 	})
 end
 
