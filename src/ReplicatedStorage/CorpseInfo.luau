@@ -177,12 +177,13 @@ return function(corpseInfo: Types.CorpseView?)
     end
 
     for _, v in corpseInfo.AdditionalIcons do
-        local icon = object.FreeKill:Clone()
+        local icon = object.MurderWeapon:Clone()
         icon.Image = v.Icon
         icon:SetAttribute("Description", v.Description)
         icon.Name = "AdditionalIcon_" .. v.Name
         icon.ScaleType = Enum.ScaleType.Fit
         icon.Visible = true
+        icon.TextLabel.Text = v.DisplayText or ""
         icon.Parent = object
 
         icon.Activated:Connect(function()
