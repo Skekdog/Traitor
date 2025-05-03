@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local DNAScanner = require(ReplicatedStorage.GameDefinition.Items.DNAScanner)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local module = {}
@@ -75,6 +76,8 @@ local function heal(station: HealthStationServer, participant: Types.Participant
 	if not station.Extras.HealSound.IsPlaying then
 		station.Extras.HealSound:Play()
 	end
+
+	DNAScanner.AddDNATrace(station, participant, nil, "rbxassetid://93284379186217", station.Object)
 end
 
 local lastRecharge = 0
