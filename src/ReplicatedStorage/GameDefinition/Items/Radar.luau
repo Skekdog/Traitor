@@ -18,7 +18,11 @@ local function HeartbeatClient(item: Types.AnyItem): ()
 
     item.Extras.LastScan = timeNow
 
-    workspace.RadarPoints:ClearAllChildren()
+    for _, v in workspace.RadarPoints:GetChildren() do
+        if v.Name == "RadarScan" then
+            v:Destroy()
+        end
+    end
 
     local decoyPlayers: {Player} = {}
     for _, v in Decoy.ActiveDecoysClient do
@@ -27,7 +31,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
 
         local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
         local role = if roleValue then roleValue() else nil
-        CreateRadarPoint(v.Object.CFrame, if role and role.Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR)
+        CreateRadarPoint(v.Object.CFrame, if role and role.Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
     end
 
     for _, v in Players:GetPlayers() do
@@ -47,7 +51,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
             continue
         end
 
-        CreateRadarPoint(root.CFrame, GREEN_COLOUR)
+        CreateRadarPoint(root.CFrame, GREEN_COLOUR, "RadarScan")
     end
 end
 
