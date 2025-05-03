@@ -53,7 +53,9 @@ local INTERMISSION_TIME = 15
 
 local gamemodes: {Types.Gamemode} = {}
 for _, v in ReplicatedStorage.GameDefinition.Gamemodes:GetChildren() do
-    table.insert(gamemodes, (require)(v))
+    for i = 1, if v.Name == "ThoseYouTrust" then 4 else 1 do
+        table.insert(gamemodes, (require)(v))
+    end
 end
 
 local module = {}
@@ -82,10 +84,18 @@ function module.TrySetForcedGamemode(gamemode: string?): boolean
     return true
 end
 
+local function pickNextGamemode(): Types.Gamemode
+    if forcedGamemode then
+        return forcedGamemode
+    end
+
+    return gamemodes[math.random(#gamemodes)]
+end
+
 local function newRound(): Types.Round
     roundCount += 1
 
-    local gamemode = if forcedGamemode then forcedGamemode else gamemodes[math.random(#gamemodes)]
+    local gamemode = pickNextGamemode()
     local round = Round.new(gamemode)
     round:LoadMap(currentMap)
 
