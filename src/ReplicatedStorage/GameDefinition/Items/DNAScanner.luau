@@ -93,6 +93,8 @@ type Participant = Types.Participant & IHasDNATraces
 
 local originalOnDeath = Participant.OnDeath
 local function patchedOnDeath(participant: Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
+	remote:FireClient(participant.Player)
+	
 	local attacker = params.Attacker
 	if not attacker then
 		return
