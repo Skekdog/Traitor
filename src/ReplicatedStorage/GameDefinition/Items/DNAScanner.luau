@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 local CreateRadarPoint = require(ReplicatedStorage.GameDefinition.Items.Common.CreateRadarPoint)
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Participant = require(ReplicatedStorage.RoundRule.Participant)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local UIAnimation = require(ReplicatedStorage.UIAnimation)
@@ -245,6 +247,9 @@ if RunService:IsClient() then
 		end
 	
 		CreateRadarPoint(cframe, Color3.fromRGB(0, 110, 255), "DNATrace")
+		PlaySound(4578451106, nil, SoundService, {
+			SoundGroup = SoundService.AllSounds :: SoundGroup,
+		})
 	end
 
 	local ui = getUI()
