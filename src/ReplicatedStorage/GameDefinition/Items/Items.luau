@@ -1073,6 +1073,7 @@ items.HealthStation = {
     CreditCost = 1,
     MaxStock = 1,
 
+    PrimaryToggled = true,
     PrimaryHint = "Deploy Health Station",
     PrimaryFireServer = throwInteractable,
 }
@@ -1091,6 +1092,7 @@ items.DeathStation = {
     CreditCost = 1,
     MaxStock = 1,
 
+    PrimaryToggled = true,
     PrimaryHint = "Deploy Death Station",
     PrimaryFireServer = throwInteractable,
 }
@@ -1107,6 +1109,7 @@ items.Decoy = {
     Description = "When placed, overrides your shown position on radars. Can be destroyed.",
     Icon = "rbxassetid://96906503847712",
 
+    AlternateToggled = true,
     AlternateHint = "Plant Decoy",
 
     AlternateFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
