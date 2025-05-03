@@ -1040,6 +1040,9 @@ items.C4 = {
     PrimaryHint = "Throw C4",
     AlternateHint = "Plant C4",
 
+    PrimaryToggled = true,
+    AlternateToggled = true,
+
     PrimaryFireServer = throwInteractable,
     AlternateFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
         local interactable, result, weld = plantInteractable(item, origin, direction, participant)
