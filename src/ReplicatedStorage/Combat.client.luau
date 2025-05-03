@@ -149,7 +149,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 	if item.Kind == "Item" and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer) then
 		ControlManager.Register("Alternate Fire", function(_, state)
-			if state ~= Enum.UserInputState.End then
+			if item.Definition.AlternateToggled and state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
 			end
 
