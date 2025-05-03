@@ -8,6 +8,8 @@ local module = {}
 local MAX_KILL_DISTANCE = 60
 local MAX_KILL_TRACE_DURATION = 120
 
+local MAX_SCAN_RANGE = 7.5
+
 local remote: RemoteEvent
 if RunService:IsServer() then
 	remote = Instance.new("RemoteEvent")
@@ -84,6 +86,52 @@ Participant.OnDeath = function(participant: Types.Participant, params: Types.Dam
 	originalOnDeath(participant, params, deferVictoryCheck)
 end
 
+local raycastParams = RaycastParams.new()
+raycastParams.CollisionGroup = "WeaponHitTargets"
+raycastParams.FilterDescendantsInstances = {workspace.Characters}
+raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+raycastParams.IgnoreWater = true
+local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+	local result = workspace:Raycast(origin, direction * MAX_SCAN_RANGE * 1.1)
+	if not result then
+		return
+	end
+
+	local round = participant.Round
+	local map = participant.Round:GetMap()
+
+	local object: IHasDNATraces?
+
+	local hitPart = result.Instance :: BasePart
+
+	if hitPart:IsDescendantOf(workspace.Corpses) then
+		local model = hitPart:FindFirstAncestorOfClass("Model")
+		if model then
+			object = round:GetParticipant(model.Name)
+		end
+	elseif hitPart:IsDescendantOf(map.Interactables) then
+		local interactable = round:GetInteractable(hitPart)
+		if interactable then
+			object = interactable
+		end
+	elseif hitPart:IsDescendantOf(map.ItemSpawns) then
+		local mapItem = round:GetItem(hitPart)
+		if mapItem then
+			object = mapItem
+		end
+	end
+
+	if not object then
+		return
+	end
+
+	remote:FireClient(participant.Player, object.Extras.DNATraces)
+end
+
+if RunService:IsClient() then
+	remote.OnClientEvent:Connect(print)
+end
+
 local item: Types.ItemDefinition = {
 	Kind = "Item" :: "Item",
 	Name = "DNAScanner",
@@ -92,10 +140,12 @@ local item: Types.ItemDefinition = {
 	Slot = 9,
 	CanDrop = true,
 
-	Model = ReplicatedStorage.WeaponModels["DNA Scanner"],
+	Model = ReplicatedStorage.WeaponModels.DNAScanner,
 	HoldAnimation = "rbxassetid://10247423634",
 
+	PrimaryToggled = true,
 	PrimaryHint = "Scan Identified Body",
+	PrimaryFireServer = PrimaryFireServer,
 }
 
 return item
