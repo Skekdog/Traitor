@@ -446,7 +446,7 @@ module.respawn = {
 			round:AddPlayer(player, false)
 		end
 
-		return "Respawned " .. getPlayersString(players)
+		return "Respawned " .. getPlayersString(players) .. "."
 	end
 }
 
