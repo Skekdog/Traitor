@@ -198,6 +198,13 @@ if RunService:IsClient() then
 		clientAvailableTraces = {}
 		clientCurrentTrace = nil
 		currentCharge = 100
+
+		local ui = getUI()
+		for _, v in ui.Object.Samples:GetChildren() do
+			if v:IsA("ImageButton") then
+				v:Destroy()
+			end
+		end
 	end
 	
 	local function tryScan(): ()
