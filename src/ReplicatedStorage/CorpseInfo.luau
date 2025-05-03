@@ -130,6 +130,7 @@ return function(corpseInfo: Types.CorpseView?)
     local equipmentText = "You find"
     if #equipment > 0 then
         for i, v in equipment do
+            v = highlightedText(v)
             if i == 1 then
                 equipmentText ..= ` {StringWithDeterminer(v)}`
             elseif i == #equipment then
