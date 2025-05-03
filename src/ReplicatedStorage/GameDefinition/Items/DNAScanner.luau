@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local CreateRadarPoint = require(ReplicatedStorage.GameDefinition.Items.Common.CreateRadarPoint)
 local Participant = require(ReplicatedStorage.RoundRule.Participant)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
@@ -203,7 +204,8 @@ if RunService:IsClient() then
 			return
 		end
 	
-		local distance = Players.LocalPlayer:DistanceFromCharacter(targetCharacter:GetPivot().Position)
+		local cframe = targetCharacter:GetPivot()
+		local distance = Players.LocalPlayer:DistanceFromCharacter(cframe.Position)
 		if distance == 0 then
 			return
 		end
@@ -211,7 +213,12 @@ if RunService:IsClient() then
 		local deplete = CHARGE_DEPLETION_PER_STUD * distance
 		currentCharge = math.max(currentCharge - deplete, 0)
 	
-		print(currentCharge, targetCharacter:GetPivot().Position)
+		local old = workspace.RadarPoints:FindFirstChild("DNATrace")
+		if old then
+			old:Destroy()
+		end
+		
+		CreateRadarPoint(cframe, Color3.fromRGB(0, 110, 255), "DNATrace")
 	end)
 end
 

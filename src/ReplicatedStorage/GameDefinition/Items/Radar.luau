@@ -1,31 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CreateRadarPoint = require(script.Parent.Common.CreateRadarPoint)
 local Decoy = require(script.Parent.Parent.Interactables.Decoy)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local GREY_COLOUR = Color3.new(0.5, 0.5, 0.5)
-
-local radarPoint = ReplicatedStorage:WaitForChild("RadarPoint")
-local function markPosition(cFrame: CFrame, grey: boolean?): ()
-    local noZRot = CFrame.Angles(cFrame.Rotation.X, cFrame.Rotation.Y, 0)
-    cFrame = CFrame.new(cFrame.Position) * noZRot
-
-    local clone = radarPoint:Clone()
-    clone:PivotTo(cFrame)
-
-    local ui = clone.RadarPoint
-    ui.TextLabel.Text = tostring(math.round(Players.LocalPlayer:DistanceFromCharacter(cFrame.Position)))
-
-    if grey then
-        ui.ImageLabel.ImageColor3 = GREY_COLOUR
-        ui.TextLabel.TextColor3 = GREY_COLOUR
-        clone.Highlight.FillColor = GREY_COLOUR
-        clone.Highlight.OutlineColor = GREY_COLOUR
-    end
-
-    ui.Enabled = true
-    clone.Parent = workspace.RadarPoints
-end
+local GREEN_COLOUR = Color3.fromRGB(154, 255, 138)
 
 local function HeartbeatClient(item: Types.AnyItem): ()
     assert(item.Kind == "Item")
@@ -47,7 +27,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
 
         local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
         local role = if roleValue then roleValue() else nil
-        markPosition(v.Object.CFrame, if role then role.Definition.IsBadGuys else false)
+        CreateRadarPoint(v.Object.CFrame, if role and role.Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR)
     end
 
     for _, v in Players:GetPlayers() do
@@ -67,7 +47,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
             continue
         end
 
-        markPosition(root.CFrame)
+        CreateRadarPoint(root.CFrame, GREEN_COLOUR)
     end
 end
 
