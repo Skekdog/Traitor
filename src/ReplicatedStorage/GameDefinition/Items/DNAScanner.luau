@@ -60,6 +60,10 @@ function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, du
 	object.Extras.DNATraces = traces
 end
 
+function module.RemoveDNATraces(object: IHasDNATraces): ()
+	object.Extras.DNATraces = nil
+end
+
 export type IHasDNATraces = {
 	Extras: {
 		DNATraces: {DNATrace}?,
