@@ -7,6 +7,7 @@ local Discombobulate = require(ReplicatedStorage.Discombobulate)
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
+local DNAScanner = require(script.Parent.DNAScanner)
 local FlareGun = require(script.Parent.FlareGun)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
@@ -950,17 +951,7 @@ melees.Crowbar = {
 local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item
 
-items["DNA Scanner"] = {
-    Kind = "Item" :: "Item",
-    Name = "DNA Scanner",
-    Slot = 9,
-    CanDrop = true,
-
-    Model = models("DNA Scanner"),
-    HoldAnimation = "rbxassetid://10247423634",
-
-    PrimaryHint = "Scan Identified Body",
-}
+items.DNAScanner = DNAScanner
 
 items.Radar = Radar
 
