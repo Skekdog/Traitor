@@ -147,7 +147,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		ControlManager.Unregister("Reload Weapon")
 	end
 
-	if item.Kind == "Item" then
+	if item.Kind == "Item" and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer) then
 		ControlManager.Register("Alternate Fire", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
@@ -179,134 +179,136 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		end)
 	end
 
-	ControlManager.Register("Primary Fire", function(_, _, input)
-		while ClientInventory.EquippedItem() == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
-			task.wait()
+	if (item.Kind == "Item" and (item.Definition.PrimaryFireClient or item.Definition.PrimaryFireServer)) or item.Kind == "Grenade" or item.Kind == "Gun" or item.Kind == "Melee" then
+		ControlManager.Register("Primary Fire", function(_, _, input)
+			while ClientInventory.EquippedItem() == item and input.UserInputState ~= Enum.UserInputState.End and input.UserInputState ~= Enum.UserInputState.Cancel do
+				task.wait()
 
-			if item.Kind == "Gun" and item.Definition.ScopeRequired and not Aim.IsAiming() then
-				playEmptyClipSound()
-				return Enum.ContextActionResult.Sink -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
-			end
+				if item.Kind == "Gun" and item.Definition.ScopeRequired and not Aim.IsAiming() then
+					playEmptyClipSound()
+					return Enum.ContextActionResult.Sink -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
+				end
 
-			if item.Kind == "Melee" or item.Kind == "Gun" then
-				if item.LastAttackTime + item.Definition.AttackInterval > tick() then
+				if item.Kind == "Melee" or item.Kind == "Gun" then
+					if item.LastAttackTime + item.Definition.AttackInterval > tick() then
+						continue
+					end
+					(item :: Types.GunWeapon).LastAttackTime = tick()
+				end
+
+				if item.Kind == "Gun" and item.IsReloading then
 					continue
 				end
-				(item :: Types.GunWeapon).LastAttackTime = tick()
-			end
 
-			if item.Kind == "Gun" and item.IsReloading then
-				continue
-			end
-
-			if item.Kind == "Gun" and item.Ammo <= 0 then
-				if not tryReloadWeapon(item) then
-					playEmptyClipSound()
+				if item.Kind == "Gun" and item.Ammo <= 0 then
+					if not tryReloadWeapon(item) then
+						playEmptyClipSound()
+					end
+					continue
 				end
-				continue
-			end
 
-			local head = char:WaitForChild("Head")
-			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
+				local head = char:WaitForChild("Head")
+				assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
-			local origin = head.Position
-			local direction = GetCentreRay().Direction
+				local origin = head.Position
+				local direction = GetCentreRay().Direction
 
-			local request: CombatTypes.PrimaryFireRequest
-			if item.Kind == "Melee" or item.Kind == "Gun" then
-				local raycasts: {CombatTypes.RaycastInfo} = {}
-				for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
-					local spread = getSpreadVector(item)
+				local request: CombatTypes.PrimaryFireRequest
+				if item.Kind == "Melee" or item.Kind == "Gun" then
+					local raycasts: {CombatTypes.RaycastInfo} = {}
+					for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
+						local spread = getSpreadVector(item)
 
-					local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
+						local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
 
-					local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
-					local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
-					local hitPartCenterPosition = if hitPart then hitPart.Position else nil
-					local normal = if raycastResult then raycastResult.Normal else nil
+						local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
+						local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
+						local hitPartCenterPosition = if hitPart then hitPart.Position else nil
+						local normal = if raycastResult then raycastResult.Normal else nil
 
-					if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) and not hitPart:IsDescendantOf(workspace.Corpses) then
-						local material = hitPart:GetAttribute("MaterialOverride") or hitPart.Material.Name
-						PlaySound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
+						if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) and not hitPart:IsDescendantOf(workspace.Corpses) then
+							local material = hitPart:GetAttribute("MaterialOverride") or hitPart.Material.Name
+							PlaySound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
+						end
+
+						table.insert(raycasts, {
+							Destination = targetPosition,
+							HitPart = hitPart,
+							HitPartCenterPosition = hitPartCenterPosition,
+							Normal = normal,
+						})
 					end
 
-					table.insert(raycasts, {
-						Destination = targetPosition,
-						HitPart = hitPart,
-						HitPartCenterPosition = hitPartCenterPosition,
-						Normal = normal,
-					})
-				end
+					if item.Kind == "Gun" and item.Definition.BeforePrimaryFireClient then
+						local parts: {BasePart} = {}
+						for _, v in raycasts do
+							if v.HitPart then
+								table.insert(parts, v.HitPart)
+							end
+						end
 
-				if item.Kind == "Gun" and item.Definition.BeforePrimaryFireClient then
-					local parts: {BasePart} = {}
-					for _, v in raycasts do
-						if v.HitPart then
-							table.insert(parts, v.HitPart)
+						if not item.Definition.BeforePrimaryFireClient(item, parts) then
+							continue
 						end
 					end
 
-					if not item.Definition.BeforePrimaryFireClient(item, parts) then
-						continue
+					local raycastRequest: CombatTypes.PrimaryFireRaycastRequest = {
+						Kind = "PrimaryFireRaycastRequest" :: "PrimaryFireRaycastRequest",
+						ItemName = item.Definition.Name,
+						Raycasts = raycasts,
+						Origin = origin,
+					}
+					request = raycastRequest
+				elseif item.Kind == "Grenade" then
+					local throwRequest: CombatTypes.PrimaryFireThrowRequest = {
+						Kind = "PrimaryFireThrowRequest" :: "PrimaryFireThrowRequest",
+						ItemName = item.Definition.Name,
+						Origin = origin,
+						Direction = direction,
+					}
+					request = throwRequest
+				elseif item.Kind == "Item" then
+					local itemRequest: CombatTypes.PrimaryFireItemRequest = {
+						Kind = "PrimaryFireItemRequest" :: "PrimaryFireItemRequest",
+						ItemName = item.Definition.Name,
+						Origin = origin,
+						Direction = direction,
+					}
+					request = itemRequest
+
+					if item.Definition.PrimaryFireClient then
+						item.Definition.PrimaryFireClient(item, "Primary", origin, direction)
 					end
+				else
+					error("Unknown item kind: " .. item.Kind)
 				end
 
-				local raycastRequest: CombatTypes.PrimaryFireRaycastRequest = {
-					Kind = "PrimaryFireRaycastRequest" :: "PrimaryFireRaycastRequest",
-					ItemName = item.Definition.Name,
-					Raycasts = raycasts,
-					Origin = origin,
-				}
-				request = raycastRequest
-			elseif item.Kind == "Grenade" then
-				local throwRequest: CombatTypes.PrimaryFireThrowRequest = {
-					Kind = "PrimaryFireThrowRequest" :: "PrimaryFireThrowRequest",
-					ItemName = item.Definition.Name,
-					Origin = origin,
-					Direction = direction,
-				}
-				request = throwRequest
-			elseif item.Kind == "Item" then
-				local itemRequest: CombatTypes.PrimaryFireItemRequest = {
-					Kind = "PrimaryFireItemRequest" :: "PrimaryFireItemRequest",
-					ItemName = item.Definition.Name,
-					Origin = origin,
-					Direction = direction,
-				}
-				request = itemRequest
-
-				if item.Definition.PrimaryFireClient then
-					item.Definition.PrimaryFireClient(item, "Primary", origin, direction)
+				if item.Kind == "Gun" then
+					item.Ammo -= 1
+					RoundInfoUI.UpdateAmmo(item)
 				end
-			else
-				error("Unknown item kind: " .. item.Kind)
+
+				if item.Kind == "Melee" then
+					local id = assert(tonumber((item.Definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(item.Definition.HoldAnimation))
+					LocalAnimation.TryPlayAnimation(id, "MeleeAttack")
+				end
+
+				if item.Kind == "Gun" and item.Definition.HasMuzzleFlash then
+					ViewmodelModule.MuzzleFlash()
+				end
+				ViewmodelModule.Recoil(item.Definition)
+
+				local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
+				if result ~= "Success" and result ~= "PreGame" then
+					warn("Hit rejected:", result)
+				end
+
+				if item.Kind == "Gun" and item.Ammo == 0 then
+					tryReloadWeapon(item)
+				end
 			end
 
-			if item.Kind == "Gun" then
-				item.Ammo -= 1
-				RoundInfoUI.UpdateAmmo(item)
-			end
-
-			if item.Kind == "Melee" then
-				local id = assert(tonumber((item.Definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(item.Definition.HoldAnimation))
-				LocalAnimation.TryPlayAnimation(id, "MeleeAttack")
-			end
-
-			if item.Kind == "Gun" and item.Definition.HasMuzzleFlash then
-				ViewmodelModule.MuzzleFlash()
-			end
-			ViewmodelModule.Recoil(item.Definition)
-
-			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
-			if result ~= "Success" and result ~= "PreGame" then
-				warn("Hit rejected:", result)
-			end
-
-			if item.Kind == "Gun" and item.Ammo == 0 then
-				tryReloadWeapon(item)
-			end
-		end
-
-		return Enum.ContextActionResult.Sink
-	end)
+			return Enum.ContextActionResult.Sink
+		end)
+	end
 end)
