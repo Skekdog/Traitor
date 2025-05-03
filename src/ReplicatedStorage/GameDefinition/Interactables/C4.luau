@@ -355,6 +355,7 @@ end
 
 if RunService:IsServer() then
 	local ServerScriptService = game:GetService("ServerScriptService")
+local DNAScanner = require(ReplicatedStorage.GameDefinition.Items.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.RoundRule.ExplosionParams)
 	local Combat = require(ServerScriptService.Combat)
 
@@ -439,6 +440,8 @@ if RunService:IsServer() then
 			Icon = "rbxassetid://17229908151",
 			Description = `You find a note on their corpse saying that {highlightText("wire " .. safeWire)} will defuse a C4.`,
 		})
+
+		DNAScanner.AddDNATrace(c4, participant, nil, "rbxassetid://17229908151")
 
 		c4.Object:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
 		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)

@@ -951,7 +951,7 @@ melees.Crowbar = {
 local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item
 
-items.DNAScanner = DNAScanner
+items.DNAScanner = DNAScanner.Item
 
 items.Radar = Radar
 

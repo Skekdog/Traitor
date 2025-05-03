@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local CreateRadarPoint = require(ReplicatedStorage.GameDefinition.Items.Common.CreateRadarPoint)
 local Participant = require(ReplicatedStorage.RoundRule.Participant)
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local UIAnimation = require(ReplicatedStorage.UIAnimation)
 
 local module = {}
 
@@ -19,6 +20,7 @@ local currentCharge = 100
 
 local clientAvailableTraces: {SampledTrace} = {}
 local clientCurrentTrace: SampledTrace?
+local clientAutoScan = true
 
 local remote: RemoteEvent
 if RunService:IsServer() then
@@ -31,7 +33,7 @@ else
 	remote = found
 end
 
-local function hasEquivalentTrace(t: {DNATrace}, trace: DNATrace): boolean
+local function hasEquivalentTrace(t: {IHasTarget}, trace: IHasTarget): boolean
 	for _, existingTrace in t do
 		if existingTrace.Target == trace.Target then
 			return true
@@ -65,14 +67,16 @@ export type IHasDNATraces = {
 	},
 }
 
-type SampledTrace = {
-	Target: string,
+type IHasTarget = {
+	Target: string
+}
+
+type SampledTrace = IHasTarget & {
 	Icon: string,
 }
 
-type DNATrace = {
+type DNATrace = IHasTarget & {
 	ExpiresAt: number?,
-	Target: string,
 	Icon: string,
 }
 
@@ -106,7 +110,9 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
-	module.AddDNATrace(participant, attacker, duration, "")
+	module.AddDNATrace(participant, attacker, duration, "rbxassetid://17229908151")
+
+	module.AddDNATrace(participant, participant, duration, "rbxassetid://17229908151")
 
 	participant:AddCorpseIcon({
 		Name = "DNATrace",
@@ -171,30 +177,20 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 	remote:FireClient(participant.Player, samples)
 end
 
-local function resetClient(): ()
-	clientAvailableTraces = {}
-	clientCurrentTrace = nil
-	currentCharge = 100
+local function getUI()
+	local UIManager = require(script.Parent.Parent.Parent.UIManager)
+	local ui = UIManager.WaitForUI("DNAScanner") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.DNAScanner)}
+	return ui
 end
 
 if RunService:IsClient() then
-	remote.OnClientEvent:Connect(function(traces: {SampledTrace}?)
-		if not traces then
-			return resetClient()
-		end
-
-		for _, trace in traces do
-			table.insert(clientAvailableTraces, trace)
-		end
-
-		if not clientCurrentTrace then
-			clientCurrentTrace = traces[1]
-		end
-	end)
-
-	RunService.Heartbeat:Connect(function(dt)
-		currentCharge = math.min(currentCharge + RECHARGE_RATE * dt, 100)
+	local function resetClient(): ()
+		clientAvailableTraces = {}
+		clientCurrentTrace = nil
+		currentCharge = 100
+	end
 	
+	local function tryScan(): ()
 		if not clientCurrentTrace or currentCharge < 100 then
 			return
 		end
@@ -217,9 +213,78 @@ if RunService:IsClient() then
 		if old then
 			old:Destroy()
 		end
-		
+	
 		CreateRadarPoint(cframe, Color3.fromRGB(0, 110, 255), "DNATrace")
+	end
+
+	local ui = getUI()
+
+	remote.OnClientEvent:Connect(function(traces: {SampledTrace}?)
+		if not traces then
+			return resetClient()
+		end
+
+		for i, trace in traces do
+			if hasEquivalentTrace(clientAvailableTraces, trace) then
+				continue
+			end
+			table.insert(clientAvailableTraces, trace)
+			
+			local newTrace = ui.Object.DefaultSample:Clone()
+			newTrace.Image = trace.Icon
+			newTrace.Visible = true
+			newTrace.UIStroke.Enabled = false
+			newTrace.Name = tostring(trace)
+			newTrace.Activated:Connect(function()
+				if clientCurrentTrace == trace then
+					return
+				end
+				clientCurrentTrace = trace
+
+				for _, v in ui.Object.Samples:GetChildren() do
+					if v:IsA("ImageButton") then
+						local uiStroke = v:FindFirstChildOfClass("UIStroke") or error("no ui stroke")
+						uiStroke.Enabled = v == newTrace
+					end
+				end
+			end)
+			newTrace.Parent = ui.Object.Samples :: any
+		end
+
+		if not clientCurrentTrace then
+			clientCurrentTrace = traces[1]
+			local button = ui.Object.Samples:FindFirstChild(tostring(clientCurrentTrace)) or error("no button");
+			(button:FindFirstChildOfClass("UIStroke") or error("no ui stroke")).Enabled = true
+		end
 	end)
+
+	RunService.Heartbeat:Connect(function(dt)
+		currentCharge = math.min(currentCharge + RECHARGE_RATE * dt, 100)
+
+		if clientAutoScan then
+			tryScan()
+		end
+
+		UIAnimation.Slider(ui.Object.DNAChargeBar.Background, nil, currentCharge, 100)
+		ui.Object.DNAChargeBar.ChargeLabel.Text = string.format("%.1f%%", currentCharge)
+	end)
+
+	ui.Object.ScanButton.Activated:Connect(tryScan)
+
+	ui.Object.AutoScanButton.Activated:Connect(function()
+		clientAutoScan = not clientAutoScan
+		UIAnimation.TransitionSwitch(ui.Object.AutoScanButton.Value, clientAutoScan)
+	end)
+end
+
+local function OnEquipClient(): ()
+	local ui = getUI()
+	ui:ToggleVisible(true)
+end
+
+local function OnUnequipClient(): ()
+	local ui = getUI()
+	ui:ToggleVisible(false)
 end
 
 local item: Types.ItemDefinition = {
@@ -236,6 +301,11 @@ local item: Types.ItemDefinition = {
 	PrimaryToggled = true,
 	PrimaryHint = "Scan Identified Body",
 	PrimaryFireServer = PrimaryFireServer,
+
+	OnEquipClient = OnEquipClient,
+	OnUnequipClient = OnUnequipClient,
 }
 
-return item
+module.Item = item
+
+return module
