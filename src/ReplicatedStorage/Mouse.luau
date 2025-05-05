@@ -129,6 +129,10 @@ function module.ShowInteractableHint(interactablePart: BasePart): ()
 		return
 	end
 
+	if interactable.Definition.NoActionHint then
+		return
+	end
+
 	local definition = interactable.Definition
 	if not definition or plr:DistanceFromCharacter(interactablePart.Position) > definition.InteractionRange then
 		return
