@@ -242,6 +242,17 @@ module.freecam = {
 	end
 }
 
+module.thirdperson = {
+	Name = "thirdperson",
+	Description = "Toggles thirdperson on/off",
+	Environment = "Client" :: "Client",
+	Arguments = {},
+	Execute = function(player: Player, args: Args)
+		player.CameraMode = if player.CameraMode == Enum.CameraMode.Classic then Enum.CameraMode.LockFirstPerson else Enum.CameraMode.Classic
+		return `Third person {if player.CameraMode == Enum.CameraMode.Classic then "enabled" else "disabled"}.`
+	end
+}
+
 module.teleportplace = {
 	Name = "teleportplace",
 	Description = "Teleports specified players to the specified place. Available named places: Imperium, MainPlace, TestPlace",
