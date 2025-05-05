@@ -7,6 +7,7 @@ local Discombobulate = require(ReplicatedStorage.Discombobulate)
 local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
+local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
 local FlareGun = require(script.Parent.FlareGun)
 local MagnetoStick = require(script.Parent.MagnetoStick)
@@ -930,24 +931,8 @@ grenades["Discombobulator"] = {
 }
 
 local melees: {[string]: Types.MeleeWeaponDefinition} = {}
-melees.Crowbar = {
-    Kind = "Melee" :: "Melee",
-    Name = "Crowbar",
-    
-    Slot = 1,
-    CanDrop = false,
 
-    DamageKind = "Bludgeon" :: "Bludgeon",
-
-    Model = models("Crowbar"),
-    HoldAnimation = "rbxassetid://10247423634",
-    AttackAnimation = "rbxassetid://13269497293",
-
-    MaxDistance = 7,
-    Damage = 20,
-    AttackInterval = 0.3,
-    AttackSound = firedSounds("Crowbar"),
-}
+melees.Crowbar = Crowbar.Item
 
 local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item
