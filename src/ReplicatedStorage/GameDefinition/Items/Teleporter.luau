@@ -33,6 +33,7 @@ type Teleporter = Types.Item & {
 	Extras: {
 		TimesUsed: number?,
 		Target: Vector3?,
+		InUse: boolean?,
 		[any]: never,
 	}
 }
@@ -78,7 +79,7 @@ end
 local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, participant: Types.Participant): ()
 	local teleporter = item :: Teleporter
 
-	if not teleporter.Extras.Target or ((teleporter.Extras.TimesUsed or 0) >= MAX_USES) then
+	if teleporter.Extras.InUse or not teleporter.Extras.Target or ((teleporter.Extras.TimesUsed or 0) >= MAX_USES) then
 		return
 	end
 
@@ -93,6 +94,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 	end
 
 	root.Anchored = true
+	teleporter.Extras.InUse = true
 	teleporter.Extras.TimesUsed = (teleporter.Extras.TimesUsed or 0) + 1
 
 	makeFXServer(participant.Player, teleporter.Extras.Target)
@@ -101,6 +103,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 
 	char:PivotTo(CFrame.new(teleporter.Extras.Target) * char:GetPivot().Rotation)
 	root.Anchored = false
+	teleporter.Extras.InUse = false
 end
 
 local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vector3, _, participant: Types.Participant): ()
