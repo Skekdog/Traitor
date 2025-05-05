@@ -244,6 +244,24 @@ ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(playe
     return participant:PurchaseItem(item)
 end
 
+ReplicatedStorage.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(function(player: Player, against: unknown): ()
+    if typeof(against) ~= "string" then
+        return
+    end
+
+    local participant = round:GetParticipant(player.Name)
+    if not participant then
+        return
+    end
+
+    local againstParticipant = round:GetParticipant(against)
+    if not againstParticipant then
+        return
+    end
+
+    againstParticipant:TryAddSlayVote(participant)
+end)
+
 ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distance: unknown): ()
     if typeof(distance) ~= "number" then
         return
@@ -306,7 +324,7 @@ ReplicatedStorage.ClientServer.Exec.OnServerInvoke = function(plr, command: unkn
     if typeof(command) ~= "string" then
         return "Invalid Command"
     end
-    
+
     return Exec.ServerExecute(plr, round, command)
 end
 
