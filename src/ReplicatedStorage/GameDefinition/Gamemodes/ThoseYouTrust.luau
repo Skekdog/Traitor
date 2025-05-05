@@ -150,7 +150,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		CorpseSearchResultsPublicised = true,
 
 		Accessories = {},
-		DamageKarmaMultiplier = 1,
+		DamageKarmaMultiplier = 1.5,
 
 		Allies = {"Innocent", "Detective"},
 		RevealedRoles = {"Detective"},
