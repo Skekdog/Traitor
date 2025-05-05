@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ProfileManager = require(script.Parent.ProfileManager)
 
@@ -13,10 +12,6 @@ ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, 
 	end
 
     ProfileManager.UpdateProfile(plr, "Settings", options)
-end)
-
-Players.PlayerRemoving:Connect(function(plr)
-	ProfileManager.ReleaseProfile(plr)
 end)
 
 return nil

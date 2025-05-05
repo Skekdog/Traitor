@@ -2,7 +2,9 @@ local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local KarmaManager = require(script.Parent.KarmaManager)
 local ProfileManager = require(script.Parent.ProfileManager)
+local RoundHandler = require(script.Parent.RoundHandler)
 
 local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
 	ReplicatedStorage.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
@@ -46,5 +48,18 @@ local function setupPlayer(plr: Player): ()
 end
 
 Players.PlayerAdded:Connect(setupPlayer)
+
+Players.PlayerRemoving:Connect(function(plr)
+	local round = RoundHandler.GetRound()
+    local participant = round:GetParticipant(plr.Name)
+    if not participant then
+        return
+    end
+
+    KarmaManager.SetKarma(plr, participant:GetKarma())
+    round:RemoveParticipant(participant, false)
+
+    ProfileManager.ReleaseProfile(plr)
+end)
 
 return nil
