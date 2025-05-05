@@ -140,6 +140,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Flashbang"],
 			Items["UMP"],
 			Items["HealthStation"],
+			Items["Teleporter"],
 		},
 
 		AwardCreditsToRolesOnDeath = {
