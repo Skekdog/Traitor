@@ -51,7 +51,7 @@ function module.ShowPlayerInfo(char: Model)
 	playerInfo.Health.Text = healthText
 	playerInfo.Health.TextColor3 = Color3.new(1, 0, 0):Lerp(Color3.new(1, 1, 1), healthPercent/100)
 
-	local karma = 1000
+	local karma = plr:GetAttribute("Karma") :: number? or 1000
 	local karmaText = ""
 	if karma > 900 then
 		karmaText = "Reputable"

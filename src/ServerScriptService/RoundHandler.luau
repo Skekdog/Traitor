@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
-local ProfileManager = require(script.Parent.ProfileManager)
+local KarmaManager = require(script.Parent.KarmaManager)
 local Exec = require(ReplicatedStorage.DevTools.Exec)
 local Map = require(ReplicatedStorage.RoundRule.Map)
 local Round = require(ReplicatedStorage.RoundRule.Round)
@@ -185,9 +185,7 @@ task.spawn(function()
 end)
 
 local function onPlayerAdded(player: Player)
-    local profile = ProfileManager.GetProfile(player)
-    local karma = if profile then profile.Karma else 1000
-    round:AddPlayer(player, true, karma)
+    round:AddPlayer(player, true, KarmaManager.GetKarma(player))
 end
 
 for _, v in Players:GetPlayers() do
@@ -206,9 +204,7 @@ ReplicatedStorage.ClientServer.JoinRound.OnServerInvoke = function(player: Playe
         return false
     end
 
-    local profile = ProfileManager.GetProfile(player)
-    local karma = if profile then profile.Karma else 1000
-    round:AddPlayer(player, false, karma)
+    round:AddPlayer(player, false, KarmaManager.GetKarma(player))
 
     return true
 end

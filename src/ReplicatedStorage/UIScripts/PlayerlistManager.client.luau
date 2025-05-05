@@ -18,8 +18,6 @@ local layoutOrders = {
 	["Spectating"] = 3000,
 }
 
-local clientServer = ReplicatedStorage:WaitForChild("ClientServer")
-
 type PlayerElement = typeof(ui.PlayerFrame)
 local players: {[string]: PlayerElement?} = {}
 local function findPlr(plrName: string)
@@ -66,7 +64,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 
 	selectMark(clone.Marks, nil, plr)
 
-	clone.Karma.Text = tostring(clientServer.GetKarma:InvokeServer(plr))
+	clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
 	clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
 
@@ -92,7 +90,7 @@ local function createPlr(plr: Player)
 	clone.Username.Text = "@"..plr.Name
 	clone.Username.TextColor3 = Color3.new()
 
-	clone.Karma.Text = tostring(clientServer.GetKarma:InvokeServer(plr))
+	clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
 	clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
 
@@ -120,6 +118,10 @@ local function createPlr(plr: Player)
 		if order == layoutOrders["Dead"] or order == layoutOrders["Missing"] then
 			ViewCorpse(plr)
 		end
+	end)
+
+	plr:GetAttributeChangedSignal("Karma"):Connect(function()
+		clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
 	end)
 
 	updatePlr(plr, clone)

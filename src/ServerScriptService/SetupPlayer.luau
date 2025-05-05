@@ -22,6 +22,7 @@ end
 local function loadAttributes(plr: Player): ()
 	plr:SetAttribute("Score", 0)
 	plr:SetAttribute("TotalScore", 0)
+	plr:SetAttribute("Karma", 1000)
 end
 
 local function loadProfile(plr: Player): ()
@@ -29,6 +30,7 @@ local function loadProfile(plr: Player): ()
 	if profile then
         sendSavedSettings(plr, profile)
 		plr:SetAttribute("TotalScore", profile.Data.TotalPoints)
+		plr:SetAttribute("Karma", profile.Data.Karma)
     end
 end
 
