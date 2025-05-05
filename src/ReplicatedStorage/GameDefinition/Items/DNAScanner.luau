@@ -10,6 +10,8 @@ local UIAnimation = require(ReplicatedStorage.UIAnimation)
 
 local module = {}
 
+local ITEM_SLOT = 9
+
 local MAX_KILL_DISTANCE = 60
 local MAX_KILL_TRACE_DURATION = 120
 
@@ -213,6 +215,8 @@ local function getUI()
 end
 
 if RunService:IsClient() then
+	local ClientInventory = require(ReplicatedStorage.ClientInventory)
+	
 	local function resetClient(): ()
 		clientAvailableTraces = {}
 		clientCurrentTrace = nil
@@ -227,6 +231,11 @@ if RunService:IsClient() then
 	end
 	
 	local function tryScan(): ()
+		local item = ClientInventory.Inventory.Slots[ITEM_SLOT]
+		if not item or item.Definition.Name ~= "DNAScanner" then
+			return
+		end
+
 		if not clientCurrentTrace or currentCharge < 100 then
 			return
 		end

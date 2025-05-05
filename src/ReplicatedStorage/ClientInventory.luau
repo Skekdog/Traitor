@@ -24,6 +24,7 @@ type ItemButton = typeof(sampleButton)
 local ourInventory: {Passive: {Types.AnyItem}, Slots: {[number]: Types.AnyItem}, [number]: never} = {Passive = {}, Slots = {}}
 local ourAmmo: DynamicValue.DynamicValue<{[string]: number?}> = DynamicValue.new({})
 
+module.Inventory = ourInventory
 module.EquippedItem = DynamicValue.new(nil :: Types.AnyItem?)
 module.Ammo = ourAmmo
 
