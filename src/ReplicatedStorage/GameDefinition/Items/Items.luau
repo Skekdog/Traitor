@@ -13,6 +13,7 @@ local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Poltergeist = require(script.Parent.Poltergeist)
 local Radar = require(script.Parent.Radar)
+local Teleporter = require(script.Parent.Teleporter)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local function models(name: string): BasePart
@@ -952,6 +953,8 @@ local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item
 
 items.DNAScanner = DNAScanner.Item
+
+items.Teleporter = Teleporter
 
 items.Radar = Radar
 
