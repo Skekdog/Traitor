@@ -40,7 +40,7 @@ local function Connect<T>(self: DynamicValue<T>, callback: Callback<T>, runImmed
 	self._connections[key] = callback
 
 	if runImmediately then
-		runCallback(callback, self._value)
+		task.defer(runCallback, callback, self._value)
 	end
 
 	return {
