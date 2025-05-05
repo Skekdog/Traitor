@@ -119,6 +119,17 @@ local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vec
 		return
 	end
 
+	local map = participant.Round:GetMap()
+
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles, map.DynamicMap, map.ItemSpawns, map.AmmoSpawns, map.Windows, map.PlayerSpawns, map.Bounds, map.Props}
+	params.FilterType = Enum.RaycastFilterType.Exclude
+
+	local result = workspace:Raycast(origin, Vector3.new(0, 6, 0), params)
+	if not result then
+		return
+	end
+
 	teleporter.Extras.Target = origin
 end
 
