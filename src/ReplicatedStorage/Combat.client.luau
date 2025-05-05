@@ -147,7 +147,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		ControlManager.Unregister("Reload Weapon")
 	end
 
-	if item.Kind == "Item" and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer) then
+	if (item.Kind == "Item" and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer)) or (item.Kind == "Melee" and item.Definition.AlternateFireServer) then
 		ControlManager.Register("Alternate Fire", function(_, state)
 			if item.Definition.AlternateToggled and state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
@@ -167,7 +167,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 			}
 
 			if item.Definition.AlternateFireClient then
-				item.Definition.AlternateFireClient(item, "Alternate", origin, direction)
+				(item.Definition.AlternateFireClient :: Types.FireActionClient)(item :: Types.Item, "Alternate", origin, direction)
 			end
 
 			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.AlternateFire:InvokeServer(itemRequest)

@@ -107,7 +107,9 @@ end
 local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, requestKind: string): CombatTypes.ValidateItemUsageResult
 	if (item.Kind == "Grenade") and (requestKind :: string ~= "PrimaryFireThrowRequest") then
 		return "OtherError"
-	elseif (item.Kind == "Gun" or item.Kind == "Melee") and (requestKind :: string ~= "PrimaryFireRaycastRequest") then
+	elseif (item.Kind == "Gun") and (requestKind :: string ~= "PrimaryFireRaycastRequest") then
+		return "OtherError"
+	elseif (item.Kind == "Melee") and (requestKind :: string ~= "PrimaryFireRaycastRequest" and requestKind :: string ~= "AlternateFireItemRequest") then
 		return "OtherError"
 	end
 	
@@ -381,7 +383,7 @@ function module.AlternateFire(by: Types.Participant, request: CombatTypes.Altern
 		return validateItemUsageResult :: CombatTypes.ValidateItemUsageResult
 	end
 
-	if item.Kind ~= "Item" then
+	if item.Kind ~= "Item" and item.Kind ~= "Melee" then
 		return "OtherError"
 	end
 
@@ -390,7 +392,7 @@ function module.AlternateFire(by: Types.Participant, request: CombatTypes.Altern
 		return "OtherError"
 	end
 
-	func(item, "Alternate", request.Origin, request.Direction, by)
+	func(item :: Types.Item, "Alternate", request.Origin, request.Direction, by)
 
 	return "Success"
 end
