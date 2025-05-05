@@ -99,7 +99,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 
 	task.wait(FX_DURATION)
 
-	char:PivotTo(CFrame.new(teleporter.Extras.Target))
+	char:PivotTo(CFrame.new(teleporter.Extras.Target) * char:GetPivot().Rotation)
 	root.Anchored = false
 end
 
