@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -21,11 +22,11 @@ teleportFX.Material = Enum.Material.Neon
 local remote: RemoteEvent
 if RunService:IsServer() then
 	remote = Instance.new("RemoteEvent")
-	remote.Name = "C4Interact"
+	remote.Name = "TeleporterFX"
 	remote.Parent = script
 else
-	local found = script:WaitForChild("C4Interact")
-	assert(found:IsA("RemoteEvent"), "C4Interact must be a RemoteEvent")
+	local found = script:WaitForChild("TeleporterFX")
+	assert(found:IsA("RemoteEvent"), "TeleporterFX must be a RemoteEvent")
 	remote = found
 end
 
@@ -37,12 +38,13 @@ type Teleporter = Types.Item & {
 	}
 }
 
-local function makeFXServer(origin: Vector3, destination: Vector3): ()
-	remote:FireAllClients(origin, destination)
+local function makeFXServer(player: string, origin: Vector3, destination: Vector3): ()
+	remote:FireAllClients(player, origin, destination)
 end
 
 if RunService:IsClient() then
-	local function makeFX(at: Vector3, mode: "MoveUp" | "MoveDown"): ()
+	local WalkSpeed = require(ReplicatedStorage.WalkSpeed)
+	local function makeFX(at: Vector3, mode: "MoveUp" | "MoveDown", onComplete: () -> ()?): ()
 		local moveVector = Vector3.new(0, if mode == "MoveUp" then -FX_HEIGHT else FX_HEIGHT, 0)
 
 		local fx = teleportFX:Clone()
@@ -55,14 +57,21 @@ if RunService:IsClient() then
 	
 		tween.Completed:Once(function()
 			fx:Destroy()
+			if onComplete then
+				onComplete()
+			end
 		end)
 	
 		tween:Play()
 	end
 
-	remote.OnClientEvent:Connect(function(origin: Vector3, destination: Vector3)
+	local function unFreezeMovement(): ()
+		WalkSpeed.SetModifier("Teleporting", 0)
+	end
+
+	remote.OnClientEvent:Connect(function(player: string, origin: Vector3, destination: Vector3)
 		makeFX(origin, "MoveUp")
-		makeFX(destination, "MoveDown")
+		makeFX(destination, "MoveDown", if player == Players.LocalPlayer.Name then unFreezeMovement else nil)
 	end)
 end
 
@@ -78,22 +87,13 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 		return
 	end
 
-	local root = char.PrimaryPart
-	if not root then
-		return
-	end
-
-	root.Anchored = true
-
 	teleporter.Extras.TimesUsed = (teleporter.Extras.TimesUsed or 0) + 1
 
-	makeFXServer(root.Position, teleporter.Extras.Target)
+	makeFXServer(participant.Player.Name, char:GetPivot().Position, teleporter.Extras.Target)
 
 	task.wait(FX_DURATION)
 
 	char:PivotTo(CFrame.new(teleporter.Extras.Target))
-
-	root.Anchored = false
 end
 
 local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vector3, _, participant: Types.Participant): ()
@@ -105,6 +105,11 @@ local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vec
 	end
 
 	teleporter.Extras.Target = origin
+end
+
+local function PrimaryFireClient(): ()
+	local WalkSpeed = require(ReplicatedStorage.WalkSpeed)
+	WalkSpeed.SetModifier("Teleporting", -math.huge)
 end
 
 local item: Types.ItemDefinition = {
@@ -130,6 +135,8 @@ local item: Types.ItemDefinition = {
 	AlternateToggled = true,
 	AlternateHint = "Mark Location",
 	AlternateFireServer = AlternateFireServer,
+
+	PrimaryFireClient = PrimaryFireClient,
 }
 
 return item
