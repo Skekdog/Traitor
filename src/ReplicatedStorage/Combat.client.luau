@@ -147,10 +147,19 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		ControlManager.Unregister("Reload Weapon")
 	end
 
-	if (item.Kind == "Item" and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer)) or (item.Kind == "Melee" and item.Definition.AlternateFireServer) then
+	if (item.Kind == "Item" or item.Kind == "Melee") and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer) then
 		ControlManager.Register("Alternate Fire", function(_, state)
 			if item.Definition.AlternateToggled and state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
+			end
+
+			if item.Kind == "Melee" then
+				if item.LastAttackTime + item.Definition.AttackInterval > tick() then
+					return Enum.ContextActionResult.Pass
+				end
+				item.LastAttackTime = tick()
+
+				ViewmodelModule.Recoil(item.Definition)
 			end
 
 			local head = char:WaitForChild("Head")
