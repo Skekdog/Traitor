@@ -443,7 +443,7 @@ module.respawn = {
 			end
 
 			round:RemoveParticipant(participant, true)
-			round:AddPlayer(player, false)
+			round:AddPlayer(player, false, participant:GetKarma())
 		end
 
 		return "Respawned " .. getPlayersString(players) .. "."
