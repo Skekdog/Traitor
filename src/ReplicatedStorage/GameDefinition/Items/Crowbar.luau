@@ -6,6 +6,7 @@ local module = {}
 
 local MAX_DISTANCE = 7
 local PUSH_FORCE = 65
+local RESPONSIBLE_DURATION = 5
 
 local function raycast(head: BasePart, direction: Vector3): RaycastResult?
 	local params = RaycastParams.new()
@@ -63,11 +64,13 @@ local item: Types.MeleeWeaponDefinition = {
 			return
 		end
 
-		hitParticipant:TryTakeDamage({
-			Attacker = attacker,
-			Amount = 0,
-			Source = "Fall",
-		})
+		hitParticipant:SetLastDamaged(attacker, RESPONSIBLE_DURATION)
+		if not attacker:HasSelfDefenseAgainstParticipant(hitParticipant) then
+			hitParticipant:AddSelfDefenseEntry({
+				Against = attacker,
+				Duration = RESPONSIBLE_DURATION,
+			})
+		end
 
 		NewtonLauncher.Fling(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass)
     end,
