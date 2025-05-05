@@ -542,6 +542,8 @@ local item: Types.ItemDefinition = {
     Model = models("Magneto Stick"),
     HoldAnimation = "rbxassetid://10247423634",
 
+	AlternateToggled = true,
+
     PrimaryFireClient = primaryFireClient,
     AlternateFireClient = alternateFireClient,
 
