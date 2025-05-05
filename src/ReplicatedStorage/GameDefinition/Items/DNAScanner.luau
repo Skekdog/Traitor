@@ -172,6 +172,10 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 	if hitPart:IsDescendantOf(workspace.Corpses) then
 		local model = hitPart:FindFirstAncestorOfClass("Model")
 		if model then
+			if model:GetAttribute("Unidentified") then
+				return
+			end
+			
 			object = round:GetParticipant(model.Name)
 		end
 	elseif hitPart:IsDescendantOf(map.Interactables) then
