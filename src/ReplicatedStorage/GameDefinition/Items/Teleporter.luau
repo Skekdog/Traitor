@@ -88,6 +88,11 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 		return
 	end
 
+	local hum = participant:GetHumanoid()
+	if not hum or not hum.FloorMaterial or hum.FloorMaterial == Enum.Material.Air then
+		return
+	end
+
 	local root = char.PrimaryPart
 	if not root then
 		return
