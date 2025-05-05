@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
+local ShowAlert = require(ReplicatedStorage.ShowAlert)
 
 local MAX_USES = 6
 local FX_DURATION = 1
@@ -90,7 +91,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 
 	local hum = participant:GetHumanoid()
 	if not hum or not hum.FloorMaterial or hum.FloorMaterial == Enum.Material.Air then
-		return
+		return ShowAlert("Can't teleport right now!", participant.Player)
 	end
 
 	local root = char.PrimaryPart
@@ -127,7 +128,7 @@ local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vec
 
 	local result = workspace:Raycast(origin, Vector3.new(0, 6, 0), params)
 	if not result then
-		return
+		return ShowAlert("Failed to mark location.", participant.Player)
 	end
 
 	teleporter.Extras.Target = origin
