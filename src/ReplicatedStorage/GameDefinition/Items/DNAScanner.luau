@@ -344,7 +344,7 @@ local item: Types.ItemDefinition = {
 	CanDrop = true,
 
 	Model = ReplicatedStorage.WeaponModels.DNAScanner,
-	HoldAnimation = "rbxassetid://10247423634",
+	HoldAnimation = "rbxassetid://134193046304179",
 
 	PrimaryToggled = true,
 	PrimaryHint = "Scan Identified Body",
