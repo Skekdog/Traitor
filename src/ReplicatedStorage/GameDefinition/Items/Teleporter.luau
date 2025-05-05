@@ -7,8 +7,11 @@ local Types = require(ReplicatedStorage.RoundRule.Types)
 local ShowAlert = require(ReplicatedStorage.ShowAlert)
 
 local MAX_USES = 6
+
 local FX_DURATION = 1
 local FX_HEIGHT = 2
+
+local GROUNDED_RAY_DISTANCE = 4
 
 local teleportFX = Instance.new("Part")
 teleportFX.Anchored = true
@@ -85,6 +88,23 @@ if RunService:IsClient() then
 	end)
 end
 
+local function isGrounded(participant: Types.Participant): boolean
+	local char = participant:GetCharacter()
+	if not char then
+		return false
+	end
+
+	local origin = char:GetPivot().Position
+	local map = participant.Round:GetMap()
+
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles, map.DynamicMap, map.ItemSpawns, map.AmmoSpawns, map.Windows, map.PlayerSpawns, map.Bounds, map.Props}
+	params.FilterType = Enum.RaycastFilterType.Exclude
+
+	local result = workspace:Raycast(origin, Vector3.new(0, -GROUNDED_RAY_DISTANCE, 0), params)
+	return not not result
+end
+
 local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, participant: Types.Participant): ()
 	local teleporter = item :: Teleporter
 
@@ -101,8 +121,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 		return
 	end
 
-	local hum = participant:GetHumanoid()
-	if not hum or not hum.FloorMaterial or hum.FloorMaterial == Enum.Material.Air then
+	if not isGrounded(participant) then
 		return ShowAlert("Can't teleport right now!", participant.Player)
 	end
 
@@ -131,19 +150,7 @@ local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vec
 		return ShowAlert("This teleporter is out of charge!", participant.Player)
 	end
 
-	local char = participant:GetCharacter()
-	if not char then
-		return
-	end
-
-	local map = participant.Round:GetMap()
-
-	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles, map.DynamicMap, map.ItemSpawns, map.AmmoSpawns, map.Windows, map.PlayerSpawns, map.Bounds, map.Props}
-	params.FilterType = Enum.RaycastFilterType.Exclude
-
-	local result = workspace:Raycast(origin, Vector3.new(0, -6, 0), params)
-	if not result then
+	if not isGrounded(participant) then
 		return ShowAlert("Failed to mark location.", participant.Player)
 	end
 
