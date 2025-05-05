@@ -93,7 +93,9 @@ local function pickNextGamemode(): Types.Gamemode
     return gamemodes[math.random(#gamemodes)]
 end
 
+local didEnd = false
 local function newRound(): Types.Round
+    didEnd = false
     roundCount += 1
 
     local gamemode = pickNextGamemode()
@@ -170,8 +172,23 @@ local function doMapVote(): ()
     assert(currentMap:IsA("ModuleScript"), "Invalid Map")
 end
 
+local function onRoundEnd(): ()
+    didEnd = true
+    if not round.Gamemode.EnableKarma then
+        return
+    end
+    for _, v in round:GetParticipants() do
+        assert(v)
+        KarmaManager.SetKarma(v.Player, v:GetKarma())
+    end
+end
+
 task.spawn(function()
     while true do
+        if not didEnd and round:GetRoundPhase() == "Highlights" then
+            onRoundEnd()
+        end
+
         if round:GetRoundPhase() ~= "Intermission" then
             task.wait()
             continue
