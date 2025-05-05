@@ -226,7 +226,11 @@ ReplicatedStorage.ClientServer.JoinRound.OnServerInvoke = function(player: Playe
     return true
 end
 
-ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(player: Player, itemName: string): Types.ItemPurchaseResult
+ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(player: Player, itemName: unknown): Types.ItemPurchaseResult
+    if typeof(itemName) ~= "string" then
+        return "InvalidItemForRole"
+    end
+
     local participant = round:GetParticipant(player.Name)
     if not participant then
         return "NotInRound"
@@ -240,7 +244,11 @@ ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(playe
     return participant:PurchaseItem(item)
 end
 
-ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distance: number)
+ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distance: unknown): ()
+    if typeof(distance) ~= "number" then
+        return
+    end
+
     local participant = round:GetParticipant(player.Name)
     if not participant then
         return
@@ -294,7 +302,11 @@ ReplicatedStorage.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body
     return nil
 end
 
-ReplicatedStorage.ClientServer.Exec.OnServerInvoke = function(plr, command: string): string | true
+ReplicatedStorage.ClientServer.Exec.OnServerInvoke = function(plr, command: unknown): string | true
+    if typeof(command) ~= "string" then
+        return "Invalid Command"
+    end
+    
     return Exec.ServerExecute(plr, round, command)
 end
 
