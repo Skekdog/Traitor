@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.RoundRule.Types)
 local ShowAlert = require(ReplicatedStorage.ShowAlert)
 
@@ -58,6 +60,12 @@ if RunService:IsClient() then
 		tween.Completed:Once(function()
 			fx:Destroy()
 		end)
+
+		PlaySound(5518430240, at, nil, {
+			SoundGroup = SoundService.AllSounds :: SoundGroup,
+			RollOffMinDistance = 5,
+			RollOffMaxDistance = 12,
+		})
 	
 		tween:Play()
 	end
