@@ -78,16 +78,25 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 		return
 	end
 
+	local root = char.PrimaryPart
+	if not root then
+		return
+	end
+
+	root.Anchored = true
+
 	teleporter.Extras.TimesUsed = (teleporter.Extras.TimesUsed or 0) + 1
 
-	makeFXServer(char:GetPivot().Position, teleporter.Extras.Target)
+	makeFXServer(root.Position, teleporter.Extras.Target)
 
 	task.wait(FX_DURATION)
 
 	char:PivotTo(CFrame.new(teleporter.Extras.Target))
+
+	root.Anchored = false
 end
 
-local function AlternateFireServer(item: Types.Item | Teleporter, _, _, _, participant: Types.Participant): ()
+local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vector3, _, participant: Types.Participant): ()
 	local teleporter = item :: Teleporter
 
 	local char = participant:GetCharacter()
@@ -95,7 +104,7 @@ local function AlternateFireServer(item: Types.Item | Teleporter, _, _, _, parti
 		return
 	end
 
-	teleporter.Extras.Target = char:GetPivot().Position
+	teleporter.Extras.Target = origin
 end
 
 local item: Types.ItemDefinition = {
@@ -103,10 +112,13 @@ local item: Types.ItemDefinition = {
 
 	Name = "Teleporter",
 	Description = "Can be used to teleport a limited number of times, after marking a target location.",
-	Icon = "rbxassetid://62159372",
-	
+	Icon = "rbxassetid://8415311131",
+
 	Slot = 8,
 	CanDrop = true,
+
+	Model = ReplicatedStorage.WeaponModels.Teleporter,
+	HoldAnimation = "rbxassetid://106602520385915",
 
 	CreditCost = 1,
 	MaxStock = 1,
