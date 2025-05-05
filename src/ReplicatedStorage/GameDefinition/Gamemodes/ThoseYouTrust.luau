@@ -128,8 +128,9 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
 
+		StartingCredits = 2,
 		StartingItems = {
-			Items["DNA Scanner"],
+			Items["DNAScanner"],
 			Items["Ballistic Vest"],
 		},
 
