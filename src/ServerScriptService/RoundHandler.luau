@@ -11,7 +11,7 @@ local maps = ServerStorage.Maps
 
 local random = Random.new(workspace:GetServerTimeNow())
 
-local currentMap = maps.TestMap
+local currentMap = maps.Skyscraper
 
 type ClientMapInfo = {
     Name: string,
