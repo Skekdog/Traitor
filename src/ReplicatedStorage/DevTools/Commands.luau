@@ -353,6 +353,40 @@ module.kill = {
 	end
 }
 
+module.setkarma = {
+	Name = "setkarma",
+	Description = "Sets the karma of players",
+	Environment = "Server" :: "Server",
+	Arguments = {"karma", "players"},
+	Execute = function(executor: Player, round: Round, args: Args)
+		local ServerScriptService = game:GetService("ServerScriptService")
+		local KarmaManager = require(ServerScriptService.KarmaManager)
+
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
+		end
+
+		local karma = processNumberArgument(args[1])
+		if not karma then
+			return "Missing argument 1 karma."
+		end
+
+		for _, player in players do
+			KarmaManager.SetKarma(player, karma)
+			
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			participant:SetKarma(karma)
+		end
+
+		return `Set karma of {getPlayersString(players)} to {karma}.`
+	end
+}
+
 module.endround = {
 	Name = "endround",
 	Description = "Ends the current round with a victory for the specified role",
