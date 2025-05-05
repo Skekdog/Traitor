@@ -1,15 +1,70 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedStorage.RoundRule.Types)
 
 local MAX_USES = 6
+local FX_DURATION = 1
+local FX_HEIGHT = 2
+
+local teleportFX = Instance.new("Part")
+teleportFX.Anchored = true
+teleportFX.Size = Vector3.new(2, 0.1, 2)
+teleportFX.CastShadow = false
+teleportFX.CanTouch = false
+teleportFX.CanCollide = false
+teleportFX.CanQuery = false
+teleportFX.Color = Color3.new(0.52549, 0.858824, 0.372549)
+teleportFX.Transparency = 0.5
+teleportFX.Material = Enum.Material.Neon
+
+local remote: RemoteEvent
+if RunService:IsServer() then
+	remote = Instance.new("RemoteEvent")
+	remote.Name = "C4Interact"
+	remote.Parent = script
+else
+	local found = script:WaitForChild("C4Interact")
+	assert(found:IsA("RemoteEvent"), "C4Interact must be a RemoteEvent")
+	remote = found
+end
 
 type Teleporter = Types.Item & {
 	Extras: {
 		TimesUsed: number?,
-		Target: CFrame?,
+		Target: Vector3?,
 		[any]: never,
 	}
 }
+
+local function makeFXServer(origin: Vector3, destination: Vector3): ()
+	remote:FireAllClients(origin, destination)
+end
+
+if RunService:IsClient() then
+	local function makeFX(at: Vector3, mode: "MoveUp" | "MoveDown"): ()
+		local moveVector = Vector3.new(0, if mode == "MoveUp" then -FX_HEIGHT else FX_HEIGHT, 0)
+
+		local fx = teleportFX:Clone()
+		fx.Position = at - moveVector / 2
+		fx.Parent = workspace.Projectiles
+	
+		local tween = TweenService:Create(fx, TweenInfo.new(FX_DURATION, Enum.EasingStyle.Linear), {
+			Position = at + moveVector,
+		})
+	
+		tween.Completed:Once(function()
+			fx:Destroy()
+		end)
+	
+		tween:Play()
+	end
+
+	remote.OnClientEvent:Connect(function(origin: Vector3, destination: Vector3)
+		makeFX(origin, "MoveUp")
+		makeFX(destination, "MoveDown")
+	end)
+end
 
 local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, participant: Types.Participant): ()
 	local teleporter = item :: Teleporter
@@ -24,7 +79,12 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 	end
 
 	teleporter.Extras.TimesUsed = (teleporter.Extras.TimesUsed or 0) + 1
-	char:PivotTo(teleporter.Extras.Target)
+
+	makeFXServer(char:GetPivot().Position, teleporter.Extras.Target)
+
+	task.wait(FX_DURATION)
+
+	char:PivotTo(CFrame.new(teleporter.Extras.Target))
 end
 
 local function AlternateFireServer(item: Types.Item | Teleporter, _, _, _, participant: Types.Participant): ()
@@ -35,7 +95,7 @@ local function AlternateFireServer(item: Types.Item | Teleporter, _, _, _, parti
 		return
 	end
 
-	teleporter.Extras.Target = char:GetPivot()
+	teleporter.Extras.Target = char:GetPivot().Position
 end
 
 local item: Types.ItemDefinition = {
@@ -44,7 +104,9 @@ local item: Types.ItemDefinition = {
 	Name = "Teleporter",
 	Description = "Can be used to teleport a limited number of times, after marking a target location.",
 	Icon = "rbxassetid://62159372",
+	
 	Slot = 8,
+	CanDrop = true,
 
 	CreditCost = 1,
 	MaxStock = 1,
