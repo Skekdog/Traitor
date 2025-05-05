@@ -17,7 +17,7 @@ local MAX_SCAN_RANGE = 7.5
 
 local CHARGE_DEPLETION_PER_STUD = 0.5
 
-local RECHARGE_RATE = 2
+local RECHARGE_RATE = 5
 local currentCharge = 100
 
 local clientAvailableTraces: {SampledTrace} = {}
