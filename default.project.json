@@ -52,6 +52,10 @@
 
     "TextChatService": {
       "$path": "Services/TextChatService"
+    },
+
+    "Players": {
+      "$path": "Services/Players"
     }
   }
 }

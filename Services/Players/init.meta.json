@@ -1,0 +1,8 @@
+{
+	"className": "Players",
+	"properties": {
+		"MaxPlayers": 16,
+		"PreferredPlayers": 16,
+		"CharacterAutoLoads": false
+	}
+}
