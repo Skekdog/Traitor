@@ -10,7 +10,11 @@
     "$className": "DataModel",
 
     "ServerScriptService": {
-      "$path": "Source/Server"
+      "$path": "Source/Server",
+
+      "$properties": {
+        "LoadStringEnabled": true
+      }
     },
 
     "ReplicatedStorage": {
