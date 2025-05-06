@@ -1,0 +1,6 @@
+{
+	"className": "BubbleChatConfiguration",
+	"properties": {
+		"Enabled": false
+	}
+}
