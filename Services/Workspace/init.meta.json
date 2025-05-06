@@ -1,0 +1,11 @@
+{
+	"className": "Workspace",
+	"properties": {
+		"MeshPartHeadsAndAccessories": "Enabled",
+		"PhysicsSteppingMethod": "Adaptive",
+		"PlayerCharacterDestroyBehavior": "Enabled",
+		"RejectCharacterDeletions": "Enabled",
+		"FallenPartsDestroyHeight": -500,
+		"Gravity": 80
+	}
+}
