@@ -1,4 +1,4 @@
 
 [submodule "src/ReplicatedStorage/RoundRule"]
-	path = Source/Client/RoundRule
+	path = Source/Shared/RoundRule
 	url = ../RoundRule
