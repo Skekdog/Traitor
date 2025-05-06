@@ -1,0 +1,14 @@
+{
+  "Properties": {
+    "PlaybackRegion": {
+      "NumberRange": [
+        0,
+        0.4399999976158142
+      ]
+    },
+    "PlaybackRegionsEnabled": true,
+    "SoundId": "rbxassetid://9125671948",
+    "Volume": 5
+  },
+  "className": "Sound"
+}
