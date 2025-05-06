@@ -1,0 +1,12 @@
+{
+	"className": "StarterPlayer",
+	"properties": {
+		"EnableMouseLockOption": false,
+		"EnableDynamicHeads": "Disabled",
+		"LoadCharacterLayeredClothing": "Disabled",
+		"CharacterJumpPower": 18,
+		"HealthDisplayDistance": 0,
+		"NameDisplayDistance": 0,
+		"CameraMaxZoomDistance": 128
+	}
+}
