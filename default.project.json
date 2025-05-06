@@ -1,17 +1,53 @@
 {
   "name": "Those You Trust",
-  "globIgnorePaths": ["src/ServerStorage/Maps"],
+
+  "servePlaceIds": [70750259318059, 2848381272],
+  "gameId": 1031123722,
+
   "emitLegacyScripts": false,
+
   "tree": {
     "$className": "DataModel",
+
     "ServerScriptService": {
-      "$className": "ServerScriptService",
-      "$path": "src/ServerScriptService"
+      "$path": "Source/Server"
     },
+
     "ReplicatedStorage": {
-      "$className": "ReplicatedStorage",
-      "$ignoreUnknownInstances": true,
-      "$path": "src/ReplicatedStorage"
+      "Shared": {
+        "$className": "Folder",
+        "$path": "Source/Shared"
+      },
+
+      "Assets": {
+        "$className": "Folder",
+        "$path": "Assets/Shared"
+      },
+
+      "Remotes": {
+        "$className": "Folder",
+        "$path": "Remotes"
+      }
+    },
+
+    "ServerStorage": {
+      "Maps": {
+        "$className": "Folder",
+        "$path": "Assets/Maps"
+      },
+
+      "Assets": {
+        "$className": "Folder",
+        "$path": "Assets/Server"
+      }
+    },
+
+    "Workspace": {
+      "$path": "Services/Workspace"
+    },
+
+    "SoundService": {
+      "$path": "Services/SoundService"
     }
   }
 }
