@@ -48,6 +48,10 @@
 
     "SoundService": {
       "$path": "Services/SoundService"
+    },
+
+    "TextChatService": {
+      "$path": "Services/TextChatService"
     }
   }
 }
