@@ -1,0 +1,7 @@
+{
+	"className": "SoundService",
+	"properties": {
+		"RespectFilteringEnabled": true,
+		"VolumetricAudio": "Enabled"
+	}
+}
