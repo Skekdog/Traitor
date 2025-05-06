@@ -1,0 +1,11 @@
+{
+	"className": "Lighting",
+	"properties": {
+		"Ambient": [0.5, 0.5, 0.5],
+		"Brightness": 1.981,
+		"EnvironmentDiffuseScale": 1,
+		"EnvironmentSpecularScale": 1,
+		"GlobalShadows": true,
+		"Technology": "Voxel"
+	}
+}
