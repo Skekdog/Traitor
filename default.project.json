@@ -60,6 +60,14 @@
 
     "Players": {
       "$path": "Services/Players"
+    },
+
+    "StarterGui": {
+      "$path": "Services/StarterGui"
+    },
+
+    "StarterPlayer": {
+      "$path": "Services/StarterPlayer"
     }
   }
 }
