@@ -3,9 +3,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
-local Items = require(ReplicatedStorage.GameDefinition.Items.Items)
-local PlaceIDs = require(ReplicatedStorage.PlaceIDs)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
+local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 export type BaseCommand = {
 	Name: string,
@@ -156,7 +156,7 @@ module.xray = {
 	Arguments = {},
 
 	Execute = function(): string
-		local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+		local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 		local map = LocalRoundInfo.Map()
 
 		if not map then
@@ -194,7 +194,7 @@ module.showbounds = {
 	Environment = "Client" :: "Client",
 	Arguments = {},
 	Execute = function(): string
-		local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+		local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 		local map = LocalRoundInfo.Map()
 
 		if not map then
@@ -236,7 +236,7 @@ module.freecam = {
 	Environment = "Client" :: "Client",
 	Arguments = {},
 	Execute = function(player: Player, args: Args)
-		local Freecam = require(ReplicatedStorage.Freecam)
+		local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 		local enabled = Freecam.ToggleFreecam()
 		return `Freecam {if enabled then "enabled" else "disabled"}.`
 	end
@@ -371,7 +371,7 @@ module.setkarma = {
 	Arguments = {"karma", "players"},
 	Execute = function(executor: Player, round: Round, args: Args)
 		local ServerScriptService = game:GetService("ServerScriptService")
-		local KarmaManager = require(ServerScriptService.KarmaManager)
+		local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -503,7 +503,7 @@ module.restart = {
 	Execute = function()
 		local ServerScriptService = game:GetService("ServerScriptService")
 
-		local RestartServer = require(ServerScriptService.RestartServer)
+		local RestartServer = require(ServerScriptService.Util.RestartServer)
 
 		RestartServer(5)
 		return "Server restarting..."

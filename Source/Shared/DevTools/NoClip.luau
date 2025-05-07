@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local FreeInput = require(ReplicatedStorage.FreeInput)
-local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
+local FreeInput = require(ReplicatedStorage.Shared.Controls.FreeInput)
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
 local module = {}
 

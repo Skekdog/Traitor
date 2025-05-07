@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local Commands = require(script.Parent.Commands)
 local IsAdmin = require(script.Parent.IsAdmin)
 
@@ -42,7 +42,7 @@ function module.ClientExecute(command: string): string
 		return parsed.Command.Execute(Players.LocalPlayer, parsed.Args)
 	end
 
-	return ReplicatedStorage.ClientServer.Exec:InvokeServer(command)
+	return ReplicatedStorage.Remotes.ClientServer.Exec:InvokeServer(command)
 end
 
 function module.ServerExecute(player: Player, round: Types.Round, command: string): string

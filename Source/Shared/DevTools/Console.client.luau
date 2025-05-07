@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Exec = require(ReplicatedStorage.DevTools.Exec)
-local ControlManager = require(script.Parent.ControlManager)
-local IsAdmin = require(script.Parent.DevTools.IsAdmin)
-local UIManager = require(script.Parent.UIManager)
+local IsAdmin = require(script.Parent.IsAdmin)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local Exec = require(ReplicatedStorage.Shared.DevTools.Exec)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 if not IsAdmin(Players.LocalPlayer) then
 	return
