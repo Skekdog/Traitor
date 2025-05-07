@@ -1,6 +1,6 @@
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
 return function(name: string, value: boolean): ()
 	local map = LocalRoundInfo.Map()

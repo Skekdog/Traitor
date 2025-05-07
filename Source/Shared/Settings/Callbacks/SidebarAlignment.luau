@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UIAnimation = require(ReplicatedStorage.UIAnimation)
-local UIManager = require(ReplicatedStorage.UIManager)
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 return function(name: string, value: string): ()
 	local ui = UIManager.WaitForUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
