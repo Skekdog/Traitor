@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ProfileManager = require(script.Parent.ProfileManager)
 
 local maxSettingsLength = ProfileManager.ProfileTemplate.Settings:len() * 1.2
-ReplicatedStorage.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: unknown)
+ReplicatedStorage.Remotes.ClientServer.SaveSettings.OnServerEvent:Connect(function(plr, options: unknown)
 	if typeof(options) ~= "string" then
 		return
 	end
