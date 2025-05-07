@@ -2,15 +2,15 @@ local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
-local ControlManager = require(ReplicatedStorage.ControlManager)
-local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
-local TextInput = require(ReplicatedStorage.TextInput)
-local UIAnimation = require(ReplicatedStorage.UIAnimation)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
+local TextInput = require(ReplicatedStorage.Shared.Interface.Util.TextInput)
 local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local Settings = require(script.Parent.Settings)
 local module = {}
 
-local ui = ReplicatedStorage.UnregisteredUIs.Settings
+local ui = ReplicatedStorage.Assets.UnregisteredUIs.Settings
 module.UI = ui
 
 local templates = ui.Main.Templates

@@ -20,7 +20,7 @@ for _, v in SettingDefinitions do
 end
 Settings.LOADED = true
 
-ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Connect(function(toLoad: string): ()
+ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings.OnClientEvent:Connect(function(toLoad: string): ()
 	local loadedVersion: number?
 
 	do
@@ -45,7 +45,7 @@ ReplicatedStorage.ServerClient.LoadSavedSettings.OnClientEvent:Connect(function(
 
 	require(script.Parent.ExtraButtons)
 
-	local UIManager = require(ReplicatedStorage.UIManager)
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 	UIManager.RegisterUI(SettingsUI.UI)
 
 	SettingsUI.AdjustForInset(UIManager.GuiInset)

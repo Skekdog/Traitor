@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local IsAdmin = require(ReplicatedStorage.DevTools.IsAdmin)
+local IsAdmin = require(ReplicatedStorage.Shared.DevTools.IsAdmin)
 
 export type ControlValue = {
 	Toggled: boolean,
