@@ -1,10 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CombatTypes = require(ReplicatedStorage.CombatTypes)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local ServerScriptService = game:GetService("ServerScriptService")
+local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
+local RoundHandler = require(ServerScriptService.RoundHandler)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local Combat = require(script.Parent.Combat)
-local RoundHandler = require(script.Parent.RoundHandler)
 
-ReplicatedStorage.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, itemName: unknown)
+local remotes = ReplicatedStorage.Remotes
+
+remotes.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, itemName: unknown)
 	if itemName and typeof(itemName) ~= "string" then
 		return
 	end
@@ -28,10 +31,10 @@ end)
 
 local function finishReloading(plr: Player, item: Types.GunWeapon): ()
 	item.IsReloading = false
-	ReplicatedStorage.ClientServer.ReloadWeapon:FireClient(plr, item.Definition.Name, item.Ammo)
+	remotes.ClientServer.ReloadWeapon:FireClient(plr, item.Definition.Name, item.Ammo)
 end
 
-ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: unknown): ()
+remotes.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: unknown): ()
 	if typeof(itemName) ~= "string" then
 		return
 	end
@@ -79,7 +82,7 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, 
 	finishReloading(plr, item)
 end)
 
-ReplicatedStorage.ClientServer.DropItem.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
+remotes.ClientServer.DropItem.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
 	if typeof(itemName) ~= "string" then
 		return
 	end
@@ -219,7 +222,7 @@ local function isAlternateFireRequest(value: any): boolean
 	end
 end
 
-ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
+remotes.ClientServer.PrimaryFire.OnServerInvoke = function(plr, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
 	if not isPrimaryFireRequest(request) then
 		return "OtherError"
 	end
@@ -233,7 +236,7 @@ ReplicatedStorage.ClientServer.PrimaryFire.OnServerInvoke = function(plr, reques
 	return result :: CombatTypes.ValidateItemUsageResult
 end
 
-ReplicatedStorage.ClientServer.AlternateFire.OnServerInvoke = function(plr, request: CombatTypes.AlternateFireRequest): CombatTypes.ValidateItemUsageResult
+remotes.ClientServer.AlternateFire.OnServerInvoke = function(plr, request: CombatTypes.AlternateFireRequest): CombatTypes.ValidateItemUsageResult
 	if not isAlternateFireRequest(request) then
 		return "OtherError"
 	end
@@ -247,7 +250,7 @@ ReplicatedStorage.ClientServer.AlternateFire.OnServerInvoke = function(plr, requ
 	return result :: CombatTypes.ValidateItemUsageResult
 end
 
-ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
+remotes.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
 	if typeof(itemName) ~= "string" then
 		return
 	end
@@ -298,7 +301,7 @@ ReplicatedStorage.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, item
 	end
 
 	item.Ammo = 0
-	ReplicatedStorage.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0)
+	remotes.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0)
 
 	local prop = round:LoadProp(model, "AmmoProp")
 	assert(prop.Kind == "AmmoProp")

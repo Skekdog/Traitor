@@ -2,12 +2,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
-local BulletTracer = require(ReplicatedStorage.BulletTracer)
-local CombatTypes = require(ReplicatedStorage.CombatTypes)
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-local ExplosionParams = require(ReplicatedStorage.RoundRule.ExplosionParams)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local ShatterGlass = require(ReplicatedStorage.ShatterGlass)
+local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
+local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
+local ShatterGlass = require(ReplicatedStorage.Shared.Combat.ShatterGlass)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local module = {}
 
 local MAX_SHOOTER_DISTANCE = 15
@@ -227,7 +227,7 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	end
 
 	if normal and item.Kind == "Gun" then
-		ReplicatedStorage.ServerClient.MakeBulletHole:FireAllClients(hitPart, hitPart.CFrame:ToObjectSpace(CFrame.new(hitPosition)), normal)
+		ReplicatedStorage.Remotes.ServerClient.MakeBulletHole:FireAllClients(hitPart, hitPart.CFrame:ToObjectSpace(CFrame.new(hitPosition)), normal)
 	end
 end
 
@@ -248,7 +248,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
     folder.Name = "Explosions"
     folder.Parent = workspace
 
-	PlaySound(sound or ServerStorage.Explosion, params.Position, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+	PlaySound(sound or ServerStorage.Assets.Explosion, params.Position, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
     explosion.Parent = folder
 
