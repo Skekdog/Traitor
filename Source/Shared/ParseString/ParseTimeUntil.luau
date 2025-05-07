@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ToRoundTime = require(ReplicatedStorage.ToRoundTime)
+local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local ParseString = require(script.Parent)
 
 local function getReplacement(timeUntilString: string): string

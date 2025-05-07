@@ -1,4 +1,5 @@
-local LocalRoundInfo = require(script.Parent.Parent.LocalRoundInfo)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local ParseString = require(script.Parent)
 
 local function getReplacement(playerName: string): string
