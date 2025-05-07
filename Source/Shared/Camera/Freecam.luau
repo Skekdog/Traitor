@@ -10,10 +10,11 @@ local exp   = math.exp
 local rad   = math.rad
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
-local FreeInput = require(script.Parent.FreeInput)
+local FreeInput = require(ReplicatedStorage.Shared.Controls.FreeInput)
 
 local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then
