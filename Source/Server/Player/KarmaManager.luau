@@ -1,4 +1,5 @@
-local ProfileManager = require(script.Parent.ProfileManager)
+local ServerScriptService = game:GetService("ServerScriptService")
+local ProfileManager = require(ServerScriptService.PlayerData.ProfileManager)
 
 local module = {}
 

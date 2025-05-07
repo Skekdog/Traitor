@@ -1,13 +1,14 @@
 local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local ProfileManager = require(ServerScriptService.PlayerData.ProfileManager)
+local RoundHandler = require(ServerScriptService.RoundHandler)
 local KarmaManager = require(script.Parent.KarmaManager)
-local ProfileManager = require(script.Parent.ProfileManager)
-local RoundHandler = require(script.Parent.RoundHandler)
 
 local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
-	ReplicatedStorage.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
+	ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
 end
 
 local function tryAwardTesterBadge(plr: Player): ()

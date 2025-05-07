@@ -1,7 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Replication = require(ReplicatedStorage.RoundRule.Replication)
-local RoundHandler = require(script.Parent.RoundHandler)
+local ServerScriptService = game:GetService("ServerScriptService")
+local RoundHandler = require(ServerScriptService.RoundHandler)
+local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 
 local function replicateTo(player: Player): ()
 	local round = RoundHandler.GetRound()

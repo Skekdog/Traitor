@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RoundHandler = require(script.Parent.RoundHandler)
+local ServerScriptService = game:GetService("ServerScriptService")
+local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local function InteractInteractable(player: Player, interactablePart: unknown): ()
 	if typeof(interactablePart) ~= "Instance" or not interactablePart:IsA("BasePart") then
@@ -29,6 +30,6 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 	interactable.Definition.OnInteractServer(interactable, participant)
 end
 
-ReplicatedStorage.ClientServer.InteractInteractable.OnServerEvent:Connect(InteractInteractable)
+ReplicatedStorage.Remotes.ClientServer.InteractInteractable.OnServerEvent:Connect(InteractInteractable)
 
 return InteractInteractable
