@@ -1,4 +1,4 @@
-local UIManager = require(script.Parent.UIManager)
+local UIManager = require(script.Parent.UILib.UIManager)
 
 local ui = UIManager.WaitForUI("Welcome") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Welcome)}
 

@@ -1,6 +1,6 @@
 local StarterGui = game:GetService("StarterGui")
 
-local ThemesManager = require(script.Parent.ThemesManager)
+local ThemesManager = require(script.Parent.UILib.ThemesManager)
 ThemesManager.UpdateTheme("Dark")
 
 require(script.Parent.Welcome)
