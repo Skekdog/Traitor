@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local LocalCharacter = require(script.Parent.LocalCharacter)
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 
 local modifiers: {[string]: boolean} = {}
 

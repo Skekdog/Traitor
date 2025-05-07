@@ -1,12 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local DynamicValue = require(script.Parent.DynamicValue)
-local JumpPower = require(script.Parent.JumpPower)
-local SetCameraSensitivity = require(script.Parent.SetCameraSensitivity)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local UIManager = require(script.Parent.UIManager)
+local SetCameraSensitivity = require(ReplicatedStorage.Shared.Camera.SetCameraSensitivity)
+local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
+local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
-local WalkSpeed = require(script.Parent.WalkSpeed)
 
 local scopeUi = UIManager.WaitForUI("Scope")
 

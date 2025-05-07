@@ -2,8 +2,9 @@
 
 -- Get services
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local soundService = game:GetService("SoundService")
-local Crouch = require(script.Parent.Crouch)
+local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
 local FootstepIDs = require(script.Parent.FootstepIDs)
 
 -- Create sound variables

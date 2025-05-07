@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
-local DynamicValue = require(script.Parent.DynamicValue)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local module = {}
 
