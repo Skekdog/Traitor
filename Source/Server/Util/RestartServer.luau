@@ -1,8 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
-local SafeTeleport = require(ReplicatedStorage.SafeTeleport)
-local ProfileManager = require(script.Parent.ProfileManager)
+local ProfileManager = require(ServerScriptService.PlayerData.ProfileManager)
+local SafeTeleport = require(ReplicatedStorage.Shared.Util.SafeTeleport)
 
 local options = Instance.new("TeleportOptions")
 options.ShouldReserveServer = true
