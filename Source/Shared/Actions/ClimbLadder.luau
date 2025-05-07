@@ -1,7 +1,8 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local LocalCharacter = require(script.Parent.LocalCharacter)
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
 local module = {}
 module.SnapCooldown = 0

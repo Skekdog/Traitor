@@ -1,13 +1,13 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
+local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ClimbLadder = require(script.Parent.ClimbLadder)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local ControlManager = require(script.Parent.ControlManager)
-local LocalCharacter = require(script.Parent.LocalCharacter)
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local Mouse = require(script.Parent.Mouse)
-local ShowAlert = require(script.Parent.ShowAlert)
 local StandardDoor = require(script.Parent.StandardDoor)
 local ViewCorpse = require(script.Parent.ViewCorpse)
 
@@ -54,7 +54,7 @@ local function interactInteractable(interactable: Types.Interactable): ()
 	if interactable.Definition.OnInteractClient then
 		interactable.Definition.OnInteractClient(interactable)
 	end
-	ReplicatedStorage.ClientServer.InteractInteractable:FireServer(interactable.Object)
+	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Object)
 end
 
 local function tryInteractInteractable(interactablePart: BasePart, input: InputObject?): boolean

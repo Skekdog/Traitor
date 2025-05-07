@@ -1,5 +1,6 @@
-local ControlManager = require(script.Parent.ControlManager)
-local LocalCharacter = require(script.Parent.LocalCharacter)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 
 local function tryGetAttachment(root: BasePart): Attachment?
 	local attachment = root:FindFirstChild("FlashlightAttachment")

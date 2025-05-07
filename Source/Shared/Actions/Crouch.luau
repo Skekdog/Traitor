@@ -1,8 +1,9 @@
 local Players = game:GetService("Players")
-local JumpPower = require(script.Parent.JumpPower)
-local LocalAnimation = require(script.Parent.LocalAnimation)
-local LocalCharacter = require(script.Parent.LocalCharacter)
-local WalkSpeed = require(script.Parent.WalkSpeed)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
+local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 
 local isCrouching = false
 local track: AnimationTrack?

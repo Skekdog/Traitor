@@ -3,6 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
+local remotes = ReplicatedStorage.Remotes
+
 local IS_SERVER = RunService:IsServer()
 
 type BaseDoorRequest = {
@@ -90,7 +92,7 @@ local function StandardDoor(request: DoorRequest): ()
 
         for _, v in Players:GetPlayers() do
             if v ~= request.Player then
-                ReplicatedStorage.ClientServer.OpenDoor:FireClient(v, clientReceive)
+                remotes.ClientServer.OpenDoor:FireClient(v, clientReceive)
             end
         end
 
@@ -104,7 +106,7 @@ local function StandardDoor(request: DoorRequest): ()
     local angle = findOrCreateAngleValue(door)
     local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if open then 90 else 0
 
-    ReplicatedStorage.ClientServer.OpenDoor:FireServer(door, open)
+    remotes.ClientServer.OpenDoor:FireServer(door, open)
 
     TweenService:Create(angle, TweenInfo.new(1, Enum.EasingStyle.Linear), {Value = targetAngle}):Play()
     RunService.PreSimulation:Connect(function()
@@ -113,7 +115,7 @@ local function StandardDoor(request: DoorRequest): ()
 end
 
 if IS_SERVER then
-    ReplicatedStorage.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, open: unknown): ()
+    remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, open: unknown): ()
         if typeof(door) ~= "Instance" or not door:IsA("BasePart") then
             return
         end
@@ -144,7 +146,7 @@ if IS_SERVER then
 end
 
 if not IS_SERVER then
-    ReplicatedStorage.ClientServer.OpenDoor.OnClientEvent:Connect(StandardDoor)
+    remotes.ClientServer.OpenDoor.OnClientEvent:Connect(StandardDoor)
 end
 
 return StandardDoor
