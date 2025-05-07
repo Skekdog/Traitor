@@ -2,7 +2,7 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local FootstepIDs = require(ReplicatedStorage.FootstepIDs)
+local FootstepIDs = require(ReplicatedStorage.Shared.Character.FootstepIDs)
 
 local function update(currentSound: Sound, id: string, volume: number, playbackSpeed: number)
     currentSound.SoundId = id
