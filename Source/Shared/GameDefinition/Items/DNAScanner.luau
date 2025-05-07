@@ -347,7 +347,7 @@ local item: Types.ItemDefinition = {
 	HoldAnimation = "rbxassetid://134193046304179",
 
 	PrimaryToggled = true,
-	PrimaryHint = "Scan Identified Body",
+	PrimaryHint = "Scan DNA",
 	PrimaryFireServer = PrimaryFireServer,
 
 	OnEquipClient = OnEquipClient,
