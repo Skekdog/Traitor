@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
@@ -27,14 +27,14 @@ local item: Types.MeleeWeaponDefinition = {
 
     DamageKind = "Bludgeon" :: "Bludgeon",
 
-    Model = ReplicatedStorage.WeaponModels.Crowbar,
+    Model = ReplicatedStorage.Assets.WeaponModels.Crowbar,
     HoldAnimation = "rbxassetid://10247423634",
     AttackAnimation = "rbxassetid://13269497293",
 
     MaxDistance = 7,
     Damage = 20,
     AttackInterval = 0.3,
-    AttackSound = ReplicatedStorage.WeaponSounds.Fired.Crowbar.SoundId,
+    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar.SoundId,
 
     AlternateFireServer = function(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
         local char = attacker:GetCharacter()

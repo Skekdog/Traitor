@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local GetCentreRay = require(ReplicatedStorage.GetCentreRay)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
@@ -39,8 +39,8 @@ local serverGrabbedProps: {[Player]: Types.Prop?} = {}
 local currentGrabClient: AlignPosition?
 
 local function animate(): ()
-	local LocalAnimation = require(ReplicatedStorage.LocalAnimation)
-	local ViewmodelModule = require(ReplicatedStorage.ViewmodelModule)
+	local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
+	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
 
 	LocalAnimation.TryPlayAnimation(13269497293, "Magneto")
 	ViewmodelModule.PlayAnimation("rbxassetid://13269497293", "Magneto")
@@ -335,8 +335,8 @@ local function pushPropClient(prop: Types.DataModelProp): ()
 end
 
 local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
-	local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
-	local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
 	local char = LocalCharacter.Character()
 	if not char then
@@ -424,7 +424,7 @@ local preSimulationClient: (item: Types.AnyItem, dt: number) -> () = function():
 		return stopControllingPropClient()
 	end
 
-	local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
+	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
 	local char = LocalCharacter.Character()
 	if not char then

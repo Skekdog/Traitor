@@ -2,11 +2,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
-local CreateRadarPoint = require(ReplicatedStorage.GameDefinition.Items.Common.CreateRadarPoint)
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-local Participant = require(ReplicatedStorage.RoundRule.Participant)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local UIAnimation = require(ReplicatedStorage.UIAnimation)
+local CreateRadarPoint = require(script.Parent.Common.CreateRadarPoint)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 
 local module = {}
 
@@ -209,13 +209,13 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 end
 
 local function getUI()
-	local UIManager = require(script.Parent.Parent.Parent.UIManager)
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 	local ui = UIManager.WaitForUI("DNAScanner") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.DNAScanner)}
 	return ui
 end
 
 if RunService:IsClient() then
-	local ClientInventory = require(ReplicatedStorage.ClientInventory)
+	local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 	
 	local function resetClient(): ()
 		clientAvailableTraces = {}
@@ -343,7 +343,7 @@ local item: Types.ItemDefinition = {
 	Slot = 9,
 	CanDrop = true,
 
-	Model = ReplicatedStorage.WeaponModels.DNAScanner,
+	Model = ReplicatedStorage.Assets.WeaponModels.DNAScanner,
 	HoldAnimation = "rbxassetid://134193046304179",
 
 	PrimaryToggled = true,

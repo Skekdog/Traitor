@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart

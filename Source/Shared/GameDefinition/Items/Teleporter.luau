@@ -2,9 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local ShowAlert = require(ReplicatedStorage.ShowAlert)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 
 local MAX_USES = 6
 
@@ -167,7 +167,7 @@ local item: Types.ItemDefinition = {
 	Slot = 8,
 	CanDrop = true,
 
-	Model = ReplicatedStorage.WeaponModels.Teleporter,
+	Model = ReplicatedStorage.Assets.WeaponModels.Teleporter,
 	HoldAnimation = "rbxassetid://106602520385915",
 
 	CreditCost = 1,

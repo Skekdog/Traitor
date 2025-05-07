@@ -8,18 +8,18 @@ local LocalCharacter
 local GetCentreRay
 local Combat
 if RunService:IsClient() then
-	LocalCharacter = require(ReplicatedStorage.LocalCharacter)
-	GetCentreRay = require(ReplicatedStorage.GetCentreRay)
+	LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+	GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 else
-	Combat = require(ServerScriptService.Combat)
+	Combat = require(ServerScriptService.Combat.Combat)
 end
 
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-local ExplosionParams = require(ReplicatedStorage.RoundRule.ExplosionParams)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Ammo = require(script.Parent.Ammo)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local MAX_RANGE = 10000
 
@@ -213,7 +213,7 @@ local item: Types.GunWeaponDefinition = {
 
 	IsBadGuyItem = true,
 
-	Model = ReplicatedStorage.WeaponModels.Poltergeist,
+	Model = ReplicatedStorage.Assets.WeaponModels.Poltergeist,
 
 	LaserColor = Color3.new(),
 

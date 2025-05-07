@@ -1,8 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local module: {[string]: Types.AmmoDefinition} = {}
 
 local NO_PART = Instance.new("Part")
+local boxModels = ReplicatedStorage.Assets.AmmoBoxModels
 
 module["Super Gun"] = {
     Kind = "Ammo",
@@ -54,7 +55,7 @@ module["9mm"] = {
     Name = "9mm",
     Capacity = 20,
     ReserveCapacity = 60,
-    Model = ReplicatedStorage.AmmoBoxModels["9mm"],
+    Model = boxModels["9mm"],
     CanDrop = true,
 }
 
@@ -63,7 +64,7 @@ module.Shotgun = {
     Name = "Shotgun",
     Capacity = 8,
     ReserveCapacity = 16,
-    Model = ReplicatedStorage.AmmoBoxModels.Shotgun,
+    Model = boxModels.Shotgun,
     CanDrop = true,
 }
 
@@ -72,7 +73,7 @@ module.Deagle = {
     Name = "Deagle",
     Capacity = 8,
     ReserveCapacity = 32,
-    Model = ReplicatedStorage.AmmoBoxModels.Deagle,
+    Model = boxModels.Deagle,
     CanDrop = true,
 }
 
@@ -81,7 +82,7 @@ module.SMG1 = {
     Name = "SMG1",
     Capacity = 30,
     ReserveCapacity = 60,
-    Model = ReplicatedStorage.AmmoBoxModels.SMG1,
+    Model = boxModels.SMG1,
     CanDrop = true,
 }
 
@@ -90,7 +91,7 @@ module.Rifle = {
     Name = "Rifle",
     Capacity = 5,
     ReserveCapacity = 10,
-    Model = ReplicatedStorage.AmmoBoxModels.Rifle,
+    Model = boxModels.Rifle,
     CanDrop = true,
 }
 

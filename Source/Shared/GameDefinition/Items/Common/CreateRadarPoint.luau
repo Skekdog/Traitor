@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local radarPoint = ReplicatedStorage.RadarPoint
+local radarPoint = ReplicatedStorage.Assets.RadarPoint
 
 type RadarPoint = typeof(radarPoint)
 
@@ -43,7 +43,7 @@ local function CreateRadarPoint(cFrame: CFrame, colour: Color3, name: string?): 
 
 	clone.Name = name or "RadarPoint"
 
-    clone.Parent = workspace.RadarPoints
+    clone.Parent = workspace.RadarPoints :: any
 
 	return clone
 end

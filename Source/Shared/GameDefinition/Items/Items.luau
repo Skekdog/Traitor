@@ -3,9 +3,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local Discombobulate = require(ReplicatedStorage.Discombobulate)
-local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
+local Discombobulate = require(ReplicatedStorage.Shared.Camera.Discombobulate)
+local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
@@ -15,7 +15,7 @@ local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Poltergeist = require(script.Parent.Poltergeist)
 local Radar = require(script.Parent.Radar)
 local Teleporter = require(script.Parent.Teleporter)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function models(name: string): BasePart
     return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
@@ -52,7 +52,7 @@ local function modify(base: Types.AnyItemDefinition, name: string, edit: {[strin
     if base.Model then
         new.Model = base.Model:Clone()
         new.Model.Name = name
-        new.Model.Parent = ReplicatedStorage.WeaponModels
+        new.Model.Parent = ReplicatedStorage.Assets.WeaponModels
     end
 
     return new
@@ -839,7 +839,7 @@ grenades["Incendiary Grenade"] = {
                         continue
                     end
 
-                    PlaySound(ReplicatedStorage.WeaponSounds.FlareBurn, nil, v, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+                    PlaySound(ReplicatedStorage.Assets.WeaponSounds.FlareBurn, nil, v, {SoundGroup = SoundService.AllSounds :: SoundGroup})
                     participant:TryTakeDamage({
                         Amount = 1,
                         Source = "Burn",

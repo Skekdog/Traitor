@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Ammo = require(script.Parent.Ammo)
 local MagnetoStick = require(script.Parent.MagnetoStick)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local flingRemote: RemoteEvent
 if RunService:IsServer() then
@@ -109,12 +109,12 @@ local item: Types.GunWeaponDefinition = {
     ReloadTime = 0,
     AmmoType = Ammo["Infinite"],
 
-    Model = ReplicatedStorage.WeaponModels["Newton Launcher"],
+    Model = ReplicatedStorage.Assets.WeaponModels["Newton Launcher"],
     HoldAnimation = "rbxassetid://10247380824",
     AttackSound = "rbxassetid://8561500387",
     ReloadSound = "",
 
-    Projectile = ReplicatedStorage.Projectiles["Newton"],
+    Projectile = ReplicatedStorage.Assets.Projectiles["Newton"],
     ProjectileSpeed = 300,
 
     RecoilX = 0,
