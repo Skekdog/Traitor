@@ -2,9 +2,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-local DynamicValue = require(ReplicatedStorage.DynamicValue)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local MIN_ARM_DURATION = 45
 local MAX_ARM_DURATION = 360
@@ -76,7 +76,7 @@ end
 
 local currentC4: C4?
 local function getC4Menu()
-	local UIManager = require(ReplicatedStorage.UIManager)
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 	local ui = UIManager.WaitForUI("C4Menu") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.C4Menu)}
 	return ui
 end
@@ -108,8 +108,8 @@ local function showC4Menu(c4: C4, show: boolean): ()
 	currentC4 = c4
 	assert(currentC4)
 
-	local WalkSpeed = require(ReplicatedStorage.WalkSpeed)
-	local JumpPower = require(ReplicatedStorage.JumpPower)
+	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
+	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 
 	local ui = getC4Menu()
 	local buttons = ui.Object.SidePanel.Buttons
@@ -205,7 +205,7 @@ end
 
 local c4s = DynamicValue.new({} :: {[Instance]: C4})
 if RunService:IsClient() then
-	local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
+	local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 	
 	local isBadGuy = false
 
@@ -322,7 +322,7 @@ if RunService:IsClient() then
 	end
 
 	RunService.Heartbeat:Connect(function()
-		local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
+		local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
 		local roleObject = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
 		local role = if roleObject then roleObject() else nil
@@ -355,9 +355,9 @@ end
 
 if RunService:IsServer() then
 	local ServerScriptService = game:GetService("ServerScriptService")
-local DNAScanner = require(ReplicatedStorage.GameDefinition.Items.DNAScanner)
-	local ExplosionParams = require(ReplicatedStorage.RoundRule.ExplosionParams)
-	local Combat = require(ServerScriptService.Combat)
+	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.DNAScanner)
+	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
+	local Combat = require(ServerScriptService.Combat.Combat)
 
 	local function pickAndRemove<T>(list: {T}): T
 		assert(#list > 0, "List is empty")
@@ -532,7 +532,7 @@ end
 local interactable: Types.InteractableDefinition = {
 	Name = "C4",
 
-	Model = ReplicatedStorage.InteractableModels.C4,
+	Model = ReplicatedStorage.Assets.InteractableModels.C4,
 
 	IsContinuousInteraction = false,
 	InteractionRange = 7.5,

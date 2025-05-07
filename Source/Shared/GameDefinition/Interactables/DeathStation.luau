@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HealthStation = require(script.Parent.HealthStation)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 type DeathStationServer = Types.Interactable & {
 	Extras: {
@@ -57,7 +57,7 @@ local interactable: Types.InteractableDefinition = {
 	Name = "DeathStation",
 	DisplayName = "Health Station",
 
-	Model = ReplicatedStorage.InteractableModels.HealthStation,
+	Model = ReplicatedStorage.Assets.InteractableModels.HealthStation,
 
 	InteractionRange = 7.5,
 	IsContinuousInteraction = true,

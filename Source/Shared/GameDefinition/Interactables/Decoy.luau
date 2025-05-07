@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
@@ -87,7 +87,7 @@ end
 local interactable: Types.InteractableDefinition = {
 	Name = "Decoy",
 
-	Model = ReplicatedStorage.InteractableModels.Decoy,
+	Model = ReplicatedStorage.Assets.InteractableModels.Decoy,
 
 	IsContinuousInteraction = false,
 	InteractionRange = 7.5,

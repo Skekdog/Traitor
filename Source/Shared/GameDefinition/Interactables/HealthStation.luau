@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local DNAScanner = require(ReplicatedStorage.GameDefinition.Items.DNAScanner)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.DNAScanner)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 module.MAX_CHARGE = 200
@@ -159,7 +159,7 @@ local interactable: Types.InteractableDefinition = {
 	Name = "HealthStation",
 	DisplayName = "Health Station",
 
-	Model = ReplicatedStorage.InteractableModels.HealthStation,
+	Model = ReplicatedStorage.Assets.InteractableModels.HealthStation,
 
 	InteractionRange = 7.5,
 	IsContinuousInteraction = true,
