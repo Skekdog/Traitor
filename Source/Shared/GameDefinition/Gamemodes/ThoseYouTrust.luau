@@ -1,28 +1,28 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local C4 = require(ReplicatedStorage.GameDefinition.Interactables.C4)
-local DeathStation = require(ReplicatedStorage.GameDefinition.Interactables.DeathStation)
-local Decoy = require(ReplicatedStorage.GameDefinition.Interactables.Decoy)
-local HealthStation = require(ReplicatedStorage.GameDefinition.Interactables.HealthStation)
-local Ammo = require(ReplicatedStorage.GameDefinition.Items.Ammo)
-local Items = require(ReplicatedStorage.GameDefinition.Items.Items)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
+local DeathStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.DeathStation)
+local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
+local HealthStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.HealthStation)
+local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
+local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local traitorMusic: {Sound} = {}
-for _, v in ReplicatedStorage.VictoryMusic.Traitor:GetChildren() do
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
 	if v:IsA("Sound") then
 		table.insert(traitorMusic, v)
 	end
 end
 
 local innocentMusic: {Sound} = {}
-for _, v in ReplicatedStorage.VictoryMusic.Innocent:GetChildren() do
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Innocent:GetChildren() do
 	if v:IsA("Sound") then
 		table.insert(innocentMusic, v)
 	end
 end
 
 local timeoutMusic: {Sound} = {}
-for _, v in ReplicatedStorage.VictoryMusic.Timeout:GetChildren() do
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Timeout:GetChildren() do
 	if v:IsA("Sound") then
 		table.insert(timeoutMusic, v)
 	end

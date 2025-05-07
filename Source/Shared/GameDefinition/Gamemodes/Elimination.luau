@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local C4 = require(ReplicatedStorage.GameDefinition.Interactables.C4)
-local DeathStation = require(ReplicatedStorage.GameDefinition.Interactables.DeathStation)
-local Decoy = require(ReplicatedStorage.GameDefinition.Interactables.Decoy)
-local HealthStation = require(ReplicatedStorage.GameDefinition.Interactables.HealthStation)
+local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
+local DeathStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.DeathStation)
+local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
+local HealthStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.HealthStation)
 local Ammo = require(script.Parent.Parent.Items.Ammo)
 local Items = require(script.Parent.Parent.Items.Items)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
@@ -28,14 +28,14 @@ local function getBestParticipant(_: unknown, round: Types.Round): Types.Partici
 end
 
 local competitorVictoryMusic: {Sound} = {}
-for _, v in ReplicatedStorage.VictoryMusic.Traitor:GetChildren() do
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
     if v:IsA("Sound") then
         table.insert(competitorVictoryMusic, v)
     end
 end
 
 local timeoutVictoryMusic: {Sound} = {}
-for _, v in ReplicatedStorage.VictoryMusic.Timeout:GetChildren() do
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Timeout:GetChildren() do
     if v:IsA("Sound") then
         table.insert(timeoutVictoryMusic, v)
     end
