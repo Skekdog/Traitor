@@ -31,7 +31,7 @@ else
 end
 
 local function models(name: string): BasePart
-    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
+    return ReplicatedStorage.Assets:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
 local serverGrabbedProps: {[Player]: Types.Prop?} = {}

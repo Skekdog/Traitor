@@ -18,27 +18,27 @@ local Teleporter = require(script.Parent.Teleporter)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function models(name: string): BasePart
-    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
+    return ReplicatedStorage.Assets:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
 local function interactableModels(name: string): BasePart
-	return ReplicatedStorage:WaitForChild("InteractableModels"):WaitForChild(name) :: BasePart
+	return ReplicatedStorage.Assets:WaitForChild("InteractableModels"):WaitForChild(name) :: BasePart
 end
 
 local function weaponSounds(name: string): string
-    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
 end
 
 local function firedSounds(name: string): string
-    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound).SoundId
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound).SoundId
 end
 
 local function reloadSounds(name: string): string
-    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name) :: Sound).SoundId
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name) :: Sound).SoundId
 end
 
 local function projectiles(name: string): BasePart
-    return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
+    return ReplicatedStorage.Assets:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
 end
 
 local function modify(base: Types.AnyItemDefinition, name: string, edit: {[string]: any}): Types.AnyItemDefinition

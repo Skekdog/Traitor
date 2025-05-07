@@ -6,19 +6,19 @@ local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function models(name: string): BasePart
-    return ReplicatedStorage:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
+    return ReplicatedStorage.Assets:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
 local function firedSounds(name: string): string
-    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound).SoundId
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound).SoundId
 end
 
 local function projectiles(name: string): BasePart
-    return ReplicatedStorage:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
+    return ReplicatedStorage.Assets:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
 end
 
 local function weaponSounds(name: string): string
-    return (ReplicatedStorage:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
 end
 
 type BurnTarget = Types.Participant | Types.Prop
