@@ -1,11 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
-local KarmaManager = require(script.Parent.KarmaManager)
-local Exec = require(ReplicatedStorage.DevTools.Exec)
-local Map = require(ReplicatedStorage.RoundRule.Map)
-local Round = require(ReplicatedStorage.RoundRule.Round)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local KarmaManager = require(ServerScriptService.Player.KarmaManager)
+local Exec = require(ReplicatedStorage.Shared.DevTools.Exec)
+local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
+local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+
+local remotes = ReplicatedStorage.Remotes
 
 local maps = ServerStorage.Maps
 
@@ -53,7 +56,7 @@ local MAP_VOTE_INTERVAL = 3
 local INTERMISSION_TIME = 15
 
 local gamemodes: {Types.Gamemode} = {}
-for _, v in ReplicatedStorage.GameDefinition.Gamemodes:GetChildren() do
+for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
     for i = 1, if v.Name == "ThoseYouTrust" then 4 else 1 do
         table.insert(gamemodes, (require)(v))
     end
@@ -116,7 +119,7 @@ local function doMapVote(): ()
 
     local votes: {[Player]: string} = {}
     local con: RBXScriptConnection
-    con = ReplicatedStorage.ClientServer.VoteMap.OnServerEvent:Connect(function(plr, mapName: unknown)
+    con = remotes.ClientServer.VoteMap.OnServerEvent:Connect(function(plr, mapName: unknown)
         if typeof(mapName) ~= "string" then
             return
         end
@@ -140,16 +143,16 @@ local function doMapVote(): ()
             counts[v] = (counts[v] or 0) + 1
         end
 
-        ReplicatedStorage.ServerClient.UpdateMapVotes:FireAllClients(counts)
+        remotes.ServerClient.UpdateMapVotes:FireAllClients(counts)
     end)
 
-    ReplicatedStorage.ServerClient.TriggerMapVote:FireAllClients(true, votableMaps)
+    remotes.ServerClient.TriggerMapVote:FireAllClients(true, votableMaps)
     round:SetRoundPhase("Intermission", INTERMISSION_TIME)
     task.wait(INTERMISSION_TIME)
 
     con:Disconnect()
 
-    ReplicatedStorage.ServerClient.TriggerMapVote:FireAllClients(false)
+    remotes.ServerClient.TriggerMapVote:FireAllClients(false)
 
     local totalVotes: {[string]: number} = {}
     for _, v in votes do
@@ -211,7 +214,7 @@ end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
 
-ReplicatedStorage.ClientServer.JoinRound.OnServerInvoke = function(player: Player): boolean?
+remotes.ClientServer.JoinRound.OnServerInvoke = function(player: Player): boolean?
     if not round:IsPreGame() then
         return false
     end
@@ -226,7 +229,7 @@ ReplicatedStorage.ClientServer.JoinRound.OnServerInvoke = function(player: Playe
     return true
 end
 
-ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(player: Player, itemName: unknown): Types.ItemPurchaseResult
+ReplicatedStorage.Shared.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(player: Player, itemName: unknown): Types.ItemPurchaseResult
     if typeof(itemName) ~= "string" then
         return "InvalidItemForRole"
     end
@@ -244,7 +247,7 @@ ReplicatedStorage.RoundRule.Remotes.PurchaseItem.OnServerInvoke = function(playe
     return participant:PurchaseItem(item)
 end
 
-ReplicatedStorage.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(function(player: Player, against: unknown): ()
+ReplicatedStorage.Shared.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(function(player: Player, against: unknown): ()
     if typeof(against) ~= "string" then
         return
     end
@@ -262,7 +265,7 @@ ReplicatedStorage.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(function(play
     againstParticipant:TryAddSlayVote(participant)
 end)
 
-ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distance: unknown): ()
+remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distance: unknown): ()
     if typeof(distance) ~= "number" then
         return
     end
@@ -284,7 +287,7 @@ ReplicatedStorage.ClientServer.Fell.OnServerEvent:Connect(function(player: Playe
     })
 end)
 
-ReplicatedStorage.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown, covert: unknown): Types.CorpseView?
+remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown, covert: unknown): Types.CorpseView?
     if typeof(body) ~= "Instance" or (not body:IsA("Model") and not body:IsA("Player")) then
         return nil
     end
@@ -320,7 +323,7 @@ ReplicatedStorage.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body
     return nil
 end
 
-ReplicatedStorage.ClientServer.Exec.OnServerInvoke = function(plr, command: unknown): string | true
+remotes.ClientServer.Exec.OnServerInvoke = function(plr, command: unknown): string | true
     if typeof(command) ~= "string" then
         return "Invalid Command"
     end
