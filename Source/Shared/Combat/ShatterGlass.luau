@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
-local Settings = require(ReplicatedStorage.Settings.Settings)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local IS_SERVER = game:GetService("RunService"):IsServer()
 
@@ -61,7 +61,7 @@ local function shatterServer(glassProperties: BasePart | GlassProperties, direct
         Reflectance = glassProperties.Reflectance,
     }
 
-    ReplicatedStorage.ServerClient.ShatterGlass:FireAllClients(properties, direction)
+    ReplicatedStorage.Remotes.ServerClient.ShatterGlass:FireAllClients(properties, direction)
 
     glassProperties:Destroy()
 end
@@ -130,7 +130,7 @@ local function ShatterGlass(glassProperties: BasePart | GlassProperties, directi
 end
 
 if not IS_SERVER then
-    ReplicatedStorage.ServerClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
+    ReplicatedStorage.Remotes.ServerClient.ShatterGlass.OnClientEvent:Connect(ShatterGlass)
 end
 
 return ShatterGlass

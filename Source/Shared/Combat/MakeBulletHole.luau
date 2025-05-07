@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local CreateEmptyPart = require(ReplicatedStorage.RoundRule.Common.CreateEmptyPart)
+local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 
 local function tryFadeBulletHole(impactHole: BasePart, impactDecal: Decal, weld: WeldConstraint): ()
 	if not impactHole:IsDescendantOf(workspace) then
@@ -52,6 +52,6 @@ local function MakeBulletHole(part: BasePart, relativeCFrame: CFrame, normal: Ve
 	tryFadeBulletHole(impactHole, impactDecal, weld)
 end
 
-ReplicatedStorage.ServerClient.MakeBulletHole.OnClientEvent:Connect(MakeBulletHole)
+ReplicatedStorage.Remotes.ServerClient.MakeBulletHole.OnClientEvent:Connect(MakeBulletHole)
 
 return MakeBulletHole

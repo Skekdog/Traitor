@@ -6,7 +6,7 @@ local IS_SERVER = RunService:IsServer()
 
 local function BulletTracer(projectile: BasePart, projectileSpeed: number, start: Vector3, target: Vector3): ()
 	if IS_SERVER then
-		return ReplicatedStorage.ServerClient.BulletTracer:FireAllClients(projectile, projectileSpeed, start, target)
+		return ReplicatedStorage.Remotes.ServerClient.BulletTracer:FireAllClients(projectile, projectileSpeed, start, target)
 	end
 
 	projectile = projectile:Clone()
@@ -26,7 +26,7 @@ local function BulletTracer(projectile: BasePart, projectileSpeed: number, start
 end
 
 if not IS_SERVER then
-	ReplicatedStorage.ServerClient.BulletTracer.OnClientEvent:Connect(BulletTracer)
+	ReplicatedStorage.Remotes.ServerClient.BulletTracer.OnClientEvent:Connect(BulletTracer)
 end
 
 return BulletTracer

@@ -1,19 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.RoundRule.Common.PlaySound)
+local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
+local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Aim = require(script.Parent.Aim)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local RoundInfoUI = require(ReplicatedStorage.UIScripts.RoundInfoUI)
-local ClientInventory = require(script.Parent.ClientInventory)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local CombatTypes = require(script.Parent.CombatTypes)
-local ControlManager = require(script.Parent.ControlManager)
-local DynamicValue = require(script.Parent.DynamicValue)
-local GetCentreRay = require(script.Parent.GetCentreRay)
 local HitSounds = require(script.Parent.HitSounds)
-local LocalAnimation = require(script.Parent.LocalAnimation)
-local LocalCharacter = require(script.Parent.LocalCharacter)
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local UIManager = require(script.Parent.UIManager)
 local ViewmodelModule = require(script.Parent.ViewmodelModule)
 
 local MAX_RANGE = 10000
@@ -48,7 +48,7 @@ local function raycast(char: Model, spread: Vector3, range: number): RaycastResu
 end
 
 local function playEmptyClipSound(): ()
-	PlaySound(ReplicatedStorage.WeaponSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+	PlaySound(ReplicatedStorage.Assets.WeaponSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 end
 
 local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}
@@ -70,7 +70,7 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	
 	PlaySound(item.Definition.ReloadSound, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
-	ReplicatedStorage.ClientServer.ReloadWeapon:FireServer(item.Definition.Name)
+	ReplicatedStorage.Remotes.ClientServer.ReloadWeapon:FireServer(item.Definition.Name)
 
 	return true
 end
@@ -179,7 +179,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				(item.Definition.AlternateFireClient :: Types.FireActionClient)(item :: Types.Item, "Alternate", origin, direction)
 			end
 
-			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.AlternateFire:InvokeServer(itemRequest)
+			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.AlternateFire:InvokeServer(itemRequest)
 			if result ~= "Success" then
 				warn("Item alternate fire rejected:", result)
 			end
@@ -312,7 +312,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				end
 				ViewmodelModule.Recoil(item.Definition)
 
-				local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.ClientServer.PrimaryFire:InvokeServer(request)
+				local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.PrimaryFire:InvokeServer(request)
 				if result ~= "Success" and result ~= "PreGame" then
 					warn("Hit rejected:", result)
 				end

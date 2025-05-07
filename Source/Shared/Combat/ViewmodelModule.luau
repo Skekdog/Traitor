@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local LocalCharacter = require(script.Parent.LocalCharacter)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local spring = require(ReplicatedStorage.Shared.Util.spring)
 local MuzzleFlash = require(script.Parent.MuzzleFlash)
-local spring = require(script.Parent.spring)
 
 local module = {}
 
@@ -18,7 +18,7 @@ local bobbingSpring = spring.new(10, 1)
 module.ReloadSpring = spring.new(7, 0.8)
 module.IsAiming = false
 
-type Viewmodel = typeof(ReplicatedStorage.Viewmodel)
+type Viewmodel = typeof(ReplicatedStorage.Assets.Viewmodel)
 local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     if not gun.LaserColor then
         return
@@ -32,7 +32,7 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     local attachment = item:FindFirstChild("LaserAttachment", true)
     assert(attachment and attachment:IsA("Attachment"), "Missing laser attachment")
 
-    local laser = item:FindFirstChild("Laser") :: typeof(ReplicatedStorage.Laser)?
+    local laser = item:FindFirstChild("Laser") :: typeof(ReplicatedStorage.Assets.Laser)?
     local ball = item:FindFirstChild("Ball") :: Part?
 
     if not ball then
@@ -66,7 +66,7 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     ball.Color = gun.LaserColor
 
     if not laser then
-        laser = ReplicatedStorage.Laser:Clone()
+        laser = ReplicatedStorage.Assets.Laser:Clone()
         assert(laser)
 
         laser.Material = Enum.Material.Neon
@@ -119,7 +119,7 @@ function module.Show(item: Types.AnyItemDefinition): ()
         return
     end
 
-    local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Viewmodel:Clone()) :: Viewmodel
+    local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Assets.Viewmodel:Clone()) :: Viewmodel
 
     if not viewmodel.Parent then
         local shirt = char:FindFirstChildOfClass("Shirt")
