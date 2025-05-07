@@ -2,10 +2,10 @@ local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local SettingDefinitions = require(ReplicatedStorage.Settings.SettingDefinitions)
-local Settings = require(ReplicatedStorage.Settings.Settings)
-local ControlManager = require(script.Parent.ControlManager)
-local ToggleMouseVisible = require(script.Parent.ToggleMouseVisible)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local ToggleMouseVisible = require(ReplicatedStorage.Shared.Interface.Util.ToggleMouseVisible)
+local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local UIAnimation = require(script.Parent.UIAnimation)
 
 local plr = Players.LocalPlayer
@@ -47,7 +47,7 @@ export type UI = {
 
 local registeredUIs: {UI} = {}
 
-UIManager.UnregisteredUIs = script.Parent.UnregisteredUIs
+UIManager.UnregisteredUIs = ReplicatedStorage.Assets.UnregisteredUIs
 UIManager.GuiInset = inset
 
 local function tryMakeCursorVisible(): ()

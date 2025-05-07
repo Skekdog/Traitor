@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Settings = require(ReplicatedStorage.Settings.Settings)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
-local ui = ReplicatedStorage.UnregisteredUIs.ActionButtons
+local ui = ReplicatedStorage.Assets.UnregisteredUIs.ActionButtons
 
 local baseButton = ui.BaseButton
 
