@@ -2,9 +2,9 @@ local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
-local ActionButton = require(script.Parent.ActionButton)
-local SettingDefinitions = require(ReplicatedStorage.Settings.SettingDefinitions)
-local Settings = require(ReplicatedStorage.Settings.Settings)
+local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
+local ActionButton = require(ReplicatedStorage.Shared.Interface.UILib.ActionButton)
 
 local module = {}
 

@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Settings = require(ReplicatedStorage.Settings.Settings)
-local UIManager = require(script.Parent.UIManager)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local ui = UIManager.WaitForUI("ItemHint") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.ItemHint)}
 

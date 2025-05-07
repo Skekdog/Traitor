@@ -1,7 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SettingDefinitions = require(ReplicatedStorage.Settings.SettingDefinitions)
-local Settings = require(ReplicatedStorage.Settings.Settings)
+local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local ControlManager = require(script.Parent.ControlManager)
 local boundInstances: {[string]: {Instance}} = {}
 
