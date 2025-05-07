@@ -1,5 +1,6 @@
-local UIAnimation = require(script.Parent.UIAnimation)
-local UIManager = require(script.Parent.UIManager)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 local ammoBar = roundInfo.Frame.AmmoBar

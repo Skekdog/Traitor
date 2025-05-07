@@ -1,4 +1,5 @@
-local UIManager = require(script.Parent.UIManager)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local prompt = UIManager.WaitForUI("ConfirmationPrompt") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.ConfirmationPrompt)}
 

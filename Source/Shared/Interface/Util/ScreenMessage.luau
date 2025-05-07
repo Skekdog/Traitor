@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local Settings = require(ReplicatedStorage.Settings.Settings)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local screenMessageFormats = {
 	Standard = {

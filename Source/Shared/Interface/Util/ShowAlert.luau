@@ -8,7 +8,7 @@ local hideThread: thread?
 local function ShowAlert(alert: string, player: Player?): ()
     if IS_SERVER then
         assert(player, "ShowAlert must be called with a player on the server")
-        return ReplicatedStorage.ServerClient.SendAlert:FireClient(player, alert)
+        return ReplicatedStorage.Remotes.ServerClient.SendAlert:FireClient(player, alert)
     end
 
     assert(not player, "ShowAlert must not be called with a player on the client")
@@ -16,7 +16,7 @@ local function ShowAlert(alert: string, player: Player?): ()
     id += 1
     local lastId = id
 
-    local UIManager = require(script.Parent.UIManager)
+    local UIManager = require(script.Parent.Parent.UILib.UIManager)
     local alertUI = UIManager.WaitForUI("Alert") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Alert)}
 
     if hideThread then
@@ -33,7 +33,7 @@ local function ShowAlert(alert: string, player: Player?): ()
 end
 
 if not IS_SERVER then
-    ReplicatedStorage.ServerClient.SendAlert.OnClientEvent:Connect(ShowAlert)
+    ReplicatedStorage.Remotes.ServerClient.SendAlert.OnClientEvent:Connect(ShowAlert)
 end
 
 return ShowAlert

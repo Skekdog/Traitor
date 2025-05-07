@@ -1,4 +1,4 @@
-local UIManager = require(script.Parent.UIManager)
+local UIManager = require(script.Parent.Parent.UILib.UIManager)
 
 local textInput = {}
 

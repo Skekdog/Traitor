@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
-local FullParse = require(ReplicatedStorage.ParseString.FullParse)
-local UIAnimation = require(script.Parent.UIAnimation)
-local UIManager = require(script.Parent.UIManager)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local Settings = require(ReplicatedStorage.Settings.Settings)
+local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
+local UIAnimation = require(script.Parent.Parent.UILib.UIAnimation)
+local UIManager = require(script.Parent.Parent.UILib.UIManager)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 
