@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ConfirmationPrompt = require(script.Parent.ConfirmationPrompt)
+local ConfirmationPrompt = require(ReplicatedStorage.Shared.Interface.Util.ConfirmationPrompt)
 
-local remote = ReplicatedStorage.RoundRule.Remotes.SlayVote
+local remote = ReplicatedStorage.Shared.RoundRule.Remotes.SlayVote
 
 local function prompt(against: string): ()
 	ConfirmationPrompt(`You've just been RDM'ed by {against}! Because of this, you may vote to slay them.`, function(response: boolean)

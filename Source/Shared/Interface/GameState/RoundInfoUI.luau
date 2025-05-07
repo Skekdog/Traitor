@@ -1,14 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ClientInventory = require(ReplicatedStorage.ClientInventory)
-local Freecam = require(ReplicatedStorage.Freecam)
-local LocalCharacter = require(ReplicatedStorage.LocalCharacter)
-local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local ShowMessage = require(ReplicatedStorage.ShowMessage)
-local ToRoundTime = require(ReplicatedStorage.ToRoundTime)
-local UIAnimation = require(ReplicatedStorage.UIAnimation)
-local UIManager = require(ReplicatedStorage.UIManager)
+local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
+local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local ShowMessage = require(ReplicatedStorage.Shared.Interface.Util.ShowMessage)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
@@ -110,7 +110,7 @@ end
 
 local healthCon: RBXScriptConnection?
 local function onCameraUpdated(): ()
-    local subject = workspace.Camera.CameraSubject
+    local subject = workspace.CurrentCamera.CameraSubject
     if not subject or not subject:IsA("Humanoid") or not subject:IsDescendantOf(workspace) then
         return showHealth(false)
     end
@@ -136,7 +136,7 @@ local function onCameraUpdated(): ()
     end)
 end
 
-workspace.Camera:GetPropertyChangedSignal("CameraSubject"):Connect(onCameraUpdated)
+workspace.CurrentCamera:GetPropertyChangedSignal("CameraSubject"):Connect(onCameraUpdated)
 
 Players.LocalPlayer.CharacterAdded:Connect(function(char)
     local hum = char:WaitForChild("Humanoid")

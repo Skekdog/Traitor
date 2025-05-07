@@ -1,10 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
-local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local ScreenMessage = require(ReplicatedStorage.ScreenMessage)
-local UIManager = require(ReplicatedStorage.UIManager)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local ScreenMessage = require(script.Parent.Parent.Util.ScreenMessage)
+local UIManager = require(script.Parent.Parent.UILib.UIManager)
 
 local goodColour = Color3.new(0.294118, 1, 0.243137)
 local badColour = Color3.fromRGB(167, 0, 0)
@@ -62,7 +62,7 @@ local function tryPurchase(): ()
         return notEnoughCredits()
     end
 
-    local response: Types.ItemPurchaseResult = ReplicatedStorage.RoundRule.Remotes.PurchaseItem:InvokeServer(selectedItem.Name)
+    local response: Types.ItemPurchaseResult = ReplicatedStorage.Shared.RoundRule.Remotes.PurchaseItem:InvokeServer(selectedItem.Name)
     if response == "NotEnoughCredits" then
         notEnoughCredits()
     elseif response == "NotInStock" then

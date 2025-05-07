@@ -2,13 +2,13 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = Players.LocalPlayer
 
-local Freecam = require(script.Parent.Parent.Freecam)
-local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
-local uiManager = require(ReplicatedStorage.UIManager)
+local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
 local camera = workspace.CurrentCamera
-local ui = uiManager.WaitForUI("Spectate")
-local uiO = ui.Object :: typeof(uiManager.UnregisteredUIs.Spectate)
+local ui = UIManager.WaitForUI("Spectate")
+local uiO = ui.Object :: typeof(UIManager.UnregisteredUIs.Spectate)
 
 local lastKey = 0
 local function spectateFunc(action, state)

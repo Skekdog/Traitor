@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
-local Role = require(ReplicatedStorage.RoundRule.Role)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local ToRoundTime = require(ReplicatedStorage.ToRoundTime)
-local UIAnimation = require(ReplicatedStorage.UIAnimation)
-local UIManager = require(ReplicatedStorage.UIManager)
+local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local UI = UIManager.WaitForUI("Highlights") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Highlights)}
 local page = UI.Object.Page

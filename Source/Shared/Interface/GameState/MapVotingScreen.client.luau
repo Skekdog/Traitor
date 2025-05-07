@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local UIAnimation = require(ReplicatedStorage.UIAnimation)
-local UIManager = require(ReplicatedStorage.UIManager)
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 type ClientMapInfo = {
 	Name: string,
@@ -18,7 +18,7 @@ type Votes = {
 local screen = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
 type Button = typeof(screen.Object.Sample)
 
-ReplicatedStorage.ServerClient.UpdateMapVotes.OnClientEvent:Connect(function(votes: Votes)
+ReplicatedStorage.Remotes.ServerClient.UpdateMapVotes.OnClientEvent:Connect(function(votes: Votes)
     local totalVotes = 0
     for _, v in votes do
         totalVotes += v
@@ -32,7 +32,7 @@ ReplicatedStorage.ServerClient.UpdateMapVotes.OnClientEvent:Connect(function(vot
 end)
 
 local function voteFor(clone: Button): ()
-    ReplicatedStorage.ClientServer.VoteMap:FireServer(clone.Name)
+    ReplicatedStorage.Remotes.ClientServer.VoteMap:FireServer(clone.Name)
     for _, v in screen.Object.Choices:GetChildren() do
         if v:IsA("ImageButton") then
             local button = v :: Button
@@ -41,7 +41,7 @@ local function voteFor(clone: Button): ()
     end
 end
 
-ReplicatedStorage.ServerClient.TriggerMapVote.OnClientEvent:Connect(function(triggered: boolean, votableMaps: {ClientMapInfo})
+ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(function(triggered: boolean, votableMaps: {ClientMapInfo})
     if not triggered then
         screen:ToggleVisible(false)
 

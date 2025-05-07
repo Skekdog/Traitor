@@ -1,10 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
-local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
-local GetDroppedItemState = require(script.Parent.GetDroppedItemState)
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local UIManager = require(script.Parent.UIManager)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local GetAmmoDefinition = require(ReplicatedStorage.Shared.LocalState.GetAmmoDefinition)
+local GetDroppedItemState = require(ReplicatedStorage.Shared.LocalState.GetDroppedItemState)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 
 local module = {}
 

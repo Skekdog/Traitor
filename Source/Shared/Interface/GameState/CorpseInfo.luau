@@ -1,13 +1,13 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local GetItemDefinition = require(ReplicatedStorage.GetItemDefinition)
-local FullParse = require(ReplicatedStorage.ParseString.FullParse)
-local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local UIManager = require(script.Parent.UIManager)
-local StringWithDeterminer = require(script.Parent.StringWithDeterminer)
-local ToRoundTime = require(script.Parent.ToRoundTime)
+local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWithDeterminer)
+local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local GetItemDefinition = require(ReplicatedStorage.Shared.LocalState.GetItemDefinition)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
+local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
 local object = corpseUi.Object.CorpseInfo

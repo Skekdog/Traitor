@@ -1,11 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(ReplicatedStorage.LocalRoundInfo)
-local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local ThemesManager = require(ReplicatedStorage.ThemesManager)
-local UIManager = require(ReplicatedStorage.UIManager)
-local ViewCorpse = require(ReplicatedStorage.ViewCorpse)
+local ViewCorpse = require(ReplicatedStorage.Shared.Actions.ViewCorpse)
+local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local info = ui.Info
