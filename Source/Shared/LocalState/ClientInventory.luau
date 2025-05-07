@@ -1,19 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
-local ControlManager = require(script.Parent.ControlManager)
-local DynamicValue = require(script.Parent.DynamicValue)
-local GetCentreRay = require(script.Parent.GetCentreRay)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
-local ItemHint = require(script.Parent.ItemHint)
-local LocalCharacter = require(script.Parent.LocalCharacter)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local ShowAlert = require(script.Parent.ShowAlert)
-local ThemesManager = require(script.Parent.ThemesManager)
-local UIAnimation = require(script.Parent.UIAnimation)
-local Types = require(ReplicatedStorage.RoundRule.Types)
-local UIManager = require(script.Parent.UIManager)
-local ViewmodelModule = require(script.Parent.ViewmodelModule)
+local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local ItemHint = require(ReplicatedStorage.Shared.Controls.ItemHint)
+local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
 
 local module = {}
@@ -83,7 +83,7 @@ local function tryUnequip(item: Types.AnyItem): ()
 	ControlManager.Unregister("Drop Ammo")
 	ControlManager.Unregister("Drop")
 
-	ReplicatedStorage.ClientServer.EquipItem:FireServer(nil)
+	ReplicatedStorage.Remotes.ClientServer.EquipItem:FireServer(nil)
 
 	ViewmodelModule.Hide()
 
@@ -141,7 +141,7 @@ local function tryDropItem(item: Types.AnyItem, direction: Vector3): ()
 		return
 	end
 
-	ReplicatedStorage.ClientServer.DropItem:FireServer(item.Definition.Name, direction)
+	ReplicatedStorage.Remotes.ClientServer.DropItem:FireServer(item.Definition.Name, direction)
 end
 
 local function tryDropAmmo(item: Types.GunWeapon, direction: Vector3): ()
@@ -154,7 +154,7 @@ local function tryDropAmmo(item: Types.GunWeapon, direction: Vector3): ()
 		return
 	end
 
-	ReplicatedStorage.ClientServer.DropAmmo:FireServer(item.Definition.Name, direction)
+	ReplicatedStorage.Remotes.ClientServer.DropAmmo:FireServer(item.Definition.Name, direction)
 end
 
 local function tryEquip(item: Types.AnyItem): ()
@@ -170,7 +170,7 @@ local function tryEquip(item: Types.AnyItem): ()
 		ItemHint(item.Definition.PrimaryHint, item.Definition.AlternateHint)
 	end
 
-	ReplicatedStorage.ClientServer.EquipItem:FireServer(item.Definition.Name)
+	ReplicatedStorage.Remotes.ClientServer.EquipItem:FireServer(item.Definition.Name)
 
 	if item.Kind == "Gun" and item.Definition.AmmoType.CanDrop then
 		ControlManager.Register("Drop Ammo", function(_, state)
@@ -393,7 +393,7 @@ ControlManager.Register("Next Item", function()
 	return Enum.ContextActionResult.Pass
 end)
 
-ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.AnyItem?): ()
+ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.AnyItem?): ()
 	if mode == "Add" then
 		assert(typeof(item) == "table", "Item must be a table")
 		addItem(item)
@@ -414,7 +414,7 @@ ReplicatedStorage.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(functi
 	end
 end)
 
-ReplicatedStorage.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Connect(function(mode: "Update" | "Reset", kind: string?, amount: number?): ()
+ReplicatedStorage.Shared.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Connect(function(mode: "Update" | "Reset", kind: string?, amount: number?): ()
 	if mode == "Update" then
 		assert(typeof(kind) == "string", "Kind must be a string")
 		assert(typeof(amount) == "number", "Amount must be a number")
@@ -429,7 +429,7 @@ ReplicatedStorage.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Connect(func
 	end
 end)
 
-ReplicatedStorage.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemName: string, amount: number): ()
+ReplicatedStorage.Remotes.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemName: string, amount: number): ()
 	for _, v in ourInventory.Slots do
 		if v.Definition.Name == itemName then
 			assert(v.Kind == "Gun", "Item is not a gun")
@@ -440,7 +440,7 @@ ReplicatedStorage.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemN
 	end
 end)
 
-ReplicatedStorage.ServerClient.UpdateAmmo.OnClientEvent:Connect(function(itemName: string, amount: number): ()
+ReplicatedStorage.Remotes.ServerClient.UpdateAmmo.OnClientEvent:Connect(function(itemName: string, amount: number): ()
 	for _, v in ourInventory.Slots do
 		if v.Definition.Name == itemName then
 			assert(v.Kind == "Gun", "Item is not a gun")

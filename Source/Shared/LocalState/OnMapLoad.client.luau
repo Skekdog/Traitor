@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetDisplayName = require(ReplicatedStorage.RoundRule.Common.GetDisplayName)
-local FIBLighting = require(ReplicatedStorage.Settings.Callbacks.FIBLighting)
-local Settings = require(ReplicatedStorage.Settings.Settings)
+local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
+local FIBLighting = require(ReplicatedStorage.Shared.Settings.Callbacks.FIBLighting)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local UIManager = require(ReplicatedStorage.UIManager)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local creditPopupUI = UIManager.WaitForUI("Credits") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Credits)}
 local playerlistUI = UIManager.WaitForUI("Playerlist") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Playerlist)}

@@ -1,14 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Interactable = require(ReplicatedStorage.RoundRule.Interactable)
-local DynamicValue = require(script.Parent.DynamicValue)
-local InstanceSignal = require(script.Parent.InstanceSignal)
-local Map = require(script.Parent.RoundRule.Map)
-local Role = require(script.Parent.RoundRule.Role)
-local Types = require(script.Parent.RoundRule.Types)
+local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
+local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
+local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
+local InstanceSignal = require(ReplicatedStorage.Shared.Util.InstanceSignal)
 local module = {}
 
-local replicatedData = ReplicatedStorage.RoundRule.ReplicatedData
-local remotes = ReplicatedStorage.RoundRule.Remotes
+local replicatedData = ReplicatedStorage.Shared.RoundRule.ReplicatedData
+local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
 
 type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole" | "Winner" | "WinnerKind" | "StartTime" | "Corpse"
 
@@ -32,7 +32,7 @@ InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connec
         return
     end
 
-    local object = ReplicatedStorage.GameDefinition.Gamemodes:FindFirstChild(name)
+    local object = ReplicatedStorage.Shared.GameDefinition.Gamemodes:FindFirstChild(name)
     if object then
         module.Gamemode:SetValue((require)(object))
     else

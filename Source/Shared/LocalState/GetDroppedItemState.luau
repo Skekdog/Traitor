@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetAmmoDefinition = require(script.Parent.GetAmmoDefinition)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 type ItemState = {
     Kind: "ItemState",

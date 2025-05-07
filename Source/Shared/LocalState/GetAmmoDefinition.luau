@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
-local Types = require(ReplicatedStorage.RoundRule.Types)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 assert(RunService:IsClient(), "GetAmmoDefinition should only be called on the client")
 
