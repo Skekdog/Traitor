@@ -72,8 +72,8 @@ local item: Types.MeleeWeaponDefinition = {
 	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar.SoundId,
 
 	Model = ReplicatedStorage.Assets.WeaponModels.Knife,
-	HoldAnimation = "rbxassetid://10247423634",
-    AttackAnimation = "rbxassetid://13269497293",
+	HoldAnimation = "rbxassetid://96501965592565",
+    AttackAnimation = "rbxassetid://122463302312412",
 
 	AlternateFireServer = throw,
 	AlternateToggled = true,
