@@ -18,6 +18,7 @@ local MAX_KILL_TRACE_DURATION = 120
 local MAX_SCAN_RANGE = 7.5
 
 local CHARGE_DEPLETION_PER_STUD = 0.5
+local MIN_CHARGE_DEPLETION = 5
 
 local RECHARGE_RATE = 5
 local currentCharge = 100
@@ -255,7 +256,7 @@ if RunService:IsClient() then
 			return
 		end
 	
-		local deplete = CHARGE_DEPLETION_PER_STUD * distance
+		local deplete = math.max(MIN_CHARGE_DEPLETION, CHARGE_DEPLETION_PER_STUD * distance)
 		currentCharge = math.max(currentCharge - deplete, 0)
 	
 		local old = workspace.RadarPoints:FindFirstChild("DNATrace")
