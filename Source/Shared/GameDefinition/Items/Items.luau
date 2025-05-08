@@ -3,13 +3,14 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local Discombobulate = require(ReplicatedStorage.Shared.Camera.Discombobulate)
+local Discombobulate = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.Discombobulate)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
 local FlareGun = require(script.Parent.FlareGun)
+local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Poltergeist = require(script.Parent.Poltergeist)
@@ -933,6 +934,7 @@ grenades["Discombobulator"] = {
 local melees: {[string]: Types.MeleeWeaponDefinition} = {}
 
 melees.Crowbar = Crowbar.Item
+melees.Knife = Knife
 
 local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item
