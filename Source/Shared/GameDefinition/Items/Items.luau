@@ -10,6 +10,7 @@ local Ammo = require(script.Parent.Ammo)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
 local FlareGun = require(script.Parent.FlareGun)
+local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Poltergeist = require(script.Parent.Poltergeist)
@@ -933,6 +934,7 @@ grenades["Discombobulator"] = {
 local melees: {[string]: Types.MeleeWeaponDefinition} = {}
 
 melees.Crowbar = Crowbar.Item
+melees.Knife = Knife
 
 local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item

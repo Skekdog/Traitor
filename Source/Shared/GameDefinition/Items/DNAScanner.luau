@@ -69,6 +69,10 @@ function module.RemoveDNATraces(object: IHasDNATraces): ()
 	object.Extras.DNATraces = nil
 end
 
+function module.GetDNATraces(object: IHasDNATraces): {DNATrace}
+	return object.Extras.DNATraces or {}
+end
+
 export type IHasDNATraces = {
 	Extras: {
 		DNATraces: {DNATrace}?,
