@@ -1,30 +1,52 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
+local SoundService = game:GetService("SoundService")
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local DROWN_THRESHOLD = 10
-local DROWN_DAMAGE_PER_SECOND = 10
-
-local heads: {[BasePart]: Types.Participant} = {}
+local DROWN_DAMAGE = 10
+local DROWN_INTERVAL = 1
 
 local params = RaycastParams.new()
 params.IgnoreWater = false
-params.FilterDescendantsInstances = {workspace.Characters}
-params.FilterType = Enum.RaycastFilterType.Exclude
+params.FilterDescendantsInstances = {workspace.Terrain}
+params.FilterType = Enum.RaycastFilterType.Include
 
 type Participant = Types.Participant & {
 	Extras: {
 		DrownElapsed: number?,
+		LastDrownAt: number?,
 	}
 }
 
-local function forEachHead(head: BasePart, participant: Participant, dt: number): ()
-	local result = workspace:Raycast(head.Position, Vector3.new(0, -0.1, 0), params)
-	if not result then
+local function forEachParticipant(participant: Participant, dt: number): ()
+	if tick() - (participant.Extras.LastDrownAt or 0) < DROWN_INTERVAL then
 		return
 	end
 
-	if result.Material ~= Enum.Material.Water then
+	if not participant:IsAlive() then
+		return
+	end
+
+	local char = participant:GetCharacter()
+	if not char then
+		return
+	end
+
+	local head = char:FindFirstChild("Head")
+	if not head or not head:IsA("BasePart") then
+		return
+	end
+
+	local roundedPos = (Vector3.new(math.round(head.Position.X), math.round(head.Position.Y), math.round(head.Position.Z)) // 4) * 4
+	local voxels = workspace.Terrain:ReadVoxelChannels(Region3.new(roundedPos, roundedPos + Vector3.one * 4), 4, {"LiquidOccupancy"})
+	local occupancy = voxels.LiquidOccupancy[1][1][1]
+
+	if occupancy == 0 then
+		participant.Extras.DrownElapsed = 0
 		return
 	end
 
@@ -35,22 +57,27 @@ local function forEachHead(head: BasePart, participant: Participant, dt: number)
 		return
 	end
 
-	if participant.Round:GetParticipant(participant.Player.Name) ~= participant then
-		return
-	end
+	PlaySound(220194561, nil, head, {
+		SoundGroup = SoundService.AllSounds :: SoundGroup,
+		RollOffMinDistance = 5,
+		RollOffMaxDistance = 10,
+	})
 
 	participant:TryTakeDamage({
-		Amount = DROWN_DAMAGE_PER_SECOND * dt,
+		Amount = DROWN_DAMAGE,
 		Source = "Drown",
 	})
+
+	participant.Extras.LastDrownAt = tick()
 end
 
 RunService.Heartbeat:Connect(function(dt)
-	for head, participant in heads do
-		forEachHead(head, participant, dt)
+	local round = RoundHandler.GetRound()
+
+	for _, v in round:GetParticipants() do
+		assert(v)
+		forEachParticipant(v, dt)
 	end
-
-
 end)
 
 return nil
