@@ -8,6 +8,7 @@ local VISUALISE_DURATION = 5
 
 local VISUALISE_MATERIAL = Enum.Material.ForceField
 local VISUALISE_COLOUR = Color3.fromRGB(0, 110, 255)
+local TRACER_TRANSPARENCY = 0.5
 
 local VISUALISATION_RADIUS = 7.5
 
@@ -27,12 +28,15 @@ type DeathData = {
 	Visualisers: {Visualiser},
 	Victim: Model,
 	Killer: Model,
+	Tracer: Part,
 }
 
 local deathData: {[Model]: DeathData} = {}
 
 local function stopVisualisation(data: DeathData): ()
 	data.Victim.Parent = nil
+	data.Tracer.Parent = nil
+	data.Killer.Parent = nil
 	data.Visualisers = {}
 end
 
@@ -94,6 +98,8 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 		table.insert(data.Visualisers, visualiser)
 		table.insert(visualiser.Extras.CurrentVisualisation.Visualisations, data)
 		data.Victim.Parent = workspace.Projectiles
+		data.Tracer.Parent = workspace.Projectiles
+		data.Killer.Parent = workspace.Projectiles
 	end
 
 	task.delay(VISUALISE_DURATION, function()
@@ -133,21 +139,48 @@ end
 
 local originalOnDeath = Participant.OnDeath
 local function patchedOnDeath(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
-	-- if params.Source ~= "Shot" and (typeof(params.Source) ~= "table" or params.Source.Kind ~= "Gun") then
-	-- 	return
-	-- end
+	if params.Source ~= "Shot" and (typeof(params.Source) ~= "table" or params.Source.Kind ~= "Gun") then
+		return
+	end
 
-	-- local attacker = params.Attacker
-	-- if not attacker then
-	-- 	return
-	-- end
+	local attacker = params.Attacker
+	if not attacker then
+		return
+	end
 
 	local char = participant:GetCharacter()
 	if not char then
 		return
 	end
 
+	local attackerChar = attacker:GetCharacter()
+	if not attackerChar then
+		return
+	end
+
 	char = copyCharacter(char)
+	attackerChar = copyCharacter(attackerChar)
+
+	local victimPos = char:GetPivot().Position
+	local attackerPos = attackerChar:GetPivot().Position
+
+	local tracerVector = victimPos - attackerPos
+	local tracer = Instance.new("Part")
+
+	local mesh = Instance.new("SpecialMesh")
+	mesh.MeshId = "rbxassetid://9788624116"
+	mesh.MeshType = Enum.MeshType.FileMesh
+	mesh.Parent = tracer
+	mesh.Scale = Vector3.new(0.1, 0.1, tracerVector.Magnitude / 2)
+	
+	tracer.Material = VISUALISE_MATERIAL
+	tracer.Color = VISUALISE_COLOUR
+	tracer.Anchored = true
+	tracer.CanCollide = false
+	tracer.CanTouch = false
+	tracer.CanQuery = false
+	tracer.Transparency = TRACER_TRANSPARENCY
+	tracer.CFrame = CFrame.lookAt((victimPos + attackerPos) / 2, victimPos)
 	
 	task.defer(function()
 		local corpse = participant:GetCharacter()
@@ -158,7 +191,8 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 		deathData[corpse] = {
 			Visualisers = {},
 			Victim = char,
-			Killer = char,
+			Killer = attackerChar,
+			Tracer = tracer,
 		}
 	end)
 end
