@@ -161,8 +161,8 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 	char = copyCharacter(char)
 	attackerChar = copyCharacter(attackerChar)
 
-	local victimPos = char:GetPivot().Position
-	local attackerPos = attackerChar:GetPivot().Position
+	local victimPos = params.HitPosition or char:GetPivot().Position
+	local attackerPos = params.Origin or attackerChar:GetPivot().Position
 
 	local tracerVector = victimPos - attackerPos
 	local tracer = Instance.new("Part")

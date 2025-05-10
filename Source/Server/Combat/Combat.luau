@@ -136,7 +136,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?): ()
+local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?, origin: Vector3?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -147,6 +147,9 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
 		IsHeadshot = isOf(hitPart, "Head"),
 		Attacker = by,
+
+		HitPosition = hitPosition,
+		Origin = origin,
 	}
 
 	if item.Kind == "ExplosionParams" then
@@ -177,7 +180,7 @@ local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, r
 	ShatterGlass(hitPart)
 end
 
-local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3): ()
+local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3, origin: Vector3?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -188,6 +191,9 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
 
 		Attacker = by,
+
+		HitPosition = hitPosition,
+		Origin = origin,
 	}
 
 	if not item:RunBeforeHit(round, hitPart, params) then
@@ -206,7 +212,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 	(prop :: Types.MapProp):TryTakeDamage(params)
 end
 
-local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?): ()
+local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3): ()
 	local round = by.Round
 	local map = round:GetMap()
 
@@ -219,11 +225,11 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	local propLike = prop or interactable
 
 	if victim then
-		return onParticipantHit(item, round, by, victim, hitPart, hitPosition)
+		return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin)
 	elseif hitPart:IsDescendantOf(map.Windows) then
 		return onWindowHit(item, round, by, hitPart, hitPosition)
 	elseif propLike then
-		return onPropHit(item, round, by, propLike, hitPart, hitPosition)
+		return onPropHit(item, round, by, propLike, hitPart, hitPosition, origin)
 	end
 
 	if normal and item.Kind == "Gun" then
@@ -332,7 +338,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			end
 
 			if item.Kind ~= "Item" and item.Kind ~= "Grenade" and v.HitPart then
-				onPartHit(item, by, v.HitPart, v.Destination, v.Normal)
+				onPartHit(item, by, v.HitPart, v.Destination, v.Normal, request.Origin)
 			end
 		end
 	elseif request.Kind == "PrimaryFireThrowRequest" then
