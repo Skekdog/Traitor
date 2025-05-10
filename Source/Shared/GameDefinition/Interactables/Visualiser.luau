@@ -17,17 +17,72 @@ local activeVisualisers: {Visualiser} = {}
 
 type Visualiser = Types.Interactable & {
 	Extras: {
+		Removed: boolean?,
 		Player: Player?,
 		LastVisualisedAt: number?,
+		CurrentVisualisation: {Sphere: Part, Visualisations: {DeathData}}?,
 		[any]: nil,
 	}
 }
 
-local visualisations: {[Model]: {
+type DeathData = {
+	Visualisers: {Visualiser},
 	OriginalCorpsePosition: Vector3,
 	Victim: Model,
 	Killer: Model,
-}} = {}
+}
+
+local deathData: {[Model]: DeathData} = {}
+
+local function stopVisualisation(data: DeathData): ()
+	data.Victim.Parent = nil
+	data.Visualisers = {}
+end
+
+local function stopVisualising(visualiser: Visualiser): ()
+	local currentVisualisation = visualiser.Extras.CurrentVisualisation
+	if not currentVisualisation then
+		return
+	end
+
+	currentVisualisation.Sphere:Destroy()
+
+	for _, data in currentVisualisation.Visualisations do
+		if #data.Visualisers == 1 then
+			stopVisualisation(data)
+		end
+	end
+end
+
+local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser): ()
+	local sphere = Instance.new("Part")
+	sphere.Shape = Enum.PartType.Ball
+	sphere.Size = Vector3.new(VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2)
+	sphere.Position = visualiser.Object.Position
+	sphere.Material = VISUALISE_MATERIAL
+	sphere.Color = VISUALISE_COLOUR
+	sphere.Anchored = true
+	sphere.CanCollide = false
+	sphere.Parent = workspace.Projectiles
+
+	visualiser.Extras.CurrentVisualisation = {
+		Sphere = sphere,
+		Visualisations = {},
+	}
+
+	for _, data in corpses do
+		table.insert(visualiser.Extras.CurrentVisualisation.Visualisations, data)
+		data.Victim.Parent = workspace.Projectiles
+	end
+
+	task.delay(VISUALISE_DURATION, function()
+		if visualiser.Extras.Removed then
+			return
+		end
+
+		stopVisualising(visualiser)
+	end)
+end
 
 local originalOnDeath = Participant.OnDeath
 local function patchedOnDeath(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
@@ -70,7 +125,8 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 			return
 		end
 
-		visualisations[corpse] = {
+		deathData[corpse] = {
+			Visualisers = {},
 			OriginalCorpsePosition = originalPosition,
 			Victim = char,
 			Killer = char,
@@ -115,11 +171,17 @@ local function OnInteractServer(interactable: Visualiser, participant: Types.Par
 	participant:GiveItemFromItemDefinition(visualiserItem)
 end
 
+local function removeVisualiser(visualiser: Visualiser): ()
+	visualiser.Extras.Removed = true
+	table.remove(activeVisualisers, table.find(activeVisualisers, visualiser) or error("Visualiser not found"))
+	stopVisualising(visualiser)
+end
+
 local function OnLoadServer(interactable: Visualiser): ()
 	interactable.Extras.LastVisualisedAt = 0
 
 	interactable.Object.Destroying:Connect(function()
-		table.remove(activeVisualisers, table.find(activeVisualisers, interactable) or error("Could not find"))
+		removeVisualiser(interactable)
 	end)
 
 	table.insert(activeVisualisers, interactable)
@@ -132,48 +194,23 @@ local function forEachVisualiser(visualiser: Visualiser): ()
 
 	visualiser.Extras.LastVisualisedAt = tick()
 
-	local corpsesInRange: {Model} = {}
+	local corpsesInRange: {[Model]: DeathData} = {}
 
 	for _, part in workspace:GetPartBoundsInRadius(visualiser.Object.Position, VISUALISATION_RADIUS) do
 		local model = part:FindFirstAncestorOfClass("Model")
-		if not model or table.find(corpsesInRange, model) then
+		if not model or corpsesInRange[model] then
 			continue
 		end
 
-		local visualisation = visualisations[model]
+		local visualisation = deathData[model]
 		if not visualisation or (visualisation.OriginalCorpsePosition - model:GetPivot().Position).Magnitude > MAX_CORPSE_MOVED_DISTANCE then
 			continue
 		end
 		
-		table.insert(corpsesInRange, model)
+		corpsesInRange[model] = visualisation
 	end
 
-	local sphere = Instance.new("Part")
-	sphere.Shape = Enum.PartType.Ball
-	sphere.Size = Vector3.new(VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2)
-	sphere.Position = visualiser.Object.Position
-	sphere.Material = VISUALISE_MATERIAL
-	sphere.Color = VISUALISE_COLOUR
-	sphere.Anchored = true
-	sphere.CanCollide = false
-
-	sphere.Parent = workspace.Projectiles
-
-	for _, corpse in corpsesInRange do
-		local visualisation = visualisations[corpse]
-		local victim = visualisation.Victim
-		victim.Parent = workspace.Projectiles
-	end
-
-	task.delay(VISUALISE_DURATION, function()
-		for _, corpse in corpsesInRange do
-			local visualisation = visualisations[corpse]
-			local victim = visualisation.Victim
-			victim.Parent = nil
-		end
-
-		sphere:Destroy()
-	end)
+	visualise(corpsesInRange, visualiser)
 end
 
 RunService.Heartbeat:Connect(function()
