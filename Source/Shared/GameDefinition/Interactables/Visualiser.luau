@@ -25,7 +25,6 @@ type Visualiser = Types.Interactable & {
 
 type DeathData = {
 	Visualisers: {Visualiser},
-	OriginalDeathPosition: Vector3,
 	Victim: Model,
 	Killer: Model,
 }
@@ -106,26 +105,10 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	end)
 end
 
-local originalOnDeath = Participant.OnDeath
-local function patchedOnDeath(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
-	-- if params.Source ~= "Shot" and (typeof(params.Source) ~= "table" or params.Source.Kind ~= "Gun") then
-	-- 	return
-	-- end
-
-	-- local attacker = params.Attacker
-	-- if not attacker then
-	-- 	return
-	-- end
-
-	local char = participant:GetCharacter()
-	if not char then
-		return
-	end
-
+local function copyCharacter(char: Model): Model
 	char.Archivable = true
 	char = char:Clone()
 
-	local originalPosition = char:GetPivot().Position
 	for _, v in char:GetDescendants() do
 		if not v:IsA("BasePart") and not v:IsA("SpecialMesh") then
 			v:Destroy()
@@ -145,6 +128,27 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 		v.Color = VISUALISE_COLOUR
 	end
 
+	return char
+end
+
+local originalOnDeath = Participant.OnDeath
+local function patchedOnDeath(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
+	-- if params.Source ~= "Shot" and (typeof(params.Source) ~= "table" or params.Source.Kind ~= "Gun") then
+	-- 	return
+	-- end
+
+	-- local attacker = params.Attacker
+	-- if not attacker then
+	-- 	return
+	-- end
+
+	local char = participant:GetCharacter()
+	if not char then
+		return
+	end
+
+	char = copyCharacter(char)
+	
 	task.defer(function()
 		local corpse = participant:GetCharacter()
 		if not corpse then
@@ -153,7 +157,6 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 
 		deathData[corpse] = {
 			Visualisers = {},
-			OriginalDeathPosition = originalPosition,
 			Victim = char,
 			Killer = char,
 		}
@@ -229,7 +232,7 @@ local function forEachVisualiser(visualiser: Visualiser): ()
 		end
 
 		local visualisation = deathData[model]
-		if not visualisation or (visualisation.OriginalDeathPosition - visualiser.Object.Position).Magnitude > VISUALISATION_RADIUS then
+		if not visualisation or (visualisation.Victim:GetPivot().Position - visualiser.Object.Position).Magnitude > VISUALISATION_RADIUS then
 			continue
 		end
 		
