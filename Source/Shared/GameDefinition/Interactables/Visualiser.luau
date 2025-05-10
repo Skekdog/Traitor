@@ -11,8 +11,6 @@ local VISUALISE_COLOUR = Color3.fromRGB(0, 110, 255)
 
 local VISUALISATION_RADIUS = 7.5
 
-local MAX_CORPSE_MOVED_DISTANCE = 10
-
 local activeVisualisers: {Visualiser} = {}
 
 type Visualiser = Types.Interactable & {
@@ -27,7 +25,7 @@ type Visualiser = Types.Interactable & {
 
 type DeathData = {
 	Visualisers: {Visualiser},
-	OriginalCorpsePosition: Vector3,
+	OriginalDeathPosition: Vector3,
 	Victim: Model,
 	Killer: Model,
 }
@@ -155,7 +153,7 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 
 		deathData[corpse] = {
 			Visualisers = {},
-			OriginalCorpsePosition = originalPosition,
+			OriginalDeathPosition = originalPosition,
 			Victim = char,
 			Killer = char,
 		}
@@ -231,7 +229,7 @@ local function forEachVisualiser(visualiser: Visualiser): ()
 		end
 
 		local visualisation = deathData[model]
-		if not visualisation or (visualisation.OriginalCorpsePosition - model:GetPivot().Position).Magnitude > MAX_CORPSE_MOVED_DISTANCE then
+		if not visualisation or (visualisation.OriginalDeathPosition - visualiser.Object.Position).Magnitude > VISUALISATION_RADIUS then
 			continue
 		end
 		
