@@ -47,10 +47,24 @@ local function stopVisualising(visualiser: Visualiser): ()
 
 	currentVisualisation.Sphere:Destroy()
 
+	local toRemove: {DeathData} = {}
+	local toRemoveOnlyFromCurrentVisualisation: {DeathData} = {}
 	for _, data in currentVisualisation.Visualisations do
 		if #data.Visualisers == 1 then
 			stopVisualisation(data)
+			table.insert(toRemoveOnlyFromCurrentVisualisation, data)
+		else
+			table.insert(toRemove, data)
 		end
+	end
+
+	for _, data in toRemove do
+		table.remove(currentVisualisation.Visualisations, table.find(currentVisualisation.Visualisations, data) or error("Visualisation not found"))
+		table.remove(data.Visualisers, table.find(data.Visualisers, visualiser) or error("Visualiser not found"))
+	end
+
+	for _, data in toRemoveOnlyFromCurrentVisualisation do
+		table.remove(currentVisualisation.Visualisations, table.find(currentVisualisation.Visualisations, data) or error("Visualisation not found"))
 	end
 end
 
@@ -78,6 +92,7 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	}
 
 	for _, data in corpses do
+		table.insert(data.Visualisers, visualiser)
 		table.insert(visualiser.Extras.CurrentVisualisation.Visualisations, data)
 		data.Victim.Parent = workspace.Projectiles
 	end
