@@ -5,6 +5,7 @@ local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Deco
 local HealthStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.HealthStation)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
+local Visualiser = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Visualiser)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local traitorMusic: {Sound} = {}
@@ -141,6 +142,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["UMP"],
 			Items["HealthStation"],
 			Items["Teleporter"],
+			Items["Visualiser"],
 		},
 
 		AwardCreditsToRolesOnDeath = {
@@ -287,6 +289,7 @@ local gamemode: Types.Gamemode = {
 		HealthStation = HealthStation.Interactable,
 		DeathStation = DeathStation,
 		Decoy = Decoy.Interactable,
+		Visualiser = Visualiser,
 	},
 
 	StartingItems = {

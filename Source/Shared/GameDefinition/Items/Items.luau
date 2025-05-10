@@ -964,7 +964,7 @@ local function createInteractableForItem(item: Types.Item, round: Types.Round): 
     return round:AddInteractable(interactableDefinition)
 end
 
-local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): Types.Interactable?
     local round = participant.Round
 
     local interactable = createInteractableForItem(item, round)
@@ -973,10 +973,12 @@ local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate"
     if not success then
         round._interactables[interactable.Object] = nil
         interactable.Object:Destroy()
-        return
+        return nil
     end
 
     participant:RemoveItem(item)
+
+    return interactable
 end
 
 local function plantInteractable(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant): (Types.Interactable?, RaycastResult?, WeldConstraint?)
@@ -1046,6 +1048,30 @@ items.C4 = {
         object.CFrame *= CFrame.Angles(math.rad(-90), 0, 0)
 		object.CFrame += result.Normal / 4
         weld.Enabled = true
+    end
+}
+
+items.Visualiser = {
+    Kind = "Item" :: "Item",
+    Name = "Visualiser",
+    Slot = 8,
+    CanDrop = true,
+
+    Description = "Recreates the scene of a player's murder, if they were killed by bullets.",
+    Icon = "rbxassetid://93284379186217",
+
+    CreditCost = 1,
+    MaxStock = 1,
+
+    PrimaryToggled = true,
+    PrimaryHint = "Deploy Visualiser",
+    PrimaryFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+        local interactable = throwInteractable(item, mode, origin, direction, participant)
+        if not interactable then
+            return
+        end
+
+        interactable.Extras.Player = participant.Player
     end
 }
 
