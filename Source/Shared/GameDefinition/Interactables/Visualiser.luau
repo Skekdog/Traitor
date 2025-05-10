@@ -61,8 +61,15 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	sphere.Position = visualiser.Object.Position
 	sphere.Material = VISUALISE_MATERIAL
 	sphere.Color = VISUALISE_COLOUR
-	sphere.Anchored = true
+	sphere.Anchored = false
 	sphere.CanCollide = false
+	sphere.Massless = true
+
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = visualiser.Object
+	weld.Part1 = sphere
+	weld.Parent = visualiser.Object
+
 	sphere.Parent = workspace.Projectiles
 
 	visualiser.Extras.CurrentVisualisation = {
