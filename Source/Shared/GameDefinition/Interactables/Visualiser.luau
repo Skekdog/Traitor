@@ -78,6 +78,8 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	sphere.Anchored = false
 	sphere.CanCollide = false
 	sphere.Massless = true
+	sphere.CanTouch = false
+	sphere.CanQuery = false
 
 	local weld = Instance.new("WeldConstraint")
 	weld.Part0 = visualiser.Object
@@ -137,6 +139,10 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 		end
 
 		v.Anchored = true
+		v.CanCollide = false
+		v.CanTouch = false
+		v.CanQuery = false
+		v.CollisionGroup = "Default"
 		v.Material = VISUALISE_MATERIAL
 		v.Color = VISUALISE_COLOUR
 	end
