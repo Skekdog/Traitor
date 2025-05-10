@@ -43,7 +43,6 @@ for k, v in workspaceData do
 end
 
 newWorkspaceData.properties = properties
-print(newWorkspaceData)
 local encodedWorkspaceData = serde.encode("json", newWorkspaceData, true)
 fs.writeFile(workspaceFilePath, encodedWorkspaceData)
 
