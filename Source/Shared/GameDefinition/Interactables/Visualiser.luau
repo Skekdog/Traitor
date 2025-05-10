@@ -1,7 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+
+local SPHERE_TWEEN_INFO = TweenInfo.new(
+	0.25,
+	Enum.EasingStyle.Quad,
+	Enum.EasingDirection.In
+)
 
 local VISUALISE_INTERVAL = 15
 local VISUALISE_DURATION = 5
@@ -48,7 +55,8 @@ local function stopVisualising(visualiser: Visualiser): ()
 		return
 	end
 
-	currentVisualisation.Sphere:Destroy()
+	TweenService:Create(currentVisualisation.Sphere, SPHERE_TWEEN_INFO, {Size = Vector3.zero}):Play()
+	task.delay(SPHERE_TWEEN_INFO.Time, currentVisualisation.Sphere.Destroy, currentVisualisation.Sphere)
 
 	local toRemove: {DeathData} = {}
 	local toRemoveOnlyFromCurrentVisualisation: {DeathData} = {}
@@ -74,7 +82,7 @@ end
 local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser): ()
 	local sphere = Instance.new("Part")
 	sphere.Shape = Enum.PartType.Ball
-	sphere.Size = Vector3.new(VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2)
+	sphere.Size = Vector3.zero
 	sphere.Position = visualiser.Object.Position
 	sphere.Material = VISUALISE_MATERIAL
 	sphere.Color = VISUALISE_COLOUR
@@ -88,6 +96,8 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	weld.Part0 = visualiser.Object
 	weld.Part1 = sphere
 	weld.Parent = visualiser.Object
+
+	TweenService:Create(sphere, SPHERE_TWEEN_INFO, {Size = Vector3.new(VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2)}):Play()
 
 	sphere.Parent = workspace.Projectiles
 
