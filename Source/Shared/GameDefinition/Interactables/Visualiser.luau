@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -98,6 +100,13 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	weld.Parent = visualiser.Object
 
 	TweenService:Create(sphere, SPHERE_TWEEN_INFO, {Size = Vector3.new(VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2)}):Play()
+
+	PlaySound(5114177371, nil, visualiser.Object, {
+		Volume = 0.5,
+		RollOffMinDistance = 5,
+		RollOffMaxDistance = 15,
+		SoundGroup = SoundService.AllSounds :: SoundGroup,
+	})
 
 	sphere.Parent = workspace.Projectiles
 
