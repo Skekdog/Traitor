@@ -10,6 +10,8 @@ local VISUALISE_MATERIAL = Enum.Material.ForceField
 local VISUALISE_COLOUR = Color3.fromRGB(0, 110, 255)
 local TRACER_TRANSPARENCY = 0.5
 
+local VISUALISE_ITEM_COLOUR = Color3.fromRGB(255, 255, 255)
+
 local VISUALISATION_RADIUS = 7.5
 
 local activeVisualisers: {Visualiser} = {}
@@ -131,7 +133,7 @@ local function copyCharacter(char: Model): Model
 		v.CanQuery = false
 		v.CollisionGroup = "Default"
 		v.Material = VISUALISE_MATERIAL
-		v.Color = VISUALISE_COLOUR
+		v.Color = if v.Name == "Item" then VISUALISE_ITEM_COLOUR else VISUALISE_COLOUR
 	end
 
 	return char
