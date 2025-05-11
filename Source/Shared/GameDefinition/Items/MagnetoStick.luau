@@ -30,6 +30,28 @@ else
 	stopControllingPropRemote = found
 end
 
+local makeRopeRemote: RemoteEvent
+if RunService:IsServer() then
+	makeRopeRemote = Instance.new("RemoteEvent")
+	makeRopeRemote.Name = "MakeRope"
+	makeRopeRemote.Parent = script
+else
+	local found = script:WaitForChild("MakeRope")
+	assert(found:IsA("RemoteEvent"), "MakeRope must be a RemoteEvent")
+	makeRopeRemote = found
+end
+
+local removeRopesRemote: RemoteEvent
+if RunService:IsServer() then
+	removeRopesRemote = Instance.new("RemoteEvent")
+	removeRopesRemote.Name = "RemoveRopes"
+	removeRopesRemote.Parent = script
+else
+	local found = script:WaitForChild("RemoveRopes")
+	assert(found:IsA("RemoteEvent"), "RemoveRopes must be a RemoteEvent")
+	removeRopesRemote = found
+end
+
 local function models(name: string): BasePart
     return ReplicatedStorage.Assets:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
@@ -254,19 +276,6 @@ local function stopControllingPropServer(player: Player): ()
 	end
 end
 
-if RunService:IsServer() then
-	stopControllingPropRemote.OnServerEvent:Connect(function(player)
-		stopControllingPropServer(player)
-	end)
-
-	Players.PlayerRemoving:Connect(function(player)
-		stopControllingPropServer(player)
-		if serverGrabbedProps[player] then
-			serverGrabbedProps[player] = nil
-		end
-	end)
-end
-
 local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
 	local controller = getController(getPrimaryInstance(prop))
 	return not controller
@@ -290,6 +299,118 @@ local function createOrFindAttachment(prop: BasePart): Attachment
 	return attachment
 end
 
+local function removeRopes(part: BasePart): ()
+	local folder = part:FindFirstChild("MagnetoRopes")
+	if folder then
+		assert(folder:IsA("Folder"), "MagnetoRopes is not a folder")
+		for _, v in folder:GetChildren() do
+			if not v:IsA("RopeConstraint") then
+				continue
+			end
+
+			local attachment0 = v.Attachment0
+			if attachment0 then
+				attachment0:Destroy()
+			end
+
+			local attachment1 = v.Attachment1
+			if attachment1 then
+				attachment1:Destroy()
+			end
+
+			v:Destroy()
+		end
+	end
+end
+
+if RunService:IsServer() then
+	stopControllingPropRemote.OnServerEvent:Connect(function(player)
+		stopControllingPropServer(player)
+	end)
+
+	Players.PlayerRemoving:Connect(function(player)
+		stopControllingPropServer(player)
+		if serverGrabbedProps[player] then
+			serverGrabbedProps[player] = nil
+		end 
+	end)
+
+	removeRopesRemote.OnServerEvent:Connect(function(player, part: unknown): ()
+		if typeof(part) ~= "Instance" then
+			return
+		end
+
+		if not part:IsA("BasePart") then
+			return
+		end
+
+		local model = part:FindFirstAncestorOfClass("Model")
+		if not model or not model:IsDescendantOf(workspace.Corpses) then
+			return
+		end
+
+		local prop = serverGrabbedProps[player]
+		if not prop or prop.Model ~= model then
+			return
+		end
+
+		removeRopes(part)
+	end)
+
+	makeRopeRemote.OnServerEvent:Connect(function(player, part: unknown, attachTo: unknown, position: unknown)
+		if typeof(part) ~= "Instance" or typeof(attachTo) ~= "Instance" or typeof(position) ~= "Vector3" then
+			return
+		end
+
+		if not part:IsA("BasePart") or not attachTo:IsA("BasePart") then
+			return
+		end
+
+		local model = part:FindFirstAncestorOfClass("Model")
+		if not model or not model:IsDescendantOf(workspace.Corpses) then
+			return
+		end
+
+		local prop = serverGrabbedProps[player]
+		if not prop or prop.Model ~= model then
+			return
+		end
+
+		local folder: Folder
+		local temp = part:FindFirstChild("MagnetoRopes")
+		if not temp then
+			folder = Instance.new("Folder")
+			folder.Name = "MagnetoRopes"
+			folder.Parent = part
+		else
+			assert(temp:IsA("Folder"), "MagnetoRopes is not a folder")
+			folder = temp
+			removeRopes(part)
+		end
+
+		local asLocal = CFrame.new(position):ToObjectSpace(attachTo.CFrame)
+		if asLocal.Position.Magnitude > attachTo.ExtentsSize.Magnitude * 1.1 then
+			return
+		end
+
+		local rope = Instance.new("RopeConstraint")
+		rope.Attachment0 = Instance.new("Attachment", part)
+
+		local attachment = Instance.new("Attachment")
+		attachment.Position = -asLocal.Position
+		attachment.Parent = attachTo
+
+		rope.Attachment1 = attachment
+		rope.Visible = true
+		rope.Thickness = 0.25
+		rope.Length = (part.Position - position).Magnitude * 1.1
+
+		rope.Name = "MagnetoRope"
+
+		rope.Parent = folder
+	end)
+end
+
 local function startControllingPropClient(prop: BasePart): ()
 	if not canControl(getPrimaryInstance(prop)) then
 		return
@@ -303,6 +424,8 @@ local function startControllingPropClient(prop: BasePart): ()
 	if not canGrab(part) then
 		return
 	end
+
+	removeRopes(prop)
 
 	local alignPosition = Instance.new("AlignPosition")
 	alignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment
@@ -368,7 +491,48 @@ local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 	return part
 end
 
+local lastHang = 0 -- magneto stick primary fire is not toggled, so it will run twice per click. this aims to mitigate that.
+local function tryHang(origin: Vector3, direction: Vector3): boolean
+	if tick() - lastHang < 0.1 then
+		return false
+	end
+	lastHang = tick()
+
+	if not currentGrabClient or not currentGrabClient:IsDescendantOf(workspace.Corpses) then
+		return false
+	end
+
+	local part = currentGrabClient.Parent
+	if not part or not part:IsA("BasePart") then
+		return false
+	end
+
+	local model = currentGrabClient:FindFirstAncestorOfClass("Model")
+	if not model then
+		return false
+	end
+
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {workspace.Corpses, workspace.Characters}
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.IgnoreWater = true
+	params.CollisionGroup = "WeaponHitTargets"
+
+	local result = workspace:Raycast(origin, direction * INTERACT_DISTANCE, params)
+	if not result then
+		return false
+	end
+
+	makeRopeRemote:FireServer(part, result.Instance, result.Position)
+
+	return true
+end
+
 local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
+	if tryHang(origin, direction) then
+		return stopControllingPropClient()
+	end
+
 	local prop = getPropClient(origin, direction)
 	if not prop then
 		return
