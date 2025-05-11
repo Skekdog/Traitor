@@ -1058,7 +1058,7 @@ items.Visualiser = {
     CanDrop = true,
 
     Description = "Recreates the scene of a player's murder, if they were killed by bullets.",
-    Icon = "rbxassetid://93284379186217",
+    Icon = "rbxassetid://11817043651",
 
     CreditCost = 1,
     MaxStock = 1,
