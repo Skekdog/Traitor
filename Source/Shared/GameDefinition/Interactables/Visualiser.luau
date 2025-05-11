@@ -14,6 +14,7 @@ local SPHERE_TWEEN_INFO = TweenInfo.new(
 
 local VISUALISE_INTERVAL = 15
 local VISUALISE_DURATION = 5
+local INITIAL_VISUALISE_DELAY = 3
 
 local VISUALISE_MATERIAL = Enum.Material.ForceField
 local VISUALISE_COLOUR = Color3.fromRGB(0, 110, 255)
@@ -262,7 +263,7 @@ local function removeVisualiser(visualiser: Visualiser): ()
 end
 
 local function OnLoadServer(interactable: Visualiser): ()
-	interactable.Extras.LastVisualisedAt = 0
+	interactable.Extras.LastVisualisedAt = tick() - (VISUALISE_INTERVAL - INITIAL_VISUALISE_DELAY)
 
 	interactable.Object.Destroying:Connect(function()
 		removeVisualiser(interactable)
