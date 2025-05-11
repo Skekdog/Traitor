@@ -1,0 +1,7 @@
+{
+	"className": "VoiceChatService",
+	"properties": {
+		"EnableDefaultVoice": true,
+		"UseAudioApi": "Enabled"
+	}
+}
