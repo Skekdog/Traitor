@@ -147,6 +147,13 @@ function module.Show(item: Types.AnyItemDefinition): ()
     local model = item.Model:Clone()
     model.Name = "Item"
 
+    model.CastShadow = false
+    for _, v in model:GetDescendants() do
+        if v:IsA("BasePart") then
+            v.CastShadow = false
+        end
+    end
+
     local motor = Instance.new("Motor6D")
     motor.Part0 = viewmodel.RightHand
     motor.Part1 = model
