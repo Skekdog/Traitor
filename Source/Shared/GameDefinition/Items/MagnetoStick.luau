@@ -6,7 +6,9 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
+
 local MAX_ROPE_DISTANCE = 6
+local ROPE_LENGTH_MULTIPLIER = 1.75
 
 local PUSH_FORCE_PER_UNIT_MASS = 1000
 
@@ -271,7 +273,6 @@ local function stopControllingPropServer(player: Player): ()
 	setNetworkOwnerOfPart(part, "Auto")
 
 	serverGrabbedProps[player] = nil
-	print("goodbye")
 
 	if prop.Kind == "MapProp" and not serverTouchedConnections[prop] then
 		module.SetLastHeldBy(prop, player)
@@ -368,6 +369,10 @@ if RunService:IsServer() then
 			return
 		end
 
+		if (part.Position - position).Magnitude > MAX_ROPE_DISTANCE then
+			return
+		end
+
 		local model = part:FindFirstAncestorOfClass("Model")
 		if not model or not model:IsDescendantOf(workspace.Corpses) then
 			return
@@ -405,7 +410,7 @@ if RunService:IsServer() then
 		rope.Attachment1 = attachment
 		rope.Visible = true
 		rope.Thickness = 0.25
-		rope.Length = (part.Position - position).Magnitude * 1.1
+		rope.Length = (part.Position - position).Magnitude * ROPE_LENGTH_MULTIPLIER
 
 		rope.Name = "MagnetoRope"
 
@@ -522,6 +527,10 @@ local function tryHang(origin: Vector3, direction: Vector3): boolean
 
 	local result = workspace:Raycast(origin, direction * INTERACT_DISTANCE, params)
 	if not result then
+		return false
+	end
+
+	if (part.Position - result.Position).Magnitude > MAX_ROPE_DISTANCE then
 		return false
 	end
 
