@@ -52,7 +52,7 @@ end
 
 function module.GetProfile(plr: Player): PlayerData?
 	if not profiles[plr] then
-		return warn(plr.Name.." profile not found!")
+		return nil
 	end
 	return profiles[plr].Data
 end
@@ -64,7 +64,7 @@ type UpdateProfile =
 
 module.UpdateProfile = function(plr: Player, key, value): ()
 	if not profiles[plr] then
-		return warn(plr.Name.." profile not found!")
+		return
 	end
 	profiles[plr].Data[key] = value
 end :: UpdateProfile
