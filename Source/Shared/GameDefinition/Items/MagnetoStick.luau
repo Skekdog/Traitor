@@ -6,6 +6,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
+local MAX_ROPE_DISTANCE = 6
 
 local PUSH_FORCE_PER_UNIT_MASS = 1000
 
@@ -338,26 +339,24 @@ if RunService:IsServer() then
 
 	removeRopesRemote.OnServerEvent:Connect(function(player, part: unknown): ()
 		if typeof(part) ~= "Instance" then
-			return print "a"
+			return
 		end
 
 		if not part:IsA("BasePart") then
-			return print "b"
+			return
 		end
 
 		local model = part:FindFirstAncestorOfClass("Model")
 		if not model or not model:IsDescendantOf(workspace.Corpses) then
-			return print "c"
+			return
 		end
 
 		local prop = serverGrabbedProps[player]
 		if not prop or prop.Model ~= model then
-			return print "d"
+			return
 		end
 
 		removeRopes(part)
-		print(part)
-		print("ayy")
 	end)
 
 	makeRopeRemote.OnServerEvent:Connect(function(player, part: unknown, attachTo: unknown, position: unknown)
