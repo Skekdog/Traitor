@@ -274,6 +274,10 @@ guns["Golden Gun"] = {
             Amount = math.huge,
             Attacker = attacker,
             Source = item,
+
+            Origin = params.Origin,
+            HitPosition = params.HitPosition,
+            HitPart = params.HitPart,
         })
         return false
     end,
@@ -290,6 +294,10 @@ guns["Golden Gun"] = {
                 Attacker = attacker,
                 Source = item,
                 IsHeadshot = false,
+
+                Origin = params.Origin,
+                HitPosition = params.HitPosition,
+                HitPart = params.HitPart,
             })
         else
             makeGolden(attacker)
@@ -298,6 +306,8 @@ guns["Golden Gun"] = {
                 Attacker = attacker,
                 Source = item,
                 IsHeadshot = false,
+
+                Origin = params.Origin,
             })
         end
 
