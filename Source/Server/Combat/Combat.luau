@@ -12,7 +12,7 @@ local module = {}
 
 local MAX_SHOOTER_DISTANCE = 15
 local MAX_TARGET_DISTANCE = 10
-local STATIC_OBSCURE_DISTANCE = 0.05					
+local STATIC_OBSCURE_DISTANCE = 0.05
 
 local function isOf(part: BasePart, name: string, match: boolean?): boolean?
 	local accessoryWeld = part:FindFirstChild("AccessoryWeld") :: Weld
@@ -150,6 +150,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 
 		HitPosition = hitPosition,
 		Origin = origin,
+		HitPart = hitPart,
 	}
 
 	if item.Kind == "ExplosionParams" then
@@ -194,6 +195,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 
 		HitPosition = hitPosition,
 		Origin = origin,
+		HitPart = hitPart,
 	}
 
 	if not item:RunBeforeHit(round, hitPart, params) then
