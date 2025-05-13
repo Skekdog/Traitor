@@ -7,6 +7,7 @@ local function YieldUntilProfile(plr: Player): ProfileManager.PlayerData?
 
 	while not profile and plr:IsDescendantOf(Players) do
 		profile = ProfileManager.GetProfile(plr)
+		task.wait()
 	end
 
 	return profile
