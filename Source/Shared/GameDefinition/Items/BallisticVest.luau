@@ -40,7 +40,7 @@ local item: Types.ItemDefinition = {
     CreditCost = 1,
     MaxStock = 1,
 
-    OnPurchase = function(item: Types.Item, participant: Types.Participant)
+    OnEquipServer = function(item: Types.Item, participant: Types.Participant)
         participant.Extras.BallisticVest = 60
 		participant.TryTakeDamage = patchedTryTakeDamage
     end,

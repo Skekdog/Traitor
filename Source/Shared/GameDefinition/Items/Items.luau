@@ -7,6 +7,7 @@ local Discombobulate = require(ReplicatedStorage.Shared.GameDefinition.Items.Com
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
+local BallisticVest = require(script.Parent.BallisticVest)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
 local FlareGun = require(script.Parent.FlareGun)
@@ -955,19 +956,7 @@ items.Teleporter = Teleporter
 
 items.Radar = Radar
 
-items["Ballistic Vest"] = {
-    Kind = "Item" :: "Item",
-    Name = "Ballistic Vest",
-    Description = "Absorbs a limited amount of damage to the torso. Not visible to others.",
-    Icon = "rbxassetid://395920626",
-
-    CreditCost = 1,
-    MaxStock = 1,
-
-    OnPurchase = function(item: Types.Item, participant: Types.Participant)
-        participant.Extras.BallisticVest = 60
-    end,
-}
+items["Ballistic Vest"] = BallisticVest.Item
 
 local function createInteractableForItem(item: Types.Item, round: Types.Round): Types.Interactable
     local interactableDefinition = round:GetInteractableDefinition(item.Definition.Name)

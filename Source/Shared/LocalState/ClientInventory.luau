@@ -328,6 +328,9 @@ local function addItem(item: Types.AnyItem): ()
 		ourInventory.Slots[item.Definition.Slot] = item
 	else
 		table.insert(ourInventory.Passive, item)
+		if item.Kind == "Item" and item.Definition.OnEquipClient then
+			item.Definition.OnEquipClient(item)
+		end
 	end
 end
 
