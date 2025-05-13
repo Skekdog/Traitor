@@ -6,6 +6,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local ProfileManager = require(ServerScriptService.PlayerData.ProfileManager)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local KarmaManager = require(script.Parent.KarmaManager)
+local ScoreManager = require(script.Parent.ScoreManager)
 
 local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
 	ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
@@ -53,11 +54,25 @@ Players.PlayerAdded:Connect(setupPlayer)
 Players.PlayerRemoving:Connect(function(plr)
 	local round = RoundHandler.GetRound()
     local participant = round:GetParticipant(plr.Name)
+
+	local totalScore = ScoreManager.GetTotalScore(plr)
+	if participant and totalScore then
+		for _, v in participant:GetScores() do
+			assert(v)
+			totalScore += v
+		end
+	end
+
+	if totalScore then
+		ScoreManager.SetTotalScore(plr, totalScore)
+	end
+
     if not participant then
         return
     end
 
     KarmaManager.SetKarma(plr, participant:GetKarma())
+
     round:RemoveParticipant(participant, false)
 
     ProfileManager.ReleaseProfile(plr)

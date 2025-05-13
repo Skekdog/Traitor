@@ -124,6 +124,14 @@ local function createPlr(plr: Player)
 		clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
 	end)
 
+	plr:GetAttributeChangedSignal("Score"):Connect(function()
+		clone.Score.Text = tostring(plr:GetAttribute("Score"))
+	end)
+	
+	plr:GetAttributeChangedSignal("TotalScore"):Connect(function()
+		clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
+	end)
+
 	updatePlr(plr, clone)
 
 	return clone :: PlayerElement

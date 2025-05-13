@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
+local ScoreManager = require(ServerScriptService.Player.ScoreManager)
 local Exec = require(ReplicatedStorage.Shared.DevTools.Exec)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
@@ -177,12 +178,20 @@ end
 
 local function onRoundEnd(): ()
     didEnd = true
-    if not round.Gamemode.EnableKarma then
-        return
-    end
     for _, v in round:GetParticipants() do
         assert(v)
-        KarmaManager.SetKarma(v.Player, v:GetKarma())
+
+        local totalScore = 0
+        for _, v in v:GetScores() do
+            assert(v)
+            totalScore += v
+        end
+
+        if round.Gamemode.EnableKarma then
+            KarmaManager.SetKarma(v.Player, v:GetKarma())
+        end
+        
+        ScoreManager.AddScore(v.Player, totalScore)
     end
 end
 

@@ -24,13 +24,21 @@ function module.GetScore(plr: Player): number
 	return plr:GetAttribute("Score") :: number? or 0
 end
 
-function module.SetScore(plr: Player, score: number): ()
+function module.SetScore(plr: Player, score: number, addToTotal: boolean): ()
+	local totalScore = module.GetTotalScore(plr)
+	if totalScore and addToTotal then
+		module.SetTotalScore(plr, totalScore + score)
+	end
 	plr:SetAttribute("Score", score)
 end
 
 function module.AddScore(plr: Player, score: number): ()
 	local newScore = module.GetScore(plr) + score
-	module.SetScore(plr, newScore)
+	local totalScore = module.GetTotalScore(plr)
+	if totalScore then
+		module.SetTotalScore(plr, totalScore + score)
+	end
+	module.SetScore(plr, newScore, false)
 end
 
 return module
