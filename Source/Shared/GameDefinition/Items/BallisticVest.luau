@@ -15,10 +15,14 @@ local function isTorso(part: BasePart): boolean
 	return part.Name == "HumanoidRootPart" or part.Name:match("Torso") ~= nil
 end
 
+local function isGunSource(source: Types.DamageSource): boolean
+	return source == "Shot" or (typeof(source) == "table" and source.Kind == "Gun")
+end
+
 local originalTryTakeDamage = Participant.TryTakeDamage
 
 local function patchedTryTakeDamage(participant: Participant, params: Types.DamageParams, deferDeath: boolean?): boolean
-	if participant.Extras.BallisticVest and params.HitPart and isTorso(params.HitPart) then
+	if isGunSource(params.Source) and ((participant.Extras.BallisticVest or 0) > 0) and params.HitPart and isTorso(params.HitPart) then
 		local reduction = math.clamp(params.Amount, 0, participant.Extras.BallisticVest)
 		participant.Extras.BallisticVest -= reduction
 		params.Amount -= reduction
