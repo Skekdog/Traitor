@@ -136,6 +136,8 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, _, partici
 
 	makeFXServer(participant.Player, teleporter.Extras.Target)
 
+	ShowAlert(`Teleporting! {100 - math.round((teleporter.Extras.TimesUsed / MAX_USES) * 100)}% remaining.`, participant.Player)
+
 	task.wait(FX_DURATION)
 
 	char:PivotTo(CFrame.new(teleporter.Extras.Target) * char:GetPivot().Rotation)
@@ -154,7 +156,13 @@ local function AlternateFireServer(item: Types.Item | Teleporter, _, origin: Vec
 		return ShowAlert("Failed to mark location.", participant.Player)
 	end
 
+	ShowAlert("Location marked!", participant.Player)
+
 	teleporter.Extras.Target = origin
+end
+
+local function OnEquipServer(teleporter: Types.Item | Teleporter, participant: Types.Participant): ()
+	ShowAlert(`{100 - math.round(((teleporter.Extras.TimesUsed or 0) / MAX_USES) * 100)}% remaining.`, participant.Player)
 end
 
 local item: Types.ItemDefinition = {
@@ -180,6 +188,8 @@ local item: Types.ItemDefinition = {
 	AlternateToggled = true,
 	AlternateHint = "Mark Location",
 	AlternateFireServer = AlternateFireServer,
+
+	OnEquipServer = OnEquipServer,
 }
 
 return item
