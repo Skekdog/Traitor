@@ -270,6 +270,7 @@ local function stopControllingPropServer(player: Player): ()
 	setNetworkOwnerOfPart(part, "Auto")
 
 	serverGrabbedProps[player] = nil
+	print("goodbye")
 
 	if prop.Kind == "MapProp" and not serverTouchedConnections[prop] then
 		module.SetLastHeldBy(prop, player)
@@ -337,24 +338,26 @@ if RunService:IsServer() then
 
 	removeRopesRemote.OnServerEvent:Connect(function(player, part: unknown): ()
 		if typeof(part) ~= "Instance" then
-			return
+			return print "a"
 		end
 
 		if not part:IsA("BasePart") then
-			return
+			return print "b"
 		end
 
 		local model = part:FindFirstAncestorOfClass("Model")
 		if not model or not model:IsDescendantOf(workspace.Corpses) then
-			return
+			return print "c"
 		end
 
 		local prop = serverGrabbedProps[player]
 		if not prop or prop.Model ~= model then
-			return
+			return print "d"
 		end
 
 		removeRopes(part)
+		print(part)
+		print("ayy")
 	end)
 
 	makeRopeRemote.OnServerEvent:Connect(function(player, part: unknown, attachTo: unknown, position: unknown)
@@ -425,7 +428,7 @@ local function startControllingPropClient(prop: BasePart): ()
 		return
 	end
 
-	removeRopes(prop)
+	task.defer(removeRopesRemote.FireServer, removeRopesRemote, prop)
 
 	local alignPosition = Instance.new("AlignPosition")
 	alignPosition.Mode = Enum.PositionAlignmentMode.OneAttachment
