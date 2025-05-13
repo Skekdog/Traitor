@@ -1,10 +1,14 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local ProfileManager = require(ServerScriptService.PlayerData.ProfileManager)
+local YieldUntilProfile = require(ServerScriptService.Util.YieldUntilProfile)
 
 local module = {}
 
-function module.GetKarma(plr: Player): number
-	local profile = ProfileManager.GetProfile(plr)
+function module.GetKarma(plr: Player): number?
+	local profile = YieldUntilProfile(plr)
+	if not profile then
+		return nil
+	end
 	return if profile then profile.Karma else 1000
 end
 
