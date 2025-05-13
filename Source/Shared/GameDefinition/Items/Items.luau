@@ -952,6 +952,7 @@ items["Ballistic Vest"] = {
     Icon = "rbxassetid://395920626",
 
     CreditCost = 1,
+    MaxStock = 1,
 
     OnPurchase = function(item: Types.Item, participant: Types.Participant)
         participant.Extras.BallisticVest = 60
@@ -1028,6 +1029,7 @@ items.C4 = {
     HoldAnimation = "rbxassetid://92236433436790",
 
     CreditCost = 1,
+    MaxStock = 2,
 
     PrimaryHint = "Throw C4",
     AlternateHint = "Plant C4",
