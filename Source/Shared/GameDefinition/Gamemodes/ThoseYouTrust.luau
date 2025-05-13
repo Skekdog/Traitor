@@ -238,6 +238,10 @@ local function getWinner(round: Types.Round): Types.Role?
 end
 
 local function tryEndRound(round: Types.Round): ()
+	if not round:IsInProgress() then
+        return
+    end
+	
 	local winner = getWinner(round)
 	if winner then
 		round:EndRound(winner)

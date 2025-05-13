@@ -97,6 +97,10 @@ local roles: {[string]: Types.RoleDefinition} = {
 }
 
 local function tryEndRound(round: Types.Round): ()
+    if not round:IsInProgress() then
+        return
+    end
+
     local survivor: Types.Participant?
     for _, v in round:GetParticipants() do
         assert(v)
