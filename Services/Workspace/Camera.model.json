@@ -1,3 +1,7 @@
 {
-	"className": "Camera"
+	"className": "Camera",
+	"properties": {
+		"CameraType": "Custom",
+		"FieldOfView": 70
+	}
 }
