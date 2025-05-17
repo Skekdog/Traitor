@@ -3,5 +3,6 @@
     "lint": {"*": true},
     "lintErrors": false,
     "typeErrors": true,
-    "globals": []
+    "globals": [],
+    "aliases": {"lune": "~/.lune/.typedefs/0.9.3/"}
 }
