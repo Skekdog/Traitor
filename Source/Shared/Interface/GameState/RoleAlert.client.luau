@@ -14,6 +14,7 @@ LocalRoundInfo.PlayerRoles:Connect(function(roles)
 	local role = LocalRoundInfo.GetPlayerRole()
 
 	if role.Definition.Name == lastRole or role == Defaults.Role then
+		lastRole = role.Definition.Name
 		return
 	end
 	
