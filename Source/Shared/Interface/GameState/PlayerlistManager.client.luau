@@ -50,6 +50,15 @@ local function selectMark(marks: Frame & any, button: (TextButton & any)?, plr: 
 	plr:SetAttribute("MarkColour", button.TextColor3)
 end
 
+local function toggleMarksVisible(clone: PlayerElement, visible: boolean): ()
+	for _, v in clone.Marks:GetChildren() :: {any} do
+		if not v:IsA("TextButton") then
+			continue
+		end
+		v.Visible = visible
+	end
+end
+
 local function createPlr(plr: Player)
 	local participant = LocalParticipantInfo.GetParticipant(plr.Name)
 	local clone = ui.PlayerFrame:Clone()
@@ -109,6 +118,7 @@ local function createPlr(plr: Player)
 
 	participant.Status:Connect(function(status)
 		movePlr(plr, status :: Types.ParticipantStatus)
+		toggleMarksVisible(clone, status == "Alive" and plr ~= Players.LocalPlayer)
 	end, true)
 
 	return clone :: PlayerElement
@@ -161,6 +171,10 @@ function movePlr(plr: Player, status: Types.ParticipantStatus)
 	recalculateCount(status)
 end
 
+if false then
+	(movePlr :: any)()
+end
+
 local function removePlr(plr: Player)
 	local f = findPlr(plr.Name)
 	players[plr.Name] = nil
@@ -179,6 +193,18 @@ LocalRoundInfo.Gamemode:Connect(function(gamemode)
 
 	info.RoundInfo.Info.Gamemode.Text = "Gamemode: " .. GetDisplayName(gamemode)
 	info.RoundInfo.Creators.Gamemode.Text = gamemode.Authors
+end, true)
+
+LocalParticipantInfo.Participants:Connect(function(participants)
+	for _, v in participants do
+		if not findPlr(v.Name) then
+			local player = Players:FindFirstChild(v.Name)
+			if not player or not player:IsA("Player") then
+				continue
+			end
+			createPlr(player)
+		end
+	end
 end, true)
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
