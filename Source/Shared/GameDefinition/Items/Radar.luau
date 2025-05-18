@@ -29,9 +29,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
         local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
         table.insert(decoyPlayers, v.Extras.Player)
 
-        local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
-        local role = if roleValue then roleValue() else nil
-        CreateRadarPoint(v.Object.CFrame, if role and role.Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
+        CreateRadarPoint(v.Object.CFrame, if LocalRoundInfo.GetPlayerRole().Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
     end
 
     for _, v in Players:GetPlayers() do

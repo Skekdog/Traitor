@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
@@ -12,8 +11,7 @@ local validPhases: {Types.RoundPhase} = {"Waiting", "Preparing"}
 local wasJoinClicked = false
 
 local function shouldMakeVisible(): boolean
-	local statusValue = LocalRoundInfo.PlayerStatuses()[Players.LocalPlayer.Name]
-	local status = if statusValue then statusValue() else "Spectating"
+	local status = LocalRoundInfo.GetPlayerStatus()
 	return not wasJoinClicked and table.find(validPhases, LocalRoundInfo.RoundPhase()) ~= nil and status == "Spectating"
 end
 

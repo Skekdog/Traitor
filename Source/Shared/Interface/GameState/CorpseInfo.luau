@@ -7,6 +7,7 @@ local GetItemDefinition = require(ReplicatedStorage.Shared.LocalState.GetItemDef
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
+local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
@@ -182,10 +183,9 @@ return function(corpseInfo: Types.CorpseView?)
     end
 
     local name = corpseInfo.Name
-    local roleValue = LocalRoundInfo.PlayerRoles()[name]
-    local role = if roleValue then roleValue() else nil
+    local role = LocalRoundInfo.GetPlayerRole(name)
 
-    if role then
+    if role ~= Defaults.Role then
         corpseUi.Object.Title.Text = `{role:GetFormattedString(`@{name}'s`)} Corpse | {role:GetFormattedRoleName()}`
         local determiner = StringWithDeterminer(GetDisplayName(role.Definition)):split(" ")[1]
         object.Avatar:SetAttribute("Description", `This is the body of {role:GetFormattedString(name)}. They were {determiner} {role:GetFormattedRoleName()}.`)

@@ -5,6 +5,7 @@ local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesMan
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
+local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
@@ -52,8 +53,7 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 		return
 	end
 
-	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
-	local status = if statusValue then statusValue() else "Spectating"
+	local status = LocalRoundInfo.GetPlayerStatus(plr.Name)
 
 	local marksVisible = (status == "Alive") and (plr ~= Players.LocalPlayer)
 	for _, v in clone.Marks:GetChildren() do
@@ -72,9 +72,8 @@ function updatePlr(plr: Player, clone: PlayerElement?)
 
 	movePlr(plr, status :: Types.ParticipantStatus)
 
-	local roleValue = LocalRoundInfo.PlayerRoles()[plr.Name]
-	local role = if roleValue then roleValue() else nil
-	if not role then
+	local role = LocalRoundInfo.GetPlayerRole(plr.Name)
+	if role == Defaults.Role then
 		clone.Username:SetAttribute("KeepText")
 		ThemesManager.UpdateThemeInstance(clone.Username)
 	else

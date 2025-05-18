@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
@@ -126,40 +127,39 @@ InstanceSignal.ListenAttribute(replicatedData, "StartTime", nil :: number?):Conn
 	module.StartTime:SetValue(startTime)
 end, true)
 
-local function createOrSetDynamicValue<T>(tbl: {[string]: DynamicValue.DynamicValue<T>?}, name: string, value: T): DynamicValue.DynamicValue<T>
-	local dynamicValue = tbl[name]
-	if not dynamicValue then
-		dynamicValue = DynamicValue.new(value)
-		tbl[name] = dynamicValue
-		assert(dynamicValue)
-		return dynamicValue
-	else
-		dynamicValue:SetValue(value)
-		return dynamicValue
-	end
-end
-
-module.PlayerStatuses = DynamicValue.new({} :: {[string]: DynamicValue.DynamicValue<Types.ParticipantStatus>?})
+module.PlayerStatuses = DynamicValue.new({} :: {[string]: Types.ParticipantStatus?})
 remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(name: string, status: Types.ParticipantStatus?)
-	createOrSetDynamicValue(module.PlayerStatuses() :: {[string]: DynamicValue.DynamicValue<Types.ParticipantStatus & any>?}, name, status or "Spectating")
+	module.PlayerStatuses()[name] = status
 	module.PlayerStatuses:Invoke()
 end)
 
-module.PlayerRoles = DynamicValue.new({} :: {[string]: DynamicValue.DynamicValue<Types.Role?>?})
+function module.GetPlayerStatus(name: string?): Types.ParticipantStatus
+    return module.PlayerStatuses()[name or Players.LocalPlayer.Name] or (Defaults.ParticipantStatus :: Types.ParticipantStatus)
+end
+
+module.PlayerRoles = DynamicValue.new({} :: {[string]: Types.Role?})
 remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: string?)
-	createOrSetDynamicValue(module.PlayerRoles(), name, getRoleFromName(roleName))
-	module.PlayerRoles:Invoke()
+    module.PlayerRoles()[name] = getRoleFromName(roleName)
+    module.PlayerRoles:Invoke()
 end)
 
-module.PlayerCorpses = DynamicValue.new({} :: {[string]: DynamicValue.DynamicValue<Types.CorpseView>?})
+function module.GetPlayerRole(name: string?): Types.Role
+    return module.PlayerRoles()[name or Players.LocalPlayer.Name] or Defaults.Role
+end
+
+module.PlayerCorpses = DynamicValue.new({} :: {[string]: Types.CorpseView?})
 remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.CorpseView, covert: boolean)
     if covert then
         return
     end
 
-	createOrSetDynamicValue(module.PlayerCorpses(), corpse.Name, corpse)
+    module.PlayerCorpses()[corpse.Name] = corpse
 	module.PlayerCorpses:Invoke()
 end)
+
+function module.GetPlayerCorpse(name: string?): Types.CorpseView?
+    return module.PlayerCorpses()[name or Players.LocalPlayer.Name]
+end
 
 function module.GetPlayerScores(): {[string]: Types.ScoreTable}
     local playerScores: {[string]: Types.ScoreTable} = {}

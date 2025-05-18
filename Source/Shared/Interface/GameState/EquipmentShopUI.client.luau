@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
@@ -127,10 +126,9 @@ local function tryPopulateEquipment(role: Types.Role?): ()
     end
 end
 
-local lastRole: Types.Role?
+local lastRole = LocalRoundInfo.GetPlayerRole()
 LocalRoundInfo.PlayerRoles:Connect(function(roles)
-    local roleValue = roles[Players.LocalPlayer.Name]
-    local role = if roleValue then roleValue() else nil
+    local role = LocalRoundInfo.GetPlayerRole()
     if lastRole ~= role then
         lastRole = role
         tryPopulateEquipment(role)

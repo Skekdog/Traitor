@@ -324,10 +324,8 @@ if RunService:IsClient() then
 	RunService.Heartbeat:Connect(function()
 		local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
-		local roleObject = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
-		local role = if roleObject then roleObject() else nil
-
-		isBadGuy = if role then role.Definition.IsBadGuys or false else false
+		local roleObject = LocalRoundInfo.GetPlayerRole()
+		isBadGuy = roleObject.Definition.IsBadGuys or false
 
 		local toRemove: {C4} = {}
 

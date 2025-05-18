@@ -81,8 +81,7 @@ local function populateScores(): ()
 		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 
-		local roleValue = LocalRoundInfo.PlayerRoles()[i]
-		local role = if roleValue then roleValue() else nil
+		local role = LocalRoundInfo.GetPlayerRole(i)
 		if role then
 			usernameLabel.Text = role:GetFormattedString("@" .. i)
 		else
@@ -149,7 +148,7 @@ local function setWinnerText(): ()
 	assert(winner and winnerKind, "No winner")
 
 	local gamemode = assert(LocalRoundInfo.Gamemode(), "No gamemode")
-	local winnerRole = if winnerKind == "Participant" then assert(assert(LocalRoundInfo.PlayerRoles()[winner])(), "Winning participant has no role") else Role.fromDefinition(gamemode.Roles[winner])
+	local winnerRole = if winnerKind == "Participant" then LocalRoundInfo.GetPlayerRole(winner) else Role.fromDefinition(gamemode.Roles[winner])
 
 	if winnerKind == "Participant" then
 		highlightsPage.Winners.Text = winnerRole:GetFormattedString(winner) .. " wins!"

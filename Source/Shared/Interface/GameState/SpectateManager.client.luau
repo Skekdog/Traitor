@@ -46,8 +46,7 @@ end
 
 local currentCameraMode: "Player" | "Freecam" = "Freecam"
 LocalRoundInfo.PlayerStatuses:Connect(function(statuses)
-	local statusValue = statuses[plr.Name]
-	local status = if statusValue then statusValue() else "Spectating"
+	local status = LocalRoundInfo.GetPlayerStatus()
 	local isSpectating = status ~= "Alive"
 
 	-- Do not early return here because we need to set camera properties always
@@ -87,8 +86,7 @@ local function switchCameraMode(mode: "Player" | "Freecam")
 
 	uiO.CameraMode.Text = "Camera Mode: " .. currentCameraMode
 
-	local statusValue = LocalRoundInfo.PlayerStatuses()[plr.Name]
-	local status = if statusValue then statusValue() else "Spectating"
+	local status = LocalRoundInfo.GetPlayerStatus()
 	if status ~= "Alive" then
 		if currentCameraMode == "Player" then
 			Freecam.StopFreecam()

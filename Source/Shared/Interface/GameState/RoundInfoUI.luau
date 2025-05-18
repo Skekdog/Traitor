@@ -8,6 +8,7 @@ local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ShowMessage = require(ReplicatedStorage.Shared.Interface.Util.ShowMessage)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
@@ -47,13 +48,10 @@ LocalRoundInfo.Paused:Connect(function(_paused)
 end)
 
 local function setRoleText(): ()
-    local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
-    local role = if roleValue then roleValue() else nil
+    local role = LocalRoundInfo.GetPlayerRole()
+    local status = LocalRoundInfo.GetPlayerStatus()
 
-    local statusValue = LocalRoundInfo.PlayerStatuses()[Players.LocalPlayer.Name]
-    local status: Types.ParticipantStatus = if statusValue then statusValue() else "Spectating"
-
-    if role and status == "Alive" then
+    if role ~= Defaults.Role and status == "Alive" then
         roundInfo.TopBar.Role.Text = role:GetFormattedRoleName()
     else
         roundInfo.TopBar.Role.Text = "Spectator"
@@ -89,10 +87,8 @@ ClientInventory.EquippedItem:Connect(function(item)
         return showFreeKillIgnoreReason(false)
     end
 
-    local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
-    local role = if roleValue then roleValue() else nil
-
-    if item.Definition.IsBadGuyItem and (not role or not role.Definition.IsBadGuys) then
+    local role = LocalRoundInfo.GetPlayerRole()
+    if item.Definition.IsBadGuyItem and not role.Definition.IsBadGuys then
         return showFreeKillIgnoreReason(true)
     end
 

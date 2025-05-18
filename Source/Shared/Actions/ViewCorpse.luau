@@ -6,8 +6,7 @@ local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInf
 local remotes = ReplicatedStorage.Remotes
 
 local function ViewCorpse(player: Model | Player): ()
-	local corpseValue = LocalRoundInfo.PlayerCorpses()[player.Name]
-	local corpse = if corpseValue then corpseValue() else nil
+	local corpse = LocalRoundInfo.GetPlayerCorpse(player.Name)
 	if not corpse then
 		corpse = remotes.ClientServer.GetCorpseInfo:InvokeServer(player, ControlManager.IsActionActive("Crouch"))
 		if not corpse then

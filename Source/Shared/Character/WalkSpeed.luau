@@ -1,6 +1,6 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 local module = {}
 
@@ -12,9 +12,8 @@ local function updateWalkSpeed(): ()
 		return
 	end
 
-	local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
-	local role = if roleValue then roleValue() else nil
-	local speed = if role then role.Definition.WalkSpeed or 16 else 16
+	local role = LocalRoundInfo.GetPlayerRole()
+	local speed = role.Definition.WalkSpeed or Defaults.WalkSpeed
 	
 	for _, v in modifiers do
 		speed += v

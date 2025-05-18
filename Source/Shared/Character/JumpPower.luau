@@ -1,6 +1,6 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 
 local modifiers: {[string]: boolean} = {}
@@ -20,9 +20,7 @@ local function setJumpPower(): ()
 		end
 	end
 
-	local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
-	local role = if roleValue then roleValue() else nil
-	hum.JumpPower = if role then role.Definition.JumpPower or 18 else 18
+	hum.JumpPower = LocalRoundInfo.GetPlayerRole().Definition.JumpPower or Defaults.JumpPower
 end
 
 function module.SetModifier(modifier: string, canJump: boolean): ()
