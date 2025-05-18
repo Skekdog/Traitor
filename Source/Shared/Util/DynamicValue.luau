@@ -21,7 +21,7 @@ export type DynamicValue<T> = typeof(setmetatable({} :: {
 	Wait: (DynamicValue<T>) -> T,
 
 	Invoke: (DynamicValue<T>) -> (),
-	[any]: never,
+	[any]: nil,
 }, {} :: {
 	__call: (self: DynamicValue<T>) -> T
 }))
