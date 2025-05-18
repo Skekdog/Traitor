@@ -166,9 +166,6 @@ end
 local function awardScoreForKill(attacker: Types.Participant, victim: Types.Participant): ()
 	local corpse = assert(victim:GetCorpse())
 	local aR, vR = attacker:GetRole(), victim:GetRole()
-	if not aR or not vR then
-		return
-	end
 
 	local attackerRole, victimRole = aR.Definition.Name, vR.Definition.Name
 
@@ -205,7 +202,7 @@ local function getWinner(round: Types.Round): Types.Role?
 		local role = v:GetRole()
 		if role == round:GetRoleFromRoleName("Innocent") or role == round:GetRoleFromRoleName("Detective") then
 			innocents += 1
-		elseif v:GetRole() == round:GetRoleFromRoleName("Traitor") then
+		elseif role == round:GetRoleFromRoleName("Traitor") then
 			traitors += 1
 		end
 	end

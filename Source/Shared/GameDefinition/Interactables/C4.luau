@@ -420,7 +420,7 @@ if RunService:IsServer() then
 		end
 
 		local role = participant:GetRole()
-		if not role or not role.Definition.IsBadGuys then
+		if not role.Definition.IsBadGuys then
 			participant:SetFreeKill("armed a C4")
 		end
 
@@ -460,7 +460,7 @@ if RunService:IsServer() then
 		local alwaysDisarm = false
 
 		local defuserRole = participant:GetRole()
-		if (c4.Extras.ArmedBy == participant) or (defuserRole and defuserRole.Definition.IsBadGuys) then
+		if (c4.Extras.ArmedBy == participant) or (defuserRole.Definition.IsBadGuys) then
 			alwaysDisarm = true
 		end
 

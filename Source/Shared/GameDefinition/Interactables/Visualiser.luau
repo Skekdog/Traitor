@@ -234,8 +234,7 @@ local function BeforeTakeDamage(interactable: Visualiser, params: Types.DamagePa
 		return false
 	end
 
-	local role = attacker:GetRole()
-	return if role then role.Definition.IsBadGuys or false else false
+	return attacker:GetRole().Definition.IsBadGuys or false
 end
 
 local function OnInteractServer(interactable: Visualiser, participant: Types.Participant): ()

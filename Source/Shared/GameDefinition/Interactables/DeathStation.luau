@@ -19,8 +19,7 @@ local function OnLoadServer(interactable: DeathStationServer): ()
 end
 
 local function OnInteractServer(interactable: DeathStationServer, participant: Types.Participant): ()
-	local role = participant:GetRole()
-	if role and role.Definition.IsBadGuys then
+	if participant:GetRole().Definition.IsBadGuys then
 		if not interactable.Extras.DeniedSound.IsPlaying then
 			interactable.Extras.DeniedSound:Play()
 		end
@@ -49,8 +48,7 @@ local function BeforeTakeDamage(interactable: DeathStationServer, params: Types.
 		return false
 	end
 
-	local role = attacker:GetRole()
-	return if role then not role.Definition.IsBadGuys else false
+	return not attacker:GetRole().Definition.IsBadGuys
 end
 
 local interactable: Types.InteractableDefinition = {
