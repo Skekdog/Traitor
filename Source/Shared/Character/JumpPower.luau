@@ -22,7 +22,7 @@ local function setJumpPower(): ()
 
 	local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
 	local role = if roleValue then roleValue() else nil
-	hum.JumpPower = if role then role.Definition.JumpPower else 18
+	hum.JumpPower = if role then role.Definition.JumpPower or 18 else 18
 end
 
 function module.SetModifier(modifier: string, canJump: boolean): ()

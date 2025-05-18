@@ -82,16 +82,6 @@ local roles: {[string]: Types.RoleDefinition} = {
         CanSeeMissingInAction = true,
         CanStealCreditsFromCorpses = true,
 
-        AwardCreditsToRolesOnDeath = {},
-
-        WalkSpeed = 16,
-        JumpPower = 18,
-        Health = 100,
-
-        Accessories = {},
-
-        DamageKarmaMultiplier = 1,
-
         RevealedRoles = {"Competitor"},
     }
 }

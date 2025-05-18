@@ -88,11 +88,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 		RevealedRoles = {"Detective", "Traitor"},
 		HighlightedRoles = {"Traitor"},
 
-		Health = 100,
-		WalkSpeed = 16,
-		JumpPower = 18,
-
-		Accessories = {},
 		DamageKarmaMultiplier = 1.5,
 	},
 
@@ -106,18 +101,10 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Allegiance = {Kind = "Role", Role = "Innocent"},
 		VictoryText = "The lovable Innocents have won the round!",
 
-		Accessories = {},
-		AwardCreditsToRolesOnDeath = {},
-		DamageKarmaMultiplier = 1,
-
 		Allies = {"Innocent", "Detective"},
 		RevealedRoles = {"Detective"},
 
 		ScoreForFindingBodies = 1,
-
-		Health = 100,
-		WalkSpeed = 16,
-		JumpPower = 18,
 	},
 
 	Detective = {
@@ -152,17 +139,12 @@ local roles: {[string]: Types.RoleDefinition} = {
 		CanStealCreditsFromCorpses = true,
 		CorpseSearchResultsPublicised = true,
 
-		Accessories = {},
 		DamageKarmaMultiplier = 1.5,
 
 		Allies = {"Innocent", "Detective"},
 		RevealedRoles = {"Detective"},
 
 		ScoreForFindingBodies = 1,
-
-		Health = 100,
-		WalkSpeed = 16,
-		JumpPower = 18,
 	}
 }
 

@@ -14,7 +14,7 @@ local function updateWalkSpeed(): ()
 
 	local roleValue = LocalRoundInfo.PlayerRoles()[Players.LocalPlayer.Name]
 	local role = if roleValue then roleValue() else nil
-	local speed = if role then role.Definition.WalkSpeed else 16
+	local speed = if role then role.Definition.WalkSpeed or 16 else 16
 	
 	for _, v in modifiers do
 		speed += v
