@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local LocalCharacter = require(script.Parent.LocalCharacter)
+
+local participant = LocalParticipantInfo.GetParticipant()
 
 local modifiers: {[string]: boolean} = {}
 
@@ -20,7 +22,7 @@ local function setJumpPower(): ()
 		end
 	end
 
-	hum.JumpPower = LocalRoundInfo.GetPlayerRole().Definition.JumpPower or Defaults.JumpPower
+	hum.JumpPower = participant.Role().Definition.JumpPower or Defaults.JumpPower
 end
 
 function module.SetModifier(modifier: string, canJump: boolean): ()

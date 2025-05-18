@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -126,14 +127,15 @@ local function tryPopulateEquipment(role: Types.Role?): ()
     end
 end
 
-local lastRole = LocalRoundInfo.GetPlayerRole()
-LocalRoundInfo.PlayerRoles:Connect(function(roles)
-    local role = LocalRoundInfo.GetPlayerRole()
+local participant = LocalParticipantInfo.GetParticipant()
+local lastRole: Types.Role?
+
+participant.Role:Connect(function(role)
     if lastRole ~= role then
         lastRole = role
         tryPopulateEquipment(role)
     end
-end)
+end, true)
 
 LocalRoundInfo.Credits:Connect(function(credits)
     updateCredits()

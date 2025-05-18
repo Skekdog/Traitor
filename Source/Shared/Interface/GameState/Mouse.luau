@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local GetAmmoDefinition = require(ReplicatedStorage.Shared.LocalState.GetAmmoDefinition)
 local GetDroppedItemState = require(ReplicatedStorage.Shared.LocalState.GetDroppedItemState)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 
@@ -29,7 +30,7 @@ function module.ShowPlayerInfo(char: Model)
         return
     end
 
-	local role = LocalRoundInfo.GetPlayerRole(plr.Name)
+	local role = LocalParticipantInfo.GetParticipant(plr.Name).Role()
 	playerInfo:FindFirstChild("Name").Text = plr.Name
 
 	local healthPercent = health / hum.MaxHealth * 100
@@ -90,7 +91,7 @@ local corpseHint = interactableFrame.InteractableName
 function module.ShowCorpseHint(char: Model)
 	local plr = Players.LocalPlayer
 
-	local status = LocalRoundInfo.GetPlayerStatus(plr.Name)
+	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 	if status == "Alive" then
 		if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
 			return
@@ -100,7 +101,7 @@ function module.ShowCorpseHint(char: Model)
 	if char:GetAttribute("Unidentified") then
 		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body`
 	else
-		local role = LocalRoundInfo.GetPlayerRole(char.Name)
+		local role = LocalParticipantInfo.GetParticipant(char.Name).Role()
 		corpseHint.Text = `{role:GetFormattedString(char.Name .. "'s")} Body`
 	end
 
@@ -110,7 +111,7 @@ end
 
 function module.ShowInteractableHint(interactablePart: BasePart): ()
 	local plr = Players.LocalPlayer
-	local status = LocalRoundInfo.GetPlayerStatus(plr.Name)
+	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 
 	if status ~= "Alive" then
 		return

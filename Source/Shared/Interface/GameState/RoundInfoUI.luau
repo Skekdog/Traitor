@@ -7,9 +7,12 @@ local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ShowMessage = require(ReplicatedStorage.Shared.Interface.Util.ShowMessage)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+
+local participant = LocalParticipantInfo.GetParticipant()
 
 local roundInfo = UIManager.WaitForUI("RoundInfo").Object :: typeof(UIManager.UnregisteredUIs.RoundInfo)
 
@@ -48,8 +51,8 @@ LocalRoundInfo.Paused:Connect(function(_paused)
 end)
 
 local function setRoleText(): ()
-    local role = LocalRoundInfo.GetPlayerRole()
-    local status = LocalRoundInfo.GetPlayerStatus()
+    local role = participant.Role()
+    local status = participant.Status()
 
     if role ~= Defaults.Role and status == "Alive" then
         roundInfo.TopBar.Role.Text = role:GetFormattedRoleName()
@@ -58,8 +61,8 @@ local function setRoleText(): ()
     end
 end
 
-LocalRoundInfo.PlayerRoles:Connect(setRoleText)
-LocalRoundInfo.PlayerStatuses:Connect(setRoleText)
+participant.Status:Connect(setRoleText, true)
+participant.Role:Connect(setRoleText, true)
 
 local function updateFreeKillStatus(): ()
     local hasReason = not not LocalRoundInfo.FreeKill()
@@ -87,7 +90,7 @@ ClientInventory.EquippedItem:Connect(function(item)
         return showFreeKillIgnoreReason(false)
     end
 
-    local role = LocalRoundInfo.GetPlayerRole()
+    local role = participant.Role()
     if item.Definition.IsBadGuyItem and not role.Definition.IsBadGuys then
         return showFreeKillIgnoreReason(true)
     end

@@ -3,6 +3,7 @@ local SoundService = game:GetService("SoundService")
 local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -81,7 +82,7 @@ local function populateScores(): ()
 		usernameLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 		totalLabel.Size = UDim2.new(0.5, 0, 0, minimisedScoreSize)
 
-		local role = LocalRoundInfo.GetPlayerRole(i)
+		local role = LocalParticipantInfo.GetParticipant(i).Role()
 		if role then
 			usernameLabel.Text = role:GetFormattedString("@" .. i)
 		else
@@ -148,7 +149,7 @@ local function setWinnerText(): ()
 	assert(winner and winnerKind, "No winner")
 
 	local gamemode = assert(LocalRoundInfo.Gamemode(), "No gamemode")
-	local winnerRole = if winnerKind == "Participant" then LocalRoundInfo.GetPlayerRole(winner) else Role.fromDefinition(gamemode.Roles[winner])
+	local winnerRole = if winnerKind == "Participant" then LocalParticipantInfo.GetParticipant(winner).Role() else Role.fromDefinition(gamemode.Roles[winner])
 
 	if winnerKind == "Participant" then
 		highlightsPage.Winners.Text = winnerRole:GetFormattedString(winner) .. " wins!"

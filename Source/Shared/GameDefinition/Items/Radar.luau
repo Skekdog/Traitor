@@ -26,10 +26,10 @@ local function HeartbeatClient(item: Types.AnyItem): ()
 
     local decoyPlayers: {Player} = {}
     for _, v in Decoy.ActiveDecoysClient do
-        local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+        local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
         table.insert(decoyPlayers, v.Extras.Player)
 
-        CreateRadarPoint(v.Object.CFrame, if LocalRoundInfo.GetPlayerRole().Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
+        CreateRadarPoint(v.Object.CFrame, if LocalParticipantInfo.GetParticipant().Role().Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
     end
 
     for _, v in Players:GetPlayers() do

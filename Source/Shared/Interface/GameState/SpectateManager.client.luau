@@ -4,7 +4,9 @@ local plr = Players.LocalPlayer
 
 local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
+
+local participant = LocalParticipantInfo.GetParticipant()
 
 local camera = workspace.CurrentCamera
 local ui = UIManager.WaitForUI("Spectate")
@@ -45,8 +47,7 @@ local function spectateFunc(action, state)
 end
 
 local currentCameraMode: "Player" | "Freecam" = "Freecam"
-LocalRoundInfo.PlayerStatuses:Connect(function(statuses)
-	local status = LocalRoundInfo.GetPlayerStatus()
+participant.Status:Connect(function(status)
 	local isSpectating = status ~= "Alive"
 
 	-- Do not early return here because we need to set camera properties always
@@ -71,7 +72,7 @@ LocalRoundInfo.PlayerStatuses:Connect(function(statuses)
 		camera.CameraType = Enum.CameraType.Custom
 		plr.CameraMode = Enum.CameraMode.LockFirstPerson
 	end
-end)
+end, true)
 
 uiO.Forward.MouseButton1Click:Connect(function()
 	spectateFunc("Spectate Next", Enum.UserInputState.End)
@@ -86,7 +87,7 @@ local function switchCameraMode(mode: "Player" | "Freecam")
 
 	uiO.CameraMode.Text = "Camera Mode: " .. currentCameraMode
 
-	local status = LocalRoundInfo.GetPlayerStatus()
+	local status = participant.Status()
 	if status ~= "Alive" then
 		if currentCameraMode == "Player" then
 			Freecam.StopFreecam()

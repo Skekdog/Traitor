@@ -1,6 +1,6 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
+local LocalParticipantInfo = require(script.Parent.LocalParticipantInfo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function highlight(player: Player, role: Types.Role)
@@ -13,8 +13,8 @@ local function highlight(player: Player, role: Types.Role)
 end
 
 local function tryHighlightPlayer(player: Player): ()
-    local ownRole = LocalRoundInfo.GetPlayerRole()
-    local theirRole = LocalRoundInfo.GetPlayerRole(player.Name)
+    local ownRole = LocalParticipantInfo.GetParticipant().Role()
+    local theirRole = LocalParticipantInfo.GetParticipant(player.Name).Role()
 
     if not ownRole.Definition.HighlightedRoles then
         return

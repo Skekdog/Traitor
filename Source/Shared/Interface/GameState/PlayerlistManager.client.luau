@@ -3,10 +3,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ViewCorpse = require(ReplicatedStorage.Shared.Actions.ViewCorpse)
 local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local InstanceSignal = require(ReplicatedStorage.Shared.Util.InstanceSignal)
 
 local ui = UIManager.WaitForUI("Playerlist").Object :: typeof(UIManager.UnregisteredUIs.Playerlist)
 local info = ui.Info
@@ -48,52 +50,12 @@ local function selectMark(marks: Frame & any, button: (TextButton & any)?, plr: 
 	plr:SetAttribute("MarkColour", button.TextColor3)
 end
 
-function updatePlr(plr: Player, clone: PlayerElement?)
-	if not clone then
-		return
-	end
-
-	local status = LocalRoundInfo.GetPlayerStatus(plr.Name)
-
-	local marksVisible = (status == "Alive") and (plr ~= Players.LocalPlayer)
-	for _, v in clone.Marks:GetChildren() do
-		if v:IsA("TextButton") then
-			v.Visible = marksVisible
-		end
-	end
-
-	selectMark(clone.Marks, nil, plr)
-
-	clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
-	clone.Score.Text = tostring(plr:GetAttribute("Score"))
-	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
-
-	clone.SearchedIcon.Visible = not not LocalRoundInfo.PlayerCorpses()[plr.Name]
-
-	movePlr(plr, status :: Types.ParticipantStatus)
-
-	local role = LocalRoundInfo.GetPlayerRole(plr.Name)
-	if role == Defaults.Role then
-		clone.Username:SetAttribute("KeepText")
-		ThemesManager.UpdateThemeInstance(clone.Username)
-	else
-		clone.Username:SetAttribute("KeepText", true)
-		clone.Username.TextColor3 = role.Definition.Color
-	end
-end
-
 local function createPlr(plr: Player)
+	local participant = LocalParticipantInfo.GetParticipant(plr.Name)
 	local clone = ui.PlayerFrame:Clone()
 	players[plr.Name] = clone
 
-	clone.Username.Text = "@"..plr.Name
-	clone.Username.TextColor3 = Color3.new()
-
-	clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
-	clone.Score.Text = tostring(plr:GetAttribute("Score"))
-	clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
-
-	clone.SearchedIcon.Visible = not not LocalRoundInfo.PlayerCorpses()[plr.Name]
+	clone.Username.Text = "@" .. plr.Name
 
 	pcall(function()
 		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
@@ -119,19 +81,35 @@ local function createPlr(plr: Player)
 		end
 	end)
 
-	plr:GetAttributeChangedSignal("Karma"):Connect(function()
+	InstanceSignal.ListenAttribute(plr, "Karma", nil :: number?):Connect(function(karma)
 		clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
-	end)
+	end, true)
 
-	plr:GetAttributeChangedSignal("Score"):Connect(function()
+	InstanceSignal.ListenAttribute(plr, "Score", nil :: number?):Connect(function(score)
 		clone.Score.Text = tostring(plr:GetAttribute("Score"))
-	end)
-	
-	plr:GetAttributeChangedSignal("TotalScore"):Connect(function()
-		clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
-	end)
+	end, true)
 
-	updatePlr(plr, clone)
+	InstanceSignal.ListenAttribute(plr, "TotalScore", nil :: number?):Connect(function()
+		clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
+	end, true)
+
+	participant.Corpse:Connect(function(corpse)
+		clone.SearchedIcon.Visible = not not corpse
+	end, true)
+
+	participant.Role:Connect(function(role)
+		if role == Defaults.Role then
+			clone.Username:SetAttribute("KeepText")
+			ThemesManager.UpdateThemeInstance(clone.Username)
+		else
+			clone.Username:SetAttribute("KeepText", true)
+			clone.Username.TextColor3 = role.Definition.Color
+		end
+	end, true)
+
+	participant.Status:Connect(function(status)
+		movePlr(plr, status :: Types.ParticipantStatus)
+	end, true)
 
 	return clone :: PlayerElement
 end
@@ -192,29 +170,7 @@ local function removePlr(plr: Player)
 	end
 end
 
-if false then -- This looks stupid but that's because it is. This doesn't do anything at runtime instead it silences the error about undefined global
-	(movePlr :: any)()
-end
-
 Players.PlayerRemoving:Connect(removePlr)
-
-LocalRoundInfo.PlayerRoles:Connect(function()
-	for _, v in Players:GetPlayers() do
-		updatePlr(v, findPlr(v.Name) or createPlr(v))
-	end
-end, true)
-
-LocalRoundInfo.PlayerStatuses:Connect(function()
-	for _, v in Players:GetPlayers() do
-		updatePlr(v, findPlr(v.Name) or createPlr(v))
-	end
-end, true)
-
-LocalRoundInfo.PlayerCorpses:Connect(function()
-	for _, v in Players:GetPlayers() do
-		updatePlr(v, findPlr(v.Name))
-	end
-end, true)
 
 LocalRoundInfo.Gamemode:Connect(function(gamemode)
 	if not gamemode then

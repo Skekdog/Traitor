@@ -4,7 +4,7 @@ local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWith
 local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local GetItemDefinition = require(ReplicatedStorage.Shared.LocalState.GetItemDefinition)
-local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
@@ -183,7 +183,7 @@ return function(corpseInfo: Types.CorpseView?)
     end
 
     local name = corpseInfo.Name
-    local role = LocalRoundInfo.GetPlayerRole(name)
+    local role = LocalParticipantInfo.GetParticipant(name).Role()
 
     if role ~= Defaults.Role then
         corpseUi.Object.Title.Text = `{role:GetFormattedString(`@{name}'s`)} Corpse | {role:GetFormattedRoleName()}`

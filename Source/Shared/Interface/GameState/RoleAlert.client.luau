@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
@@ -9,10 +9,9 @@ local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local ui = UIManager.WaitForUI("RoleAlert") 
 local UI = ui.Object :: typeof(UIManager.UnregisteredUIs.RoleAlert)
 
+local participant = LocalParticipantInfo.GetParticipant()
 local lastRole = ""
-LocalRoundInfo.PlayerRoles:Connect(function(roles)
-	local role = LocalRoundInfo.GetPlayerRole()
-
+participant.Role:Connect(function(role)
 	if role.Definition.Name == lastRole or role == Defaults.Role then
 		lastRole = role.Definition.Name
 		return

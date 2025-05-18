@@ -5,11 +5,14 @@ local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local StandardDoor = require(script.Parent.StandardDoor)
 local ViewCorpse = require(script.Parent.ViewCorpse)
+
+local participant = LocalParticipantInfo.GetParticipant()
 
 local module = {}
 
@@ -21,7 +24,7 @@ local function distanceCheck(target: Vector3, maxDistance: number): boolean
 end
 
 local function interactCorpse(corpse: Model): boolean
-	local status = LocalRoundInfo.GetPlayerStatus()
+	local status = participant.Status()
 	if status == "Alive" then
 		if not distanceCheck(corpse:GetPivot().Position, 10) then
 			return false

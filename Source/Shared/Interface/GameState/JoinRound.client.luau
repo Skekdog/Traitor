@@ -2,8 +2,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+
+local participant = LocalParticipantInfo.GetParticipant()
 
 local this = UIManager.WaitForUI("JoinRound") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.JoinRound)}
 
@@ -11,7 +14,7 @@ local validPhases: {Types.RoundPhase} = {"Waiting", "Preparing"}
 local wasJoinClicked = false
 
 local function shouldMakeVisible(): boolean
-	local status = LocalRoundInfo.GetPlayerStatus()
+	local status = participant.Status()
 	return not wasJoinClicked and table.find(validPhases, LocalRoundInfo.RoundPhase()) ~= nil and status == "Spectating"
 end
 
@@ -31,6 +34,7 @@ LocalRoundInfo.RoundPhase:Connect(function()
 	this:ToggleVisible(shouldMakeVisible())
 end, true)
 
-LocalRoundInfo.PlayerStatuses:Connect(function()
+
+participant.Status:Connect(function()
 	this:ToggleVisible(shouldMakeVisible())
 end, true)

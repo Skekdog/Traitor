@@ -1,9 +1,6 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
-local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local InstanceSignal = require(ReplicatedStorage.Shared.Util.InstanceSignal)
@@ -11,8 +8,6 @@ local module = {}
 
 local replicatedData = ReplicatedStorage.Shared.RoundRule.ReplicatedData
 local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
-
-type CallbackName = "Map" | "Gamemode" | "Role" | "Paused" | "Phase" | "AdvanceTime" | "Credits" | "PlayerStatus" | "PlayerRole" | "Winner" | "WinnerKind" | "StartTime" | "Corpse"
 
 type RoundHighlight = {
     Title: string,
@@ -41,16 +36,6 @@ InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connec
         module.Gamemode:SetValue()
     end
 end, true)
-
-local function getRoleFromName(name: string?): Types.Role?
-    if not name or name == "" then
-        return Defaults.Role
-    end
-    
-	local gamemode = module.Gamemode()
-    assert(gamemode, "Gamemode is not loaded")
-    return Role.fromDefinition(gamemode.Roles[name] or error("Role not found"))
-end
 
 module.Credits = DynamicValue.new(0)
 remotes.UpdateCredits.OnClientEvent:Connect(function(value: number?)
@@ -127,40 +112,6 @@ InstanceSignal.ListenAttribute(replicatedData, "StartTime", nil :: number?):Conn
 	module.StartTime:SetValue(startTime)
 end, true)
 
-module.PlayerStatuses = DynamicValue.new({} :: {[string]: Types.ParticipantStatus?})
-remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(name: string, status: Types.ParticipantStatus?)
-	module.PlayerStatuses()[name] = status
-	module.PlayerStatuses:Invoke()
-end)
-
-function module.GetPlayerStatus(name: string?): Types.ParticipantStatus
-    return module.PlayerStatuses()[name or Players.LocalPlayer.Name] or (Defaults.ParticipantStatus :: Types.ParticipantStatus)
-end
-
-module.PlayerRoles = DynamicValue.new({} :: {[string]: Types.Role?})
-remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: string?)
-    module.PlayerRoles()[name] = getRoleFromName(roleName)
-    module.PlayerRoles:Invoke()
-end)
-
-function module.GetPlayerRole(name: string?): Types.Role
-    return module.PlayerRoles()[name or Players.LocalPlayer.Name] or Defaults.Role
-end
-
-module.PlayerCorpses = DynamicValue.new({} :: {[string]: Types.CorpseView?})
-remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.CorpseView, covert: boolean)
-    if covert then
-        return
-    end
-
-    module.PlayerCorpses()[corpse.Name] = corpse
-	module.PlayerCorpses:Invoke()
-end)
-
-function module.GetPlayerCorpse(name: string?): Types.CorpseView?
-    return module.PlayerCorpses()[name or Players.LocalPlayer.Name]
-end
-
 function module.GetPlayerScores(): {[string]: Types.ScoreTable}
     local playerScores: {[string]: Types.ScoreTable} = {}
     for _, v in replicatedData.Scores:GetChildren() do
@@ -224,9 +175,6 @@ module.OnReset = DynamicValue.new(nil)
 
 remotes.Reset.OnClientEvent:Connect(function()
 	module.Credits:SetValue(0)
-	module.PlayerStatuses:SetValue({})
-	module.PlayerRoles:SetValue({})
-    module.PlayerCorpses:SetValue({})
     module.Interactables:SetValue({})
     module.FreeKill:SetValue()
 
