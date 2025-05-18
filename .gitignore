@@ -2,4 +2,5 @@
 *.rbxl.lock
 sourcemap.json
 *.vscode
+*.env
 Ignore/

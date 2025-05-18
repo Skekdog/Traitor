@@ -67,13 +67,10 @@ Players.PlayerRemoving:Connect(function(plr)
 		ScoreManager.SetTotalScore(plr, totalScore)
 	end
 
-    if not participant then
-        return
+    if participant then
+        KarmaManager.SetKarma(plr, participant:GetKarma())
+		round:RemoveParticipant(participant, false)
     end
-
-    KarmaManager.SetKarma(plr, participant:GetKarma())
-
-    round:RemoveParticipant(participant, false)
 
     ProfileManager.ReleaseProfile(plr)
 end)

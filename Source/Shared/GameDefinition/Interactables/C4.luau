@@ -457,12 +457,17 @@ if RunService:IsServer() then
 			return
 		end
 
-		local armRole: Types.Role? = c4.Extras.ArmedBy:GetRole()
-		local badGuyDefuse = if not armRole then false else armRole.Definition.IsBadGuys and participant:GetRole() == armRole
+		local alwaysDisarm = false
 
-		if badGuyDefuse or participant == c4.Extras.ArmedBy or not table.find(c4.Extras.DangerousWires, cutWire) then
+		local defuserRole = participant:GetRole()
+		if (c4.Extras.ArmedBy == participant) or (defuserRole and defuserRole.Definition.IsBadGuys) then
+			alwaysDisarm = true
+		end
+
+		if alwaysDisarm or not table.find(c4.Extras.DangerousWires, cutWire) then
 			return disarm(c4)
 		end
+		
 		tryExplode(c4, c4.Extras.ArmId, true)
 	end
 
