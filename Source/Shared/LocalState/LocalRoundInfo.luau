@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
@@ -41,8 +42,8 @@ InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connec
 end, true)
 
 local function getRoleFromName(name: string?): Types.Role?
-    if not name then
-        return nil
+    if not name or name == "" then
+        return Defaults.Role
     end
     
 	local gamemode = module.Gamemode()
