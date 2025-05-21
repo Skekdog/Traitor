@@ -53,6 +53,15 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 	DNAScanner.AddDNATrace(newItem, attacker, nil, "rbxassetid://14930962070", model)
 end
 
+local function BeforeHitParticipant(item: Types.ItemBeforeHit, round: Types.Round, hitParticipant: Types.Participant, params: Types.DamageParams): boolean
+	local attacker = params.Attacker
+	assert(attacker and item.Kind == "Melee")
+
+	attacker:RemoveItem(item)
+
+	return true
+end
+
 local item: Types.MeleeWeaponDefinition = {
 	Kind = "Melee" :: "Melee",
 	Name = "Knife",
@@ -80,6 +89,8 @@ local item: Types.MeleeWeaponDefinition = {
 
 	AlternateFireServer = throw,
 	AlternateToggled = true,
+
+	BeforeHitParticipant = BeforeHitParticipant,
 }
 
 return item
