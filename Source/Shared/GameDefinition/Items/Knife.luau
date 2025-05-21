@@ -64,6 +64,9 @@ local item: Types.MeleeWeaponDefinition = {
 	CanDrop = true,
 	IsBadGuyItem = true,
 
+	CreditCost = 1,
+	MaxStock = 2,
+
 	DamageKind = "Stab" :: "Stab",
 	Damage = DAMAGE,
 
