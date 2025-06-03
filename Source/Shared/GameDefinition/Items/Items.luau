@@ -10,6 +10,7 @@ local Ammo = require(script.Parent.Ammo)
 local BallisticVest = require(script.Parent.BallisticVest)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
+local Defuser = require(script.Parent.Defuser)
 local FlareGun = require(script.Parent.FlareGun)
 local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
@@ -955,6 +956,8 @@ items.DNAScanner = DNAScanner.Item
 items.Teleporter = Teleporter
 
 items.Radar = Radar
+
+items.Defuser = Defuser
 
 items["Ballistic Vest"] = BallisticVest.Item
 

@@ -131,6 +131,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["HealthStation"],
 			Items["Teleporter"],
 			Items["Visualiser"],
+			Items["Defuser"],
 		},
 
 		AwardCreditsToRolesOnDeath = {
@@ -269,7 +270,7 @@ local gamemode: Types.Gamemode = {
 	AvailableItems = Items,
 
 	InteractableDefinitions = {
-		C4 = C4,
+		C4 = C4.Interactable,
 		HealthStation = HealthStation.Interactable,
 		DeathStation = DeathStation,
 		Decoy = Decoy.Interactable,

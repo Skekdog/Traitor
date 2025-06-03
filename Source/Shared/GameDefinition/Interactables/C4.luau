@@ -13,6 +13,8 @@ local WIRE_COUNT = 6
 
 local TEXT_HIGHLIGHT_COLOUR = Color3.fromRGB(66, 135, 245)
 
+local module = {}
+
 local explosionInfo: Types.ExplosionInfo = {
 	Damage = 100,
 	FalloffBegin = 40,
@@ -446,7 +448,7 @@ if RunService:IsServer() then
 		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)
 	end
 
-	local function tryDisarm(c4: C4, participant: Types.Participant, cutWire: number?): ()
+	function module.TryDisarm(c4: C4, participant: Types.Participant, cutWire: number?, safeDisarm: boolean?): ()
 		if not cutWire or cutWire < 1 or cutWire > WIRE_COUNT then
 			return
 		end
@@ -455,7 +457,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		local alwaysDisarm = false
+		local alwaysDisarm = safeDisarm or false
 
 		local defuserRole = participant:GetRole()
 		if (c4.Extras.ArmedBy == participant) or (defuserRole.Definition.IsBadGuys) then
@@ -523,7 +525,7 @@ if RunService:IsServer() then
 		if action == "Arm" then
 			tryArm(c4, participant, explodeAtOrWireCut)
 		elseif action == "CutWire" then
-			tryDisarm(c4, participant, explodeAtOrWireCut)
+			module.TryDisarm(c4, participant, explodeAtOrWireCut)
 		elseif action == "Take" then
 			tryTake(c4, participant)
 		elseif action == "Destroy" then
@@ -562,4 +564,6 @@ local interactable: Types.InteractableDefinition = {
 	end,
 }
 
-return interactable
+module.Interactable = interactable
+
+return module

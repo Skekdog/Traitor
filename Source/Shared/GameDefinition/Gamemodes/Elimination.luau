@@ -134,7 +134,7 @@ local gamemode: Types.Gamemode = {
     AvailableAmmo = Ammo,
 
     InteractableDefinitions = {
-        C4 = C4,
+        C4 = C4.Interactable,
         HealthStation = HealthStation.Interactable,
         DeathStation = DeathStation,
         Decoy = Decoy.Interactable,
