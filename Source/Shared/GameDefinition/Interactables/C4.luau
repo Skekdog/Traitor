@@ -101,8 +101,8 @@ local function setDuration(c4: C4, percent: number): ()
 	c4.Extras.ArmDurationClient = duration
 end
 
-local function playBeep(): ()
-	PlaySound(9117060347, nil, SoundService)
+local function playBeep(position: Vector3?, parent: Instance?): ()
+	PlaySound(9117060347, position, parent)
 end
 
 local isFirstInit = true
@@ -144,7 +144,7 @@ local function showC4Menu(c4: C4, show: boolean): ()
 	if isFirstInit then
 		buttons.Arm.MouseButton1Click:Connect(function()
 			showC4Menu(currentC4, false)
-			playBeep()
+			playBeep(nil, SoundService)
 			remote:FireServer(currentC4.Object, "Arm", currentC4.Extras.ArmDurationClient or error("ArmDurationClient is nil"))
 		end)
 
@@ -170,11 +170,6 @@ local function showC4Menu(c4: C4, show: boolean): ()
 
 					showC4Menu(currentC4, false)
 					remote:FireServer(currentC4.Object, "CutWire", tonumber(v.Name:sub(5, 5)))
-					PlaySound(9118822196, nil, SoundService, {
-						Volume = 1.5,
-						PlaybackRegion = NumberRange.new(0.11, 60000),
-					})
-					playBeep()
 				end)
 			end
 		end
@@ -208,7 +203,7 @@ end
 local c4s = DynamicValue.new({} :: {[Instance]: C4})
 if RunService:IsClient() then
 	local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
-	
+
 	local isBadGuy = false
 
 	local function updateMarkerVisibility(): ()
@@ -456,6 +451,12 @@ if RunService:IsServer() then
 		if not isArmed(c4) then
 			return
 		end
+
+		PlaySound(9118822196, c4.Object.Position, nil, {
+			Volume = 1.5,
+			PlaybackRegion = NumberRange.new(0.11, 60000),
+		})
+		playBeep(c4.Object.Position)
 
 		local alwaysDisarm = safeDisarm or false
 
