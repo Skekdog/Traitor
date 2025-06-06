@@ -7,6 +7,9 @@
       ]
     },
     "PlaybackRegionsEnabled": true,
+    "RollOffMaxDistance": 100,
+    "RollOffMinDistance": 10,
+    "RollOffMode": "Inverse",
     "SoundId": "rbxassetid://9125671948",
     "Volume": 5
   },
