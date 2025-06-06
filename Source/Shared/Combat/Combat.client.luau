@@ -67,8 +67,10 @@ local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	item.IsReloading = true
 
 	ViewmodelModule.ReloadSpring.p = Vector3.new(10, 5, 10)
-	
-	PlaySound(item.Definition.ReloadSound, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+
+	if item.Definition.ReloadSound then
+		PlaySound(item.Definition.ReloadSound, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+	end
 
 	ReplicatedStorage.Remotes.ClientServer.ReloadWeapon:FireServer(item.Definition.Name)
 

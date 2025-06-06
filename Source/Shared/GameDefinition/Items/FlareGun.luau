@@ -9,8 +9,8 @@ local function models(name: string): BasePart
     return ReplicatedStorage.Assets:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
 end
 
-local function firedSounds(name: string): string
-    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound).SoundId
+local function firedSounds(name: string): Sound
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound)
 end
 
 local function projectiles(name: string): BasePart
@@ -190,7 +190,6 @@ local item: Types.GunWeaponDefinition = {
     },
 
     AmmoType = Ammo.Flare,
-    ReloadSound = "",
 
     HasMuzzleFlash = true,
 

@@ -232,9 +232,6 @@ local item: Types.GunWeaponDefinition = {
 	ReloadTime = 0,
 	AmmoType = Ammo["Poltergeist"],
 
-	AttackSound = "",
-	ReloadSound = "",
-
 	RecoilX = 0,
 	RecoilY = 0,
 

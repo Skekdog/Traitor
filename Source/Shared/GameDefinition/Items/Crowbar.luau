@@ -34,7 +34,7 @@ local item: Types.MeleeWeaponDefinition = {
     MaxDistance = 7,
     Damage = 20,
     AttackInterval = 0.3,
-    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar.SoundId,
+    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar,
 
     AlternateFireServer = function(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
         local char = attacker:GetCharacter()

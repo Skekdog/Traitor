@@ -111,8 +111,7 @@ local item: Types.GunWeaponDefinition = {
 
     Model = ReplicatedStorage.Assets.WeaponModels["Newton Launcher"],
     HoldAnimation = "rbxassetid://10247380824",
-    AttackSound = "rbxassetid://8561500387",
-    ReloadSound = "",
+    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired["Newton Launcher"] :: Sound,
 
     Projectile = ReplicatedStorage.Assets.Projectiles["Newton"],
     ProjectileSpeed = 300,

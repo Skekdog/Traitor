@@ -312,7 +312,9 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			return "ShooterTooFar"
 		end
 
-		PlaySound(definition.AttackSound, nil, char.PrimaryPart, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+		if definition.AttackSound then
+			PlaySound(definition.AttackSound, nil, char.PrimaryPart, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+		end
 	end
 
 	if item.Kind == "Gun" then

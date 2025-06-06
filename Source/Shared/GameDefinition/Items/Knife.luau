@@ -81,7 +81,7 @@ local item: Types.MeleeWeaponDefinition = {
 
 	MaxDistance = 7,
 	AttackInterval = 0.75,
-	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar.SoundId,
+	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar,
 
 	Model = ReplicatedStorage.Assets.WeaponModels.Knife,
 	HoldAnimation = "rbxassetid://96501965592565",

@@ -28,16 +28,16 @@ local function interactableModels(name: string): BasePart
 	return ReplicatedStorage.Assets:WaitForChild("InteractableModels"):WaitForChild(name) :: BasePart
 end
 
-local function weaponSounds(name: string): string
-    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
+local function weaponSounds(name: string): Sound
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound)
 end
 
-local function firedSounds(name: string): string
-    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound).SoundId
+local function firedSounds(name: string): Sound
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound)
 end
 
-local function reloadSounds(name: string): string
-    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name) :: Sound).SoundId
+local function reloadSounds(name: string): Sound
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Reload"):WaitForChild(name) :: Sound)
 end
 
 local function projectiles(name: string): BasePart
@@ -87,8 +87,7 @@ local function makeGolden(victim: Types.Participant)
             deathSound:Destroy()
         end
 
-        local sound = Instance.new("Sound")
-        sound.SoundId = weaponSounds("GoldenGunHit")
+        local sound = weaponSounds("GoldenGunHit"):Clone()
         sound.Name = "DeathSound"
         sound.Parent = root
     end
@@ -142,7 +141,6 @@ guns.HUGE = {
     AimAnimation = "rbxassetid://18691844030",
 
     AttackSound = firedSounds("HUGE"),
-    ReloadSound = "",
 
     RecoilX = 1,
     RecoilY = 2,
@@ -243,7 +241,6 @@ guns["Golden Gun"] = {
     },
 
     AmmoType = Ammo["Golden Bullet"],
-    ReloadSound = "",
 
     Spread = 0,
 
@@ -378,7 +375,6 @@ guns.AWP = {
     },
 
     AmmoType = Ammo.AWP,
-    ReloadSound = "",
 
     HasMuzzleFlash = true,
 
