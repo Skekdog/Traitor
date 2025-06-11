@@ -8,6 +8,7 @@ local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.Create
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local BallisticVest = require(script.Parent.BallisticVest)
+local Binoculars = require(script.Parent.Binoculars)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
 local Defuser = require(script.Parent.Defuser)
@@ -954,6 +955,8 @@ items.Teleporter = Teleporter
 items.Radar = Radar
 
 items.Defuser = Defuser
+
+items.Binoculars = Binoculars.Item
 
 items["Ballistic Vest"] = BallisticVest.Item
 

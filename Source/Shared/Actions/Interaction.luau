@@ -16,6 +16,8 @@ local participant = LocalParticipantInfo.GetParticipant()
 
 local module = {}
 
+module.CorpseInteractDistance = 10
+
 module.InteractTarget = nil :: Instance?
 
 local function distanceCheck(target: Vector3, maxDistance: number): boolean
@@ -26,7 +28,7 @@ end
 local function interactCorpse(corpse: Model): boolean
 	local status = participant.Status()
 	if status == "Alive" then
-		if not distanceCheck(corpse:GetPivot().Position, 10) then
+		if not distanceCheck(corpse:GetPivot().Position, module.CorpseInteractDistance) then
 			return false
 		end
 	end

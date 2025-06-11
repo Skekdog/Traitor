@@ -9,6 +9,8 @@ local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisp
 
 local module = {}
 
+module.CorpseInteractDistance = 10
+
 local camera = workspace.CurrentCamera
 
 local crosshairInfoUI = UIManager.WaitForUI("CrosshairInfo").Object :: typeof(UIManager.UnregisteredUIs.CrosshairInfo)
@@ -93,7 +95,7 @@ function module.ShowCorpseHint(char: Model)
 
 	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 	if status == "Alive" then
-		if (plr:DistanceFromCharacter(char:GetPivot().Position) > 10) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > 10) then
+		if (plr:DistanceFromCharacter(char:GetPivot().Position) > module.CorpseInteractDistance) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > module.CorpseInteractDistance) then
 			return
 		end
 	end
