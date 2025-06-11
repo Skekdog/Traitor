@@ -181,9 +181,11 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				(item.Definition.AlternateFireClient :: Types.FireActionClient)(item :: Types.Item, "Alternate", origin, direction)
 			end
 
-			local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.AlternateFire:InvokeServer(itemRequest)
-			if result ~= "Success" then
-				warn("Item alternate fire rejected:", result)
+			if item.Definition.AlternateFireServer then
+				local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.AlternateFire:InvokeServer(itemRequest)
+				if result ~= "Success" then
+					warn("Item alternate fire rejected:", result)
+				end
 			end
 
 			return Enum.ContextActionResult.Sink
