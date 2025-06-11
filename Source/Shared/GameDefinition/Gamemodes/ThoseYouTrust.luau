@@ -79,7 +79,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["C4"],
 			Items["DeathStation"],
 			Items["Decoy"],
-			Items["Knife"]
+			Items["Knife"],
 		},
 
 		CanTeamChat = true,
@@ -132,6 +132,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Teleporter"],
 			Items["Visualiser"],
 			Items["Defuser"],
+			Items["Binoculars"],
 		},
 
 		AwardCreditsToRolesOnDeath = {
