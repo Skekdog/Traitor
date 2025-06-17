@@ -63,6 +63,8 @@ function module.UpdateThemeInstance(v: Instance, theme: Theme?, noTransition: bo
 		if v.ClassName == "ChatInputBarConfiguration" then
 			properties.PlaceholderColor3 = if not inverse then theme.PlaceholderText else theme[style or "Primary"]
 		end
+	elseif v.ClassName == "ScrollingFrame" then
+		properties.ScrollBarImageColor3 = Color3.new(1, 1, 1)
 	end
 	
 	if v:IsA("GuiObject") then
