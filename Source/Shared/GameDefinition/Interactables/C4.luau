@@ -142,6 +142,14 @@ local function showC4Menu(c4: C4, show: boolean): ()
 	buttons:FindFirstChild("Destroy").Visible = not isArmedClient(c4)
 
 	if isFirstInit then
+		ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+			if ui.Object.Visible then
+				return
+			end
+			WalkSpeed.SetModifier("C4Menu", 0)
+			JumpPower.SetModifier("C4Menu", true)
+		end)
+
 		buttons.Arm.MouseButton1Click:Connect(function()
 			showC4Menu(currentC4, false)
 			playBeep(nil, SoundService)
