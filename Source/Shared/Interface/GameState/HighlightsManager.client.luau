@@ -29,9 +29,10 @@ repeat
 	task.wait()
 until minimisedScoreSize > 0
 
+-- note: the "Nothing here yet..." label is cleared by populateEvents and populateScores in the destroy children section, not explicitly. It only needs to exist when the game first loads.
 local function populateEvents(): ()
 	for _, v in eventsPage:GetChildren() do
-		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.Name ~= "EventFilters" then
+		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.ClassName ~= "UIPadding" then
 			v:Destroy()
 		end
 	end
@@ -42,7 +43,7 @@ local function populateEvents(): ()
 		event.Name = v.Description
 		event.TextLabel.Text = v.Description
 		event.Time.Text = ToRoundTime(roundStartTime, v.Timestamp)
-		
+
 		if v.WasCorrectKill == false then
 			event.IncorrectDamage.Visible = true
 		end
