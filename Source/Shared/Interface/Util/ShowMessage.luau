@@ -9,18 +9,22 @@ local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 
+type CornerNotificationLabel = typeof(ui.Label)
+
 local global = ui.Global
 local priv = ui.Private
 
-local function fade(label: TextLabel, out: boolean)
+local function fade(label: CornerNotificationLabel, out: boolean)
 	if out then
 		local animate = Settings.GetSetting("Animate UI Transitions")
 		if animate then
 			TweenService:Create(label, TweenInfo.new(5), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+			TweenService:Create(label.UIStroke, TweenInfo.new(5), {Transparency = 1}):Play()
 		end
 		task.delay(5, label.Destroy, label)
 	else
 		UIAnimation.Animate(label, TweenInfo.new(0.25), {TextTransparency = 0, BackgroundTransparency = 0.4})
+		TweenService:Create(label.UIStroke, TweenInfo.new(5), {Transparency = 0}):Play()
 	end
 end
 
