@@ -13,7 +13,7 @@ LocalRoundInfo.Map:Connect(function(map)
 		return
 	end
 
-	creditPopupUI.Object.Text.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
+	creditPopupUI.Object.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
 	creditPopupUI:ToggleVisible(true)
 
 	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Authors
