@@ -106,15 +106,15 @@ local function populateScores(): ()
 		scoreFrame.Name = "ScoreFrame"
 		scoreFrame.Visible = true
 		scoreFrame.Parent = scoresPage
-		
-		scoreFrame.MouseButton1Click:Connect(function()
+
+		scoreFrame.Activated:Connect(function()
 			local open = not scoreFrame:GetAttribute("Open")
 			scoreFrame:SetAttribute("Open", open)
 
 			local targetSize = if open then openedSize else minimisedScoreSize
 			local scoreListTarget = if open then scoreListSize else 0
 
-			local tweenInfo = TweenInfo.new(0.2)
+			local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Exponential)
 			UIAnimation.Animate(scoreFrame, tweenInfo, {
 				Size = UDim2.new(1, 0, 0, targetSize)
 			})
@@ -163,7 +163,7 @@ LocalRoundInfo.RoundPhase:Connect(function(phase)
 		return
 	end
 
-	setWinnerText()	
+	setWinnerText()
 
 	populateEvents()
 	populateScores()
