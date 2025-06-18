@@ -1,7 +1,5 @@
 {
   "name": "Those You Trust",
-
-  "servePlaceIds": [70750259318059, 2848381272],
   "gameId": 1031123722,
 
   "emitLegacyScripts": false,
