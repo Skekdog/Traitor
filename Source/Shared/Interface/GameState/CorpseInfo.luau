@@ -11,7 +11,7 @@ local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
-local object = corpseUi.Object.CorpseInfo
+local object = corpseUi.Object.CorpseInfo.ScrollingFrame
 
 local function colouredText(text: string, colour: Color3): string
     return `<font color='#{colour:ToHex()}'>{text}</font>`
