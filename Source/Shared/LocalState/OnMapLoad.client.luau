@@ -5,7 +5,7 @@ local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
-local creditPopupUI = UIManager.WaitForUI("Credits") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Credits)}
+local alertUI = UIManager.WaitForUI("Alert") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Alert)}
 local playerlistUI = UIManager.WaitForUI("Playerlist") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Playerlist)}
 
 LocalRoundInfo.Map:Connect(function(map)
@@ -13,8 +13,8 @@ LocalRoundInfo.Map:Connect(function(map)
 		return
 	end
 
-	creditPopupUI.Object.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
-	creditPopupUI:ToggleVisible(true)
+	alertUI.Object.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
+	alertUI:ToggleVisible(true)
 
 	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Authors
 	playerlistUI.Object.Info.RoundInfo.Info.Map.Text = `Map: {GetDisplayName(map)}`
@@ -22,5 +22,5 @@ LocalRoundInfo.Map:Connect(function(map)
 	FIBLighting("Use FIB Lighting", Settings.GetSetting("Use FIB Lighting") :: Settings.BooleanValue)
 
 	task.wait(5)
-	creditPopupUI:ToggleVisible(false)
+	alertUI:ToggleVisible(false)
 end, true)
