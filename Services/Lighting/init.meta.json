@@ -6,6 +6,6 @@
 		"EnvironmentDiffuseScale": 1,
 		"EnvironmentSpecularScale": 1,
 		"GlobalShadows": true,
-		"Technology": "Voxel"
+		"Technology": "ShadowMap"
 	}
 }
