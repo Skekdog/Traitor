@@ -15,7 +15,7 @@ local maps = ServerStorage.Maps
 
 local random = Random.new(workspace:GetServerTimeNow())
 
-local currentMap = maps.Skyscraper
+local currentMap = maps.Skylands
 
 type ClientMapInfo = {
     Name: string,
@@ -104,7 +104,7 @@ local function newRound(): Types.Round
 
     local gamemode = pickNextGamemode()
     local round = Round.new(gamemode)
-    round:LoadMap(currentMap)
+    task.defer(round.LoadMap, round, currentMap) -- somefuckinghow loading normally will cause recursive require errors on SERVER scripts, not even module scripts. WTF.
 
     return round
 end
