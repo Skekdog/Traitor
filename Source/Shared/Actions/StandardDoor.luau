@@ -81,10 +81,6 @@ local function StandardDoor(request: DoorRequest): ()
         end
     end
 
-    local targetAngle = (if open then 90 else -90) * angleMult
-    local rotation = CFrame.Angles(0, math.rad(targetAngle), 0)
-    local targetCFrame = pivot * rotation * pivot:Inverse() * initialCFrame
-
     if not IS_SERVER then
         local sounds = {}
         for _, v in door:GetChildren() do
@@ -98,7 +94,9 @@ local function StandardDoor(request: DoorRequest): ()
     task.delay(1, door.SetAttribute, door, "Opening", false)
 
     if request.Kind == "ServerReceive" then
-        
+        local targetAngle = (if open then 90 else -90) * angleMult
+        local rotation = CFrame.Angles(0, math.rad(targetAngle), 0)
+        local targetCFrame = pivot * rotation * pivot:Inverse() * initialCFrame
 
         door.CFrame = targetCFrame
 
@@ -119,8 +117,6 @@ local function StandardDoor(request: DoorRequest): ()
         door:SetAttribute("Opening", true)
 
         return
-    else
-        return remotes.ClientServer.OpenDoor:FireServer(door, open)
     end
 
     door:SetAttribute("Opening", true)
@@ -128,11 +124,15 @@ local function StandardDoor(request: DoorRequest): ()
     local angle = findOrCreateAngleValue(door)
     local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if open then 90 else 0
 
-    remotes.ClientServer.OpenDoor:FireServer(door, open)
+    targetAngle *= angleMult
+
+    if request.Kind == "ClientInteraction" then
+        remotes.ClientServer.OpenDoor:FireServer(door, open)
+    end
 
     TweenService:Create(angle, TweenInfo.new(1, Enum.EasingStyle.Linear), {Value = targetAngle}):Play()
     RunService.PreSimulation:Connect(function()
-        door.CFrame = hingeCFrame * CFrame.Angles(0, math.rad(angle.Value), 0) * offset
+        door.CFrame = pivot * CFrame.Angles(0, math.rad(angle.Value), 0) * pivot:Inverse() * initialCFrame
     end)
 end
 
