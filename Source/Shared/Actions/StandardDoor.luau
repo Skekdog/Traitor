@@ -61,8 +61,29 @@ local function StandardDoor(request: DoorRequest): ()
 
     local initialCFrame = if request.Kind == "ClientReceive" then request.OriginalCFrame else door.CFrame
 
-    local hingeCFrame = initialCFrame * CFrame.new(door.Size.X / -2, 0, 0)
-    local offset = hingeCFrame:Inverse() * initialCFrame
+    local pivot = CFrame.new(door.Size.X / -2, 0, 0)
+    local angleMult = 1
+
+    do
+        local pivotObject = door:FindFirstChild("DoorPivot")
+        if pivotObject and pivotObject:IsA("Attachment") then
+            pivot = pivotObject.WorldCFrame
+
+            local lookVector = pivotObject:GetAttribute("LookVector")
+            if typeof(lookVector) ~= "Vector3" then
+                lookVector = initialCFrame.LookVector
+                pivotObject:SetAttribute("LookVector", lookVector)
+            end
+
+            assert(typeof(lookVector) == "Vector3")
+
+            angleMult = if lookVector:Dot(Vector3.one.Unit) > 0 then -1 else 1
+        end
+    end
+
+    local targetAngle = (if open then 90 else -90) * angleMult
+    local rotation = CFrame.Angles(0, math.rad(targetAngle), 0)
+    local targetCFrame = pivot * rotation * pivot:Inverse() * initialCFrame
 
     if not IS_SERVER then
         local sounds = {}
@@ -77,8 +98,7 @@ local function StandardDoor(request: DoorRequest): ()
     task.delay(1, door.SetAttribute, door, "Opening", false)
 
     if request.Kind == "ServerReceive" then
-        local targetAngle = if open then 90 else -90
-        local targetCFrame = hingeCFrame * CFrame.Angles(0, math.rad(targetAngle), 0) * offset
+        
 
         door.CFrame = targetCFrame
 
@@ -99,6 +119,8 @@ local function StandardDoor(request: DoorRequest): ()
         door:SetAttribute("Opening", true)
 
         return
+    else
+        return remotes.ClientServer.OpenDoor:FireServer(door, open)
     end
 
     door:SetAttribute("Opening", true)
