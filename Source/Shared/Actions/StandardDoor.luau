@@ -46,6 +46,7 @@ end
 
 local function StandardDoor(request: DoorRequest): ()
     if IS_SERVER then
+        print("hi")
         assert(request.Kind == "ServerReceive", "Expected ServerReceive")
     else
         assert(request.Kind == "ClientInteraction" or request.Kind == "ClientReceive", "Expected ClientInteraction or ClientReceive")
@@ -77,9 +78,15 @@ local function StandardDoor(request: DoorRequest): ()
 
             assert(typeof(lookVector) == "Vector3")
 
-            angleMult = if lookVector:Dot(Vector3.one.Unit) > 0 then -1 else 1
+            --angleMult = if lookVector:Dot(Vector3.one.Unit) > 0 then -1 else 1
         end
     end
+
+    local targetAngle = math.rad(if open then 90 else -90) * angleMult
+    local rotation = CFrame.fromAxisAngle(door.CFrame.UpVector, targetAngle)
+    local targetCFrame = pivot * rotation * pivot:Inverse() * initialCFrame
+
+    print(targetAngle)
 
     if not IS_SERVER then
         local sounds = {}
@@ -94,10 +101,6 @@ local function StandardDoor(request: DoorRequest): ()
     task.delay(1, door.SetAttribute, door, "Opening", false)
 
     if request.Kind == "ServerReceive" then
-        local targetAngle = (if open then 90 else -90) * angleMult
-        local rotation = CFrame.Angles(0, math.rad(targetAngle), 0)
-        local targetCFrame = pivot * rotation * pivot:Inverse() * initialCFrame
-
         door.CFrame = targetCFrame
 
         local clientReceive: ClientReceive = {
@@ -117,6 +120,9 @@ local function StandardDoor(request: DoorRequest): ()
         door:SetAttribute("Opening", true)
 
         return
+    else
+        print(angleMult)
+        return remotes.ClientServer.OpenDoor:FireServer(door, open)
     end
 
     door:SetAttribute("Opening", true)
