@@ -112,8 +112,6 @@ local function StandardDoor(request: DoorRequest): ()
         local rotation = CFrame.Angles(0, math.rad(targetAngle), 0)
         local targetCFrame = pivot * rotation * pivot:Inverse() * initialCFrame
 
-        print(pivot.Position, door.Position, targetCFrame.Position)
-
         door.CFrame = targetCFrame
 
         local clientReceive: ClientReceive = {
