@@ -110,7 +110,7 @@ local item: Types.GunWeaponDefinition = {
     AmmoType = Ammo["Infinite"],
 
     Model = ReplicatedStorage.Assets.WeaponModels["Newton Launcher"],
-    HoldAnimation = "rbxassetid://10247380824",
+    HoldAnimation = "rbxassetid://132951688645757",
     AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired["Newton Launcher"] :: Sound,
 
     Projectile = ReplicatedStorage.Assets.Projectiles["Newton"],
