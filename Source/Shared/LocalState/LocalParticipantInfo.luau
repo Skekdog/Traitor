@@ -21,8 +21,8 @@ local function getRoleFromName(name: string?): Types.Role
     if not name or name == "" then
         return Defaults.Role
     end
-    
-	local gamemode = LocalRoundInfo.Gamemode()
+
+	local gamemode = LocalRoundInfo.Gamemode() or LocalRoundInfo.Gamemode:Wait() -- this may have unforseen consequences, test it
     assert(gamemode, "Gamemode is not loaded")
     return Role.fromDefinition(gamemode.Roles[name] or error("Role not found"))
 end
