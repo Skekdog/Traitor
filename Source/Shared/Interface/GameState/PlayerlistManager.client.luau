@@ -197,16 +197,16 @@ LocalRoundInfo.Gamemode:Connect(function(gamemode)
 	info.RoundInfo.Creators.Gamemode.Text = gamemode.Authors
 end, true)
 
-LocalParticipantInfo.Participants:Connect(function(participants)
-	for _, v in participants do
-		if not findPlr(v.Name) then
-			local player = Players:FindFirstChild(v.Name)
-			if not player or not player:IsA("Player") then
-				continue
-			end
-			createPlr(player)
-		end
+Players.PlayerAdded:Connect(function(plr)
+	if not findPlr(plr.Name) then
+		createPlr(plr)
 	end
-end, true)
+end)
+
+for _, v in Players:GetPlayers() do
+	if not findPlr(v.Name) then
+		createPlr(v)
+	end
+end
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
