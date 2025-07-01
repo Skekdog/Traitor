@@ -103,7 +103,7 @@ local function showHealth(show: boolean): ()
 end
 
 local function setHealth(hum: Humanoid)
-    roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.ceil(hum.Health))
+    roundInfo.Frame.HealthBar.HealthLabel.Text = tostring(math.max(math.ceil(hum.Health), 0))
     UIAnimation.Slider(roundInfo.Frame.HealthBar.Background, false, hum.Health, hum.MaxHealth)
 end
 
