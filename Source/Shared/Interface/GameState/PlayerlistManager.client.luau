@@ -21,6 +21,8 @@ local layoutOrders = {
 	["Spectating"] = 3000,
 }
 
+type PlayerStatus = Types.ParticipantStatus | "Spectating"
+
 type PlayerElement = typeof(ui.PlayerFrame)
 local players: {[string]: PlayerElement?} = {}
 local function findPlr(plrName: string)
@@ -67,7 +69,7 @@ local function createPlr(plr: Player)
 	clone.Username.Text = "@" .. plr.Name
 
 	pcall(function()
-		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+		clone.Avatar.Image = Players:GetUserThumbnailAsync(plr.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
 	end)
 
 	clone.Visible = true
@@ -117,14 +119,14 @@ local function createPlr(plr: Player)
 	end, true)
 
 	participant.Status:Connect(function(status)
-		movePlr(plr, status :: Types.ParticipantStatus)
+		movePlr(plr, status :: PlayerStatus)
 		toggleMarksVisible(clone, status == "Alive" and plr ~= Players.LocalPlayer)
 	end, true)
 
 	return clone :: PlayerElement
 end
 
-local function recalculateCount(status: Types.ParticipantStatus)
+local function recalculateCount(status: PlayerStatus)
 	local count = -1 -- Because this also counts the header
 	for _, v in list:GetChildren() do
 		if not v:IsA("GuiObject") then
@@ -142,7 +144,7 @@ local function recalculateCount(status: Types.ParticipantStatus)
 	label.Text = `{status} ({count})`
 end
 
-local function getStatus(order: number): Types.ParticipantStatus
+local function getStatus(order: number): PlayerStatus
 	order = (order // 1000) * 1000
 	for _, v in list:GetChildren() do
 		if not v:IsA("TextLabel") then
@@ -157,7 +159,7 @@ local function getStatus(order: number): Types.ParticipantStatus
 	error("Failed to get status for order: "..order)
 end
 
-function movePlr(plr: Player, status: Types.ParticipantStatus)
+function movePlr(plr: Player, status: PlayerStatus)
 	local clone = findPlr(plr.Name) or createPlr(plr)
 	local oldOrder = clone.LayoutOrder
 	clone.LayoutOrder = layoutOrders[status] + 1

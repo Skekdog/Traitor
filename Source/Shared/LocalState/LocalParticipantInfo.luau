@@ -13,7 +13,7 @@ local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
 export type LocalParticipant = {
     Name: string,
     Role: DynamicValue.DynamicValue<Types.Role>,
-    Status: DynamicValue.DynamicValue<Types.ParticipantStatus>,
+    Status: DynamicValue.DynamicValue<Types.ParticipantStatus | "Spectating">,
     Corpse: DynamicValue.DynamicValue<Types.CorpseView?>,
 }
 
@@ -35,7 +35,7 @@ local function getOrCreateParticipantValue(name: string): LocalParticipant
 		value = {
 			Name = name,
 			Role = DynamicValue.new(Defaults.Role),
-			Status = DynamicValue.new(Defaults.ParticipantStatus :: any),
+			Status = DynamicValue.new("Spectating" :: any),
 			Corpse = DynamicValue.new(nil :: Types.CorpseView?),
 		}
 
@@ -58,7 +58,7 @@ end
 
 remotes.UpdatePlayerStatus.OnClientEvent:Connect(function(name: string, status: Types.ParticipantStatus?)
 	local participant = module.GetParticipant(name)
-    participant.Status:SetValue(status or Defaults.ParticipantStatus :: Types.ParticipantStatus)
+    participant.Status:SetValue(status or "Spectating")
 end)
 
 remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: string?)
@@ -84,7 +84,7 @@ remotes.Reset.OnClientEvent:Connect(function()
 		end
 
 		v.Role:SetValue(Defaults.Role)
-		v.Status:SetValue(Defaults.ParticipantStatus :: Types.ParticipantStatus)
+		v.Status:SetValue("Spectating")
 		v.Corpse:SetValue(nil)
 	end
 	module.Participants:Invoke()

@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
@@ -213,27 +212,17 @@ task.spawn(function()
     end
 end)
 
-local function onPlayerAdded(player: Player)
-    round:AddPlayer(player, true, KarmaManager.GetKarma(player))
-end
-
-for _, v in Players:GetPlayers() do
-    onPlayerAdded(v)
-end
-
-Players.PlayerAdded:Connect(onPlayerAdded)
-
 remotes.ClientServer.JoinRound.OnServerInvoke = function(player: Player): boolean?
     if not round:IsPreGame() then
         return false
     end
 
     local existingParticipant = round:GetParticipant(player.Name)
-    if existingParticipant and existingParticipant:GetStatus() ~= "Spectating" then
+    if existingParticipant then
         return false
     end
 
-    round:AddPlayer(player, false, KarmaManager.GetKarma(player))
+    round:AddPlayer(player, KarmaManager.GetKarma(player))
 
     return true
 end
