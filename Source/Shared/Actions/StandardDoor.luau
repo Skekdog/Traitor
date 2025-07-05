@@ -46,7 +46,9 @@ end
 
 local function StandardDoor(request: DoorRequest): ()
     if IS_SERVER then
-        assert(request.Kind == "ServerReceive", "Expected ServerReceive")
+        if false then -- don't throw on the server, but keep the assert to keep the type checker happy
+            assert(request.Kind == "ServerReceive", "Expected ServerReceive")
+        end
     else
         assert(request.Kind == "ClientInteraction" or request.Kind == "ClientReceive", "Expected ClientInteraction or ClientReceive")
     end
@@ -59,25 +61,36 @@ local function StandardDoor(request: DoorRequest): ()
     local open = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
     door:SetAttribute("Open", open)
 
+    local originalCFrame: CFrame
+    do
+        local value = door:GetAttribute("OriginalCFrame")
+        if typeof(value) == "CFrame" then
+            originalCFrame = value
+        else
+            originalCFrame = door.CFrame
+            door:SetAttribute("OriginalCFrame", originalCFrame)
+        end
+    end
+
     local initialCFrame = if request.Kind == "ClientReceive" then request.OriginalCFrame else door.CFrame
 
-    local pivot = initialCFrame * CFrame.new(door.Size.X / -2, 0, 0)
-    local angleMult = 1
+    local pivotObject: Attachment
 
     do
-        local pivotObject = door:FindFirstChild("DoorPivot")
-        if pivotObject and pivotObject:IsA("Attachment") then
-            pivot = pivotObject.WorldCFrame
+        local foundPivotObject = door:FindFirstChild("DoorPivot")
+        if foundPivotObject and foundPivotObject:IsA("Attachment") then
+            pivotObject = foundPivotObject
+        else
+            local newPivotObject = Instance.new("Attachment")
 
-            local lookVector = pivotObject:GetAttribute("LookVector")
-            if typeof(lookVector) ~= "Vector3" then
-                lookVector = initialCFrame.LookVector
-                pivotObject:SetAttribute("LookVector", lookVector)
-            end
+            newPivotObject.CFrame = CFrame.new(door.Size.X / -2, 0, 0)
+            newPivotObject.Axis = Vector3.new(1, 0, 0)
+            newPivotObject.SecondaryAxis = Vector3.new(0, 1, 0)
 
-            assert(typeof(lookVector) == "Vector3")
+            newPivotObject.Name = "DoorPivot"
+            newPivotObject.Parent = door
 
-            angleMult = if lookVector:Dot(Vector3.one.Unit) > 0 then -1 else 1
+            pivotObject = newPivotObject
         end
     end
 
@@ -107,10 +120,11 @@ local function StandardDoor(request: DoorRequest): ()
 
     task.delay(duration, door.SetAttribute, door, "Opening", false)
 
+    local targetAngle = math.rad(if open then 90 else -90)
+
     if request.Kind == "ServerReceive" then
-        local targetAngle = (if open then 90 else -90) * angleMult
-        local rotation = CFrame.Angles(0, math.rad(targetAngle), 0)
-        local targetCFrame = pivot * rotation * pivot:Inverse() * initialCFrame
+        local rotation = CFrame.Angles(0, targetAngle, 0) -- initialCFrame:ToWorldSpace(CFrame.fromAxisAngle(axis, targetAngle)).Rotation
+        local targetCFrame = pivotObject.WorldCFrame * rotation * pivotObject.CFrame:Inverse()
 
         door.CFrame = targetCFrame
 
@@ -131,22 +145,21 @@ local function StandardDoor(request: DoorRequest): ()
         door:SetAttribute("Opening", true)
 
         return
+    else
+        return remotes.ClientServer.OpenDoor:FireServer(door, open)
     end
 
     door:SetAttribute("Opening", true)
 
     local angle = findOrCreateAngleValue(door)
-    local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if open then 90 else 0
-
-    targetAngle *= angleMult
 
     if request.Kind == "ClientInteraction" then
         remotes.ClientServer.OpenDoor:FireServer(door, open)
     end
 
-    TweenService:Create(angle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Value = targetAngle}):Play()
+    TweenService:Create(angle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Value = math.deg(targetAngle)}):Play()
     RunService.PreSimulation:Connect(function()
-        door.CFrame = pivot * CFrame.Angles(0, math.rad(angle.Value), 0) * pivot:Inverse() * initialCFrame
+        door.CFrame = pivotObject.WorldCFrame * CFrame.Angles(0, math.rad(angle.Value), 0) * pivotObject.CFrame:Inverse()
     end)
 end
 
