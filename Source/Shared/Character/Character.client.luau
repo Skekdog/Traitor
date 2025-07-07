@@ -58,12 +58,41 @@ local function setHumanoidStates(hum: Humanoid): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
 end
 
+local function checkForWater(root: BasePart): boolean
+    local map = LocalRoundInfo.Map()
+    if not map then
+        return false
+    end
+
+    for _, v in root:GetTouchingParts() do
+        if v.Name == "! Water" or v.Name == "Water" then
+            return true
+        end
+    end
+
+    local params = RaycastParams.new()
+    params.RespectCanCollide = false
+    params.IgnoreWater = false
+    params.FilterDescendantsInstances = {root.Parent :: Model}
+    params.FilterType = Enum.RaycastFilterType.Exclude
+
+    local result = workspace:Raycast(root.Position, Vector3.new(0, -5, 0), params)
+    if not result then
+        return false
+    end
+
+    return (result.Material == Enum.Material.Water) or ((result.Instance.Name == "! Water" or result.Instance.Name == "Water") and result.Instance:IsDescendantOf(map.DynamicMap))
+end
+
 local function initFallDamage(hum: Humanoid, root: BasePart): ()
     local startHeight = math.huge
     hum.StateChanged:Connect(function(_, state)
         if state == Enum.HumanoidStateType.Freefall then
             startHeight = root.Position.Y
         elseif state == Enum.HumanoidStateType.Landed then
+            if checkForWater(root) then
+                return
+            end
             local distance = startHeight - root.Position.Y
             if distance > 15 then
                 clientServer.Fell:FireServer(startHeight - root.Position.Y)
