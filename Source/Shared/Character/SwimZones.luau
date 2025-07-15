@@ -54,7 +54,6 @@ local INVALID_START_STATES = { -- Can't start swimming if character is in one of
 }
 
 local DISABLED_STATES = { -- These states are disabled when swimming
-	Enum.HumanoidStateType.GettingUp,
 	Enum.HumanoidStateType.Jumping
 }
 
