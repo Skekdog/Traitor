@@ -13,6 +13,14 @@ local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
 end
 
 local function tryAwardTesterBadge(plr: Player): ()
+	local _, hasBadge = pcall(function()
+		return BadgeService:UserHasBadgeAsync(plr.UserId, 2136698808)
+	end)
+
+	if hasBadge then
+		return
+	end
+
 	local tries = 0
 	local suc = false
 	repeat
