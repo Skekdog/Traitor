@@ -301,7 +301,7 @@ LocalRoundInfo.Map:Connect(function(map)
 	end
 
 	for _, v in map.StaticMap:GetDescendants() do
-		if v:IsA("BasePart") and v.Name == "! Water" then
+		if v:IsA("BasePart") and v.Name == "! Water" and v.Size.Y > 1 then
 			addZone(v)
 		end
 	end
