@@ -65,7 +65,7 @@ local function checkForWater(root: BasePart): boolean
     end
 
     for _, v in root:GetTouchingParts() do
-        if v.Name == "! Water" or v.Name == "Water" then
+        if v.Name == "! Water" and v:IsDescendantOf(map.StaticMap) then
             return true
         end
     end
@@ -81,7 +81,7 @@ local function checkForWater(root: BasePart): boolean
         return false
     end
 
-    return (result.Material == Enum.Material.Water) or ((result.Instance.Name == "! Water" or result.Instance.Name == "Water") and result.Instance:IsDescendantOf(map.DynamicMap))
+    return (result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.StaticMap))
 end
 
 local function initFallDamage(hum: Humanoid, root: BasePart): ()
