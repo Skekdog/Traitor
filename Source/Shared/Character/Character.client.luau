@@ -76,7 +76,8 @@ local function checkForWater(root: BasePart): boolean
     params.FilterDescendantsInstances = {root.Parent :: Model}
     params.FilterType = Enum.RaycastFilterType.Exclude
 
-    local result = workspace:Raycast(root.Position, Vector3.new(0, -5, 0), params)
+    -- The landed state often triggers really early so we do need to raycast quite far down. Testing on the Test map shows that -7.5 should suffice but I'll go -10 to be sure
+    local result = workspace:Raycast(root.Position, Vector3.new(0, -10, 0), params)
     if not result then
         return false
     end
