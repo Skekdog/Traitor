@@ -395,7 +395,7 @@ if RunService:IsServer() then
 			removeRopes(part)
 		end
 
-		local asLocal = CFrame.new(position):ToObjectSpace(attachTo.CFrame)
+		local asLocal = attachTo.CFrame:ToObjectSpace(CFrame.new(position))
 		if asLocal.Position.Magnitude > attachTo.ExtentsSize.Magnitude * 1.1 then
 			return
 		end
@@ -404,7 +404,7 @@ if RunService:IsServer() then
 		rope.Attachment0 = Instance.new("Attachment", part)
 
 		local attachment = Instance.new("Attachment")
-		attachment.Position = -asLocal.Position
+		attachment.Position = asLocal.Position
 		attachment.Parent = attachTo
 
 		rope.Attachment1 = attachment
