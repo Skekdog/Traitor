@@ -64,6 +64,11 @@ function module.Enable(enabled: boolean?): boolean
 		FreeInput.StopCapture()
 	end
 
+	if not isEnabled then
+		hum:ChangeState(Enum.HumanoidStateType.Running)
+		task.delay(0, hum.ChangeState, hum, Enum.HumanoidStateType.Freefall)
+	end
+
 	return isEnabled
 end
 
