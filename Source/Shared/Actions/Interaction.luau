@@ -2,10 +2,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-if RunService:IsStudio() then
-	task.wait(5) -- when emulating mobile devices in studio it is weird so we have to wait
-end
-
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
@@ -146,9 +142,17 @@ function module.TryInteract(target: Instance?, input: InputObject?): boolean
 	return false
 end
 
-ControlManager.Register("Interact", function(action, state, input)
+local function interactAction(action: string, state: Enum.UserInputState, input: InputObject?): Enum.ContextActionResult
 	return if module.TryInteract(module.InteractTarget, input) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
-end, Enum.ContextActionPriority.High.Value + 1)
+end
+
+if RunService:IsStudio() then
+	task.delay(5, function()
+		ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.High.Value + 1)
+	end)
+else
+	ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.High.Value + 1)
+end
 
 local params = RaycastParams.new()
 params.IgnoreWater = true
