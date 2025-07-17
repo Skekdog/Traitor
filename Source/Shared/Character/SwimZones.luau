@@ -25,7 +25,7 @@ local generalCleanup: CleanupTargets = {}
 local stateCleanup: CleanupTargets = {}
 local recalcCleanup: CleanupTargets = {}
 
-local function InPart(part: BasePart, pos: Vector3, heightOffset: number)
+local function InPart(part: BasePart, pos: Vector3, heightOffset: number): boolean
 	local rel = part.CFrame:PointToObjectSpace(pos)
 	local size = part.Size
 	if math.abs(rel.X) <= size.X/2 and math.abs(rel.Y) <= size.Y/2 + (heightOffset or 0) and math.abs(rel.Z) <= size.Z/2 then
@@ -196,7 +196,7 @@ RunService.Heartbeat:Connect(function(dt)
 	local currentZone: BasePart?
 
 	for _, v in zones do
-		if InPart(v, rootPos, if didJump then -SURFACE_DEPTH - MAX_JUMP_DEPTH else 0) then
+		if InPart(v, rootPos, if didJump then -SURFACE_DEPTH - MAX_JUMP_DEPTH else if isInSwimmingState then 1 else 0) then
 			currentZone = v
 			break
 		end
@@ -232,6 +232,10 @@ RunService.Heartbeat:Connect(function(dt)
 				table.insert(stateCleanup, UserInputService.JumpRequest:Connect(function()
 					didJump = true
 				end))
+
+				table.insert(stateCleanup, function()
+					hum:ChangeState(Enum.HumanoidStateType.Running)
+				end)
 
 				if CLAMP_SURFACE_MOVEMENT and false then
 					table.insert(stateCleanup, hum:GetPropertyChangedSignal("MoveDirection"):Connect(function()
