@@ -18,6 +18,7 @@ local function cleanup(targets: CleanupTargets): ()
 			target:Destroy()
 		end
 	end
+	table.clear(targets)
 end
 
 local generalCleanup: CleanupTargets = {}
