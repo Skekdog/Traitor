@@ -196,19 +196,21 @@ RunService.Heartbeat:Connect(function(dt)
 	local currentZone: BasePart?
 
 	for _, v in zones do
-		if InPart(v, rootPos, if didJump then -SURFACE_DEPTH - MAX_JUMP_DEPTH else if isInSwimmingState then 1 else 0) then
+		if InPart(v, rootPos, if didJump then -SURFACE_DEPTH - MAX_JUMP_DEPTH else 0) then
 			currentZone = v
 			break
 		end
 	end
 
 	if lastZone ~= currentZone then
-		lastZone = currentZone
+		if not lastZone or not InPart(lastZone, rootPos, 1) then
+			lastZone = currentZone
 
-		if currentZone then
-			startSwimming(currentZone)
-		else
-			stopSwimming()
+			if currentZone then
+				startSwimming(currentZone)
+			else
+				stopSwimming()
+			end
 		end
 	end
 
