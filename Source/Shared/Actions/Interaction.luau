@@ -1,6 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+
+if RunService:IsStudio() then
+	task.wait(5) -- when emulating mobile devices in studio it is weird so we have to wait
+end
+
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
