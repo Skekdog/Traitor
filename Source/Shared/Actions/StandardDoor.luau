@@ -54,43 +54,26 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     local door = request.Door
-    if door:GetAttribute("Opening") then
+    if request.Kind ~= "ClientReceive" and door:GetAttribute("Opening") then
         return
     end
 
     local shouldOpen = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
     door:SetAttribute("Open", shouldOpen)
 
-    local originalDoorCFrame = if request.Kind == "ClientReceive" then request.OriginalCFrame else door.CFrame
+    local originalDoorCFrame = door.CFrame
 
     do
         local attribute = door:GetAttribute("OriginalCFrame")
         if typeof(attribute) == "CFrame" then
             originalDoorCFrame = attribute
-        else
+        elseif IS_SERVER then
             door:SetAttribute("OriginalCFrame", originalDoorCFrame)
         end
     end
 
-    local pivotAttachment: Attachment
-
-    do
-        local foundPivotObject = door:FindFirstChild("DoorPivot")
-        if foundPivotObject and foundPivotObject:IsA("Attachment") then
-            pivotAttachment = foundPivotObject
-        else
-            local newPivotObject = Instance.new("Attachment")
-
-            newPivotObject.CFrame = CFrame.new(door.Size.X / -2, 0, 0)
-            newPivotObject.Axis = Vector3.new(-1, 0, 0)
-            newPivotObject.SecondaryAxis = Vector3.new(0, 1, 0)
-
-            newPivotObject.Name = "DoorPivot"
-            newPivotObject.Parent = door
-
-            pivotAttachment = newPivotObject
-        end
-    end
+    local pivotAttachment = door:FindFirstChild("DoorPivot")
+    assert(pivotAttachment and pivotAttachment:IsA("Attachment"), "DoorPivot must be an Attachment")
 
     if not IS_SERVER then
         local sounds = {}
@@ -121,7 +104,7 @@ local function StandardDoor(request: DoorRequest): ()
 
     local hingePosition = CFrame.new(pivotAttachment.Position)
 
-    local targetAngle = if shouldOpen then math.rad(90) else 0
+    local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if shouldOpen then math.rad(90) else 0
 
     do
         local axis = pivotAttachment.WorldAxis
@@ -139,7 +122,7 @@ local function StandardDoor(request: DoorRequest): ()
             Kind = "ClientReceive" :: "ClientReceive",
             Door = door,
             Open = shouldOpen,
-            TargetAngle = if shouldOpen then 90 else 0,
+            TargetAngle = targetAngle,
             OriginalCFrame = door.CFrame,
         }
 
@@ -158,6 +141,8 @@ local function StandardDoor(request: DoorRequest): ()
 
     if request.Kind == "ClientInteraction" then
         remotes.ClientServer.OpenDoor:FireServer(door, shouldOpen)
+    else
+        door.CFrame = request.OriginalCFrame
     end
 
     local tween = TweenService:Create(angle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Value = targetAngle})
