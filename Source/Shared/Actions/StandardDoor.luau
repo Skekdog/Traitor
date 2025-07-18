@@ -46,8 +46,8 @@ end
 
 local function StandardDoor(request: DoorRequest): ()
     if IS_SERVER then
-        if false then -- don't throw on the server, but keep the assert to keep the type checker happy
-            assert(request.Kind == "ServerReceive", "Expected ServerReceive")
+        if request.Kind ~= "ServerReceive" then
+            return
         end
     else
         assert(request.Kind == "ClientInteraction" or request.Kind == "ClientReceive", "Expected ClientInteraction or ClientReceive")
@@ -58,46 +58,44 @@ local function StandardDoor(request: DoorRequest): ()
         return
     end
 
-    local open = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
-    door:SetAttribute("Open", open)
+    local shouldOpen = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
+    door:SetAttribute("Open", shouldOpen)
 
-    local originalCFrame: CFrame
+    local originalDoorCFrame = if request.Kind == "ClientReceive" then request.OriginalCFrame else door.CFrame
+
     do
-        local value = door:GetAttribute("OriginalCFrame")
-        if typeof(value) == "CFrame" then
-            originalCFrame = value
+        local attribute = door:GetAttribute("OriginalCFrame")
+        if typeof(attribute) == "CFrame" then
+            originalDoorCFrame = attribute
         else
-            originalCFrame = door.CFrame
-            door:SetAttribute("OriginalCFrame", originalCFrame)
+            door:SetAttribute("OriginalCFrame", originalDoorCFrame)
         end
     end
 
-    local initialCFrame = if request.Kind == "ClientReceive" then request.OriginalCFrame else door.CFrame
-
-    local pivotObject: Attachment
+    local pivotAttachment: Attachment
 
     do
         local foundPivotObject = door:FindFirstChild("DoorPivot")
         if foundPivotObject and foundPivotObject:IsA("Attachment") then
-            pivotObject = foundPivotObject
+            pivotAttachment = foundPivotObject
         else
             local newPivotObject = Instance.new("Attachment")
 
             newPivotObject.CFrame = CFrame.new(door.Size.X / -2, 0, 0)
-            newPivotObject.Axis = Vector3.new(1, 0, 0)
+            newPivotObject.Axis = Vector3.new(-1, 0, 0)
             newPivotObject.SecondaryAxis = Vector3.new(0, 1, 0)
 
             newPivotObject.Name = "DoorPivot"
             newPivotObject.Parent = door
 
-            pivotObject = newPivotObject
+            pivotAttachment = newPivotObject
         end
     end
 
     if not IS_SERVER then
         local sounds = {}
         for _, v in door:GetChildren() do
-            if v:IsA("Sound") and v.Name == if open then "OpenSound" else "CloseSound" then
+            if v:IsA("Sound") and v.Name == if shouldOpen then "OpenSound" else "CloseSound" then
                 table.insert(sounds, v)
             end
         end
@@ -106,7 +104,7 @@ local function StandardDoor(request: DoorRequest): ()
 
     local duration = 0.75
 
-    if open then
+    if shouldOpen then
         local configOpenDuration = door:GetAttribute("Opening_Duration")
         if typeof(configOpenDuration) == "number" then
             duration = configOpenDuration
@@ -118,23 +116,34 @@ local function StandardDoor(request: DoorRequest): ()
         end
     end
 
+    door:SetAttribute("Opening", true)
     task.delay(duration, door.SetAttribute, door, "Opening", false)
 
-    local targetAngle = math.rad(if open then 90 else -90)
+    local hingePosition = CFrame.new(pivotAttachment.Position)
+
+    local targetAngle = if shouldOpen then math.rad(90) else 0
+
+    do
+        local axis = pivotAttachment.WorldAxis
+        local axisScale = axis.X + axis.Y + axis.Z
+        if axisScale >= 0 then
+            targetAngle *= -1
+        end
+    end
 
     if request.Kind == "ServerReceive" then
-        local rotation = CFrame.Angles(0, targetAngle, 0) -- initialCFrame:ToWorldSpace(CFrame.fromAxisAngle(axis, targetAngle)).Rotation
-        local targetCFrame = pivotObject.WorldCFrame * rotation * pivotObject.CFrame:Inverse()
-
-        door.CFrame = targetCFrame
+        local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, targetAngle)
+        local targetCFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
 
         local clientReceive: ClientReceive = {
             Kind = "ClientReceive" :: "ClientReceive",
             Door = door,
-            Open = open,
-            TargetAngle = if open then 90 else 0,
-            OriginalCFrame = initialCFrame,
+            Open = shouldOpen,
+            TargetAngle = if shouldOpen then 90 else 0,
+            OriginalCFrame = door.CFrame,
         }
+
+        door.CFrame = targetCFrame
 
         for _, v in Players:GetPlayers() do
             if v ~= request.Player then
@@ -142,24 +151,26 @@ local function StandardDoor(request: DoorRequest): ()
             end
         end
 
-        door:SetAttribute("Opening", true)
-
         return
-    else
-        return remotes.ClientServer.OpenDoor:FireServer(door, open)
     end
-
-    door:SetAttribute("Opening", true)
 
     local angle = findOrCreateAngleValue(door)
 
     if request.Kind == "ClientInteraction" then
-        remotes.ClientServer.OpenDoor:FireServer(door, open)
+        remotes.ClientServer.OpenDoor:FireServer(door, shouldOpen)
     end
 
-    TweenService:Create(angle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Value = math.deg(targetAngle)}):Play()
-    RunService.PreSimulation:Connect(function()
-        door.CFrame = pivotObject.WorldCFrame * CFrame.Angles(0, math.rad(angle.Value), 0) * pivotObject.CFrame:Inverse()
+    local tween = TweenService:Create(angle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Value = targetAngle})
+    tween:Play()
+
+    local con: RBXScriptConnection
+    con = RunService.PreSimulation:Connect(function()
+        local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, angle.Value)
+        door.CFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
+
+        if tween.PlaybackState == Enum.PlaybackState.Completed then
+            con:Disconnect()
+        end
     end)
 end
 
