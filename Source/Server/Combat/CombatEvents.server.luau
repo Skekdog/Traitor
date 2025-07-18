@@ -149,6 +149,10 @@ local function isRaycastInfo(value: any): boolean
 		return false
 	end
 
+	if value.RelativeHitCFrame ~= nil and typeof(value.RelativeHitCFrame) ~= "CFrame" then
+		return false
+	end
+
 	return true
 end
 

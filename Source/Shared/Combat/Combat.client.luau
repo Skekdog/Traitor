@@ -243,6 +243,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 						local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
 						local hitPartCenterPosition = if hitPart then hitPart.Position else nil
 						local normal = if raycastResult then raycastResult.Normal else nil
+						local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
 
 						if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) and not hitPart:IsDescendantOf(workspace.Corpses) then
 							local material = hitPart:GetAttribute("MaterialOverride") or hitPart.Material.Name
@@ -254,6 +255,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 							HitPart = hitPart,
 							HitPartCenterPosition = hitPartCenterPosition,
 							Normal = normal,
+							RelativeHitCFrame = relativeHitCFrame,
 						})
 					end
 

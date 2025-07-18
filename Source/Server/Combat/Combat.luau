@@ -214,7 +214,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 	(prop :: Types.MapProp):TryTakeDamage(params)
 end
 
-local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3): ()
+local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): ()
 	local round = by.Round
 	local map = round:GetMap()
 
@@ -235,7 +235,9 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	end
 
 	if normal and item.Kind == "Gun" then
-		ReplicatedStorage.Remotes.ServerClient.MakeBulletHole:FireAllClients(hitPart, hitPart.CFrame:ToObjectSpace(CFrame.new(hitPosition)), normal)
+		if relativeHitCFrame and relativeHitCFrame.Position.Magnitude <= hitPart.ExtentsSize.Magnitude * 1.1 then
+			ReplicatedStorage.Remotes.ServerClient.MakeBulletHole:FireAllClients(hitPart, relativeHitCFrame, normal)
+		end
 	end
 end
 
@@ -342,7 +344,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			end
 
 			if item.Kind ~= "Item" and item.Kind ~= "Grenade" and v.HitPart then
-				onPartHit(item, by, v.HitPart, v.Destination, v.Normal, request.Origin)
+				onPartHit(item, by, v.HitPart, v.Destination, v.Normal, request.Origin, v.RelativeHitCFrame)
 			end
 		end
 	elseif request.Kind == "PrimaryFireThrowRequest" then

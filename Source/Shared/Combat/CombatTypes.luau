@@ -7,6 +7,7 @@ export type RaycastInfo = {
 	HitPart: BasePart?,
 	HitPartCenterPosition: Vector3?,
 	Normal: Vector3?,
+	RelativeHitCFrame: CFrame?,
 }
 
 export type PrimaryFireBaseRequest = {
