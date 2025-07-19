@@ -218,7 +218,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	end
 	
 	-- Disabled when ui is closing but not fully closed yet
-	if modal then
+	if modal and not object:FindFirstChild("Modalise") then
 		local modalise = Instance.new("TextButton")
 		modalise.Modal = true
 		modalise.Size = UDim2.new()
