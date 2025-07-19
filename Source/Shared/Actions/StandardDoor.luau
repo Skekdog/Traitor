@@ -106,7 +106,7 @@ local function StandardDoor(request: DoorRequest): ()
 
     local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if shouldOpen then math.rad(90) else 0
 
-    do
+    if request.Kind ~= "ClientReceive" then
         local axis = pivotAttachment.WorldAxis
         local axisScale = axis.X + axis.Y + axis.Z
         if axisScale >= 0 then
