@@ -203,7 +203,7 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 
 	if lastZone ~= currentZone then
-		if not lastZone or not InPart(lastZone, rootPos, 1) then
+		if not lastZone or not InPart(lastZone, rootPos, 2) then
 			lastZone = currentZone
 
 			if currentZone then
@@ -236,7 +236,7 @@ RunService.Heartbeat:Connect(function(dt)
 				end))
 
 				table.insert(stateCleanup, function()
-					hum:ChangeState(Enum.HumanoidStateType.Running)
+					hum:ChangeState(Enum.HumanoidStateType.Freefall)
 				end)
 
 				if CLAMP_SURFACE_MOVEMENT and false then
