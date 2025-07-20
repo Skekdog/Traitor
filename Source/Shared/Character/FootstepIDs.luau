@@ -46,7 +46,7 @@ local IDList: {[string]: FootstepData} = {
 	SmoothPlastic = {id = "rbxassetid://178190837", volume = 0.60, speed = 1.00},
 	Wood = {id = "rbxassetid://3199270096", volume = 0.60, speed = 1.00},
 	WoodPlanks = {id = "rbxassetid://211987063", volume = 0.60, speed = 1.00},
-	Water = {id = "rbxassetid://122684680935247", volume = 1.00, speed = 1.00},
+	Water = {id = "rbxasset://sounds/action_swim.mp3", volume = 1.30, speed = 1.6},
 	Default = {id = "rbxassetid://277067660", volume = 0.60, speed = 1.00},
 }
 
