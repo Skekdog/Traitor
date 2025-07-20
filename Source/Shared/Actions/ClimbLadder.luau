@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
@@ -70,6 +71,14 @@ function module.Climb(ladder: BasePart): ()
     alignPos.Attachment1 = ladderAttachment
     alignPos.Enabled = true
 
+    local climbSound = Instance.new("Sound")
+    climbSound.SoundId = "rbxassetid://101348938648563"
+    climbSound.Volume = 0.5
+    climbSound.SoundGroup = SoundService.AllSounds
+    climbSound.Looped = true
+    climbSound.Name = "ClimbSound"
+    climbSound.Parent = root
+
     local PlayerModule = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
     local ControlModule = PlayerModule:GetControls()
     thread = coroutine.create(function()
@@ -82,7 +91,10 @@ function module.Climb(ladder: BasePart): ()
 
             local z = ControlModule:GetMoveVector().Z
             if z == 0 then
+                climbSound:Pause()
                 continue
+            elseif not climbSound.IsPlaying then
+                climbSound:Resume()
             end
 
             local cameraLook = workspace.CurrentCamera.CFrame.LookVector
@@ -123,6 +135,11 @@ function module.StopClimbing(): ()
         return
     end
     setStates(hum, true)
+
+    local climbSound = root:FindFirstChild("ClimbSound") :: Sound?
+    if climbSound then
+        climbSound:Destroy()
+    end
 
     if hum:GetState() == Enum.HumanoidStateType.Swimming then
         hum:ChangeState(Enum.HumanoidStateType.GettingUp)
