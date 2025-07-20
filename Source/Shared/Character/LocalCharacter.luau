@@ -28,7 +28,10 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 
 	module.Humanoid:SetValue(hum)
 
-	module.RootPart:SetValue(hum.RootPart)
+	local root = char:WaitForChild("HumanoidRootPart")
+	assert(root:IsA("BasePart"), "Root is not a BasePart")
+
+	module.RootPart:SetValue(root)
 	
 	local head = char:WaitForChild("Head")
 	assert(head:IsA("BasePart"), "Head is not a BasePart")

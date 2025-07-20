@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local IsAboveWater = require(script.Parent.IsAboveWater)
 local ClimbLadder = require(ReplicatedStorage.Shared.Actions.ClimbLadder)
 local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
@@ -70,19 +71,8 @@ local function checkForWater(root: BasePart): boolean
         end
     end
 
-    local params = RaycastParams.new()
-    params.RespectCanCollide = false
-    params.IgnoreWater = false
-    params.FilterDescendantsInstances = {root.Parent :: Model}
-    params.FilterType = Enum.RaycastFilterType.Exclude
-
     -- The landed state often triggers really early so we do need to raycast quite far down. Testing on the Test map shows that -7.5 should suffice but I'll go -10 to be sure
-    local result = workspace:Raycast(root.Position, Vector3.new(0, -10, 0), params)
-    if not result then
-        return false
-    end
-
-    return (result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.StaticMap))
+    return IsAboveWater(map, root, 10)
 end
 
 local function initFallDamage(hum: Humanoid, root: BasePart): ()

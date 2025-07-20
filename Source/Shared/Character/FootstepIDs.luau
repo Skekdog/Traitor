@@ -4,7 +4,9 @@
 -- To change the volume, change the volume variable.
 -- To change the playback speed of a sound, change the speed variable.
 
-local IDList = {
+export type FootstepData = {id: string, volume: number, speed: number}
+
+local IDList: {[string]: FootstepData} = {
 	Air = {id = "rbxassetid://329997777", volume = 0, speed = 1.00},
 	Asphalt = {id = "rbxassetid://277067660", volume = 0.60, speed = 1.00},
 	Basalt = {id = "rbxassetid://3190903775", volume = 0.60, speed = 1.00},
@@ -44,6 +46,7 @@ local IDList = {
 	SmoothPlastic = {id = "rbxassetid://178190837", volume = 0.60, speed = 1.00},
 	Wood = {id = "rbxassetid://3199270096", volume = 0.60, speed = 1.00},
 	WoodPlanks = {id = "rbxassetid://211987063", volume = 0.60, speed = 1.00},
+	Water = {id = "rbxassetid://122684680935247", volume = 0.60, speed = 1.00},
 	Default = {id = "rbxassetid://277067660", volume = 0.60, speed = 1.00},
 }
 
