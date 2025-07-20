@@ -57,4 +57,12 @@ LocalCharacter.Humanoid:Connect(function(hum)
 	end)
 end)
 
+LocalCharacter.RootPart:Connect(function(root)
+	if not root then
+		return
+	end
+
+	root:WaitForChild("Landing"):Destroy()
+end)
+
 return nil
