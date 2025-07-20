@@ -89,9 +89,11 @@ local function initFallDamage(hum: Humanoid, root: BasePart): ()
             local distance = startHeight - root.Position.Y
             if distance > 15 then
                 clientServer.Fell:FireServer(startHeight - root.Position.Y)
-                PlaySound("rbxasset://sounds/action_jump_land.mp3", nil, root, {
+                PlaySound(18782450650, nil, root, {
                     SoundGroup = SoundService.AllSounds :: SoundGroup,
-                    Volume = 0.65,
+                    Volume = 0.45,
+
+                    PlaybackRegion = NumberRange.new(0.05, 60000)
                 })
             end
             startHeight = math.huge
