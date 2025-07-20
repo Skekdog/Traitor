@@ -7,13 +7,17 @@ local IsAboveWater = require(script.Parent.IsAboveWater)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
 type PlayerState = {
+	Player: Player,
 	Humanoid: Humanoid?,
 	Root: BasePart?,
 	CurrentSound: Sound,
 	LastMaterial: Enum.Material,
 }
 
-local VOLUME_MULTIPLIER = 0.5
+local VOLUME_MULTIPLIER_SELF = 0.5
+local VOLUME_MULTIPLIER_OTHER = 0.3
+local ROLL_OFF_MIN = 3
+local ROLL_OFF_MAX = 10
 
 local playerStates: {[Player]: PlayerState?} = {}
 
@@ -22,11 +26,16 @@ local function createSound(): Sound
 	sound.Name = "Footsteps"
 	sound.Looped = true
 	sound.SoundGroup = SoundService.AllSounds
+
+	sound.RollOffMinDistance = ROLL_OFF_MIN
+	sound.RollOffMaxDistance = ROLL_OFF_MAX
+
 	return sound
 end
 
-local function createState(): PlayerState
+local function createState(player: Player): PlayerState
 	return {
+		Player = player,
 		CurrentSound = createSound(),
 		LastMaterial = Enum.Material.Air,
 	}
@@ -74,7 +83,7 @@ local function doFootstep(state: PlayerState): ()
 	state.LastMaterial = newMaterial
 
 	currentSound.SoundId = properties.id
-	currentSound.Volume = properties.volume * VOLUME_MULTIPLIER
+	currentSound.Volume = properties.volume * (if state.Player == Players.LocalPlayer then VOLUME_MULTIPLIER_OTHER else VOLUME_MULTIPLIER_SELF)
 	currentSound:Play()
 end
 
@@ -85,7 +94,7 @@ RunService.PostSimulation:Connect(function()
 	end
 end)
 
-local function onCharacterAdded(character: Model, state: PlayerState, player: Player): ()
+local function onCharacterAdded(character: Model, state: PlayerState): ()
 	local root = character:WaitForChild("HumanoidRootPart")
 	local hum = character:WaitForChild("Humanoid")
 
@@ -94,7 +103,7 @@ local function onCharacterAdded(character: Model, state: PlayerState, player: Pl
 	state.Root = root
 	state.Humanoid = hum
 
-	state.CurrentSound.Parent = if player == Players.LocalPlayer then SoundService else root
+	state.CurrentSound.Parent = if state.Player == Players.LocalPlayer then SoundService else root
 
 	task.spawn(function()
 		root:WaitForChild("Running"):Destroy()
@@ -102,11 +111,11 @@ local function onCharacterAdded(character: Model, state: PlayerState, player: Pl
 end
 
 local function onPlayerAdded(player: Player): ()
-	local state = createState()
+	local state = createState(player)
 	playerStates[player] = state
 
 	player.CharacterAdded:Connect(function(character)
-		onCharacterAdded(character, state, player)
+		onCharacterAdded(character, state)
 	end)
 
 	player.CharacterRemoving:Connect(function()
@@ -116,7 +125,7 @@ local function onPlayerAdded(player: Player): ()
 	end)
 
 	if player.Character then
-		onCharacterAdded(player.Character, state, player)
+		onCharacterAdded(player.Character, state)
 	end
 
 	player.Destroying:Connect(function()
