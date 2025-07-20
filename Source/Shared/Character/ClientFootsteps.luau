@@ -13,6 +13,8 @@ type PlayerState = {
 	LastMaterial: Enum.Material,
 }
 
+local VOLUME_MULTIPLIER = 0.5
+
 local playerStates: {[Player]: PlayerState?} = {}
 
 local function createSound(): Sound
@@ -72,7 +74,7 @@ local function doFootstep(state: PlayerState): ()
 	state.LastMaterial = newMaterial
 
 	currentSound.SoundId = properties.id
-	currentSound.Volume = properties.volume / 5
+	currentSound.Volume = properties.volume * VOLUME_MULTIPLIER
 	currentSound:Play()
 end
 

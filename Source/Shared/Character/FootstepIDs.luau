@@ -33,7 +33,7 @@ local IDList: {[string]: FootstepData} = {
 	Mud = {id = "rbxassetid://6441160246", volume = 0.60, speed = 1.00},
 	Neon = {id = "rbxassetid://177940974", volume = 0.60, speed = 1.00},
 	Pebble = {id = "rbxassetid://178190837", volume = 0.60, speed = 1.00},
-	Plastic = {id = "rbxassetid://4416041299", volume = 0.60, speed = 1.40},
+	Plastic = {id = "rbxassetid://4416041299", volume = 1.50, speed = 1.40},
 	Pavement = {id = "rbxassetid://277067660", volume = 0.60, speed = 1.00},
 	Rock = {id = "rbxassetid://178190837", volume = 0.60, speed = 1.00},
 	RoofShingles = {id = "rbxassetid://178190837", volume = 0.60, speed = 1.00},
@@ -46,7 +46,7 @@ local IDList: {[string]: FootstepData} = {
 	SmoothPlastic = {id = "rbxassetid://178190837", volume = 0.60, speed = 1.00},
 	Wood = {id = "rbxassetid://3199270096", volume = 0.60, speed = 1.00},
 	WoodPlanks = {id = "rbxassetid://211987063", volume = 0.60, speed = 1.00},
-	Water = {id = "rbxassetid://122684680935247", volume = 0.60, speed = 1.00},
+	Water = {id = "rbxassetid://122684680935247", volume = 1.00, speed = 1.00},
 	Default = {id = "rbxassetid://277067660", volume = 0.60, speed = 1.00},
 }
 
