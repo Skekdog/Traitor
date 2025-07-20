@@ -1,9 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 local IsAboveWater = require(script.Parent.IsAboveWater)
 local ClimbLadder = require(ReplicatedStorage.Shared.Actions.ClimbLadder)
 local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local JumpPower = require(script.Parent.JumpPower)
 local LocalCharacter = require(script.Parent.LocalCharacter)
@@ -87,12 +89,18 @@ local function initFallDamage(hum: Humanoid, root: BasePart): ()
             local distance = startHeight - root.Position.Y
             if distance > 15 then
                 clientServer.Fell:FireServer(startHeight - root.Position.Y)
+                PlaySound("rbxasset://sounds/action_jump_land.mp3", nil, root, {
+                    SoundGroup = SoundService.AllSounds :: SoundGroup,
+                    Volume = 0.65,
+                })
             end
             startHeight = math.huge
         elseif state == Enum.HumanoidStateType.Climbing then
             startHeight = math.huge
         end
     end)
+
+    root:WaitForChild("Landing"):Destroy()
 end
 
 local function initRemoveDeathSound(root: BasePart): ()
