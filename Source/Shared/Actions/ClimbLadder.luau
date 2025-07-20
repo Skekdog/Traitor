@@ -85,6 +85,12 @@ function module.Climb(ladder: BasePart): ()
                 continue
             end
 
+            local cameraLook = workspace.CurrentCamera.CFrame.LookVector
+
+            if cameraLook.Y < -0.85 then
+                z *= -1
+            end
+
             local lastY = ladderAttachment.Position.Y
             ladderAttachment.Position = Vector3.new(0, math.clamp(lastY + (dt * if z < 0 then CLIMB_SPEED else -CLIMB_SPEED), -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight + MIN_LADDER_HEIGHT), 0)
 
