@@ -95,6 +95,10 @@ local function onCharacterAdded(character: Model, state: PlayerState, player: Pl
 	state.Humanoid = hum
 
 	state.CurrentSound.Parent = if player == Players.LocalPlayer then SoundService else root
+
+	task.spawn(function()
+		root:WaitForChild("Running"):Destroy()
+	end)
 end
 
 local function onPlayerAdded(player: Player): ()
