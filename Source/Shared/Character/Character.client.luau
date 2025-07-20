@@ -1,11 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
-local IsAboveWater = require(script.Parent.IsAboveWater)
 local ClimbLadder = require(ReplicatedStorage.Shared.Actions.ClimbLadder)
 local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local JumpPower = require(script.Parent.JumpPower)
 local LocalCharacter = require(script.Parent.LocalCharacter)
@@ -59,50 +56,6 @@ local function setHumanoidStates(hum: Humanoid): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false)
     hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
-end
-
-local function checkForWater(root: BasePart): boolean
-    local map = LocalRoundInfo.Map()
-    if not map then
-        return false
-    end
-
-    for _, v in root:GetTouchingParts() do
-        if v.Name == "! Water" and v:IsDescendantOf(map.StaticMap) then
-            return true
-        end
-    end
-
-    -- The landed state often triggers really early so we do need to raycast quite far down. Testing on the Test map shows that -7.5 should suffice but I'll go -10 to be sure
-    return IsAboveWater(map, root, 10)
-end
-
-local function initFallDamage(hum: Humanoid, root: BasePart): ()
-    local startHeight = math.huge
-    hum.StateChanged:Connect(function(_, state)
-        if state == Enum.HumanoidStateType.Freefall then
-            startHeight = root.Position.Y
-        elseif state == Enum.HumanoidStateType.Landed then
-            if checkForWater(root) then
-                return
-            end
-            local distance = startHeight - root.Position.Y
-            if distance > 15 then
-                clientServer.Fell:FireServer(startHeight - root.Position.Y)
-                PlaySound(18782450650, nil, root, {
-                    SoundGroup = SoundService.AllSounds :: SoundGroup,
-                    Volume = 0.45,
-
-                    PlaybackRegion = NumberRange.new(0.05, 60000)
-                })
-            end
-            startHeight = math.huge
-        elseif state == Enum.HumanoidStateType.Climbing then
-            startHeight = math.huge
-        end
-    end)
-
-    root:WaitForChild("Landing"):Destroy()
 end
 
 local function initRemoveDeathSound(root: BasePart): ()
@@ -163,7 +116,6 @@ LocalCharacter.Humanoid:Connect(function(hum)
     registerCrouch()
 
     initSnapToLadder(root)
-    initFallDamage(hum, root)
     initRemoveDeathSound(root)
     initHeadTilt(char)
 end)

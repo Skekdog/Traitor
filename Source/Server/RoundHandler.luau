@@ -263,8 +263,8 @@ ReplicatedStorage.Shared.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(functi
     againstParticipant:TryAddSlayVote(participant)
 end)
 
-remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distance: unknown): ()
-    if typeof(distance) ~= "number" then
+remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, velocity: unknown): ()
+    if typeof(velocity) ~= "number" then
         return
     end
 
@@ -273,11 +273,11 @@ remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, distanc
         return
     end
 
-    if distance <= 15 then
+    if velocity <= 45 then
         return
     end
 
-    local damage = (0.5 * (distance - 15) ^ 1.5) * 80 / workspace.Gravity
+    local damage = (0.00591 * (velocity ^ 2)) + (0.62055 * velocity) - 40
 
     participant:TryTakeDamage({
         Amount = damage,
