@@ -1,25 +1,34 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local FootstepIDs = require(script.Parent.FootstepIDs)
-local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
 local IsAboveWater = require(script.Parent.IsAboveWater)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local LocalCharacter = require(script.Parent.LocalCharacter)
 
-local hum
-LocalCharacter.Humanoid:Connect(function(newHum)
-	hum = newHum
-end, true)
+type PlayerState = {
+	Humanoid: Humanoid?,
+	Root: BasePart?,
+	CurrentSound: Sound,
+	LastMaterial: Enum.Material,
+}
 
-local root
-LocalCharacter.RootPart:Connect(function(newRoot)
-	root = newRoot
+local playerStates: {[Player]: PlayerState?} = {}
 
-	if root then
-		root:WaitForChild("Running"):Destroy()
-	end
-end, true)
+local function createSound(): Sound
+	local sound = Instance.new("Sound")
+	sound.Name = "Footsteps"
+	sound.Looped = true
+	sound.SoundGroup = SoundService.AllSounds
+	return sound
+end
+
+local function createState(): PlayerState
+	return {
+		CurrentSound = createSound(),
+		LastMaterial = Enum.Material.Air,
+	}
+end
 
 local map
 LocalRoundInfo.Map:Connect(function(newMap)
@@ -34,25 +43,18 @@ local function getProperties(material: Enum.Material): FootstepIDs.FootstepData
 	return FootstepIDs[material.Name] or FootstepIDs.Default
 end
 
-local lastMaterial = Enum.Material.Air
-
-local currentSound = Instance.new("Sound")
-currentSound.Name = "ClientFootsteps"
-currentSound.Looped = true
-currentSound.SoundGroup = SoundService.AllSounds
-currentSound.Parent = SoundService
-
-local function stopSound(): ()
-	currentSound:Stop()
+local function stopSound(sound: Sound): ()
+	sound:Stop()
 end
 
-RunService.PostSimulation:Connect(function()
+local function doFootstep(state: PlayerState): ()
+	local hum, root, currentSound, lastMaterial = state.Humanoid, state.Root, state.CurrentSound, state.LastMaterial
 	if not hum or not root then
-		return stopSound()
+		return stopSound(currentSound)
 	end
 
-	if hum.MoveDirection.Magnitude <= 0 or Crouch.IsCrouching() then
-		return stopSound()
+	if hum.MoveDirection.Magnitude <= 0 or hum:GetAttribute("IsCrouching") then
+		return stopSound(currentSound)
 	end
 
 	local newMaterial = getFloorMaterial(hum, root)
@@ -67,11 +69,58 @@ RunService.PostSimulation:Connect(function()
 		return
 	end
 
-	lastMaterial = newMaterial
+	state.LastMaterial = newMaterial
 
 	currentSound.SoundId = properties.id
 	currentSound.Volume = properties.volume / 5
 	currentSound:Play()
+end
+
+RunService.PostSimulation:Connect(function()
+	for _, state in playerStates do
+		assert(state)
+		doFootstep(state)
+	end
 end)
+
+local function onCharacterAdded(character: Model, state: PlayerState, player: Player): ()
+	local root = character:WaitForChild("HumanoidRootPart")
+	local hum = character:WaitForChild("Humanoid")
+
+	assert(root:IsA("BasePart") and hum:IsA("Humanoid"), "Invalid humanoid or root part")
+
+	state.Root = root
+	state.Humanoid = hum
+
+	state.CurrentSound.Parent = if player == Players.LocalPlayer then SoundService else root
+end
+
+local function onPlayerAdded(player: Player): ()
+	local state = createState()
+	playerStates[player] = state
+
+	player.CharacterAdded:Connect(function(character)
+		onCharacterAdded(character, state, player)
+	end)
+
+	player.CharacterRemoving:Connect(function()
+		state.Root = nil
+		state.Humanoid = nil
+		state.CurrentSound.Parent = nil
+	end)
+
+	if player.Character then
+		onCharacterAdded(player.Character, state, player)
+	end
+
+	player.Destroying:Connect(function()
+		playerStates[player] = nil
+	end)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+for _, player in Players:GetPlayers() do
+	onPlayerAdded(player)
+end
 
 return nil

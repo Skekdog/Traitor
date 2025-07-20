@@ -18,10 +18,6 @@ end
 Players.PlayerAdded:Connect(removeFootsteps)
 
 for _, player in Players:GetPlayers() do
-	if player == Players.LocalPlayer then
-		continue
-	end
-
     removeFootsteps(player)
 end
 
