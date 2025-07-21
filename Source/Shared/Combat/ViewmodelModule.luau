@@ -18,6 +18,25 @@ local bobbingSpring = spring.new(10, 1)
 module.ReloadSpring = spring.new(7, 0.8)
 module.IsAiming = false
 
+local shirtCon: RBXScriptConnection?
+local coloursCon: RBXScriptConnection?
+local childCon: RBXScriptConnection?
+
+local function clearViewmodelAppearanceConnections(): ()
+    if shirtCon then
+        shirtCon:Disconnect()
+        shirtCon = nil
+    end
+    if coloursCon then
+        coloursCon:Disconnect()
+        coloursCon = nil
+    end
+    if childCon then
+        childCon:Disconnect()
+        childCon = nil
+    end
+end
+
 type Viewmodel = typeof(ReplicatedStorage.Assets.Viewmodel)
 local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     if not gun.LaserColor then
@@ -103,6 +122,8 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
 end
 
 function module.Show(item: Types.AnyItemDefinition): ()
+    clearViewmodelAppearanceConnections()
+
     if not item.HoldAnimation or not item.Model then
         module.Hide()
         return
@@ -122,16 +143,66 @@ function module.Show(item: Types.AnyItemDefinition): ()
     local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Assets.Viewmodel:Clone()) :: Viewmodel
 
     if not viewmodel.Parent then
+        local function updateShirt(shirt: Shirt): ()
+            local oldShirt = viewmodel:FindFirstChildOfClass("Shirt")
+            if oldShirt then
+                oldShirt:Destroy()
+            end
+
+            local newShirt = shirt:Clone()
+            newShirt.Parent = viewmodel
+
+            if shirtCon then
+                shirtCon:Disconnect()
+            end
+
+            shirtCon = shirt.Changed:Connect(function(prop)
+                if prop == "Parent" then
+                    return
+                end
+                (newShirt :: any)[prop] = (shirt :: any)[prop]
+            end)
+        end
+
+        local function updateColours(colours: BodyColors): ()
+            local oldColours = viewmodel:FindFirstChildOfClass("BodyColors")
+            if oldColours then
+                oldColours:Destroy()
+            end
+
+            local newColours = colours:Clone()
+            newColours.Parent = viewmodel
+
+            if coloursCon then
+                coloursCon:Disconnect()
+            end
+
+            coloursCon = colours.Changed:Connect(function(prop)
+                if prop == "Parent" then
+                    return
+                end
+                (newColours :: any)[prop] = (colours :: any)[prop]
+            end)
+        end
+
         local shirt = char:FindFirstChildOfClass("Shirt")
         if shirt then
-            shirt:Clone().Parent = viewmodel
+            updateShirt(shirt)
         end
 
         local bodyColours = char:FindFirstChildOfClass("BodyColors")
         if bodyColours then
-            bodyColours:Clone().Parent = viewmodel
+            updateColours(bodyColours)
         end
-        
+
+        childCon = char.ChildAdded:Connect(function(child)
+            if child:IsA("Shirt") then
+                updateShirt(child)
+            elseif child:IsA("BodyColors") then
+                updateColours(child)
+            end
+        end)
+
         viewmodel.Parent = camera :: any
     else
         local model = viewmodel:FindFirstChild("Item")
@@ -255,6 +326,7 @@ function module.StopAnimation(name: string): ()
 end
 
 function module.Hide(): ()
+    clearViewmodelAppearanceConnections()
     local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel")
     if viewmodel then
         viewmodel:Destroy()
