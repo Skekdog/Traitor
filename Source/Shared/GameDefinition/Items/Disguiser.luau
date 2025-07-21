@@ -54,7 +54,6 @@ if RunService:IsServer() then
 end
 
 local function OnEquipClient(item: Types.Item): ()
-	print("client equip")
 	ControlManager.Register("Disguise", function(_, state)
 		clientDisguiseActive = not clientDisguiseActive
 		ShowAlert("Disguise: " .. if clientDisguiseActive then "ON" else "OFF")
@@ -71,18 +70,15 @@ local function OnEquipClient(item: Types.Item): ()
 end
 
 local function OnEquipServer(item: Types.Item, participant: Types.Participant): ()
-	print("server equip")
 	serverParticipantTable[participant.Player] = participant
 end
 
 local function OnUnequipClient(item: Types.Item): ()
-	print("client unequip")
 	clientDisguiseActive = false
 	ControlManager.Unregister("Disguise")
 end
 
 local function OnUnequipServer(item: Types.Item, participant: Types.Participant): ()
-	print("server unequip")
 	disguiseServer(participant, false)
 	serverParticipantTable[participant.Player] = nil
 end
