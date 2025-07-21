@@ -88,7 +88,7 @@ local item: Types.ItemDefinition = {
 
 	Name = "Disguiser",
 	Description = "Conceals your identity from others. Use semicolon to activate.",
-	Icon = "rbxassetid://7677183404",
+	Icon = "rbxassetid://107291373883291",
 
 	CreditCost = 1,
 	MaxStock = 1,
