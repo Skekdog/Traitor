@@ -63,16 +63,6 @@ local function disguiseServer(participantData: ParticipantData, enable: boolean?
 		return
 	end
 
-	if enable then
-		if not participantData.HumanoidDescription then
-			-- We only set it once. This is because if a player spams the disguiser, they will end up with the description just being the disguise description. Bad!
-			participantData.HumanoidDescription = hum:GetAppliedDescription()
-		end
-		hum:ApplyDescription(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
-	elseif participantData.HumanoidDescription then
-		hum:ApplyDescription(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
-	end
-
 	hum.ApplyDescriptionFinished:Once(function()
 		local item = char:FindFirstChild("Item")
 		if item then
@@ -85,6 +75,16 @@ local function disguiseServer(participantData: ParticipantData, enable: boolean?
 			end
 		end
 	end)
+
+	if enable then
+		if not participantData.HumanoidDescription then
+			-- We only set it once. This is because if a player spams the disguiser, they will end up with the description just being the disguise description. Bad!
+			participantData.HumanoidDescription = hum:GetAppliedDescription()
+		end
+		hum:ApplyDescription(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+	elseif participantData.HumanoidDescription then
+		hum:ApplyDescription(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
+	end
 end
 
 if RunService:IsServer() then
