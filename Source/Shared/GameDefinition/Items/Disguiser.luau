@@ -69,9 +69,9 @@ local function disguiseServer(participantData: ParticipantData, enable: boolean?
 			-- We only set it once. This is because if a player spams the disguiser, they will end up with the description just being the disguise description. Bad!
 			participantData.HumanoidDescription = hum:GetAppliedDescription()
 		end
-		hum:ApplyDescriptionReset(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+		hum:ApplyDescription(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
 	elseif participantData.HumanoidDescription then
-		hum:ApplyDescriptionReset(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
+		hum:ApplyDescription(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
 	end
 
 	hum.ApplyDescriptionFinished:Once(function()
@@ -81,7 +81,7 @@ local function disguiseServer(participantData: ParticipantData, enable: boolean?
 			if motor then
 				local hand = char:FindFirstChild("RightHand")
 				if hand and hand:IsA("BasePart") then
-					motor.Part1 = hand
+					motor.Part0 = hand
 				end
 			end
 		end
@@ -172,7 +172,5 @@ local item: Types.ItemDefinition = {
 }
 
 module.Item = item
-
-print("aarjewrjbkk")
 
 return module
