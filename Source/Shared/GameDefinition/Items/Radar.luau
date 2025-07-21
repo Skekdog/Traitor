@@ -37,6 +37,10 @@ local function HeartbeatClient(item: Types.AnyItem): ()
             continue
         end
 
+        if v:GetAttribute("IsDisguised") then
+            continue
+        end
+
         local char = v.Character
         if not char or v == Players.LocalPlayer then
             continue
