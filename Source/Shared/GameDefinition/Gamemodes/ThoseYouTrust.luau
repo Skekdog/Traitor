@@ -126,15 +126,15 @@ local roles: {[string]: Types.RoleDefinition} = {
 		},
 
 		EquipmentShop = {
-			Items["Golden Gun"],
 			Items["Radar"],
-			Items["Flashbang"],
-			Items["UMP"],
 			Items["HealthStation"],
 			Items["Teleporter"],
+			Items["Golden Gun"],
+			Items["UMP"],
 			Items["Visualiser"],
 			Items["Defuser"],
 			Items["Binoculars"],
+			Items["Flashbang"],
 		},
 
 		AwardCreditsToRolesOnDeath = {
