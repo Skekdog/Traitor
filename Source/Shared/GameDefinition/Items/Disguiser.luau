@@ -6,7 +6,29 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-local serverParticipantTable: {[Player]: Types.Participant?} = {}
+local DISGUISED_SKIN_TONE = Color3.new(1, 1, 1)
+local DISGUISED_CLOTHING_COLOR = Color3.new(0.5, 0.5, 0.5)
+local DISGUISED_SHIRT = 855773572
+local DISGUISED_PANTS = 867838635
+
+local DISGUISED_DESCRIPTION = Instance.new("HumanoidDescription")
+
+DISGUISED_DESCRIPTION.HeadColor = DISGUISED_SKIN_TONE
+DISGUISED_DESCRIPTION.LeftArmColor = DISGUISED_SKIN_TONE
+DISGUISED_DESCRIPTION.RightArmColor = DISGUISED_SKIN_TONE
+DISGUISED_DESCRIPTION.LeftLegColor = DISGUISED_SKIN_TONE
+DISGUISED_DESCRIPTION.RightLegColor = DISGUISED_SKIN_TONE
+DISGUISED_DESCRIPTION.TorsoColor = DISGUISED_SKIN_TONE
+
+DISGUISED_DESCRIPTION.Shirt = DISGUISED_SHIRT
+DISGUISED_DESCRIPTION.Pants = DISGUISED_PANTS
+
+type ParticipantData = {
+	Participant: Types.Participant,
+	HumanoidDescription: HumanoidDescription?,
+}
+
+local serverParticipantTable: {[Player]: ParticipantData?} = {}
 
 local remote: RemoteEvent
 if RunService:IsServer() then
@@ -21,8 +43,49 @@ end
 
 local clientDisguiseActive = false
 
-local function disguiseServer(participant: Types.Participant, enable: boolean?): ()
-	participant.Player:SetAttribute("IsDisguised", if enable == nil then not participant.Player:GetAttribute("IsDisguised") else enable)
+local function disguiseServer(participantData: ParticipantData, enable: boolean?): ()
+	local participant = participantData.Participant
+
+	-- this is to prevent an error in studio when stopping the game.
+	if not participant.Player.Parent then
+		return
+	end
+
+	enable = if enable == nil then not participant.Player:GetAttribute("IsDisguised") else enable
+	participant.Player:SetAttribute("IsDisguised", enable)
+
+	local hum = participant:GetHumanoid()
+	if not hum then
+		return
+	end
+
+	local char = participant:GetCharacter()
+	if not char then
+		return
+	end
+
+	if enable then
+		if not participantData.HumanoidDescription then
+			-- We only set it once. This is because if a player spams the disguiser, they will end up with the description just being the disguise description. Bad!
+			participantData.HumanoidDescription = hum:GetAppliedDescription()
+		end
+		hum:ApplyDescriptionReset(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+	elseif participantData.HumanoidDescription then
+		hum:ApplyDescriptionReset(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
+	end
+
+	hum.ApplyDescriptionFinished:Once(function()
+		local item = char:FindFirstChild("Item")
+		if item then
+			local motor = item:FindFirstChildOfClass("Motor6D")
+			if motor then
+				local hand = char:FindFirstChild("RightHand")
+				if hand and hand:IsA("BasePart") then
+					motor.Part1 = hand
+				end
+			end
+		end
+	end)
 end
 
 if RunService:IsServer() then
@@ -31,10 +94,12 @@ if RunService:IsServer() then
 			return
 		end
 
-		local participant = serverParticipantTable[player]
-		if not participant then
+		local participantData = serverParticipantTable[player]
+		if not participantData then
 			return
 		end
+
+		local participant = participantData.Participant
 
 		local found = false
 		for _, v in participant:GetItems() do
@@ -49,7 +114,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		disguiseServer(participant, enable)
+		disguiseServer(participantData, enable)
 	end)
 end
 
@@ -70,7 +135,9 @@ local function OnEquipClient(item: Types.Item): ()
 end
 
 local function OnEquipServer(item: Types.Item, participant: Types.Participant): ()
-	serverParticipantTable[participant.Player] = participant
+	serverParticipantTable[participant.Player] = {
+		Participant = participant,
+	}
 end
 
 local function OnUnequipClient(item: Types.Item): ()
@@ -79,7 +146,11 @@ local function OnUnequipClient(item: Types.Item): ()
 end
 
 local function OnUnequipServer(item: Types.Item, participant: Types.Participant): ()
-	disguiseServer(participant, false)
+	local data = serverParticipantTable[participant.Player]
+	if not data then
+		return
+	end
+	disguiseServer(data, false)
 	serverParticipantTable[participant.Player] = nil
 end
 
@@ -101,5 +172,7 @@ local item: Types.ItemDefinition = {
 }
 
 module.Item = item
+
+print("aarjewrjbkk")
 
 return module
