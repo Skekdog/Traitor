@@ -22,6 +22,10 @@ function module.ShowPlayerInfo(char: Model)
         return
     end
 
+	if plr:GetAttribute("IsDisguised") then
+		return
+	end
+
 	local hum = char:FindFirstChildOfClass("Humanoid")
 	if not hum then
         return
