@@ -64,11 +64,16 @@ local function doFootstep(state: PlayerState): ()
 		return stopSound(currentSound)
 	end
 
-	if hum.MoveDirection.Magnitude <= 0 or hum:GetAttribute("IsCrouching") then
+	if hum.MoveDirection.Magnitude <= 0 then
 		return stopSound(currentSound)
 	end
 
 	local newMaterial = getFloorMaterial(hum, root)
+
+	if hum:GetAttribute("IsCrouching") and newMaterial ~= Enum.Material.Water then
+		return stopSound(currentSound)
+	end
+
 	local properties = getProperties(newMaterial)
 
 	currentSound.PlaybackSpeed = properties.speed * (hum.WalkSpeed / 16)
