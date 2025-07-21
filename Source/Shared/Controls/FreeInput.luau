@@ -76,7 +76,7 @@ function module.GetVelocity(dt: number): Vector3
 
 	local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
 
-	return (kGamepad + kKeyboard + kTouch) * (if shift then NAV_SHIFT_MUL else 1)
+	return ((kGamepad + kKeyboard + kTouch) * (if shift then NAV_SHIFT_MUL else 1)) * 60 * dt
 end
 
 function module.GetCameraPan(dt: number): Vector2
