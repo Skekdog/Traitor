@@ -7,7 +7,6 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local module = {}
 
 local DISGUISED_SKIN_TONE = Color3.new(1, 1, 1)
-local DISGUISED_CLOTHING_COLOR = Color3.new(0.5, 0.5, 0.5)
 local DISGUISED_SHIRT = 855773572
 local DISGUISED_PANTS = 867838635
 
