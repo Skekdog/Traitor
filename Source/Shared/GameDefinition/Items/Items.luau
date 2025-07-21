@@ -12,6 +12,7 @@ local Binoculars = require(script.Parent.Binoculars)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
 local Defuser = require(script.Parent.Defuser)
+local Disguiser = require(script.Parent.Disguiser)
 local FlareGun = require(script.Parent.FlareGun)
 local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
@@ -959,6 +960,8 @@ items.Defuser = Defuser
 items.Binoculars = Binoculars.Item
 
 items["Ballistic Vest"] = BallisticVest.Item
+
+items.Disguiser = Disguiser.Item
 
 local function createInteractableForItem(item: Types.Item, round: Types.Round): Types.Interactable
     local interactableDefinition = round:GetInteractableDefinition(item.Definition.Name)

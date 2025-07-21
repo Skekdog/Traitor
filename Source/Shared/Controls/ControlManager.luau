@@ -108,7 +108,7 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 end
 
 -- Returns the Button if it was created
-function module.Register(actionName: string, callback: ActionCallback, priority: number?): ActionButton.ActionButton?
+function module.Register(actionName: string, callback: ActionCallback, priority: number?, settingOverride: Settings.ControlValue?): ActionButton.ActionButton?
 	priority = priority or Enum.ContextActionPriority.Medium.Value
 	assert(priority)
 
@@ -122,7 +122,7 @@ function module.Register(actionName: string, callback: ActionCallback, priority:
 		Priority = priority,
 	}
 
-	local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
+	local setting = settingOverride or Settings.GetSetting(actionName) :: Settings.ControlValue
 
 	local toggled = setting.Toggled
 

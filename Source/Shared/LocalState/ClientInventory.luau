@@ -310,6 +310,9 @@ local function removeItem(itemName: string): ()
 		for i, v in ourInventory.Passive do
 			if v.Definition.Name == itemName then
 				table.remove(ourInventory.Passive, i)
+				if v.Kind == "Item" and v.Definition.OnUnequipClient then
+					v.Definition.OnUnequipClient(v)
+				end
 				return
 			end
 		end
