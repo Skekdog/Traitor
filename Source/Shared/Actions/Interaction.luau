@@ -163,7 +163,7 @@ RunService.PostSimulation:Connect(function()
 	local camera = workspace.CurrentCamera
 	local cameraSubject = camera.CameraSubject
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
-		params:AddToFilter(cameraSubject.Parent)
+		params.FilterDescendantsInstances = {cameraSubject.Parent :: Model}
 	end
 	
     local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
@@ -190,6 +190,7 @@ RunService.PostSimulation:Connect(function()
 	for _, v in validAncestors do
 		if result.Instance:IsDescendantOf(v) then
 			isValid = true
+			break
 		end
 	end
 
