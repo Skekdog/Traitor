@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
-local FootstepIDs = require(ReplicatedStorage.Shared.Character.FootstepIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local PLAY_COOLDOWN = 0.1
