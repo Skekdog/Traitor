@@ -8,7 +8,7 @@ local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter
 local module = {}
 module.SnapCooldown = 0
 
-local CLIMB_SPEED = 12
+local CLIMB_SPEED_MULTIPLIER = 0.75
 local MIN_LADDER_HEIGHT = 2.5
 
 local thread: thread?
@@ -112,7 +112,9 @@ function module.Climb(ladder: BasePart): ()
             end
 
             local lastY = ladderAttachment.Position.Y
-            ladderAttachment.Position = Vector3.new(0, math.clamp(lastY + (dt * if z < 0 then CLIMB_SPEED else -CLIMB_SPEED), -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight + MIN_LADDER_HEIGHT), 0)
+
+            local speed = hum.WalkSpeed * CLIMB_SPEED_MULTIPLIER
+            ladderAttachment.Position = Vector3.new(0, math.clamp(lastY + (dt * speed * -math.sign(z)), -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight + MIN_LADDER_HEIGHT), 0)
 
             if ladderAttachment.Position.Y >= ladderHeight + MIN_LADDER_HEIGHT or ladderAttachment.Position.Y <= -ladderHeight + MIN_LADDER_HEIGHT then
                 task.defer(module.StopClimbing) -- We can't stop the current thread because its the current thread, so defer it to stop
