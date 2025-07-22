@@ -5,6 +5,7 @@ local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): b
 	local params = RaycastParams.new()
     params.RespectCanCollide = false
     params.IgnoreWater = false
+    params.CollisionGroup = "PlayerCharacterParts"
     params.FilterDescendantsInstances = {root.Parent :: Model}
     params.FilterType = Enum.RaycastFilterType.Exclude
 
@@ -14,7 +15,7 @@ local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): b
         return false
     end
 
-    return (result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.StaticMap))
+    return (result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.Bounds))
 end
 
 return IsAboveWater
