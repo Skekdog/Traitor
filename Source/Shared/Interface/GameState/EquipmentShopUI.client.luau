@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
@@ -16,29 +17,31 @@ local isPurchaseConnected: boolean = false
 local function updateCredits(ui: ShopUI?, requiredCredits: number?): ()
     ui = ui or UIManager.TryGetUI("Equipment Shop") :: ShopUI?
     if ui then
+        local page = ui.Object.Page.Shop
         local credits = LocalRoundInfo.Credits()
-        ui.Object.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
-        ui.Object.CurrentCredits.TextColor3 = if credits >= (requiredCredits or 0) then goodColour else badColour
-        ui.Object.Purchase.TextColor3 = if requiredCredits and credits >= requiredCredits then goodColour else badColour
-        ui.Object.CreditCost.TextColor3 = if LocalRoundInfo.Credits() >= (requiredCredits or 0) then goodColour else badColour
+        page.CurrentCredits.Text = `You have {credits} {if credits == 1 then "credit" else "credits"}.`
+        page.CurrentCredits.TextColor3 = if credits >= (requiredCredits or 0) then goodColour else badColour
+        page.Purchase.TextColor3 = if requiredCredits and credits >= requiredCredits then goodColour else badColour
+        page.CreditCost.TextColor3 = if LocalRoundInfo.Credits() >= (requiredCredits or 0) then goodColour else badColour
     end
 end
 
 type ShopUI = UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])}
 local function selectItem(ui: ShopUI, item: Types.AnyItemDefinition?): ()
+    local page = ui.Object.Page.Shop
     selectedItem = item
     if not item then
-        ui.Object.Description.Text = "Click on an item to view more information."
-        ui.Object.ItemName.Text = "Item Name"
+        page.Description.Text = "Click on an item to view more information."
+        page.ItemName.Text = "Item Name"
 
-        ui.Object.CreditCost.Visible = false
+        page.CreditCost.Visible = false
         return
     end
-    ui.Object.Description.Text = item.Description or ""
-    ui.Object.ItemName.Text = GetDisplayName(item)
+    page.Description.Text = item.Description or ""
+    page.ItemName.Text = GetDisplayName(item)
 
-    ui.Object.CreditCost.Visible = true
-    ui.Object.CreditCost.Text = `This costs {item.CreditCost} {if item.CreditCost == 1 then "credit" else "credits"}.`
+    page.CreditCost.Visible = true
+    page.CreditCost.Text = `This costs {item.CreditCost} {if item.CreditCost == 1 then "credit" else "credits"}.`
 
     selectedItem = item
 
@@ -81,11 +84,31 @@ local function tryPurchase(): ()
     end
 end
 
+local didLoadPages = false
+local function tryLoadPages(ui: ShopUI): ()
+    if didLoadPages then
+        return
+    end
+
+    local currentPage: GuiObject = ui.Object.Page.Shop
+
+    ui.Object.ChangePageButton.Activated:Connect(function()
+        local newPage = if currentPage == ui.Object.Page.Shop then ui.Object.Page.Radio else ui.Object.Page.Shop
+        UIAnimation.TransitionUIPage(currentPage, newPage, UDim2.fromScale(0.5, 0.5))
+
+        ui.Object.ChangePageButton.Text = currentPage.Name
+
+        currentPage = newPage
+    end)
+end
+
 local function tryPopulateEquipment(role: Types.Role?): ()
     local ui = (UIManager.TryGetUI("Equipment Shop") or UIManager.RegisterUI(UIManager.UnregisteredUIs["Equipment Shop"])) :: ShopUI
+    tryLoadPages(ui)
+    local page = ui.Object.Page.Shop
     if not isPurchaseConnected then
         isPurchaseConnected = true
-        ui.Object.Purchase.Activated:Connect(tryPurchase)
+        page.Purchase.Activated:Connect(tryPurchase)
     end
 
     selectItem(ui, nil)
@@ -99,7 +122,7 @@ local function tryPopulateEquipment(role: Types.Role?): ()
 
     updateCredits(ui)
 
-    local list = ui.Object.ScrollingFrame
+    local list = page.ScrollingFrame
 
     for _, v in list:GetChildren() do
         if v:IsA("GuiButton") then
@@ -110,7 +133,7 @@ local function tryPopulateEquipment(role: Types.Role?): ()
     for _, v in role.Definition.EquipmentShop do
         assert(v.CreditCost and v.Icon and v.Description, `Equipment {v.Name} is missing an icon, cost or description.`)
 
-        local button = ui.Object.EquipmentEntry:Clone()
+        local button = page.EquipmentEntry:Clone()
         button.Name = v.Name
         button.Image = v.Icon or ""
         button.ResampleMode = if v.IsPixelIcon then Enum.ResamplerMode.Pixelated else Enum.ResamplerMode.Default
