@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local PLAY_COOLDOWN = 0.1
+local PLAY_COOLDOWN = 0.25
 
 local serverRound: Types.Round?
 
