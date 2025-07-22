@@ -3,6 +3,7 @@ local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
 local DeathStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.DeathStation)
 local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
 local HealthStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.HealthStation)
+local Radio = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Radio)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local Visualiser = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Visualiser)
@@ -82,6 +83,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Newton Launcher"],
 			Items["Poltergeist"],
 			Items["BAR"],
+			Items["Radio"],
 		},
 
 		CanTeamChat = true,
@@ -278,6 +280,7 @@ local gamemode: Types.Gamemode = {
 		DeathStation = DeathStation,
 		Decoy = Decoy.Interactable,
 		Visualiser = Visualiser,
+		Radio = Radio,
 	},
 
 	StartingItems = {

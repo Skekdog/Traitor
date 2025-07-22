@@ -1081,6 +1081,30 @@ items.Visualiser = {
     end
 }
 
+items.Radio = {
+    Kind = "Item" :: "Item",
+    Name = "Radio",
+    Slot = 8,
+    CanDrop = false,
+
+    Description = "Remotely plays a sound to confuse nearby spies.",
+    Icon = "rbxassetid://11817043651",
+
+    CreditCost = 1,
+    MaxStock = 1,
+
+    PrimaryToggled = true,
+    PrimaryHint = "Deploy Radio",
+    PrimaryFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+        local interactable = throwInteractable(item, mode, origin, direction, participant)
+        if not interactable then
+            return
+        end
+
+        interactable.Extras.Player = participant.Player
+    end,
+}
+
 items.HealthStation = {
     Kind = "Item" :: "Item",
     Name = "HealthStation",

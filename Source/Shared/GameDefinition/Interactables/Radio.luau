@@ -1,0 +1,235 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+
+local PLAY_COOLDOWN = 0.1
+
+local serverRound: Types.Round?
+
+type Radio = Types.Interactable & {
+	Extras: {
+		Player: Player?,
+		LastPlayedAt: number?,
+		[any]: never,
+	}
+}
+
+type SoundEntry = {
+	Sound: Sound,
+	AddedByMap: string?,
+	AddedByGamemode: string?,
+}
+
+local sounds: {SoundEntry} = {}
+
+local function addSound(sound: Sound, map: string?, gamemode: string?): ()
+	table.insert(sounds, {
+		Sound = sound,
+		AddedByMap = map,
+		AddedByGamemode = gamemode,
+	})
+end
+
+local function removeSoundsByMap(newMap: string): ()
+	for i = #sounds, 1, -1 do
+		if sounds[i].AddedByMap == newMap then
+			table.remove(sounds, i)
+		end
+	end
+end
+
+local function removeSoundsByGamemode(newGamemode: string): ()
+	for i = #sounds, 1, -1 do
+		if sounds[i].AddedByGamemode == newGamemode then
+			table.remove(sounds, i)
+		end
+	end
+end
+
+local function addSoundsFromMap(map: Types.Map): ()
+	for _, v in map.AvailableItems do
+		if v.Kind == "Gun" and v.AttackSound then
+			addSound(v.AttackSound, map.Name, nil)
+		end
+	end
+end
+
+local function addSoundsFromGamemode(gamemode: Types.Gamemode): ()
+	for _, v in gamemode.AvailableItems do
+		if v.Kind == "Gun" and v.AttackSound then
+			addSound(v.AttackSound, nil, gamemode.Name)
+		end
+	end
+end
+
+if RunService:IsClient() then
+	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+
+	local lastGamemode: Types.Gamemode?
+	local lastMap: Types.Map?
+
+	LocalRoundInfo.Gamemode:Connect(function(gamemode)
+		if not gamemode or gamemode == lastGamemode then
+			return
+		end
+
+		if lastGamemode then
+			removeSoundsByGamemode(lastGamemode.Name)
+		end
+
+		lastGamemode = gamemode
+
+		addSoundsFromGamemode(gamemode)
+	end, true)
+
+	LocalRoundInfo.Map:Connect(function(map)
+		if not map or map == lastMap then
+			return
+		end
+
+		if lastMap then
+			removeSoundsByMap(lastMap.Name)
+		end
+
+		lastMap = map
+
+		addSoundsFromMap(map)
+	end, true)
+end
+
+local remote: RemoteEvent
+if RunService:IsServer() then
+	remote = Instance.new("RemoteEvent")
+	remote.Name = "RadioUse"
+	remote.Parent = script
+else
+	local found = script:WaitForChild("RadioUse")
+	assert(found:IsA("RemoteEvent"), "RadioUse must be a RemoteEvent")
+	remote = found
+end
+
+local activeRadios: {Radio} = {}
+
+if RunService:IsServer() then
+	local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+
+	local lastGamemode: Types.Gamemode?
+	local lastMap: Types.Map?
+
+	remote.OnServerEvent:Connect(function(player, soundName: unknown): ()
+		if typeof(soundName) ~= "string" then
+			return
+		end
+
+		if not serverRound then
+			return
+		end
+
+		local radio: Radio?
+		for _, v in activeRadios do
+			if (v.Extras.Player :: Player?) == player then
+				radio = v
+				break
+			end
+		end
+
+		if not radio then
+			return
+		end
+
+		if radio.Extras.LastPlayedAt and tick() - radio.Extras.LastPlayedAt < PLAY_COOLDOWN then
+			return
+		end
+
+		if lastGamemode ~= serverRound.Gamemode then
+			if lastGamemode then
+				removeSoundsByGamemode(lastGamemode.Name)
+			end
+			lastGamemode = serverRound.Gamemode
+			addSoundsFromGamemode(serverRound.Gamemode)
+		end
+
+		local map = serverRound:GetMap()
+		if lastMap ~= map then
+			if lastMap then
+				removeSoundsByMap(lastMap.Name)
+			end
+			lastMap = map
+			addSoundsFromMap(map)
+		end
+
+		local sound: Sound
+		for _, v in sounds do
+			if v.Sound.Name == soundName then
+				sound = v.Sound
+				break
+			end
+		end
+
+		if not sound then
+			return
+		end
+
+		radio.Extras.LastPlayedAt = tick()
+
+		PlaySound(sound, nil, radio.Object, {
+			SoundGroup = SoundService.AllSounds :: SoundGroup,
+		})
+	end)
+end
+
+local function BeforeTakeDamage(interactable: Radio, params: Types.DamageParams?): boolean
+	if not params then
+		return false
+	end
+
+	local attacker = params.Attacker
+	if not attacker then
+		return false
+	end
+
+	return not attacker:GetRole().Definition.IsBadGuys
+end
+
+local function OnLoadServer(interactable: Radio): ()
+	serverRound = interactable.Round
+	interactable.Object.Destroying:Connect(function()
+		table.remove(activeRadios, table.find(activeRadios, interactable) or error("Radio not found"))
+	end)
+
+	table.insert(activeRadios, interactable)
+end
+
+local function OnInteractServer(interactable: Radio, participant: Types.Participant): ()
+	if participant.Player ~= interactable.Extras.Player :: Player? then
+		return
+	end
+
+	local radioItem = participant.Round:GetItemDefinition(interactable.Definition.Name)
+	if not radioItem then
+		return warn("Could not find Radio item")
+	end
+
+	if radioItem.Slot and participant:IsItemSlotOccupied(radioItem.Slot) then
+		return
+	end
+
+	interactable.Object:Destroy()
+	participant:GiveItemFromItemDefinition(radioItem)
+end
+
+local interactable: Types.InteractableDefinition = {
+	Name = "Radio",
+
+	IsContinuousInteraction = false,
+	InteractionRange = 7.5,
+
+	Model = ReplicatedStorage.Assets.InteractableModels.Radio,
+
+	OnInteractServer = OnInteractServer,
+	OnLoadServer = OnLoadServer,
+	BeforeTakeDamage = BeforeTakeDamage,
+}
+
+return interactable
