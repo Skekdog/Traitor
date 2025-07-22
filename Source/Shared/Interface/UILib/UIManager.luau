@@ -6,6 +6,7 @@ local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ToggleMouseVisible = require(ReplicatedStorage.Shared.Interface.Util.ToggleMouseVisible)
 local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local UIAnimation = require(script.Parent.UIAnimation)
 
 local plr = Players.LocalPlayer
@@ -59,6 +60,8 @@ local function tryMakeCursorVisible(): ()
 
 	ToggleMouseVisible(false)
 end
+
+UIManager.RegisteredEvent = DynamicValue.new("")
 
 function UIManager.RegisterUI(object: GuiObject): UI
 	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
@@ -233,6 +236,9 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	
 	object.Parent = plrUi:FindFirstChild(self.Layer)
 	table.insert(registeredUIs, self)
+
+	UIManager.RegisteredEvent:SetValue(self.Name)
+
 	return self
 end
 

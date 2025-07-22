@@ -23,18 +23,112 @@ type SoundEntry = {
 
 local sounds: {SoundEntry} = {}
 
+local remote: RemoteEvent
+if RunService:IsServer() then
+	remote = Instance.new("RemoteEvent")
+	remote.Name = "RadioUse"
+	remote.Parent = script
+else
+	local found = script:WaitForChild("RadioUse")
+	assert(found:IsA("RemoteEvent"), "RadioUse must be a RemoteEvent")
+	remote = found
+end
+
+
+local function getEquipmentMenu()
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+	local ui = UIManager.TryGetUI("Equipment Shop") :: (UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])})?
+	return ui
+end
+
+local function addToMenu(sound: Sound | {Sound}): ()
+	local ui = getEquipmentMenu()
+	if not ui then
+		return
+	end
+
+	local page = ui.Object.Page.Radio
+	local button = page.RadioButton:Clone()
+
+	local soundName = if typeof(sound) == "table" then sound[1].Name else sound.Name
+
+	button.Name = "Button_" .. soundName
+	button.Text = soundName
+	button.Visible = true
+
+	button.Activated:Connect(function()
+		remote:FireServer(soundName)
+	end)
+
+	button.Parent = page.ScrollingFrame :: any
+end
+
+if RunService:IsClient() then
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+	UIManager.RegisteredEvent:Connect(function(name: string)
+		if name ~= "Equipment Shop" then
+			return
+		end
+
+		local ui = getEquipmentMenu()
+		if not ui then
+			return
+		end
+
+		for _, v in ui.Object.Page.Radio.ScrollingFrame:GetChildren() do
+			if v:IsA("TextButton") then
+				v:Destroy()
+			end
+		end
+
+		for _, v in sounds do
+			addToMenu(v.Sound)
+		end
+	end)
+end
+
+-- jesus fucking christ this is horrible
+
 local function addSound(sound: Sound | {Sound}, map: string?, gamemode: string?): ()
+	for _, v in sounds do
+		if v.Sound == sound then
+			return
+		end
+	end
+
 	table.insert(sounds, {
 		Sound = sound,
 		AddedByMap = map,
 		AddedByGamemode = gamemode,
 	})
+
+	if RunService:IsClient() then
+		addToMenu(sound)
+	end
+end
+
+local function removeSound(index: number): ()
+	table.remove(sounds, index)
+
+	if RunService:IsClient() then
+		local ui = getEquipmentMenu()
+		if not ui then
+			return
+		end
+
+		local page = ui.Object.Page.Radio
+		local sound = sounds[index].Sound
+		local button = page:FindFirstChild("Button_" .. if typeof(sound) == "table" then sound[1].Name else sound.Name)
+		if button then
+			button:Destroy()
+		end
+	end
 end
 
 local function removeSoundsByMap(newMap: string): ()
 	for i = #sounds, 1, -1 do
 		if sounds[i].AddedByMap == newMap then
-			table.remove(sounds, i)
+			removeSound(i)
 		end
 	end
 end
@@ -42,7 +136,7 @@ end
 local function removeSoundsByGamemode(newGamemode: string): ()
 	for i = #sounds, 1, -1 do
 		if sounds[i].AddedByGamemode == newGamemode then
-			table.remove(sounds, i)
+			removeSound(i)
 		end
 	end
 end
@@ -71,17 +165,6 @@ local function addSoundsFromGamemode(gamemode: Types.Gamemode): ()
 	end
 
 	addSound(deathSounds, nil, gamemode.Name)
-end
-
-local remote: RemoteEvent
-if RunService:IsServer() then
-	remote = Instance.new("RemoteEvent")
-	remote.Name = "RadioUse"
-	remote.Parent = script
-else
-	local found = script:WaitForChild("RadioUse")
-	assert(found:IsA("RemoteEvent"), "RadioUse must be a RemoteEvent")
-	remote = found
 end
 
 do
