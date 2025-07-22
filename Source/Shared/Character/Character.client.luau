@@ -21,8 +21,7 @@ local function initSnapToLadder(root: BasePart): ()
             return
         end
         
-        if Settings.GetSetting("Snap To Ladders") and ClimbLadder.SnapCooldown < os.clock() then
-            ClimbLadder.SnapCooldown = os.clock() + 3
+        if Settings.GetSetting("Snap To Ladders") then
             ClimbLadder.Climb(part)
         end
     end)
