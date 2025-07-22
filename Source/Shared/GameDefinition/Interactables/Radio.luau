@@ -73,6 +73,17 @@ local function addSoundsFromGamemode(gamemode: Types.Gamemode): ()
 	addSound(deathSounds, nil, gamemode.Name)
 end
 
+local remote: RemoteEvent
+if RunService:IsServer() then
+	remote = Instance.new("RemoteEvent")
+	remote.Name = "RadioUse"
+	remote.Parent = script
+else
+	local found = script:WaitForChild("RadioUse")
+	assert(found:IsA("RemoteEvent"), "RadioUse must be a RemoteEvent")
+	remote = found
+end
+
 do
 	local footstepSound = Instance.new("Sound")
 	footstepSound.Name = "Footstep"
@@ -117,17 +128,6 @@ if RunService:IsClient() then
 		lastMap = map
 		addSoundsFromMap(map)
 	end, true)
-end
-
-local remote: RemoteEvent
-if RunService:IsServer() then
-	remote = Instance.new("RemoteEvent")
-	remote.Name = "RadioUse"
-	remote.Parent = script
-else
-	local found = script:WaitForChild("RadioUse")
-	assert(found:IsA("RemoteEvent"), "RadioUse must be a RemoteEvent")
-	remote = found
 end
 
 local activeRadios: {Radio} = {}
