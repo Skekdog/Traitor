@@ -174,7 +174,7 @@ do
 	footstepSound.SoundId = "rbxassetid://81623756670923"
 	footstepSound.RollOffMinDistance = 10
 	footstepSound.RollOffMaxDistance = 15
-	footstepSound.Volume = 1
+	footstepSound.Volume = 5 -- for some reason its really quiet
 
 	addSound(footstepSound)
 
