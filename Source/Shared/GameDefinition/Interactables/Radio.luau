@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local FootstepIDs = require(ReplicatedStorage.Shared.Character.FootstepIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local PLAY_COOLDOWN = 0.1
@@ -16,14 +17,14 @@ type Radio = Types.Interactable & {
 }
 
 type SoundEntry = {
-	Sound: Sound,
+	Sound: Sound | {Sound},
 	AddedByMap: string?,
 	AddedByGamemode: string?,
 }
 
 local sounds: {SoundEntry} = {}
 
-local function addSound(sound: Sound, map: string?, gamemode: string?): ()
+local function addSound(sound: Sound | {Sound}, map: string?, gamemode: string?): ()
 	table.insert(sounds, {
 		Sound = sound,
 		AddedByMap = map,
@@ -61,6 +62,33 @@ local function addSoundsFromGamemode(gamemode: Types.Gamemode): ()
 			addSound(v.AttackSound, nil, gamemode.Name)
 		end
 	end
+
+	local deathSounds: {Sound} = {}
+	for _, v in gamemode.DeathSounds do
+		local sound = Instance.new("Sound")
+		sound.Name = "Death"
+		sound.SoundId = v
+		table.insert(deathSounds, sound)
+	end
+
+	addSound(deathSounds, nil, gamemode.Name)
+end
+
+do
+	local footstepSound = Instance.new("Sound")
+	footstepSound.Name = "Footstep"
+
+	footstepSound.SoundId = "rbxassetid://81623756670923"
+	footstepSound.RollOffMinDistance = 10
+	footstepSound.RollOffMaxDistance = 15
+	footstepSound.Volume = 1
+
+	addSound(footstepSound)
+
+	local burnSound = ReplicatedStorage.Assets.WeaponSounds.FlareBurn:Clone()
+	burnSound.Name = "Burn"
+
+	addSound(burnSound)
 end
 
 if RunService:IsClient() then
@@ -73,13 +101,10 @@ if RunService:IsClient() then
 		if not gamemode or gamemode == lastGamemode then
 			return
 		end
-
 		if lastGamemode then
 			removeSoundsByGamemode(lastGamemode.Name)
 		end
-
 		lastGamemode = gamemode
-
 		addSoundsFromGamemode(gamemode)
 	end, true)
 
@@ -87,13 +112,10 @@ if RunService:IsClient() then
 		if not map or map == lastMap then
 			return
 		end
-
 		if lastMap then
 			removeSoundsByMap(lastMap.Name)
 		end
-
 		lastMap = map
-
 		addSoundsFromMap(map)
 	end, true)
 end
@@ -160,9 +182,12 @@ if RunService:IsServer() then
 		end
 
 		local sound: Sound
+
+
+
 		for _, v in sounds do
-			if v.Sound.Name == soundName then
-				sound = v.Sound
+			if typeof(v.Sound) == "table" and v.Sound[1].Name == soundName or typeof(v.Sound) ~= "table" and v.Sound.Name == soundName then
+				sound = if typeof(v.Sound) == "table" then v.Sound[math.random(#v.Sound)] else v.Sound
 				break
 			end
 		end
