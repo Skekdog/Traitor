@@ -129,6 +129,10 @@ local function OnEquipClient(item: Types.Item): ()
 		Keybind = {
 			ConsoleKeybind = Enum.KeyCode.ButtonR1,
 			KBMKeybind = Enum.KeyCode.Semicolon,
+		},
+		TouchButton = {
+			Position = UDim2.fromOffset(50, 250),
+			Scale = 1,
 		}
 	})
 end

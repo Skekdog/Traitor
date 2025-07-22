@@ -36,8 +36,8 @@ local function setCallbacks(actionName: string, button: ActionButton, callback: 
 	end))
 end
 
-function module.ShowActionButton(actionName: string, callback: (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult): ActionButton
-	local control = Settings.GetSetting(actionName) :: Settings.ControlValue
+function module.ShowActionButton(actionName: string, callback: (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult, settingOverride: Settings.ControlValue?): ActionButton
+	local control = settingOverride or Settings.GetSetting(actionName) :: Settings.ControlValue
 	assert(control.TouchButton, `{actionName} is not a touch control`)
 
 	local button = module.GetButton(actionName)

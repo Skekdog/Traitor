@@ -150,7 +150,7 @@ function module.Register(actionName: string, callback: ActionCallback, priority:
 	ContextActionService:BindActionAtPriority(actionName, runCallback, false, priority, table.unpack(binds))
 	
 	if module.GetPreferredInputMethod() == "Touch" and setting.TouchButton then
-		return ActionButton.ShowActionButton(actionName, runCallback)
+		return ActionButton.ShowActionButton(actionName, runCallback, settingOverride)
 	end
 
 	return nil
