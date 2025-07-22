@@ -14,6 +14,19 @@ local MIN_LADDER_HEIGHT = 2.5
 local thread: thread?
 local jumpRequestCon: RBXScriptConnection?
 
+local currentClimbSoundIndex = 1
+local CLIMB_SOUNDS: {Sound} = {}
+
+for i, id in {84250734989129, 131423923611717, 132473964674158, 98963245122177} do
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://" .. id
+    sound.Volume = 0.5
+    sound.SoundGroup = SoundService.AllSounds
+    sound.Name = "ClimbSound" .. i
+    sound.Parent = SoundService
+    table.insert(CLIMB_SOUNDS, sound)
+end
+
 local function setStates(hum: Humanoid, enabled: boolean): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, enabled)
     hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, not enabled)
@@ -39,6 +52,9 @@ function module.Climb(ladder: BasePart): ()
     if not hum then
         return
     end
+
+    currentClimbSoundIndex = 1
+
     setStates(hum, false)
 
     local alignPos = (root:FindFirstChild("LadderPositionAlignment") :: AlignPosition?) or Instance.new("AlignPosition")
@@ -71,14 +87,6 @@ function module.Climb(ladder: BasePart): ()
     alignPos.Attachment1 = ladderAttachment
     alignPos.Enabled = true
 
-    local climbSound = Instance.new("Sound")
-    climbSound.SoundId = "rbxassetid://101348938648563"
-    climbSound.Volume = 0.5
-    climbSound.SoundGroup = SoundService.AllSounds
-    climbSound.Looped = true
-    climbSound.Name = "ClimbSound"
-    climbSound.Parent = root
-
     local PlayerModule = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
     local ControlModule = PlayerModule:GetControls()
     thread = coroutine.create(function()
@@ -91,10 +99,10 @@ function module.Climb(ladder: BasePart): ()
 
             local z = ControlModule:GetMoveVector().Z
             if z == 0 then
-                climbSound:Pause()
                 continue
-            elseif not climbSound.IsPlaying then
-                climbSound:Resume()
+            elseif not CLIMB_SOUNDS[currentClimbSoundIndex].IsPlaying then
+                currentClimbSoundIndex = if currentClimbSoundIndex == #CLIMB_SOUNDS then 1 else currentClimbSoundIndex + 1
+                CLIMB_SOUNDS[currentClimbSoundIndex]:Play()
             end
 
             local cameraLook = workspace.CurrentCamera.CFrame.LookVector
