@@ -277,6 +277,42 @@ module.teleportplace = {
 	end
 }
 
+module.teleport = {
+	Name = "teleport",
+	Description = "Teleports players to another player.",
+	Environment = "Server" :: "Server",
+	Arguments = {"to", "targets"},
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local to = processPlayerArgument(executor, args[1])
+		if not to then
+			return `Player {args[1]} not found.`
+		end
+
+		local targets = processPlayerArgument(executor, args[2])
+		if not targets then
+			return `Player {args[2]} not found.`
+		end
+
+		local toChar = to[1].Character
+		if not toChar then
+			return `Player {to[1].Name} has no character.`
+		end
+
+		for _, target in targets do
+			local char = target.Character
+			if char then
+				local root = char.PrimaryPart
+				if root then
+					root.AssemblyLinearVelocity = Vector3.zero
+				end
+				char:PivotTo(toChar:GetPivot())
+			end
+		end
+
+		return `Teleported {getPlayersString(targets)} to {to[1].Name}.`
+	end
+}
+
 module.setrole = {
 	Name = "setrole",
 	Description = "Sets the roles of players",
