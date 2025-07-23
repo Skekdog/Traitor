@@ -1140,7 +1140,14 @@ items.DeathStation = {
 
     PrimaryToggled = true,
     PrimaryHint = "Deploy Death Station",
-    PrimaryFireServer = throwInteractable,
+    PrimaryFireServer = function(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+        local interactable = throwInteractable(item, mode, origin, direction, participant)
+        if not interactable then
+            return
+        end
+
+        interactable.Extras.Owner = participant
+    end,
 }
 
 items.Decoy = {

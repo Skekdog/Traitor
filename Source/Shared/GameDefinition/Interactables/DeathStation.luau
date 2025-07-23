@@ -5,6 +5,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 type DeathStationServer = Types.Interactable & {
 	Extras: {
 		DeniedSound: Sound?,
+		Owner: Types.Participant?,
 	}
 }
 
@@ -29,7 +30,7 @@ local function OnInteractServer(interactable: DeathStationServer, participant: T
 	participant:TryTakeDamage({
 		Amount = math.huge,
 		Source = "Poison",
-		Attacker = participant,
+		Attacker = interactable.Extras.Owner,
 		IgnoreKarma = true,
 	})
 end
