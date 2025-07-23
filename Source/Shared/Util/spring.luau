@@ -20,7 +20,7 @@ function spring.new(angularFrequency: number, dampingRatio: number)
 	return setmetatable(self, spring_mt);
 end
 
-function spring.update(self: typeof(spring.new(0, 0)), dt)
+function spring.update(self: typeof(spring.new(0, 0)), dt: number)
 	local aF = self.angularFrequency;
 	local dR =  self.dampingRatio;
 	
