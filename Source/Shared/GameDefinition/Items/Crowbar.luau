@@ -1,11 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
 local MAX_DISTANCE = 7
-local PUSH_FORCE = 65
+local PUSH_FORCE = 75
 local RESPONSIBLE_DURATION = 5
 
 local function raycast(head: BasePart, direction: Vector3): RaycastResult?
@@ -46,6 +48,8 @@ local item: Types.MeleeWeaponDefinition = {
         if not head or not head:IsA("BasePart") then
             return
         end
+
+		PlaySound(item.Definition.AttackSound :: Sound, nil, char.PrimaryPart, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
         local raycastResult = raycast(head, direction)
 		if not raycastResult then
