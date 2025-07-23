@@ -1088,7 +1088,7 @@ items.Radio = {
     CanDrop = false,
 
     Description = "Remotely plays a sound to confuse nearby spies.",
-    Icon = "rbxassetid://11817043651",
+    Icon = "rbxassetid://128627317841330",
 
     CreditCost = 1,
     MaxStock = 1,
@@ -1102,7 +1102,7 @@ items.Radio = {
         end
 
         interactable.Extras.Player = participant.Player
-        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://11817043651", interactable.Object)
+        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://128627317841330", interactable.Object)
     end,
 }
 
