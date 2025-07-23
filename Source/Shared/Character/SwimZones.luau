@@ -240,7 +240,7 @@ RunService.Heartbeat:Connect(function(dt)
 					hum:ChangeState(Enum.HumanoidStateType.Freefall)
 				end)
 
-				if CLAMP_SURFACE_MOVEMENT and false then
+				if CLAMP_SURFACE_MOVEMENT then
 					table.insert(stateCleanup, hum:GetPropertyChangedSignal("MoveDirection"):Connect(function()
 						local moveDir = hum.MoveDirection
 
