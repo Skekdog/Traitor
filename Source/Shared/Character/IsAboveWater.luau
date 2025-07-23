@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): boolean
+local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): (boolean, BasePart?)
 	local params = RaycastParams.new()
     params.RespectCanCollide = false
     params.IgnoreWater = false
@@ -15,7 +15,7 @@ local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): b
         return false
     end
 
-    return (result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.Bounds))
+    return ((result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.Bounds))), result.Instance
 end
 
 return IsAboveWater

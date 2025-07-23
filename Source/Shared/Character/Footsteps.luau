@@ -47,7 +47,11 @@ LocalRoundInfo.Map:Connect(function(newMap)
 end, true)
 
 local function getFloorMaterial(hum: Humanoid, root: BasePart): Enum.Material
-	return if map and IsAboveWater(map, root, 3) then Enum.Material.Water else hum.FloorMaterial
+	local isAboveWater: boolean, waterPart: BasePart? = false, nil
+	if map then
+		isAboveWater, waterPart = IsAboveWater(map, root, 3)
+	end
+	return if isAboveWater and waterPart and not waterPart:IsA("Terrain") then Enum.Material.Water else hum.FloorMaterial
 end
 
 local function getProperties(material: Enum.Material): FootstepIDs.FootstepData
