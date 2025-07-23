@@ -1102,6 +1102,7 @@ items.Radio = {
         end
 
         interactable.Extras.Player = participant.Player
+        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://11817043651", interactable.Object)
     end,
 }
 
