@@ -16,6 +16,8 @@ local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 local FreeInput = require(ReplicatedStorage.Shared.Controls.FreeInput)
 
+local DT_CONST = 1 / 60
+
 local LocalPlayer = Players.LocalPlayer
 if not LocalPlayer then
 	Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
@@ -91,13 +93,13 @@ local panSpring = Spring.new(PAN_STIFFNESS, Vector2.new())
 ------------------------------------------------------------------------
 
 local function StepFreecam(dt)
-	local vel = velSpring:Update(dt, FreeInput.GetVelocity(dt))
-	local pan = panSpring:Update(dt, FreeInput.GetCameraPan(dt))
+	local vel = velSpring:Update(DT_CONST, FreeInput.GetVelocity(dt))
+	local pan = panSpring:Update(DT_CONST, FreeInput.GetCameraPan(dt))
 
-	cameraRot = cameraRot + pan*PAN_GAIN*(dt)
+	cameraRot = cameraRot + pan*PAN_GAIN*DT_CONST
 	cameraRot = Vector2.new(clamp(cameraRot.x, -PITCH_LIMIT, PITCH_LIMIT), cameraRot.y%(2*pi))
 
-	local cameraCFrame = CFrame.new(cameraPos)*CFrame.fromOrientation(cameraRot.x, cameraRot.y, 0)*CFrame.new(vel*NAV_GAIN*dt)
+	local cameraCFrame = CFrame.new(cameraPos)*CFrame.fromOrientation(cameraRot.x, cameraRot.y, 0)*CFrame.new(vel*NAV_GAIN*DT_CONST)
 	cameraPos = cameraCFrame.p
 
 	Camera.CFrame = cameraCFrame
