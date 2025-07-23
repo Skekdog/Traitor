@@ -64,14 +64,15 @@ local PROCESS_WELDED_PARTS = true -- calculate buoyancy forces for parts welded 
 local DRAG_FORCE_MULTIPLIER = 9.85 -- magic number that determines strength of drag
 
 local SURFACE_DEPTH = 0.35 -- offsets surface from the top of the part
-local MAX_JUMP_DEPTH = 2 -- determines how close to the surface you need to be to jump
+local NEAR_SURFACE_THRESHOLD = 2 -- determines how close to the surface you need to be to jump and also when movement clamping applies
+
+local UP_FORCE_MULTIPLIER = 1.5
 
 local shouldRecalculateForces = false
 local assemblyMass = 0
 
 local dragMultiplier = 0
 local antiGravForce = 0
-local buoyancyForce = 0
 
 local nearSurface = false
 local surfaceY = 0
@@ -196,7 +197,7 @@ RunService.Heartbeat:Connect(function(dt)
 	local currentZone: BasePart?
 
 	for _, v in zones do
-		if InPart(v, rootPos, if didJump then -SURFACE_DEPTH - MAX_JUMP_DEPTH else 0) then
+		if InPart(v, rootPos, if didJump then -SURFACE_DEPTH - NEAR_SURFACE_THRESHOLD else 0) then
 			currentZone = v
 			break
 		end
@@ -281,13 +282,9 @@ RunService.Heartbeat:Connect(function(dt)
 		local offsetToSurface = (surfaceY - SURFACE_DEPTH) - rootPos.Y
 
 		didJump = false
-		nearSurface = offsetToSurface < 2
+		nearSurface = offsetToSurface < NEAR_SURFACE_THRESHOLD
 
-		if nearSurface then
-			upForce += math.clamp(math.min(1, offsetToSurface) * 12 - velocity.Y, -10, 100) * 5 * assemblyMass
-		else
-			upForce += buoyancyForce
-		end
+		upForce += math.clamp(math.min(1, offsetToSurface) * 12 - velocity.Y, -10, 100) * UP_FORCE_MULTIPLIER * assemblyMass
 
 		if vectorForce then
 			vectorForce.Force = Vector3.yAxis * upForce - drag
