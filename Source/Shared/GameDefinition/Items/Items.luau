@@ -973,7 +973,7 @@ local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate"
     local round = participant.Round
 
     local interactable = createInteractableForItem(item, round)
-    local success = participant:TryThrowAssembly(interactable.Object, 10, nil, nil, direction)
+    local success = participant:TryThrowAssembly(interactable.Object, 10, nil, nil, direction, true)
 
     if not success then
         round._interactables[interactable.Object] = nil
