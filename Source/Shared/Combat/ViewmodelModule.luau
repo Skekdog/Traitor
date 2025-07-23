@@ -269,11 +269,11 @@ function module.Show(item: Types.AnyItemDefinition): ()
         breathingSpring.target = Vector3.new(math.cos(timeNow) / 2, math.cos(timeNow), math.cos(timeNow) / 2) / 5
         breathingSpring:update(dt)
 
-        cameraRecoilSpring:update(1 / 60)
-        armRecoilSpring:update(1 / 60)
+        cameraRecoilSpring:update(dt)
+        armRecoilSpring:update(dt)
 
         local isMoving = hum.MoveDirection.Magnitude > 0
-        
+
         if isMoving then
             local speedModifier = hum.WalkSpeed / 16
             bobbingSpring.target = Vector3.new(math.sin(timeNow * 7 * speedModifier) * 0.1, math.sin(timeNow * 10 * speedModifier) * 0.1, 0) * speedModifier
@@ -286,7 +286,7 @@ function module.Show(item: Types.AnyItemDefinition): ()
 
         local modifiers = breathingSpring.p + bobbingSpring.p + armRecoilSpring.p + module.ReloadSpring.p
 
-        local r = cameraRecoilSpring.p
+        local r = cameraRecoilSpring.p * (dt * 60) -- i'm not certain why this is needed, but otherwise recoil is dependent on fps. 😃
         camera.CFrame *= CFrame.Angles(math.rad(r.X), math.rad(r.Y), math.rad(r.Z))
 
         local final = camera.CFrame:ToWorldSpace(CFrame.new(modifiers) * CFrame.new(0, -1.75, -0.75));
