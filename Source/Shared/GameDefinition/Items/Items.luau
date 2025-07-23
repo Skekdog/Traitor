@@ -1147,6 +1147,8 @@ items.DeathStation = {
         end
 
         interactable.Extras.Owner = participant
+
+        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://93284379186217", interactable.Object)
     end,
 }
 
