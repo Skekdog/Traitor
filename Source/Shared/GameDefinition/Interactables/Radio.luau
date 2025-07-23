@@ -162,6 +162,8 @@ local function addSoundsFromGamemode(gamemode: Types.Gamemode): ()
 		local sound = Instance.new("Sound")
 		sound.Name = "Death"
 		sound.SoundId = v
+		sound.RollOffMinDistance = 20
+		sound.RollOffMaxDistance = 50
 		table.insert(deathSounds, sound)
 	end
 
