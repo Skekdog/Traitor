@@ -22,7 +22,12 @@ type Participant = Types.Participant & {
 	}
 }
 
-local function forEachParticipant(participant: Participant, dt: number): ()
+local overlapParams = OverlapParams.new()
+overlapParams.RespectCanCollide = false
+overlapParams.FilterType = Enum.RaycastFilterType.Include
+overlapParams.FilterDescendantsInstances = {workspace.Characters}
+
+local function forEachParticipant(participant: Participant, dt: number, alreadySubmerged: boolean?): ()
 	if tick() - (participant.Extras.LastDrownAt or 0) < DROWN_INTERVAL then
 		return
 	end
@@ -41,11 +46,16 @@ local function forEachParticipant(participant: Participant, dt: number): ()
 		return
 	end
 
-	local roundedPos = (Vector3.new(math.round(head.Position.X), math.round(head.Position.Y), math.round(head.Position.Z)) // 4) * 4
-	local voxels = workspace.Terrain:ReadVoxelChannels(Region3.new(roundedPos, roundedPos + Vector3.one * 4), 4, {"LiquidOccupancy"})
-	local occupancy = voxels.LiquidOccupancy[1][1][1]
+	local isSubmerged = alreadySubmerged
 
-	if occupancy == 0 then
+	if not isSubmerged then
+		local roundedPos = (Vector3.new(math.round(head.Position.X), math.round(head.Position.Y), math.round(head.Position.Z)) // 4) * 4
+		local voxels = workspace.Terrain:ReadVoxelChannels(Region3.new(roundedPos, roundedPos + Vector3.one * 4), 4, {"LiquidOccupancy"})
+		local occupancy = voxels.LiquidOccupancy[1][1][1]
+		isSubmerged = occupancy > 0
+	end
+
+	if not isSubmerged then
 		participant.Extras.DrownElapsed = 0
 		return
 	end
@@ -74,9 +84,37 @@ end
 RunService.Heartbeat:Connect(function(dt)
 	local round = RoundHandler.GetRound()
 
+	local submergedParticipants: {[Participant]: true?} = {}
+
+	for _, bound in round:GetMap().Bounds:GetDescendants() do
+		if bound.Name ~= "! Water" or not bound:IsA("BasePart") then
+			continue
+		end
+
+		local size = Vector3.new(bound.Size.X, math.max(bound.Size.Y - 0.5, 0), bound.Size.Z)
+
+		for _, v in workspace:GetPartBoundsInBox(bound.CFrame, size, overlapParams) do
+			if v.Name ~= "Head" then
+				continue
+			end
+
+			local character = v:FindFirstAncestorOfClass("Model")
+			if not character then
+				continue
+			end
+
+			local participant = round:GetParticipant(character.Name)
+			if not participant then
+				continue
+			end
+
+			submergedParticipants[participant] = true
+		end
+	end
+
 	for _, v in round:GetParticipants() do
 		assert(v)
-		forEachParticipant(v, dt)
+		forEachParticipant(v, dt, submergedParticipants[v])
 	end
 end)
 
