@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -182,6 +183,22 @@ do
 	burnSound.Name = "Burn"
 
 	addSound(burnSound)
+
+	local c4BeepingSound = Instance.new("Sound")
+	c4BeepingSound.Name = "C4 Beeping"
+	c4BeepingSound.SoundId = "rbxassetid://6992631696"
+	c4BeepingSound.Volume = 1.5
+	c4BeepingSound.RollOffMinDistance = 10
+	c4BeepingSound.RollOffMaxDistance = 20
+	c4BeepingSound.PlaybackRegionsEnabled = true
+	c4BeepingSound.PlaybackRegion = NumberRange.new(2.5, 7.5)
+
+	addSound(c4BeepingSound)
+
+	local smallExplosionSound: Sound = if RunService:IsClient() then Instance.new("Sound") else ServerStorage.Assets.Explosion:Clone()
+	smallExplosionSound.Name = "Small Explosion"
+
+	addSound(smallExplosionSound)
 end
 
 if RunService:IsClient() then
@@ -264,9 +281,6 @@ if RunService:IsServer() then
 		end
 
 		local sound: Sound
-
-
-
 		for _, v in sounds do
 			if typeof(v.Sound) == "table" and v.Sound[1].Name == soundName or typeof(v.Sound) ~= "table" and v.Sound.Name == soundName then
 				sound = if typeof(v.Sound) == "table" then v.Sound[math.random(#v.Sound)] else v.Sound
