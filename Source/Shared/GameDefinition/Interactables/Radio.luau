@@ -263,6 +263,10 @@ if RunService:IsServer() then
 			return
 		end
 
+		if radio.Object:FindFirstChild(soundName) then
+			return
+		end
+
 		if lastGamemode ~= serverRound.Gamemode then
 			if lastGamemode then
 				removeSoundsByGamemode(lastGamemode.Name)
