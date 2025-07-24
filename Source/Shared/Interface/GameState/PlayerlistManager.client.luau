@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 local ViewCorpse = require(ReplicatedStorage.Shared.Actions.ViewCorpse)
 local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
@@ -140,6 +141,10 @@ local function createPlr(plr: Player)
 		movePlr(plr, status :: PlayerStatus)
 		toggleMarksVisible(clone, status == "Alive" and plr ~= Players.LocalPlayer)
 	end, true)
+
+	if plr == Players.LocalPlayer then
+		TweenService:Create(clone, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.In, -1, true), {Transparency = 0}):Play()
+	end
 
 	return clone :: PlayerElement
 end
