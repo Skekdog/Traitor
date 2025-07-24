@@ -84,9 +84,14 @@ end
 RunService.Heartbeat:Connect(function(dt)
 	local round = RoundHandler.GetRound()
 
+	local map = round._map
+	if not map then
+		return
+	end
+
 	local submergedParticipants: {[Participant]: true?} = {}
 
-	for _, bound in round:GetMap().Bounds:GetDescendants() do
+	for _, bound in map.Bounds:GetDescendants() do
 		if bound.Name ~= "! Water" or not bound:IsA("BasePart") then
 			continue
 		end
