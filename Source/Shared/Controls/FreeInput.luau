@@ -79,13 +79,14 @@ function module.GetVelocity(dt: number): Vector3
 	return ((kGamepad + kKeyboard + kTouch) * (if shift then NAV_SHIFT_MUL else 1)) * 60 * dt
 end
 
-function module.GetCameraPan(dt: number): Vector2
+-- we don't actually need deltatime here because mouse.Delta is... well it's a delta
+function module.GetCameraPan(): Vector2
 	local kGamepad = Vector2.new(
 		thumbstickCurve(gamepad.Thumbstick2.Y),
 		thumbstickCurve(-gamepad.Thumbstick2.X)
 	) * PAN_GAMEPAD_SPEED
 
-	local kMouse = mouse.Delta * PAN_MOUSE_SPEED / dt / 60
+	local kMouse = mouse.Delta * PAN_MOUSE_SPEED
 
 	mouse.Delta = Vector2.new()
 	

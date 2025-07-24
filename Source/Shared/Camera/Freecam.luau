@@ -94,7 +94,7 @@ local panSpring = Spring.new(PAN_STIFFNESS, Vector2.new())
 
 local function StepFreecam(dt)
 	local vel = velSpring:Update(DT_CONST, FreeInput.GetVelocity(dt))
-	local pan = panSpring:Update(DT_CONST, FreeInput.GetCameraPan(dt))
+	local pan = panSpring:Update(DT_CONST, FreeInput.GetCameraPan())
 
 	cameraRot = cameraRot + pan*PAN_GAIN*DT_CONST
 	cameraRot = Vector2.new(clamp(cameraRot.x, -PITCH_LIMIT, PITCH_LIMIT), cameraRot.y%(2*pi))
