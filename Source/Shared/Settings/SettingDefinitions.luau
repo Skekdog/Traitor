@@ -71,19 +71,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Use FIB Lighting",
-	Tab = "Display",
-	Category = "Environment",
-	Tooltip = "If you have modified your client to use Future lighting, enable this for better map compatibility.",
-	Kind = "Boolean" :: "Boolean",
-	Default = false,
-
-	Callback = function(name, value)
-		(require)(callbacks.FIBLighting)(name, value)
-	end
-})
-
-table.insert(availableSettings, {
 	Name = "Item Hints",
 	Tab = "Display",
 	Category = "User Interface",
