@@ -1,6 +1,5 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local ControlManager = require(script.Parent.ControlManager)
 local boundInstances: {[string]: {Instance}} = {}
@@ -138,7 +137,7 @@ end
 
 local module = {}
 
-function module.TryUpdateKeybind(name: string, value: SettingDefinitions.ControlValue): ()
+function module.TryUpdateKeybind(name: string): ()
     if not boundInstances[name] then
         return
     end
@@ -147,5 +146,11 @@ function module.TryUpdateKeybind(name: string, value: SettingDefinitions.Control
         updateText(name, v)
     end
 end
+
+ControlManager.PreferredInput:Connect(function()
+    for name in boundInstances do
+        module.TryUpdateKeybind(name)
+    end
+end)
 
 return module

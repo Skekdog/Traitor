@@ -5,6 +5,7 @@ local UserInputService = game:GetService("UserInputService")
 local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local ActionButton = require(ReplicatedStorage.Shared.Interface.UILib.ActionButton)
+local InstanceSignal = require(ReplicatedStorage.Shared.Util.InstanceSignal)
 
 local module = {}
 
@@ -19,16 +20,7 @@ export type InputMethod = "Touch" | "Keyboard" | "Controller"
 
 local registered: {[string]: RegistrationInfo} = {}
 
-function module.GetPreferredInputMethod(): InputMethod
-	if UserInputService.GamepadEnabled then
-		return "Controller"
-	elseif UserInputService.KeyboardEnabled then
-		return "Keyboard"
-	elseif UserInputService.TouchEnabled then
-		return "Touch"
-	end
-	error("No valid input methods!")
-end
+module.PreferredInput = InstanceSignal.ListenProperty(UserInputService, "PreferredInput", (nil :: any) :: Enum.PreferredInput)
 
 function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?): string
 	if not keycode then
@@ -83,8 +75,8 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 	local controlSetting = Settings.GetSetting(actionName) :: Settings.ControlValue
 	local keybinds = controlSetting.Keybind
 
-	local preferred: InputMethod = module.GetPreferredInputMethod()
-	if preferred == "Touch" then
+	local preferred = module.PreferredInput()
+	if preferred == Enum.PreferredInput.Touch then
 		return if blankForTouch then "" else actionName
 	end
 
@@ -92,9 +84,9 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 		return "NONE"
 	end
 
-	if preferred == "Controller" and keybinds.ConsoleKeybind then
+	if preferred == Enum.PreferredInput.Gamepad and keybinds.ConsoleKeybind then
 		return module.GetStringForKeyCode(keybinds.ConsoleKeybind)
-	elseif preferred == "Keyboard" and keybinds.KBMKeybind then
+	elseif preferred == Enum.PreferredInput.KeyboardAndMouse and keybinds.KBMKeybind then
 		return module.GetStringForKeyCode(keybinds.KBMKeybind)
 	end
 
@@ -149,7 +141,7 @@ function module.Register(actionName: string, callback: ActionCallback, priority:
 
 	ContextActionService:BindActionAtPriority(actionName, runCallback, false, priority, table.unpack(binds))
 	
-	if module.GetPreferredInputMethod() == "Touch" and setting.TouchButton then
+	if module.PreferredInput() == Enum.PreferredInput.Touch and setting.TouchButton then
 		return ActionButton.ShowActionButton(actionName, runCallback, settingOverride)
 	end
 
