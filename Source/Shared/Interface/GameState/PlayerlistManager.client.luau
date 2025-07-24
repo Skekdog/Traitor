@@ -93,22 +93,37 @@ local function createPlr(plr: Player)
 	end)
 
 	InstanceSignal.ListenAttribute(plr, "Karma", nil :: number?):Connect(function(karma)
+		if not clone.Parent then
+			return
+		end
 		clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
 	end, true)
 
 	InstanceSignal.ListenAttribute(plr, "Score", nil :: number?):Connect(function(score)
+		if not clone.Parent then
+			return
+		end
 		clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	end, true)
 
 	InstanceSignal.ListenAttribute(plr, "TotalScore", nil :: number?):Connect(function()
+		if not clone.Parent then
+			return
+		end
 		clone.Total.Text = tostring(plr:GetAttribute("TotalScore"))
 	end, true)
 
 	participant.Corpse:Connect(function(corpse)
+		if not clone.Parent then
+			return
+		end
 		clone.SearchedIcon.Visible = not not corpse
 	end, true)
 
 	participant.Role:Connect(function(role)
+		if not clone.Parent then
+			return
+		end
 		if role == Defaults.Role then
 			clone.Username:SetAttribute("KeepText")
 			ThemesManager.UpdateThemeInstance(clone.Username)
@@ -119,6 +134,9 @@ local function createPlr(plr: Player)
 	end, true)
 
 	participant.Status:Connect(function(status)
+		if not clone.Parent then
+			return
+		end
 		movePlr(plr, status :: PlayerStatus)
 		toggleMarksVisible(clone, status == "Alive" and plr ~= Players.LocalPlayer)
 	end, true)
