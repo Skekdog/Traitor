@@ -90,12 +90,6 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 		return module.GetStringForKeyCode(keybinds.KBMKeybind)
 	end
 
-	if UserInputService.GamepadEnabled and keybinds.ConsoleKeybind then
-		return module.GetStringForKeyCode(keybinds.ConsoleKeybind)
-	elseif UserInputService.KeyboardEnabled and keybinds.KBMKeybind then
-		return module.GetStringForKeyCode(keybinds.KBMKeybind)
-	end
-
 	return "NONE"
 end
 
