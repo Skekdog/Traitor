@@ -140,13 +140,26 @@ function module.Register(actionName: string, callback: ActionCallback, priority:
 	end
 
 	ContextActionService:BindActionAtPriority(actionName, runCallback, false, priority, table.unpack(binds))
-	
+
 	if module.PreferredInput() == Enum.PreferredInput.Touch and setting.TouchButton then
-		return ActionButton.ShowActionButton(actionName, runCallback, settingOverride)
+		return ActionButton.ShowActionButton(actionName, runCallback, setting)
 	end
 
 	return nil
 end
+
+module.PreferredInput:Connect(function(preferred)
+	for actionName, info in registered do
+		local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
+		if setting.TouchButton then
+			if preferred == Enum.PreferredInput.Touch then
+				ActionButton.ShowActionButton(actionName, info.Callback, setting)
+			else
+				ActionButton.TryHideActionButton(actionName)
+			end
+		end
+	end
+end)
 
 function module.Unregister(actionName: string)
 	ContextActionService:UnbindAction(actionName)
