@@ -1,15 +1,17 @@
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
+
+local PlayerModule = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
+local CameraInput = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("CameraModule"):WaitForChild("CameraInput"))
+local Controls = PlayerModule:GetControls()
+local Cameras = PlayerModule:GetCameras()
 
 local module = {}
 
 local MOBILE_PAN_SENSITIVITY_MULTIPLIER = 4
 local NAV_GAMEPAD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
 local NAV_KEYBOARD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
-local PAN_MOUSE_SPEED = Vector2.new(1, 1) * (math.pi / 64)
-local PAN_GAMEPAD_SPEED = Vector2.new(1, 1) * (math.pi / 8)
 local FOV_WHEEL_SPEED = 1.5 -- normal value is 1.0
 local FOV_GAMEPAD_SPEED = 0.25
 local NAV_SHIFT_MUL = 0.25
@@ -80,17 +82,8 @@ function module.GetVelocity(dt: number): Vector3
 end
 
 -- we don't actually need deltatime here because mouse.Delta is... well it's a delta
-function module.GetCameraPan(): Vector2
-	local kGamepad = Vector2.new(
-		thumbstickCurve(gamepad.Thumbstick2.Y),
-		thumbstickCurve(-gamepad.Thumbstick2.X)
-	) * PAN_GAMEPAD_SPEED
-
-	local kMouse = mouse.Delta * PAN_MOUSE_SPEED
-
-	mouse.Delta = Vector2.new()
-	
-	return kGamepad + kMouse
+function module.GetCameraPan(dt: number): CFrame
+	return Cameras.activeCameraController:CalculateNewLookCFrameFromArg(nil, CameraInput.getRotation(dt))
 end
 
 function module.GetFov(dt: number): number
