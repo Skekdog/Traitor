@@ -112,7 +112,9 @@ return function(corpseInfo: Types.CorpseView?)
 
     information.Text = "Click on an icon to reveal detailed information."
 
-    object.MurderWeapon.TextLabel.Text = corpseInfo.DamageSource
+    local item = getItemFromName(corpseInfo.DamageSource)
+    local weaponName = if item then GetDisplayName(item) else corpseInfo.DamageSource
+    object.MurderWeapon.TextLabel.Text = weaponName
 
     local flavourText = getFlavourText(corpseInfo.DamageSource)
     object.MurderWeapon:SetAttribute("Description", flavourText)
