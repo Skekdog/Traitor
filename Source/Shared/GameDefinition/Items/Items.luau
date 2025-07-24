@@ -190,6 +190,7 @@ guns.Scout = {
 guns.Pistol = {
     Kind = "Gun" :: "Gun",
     Name = "Pistol",
+    DisplayName = "Five-Seven",
 
     Slot = 2,
     CanDrop = true,
@@ -324,6 +325,7 @@ guns["Flare Gun"] = FlareGun
 guns.SMG = {
     Kind = "Gun" :: "Gun",
     Name = "SMG",
+    DisplayName = "M11",
 
     Slot = 3,
     CanDrop = true,
@@ -444,7 +446,7 @@ guns["Assault Rifle"] = {
 guns["Silenced Pistol"] = {
     Kind = "Gun" :: "Gun",
     Name = "Silenced Pistol",
-    Description = "A Pistol that has had a suppressor fitted to it, making it much quieter. People killed with silenced weapons will not scream.",
+    Description = "A Five-Seven that has had a suppressor fitted to it, making it much quieter. People killed with silenced weapons will not scream.",
     Icon = "rbxassetid://299432421",
     CreditCost = 1,
     MaxStock = 3,
@@ -545,6 +547,7 @@ guns.XM1014 = {
 guns.Glock = {
     Kind = "Gun" :: "Gun",
     Name = "Glock",
+    DisplayName = "G18",
 
     Slot = 2,
     CanDrop = true,
