@@ -177,7 +177,7 @@ do
 	footstepSound.SoundId = "rbxassetid://81623756670923"
 	footstepSound.RollOffMinDistance = 10
 	footstepSound.RollOffMaxDistance = 15
-	footstepSound.Volume = 1 -- for some reason its really quiet
+	footstepSound.Volume = 1
 
 	addSound(footstepSound)
 
@@ -246,6 +246,10 @@ if RunService:IsServer() then
 		end
 
 		if not serverRound then
+			return
+		end
+
+		if not player.Character then
 			return
 		end
 
