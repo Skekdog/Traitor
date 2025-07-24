@@ -406,6 +406,7 @@ guns.AWP = {
 guns["Assault Rifle"] = {
     Kind = "Gun" :: "Gun",
     Name = "Assault Rifle",
+    DisplayName = "M4A1",
 
     Slot = 3,
     CanDrop = true,
