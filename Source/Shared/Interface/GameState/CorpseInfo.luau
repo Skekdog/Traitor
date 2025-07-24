@@ -78,7 +78,9 @@ end
 local function getFlavourText(deathType: Types.NamedDamageSource): string?
     local attackType: Types.GeneralDamageSource = getItemAttackType(deathType)
     if attackType ~= deathType then
-        return if flavourTextsWithWeapon[attackType] then flavourTextsWithWeapon[attackType]:format(StringWithDeterminer(deathType)) else flavourTexts[attackType]
+        local item = getItemFromName(deathType)
+        local weaponName = if item then GetDisplayName(item) else deathType
+        return if flavourTextsWithWeapon[attackType] then flavourTextsWithWeapon[attackType]:format(StringWithDeterminer(weaponName)) else flavourTexts[attackType]
     end
 
     return flavourTexts[attackType] or error("Unknown death type: " .. deathType)
