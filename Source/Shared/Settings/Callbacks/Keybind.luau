@@ -5,5 +5,5 @@ local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefi
 
 return function(name: string, value: SettingDefinitions.ControlValue): ()
 	ControlManager.TryUpdateRegisteredAction(name, value)
-	KeybindHintManager.TryUpdateKeybind(name, value)
+	KeybindHintManager.TryUpdateKeybind(name)
 end
