@@ -132,6 +132,7 @@ table.insert(availableSettings, {
 	Tab = "Keybinds",
 	Category = "Movement",
 	Kind = "Control" :: "Control",
+	Tooltip = "Also used for covert corpse searching.",
 	SpecifyToggle = false,
 
 	Default = {
