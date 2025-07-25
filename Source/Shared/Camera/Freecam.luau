@@ -5,7 +5,9 @@
 ------------------------------------------------------------------------
 
 local pi    = math.pi
+local clamp = math.clamp
 local exp   = math.exp
+local rad   = math.rad
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -33,6 +35,9 @@ end)
 ------------------------------------------------------------------------
 
 local NAV_GAIN = Vector3.new(1, 1, 1)*64
+local PAN_GAIN = Vector2.new(0.75, 1)*8
+
+local PITCH_LIMIT = rad(90)
 
 while Camera.ViewportSize.Magnitude < 10 do
 	task.wait()
@@ -80,17 +85,21 @@ end
 ------------------------------------------------------------------------
 
 local cameraPos = Vector3.new()
+local cameraRot = Vector2.new()
 
 local velSpring = Spring.new(VEL_STIFFNESS, Vector3.new())
 local panSpring = Spring.new(PAN_STIFFNESS, Vector2.new())
 
 ------------------------------------------------------------------------
 
-local function StepFreecam(dt: number)
+local function StepFreecam(dt)
 	local vel = velSpring:Update(DT_CONST, FreeInput.GetVelocity(dt))
-	local pan = FreeInput.GetCameraPan(dt)
+	local pan = panSpring:Update(DT_CONST, FreeInput.GetCameraPan())
 
-	local cameraCFrame = CFrame.new(cameraPos)*pan.Rotation*CFrame.new(vel*NAV_GAIN*DT_CONST)
+	cameraRot = cameraRot + pan*PAN_GAIN*DT_CONST
+	cameraRot = Vector2.new(clamp(cameraRot.x, -PITCH_LIMIT, PITCH_LIMIT), cameraRot.y%(2*pi))
+
+	local cameraCFrame = CFrame.new(cameraPos)*CFrame.fromOrientation(cameraRot.x, cameraRot.y, 0)*CFrame.new(vel*NAV_GAIN*DT_CONST)
 	cameraPos = cameraCFrame.p
 
 	Camera.CFrame = cameraCFrame
@@ -154,13 +163,14 @@ local function StartFreecam(): ()
 	freecamEnabled = true
 
 	local cameraCFrame = Camera.CFrame
+	cameraRot = Vector2.new(cameraCFrame:toEulerAnglesYXZ())
 	cameraPos = cameraCFrame.p + Vector3.new(1.5, 3, 0)
 
 	velSpring:Reset(Vector3.new())
 	panSpring:Reset(Vector2.new())
 
 	PlayerState.Push()
-	RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value - 1, StepFreecam)
+	RunService:BindToRenderStep("Freecam", Enum.RenderPriority.Camera.Value, StepFreecam)
 	FreeInput.StartCapture()
 
 	runCallbacks()
