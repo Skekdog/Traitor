@@ -111,7 +111,9 @@ function module.ShowCorpseHint(char: Model)
 		corpseHint.Text = `{role:GetFormattedString(char.Name .. "'s")} Body`
 	end
 
-	interactableHint.Visible = false
+	interactableHint.Text = "Crouch to search covertly."
+
+	interactableHint.Visible = true
 	interactableFrame.Visible = true
 end
 
