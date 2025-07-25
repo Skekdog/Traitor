@@ -122,7 +122,7 @@ local function tryPopulateEquipment(role: Types.Role?): ()
 
     updateCredits(ui)
 
-    local list = page.ScrollingFrame
+    local list = page.ScrollHolder.ScrollingFrame
 
     for _, v in list:GetChildren() do
         if v:IsA("GuiButton") then
