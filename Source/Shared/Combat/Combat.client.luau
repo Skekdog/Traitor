@@ -53,6 +53,14 @@ end
 
 local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}
 
+local crosshairFrames: {Frame} = {}
+
+for _, v in crosshair.Object:GetChildren() do
+	if v:IsA("Frame") then
+		table.insert(crosshairFrames, v)
+	end
+end
+
 local function tryReloadWeapon(item: Types.GunWeapon): boolean
 	local ammoDefinition = item.Definition.AmmoType
 	if item.Ammo >= ammoDefinition.Capacity or item.IsReloading then
@@ -91,12 +99,20 @@ local function updateCrosshair(isAiming: boolean): ()
 		return crosshair:ToggleVisible(false)
 	end
 
-	if item.Kind == "Gun" then
-		local spread = item.Definition.Spread * 5 * (if isAiming then item.Definition.AimSpreadMultiplier or 1 else 1)
-        crosshair.Object.Size = UDim2.fromScale(spread, spread)
-    else
-        crosshair.Object.Size = UDim2.new()
-    end
+	local spread = if item.Kind == "Gun" then item.Definition.Spread * 10 * (if isAiming then item.Definition.AimSpreadMultiplier or 1 else 1) else 0
+
+	for _, v in crosshairFrames do
+		local anchorPoint = v.AnchorPoint
+		if anchorPoint.X == 0 then
+			v.Position = UDim2.fromScale(-spread, v.Position.Y.Scale)
+		elseif anchorPoint.X == 1 then
+			v.Position = UDim2.fromScale(1 + spread, v.Position.Y.Scale)
+		elseif anchorPoint.Y == 0 then
+			v.Position = UDim2.fromScale(v.Position.X.Scale, -spread)
+		elseif anchorPoint.Y == 1 then
+			v.Position = UDim2.fromScale(v.Position.X.Scale, 1 + spread)
+		end
+	end
 end
 
 Aim.IsAiming:Connect(function(isAiming)
