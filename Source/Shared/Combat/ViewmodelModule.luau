@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local VRService = game:GetService("VRService")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -124,7 +125,7 @@ end
 function module.Show(item: Types.AnyItemDefinition): ()
     clearViewmodelAppearanceConnections()
 
-    if not item.HoldAnimation or not item.Model then
+    if not item.HoldAnimation or not item.Model or VRService.VREnabled then
         module.Hide()
         return
     end
