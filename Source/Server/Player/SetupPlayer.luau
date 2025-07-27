@@ -6,6 +6,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local ProfileManager = require(ServerScriptService.PlayerData.ProfileManager)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local KarmaManager = require(script.Parent.KarmaManager)
+local LoadMapCommand = require(script.Parent.LoadMapCommand)
 local ScoreManager = require(script.Parent.ScoreManager)
 
 local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
@@ -53,6 +54,8 @@ local function setupPlayer(plr: Player): ()
 	
     loadAttributes(plr)
 	loadProfile(plr)
+
+	LoadMapCommand(plr)
 
 	tryAwardTesterBadge(plr)
 end
