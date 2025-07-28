@@ -13,8 +13,10 @@ local ROPE_LENGTH_MULTIPLIER = 1.75
 
 local PUSH_FORCE_PER_UNIT_MASS = 1000
 
-local ALIGNMENT_RESPONSIVENESS = 200
+local ALIGNMENT_RESPONSIVENESS = 80
 local ALIGNMENT_DEPTH = 6
+local ALIGNMENT_VELOCITY = 100
+local ALIGNMENT_FORCE_MULTIPLIER = 1000
 
 local PROP_DAMAGE_TIME = 5
 
@@ -441,7 +443,8 @@ local function startControllingPropClient(prop: BasePart): ()
 	alignPosition.ReactionForceEnabled = false
 	alignPosition.ApplyAtCenterOfMass = true
 	alignPosition.Responsiveness = ALIGNMENT_RESPONSIVENESS
-	alignPosition.MaxForce = part.AssemblyMass * ALIGNMENT_RESPONSIVENESS * 200
+	alignPosition.MaxVelocity = ALIGNMENT_VELOCITY
+	alignPosition.MaxForce = ALIGNMENT_FORCE_MULTIPLIER * part.AssemblyMass
 
 	alignPosition.Attachment0 = createOrFindAttachment(prop)
 	alignPosition.Parent = prop
@@ -615,7 +618,17 @@ local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function()
 		return stopControllingPropClient()
 	end
 
-	currentGrabClient.Position = GetCentreRay(ALIGNMENT_DEPTH).Origin
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {char, part}
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.IgnoreWater = true
+	params.RespectCanCollide = true
+
+	local centreRay = GetCentreRay(ALIGNMENT_DEPTH)
+	local result = workspace:Raycast(centreRay.Origin, centreRay.Direction * ALIGNMENT_DEPTH / 2, params)
+	
+	local targetPosition = if result then result.Position + (result.Normal * part.Size / 2) else centreRay.Origin
+	currentGrabClient.Position = targetPosition
 end
 
 local function getPropServer(participant: Types.Participant, origin: Vector3, direction: Vector3): Types.Prop?
