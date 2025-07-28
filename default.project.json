@@ -74,6 +74,10 @@
 
     "VoiceChatService": {
       "$path": "Services/VoiceChatService"
+    },
+
+    "VRService": {
+      "$path": "Services/VRService"
     }
   }
 }

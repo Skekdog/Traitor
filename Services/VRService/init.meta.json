@@ -1,0 +1,6 @@
+{
+	"className": "VRService",
+	"properties": {
+		"AvatarGestures": true
+	}
+}
