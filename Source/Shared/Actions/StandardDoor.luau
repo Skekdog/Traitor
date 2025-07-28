@@ -82,7 +82,9 @@ local function StandardDoor(request: DoorRequest): ()
                 table.insert(sounds, v)
             end
         end
-        sounds[math.random(1, #sounds)]:Play()
+        if #sounds ~= 0 then
+            sounds[math.random(1, #sounds)]:Play()
+        end
     end
 
     local duration = 0.75
