@@ -8,7 +8,6 @@
     "$className": "DataModel",
 
     "ServerScriptService": {
-      "$ignoreUnknownInstances": true,
       "$path": "Source/Server",
 
       "$properties": {
