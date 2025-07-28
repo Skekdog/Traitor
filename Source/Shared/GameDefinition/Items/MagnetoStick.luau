@@ -1,3 +1,4 @@
+local PhysicsService = game:GetService("PhysicsService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -572,17 +573,16 @@ local function onUnequipServer(_, participant: Types.Participant): ()
 	stopControllingPropServer(participant.Player)
 end
 
-local function isPartTouchingPart(part1: BasePart, part2: BasePart): boolean
-	for _, v in workspace:GetPartsInPart(part1) do
-		if v == part2 then
-			return true
-		end
-	end
+local function isAbovePart(root: BasePart, part: BasePart): boolean
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {part}
+	params.FilterType = Enum.RaycastFilterType.Include
 
-	return false
+	local result = workspace:Blockcast(root.CFrame, root.Size, -root.CFrame.UpVector * 3, params)
+	return result ~= nil
 end
 
-local preSimulationClient: (item: Types.AnyItem, dt: number) -> () = function(): ()
+local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function(): ()
 	if not currentGrabClient then
 		return
 	end
@@ -606,19 +606,13 @@ local preSimulationClient: (item: Types.AnyItem, dt: number) -> () = function():
 		return
 	end
 
-	local leftFoot = char:FindFirstChild("LeftFoot")
-	local rightFoot = char:FindFirstChild("RightFoot")
-
-	if leftFoot and leftFoot:IsA("BasePart") then
-		if isPartTouchingPart(leftFoot, part) then
-			return stopControllingPropClient()
-		end
+	local root = char.PrimaryPart
+	if not root then
+		return
 	end
 
-	if rightFoot and rightFoot:IsA("BasePart") then
-		if isPartTouchingPart(rightFoot, part) then
-			return stopControllingPropClient()
-		end
+	if PhysicsService:CollisionGroupsAreCollidable(root.CollisionGroup, part.CollisionGroup) and isAbovePart(root, part) then
+		return stopControllingPropClient()
 	end
 
 	currentGrabClient.Position = GetCentreRay(ALIGNMENT_DEPTH).Origin
@@ -728,7 +722,7 @@ local item: Types.ItemDefinition = {
 	OnUnequipClient = onUnequipClient,
 	OnUnequipServer = onUnequipServer,
 
-	PreSimulationClient = preSimulationClient,
+	PostSimulationClient = postSimulationClient,
 
     PrimaryHint = "Push Prop",
     AlternateHint = "Grab Prop",
