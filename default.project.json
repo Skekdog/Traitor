@@ -28,7 +28,12 @@
 
       "Assets": {
         "$className": "Folder",
-        "$path": "Assets/Shared"
+        "$path": "Assets/Shared",
+
+        "MapPrefabs": {
+          "$className": "Folder",
+          "$path": "Source/TT2Compat/MapPrefabs"
+        }
       },
 
       "Remotes": {
