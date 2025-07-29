@@ -7,6 +7,7 @@ local Exec = require(ReplicatedStorage.Shared.DevTools.Exec)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local remotes = ReplicatedStorage.Remotes
 
@@ -96,22 +97,24 @@ local function pickNextGamemode(): Types.Gamemode
     return gamemodes[math.random(#gamemodes)]
 end
 
+module.Round = DynamicValue.new((nil :: any) :: Types.Round)
+
 local didEnd = false
 local function newRound(): Types.Round
     didEnd = false
     roundCount += 1
 
     local gamemode = pickNextGamemode()
-    local round = Round.new(gamemode)
-    task.defer(round.LoadMap, round, currentMap) -- somefuckinghow loading normally will cause recursive require errors on SERVER scripts, not even module scripts. WTF.
+    module.Round:SetValue(Round.new(gamemode))
+    task.defer(module.Round().LoadMap, module.Round(), currentMap) -- somefuckinghow loading normally will cause recursive require errors on SERVER scripts, not even module scripts. WTF.
 
-    return round
+    return module.Round()
 end
 
-local round = newRound()
+newRound()
 
 function module.GetRound(): Types.Round
-    return round
+    return module.Round()
 end
 
 local function doMapVote(): ()
@@ -147,7 +150,7 @@ local function doMapVote(): ()
     end)
 
     remotes.ServerClient.TriggerMapVote:FireAllClients(true, votableMaps)
-    round:SetRoundPhase("Intermission", INTERMISSION_TIME)
+    module.Round():SetRoundPhase("Intermission", INTERMISSION_TIME)
     task.wait(INTERMISSION_TIME)
 
     con:Disconnect()
@@ -177,7 +180,7 @@ end
 
 local function onRoundEnd(): ()
     didEnd = true
-    for _, v in round:GetParticipants() do
+    for _, v in module.Round():GetParticipants() do
         assert(v)
 
         local totalScore = 0
@@ -186,7 +189,7 @@ local function onRoundEnd(): ()
             totalScore += v
         end
 
-        if round.Gamemode.EnableKarma then
+        if module.Round().Gamemode.EnableKarma then
             KarmaManager.SetKarma(v.Player, v:GetKarma())
         end
         
@@ -196,11 +199,11 @@ end
 
 task.spawn(function()
     while true do
-        if not didEnd and round:GetRoundPhase() == "Highlights" then
+        if not didEnd and module.Round():GetRoundPhase() == "Highlights" then
             onRoundEnd()
         end
 
-        if round:GetRoundPhase() ~= "Intermission" then
+        if module.Round():GetRoundPhase() ~= "Intermission" then
             task.wait()
             continue
         end
@@ -208,21 +211,21 @@ task.spawn(function()
         if roundCount % MAP_VOTE_INTERVAL == 0 then
             doMapVote()
         end
-        round = newRound()
+        newRound()
     end
 end)
 
 remotes.ClientServer.JoinRound.OnServerInvoke = function(player: Player): boolean?
-    if not round:IsPreGame() then
+    if not module.Round():IsPreGame() then
         return false
     end
 
-    local existingParticipant = round:GetParticipant(player.Name)
+    local existingParticipant = module.Round():GetParticipant(player.Name)
     if existingParticipant then
         return false
     end
 
-    round:AddPlayer(player, KarmaManager.GetKarma(player))
+    module.Round():AddPlayer(player, KarmaManager.GetKarma(player))
 
     return true
 end
@@ -232,7 +235,7 @@ ReplicatedStorage.Shared.RoundRule.Remotes.PurchaseItem.OnServerInvoke = functio
         return "InvalidItemForRole"
     end
 
-    local participant = round:GetParticipant(player.Name)
+    local participant = module.Round():GetParticipant(player.Name)
     if not participant then
         return "NotInRound"
     end
@@ -250,12 +253,12 @@ ReplicatedStorage.Shared.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(functi
         return
     end
 
-    local participant = round:GetParticipant(player.Name)
+    local participant = module.Round():GetParticipant(player.Name)
     if not participant then
         return
     end
 
-    local againstParticipant = round:GetParticipant(against)
+    local againstParticipant = module.Round():GetParticipant(against)
     if not againstParticipant then
         return
     end
@@ -268,7 +271,7 @@ remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, velocit
         return
     end
 
-    local participant = round:GetParticipant(player.Name)
+    local participant = module.Round():GetParticipant(player.Name)
     if not participant then
         return
     end
@@ -294,7 +297,7 @@ remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown,
         return nil
     end
 
-    local participant = round:GetParticipant(plr.Name)
+    local participant = module.Round():GetParticipant(plr.Name)
     if not participant then
         return nil
     end
@@ -303,7 +306,7 @@ remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown,
         return nil -- if alive then we need to find a body to view corpse info. Spectators don't need to do that
     end
 
-    local otherParticipant = round:GetParticipant(body.Name)
+    local otherParticipant = module.Round():GetParticipant(body.Name)
     if not otherParticipant then
         return nil
     end
@@ -326,7 +329,7 @@ remotes.ClientServer.Exec.OnServerInvoke = function(plr, command: unknown): stri
         return "Invalid Command"
     end
 
-    return Exec.ServerExecute(plr, round, command)
+    return Exec.ServerExecute(plr, module.Round(), command)
 end
 
 return module
