@@ -1,0 +1,47 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local RoundHandler = require(ServerScriptService.RoundHandler)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+
+local module = {}
+
+function module.GetCharactersArray(position: Vector3, distance: number): {Model}
+	local characters: {Model} = {}
+	for _, v in Players:GetPlayers() do
+		if v.Character and v:DistanceFromCharacter(position) < distance then
+			table.insert(characters, v.Character)
+		end
+	end
+	return characters
+end
+
+function module.GetPlayerFromInstance(instance: Model): Player?
+	return Players:GetPlayerFromCharacter(instance)
+end
+
+function module.GetPropFromInstance(instance: BasePart): Types.MapProp?
+	local round = RoundHandler.GetRound()
+	return round:GetProp(instance) :: Types.MapProp
+end
+
+function module.GetItemFromInstance(instance: BasePart): Types.AnyItem?
+	local round = RoundHandler.GetRound()
+	return round:GetItem(instance)
+end
+
+function module.GetAlivePlayers(): {Player}
+	local round = RoundHandler.GetRound()
+	local players = {}
+
+	for _, v in round:GetParticipants() do
+		assert(v)
+		if v:GetStatus() == "Alive" then
+			table.insert(players, v.Player)
+		end
+	end
+
+	return players
+end
+
+return module
