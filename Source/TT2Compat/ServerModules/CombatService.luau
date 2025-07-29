@@ -61,4 +61,8 @@ function module.Impulse(self, target: Model | BasePart, attacker: Player?, origi
 	NewtonLauncher.Fling(part, directionalForce)
 end
 
+function module.SpawnFire(): ()
+
+end
+
 return module
