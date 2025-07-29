@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -21,23 +20,23 @@ function module.GetPlayerFromInstance(instance: Model): Player?
 end
 
 function module.GetPropFromInstance(instance: BasePart): Types.MapProp?
+	local RoundHandler = require(ServerScriptService.RoundHandler)
 	local round = RoundHandler.GetRound()
 	return round:GetProp(instance) :: Types.MapProp
 end
 
 function module.GetItemFromInstance(instance: BasePart): Types.AnyItem?
+	local RoundHandler = require(ServerScriptService.RoundHandler)
 	local round = RoundHandler.GetRound()
 	return round:GetItem(instance)
 end
 
 function module.GetAlivePlayers(): {Player}
-	local round = RoundHandler.GetRound()
-	local players = {}
+	local players: {Player} = {}
 
-	for _, v in round:GetParticipants() do
-		assert(v)
-		if v:GetStatus() == "Alive" then
-			table.insert(players, v.Player)
+	for _, v in Players:GetPlayers() do
+		if v.Character then
+			table.insert(players, v)
 		end
 	end
 

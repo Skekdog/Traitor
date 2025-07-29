@@ -8,7 +8,11 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-function module.Damage(self, player: Player, attacker: Player?, damage: number, _, _, _, _, _, source: Types.DamageSource): ()
+function module.Damage(self, player: Player?, attacker: Player?, damage: number, _, _, _, _, _, source: Types.DamageSource): ()
+	if not player then
+		return
+	end
+
 	local round = RoundHandler.GetRound()
 	local participant = round:GetParticipant(player.Name)
 
