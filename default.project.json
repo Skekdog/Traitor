@@ -21,6 +21,11 @@
         "$path": "Source/Shared"
       },
 
+      "SharedModules": {
+        "$className": "Folder",
+        "$path": "Source/TT2Compat/SharedModules"
+      },
+
       "Assets": {
         "$className": "Folder",
         "$path": "Assets/Shared"
@@ -41,6 +46,11 @@
       "Assets": {
         "$className": "Folder",
         "$path": "Assets/Server"
+      },
+
+      "ServerModules": {
+        "$className": "Folder",
+        "$path": "Source/TT2Compat/ServerModules"
       }
     },
 
