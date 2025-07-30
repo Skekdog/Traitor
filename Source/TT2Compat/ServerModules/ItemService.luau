@@ -1,4 +1,6 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local AmmoRemap = require(ReplicatedStorage.Compat.AmmoRemap)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local module = {}
@@ -34,6 +36,18 @@ function module.SpawnItem(self, item: string, cframe: CFrame, _, _, _, _): ()
 	model.Parent = round:GetMap().ItemSpawns
 	model:PivotTo(cframe)
 	round:LoadProp(model, "ItemProp")
+end
+
+function module.GiveAmmoReserve(self, player: Player, ammoName: string, amount: number): ()
+	local round = RoundHandler.GetRound()
+	local participant = round:GetParticipant(player.Name)
+	if not participant then
+		return
+	end
+
+	ammoName = AmmoRemap(ammoName)
+	local currentAmmo = participant:GetAmmo(ammoName)
+	participant:SetAmmo(ammoName, currentAmmo + amount)
 end
 
 return module
