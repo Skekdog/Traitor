@@ -20,8 +20,12 @@ local function kill(part: BasePart, damageSource: string): ()
 	end
 end
 
-local function KillParts(parts: {BasePart}, damageSource: string): ()
+local function KillParts(parts: {Instance}, damageSource: string): ()
 	for _, part in parts do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
 		part.Touched:Connect(function(otherPart: BasePart): ()
 			kill(otherPart, damageSource)
 		end)
