@@ -8,7 +8,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-function module.Damage(self, player: Player?, attacker: Player?, damage: number, _, _, _, _, _, source: Types.DamageSource): ()
+function module.Damage(self, player: Player?, attacker: Player?, damage: number, origin: Vector3?, hitPosition: Vector3?, directionalForce: Vector3?, _: boolean, _: boolean, source: Types.DamageSource, itemName: string?): ()
 	if not player then
 		return
 	end
@@ -26,6 +26,9 @@ function module.Damage(self, player: Player?, attacker: Player?, damage: number,
 		Amount = damage,
 		Attacker = attackerParticipant,
 		Source = source,
+
+		Origin = origin,
+		HitPosition = hitPosition,
 	})
 end
 
@@ -41,7 +44,7 @@ function module.DamageWithinRadius(self, _, attacker: Player?, _: number, _: boo
 	Combat.CreateExplosion(round, params, nil, Instance.new("Sound"))
 end
 
-function module.Explosion(self, position: Vector3): ()
+function module.Explosion(self, position: Vector3, soundId: number?): ()
 	local round = RoundHandler.GetRound()
 	local params = ExplosionParams.new({
 		Damage = 0,
@@ -50,7 +53,13 @@ function module.Explosion(self, position: Vector3): ()
 		Pressure = 10000,
 		VisualRadius = 20,
 	}, position)
-	Combat.CreateExplosion(round, params)
+
+	local sound = Instance.new("Sound")
+	if soundId then
+		sound.SoundId = "rbxassetid://" .. soundId
+	end
+
+	Combat.CreateExplosion(round, params, nil, soundId and sound)
 end
 
 function module.Impulse(self, target: Model | BasePart, attacker: Player?, origin: Vector3, directionalForce: Vector3, _: boolean, _: boolean, itemName: string): ()
@@ -59,6 +68,14 @@ function module.Impulse(self, target: Model | BasePart, attacker: Player?, origi
 		return
 	end
 	NewtonLauncher.Fling(part, directionalForce)
+end
+
+function module.Impact(self, player: Player?, hit: {Position: Vector3}, target: BasePart, material: Enum.Material): ()
+	return
+end
+
+function module.ValidateRay(self, range: number, origin: Vector3, hit: {Position: Vector3}, target: BasePart): boolean
+	return true -- most usages of this function will need to be manually rewritten anyway, so this is fine
 end
 
 function module.SpawnFire(): ()

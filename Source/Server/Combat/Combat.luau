@@ -64,7 +64,7 @@ local function tryGetParticipantFromPart(round: Types.Round, part: BasePart): Ty
 end
 
 -- only considers static map
-local function validateRaycast(item: Types.AnyItem, by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): CombatTypes.ValidateRaycastResult
+local function validatePrimaryFire(item: Types.AnyItem, by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): CombatTypes.ValidatePrimaryFire
 	local char = by:GetCharacter()
 	if not char then
 		return "ShooterTooFar"
@@ -338,9 +338,9 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 				BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, request.Origin, v.Destination)
 			end
 
-			local validateRaycastResult = validateRaycast(item, by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)
+			local validateRaycastResult = validatePrimaryFire(item, by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)
 			if validateRaycastResult ~= "Success" then
-				return validateRaycastResult :: CombatTypes.ValidateRaycastResult
+				return validateRaycastResult :: CombatTypes.ValidatePrimaryFire
 			end
 
 			if item.Kind ~= "Item" and item.Kind ~= "Grenade" and v.HitPart then
