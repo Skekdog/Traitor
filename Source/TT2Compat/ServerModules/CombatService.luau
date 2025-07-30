@@ -1,14 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local DamageSourceRemap = require(ReplicatedStorage.Compat.DamageSourceRemap)
 local NewtonLauncher = require(ReplicatedStorage.Shared.GameDefinition.Items.NewtonLauncher)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Combat = require(ServerScriptService.Combat.Combat)
 local RoundHandler = require(ServerScriptService.RoundHandler)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-function module.Damage(self, player: Player?, attacker: Player?, damage: number, origin: Vector3?, hitPosition: Vector3?, directionalForce: Vector3?, _: boolean, _: boolean, source: Types.DamageSource, itemName: string?): ()
+function module.Damage(self, player: Player?, attacker: Player?, damage: number, origin: Vector3?, hitPosition: Vector3?, directionalForce: Vector3?, _: boolean, _: boolean, source: string, itemName: string?): ()
 	if not player then
 		return
 	end
@@ -25,14 +25,14 @@ function module.Damage(self, player: Player?, attacker: Player?, damage: number,
 	participant:TryTakeDamage({
 		Amount = damage,
 		Attacker = attackerParticipant,
-		Source = source,
+		Source = DamageSourceRemap(source),
 
 		Origin = origin,
 		HitPosition = hitPosition,
 	})
 end
 
-function module.DamageWithinRadius(self, _, attacker: Player?, _: number, _: boolean, position: Vector3, _: number, _: number, _: boolean, _: boolean, source: Types.DamageSource): ()
+function module.DamageWithinRadius(self, _, attacker: Player?, _: number, _: boolean, position: Vector3, _: number, _: number, _: boolean, _: boolean, source: string): ()
 	local round = RoundHandler.GetRound()
 	local params = ExplosionParams.new({
 		Damage = 0,

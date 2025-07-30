@@ -1,4 +1,6 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local DamageSourceRemap = require(ReplicatedStorage.Compat.DamageSourceRemap)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local function kill(part: BasePart, damageSource: string): ()
@@ -13,7 +15,7 @@ local function kill(part: BasePart, damageSource: string): ()
 	if participant then
 		participant:TryTakeDamage({
 			Amount = math.huge,
-			Source = "Other", -- todo: map tt2 damage sources to tyt sources
+			Source = DamageSourceRemap(damageSource),
 		})
 	end
 end
