@@ -1,4 +1,5 @@
 local ServerScriptService = game:GetService("ServerScriptService")
+local TextChatService = game:GetService("TextChatService")
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local module = {}
@@ -9,6 +10,11 @@ function module.GameMessage(self, message: string, colour: string, _, player: Pl
 	round:SendMessage(player, `<font color='#{brickColor.Color:ToHex()}'>{message}</font>`, "Chat")
 end
 
-module.PlayerChatted = nil
+local playerChatted = Instance.new("BindableEvent")
+module.PlayerChatted = playerChatted.Event
+
+TextChatService.MessageReceived:Connect(function(message: TextChatMessage): ()
+	playerChatted:Fire(message.TextSource, message.Text)
+end)
 
 return module
