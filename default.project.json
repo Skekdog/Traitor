@@ -26,6 +26,11 @@
         "$path": "Source/TT2Compat/SharedModules"
       },
 
+      "Compat": {
+        "$className": "Folder",
+        "$path": "Source/TT2Compat/Compat"
+      },
+
       "Assets": {
         "$className": "Folder",
         "$path": "Assets/Shared",
