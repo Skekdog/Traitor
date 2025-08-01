@@ -5,7 +5,7 @@ local Decoy = require(script.Parent.Parent.Interactables.Decoy)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local GREY_COLOUR = Color3.new(0.5, 0.5, 0.5)
-local GREEN_COLOUR = Color3.fromRGB(154, 255, 138)
+local GREEN_COLOUR = Color3.fromRGB(55, 174, 37)
 
 local function HeartbeatClient(item: Types.AnyItem): ()
     assert(item.Kind == "Item")
