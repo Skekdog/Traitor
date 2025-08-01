@@ -3,10 +3,10 @@ local RoundHandler = require(ServerScriptService.RoundHandler)
 
 RoundHandler.Round:Connect(function(round)
 	while true do
+		task.wait()
 		if not round:GetMap().Extras.CompatibilityMode then
 			continue
 		end
-		task.wait()
 		if round:IsPreGame() then
 			workspace:SetAttribute("RoundState", "Preparing")
 		elseif round:IsInProgress() then
