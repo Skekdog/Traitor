@@ -72,8 +72,11 @@ local function burn(attacker: Types.Participant, target: BurnTarget): ()
         part:SetAttribute("Burning", true)
     elseif target.Kind == "CorpseProp" then
         target.Model:SetAttribute("Burning", true)
+        if not attacker:IsBadGuy() then
+            attacker:SetFreeKill("burned a corpse")
+        end
     end
-    
+
     burningThings[target] = {
         LastBurn = tick(),
         BurnUntil = tick() + 10,
