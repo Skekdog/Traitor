@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local StandardDoor = require(ReplicatedStorage.Shared.Actions.StandardDoor)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Doors = require(ReplicatedStorage.SharedModules.Doors)
 
 type FireServerRemote = (targets: Player?, ...any) -> ()
 type ServerRemote = {
@@ -78,9 +78,7 @@ end)
 
 
 local client = {}
-client.Doors = newClientRemote(function(door: BasePart, _: boolean): ()
-	StandardDoor({Kind = "ClientInteraction" :: "ClientInteraction", Door = door})
-end)
+client.Doors = newClientRemote(Doors.Use)
 
 return {
 	Server = server,
