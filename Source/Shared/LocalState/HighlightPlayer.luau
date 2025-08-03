@@ -16,10 +16,11 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui
     end
     gui.Adornee = head
 
-    gui.Size = UDim2.fromScale(1, 1)
+    gui.Size = UDim2.new(1, 20, 1, 20)
 
     local frame = Instance.new("Frame")
-    frame.BackgroundColor3 = role.Definition.Color
+    frame.BackgroundColor3 = Color3.new(1, 1, 1)
+    frame.BackgroundTransparency = 0.1
     frame.Size = UDim2.fromScale(1, 1)
     frame.Parent = gui
 
@@ -27,12 +28,27 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui
         local uiCorner = Instance.new("UICorner")
         uiCorner.CornerRadius = UDim.new(0, 8)
         uiCorner.Parent = frame
+
+        local uiGradient = Instance.new("UIGradient")
+        uiGradient.Color = ColorSequence.new(Color3.new(1, 1, 1), role.Definition.Color)
+        uiGradient.Offset = Vector2.new(0, 0.5)
+        uiGradient.Rotation = -90
+        uiGradient.Parent = frame
+
+        local uiStroke = Instance.new("UIStroke")
+        uiStroke.Thickness = 1
+        uiStroke.Color = Color3.new(1, 1, 1)
+        uiStroke.Parent = frame
     end
 
     local textLabel = Instance.new("TextLabel")
     textLabel.Text = GetDisplayName(role.Definition):sub(1, 1):upper()
     textLabel.TextColor3 = Color3.new(1, 1, 1) --todo: follow WCAG contrast guidelines for determining colour
     textLabel.TextScaled = true
+    textLabel.Font = Enum.Font.SourceSans
+    textLabel.BackgroundTransparency = 1
+    textLabel.Size = UDim2.fromScale(1, 1)
+    textLabel.Parent = frame
 
     do
         local uiPadding = Instance.new("UIPadding")
@@ -44,6 +60,8 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui
     end
 
     gui:AddTag("AllyMarker")
+    gui.AlwaysOnTop = true
+    gui.StudsOffsetWorldSpace = Vector3.new(0, 1.5, 0)
     gui.Parent = player.Character
 
     return gui
