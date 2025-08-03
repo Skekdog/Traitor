@@ -55,8 +55,17 @@ participant.Status:Connect(function(status)
 		uiO.Username.Text = "Use buttons to spectate"
 		lastKey = 0
 	end
-	
+
 	if isSpectating then
+		local corpse = workspace.Corpses:FindFirstChild(participant.Name)
+		if corpse then
+			local head = corpse:FindFirstChild("Head")
+			if head and head:IsA("BasePart") then
+				camera.CameraSubject = head
+				task.wait(3)
+			end
+		end
+
 		if currentCameraMode == "Player" then
 			Freecam.StopFreecam()
 		else
