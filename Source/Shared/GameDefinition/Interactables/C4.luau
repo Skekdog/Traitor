@@ -290,25 +290,19 @@ if RunService:IsClient() then
 		end
 
 		if isBadGuy then
+			local marker = (c4.Object :: typeof(ReplicatedStorage.Assets.InteractableModels.C4)):FindFirstChild("Marker")
+			if not marker then
+				return -- This is when the C4 is destroyed, e.g. when exploding
+			end
+
 			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Object.Position)
 			if distance == 0 then
 				distance = (workspace.CurrentCamera.CFrame.Position - c4.Object.Position).Magnitude
 			end
 
-			local marker = c4.Object:FindFirstChild("Marker")
-			if not marker or not marker:IsA("BillboardGui") then
-				return
-			end
-
-			local border = marker:FindFirstChild("Border")
-			if not border or not border:IsA("ImageLabel") then
-				return
-			end
-
-			local distanceLabel = marker:FindFirstChild("Distance")
-			if not distanceLabel or not distanceLabel:IsA("TextLabel") then
-				return
-			end
+			local border = marker.Border
+			local distanceLabel = marker.Distance
+			local timerLabel = marker.Timer
 
 			local colour: Color3
 			if distance > explosionInfo.FalloffEnd then
@@ -323,6 +317,8 @@ if RunService:IsClient() then
 			distanceLabel.TextColor3 = colour
 
 			distanceLabel.Text = tostring(math.round(distance))
+			timerLabel.Text = timer.Text
+			timerLabel.TextColor3 = colour
 		end
 	end
 
