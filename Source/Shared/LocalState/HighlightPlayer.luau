@@ -43,7 +43,13 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui
 
     local textLabel = Instance.new("TextLabel")
     textLabel.Text = GetDisplayName(role.Definition):sub(1, 1):upper()
-    textLabel.TextColor3 = Color3.new(1, 1, 1) --todo: follow WCAG contrast guidelines for determining colour
+
+    -- I tried using the WCAG contrast guidelines for this and the results were... eh.
+    -- Probably because of the transparency and gradient (modifying the function to account for transparency didn't help)
+    -- So instead we just compare to the denary value of 0.8, 0.8, 0.8 (0.5 is too dark)
+    -- Not exactly perfect but well, colour is subjective anyway, and also, who is going to make a role that is so bright??
+    textLabel.TextColor3 = if tonumber("0x" .. role.Definition.Color:ToHex()) > 13421772 then Color3.new() else Color3.new(1, 1, 1)
+
     textLabel.TextScaled = true
     textLabel.Font = Enum.Font.SourceSans
     textLabel.BackgroundTransparency = 1
