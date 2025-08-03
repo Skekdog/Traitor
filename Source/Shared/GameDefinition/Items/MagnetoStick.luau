@@ -11,6 +11,8 @@ local MAX_DISTANCE = 15
 local MAX_ROPE_DISTANCE = 6
 local ROPE_LENGTH_MULTIPLIER = 1.75
 
+local MAX_SIZE = 6
+
 local PUSH_FORCE_PER_UNIT_MASS = 1000
 
 local ALIGNMENT_RESPONSIVENESS = 80
@@ -105,7 +107,7 @@ end
 
 local function isPropSmallEnough(part: BasePart): boolean
 	local size = part.Size
-	if part.AssemblyMass > 160 or (size.X * size.Y * size.Z) > 50 or size.X > 5 or size.Y > 5 or size.Z > 5 then
+	if part.AssemblyMass > 160 or (size.X * size.Y * size.Z) > 50 or size.X > MAX_SIZE or size.Y > MAX_SIZE or size.Z > MAX_SIZE then
 		return false
 	end
 
