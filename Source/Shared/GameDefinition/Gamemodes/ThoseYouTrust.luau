@@ -48,7 +48,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Kind = "RoleDefinition",
 		Name = "Traitor",
 		Description = "Work with the other Traitors to kill the Innocents. Keep your role secret.",
-		Color = Color3.fromRGB(255, 0, 0),
+		Color = Color3.fromRGB(211, 20, 20),
 		Sound = "rbxassetid://9042088276",
 
 		IsBadGuys = true,
@@ -100,7 +100,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Kind = "RoleDefinition",
 		Name = "Innocent",
 		Description = "Spy HQ has been infilitrated by Traitors. Work with the Detectives to survive.",
-		Color = Color3.fromRGB(0, 255, 0),
+		Color = Color3.fromRGB(29, 237, 29),
 		Sound = "rbxassetid://9042819926",
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
@@ -116,7 +116,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Kind = "RoleDefinition",
 		Name = "Detective",
 		Description = "Spy HQ has been infilitrated by Traitors. Work with the Innocents to survive.",
-		Color = Color3.fromRGB(0, 0, 255),
+		Color = Color3.fromRGB(25, 134, 230),
 		Sound = "rbxassetid://9042823666",
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
