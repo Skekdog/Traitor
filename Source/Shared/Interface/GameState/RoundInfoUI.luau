@@ -55,7 +55,7 @@ local function setRoleText(): ()
     local status = participant.Status()
 
     if role ~= Defaults.Role and status == "Alive" then
-        roundInfo.TopBar.Role.Text = role:GetFormattedRoleName()
+        roundInfo.TopBar.Role.Text = role:GetFormattedName()
     else
         roundInfo.TopBar.Role.Text = "Spectator"
     end

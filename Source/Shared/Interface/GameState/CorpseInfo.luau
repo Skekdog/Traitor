@@ -190,9 +190,9 @@ return function(corpseInfo: Types.CorpseView?)
     local role = LocalParticipantInfo.GetParticipant(name).Role()
 
     if role ~= Defaults.Role then
-        corpseUi.Object.Title.Text = `{role:GetFormattedString(`@{name}'s`)} Corpse | {role:GetFormattedRoleName()}`
+        corpseUi.Object.Title.Text = `{role:GetFormattedString(`@{name}'s`)} Corpse | {role:GetFormattedName()}`
         local determiner = StringWithDeterminer(GetDisplayName(role.Definition)):split(" ")[1]
-        object.Avatar:SetAttribute("Description", `This is the body of {role:GetFormattedString(name)}. They were {determiner} {role:GetFormattedRoleName()}.`)
+        object.Avatar:SetAttribute("Description", `This is the body of {role:GetFormattedString(name)}. They were {determiner} {role:GetFormattedName()}.`)
     else
         corpseUi.Object.Title.Text = `@{name}'s Corpse`
         object.Avatar:SetAttribute("Description", `This is the body of {name}.`)
