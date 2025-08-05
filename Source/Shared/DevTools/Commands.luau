@@ -493,7 +493,7 @@ module.pause = {
 			return "Cannot pause during intermission or waiting phase."
 		end
 	
-		round:PauseRound(not round:IsPaused())
+		round:Pause(not round:IsPaused())
 		return if round:IsPaused() then "Round paused." else "Round unpaused."
 	end
 }
