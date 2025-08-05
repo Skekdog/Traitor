@@ -6,7 +6,6 @@ local UserInputService = game:GetService("UserInputService")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
 local module = {}
-module.SnapCooldown = 0
 
 local CLIMB_SPEED_MULTIPLIER = 0.75
 local MIN_LADDER_HEIGHT = 2.5
@@ -157,7 +156,6 @@ function module.StopClimbing(): ()
 
     local alignPos = root:FindFirstChild("LadderPositionAlignment") :: AlignPosition?
     if alignPos and alignPos.Enabled then
-        module.SnapCooldown = os.clock() + 3
         alignPos.Enabled = false
     end
 end
