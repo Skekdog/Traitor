@@ -150,7 +150,7 @@ local function doMapVote(): ()
     end)
 
     remotes.ServerClient.TriggerMapVote:FireAllClients(true, votableMaps)
-    module.Round():SetRoundPhase("Intermission", INTERMISSION_TIME)
+    module.Round():SetPhase("Intermission", INTERMISSION_TIME)
     task.wait(INTERMISSION_TIME)
 
     con:Disconnect()
@@ -199,11 +199,11 @@ end
 
 task.spawn(function()
     while true do
-        if not didEnd and module.Round():GetRoundPhase() == "Highlights" then
+        if not didEnd and module.Round():GetPhase() == "Highlights" then
             onRoundEnd()
         end
 
-        if module.Round():GetRoundPhase() ~= "Intermission" then
+        if module.Round():GetPhase() ~= "Intermission" then
             task.wait()
             continue
         end

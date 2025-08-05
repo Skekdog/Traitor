@@ -78,9 +78,9 @@ function module.GetOrderedRoundEvents(): {RoundEvent}
     return events
 end
 
-module.RoundPhase = DynamicValue.new("Waiting" :: Types.RoundPhase)
-InstanceSignal.ListenAttribute(replicatedData, "Phase", "Waiting" :: Types.RoundPhase):Connect(function(phase: string?)
-	module.RoundPhase:SetValue(phase or "Waiting")
+module.Phase = DynamicValue.new("Waiting" :: Types.Phase)
+InstanceSignal.ListenAttribute(replicatedData, "Phase", "Waiting" :: Types.Phase):Connect(function(phase: string?)
+	module.Phase:SetValue(phase or "Waiting")
 end, true)
 
 module.AdvanceTime = DynamicValue.new(nil :: number?)

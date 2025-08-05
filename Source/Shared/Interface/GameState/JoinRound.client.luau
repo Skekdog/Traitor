@@ -10,12 +10,12 @@ local participant = LocalParticipantInfo.GetParticipant()
 
 local this = UIManager.WaitForUI("JoinRound") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.JoinRound)}
 
-local validPhases: {Types.RoundPhase} = {"Waiting", "Preparing"}
+local validPhases: {Types.Phase} = {"Waiting", "Preparing"}
 local wasJoinClicked = false
 
 local function shouldMakeVisible(): boolean
 	local status = participant.Status()
-	return not wasJoinClicked and table.find(validPhases, LocalRoundInfo.RoundPhase()) ~= nil and status == "Spectating"
+	return not wasJoinClicked and table.find(validPhases, LocalRoundInfo.Phase()) ~= nil and status == "Spectating"
 end
 
 this.Object.MouseButton1Click:Connect(function()
@@ -30,7 +30,7 @@ this.Object.MouseButton1Click:Connect(function()
 	end
 end)
 
-LocalRoundInfo.RoundPhase:Connect(function()
+LocalRoundInfo.Phase:Connect(function()
 	this:ToggleVisible(shouldMakeVisible())
 end, true)
 

@@ -160,7 +160,7 @@ local function setWinnerText(): ()
 	end
 end
 
-LocalRoundInfo.RoundPhase:Connect(function(phase)
+LocalRoundInfo.Phase:Connect(function(phase)
 	if phase ~= "Highlights" then
 		return
 	end

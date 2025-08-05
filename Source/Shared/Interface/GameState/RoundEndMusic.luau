@@ -27,7 +27,7 @@ ReplicatedStorage.Shared.RoundRule.Remotes.RoundEndMusic.OnClientEvent:Connect(f
 	music:Resume()
 end)
 
-LocalRoundInfo.RoundPhase:Connect(function(phase)
+LocalRoundInfo.Phase:Connect(function(phase)
 	if phase ~= "Preparing" then
 		return
 	end

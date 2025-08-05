@@ -470,7 +470,7 @@ module.skipphase = {
 	Environment = "Server" :: "Server",
 	Arguments = {},
 	Execute = function(_, round: Round): string
-		local currentPhase: Types.RoundPhase = round:GetRoundPhase()
+		local currentPhase: Types.Phase = round:GetPhase()
 		if currentPhase == "Intermission" then
 			return "Cannot skip intermission phase."
 		end
@@ -479,7 +479,7 @@ module.skipphase = {
 		RunService.Heartbeat:Wait()
 		RunService.Heartbeat:Wait()
 
-		return `Skipped {currentPhase} phase to {round:GetRoundPhase()}.`
+		return `Skipped {currentPhase} phase to {round:GetPhase()}.`
 	end
 }
 
@@ -489,7 +489,7 @@ module.pause = {
 	Environment = "Server" :: "Server",
 	Arguments = {},
 	Execute = function(_, round: Types.Round)
-		if round:GetRoundPhase() == "Intermission" or round:GetRoundPhase() == "Waiting" then
+		if round:GetPhase() == "Intermission" or round:GetPhase() == "Waiting" then
 			return "Cannot pause during intermission or waiting phase."
 		end
 	
