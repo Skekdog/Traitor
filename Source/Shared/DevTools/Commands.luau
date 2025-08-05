@@ -80,13 +80,13 @@ local function toggleVictory(_: any, round: Types.Round): string
         return "Round is not in progress."
     end
 
-    if round.End ~= disabledEndRound then
+    if round.Finish ~= disabledEndRound then
         endRoundParams = nil
-        normalEndRound = round.End
-        round.End = disabledEndRound
+        normalEndRound = round.Finish
+        round.Finish = disabledEndRound
         return "Victory disabled."
     else
-        round.End = normalEndRound
+        round.Finish = normalEndRound
         if endRoundParams then
             normalEndRound(table.unpack(endRoundParams))
         end
@@ -450,8 +450,8 @@ module.endround = {
 		end
 
 		local success, err = pcall(function()
-			round:End(round:GetRoleFromRoleName(roleName))
-			if round.End == disabledEndRound then
+			round:Finish(round:GetRoleFromRoleName(roleName))
+			if round.Finish == disabledEndRound then
 				toggleVictory(nil, round)
 			end
 		end)

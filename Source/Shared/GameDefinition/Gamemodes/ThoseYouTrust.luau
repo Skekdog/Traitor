@@ -230,7 +230,7 @@ local function tryEndRound(round: Types.Round): ()
 	
 	local winner = getWinner(round)
 	if winner then
-		round:End(winner)
+		round:Finish(winner)
 	end
 end
 
