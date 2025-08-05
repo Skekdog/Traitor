@@ -15,7 +15,7 @@ local function getBestParticipant(_: unknown, round: Types.Round): Types.Partici
         assert(participant)
 
         local totalScore = 0
-        for _, v in participant:GetScores() do
+        for _, v in participant.Scores do
             assert(v)
             totalScore += v
         end

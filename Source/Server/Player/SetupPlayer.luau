@@ -65,7 +65,7 @@ Players.PlayerRemoving:Connect(function(plr)
 
 	local totalScore = ScoreManager.GetTotalScore(plr)
 	if participant and totalScore then
-		for _, v in participant:GetScores() do
+		for _, v in participant.Scores do
 			assert(v)
 			totalScore += v
 		end

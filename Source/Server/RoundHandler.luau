@@ -184,7 +184,7 @@ local function onRoundEnd(): ()
         assert(v)
 
         local totalScore = 0
-        for _, v in v:GetScores() do
+        for _, v in v.Scores do
             assert(v)
             totalScore += v
         end
