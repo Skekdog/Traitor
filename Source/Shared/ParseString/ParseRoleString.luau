@@ -4,7 +4,7 @@ local ParseString = require(script.Parent)
 
 local function getReplacement(playerName: string): string
 	local role = LocalParticipantInfo.GetParticipant(playerName).Role()
-	local replaceWith = role:GetFormattedString(playerName)
+	local replaceWith = role:FormatString(playerName)
 
 	return replaceWith
 end

@@ -85,7 +85,7 @@ local function populateScores(): ()
 
 		local role = LocalParticipantInfo.GetParticipant(i).Role()
 		if role then
-			usernameLabel.Text = role:GetFormattedString("@" .. i)
+			usernameLabel.Text = role:FormatString("@" .. i)
 		else
 			usernameLabel.Text = "@" .. i
 		end
@@ -154,9 +154,9 @@ local function setWinnerText(): ()
 	local winnerRole = if winnerKind == "Participant" then LocalParticipantInfo.GetParticipant(winner).Role() else Role.fromDefinition(gamemode.Roles[winner])
 
 	if winnerKind == "Participant" then
-		highlightsPage.Winners.Text = winnerRole:GetFormattedString(winner) .. " wins!"
+		highlightsPage.Winners.Text = winnerRole:FormatString(winner) .. " wins!"
 	else
-		highlightsPage.Winners.Text = `The {winnerRole:GetFormattedString(winner .. "s")} win!`
+		highlightsPage.Winners.Text = `The {winnerRole:FormatString(winner .. "s")} win!`
 	end
 end
 

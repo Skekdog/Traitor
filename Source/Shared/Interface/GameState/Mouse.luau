@@ -108,7 +108,7 @@ function module.ShowCorpseHint(char: Model)
 		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body`
 	else
 		local role = LocalParticipantInfo.GetParticipant(char.Name).Role()
-		corpseHint.Text = `{role:GetFormattedString(char.Name .. "'s")} Body`
+		corpseHint.Text = `{role:FormatString(char.Name .. "'s")} Body`
 	end
 
 	interactableHint.Text = "Crouch to search covertly."
