@@ -10,7 +10,7 @@ local function kill(part: BasePart, damageSource: string): ()
 	end
 
 	local round = RoundHandler.GetRound()
-	local participant = round:GetParticipantFromCharacter(char)
+	local participant = round:GetParticipant(char)
 
 	if participant then
 		participant:TryTakeDamage({
