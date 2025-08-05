@@ -42,8 +42,8 @@ remotes.FreeKill.OnClientEvent:Connect(function(reason: string?)
     module.FreeKill:SetValue(reason)
 end)
 
-function module.GetRoundHighlights(): {Types.RoundHighlight}
-    local highlights: {Types.RoundHighlight} = {}
+function module.GetHighlights(): {Types.Highlight}
+    local highlights: {Types.Highlight} = {}
     for _, v in replicatedData.Highlights:GetChildren() do
         if v:IsA("StringValue") then
             table.insert(highlights, {

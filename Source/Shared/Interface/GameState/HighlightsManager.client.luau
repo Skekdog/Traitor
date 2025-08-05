@@ -128,7 +128,7 @@ local function populateScores(): ()
 end
 
 local function setHighlights(): ()
-	local highlights = LocalRoundInfo.GetRoundHighlights()
+	local highlights = LocalRoundInfo.GetHighlights()
 
 	table.sort(highlights, function(highlight1, highlight2)
 		return highlight1.Priority > highlight2.Priority --todo: i remember that something like this errored before, but i checked with lune and it didn't. see what's up, this might not work still.
