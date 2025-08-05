@@ -15,7 +15,7 @@ RoundHandler.Round:Connect(function(round)
 			workspace:SetAttribute("RoundState", "Round over")
 		end
 
-		workspace:SetAttribute("Paused", round:GetIsRoundPaused())
+		workspace:SetAttribute("Paused", round:IsPaused())
 	end
 end, true)
 
