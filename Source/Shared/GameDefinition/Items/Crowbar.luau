@@ -68,7 +68,7 @@ local item: Types.MeleeWeaponDefinition = {
 			return
 		end
 
-		hitParticipant:SetLastDamaged(attacker, RESPONSIBLE_DURATION)
+		hitParticipant:SetLastDamagedBy(attacker, RESPONSIBLE_DURATION)
 		if not attacker:HasSelfDefenseAgainstParticipant(hitParticipant) then
 			hitParticipant:AddSelfDefenseEntry({
 				Against = attacker,
