@@ -9,11 +9,6 @@ local module = {}
 local replicatedData = ReplicatedStorage.Shared.RoundRule.ReplicatedData
 local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
 
-type RoundHighlight = {
-    Title: string,
-    Description: string
-}
-
 type RoundEvent = {
     Timestamp: number,
     Description: string,
@@ -47,13 +42,14 @@ remotes.FreeKill.OnClientEvent:Connect(function(reason: string?)
     module.FreeKill:SetValue(reason)
 end)
 
-function module.GetRoundHighlights(): {RoundHighlight}
-    local highlights: {RoundHighlight} = {}
+function module.GetRoundHighlights(): {Types.RoundHighlight}
+    local highlights: {Types.RoundHighlight} = {}
     for _, v in replicatedData.Highlights:GetChildren() do
         if v:IsA("StringValue") then
             table.insert(highlights, {
                 Title = v.Name,
-                Description = v.Value
+                Description = v.Value,
+                Priority = v:GetAttribute("Priority") :: number,
             })
         end
     end

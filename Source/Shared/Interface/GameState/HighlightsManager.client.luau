@@ -129,16 +129,17 @@ end
 
 local function setHighlights(): ()
 	local highlights = LocalRoundInfo.GetRoundHighlights()
-	for i = 1, 5 do
-		local highlight = highlights[i]
-		local frame = highlightsPage.Highlights:FindFirstChild("Highlight" .. tostring(i)) :: typeof(highlightsPage.Highlights.Highlight1)
 
-		if not highlight then
-			highlight = {
-				Title = "",
-				Description = ""
-			}
+	table.sort(highlights, function(highlight1, highlight2)
+		return highlight1.Priority > highlight2.Priority --todo: i remember that something like this errored before, but i checked with lune and it didn't. see what's up, this might not work still.
+	end)
+
+	for i, highlight in highlights do
+		if i > 5 then
+			break
 		end
+
+		local frame = highlightsPage.Highlights:FindFirstChild("Highlight" .. tostring(i)) :: typeof(highlightsPage.Highlights.Highlight1)
 
 		frame.Description.Text = highlight.Description
 		frame.Highlight.Text = highlight.Title
