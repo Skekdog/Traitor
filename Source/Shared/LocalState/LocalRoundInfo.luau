@@ -9,7 +9,7 @@ local module = {}
 local replicatedData = ReplicatedStorage.Shared.RoundRule.ReplicatedData
 local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
 
-type RoundEvent = {
+type Event = {
     Timestamp: number,
     Description: string,
     WasFreeKill: boolean?,
@@ -57,8 +57,8 @@ function module.GetHighlights(): {Types.Highlight}
     return highlights
 end
 
-function module.GetOrderedRoundEvents(): {RoundEvent}
-    local events: {RoundEvent} = {}
+function module.GetOrderedRoundEvents(): {Event}
+    local events: {Event} = {}
     for _, v in replicatedData.Events:GetChildren() do
         if v:IsA("StringValue") then
             table.insert(events, {
