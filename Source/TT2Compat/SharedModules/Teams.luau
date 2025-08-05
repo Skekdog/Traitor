@@ -1,13 +1,21 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local ServerScriptService = game:GetService("ServerScriptService")
+local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local Teams = {}
 
-local originalSetRole = Participant.SetRole
-Participant.SetRole = function(participant: Types.Participant, role: Types.RoleDefinition?)
-	Teams[participant.Player] = if role then role.Name else nil
-	originalSetRole(participant, role)
-end
+setmetatable(Teams, {
+	__index = function(self, index: unknown): string?
+		if typeof(index) ~= "Instance" or not index:IsA("Player") then
+			return nil
+		end
+
+		local participant = RoundHandler.GetRound():GetParticipant(index.Name)
+		if not participant then
+			return nil
+		end
+
+		return participant:GetRole().Definition.Name
+	end
+})
 
 return Teams
