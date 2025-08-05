@@ -171,7 +171,7 @@ local function assignRoles(gamemode: Types.Gamemode, participants: {Types.Partic
 end
 
 local function awardScoreForKill(attacker: Types.Participant, victim: Types.Participant): ()
-	local corpse = assert(victim:GetCorpse())
+	local corpse = assert(victim.Corpse)
 	local aR, vR = attacker:GetRole(), victim:GetRole()
 
 	local attackerRole, victimRole = aR.Definition.Name, vR.Definition.Name
@@ -235,7 +235,7 @@ local function tryEndRound(round: Types.Round): ()
 end
 
 local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
-	local corpse = victim:GetCorpse()
+	local corpse = victim.Corpse
 
 	if corpse then
 		local attacker = corpse.Killer

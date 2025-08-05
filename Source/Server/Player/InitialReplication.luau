@@ -16,7 +16,7 @@ local function replicateTo(player: Player): ()
 		Replication.ReplicatePlayerStatus(player, v, v:GetStatus())
 		Replication.ReplicateRole(player, v, false)
 		
-		local corpse = v:GetCorpse()
+		local corpse = v.Corpse
 		if corpse then
 			Replication.ReplicateCorpse(player, corpse, false)
 		end

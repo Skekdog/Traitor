@@ -311,7 +311,7 @@ remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown,
         return nil
     end
 
-    local corpse = otherParticipant:GetCorpse()
+    local corpse = otherParticipant.Corpse
     if not corpse then
         return nil
     end

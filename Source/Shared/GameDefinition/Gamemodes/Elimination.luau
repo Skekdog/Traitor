@@ -163,7 +163,7 @@ local gamemode: Types.Gamemode = {
 	},
 
     OnDeath = function(gamemode: Types.Gamemode, participant: Types.Participant, deferVictoryCheck: boolean)
-        local corpse = participant:GetCorpse()
+        local corpse = participant.Corpse
         local attacker = if corpse then corpse.Killer else nil
         if attacker then
             if attacker == participant then
