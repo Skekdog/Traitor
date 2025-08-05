@@ -1,34 +1,35 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local GamemodeNameRemap = require(ReplicatedStorage.Compat.GamemodeNameRemap)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
-local module = {}
+local Credits = {}
+local Gamemode = {Credits = Credits}
+local GamemodeService = {Gamemode = Gamemode}
 
-module.Gamemode = nil :: (Types.Gamemode & {Credits: {}})?
+setmetatable(Gamemode, {
+	__index = function(self, index: unknown): any
+		if typeof(index) ~= "Instance" or not index:IsA("Player") then
+			return nil
+		end
 
-local function onPlayerAdded(player: Player): ()
-	if module.Gamemode then
-		module.Gamemode.Credits[player] = math.huge -- So that when a traitor node is checking if they have enough credits, they do.
+		local participant = RoundHandler.GetRound():GetParticipant(index.Name)
+		if not participant then
+			return nil
+		end
+
+		return participant:GetCredits()
 	end
-end
+})
 
-RoundHandler.Round:Connect(function(round)
-	module.GamemodeId = GamemodeNameRemap(round.Gamemode.Name)
-
-	local gamemode = round.Gamemode :: Types.Gamemode & {Credits: {}}
-	module.Gamemode = gamemode
-	gamemode.Credits = {}
-
-	for _, v in Players:GetPlayers() do
-		onPlayerAdded(v)
+setmetatable(GamemodeService, {
+	__index = function(self, index: unknown): any
+		local round = RoundHandler.GetRound()
+		if index == "GamemodeId" then
+			return GamemodeNameRemap(round.Gamemode.Name)
+		end
+		return nil
 	end
-end, true)
+})
 
-Players.PlayerAdded:Connect(onPlayerAdded)
-
--- And we don't need to listen for PlayerRemoving because the credits table is reset every round
-
-return module
+return GamemodeService
