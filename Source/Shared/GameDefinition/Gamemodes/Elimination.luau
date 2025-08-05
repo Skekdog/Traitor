@@ -106,9 +106,9 @@ local function tryEndRound(round: Types.Round): ()
     end
 
     if survivor then
-        round:EndRound(survivor)
+        round:End(survivor)
     else
-        round:EndRound(getBestParticipant(nil, round))
+        round:End(getBestParticipant(nil, round))
     end
 end
 
