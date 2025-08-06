@@ -236,6 +236,133 @@ local function tryEndRound(round: Types.Round): ()
 	end
 end
 
+local function killHighlights(attacker: Types.Participant, victim: Types.Participant): ()
+	local attackerRole = attacker:GetRole().Definition
+	local victimRole = victim:GetRole().Definition
+	local corpse = victim.Corpse
+	local round = victim.Round
+
+	if not corpse then
+		return
+	end
+
+	if attackerRole == roles.Traitor then
+		if victimRole ~= roles.Traitor then
+			if not round.Extras.FirstBloodAwarded then
+				round:AddHighlight({
+					Title = "First Blood",
+					Description = attacker:GetFormattedName() .. " delivered the first innocent death at a traitor's hands.",
+					Priority = 1,
+					Group = "First Blood",
+				})
+				attacker.Extras.CorrectInnocentKills = 1
+				round.Extras.FirstBloodAwarded = true
+			else
+				attacker.Extras.CorrectInnocentKills = (attacker.Extras.CorrectInnocentKills or 0) + 1
+				local kills = attacker.Extras.CorrectInnocentKills
+
+				if kills == 1 then
+					round:AddHighlight({
+						Title = "I Got One, Boss!",
+						Description = attacker:GetFormattedName() .. " managed to kill a single innocent. Sweet!",
+						Group = "Traitor Correct Kills",
+						Priority = 1,
+					})
+				elseif kills == 2 then
+					round:AddHighlight({
+						Title = "A Bullet For Two",
+						Description = attacker:GetFormattedName() .. " showed the first one was not a lucky shot by killing another.",
+						Group = "Traitor Correct Kills",
+						Priority = 2,
+					})
+				elseif kills == 3 then
+					round:AddHighlight({
+						Title = "Serial Traitor",
+						Description = attacker:GetFormattedName() .. " ended three innocent lives of espionage today.",
+						Group = "Traitor Correct Kills",
+						Priority = 3,
+					})
+				elseif kills > 3 and kills < 7 then
+					round:AddHighlight({
+						Title = "Wolf Among More Sheep-Like Wolves",
+						Description = attacker:GetFormattedName() .. ` eats innocent spies for dinner. A dinner of {kills} courses.`,
+						Group = "Traitor Correct Kills",
+						Priority = 4,
+					})
+				else
+					round:AddHighlight({
+						Title = "Counter-Espionage Operative",
+						Description = attacker:GetFormattedName() .. " gets paid per kill. Can now buy another luxury yacht.",
+						Group = "Traitor Correct Kills",
+						Priority = 5,
+					})
+				end
+			end
+		elseif victimRole == roles.Traitor and not corpse.WasCorrectKill and not round.Extras.AnyKillsHappened then
+			round:AddHighlight({
+				Title = "First Bloody Stupid Kill",
+				Description = attacker:GetFormattedName() .. " scored the first kill by shooting a fellow traitor. Good job.",
+				Priority = 5,
+				Group = "Teamkilling",
+			})
+		end
+	else
+		if not round.Extras.AnyKillsHappened then
+			if not corpse.WasCorrectKill then
+				round:AddHighlight({
+					Title = "First Blooper",
+					Description = attacker:GetFormattedName() .. " was the first to kill. Too bad it was an innocent comrade.",
+					Priority = 1,
+					Group = "Teamkilling",
+				})
+			else
+				round:AddHighlight({
+					Title = "First Blow",
+					Description = attacker:GetFormattedName() .. " struck the first blow for the innocent spies by making the first death a traitor's.",
+					Priority = 1,
+					Group = "Correct kills",
+				})
+				attacker.Extras.CorrectTraitorKills = 1
+			end
+		elseif victimRole == roles.Traitor then
+			attacker.Extras.CorrectTraitorKills = (attacker.Extras.CorrectTraitorKills or 0) + 1
+			local kills = attacker.Extras.CorrectTraitorKills
+
+			if kills == 1 then
+				round:AddHighlight({
+					Title = "Betray This",
+					Description = attacker:GetFormattedName() .. " found a traitor. Shot a traitor. Easy.",
+					Priority = 2,
+					Group = "Innocent Correct Kills",
+				})
+			elseif kills == 2 then
+				round:AddHighlight({
+					Title = "Applied to the Justice Squad",
+					Description = attacker:GetFormattedName() .. " escorted two traitors to the great beyond.",
+					Priority = 3,
+					Group = "Innocent Correct Kills",
+				})
+			elseif kills == 3 then
+				round:AddHighlight({
+					Title = "Do Traitors Dream of Traitorous Sheep?",
+					Description = attacker:GetFormattedName() .. " put three traitors to rest.",
+					Priority = 4,
+					Group = "Innocent Correct Kills",
+				})
+			else
+				round:AddHighlight({
+					Title = "Internal Affairs Employee",
+					Description = attacker:GetFormattedName() .. " gets paid per kill. Can now order their fifth swimming pool.",
+					Priority = 5,
+					Group = "Innocent Correct Kills",
+				})
+			end
+		end
+	end
+
+	round.Extras.AnyKillsHappened = true
+end
+
 local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
 	StandardHighlights.OnDeath(gamemode, victim, deferVictoryCheck)
 
@@ -250,6 +377,7 @@ local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, defe
 		local attacker = corpse.Killer
 
 		if attacker then
+			killHighlights(attacker, victim)
 			awardScoreForKill(attacker, victim)
 		end
 	end
