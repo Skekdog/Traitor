@@ -266,6 +266,8 @@ local gamemode: Types.Gamemode = {
 		return round:GetRoleFromRoleName("Innocent")
 	end,
 
+	RoleCanCallToCorpse = roles.Detective,
+
 	GetRoundEndMusic = getVictoryMusic,
 
 	EnableFriendlyFire = true,
