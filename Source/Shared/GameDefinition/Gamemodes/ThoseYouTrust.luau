@@ -320,7 +320,7 @@ local gamemode: Types.Gamemode = {
 	OnCharacterAdded = function() end,
 	OnDeath = onDeath,
 
-	OnSearchCorpse = function(_, corpse, searcher, covert)
+	OnIdentifyCorpse = function(_, corpse, searcher)
 		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false)
 	end
 }
