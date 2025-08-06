@@ -96,6 +96,12 @@ local burn3 = {
 	Priority = 5,
 }
 
+local drown = {
+	Title = "Fish In Water",
+	Description = "%s thought they would say hello to the fish, but didn't plan their way out.",
+	Priority = 1
+}
+
 local BURN_1_THRESHOLD = 2
 local BURN_2_THRESHOLD = 4
 local BURN_3_THRESHOLD = 6
@@ -174,6 +180,10 @@ module.OnDeath = function(_, victim)
 		elseif kills == HEADSHOTS_3_THRESHOLD then
 			addHighlight(round, headshots3, attacker, kills)
 		end
+	end
+
+	if corpse.CorpseView.DamageSource == "Drown" then
+		addHighlight(round, drown, victim)
 	end
 
 	if round.ElapsedPhaseTime < HATE_THRESHOLD then
