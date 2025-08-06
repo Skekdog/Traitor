@@ -32,12 +32,13 @@ function module.Damage(self, player: Player?, attacker: Player?, damage: number,
 	})
 end
 
-function module.DamageWithinRadius(self, _, attacker: Player?, _: number, _: boolean, position: Vector3, _: number, _: number, _: boolean, _: boolean, source: string): ()
+--todo: i'm not certain about these parameters, obviously the missing ones, but also the ones starting with underscore
+function module.DamageWithinRadius(self, _, attacker: Player?, _damage: number, _: boolean, position: Vector3, _falloffBegin: number, _falloffEnd: number, _: boolean, _: boolean, source: string): ()
 	local round = RoundHandler.GetRound()
 	local params = ExplosionParams.new({
-		Damage = 0,
-		FalloffBegin = 5,
-		FalloffEnd = 20,
+		Damage = _damage,
+		FalloffBegin = _falloffBegin,
+		FalloffEnd = _falloffEnd,
 		Pressure = 0,
 		VisualRadius = 0,
 	}, position)
