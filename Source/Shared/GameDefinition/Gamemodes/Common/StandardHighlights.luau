@@ -48,6 +48,28 @@ local fellHighlight = {
 	Priority = 1,
 }
 
+local headshots1 = {
+	Title = "Efficiency",
+	Description = "%s discovered the joy of headshots and made %d.",
+	Priority = 1,
+}
+
+local headshots2 = {
+	Title = "Neurology",
+	Description = "%s removed the brains from %d heads for a closer examination.",
+	Priority = 3,
+}
+
+local headshots3 = {
+	Title = "Videogames Made Me Do It",
+	Description = "%s applied their murder simulation training and headshotted %d foes.",
+	Priority = 5,
+}
+
+local HEADSHOTS_1_THRESHOLD = 2
+local HEADSHOTS_2_THRESHOLD = 5
+local HEADSHOTS_3_THRESHOLD = 8
+
 local GRANT_THRESHOLD = 2
 
 local SUICIDE_CULT_THRESHOLD = 3
@@ -89,6 +111,18 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, pushKillHighlight, attacker)
 		elseif not attacker then
 			addHighlight(round, fellHighlight, victim)
+		end
+	end
+
+	if corpse.CorpseView.WasHeadshot and attacker then
+		attacker.Extras.HeadshotKills = (attacker.Extras.HeadshotKills or 0) + 1
+		local kills = attacker.Extras.HeadshotKills
+		if kills == HEADSHOTS_1_THRESHOLD then
+			addHighlight(round, headshots1, attacker, kills)
+		elseif kills == HEADSHOTS_2_THRESHOLD then
+			addHighlight(round, headshots2, attacker, kills)
+		elseif kills == HEADSHOTS_3_THRESHOLD then
+			addHighlight(round, headshots3, attacker, kills)
 		end
 	end
 end :: typeof((({} :: any) :: Types.Gamemode).OnDeath)
