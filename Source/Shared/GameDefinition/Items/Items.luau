@@ -149,6 +149,21 @@ guns.HUGE = {
     RecoilY = 2,
 
     AmmoType = Ammo.HUGE,
+
+    BeforeHitParticipant = ItemKillHighlights(
+        {
+            Title = "A HUGE Spread",
+            Description = "%s was in tune with their HUGE, somehow managing to make their bullets hit %d people.",
+            Priority = 1,
+            Threshold = 2,
+        },
+        {
+            Title = "A Patient Para",
+            Description = "%s just kept firing, and saw their HUGE patience rewarded with %d kills.",
+            Priority = 3,
+            Threshold = 4,
+        }
+    )
 }
 
 guns.Scout = {
