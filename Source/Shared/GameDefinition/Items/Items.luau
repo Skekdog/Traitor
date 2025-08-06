@@ -388,6 +388,21 @@ guns.SMG = {
 
     RecoilX = 0.5,
     RecoilY = 1,
+
+    BeforeHitParticipant = ItemKillHighlights(
+        {
+            Title = "Pray and Slay",
+            Description = "%s killed %d people with the M11, but won't say how much ammo they needed.",
+            Priority = 1,
+            Threshold = 2,
+        },
+        {
+            Title = "Mac and Cheese",
+            Description = "%s wonders what would happen if they could wield two M11s. %d times two?",
+            Priority = 3,
+            Threshold = 4,
+        }
+    ),
 }
 
 guns.AWP = {
