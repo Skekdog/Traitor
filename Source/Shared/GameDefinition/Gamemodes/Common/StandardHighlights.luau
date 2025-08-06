@@ -66,6 +66,21 @@ local headshots3 = {
 	Priority = 5,
 }
 
+local iHateThisGame = {
+	Title = "I Hate This Game",
+	Description = "%s died right after the start of the round.",
+	Priority = 1,
+}
+
+local pyrrhicVictory = {
+	Title = "Pyrrhic Victory",
+	Description = "%s died only seconds before their team won the round.",
+	Priority = 1,
+}
+
+local HATE_THRESHOLD = 1
+local PYRRHIC_THRESHOLD = 1
+
 local HEADSHOTS_1_THRESHOLD = 2
 local HEADSHOTS_2_THRESHOLD = 5
 local HEADSHOTS_3_THRESHOLD = 8
@@ -125,6 +140,16 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, headshots3, attacker, kills)
 		end
 	end
+
+	if round.ElapsedPhaseTime < HATE_THRESHOLD then
+		addHighlight(round, iHateThisGame, victim)
+	end
+
+	task.delay(PYRRHIC_THRESHOLD, function()
+		if round:IsPostGame() then
+			addHighlight(round, pyrrhicVictory, victim)
+		end
+	end)
 end :: typeof((({} :: any) :: Types.Gamemode).OnDeath)
 
 return module
