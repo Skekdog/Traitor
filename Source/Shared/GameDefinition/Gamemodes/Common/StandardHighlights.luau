@@ -8,6 +8,7 @@ local function addHighlight(round: Types.Round, highlightParams: Types.Highlight
 		Title = highlightParams.Title,
 		Description = highlightParams.Description:format(participant:GetFormattedName(), ...),
 		Priority = highlightParams.Priority,
+		Group = highlightParams.Group
 	}
 	round:AddHighlight(highlight)
 end
@@ -16,12 +17,14 @@ local suicideHighlight = {
 	Title = "Lonely and Depressed",
 	Description = "%s was the only one who killed themselves.",
 	Priority = 1,
+	Group = "Suicide",
 }
 
 local suicideCultHighlight = {
 	Title = "Suicide Cult Leader",
 	Description = "%s showed the other suiciders how to do it by being the first to go.",
 	Priority = 2,
+	Group = "Suicide"
 }
 
 local fieldResearchHighlight = {
