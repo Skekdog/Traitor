@@ -24,19 +24,21 @@ local suicideCultHighlight = {
 	Title = "Suicide Cult Leader",
 	Description = "%s showed the other suiciders how to do it by being the first to go.",
 	Priority = 2,
-	Group = "Suicide"
+	Group = "Suicide",
 }
 
 local fieldResearchHighlight = {
 	Title = "Field Research",
 	Description = "%s tested their own resistance to explosions. It was not high enough.",
 	Priority = 1,
+	Group = "Explosives",
 }
 
 local explosivesResearchGrantHighlight = {
 	Title = "Explosives Research Grant",
 	Description = "%s was recognized for their research on explosions. %d test subjects helped out.",
 	Priority = 2,
+	Group = "Explosives",
 }
 
 local pushKillHighlight = {
