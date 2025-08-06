@@ -243,7 +243,7 @@ module.OnDeath = function(_, victim)
 			round.Extras.FirstSuicide = victim
 		else
 			round.Extras.SuicideCount += 1
-			if round.Extras.SuicideCount == SUICIDE_CULT_THRESHOLD then
+			if round.Extras.SuicideCount >= SUICIDE_CULT_THRESHOLD then
 				addHighlight(round, suicideCultHighlight, round.Extras.FirstSuicide)
 			end
 		end
@@ -254,7 +254,7 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, fieldResearchHighlight, victim)
 		elseif attacker then
 			attacker.Extras.ExplosiveKills = (attacker.Extras.ExplosiveKills or 0) + 1
-			if attacker.Extras.ExplosiveKills == GRANT_THRESHOLD then
+			if attacker.Extras.ExplosiveKills >= GRANT_THRESHOLD then
 				addHighlight(round, explosivesResearchGrantHighlight, attacker, attacker.Extras.ExplosiveKills)
 			end
 		end
@@ -272,12 +272,12 @@ module.OnDeath = function(_, victim)
 		attacker.Extras.BurnKills = (attacker.Extras.BurnKills or 0) + 1
 		local kills = attacker.Extras.BurnKills
 
-		if kills == BURN_1_THRESHOLD then
-			addHighlight(round, burn1, attacker)
-		elseif kills == BURN_2_THRESHOLD then
-			addHighlight(round, burn2, attacker)
-		elseif kills == BURN_3_THRESHOLD then
+		if kills >= BURN_3_THRESHOLD then
 			addHighlight(round, burn3, attacker)
+		elseif kills >= BURN_2_THRESHOLD then
+			addHighlight(round, burn2, attacker)
+		elseif kills >= BURN_1_THRESHOLD then
+			addHighlight(round, burn1, attacker)
 		end
 	end
 
@@ -285,22 +285,22 @@ module.OnDeath = function(_, victim)
 		attacker.Extras.CrushKills = (attacker.Extras.CrushKills or 0) + 1
 		local kills = attacker.Extras.CrushKills
 
-		if kills == CRUSH_1_THRESHOLD then
-			addHighlight(round, crush1, attacker, kills)
-		elseif kills == CRUSH_2_THRESHOLD then
+		if kills == CRUSH_2_THRESHOLD then
 			addHighlight(round, crush2, attacker, kills)
+		elseif kills == CRUSH_1_THRESHOLD then
+			addHighlight(round, crush1, attacker, kills)
 		end
 	end
 
 	if corpse.CorpseView.WasHeadshot and attacker then
 		attacker.Extras.HeadshotKills = (attacker.Extras.HeadshotKills or 0) + 1
 		local kills = attacker.Extras.HeadshotKills
-		if kills == HEADSHOTS_1_THRESHOLD then
-			addHighlight(round, headshots1, attacker, kills)
+		if kills == HEADSHOTS_3_THRESHOLD then
+			addHighlight(round, headshots3, attacker, kills)
 		elseif kills == HEADSHOTS_2_THRESHOLD then
 			addHighlight(round, headshots2, attacker, kills)
-		elseif kills == HEADSHOTS_3_THRESHOLD then
-			addHighlight(round, headshots3, attacker, kills)
+		elseif kills == HEADSHOTS_1_THRESHOLD then
+			addHighlight(round, headshots1, attacker, kills)
 		end
 	end
 
@@ -330,7 +330,7 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, doubleOops, attacker)
 		elseif kills == 3 then
 			addHighlight(round, karmaConscious, attacker)
-		elseif kills == 4 then
+		elseif kills >= 4 then
 			addHighlight(round, roleplayer, attacker)
 		end
 	end
@@ -356,12 +356,12 @@ module.OnIdentifyCorpse = function(gamemode: Types.Gamemode, corpse: Types.Corps
 	searcher.Extras.IdentifiedBodies = (searcher.Extras.IdentifiedBodies or 0) + 1
 	local bodies = searcher.Extras.IdentifiedBodies
 
-	if bodies == BODIES_1_THRESHOLD then
-		addHighlight(round, bodies1, searcher)
+	if bodies >= BODIES_3_THRESHOLD then
+		addHighlight(round, bodies3, searcher)
 	elseif bodies == BODIES_2_THRESHOLD then
 		addHighlight(round, bodies2, searcher)
-	elseif bodies == BODIES_3_THRESHOLD then
-		addHighlight(round, bodies3, searcher)
+	elseif bodies == BODIES_1_THRESHOLD then
+		addHighlight(round, bodies1, searcher)
 	end
 end
 
