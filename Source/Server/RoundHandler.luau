@@ -266,28 +266,6 @@ ReplicatedStorage.Shared.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(functi
     againstParticipant:TryAddSlayVote(participant)
 end)
 
-remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, velocity: unknown): ()
-    if typeof(velocity) ~= "number" then
-        return
-    end
-
-    local participant = module.Round():GetParticipant(player.Name)
-    if not participant then
-        return
-    end
-
-    if velocity <= 45 then
-        return
-    end
-
-    local damage = (0.00591 * (velocity ^ 2)) + (0.62055 * velocity) - 40
-
-    participant:TryTakeDamage({
-        Amount = damage,
-        Source = "Fall",
-    })
-end)
-
 remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown, covert: unknown): Types.CorpseView?
     if typeof(body) ~= "Instance" or (not body:IsA("Model") and not body:IsA("Player")) then
         return nil
