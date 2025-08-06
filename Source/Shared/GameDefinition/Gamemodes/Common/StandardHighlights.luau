@@ -111,6 +111,20 @@ local burn3 = {
 	Group = "Burning",
 }
 
+local crush1 = {
+	Title = "Crushing Victory",
+	Description = "%s shattered the bones of %d lucky winners of brand new barrels.",
+	Priority = 2,
+	Group = "Propkills",
+}
+
+local crush2 = {
+	Title = "Bone-breaking Research",
+	Description = "%s dedicated their time to the science of bone-breaking. %d test subjects did not live to see the outcome.",
+	Priority = 4,
+	Group = "Propkills",
+}
+
 local drown = {
 	Title = "Fish In Water",
 	Description = "%s thought they would say hello to the fish, but didn't plan their way out.",
@@ -207,6 +221,9 @@ local HEADSHOTS_1_THRESHOLD = 2
 local HEADSHOTS_2_THRESHOLD = 5
 local HEADSHOTS_3_THRESHOLD = 8
 
+local CRUSH_1_THRESHOLD = 2
+local CRUSH_2_THRESHOLD = 4
+
 local GRANT_THRESHOLD = 2
 
 local SUICIDE_CULT_THRESHOLD = 3
@@ -261,6 +278,17 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, burn2, attacker)
 		elseif kills == BURN_3_THRESHOLD then
 			addHighlight(round, burn3, attacker)
+		end
+	end
+
+	if corpse.CorpseView.DamageSource == "Crush" and attacker then
+		attacker.Extras.CrushKills = (attacker.Extras.CrushKills or 0) + 1
+		local kills = attacker.Extras.CrushKills
+
+		if kills == CRUSH_1_THRESHOLD then
+			addHighlight(round, crush1, attacker, kills)
+		elseif kills == CRUSH_2_THRESHOLD then
+			addHighlight(round, crush2, attacker, kills)
 		end
 	end
 
