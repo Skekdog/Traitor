@@ -242,6 +242,10 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 	local corpse = victim.Corpse
 	local round = victim.Round
 
+	if attacker == victim then
+		return
+	end
+
 	if not corpse then
 		return
 	end
