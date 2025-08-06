@@ -3,10 +3,10 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-local function addHighlight(round: Types.Round, highlightParams: Types.Highlight, participant: Types.Participant): ()
+local function addHighlight(round: Types.Round, highlightParams: Types.Highlight, participant: Types.Participant, ...): ()
 	local highlight = {
 		Title = highlightParams.Title,
-		Description = highlightParams.Description:format(participant:GetFormattedName()),
+		Description = highlightParams.Description:format(participant:GetFormattedName(), ...),
 		Priority = highlightParams.Priority,
 	}
 	round:AddHighlight(highlight)
@@ -24,23 +24,50 @@ local suicideCultHighlight = {
 	Priority = 2,
 }
 
+local fieldResearchHighlight = {
+	Title = "Field Research",
+	Description = "%s tested their own resistance to explosions. It was not high enough.",
+	Priority = 1,
+}
+
+local explosivesResearchGrantHighlight = {
+	Title = "Explosives Research Grant",
+	Description = "%s was recognized for their research on explosions. %d test subjects helped out.",
+	Priority = 2,
+}
+
+local GRANT_THRESHOLD = 2
+
 local SUICIDE_CULT_THRESHOLD = 3
 
 module.OnDeath = function(_, victim)
 	local round = victim.Round
 	local corpse = victim.Corpse
-	if corpse then
-		local attacker = corpse.Killer
+	if not corpse then
+		return
+	end
+
+	local attacker = corpse.Killer
+	if attacker == victim then
+		if not round.Extras.SuicideCount then
+			addHighlight(round, suicideHighlight, victim)
+			round.Extras.SuicideCount = 1
+			round.Extras.FirstSuicide = victim
+		else
+			round.Extras.SuicideCount += 1
+			if round.Extras.SuicideCount == SUICIDE_CULT_THRESHOLD then
+				addHighlight(round, suicideCultHighlight, round.Extras.FirstSuicide)
+			end
+		end
+	end
+
+	if corpse.CorpseView.DamageSource == "Explode" then
 		if attacker == victim then
-			if not round.Extras.SuicideCount then
-				addHighlight(round, suicideHighlight, victim)
-				round.Extras.SuicideCount = 1
-				round.Extras.FirstSuicide = victim
-			else
-				round.Extras.SuicideCount += 1
-				if round.Extras.SuicideCount == SUICIDE_CULT_THRESHOLD then
-					addHighlight(round, suicideCultHighlight, round.Extras.FirstSuicide)
-				end
+			addHighlight(round, fieldResearchHighlight, victim)
+		elseif attacker then
+			attacker.Extras.ExplosiveKills = (attacker.Extras.ExplosiveKills or 0) + 1
+			if attacker.Extras.ExplosiveKills == GRANT_THRESHOLD then
+				addHighlight(round, explosivesResearchGrantHighlight, attacker, attacker.Extras.ExplosiveKills)
 			end
 		end
 	end
