@@ -42,7 +42,7 @@ end
 
 local clientDisguiseActive = false
 
-local function disguiseServer(participantData: ParticipantData, enable: boolean?): ()
+function module.DisguiseServer(participantData: ParticipantData, enable: boolean?): ()
 	local participant = participantData.Participant
 
 	-- this is to prevent an error in studio when stopping the game.
@@ -113,7 +113,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		disguiseServer(participantData, enable)
+		module.DisguiseServer(participantData, enable)
 	end)
 end
 
@@ -153,7 +153,7 @@ local function OnUnequipServer(item: Types.Item, participant: Types.Participant)
 	if not data then
 		return
 	end
-	disguiseServer(data, false)
+	module.DisguiseServer(data, false)
 	serverParticipantTable[participant.Player] = nil
 end
 
