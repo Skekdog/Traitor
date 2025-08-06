@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
 local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
 local DeathStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.DeathStation)
 local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
@@ -163,6 +164,8 @@ local gamemode: Types.Gamemode = {
 	},
 
     OnDeath = function(gamemode: Types.Gamemode, participant: Types.Participant, deferVictoryCheck: boolean)
+        StandardHighlights.OnDeath(gamemode, participant, deferVictoryCheck)
+
         local corpse = participant.Corpse
         local attacker = if corpse then corpse.Killer else nil
         if attacker then
