@@ -102,6 +102,28 @@ local drown = {
 	Priority = 1
 }
 
+local bodies1 = {
+	Title = "Coroner",
+	Description = "%s found %d bodies lying around.",
+	Priority = 1,
+}
+
+local bodies2 = {
+	Title = "Gotta Catch Em All",
+	Description = "%s found %d corpses for their collection.",
+	Priority = 2,
+}
+
+local bodies3 = {
+	Title = "Death Scent",
+	Description = "%s keeps stumbling on random corpses, %d times this round.",
+	Priority = 3,
+}
+
+local BODIES_1_THRESHOLD = 2
+local BODIES_2_THRESHOLD = 5
+local BODIES_3_THRESHOLD = 8
+
 local BURN_1_THRESHOLD = 2
 local BURN_2_THRESHOLD = 4
 local BURN_3_THRESHOLD = 6
@@ -196,5 +218,20 @@ module.OnDeath = function(_, victim)
 		end
 	end)
 end :: typeof((({} :: any) :: Types.Gamemode).OnDeath)
+
+module.OnIdentifyCorpse = function(gamemode: Types.Gamemode, corpse: Types.Corpse, searcher: Types.Participant)
+	local round = searcher.Round
+
+	searcher.Extras.IdentifiedBodies = (searcher.Extras.IdentifiedBodies or 0) + 1
+	local bodies = searcher.Extras.IdentifiedBodies
+
+	if bodies == BODIES_1_THRESHOLD then
+		addHighlight(round, bodies1, searcher)
+	elseif bodies == BODIES_2_THRESHOLD then
+		addHighlight(round, bodies2, searcher)
+	elseif bodies == BODIES_3_THRESHOLD then
+		addHighlight(round, bodies3, searcher)
+	end
+end
 
 return module
