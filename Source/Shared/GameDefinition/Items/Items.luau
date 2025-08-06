@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local Discombobulate = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.Discombobulate)
+local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
@@ -216,6 +217,21 @@ guns.Pistol = {
     AimAnimation = "rbxassetid://18691552315",
     AttackSound = firedSounds("Pistol"),
     ReloadSound = reloadSounds("Pistol"),
+
+    BeforeHitParticipant = ItemKillHighlights(
+        {
+            Title = "Persistent Little Bugger",
+            Description = "%s scored %d kills using the pistol. Then they went on to hug someone to death.",
+            Priority = 1,
+            Threshold = 2,
+        },
+        {
+            Title = "Small Caliber Slaughter",
+            Description = "%s killed a small army of %d with a pistol. Presumably installed a tiny shotgun inside the barrel.",
+            Priority = 3,
+            Threshold = 4,
+        }
+    ),
 
     Projectile = bullet,
     ProjectileSpeed = 100,
