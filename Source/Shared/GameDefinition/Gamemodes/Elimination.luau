@@ -192,6 +192,25 @@ local gamemode: Types.Gamemode = {
         end
     end,
 
+    AddFinishHighlights = function(gamemode, round)
+        local mostKillsAmount, mostKillsParticipant: Types.Participant? = 0, nil
+        for _, v in round:GetParticipants() do
+            if #v.KillList > mostKillsAmount then
+                mostKillsAmount = #v.KillList
+                mostKillsParticipant = v
+            end
+        end
+
+        if mostKillsParticipant then
+            round:AddHighlight({
+                Title = "Most Kills",
+                Description = mostKillsParticipant:GetFormattedName() .. " scored the most kills this round.",
+                Group = "Most Kills",
+                Priority = 2,
+            })
+        end
+    end,
+
     OnCharacterAdded = function() end,
 }
 
