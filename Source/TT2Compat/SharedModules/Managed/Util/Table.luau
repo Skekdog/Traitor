@@ -1,11 +1,8 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CombineTable = require(ReplicatedStorage.Shared.Util.CombineTable)
 
 local module = {}
 
-function module.Combine<T>(table1: {T}, table2: {T}): {T}
-	local new = {}
-	table.move(table1, 1, #table1, 1, new)
-	table.move(table2, 1, #table2, #new + 1, new)
-	return new
-end
+module.Combine = CombineTable
 
 return module

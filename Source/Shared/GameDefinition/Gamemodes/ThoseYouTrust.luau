@@ -10,6 +10,7 @@ local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local Visualiser = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Visualiser)
 local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Disguiser)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local CombineTable = require(ReplicatedStorage.Shared.Util.CombineTable)
 
 local traitorMusic: {Sound} = {}
 for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
@@ -455,6 +456,66 @@ local gamemode: Types.Gamemode = {
 	OnIdentifyCorpse = function(gamemode, corpse, searcher)
 		StandardHighlights.OnIdentifyCorpse(gamemode, corpse, searcher)
 		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false)
+	end,
+
+	AddFinishHighlights = function(gamemode, round)
+		local awardDeadliestAmongEquals: Types.Participant?
+		for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Traitor")) do
+			local corpse = v.Corpse
+			if not corpse then
+				continue
+			end
+
+			local attacker = corpse.Killer
+			if not attacker or attacker:GetRole().Definition == roles.Traitor then
+				continue
+			end
+
+			if awardDeadliestAmongEquals then
+				awardDeadliestAmongEquals = nil
+				break
+			end
+			awardDeadliestAmongEquals = attacker
+		end
+
+		local awardLoneWolf: Types.Participant?
+		local innocentList = CombineTable(round:GetParticipantsWithRole(round:GetRoleFromRoleName("Innocent")), round:GetParticipantsWithRole(round:GetRoleFromRoleName("Detective")))
+		for _, v in innocentList do
+			local corpse = v.Corpse
+			if not corpse then
+				continue
+			end
+
+			local attacker = corpse.Killer
+			if not attacker or attacker:GetRole().Definition ~= roles.Traitor then
+				continue
+			end
+
+			if awardLoneWolf then
+				awardLoneWolf = nil
+				break
+			end
+
+			awardLoneWolf = attacker
+		end
+
+		if awardDeadliestAmongEquals then
+			round:AddHighlight({
+				Title = "Deadliest Among Equals",
+				Description = awardDeadliestAmongEquals:GetFormattedName() .. "was responsible for every traitor death made by the innocents this round.",
+				Priority = 2,
+				Group = "Innocent Correct Kills",
+			})
+		end
+
+		if awardLoneWolf then
+			round:AddHighlight({
+				Title = "Lone Wolf",
+				Description = awardLoneWolf:GetFormattedName() .. " was responsible for every innocent death made by a traitor this round",
+				Priority = 2,
+				Group = "Traitor Correct Kills",
+			})
+		end
 	end
 }
 
