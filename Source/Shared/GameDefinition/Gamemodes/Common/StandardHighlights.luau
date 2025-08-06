@@ -59,114 +59,133 @@ local headshots1 = {
 	Title = "Efficiency",
 	Description = "%s discovered the joy of headshots and made %d.",
 	Priority = 1,
+	Group = "Headshots",
 }
 
 local headshots2 = {
 	Title = "Neurology",
 	Description = "%s removed the brains from %d heads for a closer examination.",
 	Priority = 3,
+	Group = "Headshots",
 }
 
 local headshots3 = {
 	Title = "Videogames Made Me Do It",
 	Description = "%s applied their murder simulation training and headshotted %d foes.",
 	Priority = 5,
+	Group = "Headshots",
 }
 
 local iHateThisGame = {
 	Title = "I Hate This Game",
 	Description = "%s died right after the start of the round.",
 	Priority = 1,
+	Group = "Death Time",
 }
 
 local pyrrhicVictory = {
 	Title = "Pyrrhic Victory",
 	Description = "%s died only seconds before their team won the round.",
 	Priority = 1,
+	Group = "Death Time",
 }
 
 local burn1 = {
 	Title = "Like Grandma Used To Make Them",
 	Description = "%s fried several people to a nice crisp.",
 	Priority = 2,
+	Group = "Burning",
 }
 
 local burn2 = {
 	Title = "Pyroid",
 	Description = "%s was heard cackling loudly after burning one of their many victims.",
 	Priority = 4,
+	Group = "Burning",
 }
 
 local burn3 = {
 	Title = "Pyrrhic Burnery",
 	Description = "%s burned them all, but is now all out of incendiary grenades! How will they cope!?",
 	Priority = 5,
+	Group = "Burning",
 }
 
 local drown = {
 	Title = "Fish In Water",
 	Description = "%s thought they would say hello to the fish, but didn't plan their way out.",
-	Priority = 1
+	Priority = 1,
+	Group = "Drowning",
 }
 
 local bodies1 = {
 	Title = "Coroner",
 	Description = "%s found %d bodies lying around.",
 	Priority = 1,
+	Group = "Bodies Found",
 }
 
 local bodies2 = {
 	Title = "Gotta Catch Em All",
 	Description = "%s found %d corpses for their collection.",
 	Priority = 2,
+	Group = "Bodies Found",
 }
 
 local bodies3 = {
 	Title = "Death Scent",
 	Description = "%s keeps stumbling on random corpses, %d times this round.",
 	Priority = 3,
+	Group = "Bodies Found",
 }
 
 local moron = {
 	Title = "Moron",
 	Description = "%s couldn't figure out which side they were on, and killed over half of their comrades.",
 	Priority = 5,
+	Group = "Teamkilling",
 }
 
 local roleplayer = {
 	Title = "Roleplayer",
 	Description = "%s was roleplaying a madman, honest. That's why they killed most of their team.",
 	Priority = 3,
+	Group = "Teamkilling",
 } -- 4 kills
 
 local teamkiller = {
 	Title = "Teamkiller",
 	Description = "%s murdered the entirety of their team. OMGBANBANBAN.",
 	Priority = 6,
+	Group = "Teamkilling",
 }
 
 local oopsie = {
 	Title = "Made An Oopsie",
 	Description = "%s had their finger slip just when they were aiming at a buddy.",
 	Priority = 1,
+	Group = "Teamkilling",
 }
 
 local doubleOops = {
 	Title = "Double-Oops",
 	Description = "%s thought they got the enemy twice, but was wrong both times.",
 	Priority = 2,
+	Group = "Teamkilling",
 }
 
 local karmaConscious = {
 	Title = "Karma-conscious",
 	Description = "%s couldn't stop after killing two teammates. Three is their lucky number.",
 	Priority = 3,
+	Group = "Teamkilling",
 }
 
 local redneck = {
 	Title = "Redneck",
 	Description = "%s protected their turf real good by killing over a quarter of their teammates.",
 	Priority = 4,
+	Group = "Teamkilling",
 }
 
 local MORON_MINIMUM_KILLS = 2
