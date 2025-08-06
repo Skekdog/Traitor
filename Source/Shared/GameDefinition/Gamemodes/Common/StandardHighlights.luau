@@ -120,6 +120,52 @@ local bodies3 = {
 	Priority = 3,
 }
 
+local moron = {
+	Title = "Moron",
+	Description = "%s couldn't figure out which side they were on, and killed over half of their comrades.",
+	Priority = 5,
+}
+
+local roleplayer = {
+	Title = "Roleplayer",
+	Description = "%s was roleplaying a madman, honest. That's why they killed most of their team.",
+	Priority = 3,
+} -- 4 kills
+
+local teamkiller = {
+	Title = "Teamkiller",
+	Description = "%s murdered the entirety of their team. OMGBANBANBAN.",
+	Priority = 6,
+}
+
+local oopsie = {
+	Title = "Made An Oopsie",
+	Description = "%s had their finger slip just when they were aiming at a buddy.",
+	Priority = 1,
+}
+
+local doubleOops = {
+	Title = "Double-Oops",
+	Description = "%s thought they got the enemy twice, but was wrong both times.",
+	Priority = 2,
+}
+
+local karmaConscious = {
+	Title = "Karma-conscious",
+	Description = "%s couldn't stop after killing two teammates. Three is their lucky number.",
+	Priority = 3,
+}
+
+local redneck = {
+	Title = "Redneck",
+	Description = "%s protected their turf real good by killing over a quarter of their teammates.",
+	Priority = 4,
+}
+
+local MORON_MINIMUM_KILLS = 2
+local REDNECK_MINIMUM_KILLS = 2
+local TEAMKILLER_MINIMUM_KILLS = 2
+
 local BODIES_1_THRESHOLD = 2
 local BODIES_2_THRESHOLD = 5
 local BODIES_3_THRESHOLD = 8
@@ -201,6 +247,37 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, headshots2, attacker, kills)
 		elseif kills == HEADSHOTS_3_THRESHOLD then
 			addHighlight(round, headshots3, attacker, kills)
+		end
+	end
+
+	if not corpse.WasCorrectKill and attacker and attacker ~= victim then
+		attacker.Extras.BadKills = (attacker.Extras.BadKills or 0) + 1
+		local kills = attacker.Extras.BadKills
+
+		local totalTeammates = 0
+
+		local allies: {string} = attacker:GetRole().Definition.Allies or {}
+		for _, roleName in allies do
+			for _, participant in round:GetParticipantsWithRole(round:GetRoleFromRoleName(roleName)) do
+				totalTeammates += 1
+			end
+		end
+
+		local killPercent = kills / totalTeammates
+		if kills >= TEAMKILLER_MINIMUM_KILLS and killPercent == 1 then
+			addHighlight(round, teamkiller, attacker)
+		elseif kills >= MORON_MINIMUM_KILLS and killPercent >= 0.5 then
+			addHighlight(round, moron, attacker)
+		elseif kills >= REDNECK_MINIMUM_KILLS and killPercent >= 0.25 then
+			addHighlight(round, redneck, attacker)
+		elseif kills == 1 then
+			addHighlight(round, oopsie, attacker)
+		elseif kills == 2 then
+			addHighlight(round, doubleOops, attacker)
+		elseif kills == 3 then
+			addHighlight(round, karmaConscious, attacker)
+		elseif kills == 4 then
+			addHighlight(round, roleplayer, attacker)
 		end
 	end
 
