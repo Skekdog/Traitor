@@ -184,6 +184,21 @@ guns.Scout = {
     AttackSound = firedSounds("Scout"),
     ReloadSound = reloadSounds("Scout"),
 
+    BeforeHitParticipant = ItemKillHighlights(
+        {
+            Title = "Point and Click",
+            Description = "%s shows all you need for %d kills is a rifle and a steady hand.",
+            Priority = 1,
+            Threshold = 2,
+        },
+        {
+            Title = "I Can See Your Head From Here",
+            Description = "%s knows their rifle. Now %d other people know the rifle too.",
+            Priority = 3,
+            Threshold = 4,
+        }
+    ),
+
     RecoilX = 0.5,
     RecoilY = 1.5,
 }
