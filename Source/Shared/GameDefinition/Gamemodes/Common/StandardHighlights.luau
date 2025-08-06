@@ -45,12 +45,14 @@ local pushKillHighlight = {
 	Title = "No Mr. Bond, I Expect You To Fall",
 	Description = "%s pushed someone off a great height.",
 	Priority = 2,
+	Group = "Falling",
 }
 
 local fellHighlight = {
 	Title = "Floored",
 	Description = "%s let their body hit the floor after falling from a significant altitude.",
 	Priority = 1,
+	Group = "Falling",
 }
 
 local headshots1 = {
