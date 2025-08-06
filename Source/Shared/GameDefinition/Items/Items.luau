@@ -556,6 +556,21 @@ guns.XM1014 = {
     AttackSound = firedSounds("XM1014"),
     ReloadSound = reloadSounds("XM1014"),
 
+    BeforeHitParticipant = ItemKillHighlights(
+        {
+            Title = "Easy Mode",
+            Description = "%s applies the buckshot where it hurts, murdering %d targets.",
+            Priority = 1,
+            Threshold = 2,
+        },
+        {
+            Title = "A Thousand Little Pellets",
+            Description = "%s didn't really like their buckshot, so they gave it all away. %d recipients did not live to enjoy it.",
+            Priority = 3,
+            Threshold = 4,
+        }
+    ),
+
     RecoilX = 1.0,
     RecoilY = 2.0,
 }
