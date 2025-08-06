@@ -663,6 +663,21 @@ guns.Deagle = {
 
     RecoilX = 0.3,
     RecoilY = 1.2,
+
+    BeforeHitParticipant = ItemKillHighlights(
+        {
+            Title = "It's Like A Tiny Rifle",
+            Description = "%s is getting the hang of the Desert Eagle and killed %d people.",
+            Priority = 1,
+            Threshold = 2,
+        },
+        {
+            Title = "Eagle Master",
+            Description = "%s blew away %d people with the deagle.",
+            Priority = 3,
+            Threshold = 4,
+        }
+    ),
 }
 
 guns.UMP = {
