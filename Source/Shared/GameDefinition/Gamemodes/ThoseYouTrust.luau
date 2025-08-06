@@ -7,6 +7,7 @@ local Radio = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Radi
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local Visualiser = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Visualiser)
+local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Disguiser)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local traitorMusic: {Sound} = {}
@@ -235,6 +236,11 @@ local function tryEndRound(round: Types.Round): ()
 end
 
 local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
+	victim.Extras.CorpseDisguiseData = {
+		Participant = victim,
+	}
+	Disguiser.DisguiseServer(victim.Extras.CorpseDisguiseData, true)
+
 	local corpse = victim.Corpse
 
 	if corpse then
@@ -310,6 +316,10 @@ local gamemode: Types.Gamemode = {
 
 	OnCharacterAdded = function() end,
 	OnDeath = onDeath,
+
+	OnSearchCorpse = function(_, corpse, searcher, covert)
+		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false)
+	end
 }
 
 return gamemode
