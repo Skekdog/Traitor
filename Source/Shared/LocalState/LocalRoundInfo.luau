@@ -50,6 +50,7 @@ function module.GetHighlights(): {Types.Highlight}
                 Title = v.Name,
                 Description = v.Value,
                 Priority = v:GetAttribute("Priority") :: number,
+                Group = v:GetAttribute("Group") :: string,
             })
         end
     end
