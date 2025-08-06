@@ -11,10 +11,9 @@ export type ItemKillHighlight = {
 local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitParticipant
 	local highlightsArray = table.pack(...)
 
-	local highlightsParamsMap: {[number]: ItemKillHighlight} = {}
-	for _, highlight in highlightsArray do
-		highlightsParamsMap[highlight.Threshold] = highlight
-	end
+	table.sort(highlightsArray, function(highlight1, highlight2)
+		return highlight1.Priority < highlight2.Priority --todo: i remember that something like this errored before, but i checked with lune and it didn't. see what's up, this might not work still.
+	end)
 
 	return function(item, round, victim, params)
 		assert(item.Kind ~= "ExplosionParams")
@@ -34,12 +33,20 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
 
 		local kills = attacker.Extras[identifier]
 
-		local highlightParams = highlightsParamsMap[kills]
+		local highlightParams: ItemKillHighlight?
+		for _, v in highlightsArray do
+			if kills >= v.Threshold then
+				highlightParams = v
+				break
+			end
+		end
+
 		if highlightParams then
 			local highlight = {
 				Title = highlightParams.Title,
 				Description = highlightParams.Description:format(attacker:GetFormattedName(), kills),
-				Priority = highlightParams.Priority
+				Priority = highlightParams.Priority,
+				Group = identifier,
 			}
 			round:AddHighlight(highlight)
 		end
