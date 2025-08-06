@@ -173,6 +173,15 @@ local gamemode: Types.Gamemode = {
                 attacker:AddScore("Suicide", -2)
             else
                 attacker:AddScore("Killed Player", 1)
+                if not participant.Round.Extras.AnyKillsHappened then
+                    participant.Round.Extras.AnyKillsHappened = true
+                    participant.Round:AddHighlight({
+                        Title = "First Blood",
+                        Description = attacker:GetFormattedName() .. " drew the first blood of the round.",
+                        Priority = 2,
+                        Group = "First Blood",
+                    })
+                end
             end
         end
 
