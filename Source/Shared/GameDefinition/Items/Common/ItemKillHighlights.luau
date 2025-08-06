@@ -8,6 +8,12 @@ export type ItemKillHighlight = {
 	Threshold: number,
 }
 
+local module = {}
+
+function module.GetIdentifier(itemName: string): string
+	return "Highlights_KillsWithItem_" .. itemName
+end
+
 local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitParticipant
 	local highlightsArray = table.pack(...)
 
@@ -28,7 +34,7 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
             return true
         end
 
-		local identifier = "Highlights_KillsWithItem_" .. item.Definition.Name
+		local identifier = module.GetIdentifier(item.Definition.Name)
 		attacker.Extras[identifier] = (attacker.Extras[identifier] or 0) + 1
 
 		local kills = attacker.Extras[identifier]
@@ -55,4 +61,10 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
 	end
 end
 
-return ItemKillHighlights
+setmetatable(module, {
+	__call = function(self, ...: ItemKillHighlight): Types.BeforeHitParticipant
+		return ItemKillHighlights(...)
+	end
+})
+
+return module
