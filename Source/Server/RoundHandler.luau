@@ -3,7 +3,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 local ScoreManager = require(ServerScriptService.Player.ScoreManager)
-local Exec = require(ReplicatedStorage.Shared.DevTools.Exec)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -300,14 +299,6 @@ remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown,
     end
 
     return nil
-end
-
-remotes.ClientServer.Exec.OnServerInvoke = function(plr, command: unknown): string | true
-    if typeof(command) ~= "string" then
-        return "Invalid Command"
-    end
-
-    return Exec.ServerExecute(plr, module.Round(), command)
 end
 
 return module
