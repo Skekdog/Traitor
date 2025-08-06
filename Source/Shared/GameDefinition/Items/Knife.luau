@@ -94,6 +94,7 @@ local function BeforeHitParticipant(item: Types.ItemBeforeHit, round: Types.Roun
 			Title = "Where Did You Get That From?",
 			Description = `{attacker:GetFormattedName()} did not have connections, but still killed someone with a knife.`,
 			Priority = 5,
+			Group = ItemKillHighlights.GetIdentifier("Knife")
 		})
 	end
 
