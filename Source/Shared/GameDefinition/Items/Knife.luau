@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local DNAScanner = require(script.Parent.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -54,8 +55,47 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 end
 
 local function BeforeHitParticipant(item: Types.ItemBeforeHit, round: Types.Round, hitParticipant: Types.Participant, params: Types.DamageParams): boolean
+	ItemKillHighlights(
+		{
+			Title = "Knife Knowing You",
+			Description = "%s stabbed someone in the face over the internet.",
+			Priority = 2,
+			Threshold = 1,
+		},
+		{
+			Title = "Such A Knife Man",
+			Description = "%s found %d knives lying around, and made use of them.",
+			Priority = 4,
+			Threshold = 2,
+		},
+		{
+			Title = "World's Knifest Man",
+			Description = "%s killed %d people with a knife. Don't ask me how.",
+			Priority = 6,
+			Threshold = 4,
+		}
+	)(item, round, hitParticipant, params)
 	local attacker = params.Attacker
 	assert(attacker and item.Kind == "Melee")
+
+	local shop = attacker:GetRole().Definition.EquipmentShop
+	local foundKnife = false
+	if shop then
+		for _, v in shop do
+			if v.Name == "Knife" then
+				foundKnife = true
+				break
+			end
+		end
+	end
+
+	if not foundKnife then
+		round:AddHighlight({
+			Title = "Where Did You Get That From?",
+			Description = `{attacker:GetFormattedName()} did not have connections, but still killed someone with a knife.`,
+			Priority = 5,
+		})
+	end
 
 	attacker:RemoveItem(item)
 
