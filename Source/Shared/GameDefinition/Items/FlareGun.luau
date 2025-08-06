@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -20,6 +21,20 @@ end
 local function weaponSounds(name: string): string
     return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
 end
+
+local highlight1 = {
+    Title = "To The Rescue",
+    Description = "%s used their flares to signal for %d deaths.",
+    Priority = 2,
+    Threshold = 2,
+}
+
+local highlight2 = {
+    Title = "Flare Indicates Fire",
+    Description = "%s taught %d people about the danger of wearing flammable clothing.",
+    Priority = 4,
+    Threshold = 4,
+}
 
 type BurnTarget = Types.Participant | Types.Prop
 type BurnInfo = {
@@ -158,11 +173,15 @@ local function burnThing(target: BurnTarget, info: BurnInfo): ()
         end
 
         if health then
-            (target :: Types.MapProp):TryTakeDamage({
+            local params = {
                 Amount = 1,
-                Source = "Burn",
+                Source = "Burn" :: "Burn",
                 Attacker = info.Attacker,
-            })
+            }
+            if target.Kind == "Participant" then
+                ItemKillHighlights(highlight1, highlight2)({Definition = {Name = "Flare Gun"}} :: Types.GunWeapon, target.Round, target, params)
+            end
+            (target :: Types.MapProp):TryTakeDamage(params)
         end
     end
 end
@@ -213,7 +232,8 @@ local item: Types.GunWeaponDefinition = {
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
-    BeforeHitParticipant = function(_, _, target: Types.Participant, params: Types.DamageParams): boolean
+    BeforeHitParticipant = function(item, round, target: Types.Participant, params: Types.DamageParams): boolean
+        ItemKillHighlights(highlight1, highlight2)(item, round, target, params)
         local attacker = params.Attacker
         assert(attacker)
         burn(attacker, target)
