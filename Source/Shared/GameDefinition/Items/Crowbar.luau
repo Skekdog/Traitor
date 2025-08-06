@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -37,6 +38,18 @@ local item: Types.MeleeWeaponDefinition = {
     Damage = 20,
     AttackInterval = 0.3,
     AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar,
+
+	BeforeHitParticipant = ItemKillHighlights({
+		Title = "Thunk Thunk Thunk",
+		Description = "%s has a mean swing with the crowbar, as %d victims found out.",
+		Priority = 2,
+		Threshold = 2,
+	}, {
+		Title = "Freeman",
+		Description = "%s covered their crowbar in the brains of no less than %d people.",
+		Priority = 4,
+		Threshold = 4,
+	}),
 
     AlternateFireServer = function(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
         local char = attacker:GetCharacter()
