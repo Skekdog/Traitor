@@ -502,6 +502,21 @@ guns["Assault Rifle"] = {
 
     RecoilX = 0.6,
     RecoilY = 1.5,
+
+    BeforeHitParticipant = ItemKillHighlights(
+        {
+            Title = "Putt Putt Putt",
+            Description = "%s picked off %d people with the M4A1.",
+            Priority = 1,
+            Threshold = 2,
+        },
+        {
+            Title = "Mid-range Madness",
+            Description = "%s knows how to take down targets with the M4A1, scoring %d kills.",
+            Priority = 3,
+            Threshold = 4,
+        }
+    ),
 }
 
 guns["Silenced Pistol"] = {
