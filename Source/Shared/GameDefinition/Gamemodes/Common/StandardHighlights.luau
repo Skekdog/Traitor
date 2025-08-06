@@ -78,6 +78,28 @@ local pyrrhicVictory = {
 	Priority = 1,
 }
 
+local burn1 = {
+	Title = "Like Grandma Used To Make Them",
+	Description = "%s fried several people to a nice crisp.",
+	Priority = 2,
+}
+
+local burn2 = {
+	Title = "Pyroid",
+	Description = "%s was heard cackling loudly after burning one of their many victims.",
+	Priority = 4,
+}
+
+local burn3 = {
+	Title = "Pyrrhic Burnery",
+	Description = "%s burned them all, but is now all out of incendiary grenades! How will they cope!?",
+	Priority = 5,
+}
+
+local BURN_1_THRESHOLD = 2
+local BURN_2_THRESHOLD = 4
+local BURN_3_THRESHOLD = 6
+
 local HATE_THRESHOLD = 1
 local PYRRHIC_THRESHOLD = 1
 
@@ -126,6 +148,19 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, pushKillHighlight, attacker)
 		elseif not attacker then
 			addHighlight(round, fellHighlight, victim)
+		end
+	end
+
+	if corpse.CorpseView.DamageSource == "Burn" and attacker then
+		attacker.Extras.BurnKills = (attacker.Extras.BurnKills or 0) + 1
+		local kills = attacker.Extras.BurnKills
+
+		if kills == BURN_1_THRESHOLD then
+			addHighlight(round, burn1, attacker)
+		elseif kills == BURN_2_THRESHOLD then
+			addHighlight(round, burn2, attacker)
+		elseif kills == BURN_3_THRESHOLD then
+			addHighlight(round, burn3, attacker)
 		end
 	end
 
