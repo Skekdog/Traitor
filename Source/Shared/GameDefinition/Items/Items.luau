@@ -528,7 +528,22 @@ guns["Silenced Pistol"] = {
     Projectile = projectiles("SilencedBullet"),
     ProjectileSpeed = 100,
 
-    BeforeHitParticipant = function(_, _, victim: Types.Participant, params: Types.DamageParams): boolean
+    BeforeHitParticipant = function(item, round, victim: Types.Participant, params: Types.DamageParams): boolean
+        ItemKillHighlights(
+            {
+            Title = "Be Quiet",
+            Description = "%s shut %d people up with the silenced pistol.",
+            Priority = 2,
+            Threshold = 2,
+            },
+            {
+                Title = "Silenced Assassin",
+                Description = "%s killed %d people who did not hear themselves die.",
+                Priority = 4,
+                Threshold = 4,
+            }
+        )(item, round, victim, params)
+
         local willDie = params.Amount >= victim:GetHealth()
         if not willDie then
             return true
