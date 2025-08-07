@@ -14,6 +14,12 @@ local MAX_SHOOTER_DISTANCE = 15
 local MAX_TARGET_DISTANCE = 10
 local STATIC_OBSCURE_DISTANCE = 0.05
 
+local NEAR_MISS_RADIUS = 0.5 -- note this is a RADIUS, so it gets doubled when used
+local NEAR_MISS_SD_DURATION = 5
+
+local nearMissSound = Instance.new("Sound")
+nearMissSound.SoundId = "rbxassetid://98905989782853"
+
 local function isOf(part: BasePart, name: string, match: boolean?): boolean?
 	local accessoryWeld = part:FindFirstChild("AccessoryWeld") :: Weld
 	if accessoryWeld and accessoryWeld.Part1 and accessoryWeld.Part1.Name == name then
@@ -296,6 +302,38 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
     end
 end
 
+local nearMissOverlapParams = OverlapParams.new()
+nearMissOverlapParams.FilterDescendantsInstances = {workspace.Characters}
+nearMissOverlapParams.FilterType = Enum.RaycastFilterType.Include
+
+-- I think it makes more sense to do this on the server than on the client?
+-- I'm not honestly sure though
+local function applyNearMissSelfDefense(origin: Vector3, destination: Vector3, attacker: Types.Participant): ()
+	local round = attacker.Round
+
+	local processed: {[Model]: true?} = {}
+	for _, part in workspace:GetPartBoundsInBox(CFrame.new(origin, destination), Vector3.one * NEAR_MISS_RADIUS * 2, nearMissOverlapParams) do
+		local model = part:FindFirstAncestorOfClass("Model")
+		if not model or processed[model] then
+			continue
+		end
+
+		processed[model] = true
+
+		local target = round:GetParticipant(model)
+		if not target or target == attacker then
+			continue
+		end
+
+		target:AddSelfDefenseEntry({
+			Against = attacker,
+			Duration = NEAR_MISS_SD_DURATION,
+		})
+
+		PlaySound(nearMissSound, nil, part, nil, target.Player)
+	end
+end
+
 function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
 	local item = by:GetEquippedItem()
 	if not item or item.Definition.Name ~= request.ItemName then
@@ -341,6 +379,10 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			local validateRaycastResult = validatePrimaryFire(item, by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)
 			if validateRaycastResult ~= "Success" then
 				return validateRaycastResult :: CombatTypes.ValidatePrimaryFire
+			end
+
+			if item.Kind == "Gun" then
+				applyNearMissSelfDefense(request.Origin, v.Destination, by)
 			end
 
 			if item.Kind ~= "Item" and item.Kind ~= "Grenade" and v.HitPart then
