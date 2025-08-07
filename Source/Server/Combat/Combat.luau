@@ -19,6 +19,7 @@ local NEAR_MISS_SD_DURATION = 5
 
 local nearMissSound = Instance.new("Sound")
 nearMissSound.SoundId = "rbxassetid://98905989782853"
+nearMissSound.Parent = ReplicatedStorage.Assets
 
 local function isOf(part: BasePart, name: string, match: boolean?): boolean?
 	local accessoryWeld = part:FindFirstChild("AccessoryWeld") :: Weld
