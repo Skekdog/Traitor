@@ -37,11 +37,33 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 
 		model:Destroy()
 
-		otherParticipant:TryTakeDamage({
+		local params = {
 			Amount = DAMAGE,
 			Attacker = attacker,
 			Source = item,
-		})
+		}
+
+		ItemKillHighlights(
+			{
+				Title = "Knife Knowing You",
+				Description = "%s stabbed someone in the face over the internet.",
+				Priority = 2,
+				Threshold = 1,
+			},
+			{
+				Title = "Such A Knife Man",
+				Description = "%s found %d knives lying around, and made use of them.",
+				Priority = 4,
+				Threshold = 2,
+			},
+			{
+				Title = "World's Knifest Man",
+				Description = "%s killed %d people with a knife. Don't ask me how.",
+				Priority = 6,
+				Threshold = 4,
+			}
+		)(item, attacker.Round, otherParticipant, params)
+		otherParticipant:TryTakeDamage(params)
 	end)
 
 	attacker:RemoveItem(item)
