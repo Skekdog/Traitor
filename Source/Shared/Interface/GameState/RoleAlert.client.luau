@@ -20,6 +20,7 @@ participant.Role:Connect(function(role)
 	lastRole = role.Definition.Name
 	PlaySound(role.Definition.Sound, nil, nil, {SoundGroup = SoundService.RoleReveals :: SoundGroup})
 	
+	UI.Frame.UIGradient.Color = ColorSequence.new(role.Definition.Color, Color3.new(1, 1, 1))
 	UI:FindFirstChild("HintLabel").Text = role.Definition.Description
 	UI:FindFirstChild("RoleLabel").Text = GetDisplayName(role.Definition)
 	UI:FindFirstChild("RoleLabel").TextColor3 = role.Definition.Color
