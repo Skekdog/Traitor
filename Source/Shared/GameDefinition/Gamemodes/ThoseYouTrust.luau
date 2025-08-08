@@ -544,7 +544,7 @@ local gamemode: Types.GamemodeDefinition = {
 		if awardDeadliestAmongEquals then
 			round:AddHighlight({
 				Title = "Deadliest Among Equals",
-				Description = awardDeadliestAmongEquals:GetFormattedName() .. "was responsible for every traitor death made by the innocents this round.",
+				Description = awardDeadliestAmongEquals:GetFormattedName() .. " was responsible for every traitor death made by the innocents this round.",
 				Priority = 2,
 				Group = "Innocent Correct Kills",
 			})
