@@ -388,7 +388,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 				return validateRaycastResult :: CombatTypes.ValidatePrimaryFire
 			end
 
-			if item.Kind == "Gun" then
+			if item.Kind == "Gun" and not item.Definition.IsSilent then
 				applyNearMissSelfDefense(request.Origin, v.Destination, by)
 			end
 
