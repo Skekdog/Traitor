@@ -5,6 +5,7 @@ local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local GetItemDefinition = require(ReplicatedStorage.Shared.LocalState.GetItemDefinition)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
@@ -106,6 +107,11 @@ confirmDeathButton.Activated:Connect(function()
     ReplicatedStorage.Remotes.ClientServer.ConfirmDeath:FireServer(corpseName)
 end)
 
+local callRoleButton = corpseUi.Object.Actions.CallRole
+callRoleButton.Activated:Connect(function()
+    ReplicatedStorage.Remotes.ClientServer.CallRole:FireServer(corpseName)
+end)
+
 return function(corpseInfo: Types.CorpseView?)
     if not corpseInfo then
         return
@@ -117,10 +123,21 @@ return function(corpseInfo: Types.CorpseView?)
         end
     end
 
+    local ownParticipant = LocalParticipantInfo.GetParticipant()
+
     corpseName = corpseInfo.Name
     local participant = LocalParticipantInfo.GetParticipant(corpseName)
 
-    confirmDeathButton.Visible = participant.Status() == "Missing" and LocalParticipantInfo.GetParticipant().Status() == "Alive"
+    confirmDeathButton.Visible = participant.Status() == "Missing" and ownParticipant.Status() == "Alive"
+
+    local gamemode = LocalRoundInfo.Gamemode()
+
+    local callRoleVisible = false -- sadly trying to set directly with these conditions is a type error. idk if its a valid type error, lua(u)'s "and" system is weird.
+    if gamemode and gamemode.RoleCanCallToCorpse and participant.Status() == "Dead" and ownParticipant.Status() == "Alive" and ownParticipant.Role().Definition ~= gamemode.RoleCanCallToCorpse then
+        callRoleVisible = true
+    end
+
+    callRoleButton.Visible = callRoleVisible
 
     information.Text = "Click on an icon to reveal detailed information."
 

@@ -7,6 +7,7 @@ local ThemesManager = require(script.Parent.UILib.ThemesManager)
 ThemesManager.UpdateTheme("Dark")
 
 require(script.Parent.Welcome)
+require(script.Parent.GameState.CalledToCorpse)
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
 

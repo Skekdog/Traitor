@@ -325,4 +325,27 @@ remotes.ClientServer.ConfirmDeath.OnServerEvent:Connect(function(player: Player,
     corpse:SearchAsAlive(participant, false)
 end)
 
+remotes.ClientServer.CallRole.OnServerEvent:Connect(function(player: Player, corpseName: unknown): ()
+    if typeof(corpseName) ~= "string" then
+        return
+    end
+
+    local participant = module.Round():GetParticipant(player.Name)
+    if not participant or not participant:IsAlive() then
+        return
+    end
+
+    local otherParticipant = module.Round():GetParticipant(corpseName)
+    if not otherParticipant then
+        return
+    end
+
+    local corpse = otherParticipant.Corpse
+    if not corpse then
+        return
+    end
+
+    corpse:CallRole(participant)
+end)
+
 return module
