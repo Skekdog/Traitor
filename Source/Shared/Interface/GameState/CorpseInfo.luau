@@ -99,6 +99,13 @@ for _, v in object:GetChildren() do
     end
 end
 
+local corpseName: string
+
+local confirmDeathButton = corpseUi.Object.Actions.ConfirmDeath
+confirmDeathButton.Activated:Connect(function()
+    ReplicatedStorage.Remotes.ClientServer.ConfirmDeath:FireServer(corpseName)
+end)
+
 return function(corpseInfo: Types.CorpseView?)
     if not corpseInfo then
         return
@@ -109,6 +116,11 @@ return function(corpseInfo: Types.CorpseView?)
             v:Destroy()
         end
     end
+
+    corpseName = corpseInfo.Name
+    local participant = LocalParticipantInfo.GetParticipant(corpseName)
+
+    confirmDeathButton.Visible = participant.Status() == "Missing" and LocalParticipantInfo.GetParticipant().Status() == "Alive"
 
     information.Text = "Click on an icon to reveal detailed information."
 
@@ -186,16 +198,15 @@ return function(corpseInfo: Types.CorpseView?)
         end)
     end
 
-    local name = corpseInfo.Name
-    local role = LocalParticipantInfo.GetParticipant(name).Role()
+    local role = participant.Role()
 
     if role ~= Defaults.Role then
-        corpseUi.Object.TitleBar.Title.Text = `{role:FormatString(`@{name}'s`)} Corpse | {role:GetFormattedName()}`
+        corpseUi.Object.TitleBar.Title.Text = `{role:FormatString(`@{corpseName}'s`)} Corpse | {role:GetFormattedName()}`
         local determiner = StringWithDeterminer(GetDisplayName(role.Definition)):split(" ")[1]
-        object.Avatar:SetAttribute("Description", `This is the body of {role:FormatString(name)}. They were {determiner} {role:GetFormattedName()}.`)
+        object.Avatar:SetAttribute("Description", `This is the body of {role:FormatString(corpseName)}. They were {determiner} {role:GetFormattedName()}.`)
     else
-        corpseUi.Object.TitleBar.Title.Text = `@{name}'s Corpse`
-        object.Avatar:SetAttribute("Description", `This is the body of {name}.`)
+        corpseUi.Object.TitleBar.Title.Text = `@{corpseName}'s Corpse`
+        object.Avatar:SetAttribute("Description", `This is the body of {corpseName}.`)
     end
 
     task.defer(function()
