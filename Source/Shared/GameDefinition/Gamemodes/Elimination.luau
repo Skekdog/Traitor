@@ -63,8 +63,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         Allegiance = {Kind = "Solo"},
 
-        VictoryText = "Everyone is dead!",
-
         StartingItems = {Items.Radar},
         StartingCredits = 1,
 
@@ -128,6 +126,13 @@ local gamemode: Types.GamemodeDefinition = {
         for _, v in participants do
             v:SetRole(roles.Competitor)
         end
+    end,
+
+    GetVictoryEventText = function(gamemode: Types.GamemodeDefinition, round: Types.Round, victor: Types.Victor, isTimeout: boolean): string?
+        if isTimeout then
+            return "The time has run out and the player with the highest score has won."
+        end
+        return if victor.Kind == "Participant" then victor:GetFormattedName() .. " has won the round!" else nil
     end,
 
     EnableFriendlyFire = true,

@@ -63,8 +63,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 		IsExclamatory = true,
 		Allegiance = {Kind = "Role", Role = "Traitor"},
 
-		VictoryText = "The dastardly Traitors have won the round!",
-
 		ShouldAnnounceDisconnect = true,
 		CanStealCreditsFromCorpses = true,
 		
@@ -111,7 +109,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Sound = "rbxassetid://9042819926",
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
-		VictoryText = "The lovable Innocents have won the round!",
 
 		Allies = {"Innocent", "Detective"},
 		RevealedRoles = {"Detective"},
@@ -175,6 +172,27 @@ local function assignRoles(gamemode: Types.GamemodeDefinition, participants: {Ty
 			v:SetRole(roles.Innocent)
 		end
 	end
+end
+
+local function getVictoryEventText(gamemode: Types.GamemodeDefinition, round: Types.Round, victor: Types.Victor, isTimeout: boolean): string?
+	if victor.Kind == "Participant" then
+		return nil
+	end
+
+	local traitorRole = round:GetRoleFromRoleName("Traitor")
+	local innocentRole = round:GetRoleFromRoleName("Innocent")
+
+	if isTimeout then
+		return "The " .. traitorRole:FormatString("Traitors") .. " have ran out of time and so the lovable " .. innocentRole:FormatString("Innocents") .. " have won the round!"
+	end
+
+	if victor.Definition == roles.Traitor then
+		return "The dastardly " .. traitorRole:FormatString("Traitors") .. " have won the round!"
+	elseif victor.Definition == roles.Innocent then
+		return "The lovable " .. innocentRole:FormatString("Innocents") .. " have won the round!"
+	end
+
+	return nil
 end
 
 local function awardScoreForKill(attacker: Types.Participant, victim: Types.Participant): ()
@@ -430,6 +448,7 @@ local gamemode: Types.GamemodeDefinition = {
 	RoleCanCallToCorpse = roles.Detective,
 
 	GetRoundEndMusic = getVictoryMusic,
+	GetVictoryEventText = getVictoryEventText,
 
 	EnableFriendlyFire = true,
 	EnableKarma = true,
