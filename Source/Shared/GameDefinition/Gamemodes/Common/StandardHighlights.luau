@@ -357,11 +357,11 @@ module.OnIdentifyCorpse = function(gamemode: Types.Gamemode, corpse: Types.Corps
 	local bodies = searcher.Extras.IdentifiedBodies
 
 	if bodies >= BODIES_3_THRESHOLD then
-		addHighlight(round, bodies3, searcher)
+		addHighlight(round, bodies3, searcher, bodies)
 	elseif bodies == BODIES_2_THRESHOLD then
-		addHighlight(round, bodies2, searcher)
+		addHighlight(round, bodies2, searcher, bodies)
 	elseif bodies == BODIES_1_THRESHOLD then
-		addHighlight(round, bodies1, searcher)
+		addHighlight(round, bodies1, searcher, bodies)
 	end
 end
 
