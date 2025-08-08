@@ -512,7 +512,7 @@ local gamemode: Types.Gamemode = {
 		if awardLoneWolf then
 			round:AddHighlight({
 				Title = "Lone Wolf",
-				Description = awardLoneWolf:GetFormattedName() .. " was responsible for every innocent death made by a traitor this round",
+				Description = awardLoneWolf:GetFormattedName() .. " was responsible for every innocent death made by a traitor this round.",
 				Priority = 2,
 				Group = "Traitor Correct Kills",
 			})
