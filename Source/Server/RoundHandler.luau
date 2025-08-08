@@ -279,11 +279,8 @@ remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown,
     end
 
     local participant = module.Round():GetParticipant(plr.Name)
-    if not participant then
-        return nil
-    end
 
-    if participant:GetStatus() == "Alive" and not body:IsA("Model") then
+    if participant and participant:GetStatus() == "Alive" and not body:IsA("Model") then
         return nil -- if alive then we need to find a body to view corpse info. Spectators don't need to do that
     end
 
@@ -297,7 +294,7 @@ remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown,
         return nil
     end
 
-    local success = corpse:Search(participant, covert)
+    local success = corpse:Search(participant, covert, if not participant then plr else nil)
     if success then
         return corpse.CorpseView
     end
