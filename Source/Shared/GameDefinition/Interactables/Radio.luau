@@ -150,7 +150,7 @@ local function addSoundsFromMap(map: Types.Map): ()
 	end
 end
 
-local function addSoundsFromGamemode(gamemode: Types.Gamemode): ()
+local function addSoundsFromGamemode(gamemode: Types.GamemodeDefinition): ()
 	for _, v in gamemode.AvailableItems do
 		if v.Kind == "Gun" and v.AttackSound then
 			addSound(v.AttackSound, nil, gamemode.Name)
@@ -206,7 +206,7 @@ end
 if RunService:IsClient() then
 	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
-	local lastGamemode: Types.Gamemode?
+	local lastGamemode: Types.GamemodeDefinition?
 	local lastMap: Types.Map?
 
 	LocalRoundInfo.Gamemode:Connect(function(gamemode)
@@ -237,7 +237,7 @@ local activeRadios: {Radio} = {}
 if RunService:IsServer() then
 	local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 
-	local lastGamemode: Types.Gamemode?
+	local lastGamemode: Types.GamemodeDefinition?
 	local lastMap: Types.Map?
 
 	remote.OnServerEvent:Connect(function(player, soundName: unknown): ()

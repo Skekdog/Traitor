@@ -17,7 +17,7 @@ type Event = {
     WasCorrectKill: boolean?,
 }
 
-module.Gamemode = DynamicValue.new(nil :: Types.Gamemode?)
+module.Gamemode = DynamicValue.new(nil :: Types.GamemodeDefinition?)
 InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connect(function(name: string?)
     if not name then
         module.Gamemode:SetValue()

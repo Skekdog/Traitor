@@ -55,7 +55,7 @@ local roundCount = -1
 local MAP_VOTE_INTERVAL = 3
 local INTERMISSION_TIME = 15
 
-local gamemodes: {Types.Gamemode} = {}
+local gamemodes: {Types.GamemodeDefinition} = {}
 for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
     if not v:IsA("ModuleScript") then
         continue
@@ -68,7 +68,7 @@ end
 
 local module = {}
 
-local forcedGamemode = nil :: Types.Gamemode?
+local forcedGamemode = nil :: Types.GamemodeDefinition?
 
 function module.TrySetForcedGamemode(gamemode: string?): boolean
     if not gamemode then
@@ -76,7 +76,7 @@ function module.TrySetForcedGamemode(gamemode: string?): boolean
         return true
     end
 
-    local found: Types.Gamemode?
+    local found: Types.GamemodeDefinition?
     for _, v in gamemodes do
         if v.Name == gamemode then
             found = v
@@ -92,7 +92,7 @@ function module.TrySetForcedGamemode(gamemode: string?): boolean
     return true
 end
 
-local function pickNextGamemode(): Types.Gamemode
+local function pickNextGamemode(): Types.GamemodeDefinition
     if forcedGamemode then
         return forcedGamemode
     end

@@ -113,7 +113,7 @@ local function tryEndRound(round: Types.Round): ()
     end
 end
 
-local gamemode: Types.Gamemode = {
+local gamemode: Types.GamemodeDefinition = {
     Name = "Elimination",
     Description = "Last player standing wins",
 
@@ -124,7 +124,7 @@ local gamemode: Types.Gamemode = {
     TimeoutVictor = getBestParticipant,
     GetRoundEndMusic = getVictoryMusic,
 
-    AssignRoles = function(gamemode: Types.Gamemode, participants: {Types.Participant})
+    AssignRoles = function(gamemode: Types.GamemodeDefinition, participants: {Types.Participant})
         for _, v in participants do
             v:SetRole(roles.Competitor)
         end
@@ -163,7 +163,7 @@ local gamemode: Types.Gamemode = {
 		"rbxassetid://9125652675"
 	},
 
-    OnDeath = function(gamemode: Types.Gamemode, participant: Types.Participant, deferVictoryCheck: boolean)
+    OnDeath = function(gamemode: Types.GamemodeDefinition, participant: Types.Participant, deferVictoryCheck: boolean)
         StandardHighlights.OnDeath(gamemode, participant, deferVictoryCheck)
 
         local corpse = participant.Corpse

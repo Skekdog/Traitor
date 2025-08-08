@@ -163,7 +163,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 }
 
 local EXTRA_BETWEEN = vector.create(6, 8)
-local function assignRoles(gamemode: Types.Gamemode, participants: {Types.Participant}): ()
+local function assignRoles(gamemode: Types.GamemodeDefinition, participants: {Types.Participant}): ()
 	local numDetectives = if #participants >= EXTRA_BETWEEN.x and #participants < EXTRA_BETWEEN.y then 1 else #participants // 8
 	local numTraitors = if #participants >= EXTRA_BETWEEN.x and #participants < EXTRA_BETWEEN.y then 2 else math.max(#participants // 4, 1)
 	for i, v in participants do
@@ -389,7 +389,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 	end
 end
 
-local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
+local function onDeath(gamemode: Types.GamemodeDefinition, victim: Types.Participant, deferVictoryCheck: boolean): ()
 	StandardHighlights.OnDeath(gamemode, victim, deferVictoryCheck)
 
 	local corpse = victim.Corpse
@@ -413,7 +413,7 @@ local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, defe
 	end
 end
 
-local gamemode: Types.Gamemode = {
+local gamemode: Types.GamemodeDefinition = {
 	Name = "ThoseYouTrust",
 	DisplayName = "Those You Trust",
 	Description = "Spy HQ has been infilitrated by Traitors. Can you separate those you trust, from those you shouldn't?",
@@ -423,7 +423,7 @@ local gamemode: Types.Gamemode = {
 
 	RequiredSlayVotes = 2,
 
-	TimeoutVictor = function(gamemode: Types.Gamemode, round: Types.Round): Types.Victor
+	TimeoutVictor = function(gamemode: Types.GamemodeDefinition, round: Types.Round): Types.Victor
 		return round:GetRoleFromRoleName("Innocent")
 	end,
 

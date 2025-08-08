@@ -348,9 +348,9 @@ module.OnDeath = function(_, victim)
 			addHighlight(round, pyrrhicVictory, victim)
 		end
 	end)
-end :: typeof((({} :: any) :: Types.Gamemode).OnDeath)
+end :: typeof((({} :: any) :: Types.GamemodeDefinition).OnDeath)
 
-module.OnIdentifyCorpse = function(gamemode: Types.Gamemode, corpse: Types.Corpse, searcher: Types.Participant)
+module.OnIdentifyCorpse = function(gamemode: Types.GamemodeDefinition, corpse: Types.Corpse, searcher: Types.Participant)
 	local round = searcher.Round
 
 	searcher.Extras.IdentifiedBodies = (searcher.Extras.IdentifiedBodies or 0) + 1
