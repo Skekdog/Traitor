@@ -126,8 +126,8 @@ local crush2 = {
 }
 
 local drown = {
-	Title = "Fish In Water",
-	Description = "%s thought they would say hello to the fish, but didn't plan their way out.",
+	Title = "Glub Glub Glub",
+	Description = "%s thought they would say hello to the fish. Unfortunately speaking is difficult under water.",
 	Priority = 1,
 	Group = "Drowning",
 }
