@@ -195,8 +195,13 @@ local gamemode: Types.Gamemode = {
     AddFinishHighlights = function(gamemode, round)
         local mostKillsAmount, mostKillsParticipant: Types.Participant? = 0, nil
         for _, v in round:GetParticipants() do
-            if #v.KillList > mostKillsAmount then
-                mostKillsAmount = #v.KillList
+            local count = #v.KillList
+            if table.find(v.KillList, v) then
+                count -= 1
+            end
+
+            if count > mostKillsAmount then
+                mostKillsAmount = count
                 mostKillsParticipant = v
             end
         end
