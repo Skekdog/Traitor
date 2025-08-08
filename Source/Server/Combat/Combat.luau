@@ -14,7 +14,7 @@ local MAX_SHOOTER_DISTANCE = 15
 local MAX_TARGET_DISTANCE = 10
 local STATIC_OBSCURE_DISTANCE = 0.05
 
-local NEAR_MISS_RADIUS = 0.5 -- note this is a RADIUS, so it gets doubled when used
+local NEAR_MISS_RADIUS = 0.25 -- note this is a RADIUS, so it gets doubled when used
 local NEAR_MISS_SD_DURATION = 5
 
 local nearMissSound = Instance.new("Sound")
@@ -313,7 +313,13 @@ local function applyNearMissSelfDefense(origin: Vector3, destination: Vector3, a
 	local round = attacker.Round
 
 	local processed: {[Model]: true?} = {}
-	for _, part in workspace:GetPartBoundsInBox(CFrame.new(origin, destination), Vector3.one * NEAR_MISS_RADIUS * 2, nearMissOverlapParams) do
+
+	local length = (destination - origin).Magnitude
+	local cframe = CFrame.new(origin, destination) * CFrame.new(0, 0, -length / 2)
+
+	local size = Vector3.one * NEAR_MISS_RADIUS * 2 * Vector3.new(1, 1, length)
+
+	for _, part in workspace:GetPartBoundsInBox(cframe, size, nearMissOverlapParams) do
 		local model = part:FindFirstAncestorOfClass("Model")
 		if not model or processed[model] then
 			continue
