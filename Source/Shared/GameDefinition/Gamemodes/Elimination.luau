@@ -55,7 +55,7 @@ local roles: {[string]: Types.RoleDefinition} = {
     Competitor = {
         Kind = "RoleDefinition",
         Name = "Competitor",
-        Description = "It's you against the world. Kill them all.",
+        Description = "Free for all! Kill everyone.",
         Sound = "rbxassetid://9042088276",
         Color = Color3.fromRGB(255, 176, 7),
 
