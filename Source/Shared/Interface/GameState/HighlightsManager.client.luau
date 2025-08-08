@@ -134,6 +134,14 @@ local function setHighlights(): ()
 		return highlight1.Priority > highlight2.Priority --todo: i remember that something like this errored before, but i checked with lune and it didn't. see what's up, this might not work still.
 	end)
 
+	for _, v in highlightsPage.Highlights:GetChildren() do
+		if v.Name:sub(1, 9) == "Highlight" then
+			local frame = v :: typeof(highlightsPage.Highlights.Highlight1)
+			frame.Description.Text = ""
+			frame.Highlight.Text = ""
+		end
+	end
+
 	for i, highlight in highlights do
 		if i > 5 then
 			break
