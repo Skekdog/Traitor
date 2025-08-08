@@ -492,6 +492,10 @@ local gamemode: Types.GamemodeDefinition = {
 	OnDeath = onDeath,
 
 	OnIdentifyCorpse = function(gamemode, corpse, searcher)
+		if not searcher.Round:IsInProgress() then
+			return
+		end
+
 		StandardHighlights.OnIdentifyCorpse(gamemode, corpse, searcher)
 		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false, corpse.Model, corpse.Model and corpse.Model:FindFirstChildOfClass("Humanoid"), false)
 	end,
