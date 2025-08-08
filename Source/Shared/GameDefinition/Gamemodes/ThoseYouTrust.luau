@@ -368,6 +368,17 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 	round.Extras.AnyKillsHappened = true
 end
 
+local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corpse): ()
+	if not corpse.Model then
+		return
+	end
+
+	participant.Extras.CorpseDisguiseData = {
+		Participant = participant,
+	}
+	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, true, corpse.Model, corpse.Model:FindFirstChildOfClass("Humanoid"), false)
+end
+
 local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
 	StandardHighlights.OnDeath(gamemode, victim, deferVictoryCheck)
 
@@ -375,10 +386,7 @@ local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, defe
 
 	if corpse then
 		if corpse.Model then
-			victim.Extras.CorpseDisguiseData = {
-				Participant = victim,
-			}
-			Disguiser.DisguiseServer(victim.Extras.CorpseDisguiseData, true, corpse.Model, corpse.Model:FindFirstChildOfClass("Humanoid"), true)
+			disguiseCorpse(victim, corpse)
 		end
 		local attacker = corpse.Killer
 
@@ -387,7 +395,7 @@ local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, defe
 			awardScoreForKill(attacker, victim)
 		end
 	end
-	
+
 	if deferVictoryCheck then
 		task.defer(tryEndRound, victim.Round)
 	else
@@ -456,7 +464,7 @@ local gamemode: Types.Gamemode = {
 
 	OnIdentifyCorpse = function(gamemode, corpse, searcher)
 		StandardHighlights.OnIdentifyCorpse(gamemode, corpse, searcher)
-		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false, corpse.Model, corpse.Model and corpse.Model:FindFirstChildOfClass("Humanoid"), true)
+		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false, corpse.Model, corpse.Model and corpse.Model:FindFirstChildOfClass("Humanoid"), false)
 	end,
 
 	AddFinishHighlights = function(gamemode, round)

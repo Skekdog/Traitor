@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
+local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -73,6 +74,10 @@ function module.DisguiseServer(participantData: ParticipantData, enable: boolean
 					motor.Part0 = hand
 				end
 			end
+		end
+
+		for _, v in char:GetDescendants() do
+			Participant.OnCharacterPartAdded(v)
 		end
 	end)
 
