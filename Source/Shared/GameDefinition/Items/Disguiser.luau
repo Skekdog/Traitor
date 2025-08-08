@@ -42,7 +42,7 @@ end
 
 local clientDisguiseActive = false
 
-function module.DisguiseServer(participantData: ParticipantData, enable: boolean?): ()
+function module.DisguiseServer(participantData: ParticipantData, enable: boolean?, char: Model?, hum: Humanoid?, applyReset: boolean?): ()
 	local participant = participantData.Participant
 
 	-- this is to prevent an error in studio when stopping the game.
@@ -53,12 +53,12 @@ function module.DisguiseServer(participantData: ParticipantData, enable: boolean
 	enable = if enable == nil then not participant.Player:GetAttribute("IsDisguised") else enable
 	participant.Player:SetAttribute("IsDisguised", enable)
 
-	local hum = participant:GetHumanoid()
+	hum = hum or participant:GetHumanoid()
 	if not hum then
 		return
 	end
 
-	local char = participant:GetCharacter()
+	char = char or participant:GetCharacter()
 	if not char then
 		return
 	end
@@ -81,9 +81,17 @@ function module.DisguiseServer(participantData: ParticipantData, enable: boolean
 			-- We only set it once. This is because if a player spams the disguiser, they will end up with the description just being the disguise description. Bad!
 			participantData.HumanoidDescription = hum:GetAppliedDescription()
 		end
-		hum:ApplyDescription(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+		if applyReset then
+			hum:ApplyDescriptionReset(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+		else
+			hum:ApplyDescription(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+		end
 	elseif participantData.HumanoidDescription then
-		hum:ApplyDescription(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
+		if applyReset then
+			hum:ApplyDescriptionReset(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
+		else
+			hum:ApplyDescription(participantData.HumanoidDescription, Enum.AssetTypeVerification.Always)
+		end
 	end
 end
 

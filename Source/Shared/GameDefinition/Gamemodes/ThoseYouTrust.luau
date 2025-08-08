@@ -371,14 +371,15 @@ end
 local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
 	StandardHighlights.OnDeath(gamemode, victim, deferVictoryCheck)
 
-	victim.Extras.CorpseDisguiseData = {
-		Participant = victim,
-	}
-	Disguiser.DisguiseServer(victim.Extras.CorpseDisguiseData, true)
-
 	local corpse = victim.Corpse
 
 	if corpse then
+		if corpse.Model then
+			victim.Extras.CorpseDisguiseData = {
+				Participant = victim,
+			}
+			Disguiser.DisguiseServer(victim.Extras.CorpseDisguiseData, true, corpse.Model, corpse.Model:FindFirstChildOfClass("Humanoid"), true)
+		end
 		local attacker = corpse.Killer
 
 		if attacker then
@@ -455,7 +456,7 @@ local gamemode: Types.Gamemode = {
 
 	OnIdentifyCorpse = function(gamemode, corpse, searcher)
 		StandardHighlights.OnIdentifyCorpse(gamemode, corpse, searcher)
-		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false)
+		Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false, corpse.Model, corpse.Model and corpse.Model:FindFirstChildOfClass("Humanoid"), true)
 	end,
 
 	AddFinishHighlights = function(gamemode, round)
