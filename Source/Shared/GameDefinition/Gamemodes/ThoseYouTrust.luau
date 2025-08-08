@@ -373,10 +373,16 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 		return
 	end
 
+	local hum = corpse.Model:FindFirstChildOfClass("Humanoid")
+
 	participant.Extras.CorpseDisguiseData = {
 		Participant = participant,
 	}
-	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, true, corpse.Model, corpse.Model:FindFirstChildOfClass("Humanoid"), false)
+	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, true, corpse.Model, hum, false)
+
+	if hum then
+		hum:RemoveAccessories()
+	end
 end
 
 local function onDeath(gamemode: Types.Gamemode, victim: Types.Participant, deferVictoryCheck: boolean): ()
