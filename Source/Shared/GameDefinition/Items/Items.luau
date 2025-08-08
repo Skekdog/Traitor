@@ -558,39 +558,21 @@ guns["Silenced Pistol"] = {
     Projectile = projectiles("SilencedBullet"),
     ProjectileSpeed = 100,
 
-    BeforeHitParticipant = function(item, round, victim: Types.Participant, params: Types.DamageParams): boolean
-        ItemKillHighlights(
-            {
+    IsSilent = true,
+    BeforeHitParticipant = ItemKillHighlights(
+        {
             Title = "Be Quiet",
             Description = "%s shut %d people up with the silenced pistol.",
             Priority = 2,
             Threshold = 2,
-            },
-            {
-                Title = "Silenced Assassin",
-                Description = "%s killed %d people who did not hear themselves die.",
-                Priority = 4,
-                Threshold = 4,
-            }
-        )(item, round, victim, params)
-
-        local willDie = params.Amount >= victim:GetHealth()
-        if not willDie then
-            return true
-        end
-
-        local root = assert(victim:GetCharacter(), "Participant has no character").PrimaryPart
-        if not root then
-            return true
-        end
-
-        local deathSound = root:FindFirstChild("DeathSound")
-        if deathSound and deathSound:IsA("Sound") then
-            deathSound.Volume = 0
-        end
-
-        return true
-    end,
+        },
+        {
+            Title = "Silenced Assassin",
+            Description = "%s killed %d people who did not hear themselves die.",
+            Priority = 4,
+            Threshold = 4,
+        }
+    ),
 
     RecoilX = 0.2,
     RecoilY = 1.0,
