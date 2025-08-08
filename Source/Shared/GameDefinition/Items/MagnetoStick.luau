@@ -627,7 +627,7 @@ local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function()
 	params.RespectCanCollide = true
 
 	local centreRay = GetCentreRay(ALIGNMENT_DEPTH)
-	local result = workspace:Raycast(centreRay.Origin, centreRay.Direction.Unit * ALIGNMENT_DEPTH, params)
+	local result = workspace:Raycast(GetCentreRay(0).Origin, centreRay.Direction * ALIGNMENT_DEPTH, params)
 	
 	local targetPosition = if result then result.Position else centreRay.Origin
 	currentGrabClient.Position = targetPosition
