@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
 local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
@@ -9,6 +10,7 @@ local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local Visualiser = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Visualiser)
 local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Disguiser)
+local MakeRagdoll = require(ReplicatedStorage.Shared.RoundRule.MakeRagdoll)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local CombineTable = require(ReplicatedStorage.Shared.Util.CombineTable)
 
@@ -390,20 +392,33 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 	round.Extras.AnyKillsHappened = true
 end
 
-local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corpse): ()
+local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corpse, enable: boolean): ()
 	if not corpse.Model then
 		return
 	end
 
 	local hum = corpse.Model:FindFirstChildOfClass("Humanoid")
 
-	participant.Extras.CorpseDisguiseData = {
-		Participant = participant,
-	}
-	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, true, corpse.Model, hum, false)
+	if enable then
+		participant.Extras.CorpseDisguiseData = {
+			Participant = participant,
+		}
+	end
 
-	if hum then
-		hum:RemoveAccessories()
+	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, enable, corpse.Model, hum, true)
+
+	local model = MakeRagdoll(participant, corpse.Model.Parent or error("No parent"), corpse.Model)
+	corpse.Model = model
+
+	if model then
+		model:SetAttribute("Unidentified", enable)
+		participant.Round:LoadProp(model, "CorpseProp")
+	end
+end
+
+local function onFinish(gamemode: Types.GamemodeDefinition, round: Types.Round): ()
+	for _, v in Players:GetPlayers() do
+		v:SetAttribute("IsDisguised", false)
 	end
 end
 
@@ -414,7 +429,7 @@ local function onDeath(gamemode: Types.GamemodeDefinition, victim: Types.Partici
 
 	if corpse then
 		if corpse.Model then
-			disguiseCorpse(victim, corpse)
+			disguiseCorpse(victim, corpse, true)
 		end
 		local attacker = corpse.Killer
 
@@ -498,7 +513,7 @@ local gamemode: Types.GamemodeDefinition = {
 		end
 
 		if corpse.Participant.Extras.CorpseDisguiseData then
-			Disguiser.DisguiseServer(corpse.Participant.Extras.CorpseDisguiseData, false, corpse.Model, corpse.Model and corpse.Model:FindFirstChildOfClass("Humanoid"), false)
+			disguiseCorpse(corpse.Participant, corpse, false)
 		end
 	end,
 
@@ -561,7 +576,9 @@ local gamemode: Types.GamemodeDefinition = {
 				Group = "Traitor Correct Kills",
 			})
 		end
-	end
+	end,
+
+	OnFinish = onFinish,
 }
 
 return gamemode
