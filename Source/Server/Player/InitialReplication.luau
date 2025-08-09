@@ -7,8 +7,8 @@ local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 local function replicateTo(player: Player): ()
 	local round = RoundHandler.GetRound()
 
-	if round.RoundEndMusic then
-		Replication.ReplicateRoundEndMusic(player, round.RoundEndMusic.Music, round.RoundEndMusic.StartedAt)
+	if round.VictoryData and round.VictoryData.Music then
+		Replication.ReplicateRoundEndMusic(player, round.VictoryData.Music, round.VictoryData.EndedAt)
 	end
 
 	for _, v in round:GetParticipants() do

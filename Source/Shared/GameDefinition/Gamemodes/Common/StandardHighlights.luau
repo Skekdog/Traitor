@@ -342,12 +342,6 @@ module.OnDeath = function(_, victim)
 	if round.ElapsedPhaseTime < HATE_THRESHOLD then
 		addHighlight(round, iHateThisGame, victim)
 	end
-
-	task.delay(PYRRHIC_THRESHOLD, function()
-		if round:IsPostGame() then
-			addHighlight(round, pyrrhicVictory, victim)
-		end
-	end)
 end :: typeof((({} :: any) :: Types.GamemodeDefinition).OnDeath)
 
 module.OnIdentifyCorpse = function(gamemode: Types.GamemodeDefinition, corpse: Types.Corpse, searcher: Types.Participant)
@@ -362,6 +356,28 @@ module.OnIdentifyCorpse = function(gamemode: Types.GamemodeDefinition, corpse: T
 		addHighlight(round, bodies2, searcher, bodies)
 	elseif bodies == BODIES_1_THRESHOLD then
 		addHighlight(round, bodies1, searcher, bodies)
+	end
+end
+
+module.FinishHighlights = function(gamemode: Types.GamemodeDefinition, round: Types.Round): ()
+	assert(round.VictoryData)
+
+	local events = round:GetEventLog()
+	for i = #events, 1, -1 do
+		local event = events[i]
+		if event.Data.Kind ~= "DeathRoundEvent" then
+			continue
+		end
+
+		local victim = event.Data.Victim
+
+		if victim ~= round.VictoryData.Victor and victim:GetRole() ~= round.VictoryData.Victor then
+			continue
+		end
+
+		if round.VictoryData.EndedAt - event.Timestamp < PYRRHIC_THRESHOLD then
+			addHighlight(round, pyrrhicVictory, victim)
+		end
 	end
 end
 
