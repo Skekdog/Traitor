@@ -399,10 +399,39 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 	local hum = corpse.Model:FindFirstChildOfClass("Humanoid")
 
+	local ropes: {[BasePart]: {{Constraint: RopeConstraint, Attachment0: Attachment}}} = {}
 	if enable then
 		participant.Extras.CorpseDisguiseData = {
 			Participant = participant,
 		}
+	else
+		for _, part in corpse.Model:GetChildren() do
+			if not part:IsA("BasePart") then
+				continue
+			end
+
+			local ropesFolder = part:FindFirstChild("MagnetoRopes")
+			if not ropesFolder then
+				continue
+			end
+
+			for _, constraint in ropesFolder:GetChildren() do
+				if not constraint:IsA("RopeConstraint") then
+					continue
+				end
+
+				local attachment = constraint.Attachment0
+				if not attachment then
+					continue
+				end
+
+				ropes[part] = ropes[part] or {}
+				table.insert(ropes[part], {
+					Constraint = constraint:Clone(),
+					Attachment0 = attachment:Clone(),
+				})
+			end
+		end
 	end
 
 	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, enable, corpse.Model, hum, true)
@@ -413,6 +442,25 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 	if model then
 		model:SetAttribute("Unidentified", enable)
 		participant.Round:LoadProp(model, "CorpseProp")
+
+		if not enable then
+			for part, constraints in ropes do
+				local newPart = model:FindFirstChild(part.Name)
+				if not newPart then
+					continue
+				end
+
+				local folder = newPart:FindFirstChild("MagnetoRopes") or Instance.new("Folder") :: Instance
+				folder.Name = "MagnetoRopes"
+				folder.Parent = newPart
+
+				for _, constraint in constraints do
+					constraint.Constraint.Attachment0 = constraint.Attachment0
+					constraint.Attachment0.Parent = newPart
+					constraint.Constraint.Parent = folder
+				end
+			end
+		end
 	end
 end
 
