@@ -77,7 +77,7 @@ function module.Climb(ladder: BasePart): ()
     end)
 
     local ladderHeight = ladder.Size.Y / 2
-    ladderAttachment.Position = Vector3.new(0, math.clamp(ladder.CFrame:PointToObjectSpace(root.Position).Y, -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight), 0)
+    ladderAttachment.Position = Vector3.new(0, math.clamp(ladder.CFrame:PointToObjectSpace(root.Position).Y, -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight), -1)
 
     local worldRot = ladderAttachment.WorldOrientation
     char:PivotTo(CFrame.new(char:GetPivot().Position) * CFrame.Angles(0, math.rad(worldRot.Y + 180), 0))
@@ -113,7 +113,7 @@ function module.Climb(ladder: BasePart): ()
             local lastY = ladderAttachment.Position.Y
 
             local speed = hum.WalkSpeed * CLIMB_SPEED_MULTIPLIER
-            ladderAttachment.Position = Vector3.new(0, math.clamp(lastY + (dt * speed * -math.sign(z)), -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight + MIN_LADDER_HEIGHT), 0)
+            ladderAttachment.Position = Vector3.new(0, math.clamp(lastY + (dt * speed * -math.sign(z)), -ladderHeight + MIN_LADDER_HEIGHT, ladderHeight + MIN_LADDER_HEIGHT), -1)
 
             if ladderAttachment.Position.Y >= ladderHeight + MIN_LADDER_HEIGHT or ladderAttachment.Position.Y <= -ladderHeight + MIN_LADDER_HEIGHT then
                 task.defer(module.StopClimbing) -- We can't stop the current thread because its the current thread, so defer it to stop
