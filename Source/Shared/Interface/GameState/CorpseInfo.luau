@@ -1,8 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local Mouse = require(script.Parent.Mouse)
 local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWithDeterminer)
 local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
 local GetItemDefinition = require(ReplicatedStorage.Shared.LocalState.GetItemDefinition)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
@@ -100,15 +103,35 @@ for _, v in object:GetChildren() do
     end
 end
 
+local corpseModel: Instance?
 local corpseName: string
+
+local function getDistanceToCorpse(): number
+    if not corpseModel or not corpseModel:IsA("Model") or not corpseModel.PrimaryPart then
+        return math.huge
+    end
+
+    local root = LocalCharacter.RootPart()
+    if not root then
+        return math.huge
+    end
+
+    return (root.Position - corpseModel.PrimaryPart.Position).Magnitude
+end
 
 local confirmDeathButton = corpseUi.Object.Actions.ConfirmDeath
 confirmDeathButton.Activated:Connect(function()
+    if getDistanceToCorpse() > Mouse.CorpseInteractDistance then
+        return ScreenMessage("Error", "You must be near the body to confirm death.")
+    end
     ReplicatedStorage.Remotes.ClientServer.ConfirmDeath:FireServer(corpseName)
 end)
 
 local callRoleButton = corpseUi.Object.Actions.CallRole
 callRoleButton.Activated:Connect(function()
+    if getDistanceToCorpse() > Mouse.CorpseInteractDistance then
+        return ScreenMessage("Error", "You must be near the body to call a role over.")
+    end
     ReplicatedStorage.Remotes.ClientServer.CallRole:FireServer(corpseName)
 end)
 
@@ -128,13 +151,16 @@ return function(corpseInfo: Types.CorpseView?)
     corpseName = corpseInfo.Name
     local participant = LocalParticipantInfo.GetParticipant(corpseName)
 
-    confirmDeathButton.Visible = participant.Status() == "Missing" and ownParticipant.Status() == "Alive"
+    corpseModel = workspace.Corpses:FindFirstChild(corpseName)
+    local withinRange = getDistanceToCorpse() <= Mouse.CorpseInteractDistance
+
+    confirmDeathButton.Visible = participant.Status() == "Missing" and ownParticipant.Status() == "Alive" and withinRange
 
     local gamemode = LocalRoundInfo.Gamemode()
 
     local callRoleVisible = false -- sadly trying to set directly with these conditions is a type error. idk if its a valid type error, lua(u)'s "and" system is weird.
     if gamemode and gamemode.RoleCanCallToCorpse and participant.Status() == "Dead" and ownParticipant.Status() == "Alive" and ownParticipant.Role().Definition ~= gamemode.RoleCanCallToCorpse then
-        callRoleVisible = true
+        callRoleVisible = withinRange
     end
 
     callRoleButton.Visible = callRoleVisible

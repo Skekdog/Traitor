@@ -322,6 +322,20 @@ remotes.ClientServer.ConfirmDeath.OnServerEvent:Connect(function(player: Player,
         return
     end
 
+    local searcherChar = participant:GetCharacter()
+    if not searcherChar or not searcherChar.PrimaryPart then
+        return
+    end
+
+    local corpseChar = corpse.Model
+    if not corpseChar or not corpseChar.PrimaryPart then
+        return
+    end
+
+    if (searcherChar.PrimaryPart.Position - corpseChar.PrimaryPart.Position).Magnitude > participant.CorpseSearchDistance then
+        return
+    end
+
     corpse:SearchAsAlive(participant, false)
 end)
 
@@ -342,6 +356,20 @@ remotes.ClientServer.CallRole.OnServerEvent:Connect(function(player: Player, cor
 
     local corpse = otherParticipant.Corpse
     if not corpse then
+        return
+    end
+
+    local searcherChar = participant:GetCharacter()
+    if not searcherChar or not searcherChar.PrimaryPart then
+        return
+    end
+
+    local corpseChar = corpse.Model
+    if not corpseChar or not corpseChar.PrimaryPart then
+        return
+    end
+
+    if (searcherChar.PrimaryPart.Position - corpseChar.PrimaryPart.Position).Magnitude > participant.CorpseSearchDistance then
         return
     end
 
