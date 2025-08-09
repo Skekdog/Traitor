@@ -503,6 +503,7 @@ local gamemode: Types.GamemodeDefinition = {
 	end,
 
 	AddFinishHighlights = function(gamemode, round)
+		StandardHighlights.FinishHighlights(gamemode, round)
 		local awardDeadliestAmongEquals: Types.Participant?
 		for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Traitor")) do
 			local corpse = v.Corpse

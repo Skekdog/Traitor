@@ -198,6 +198,7 @@ local gamemode: Types.GamemodeDefinition = {
     end,
 
     AddFinishHighlights = function(gamemode, round)
+        StandardHighlights.FinishHighlights(gamemode, round)
         local mostKillsAmount, mostKillsParticipant: Types.Participant? = 0, nil
         for _, v in round:GetParticipants() do
             local count = #v.KillList
@@ -208,6 +209,8 @@ local gamemode: Types.GamemodeDefinition = {
             if count > mostKillsAmount then
                 mostKillsAmount = count
                 mostKillsParticipant = v
+            elseif count == mostKillsAmount then
+                mostKillsParticipant = nil -- don't award if there is a tie
             end
         end
 
