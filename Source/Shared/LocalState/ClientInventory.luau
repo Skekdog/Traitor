@@ -126,8 +126,7 @@ local function canDrop(direction: Vector3): boolean
 		return false
 	end
 
-	local velocityModifier = head.AssemblyLinearVelocity:Dot(direction) / (16 * 3)
-    local startPosition = head.Position + (direction * 3) + (head.AssemblyLinearVelocity * velocityModifier)
+    local startPosition = head.Position + (direction * 5.5)
 	if isObscured(head.Position, startPosition) then
 		ShowAlert("There is no room to drop anything here!")
 		return false
