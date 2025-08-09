@@ -154,12 +154,13 @@ return function(corpseInfo: Types.CorpseView?)
     corpseModel = workspace.Corpses:FindFirstChild(corpseName)
     local withinRange = getDistanceToCorpse() <= Mouse.CorpseInteractDistance
 
-    confirmDeathButton.Visible = participant.Status() == "Missing" and ownParticipant.Status() == "Alive" and withinRange
+    local bodyIdentified = if corpseModel then not corpseModel:GetAttribute("Unidentified") else false
+    confirmDeathButton.Visible = not bodyIdentified and ownParticipant.Status() == "Alive" and withinRange
 
     local gamemode = LocalRoundInfo.Gamemode()
 
     local callRoleVisible = false -- sadly trying to set directly with these conditions is a type error. idk if its a valid type error, lua(u)'s "and" system is weird.
-    if gamemode and gamemode.RoleCanCallToCorpse and participant.Status() == "Dead" and ownParticipant.Status() == "Alive" and ownParticipant.Role().Definition ~= gamemode.RoleCanCallToCorpse then
+    if gamemode and gamemode.RoleCanCallToCorpse and bodyIdentified and ownParticipant.Status() == "Alive" and ownParticipant.Role().Definition ~= gamemode.RoleCanCallToCorpse then
         callRoleVisible = withinRange
     end
 
