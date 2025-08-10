@@ -90,9 +90,7 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 		value.Toggled = request.New
 	end
 
-	if definition.Callback then
-		task.spawn(definition.Callback :: SettingDefinitions.SettingCallback, name, value)
-	end
+	module.SetSetting(name, value)
 end
 
 function module.JSONEncode(): string
