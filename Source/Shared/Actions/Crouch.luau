@@ -37,6 +37,7 @@ function module.ToggleCrouching(enabled: boolean?): ()
 		hum.CameraOffset = Vector3.new(0, if isCrouching then -0.9 else 0, 0)
 		JumpPower.SetModifier("Crouching", not isCrouching)
 		hum:SetAttribute("IsCrouching", isCrouching)
+		ReplicatedStorage.Remotes.ClientServer.Crouch:FireServer(isCrouching)
 	end
 
 	if isCrouching then
