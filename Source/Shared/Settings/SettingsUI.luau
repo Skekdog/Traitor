@@ -144,7 +144,6 @@ local function setupBooleanButton(definition: SettingDefinitions.BooleanDefiniti
 
 	button.Activated:Connect(function()
 		setBooleanValue(button, definition, not Settings.GetSetting(definition.Name))
-		print(Settings.GetSetting(definition.Name))
 	end)
 
 	setBooleanButton(button, value)

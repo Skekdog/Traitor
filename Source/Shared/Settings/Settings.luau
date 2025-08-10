@@ -99,7 +99,6 @@ function module.JSONEncode(): string
 end
 
 function module.SaveSettings(): ()
-	print(settingValues)
 	assert(RunService:IsClient(), "SaveSettings should only be called from the client")
 	ReplicatedStorage.Remotes.ClientServer.SaveSettings:FireServer(module.JSONEncode())
 end
