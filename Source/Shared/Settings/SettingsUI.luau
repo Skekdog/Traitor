@@ -151,13 +151,13 @@ local function setupBooleanButton(definition: SettingDefinitions.BooleanDefiniti
 	return button
 end
 
-local function setChoiceButton(button: ChoiceButton, value: SettingDefinitions.ChoiceValue): ()
-	UIAnimation.TransitionUnderline(button.Choices.Underline, button)
+local function setChoiceButton(button: ChoiceButton, choiceButton: TextButton, value: SettingDefinitions.ChoiceValue): ()
+	UIAnimation.TransitionUnderline(button.Choices.Underline, choiceButton)
 end
 
 local function setChoiceValue(button: ChoiceButton, choiceButton: TextButton, definition: SettingDefinitions.ChoiceDefinition, value: SettingDefinitions.ChoiceValue): ()
 	Settings.SetSetting(definition.Name, value)
-	setChoiceButton(button, value)
+	setChoiceButton(button, choiceButton, value)
 end
 
 local function setupChoiceButton(definition: SettingDefinitions.ChoiceDefinition, value: SettingDefinitions.ChoiceValue): ChoiceButton
@@ -182,7 +182,7 @@ local function setupChoiceButton(definition: SettingDefinitions.ChoiceDefinition
 		but.Parent = button.Choices
 
 		if value == choice then
-			task.defer(setChoiceButton, button, value)
+			task.defer(setChoiceButton, button, but, value)
 		end
 	end
 
