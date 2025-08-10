@@ -49,7 +49,7 @@ end, true)
 local function getFloorMaterial(hum: Humanoid, root: BasePart): Enum.Material
 	local isAboveWater: boolean, waterPart: BasePart? = false, nil
 	if map then
-		isAboveWater, waterPart = IsAboveWater(map, root, 3)
+		isAboveWater, waterPart = IsAboveWater(map, root, 4)
 	end
 	return if isAboveWater and waterPart and not waterPart:IsA("Terrain") then Enum.Material.Water else hum.FloorMaterial
 end
