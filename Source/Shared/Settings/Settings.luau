@@ -26,7 +26,7 @@ export type ChoiceValue = SettingDefinitions.ChoiceValue
 export type ControlValue = SettingDefinitions.ControlValue
 export type SettingValue = SettingDefinitions.SettingValue
 
-module.SETTINGS_VERSION = 6
+module.SETTINGS_VERSION = 7
 module.LOADED = false
 
 local function yieldIfNotLoaded(): ()
