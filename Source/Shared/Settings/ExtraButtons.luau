@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SettingDefinitions = require(script.Parent.SettingDefinitions)
+local Settings = require(script.Parent.Settings)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local SafeTeleport = require(ReplicatedStorage.Shared.Util.SafeTeleport)
@@ -41,5 +43,17 @@ for _, v in ReplicatedStorage.Assets.Licenses:GetChildren() do
 		ui:ToggleVisible(true)
 	end)
 end
+
+SettingsUI.AddClickButton("Reset to Defaults", "Other", "Settings", "Resets all settings to their default values. Cannot be undone.", function()
+	ConfirmationPrompt("Are you sure you want to reset all settings to their defaults?", function(response: boolean): ()
+		if not response then
+			return
+		end
+
+		for _, v in SettingDefinitions do
+			Settings.SetSetting(v.Name, v.Default)
+		end
+	end)
+end)
 
 return nil
