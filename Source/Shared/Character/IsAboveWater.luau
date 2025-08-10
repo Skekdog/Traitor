@@ -12,7 +12,7 @@ local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): (
     -- The landed state often triggers really early so we do need to raycast quite far down. Testing on the Test map shows that -7.5 should suffice but I'll go -10 to be sure
     local result = workspace:Raycast(root.Position, Vector3.new(0, -distance, 0), params)
     if not result then
-        return false
+        return false, nil
     end
 
     return ((result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.Bounds))), result.Instance
