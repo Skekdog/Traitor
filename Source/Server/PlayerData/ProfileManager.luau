@@ -5,8 +5,6 @@ local ProfileService = require(script.Parent.ProfileService)
 
 local module = {}
 
-Settings.PopulateDefaults()
-
 module.ProfileTemplate = {
 	Karma = 1000,
 	Settings = Settings.JSONEncode(),

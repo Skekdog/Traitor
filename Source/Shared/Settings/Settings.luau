@@ -49,7 +49,7 @@ end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue
 	yieldIfNotLoaded()
-	local value = settingValues[name]
+	local value = if settingValues[name] ~= nil then settingValues[name] else (module.GetDefinition(name) or {Default = nil}).Default
 	assert(value ~= nil, `No value found for setting {name}`)
 	return value
 end
@@ -95,22 +95,13 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 	end
 end
 
-function module.PopulateDefaults(): ()
-	assert(RunService:IsServer(), "PopulateDefaults should only be called from the server")
-	for _, definition in SettingDefinitions do
-		assert(definition)
-		if not settingValues[definition.Name] then
-			settingValues[definition.Name] = definition.Default
-		end
-	end
-end
-
 function module.JSONEncode(): string
 	local encoded = Serialisation.SerialiseTable(settingValues)
 	return encoded
 end
 
 function module.SaveSettings(): ()
+	print(settingValues)
 	assert(RunService:IsClient(), "SaveSettings should only be called from the client")
 	ReplicatedStorage.Remotes.ClientServer.SaveSettings:FireServer(module.JSONEncode())
 end

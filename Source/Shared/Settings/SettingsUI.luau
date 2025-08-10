@@ -129,9 +129,13 @@ local function getLayoutOrderForCategory(category: string, page: Page): number?
 	return index[category]
 end
 
+local function setBooleanButton(button: BooleanButton, value: SettingDefinitions.BooleanValue): ()
+	UIAnimation.TransitionSwitch(button.Value, value)
+end
+
 local function setBooleanValue(button: BooleanButton, definition: SettingDefinitions.BooleanDefinition, value: SettingDefinitions.BooleanValue)
 	Settings.SetSetting(definition.Name, value)
-	UIAnimation.TransitionSwitch(button.Value, value)
+	setBooleanButton(button, value)
 end
 
 local function setupBooleanButton(definition: SettingDefinitions.BooleanDefinition, value: SettingDefinitions.BooleanValue): BooleanButton
@@ -140,16 +144,21 @@ local function setupBooleanButton(definition: SettingDefinitions.BooleanDefiniti
 
 	button.Activated:Connect(function()
 		setBooleanValue(button, definition, not Settings.GetSetting(definition.Name))
+		print(Settings.GetSetting(definition.Name))
 	end)
 
-	setBooleanValue(button, definition, value)
+	setBooleanButton(button, value)
 
 	return button
 end
 
+local function setChoiceButton(button: ChoiceButton, value: SettingDefinitions.ChoiceValue): ()
+	UIAnimation.TransitionUnderline(button.Choices.Underline, button)
+end
+
 local function setChoiceValue(button: ChoiceButton, choiceButton: TextButton, definition: SettingDefinitions.ChoiceDefinition, value: SettingDefinitions.ChoiceValue): ()
 	Settings.SetSetting(definition.Name, value)
-	UIAnimation.TransitionUnderline(button.Choices.Underline, choiceButton)
+	setChoiceButton(button, value)
 end
 
 local function setupChoiceButton(definition: SettingDefinitions.ChoiceDefinition, value: SettingDefinitions.ChoiceValue): ChoiceButton
@@ -174,7 +183,7 @@ local function setupChoiceButton(definition: SettingDefinitions.ChoiceDefinition
 		but.Parent = button.Choices
 
 		if value == choice then
-			task.defer(setChoiceValue, button, but, definition, value)
+			task.defer(setChoiceButton, button, value)
 		end
 	end
 

@@ -15,9 +15,6 @@ local function setSetting(name: string, value: SettingDefinitions.SettingValue):
 	Settings.SetSetting(name, value)
 end
 
-for _, v in SettingDefinitions do
-	setSetting(v.Name, v.Default)
-end
 Settings.LOADED = true
 
 ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings.OnClientEvent:Connect(function(toLoad: string): ()
@@ -39,7 +36,12 @@ ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings.OnClientEvent:Connect(f
 	local SettingsUI = require(script.Parent.SettingsUI)
 	for i, v in SettingDefinitions do
 		if not v.Hidden then
-			SettingsUI.AddButton(v, values[v.Name])
+			local value = values[v.Name]
+			if value == nil then
+				value = v.Default
+			end
+			assert(value ~= nil, "Value must not be nil")
+			SettingsUI.AddButton(v, value)
 		end
 	end
 
