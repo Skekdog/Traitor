@@ -213,11 +213,6 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		return
 	end
 
-	local health = (prop :: Types.MapProp):GetHealth()
-	if not health then
-		return
-	end
-
 	(prop :: Types.MapProp):TryTakeDamage(params)
 end
 
