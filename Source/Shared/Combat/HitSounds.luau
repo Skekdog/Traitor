@@ -4,10 +4,13 @@ local woodSounds = {8542226017, 8542224235, 8542224819, 8542225504, 8542223682}
 local fabricSounds = {106969093871170, 9118771226, 9099672443}
 local glassSounds = {3207457473, 9119937112, 9119596406}
 local groundSounds = {6876730610, 6876735204, 6877211005, 6877211445}
+local fruitSounds = {9114540315, 9114539908, 9114542474, 9114540327, 9114541282}
+
 return {
     Default = plasticSounds,
     
-    Fruit = {9114540315, 9114539908, 9114542474, 9114540327, 9114541282},
+    Fruit = fruitSounds,
+    Body = fruitSounds,
 
     -- Carpet stuff
     Fabric = fabricSounds,
