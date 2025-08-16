@@ -11,6 +11,7 @@ return {
     
     Fruit = fruitSounds,
     Body = fruitSounds,
+    Water = fruitSounds,
 
     -- Carpet stuff
     Fabric = fabricSounds,
@@ -20,11 +21,16 @@ return {
     -- Wood stuff
     Wood = woodSounds,
     WoodPlanks = woodSounds,
+    CardboardBox = woodSounds,
+    WoodCrate = woodSounds,
 
     -- Metal stuff
     Metal = metalSounds,
     CorrodedMetal = metalSounds,
     DiamondPlate = metalSounds,
+    MetalBox = metalSounds,
+    MetalGrate = metalSounds,
+    Computer = metalSounds,
 
     -- Glass stuff
     Glass = glassSounds,
@@ -36,4 +42,5 @@ return {
     Grass = groundSounds,
     LeafyGrass = groundSounds,
     Mud = groundSounds,
+    Dirt = groundSounds,
 }
