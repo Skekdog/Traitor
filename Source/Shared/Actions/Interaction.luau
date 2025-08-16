@@ -108,7 +108,6 @@ local function tryClimbLadder(map: Types.Map): boolean
 end
 
 function module.TryInteract(target: Types.MapThing?, input: InputObject?): boolean
-	print(target)
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return false
