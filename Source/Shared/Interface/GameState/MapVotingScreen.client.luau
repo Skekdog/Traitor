@@ -25,8 +25,10 @@ ReplicatedStorage.Remotes.ServerClient.UpdateMapVotes.OnClientEvent:Connect(func
     end
 
     for _, v in screen.Object.Choices:GetChildren() do
-        if v:IsA("ImageButton") then
-            UIAnimation.Slider((v :: Button).ProgressBar, nil, votes[v.Name] or 0, totalVotes)
+        local button = v :: Button
+        if button:IsA("ImageButton") then
+            UIAnimation.Slider(button.ProgressBar, nil, votes[v.Name] or 0, totalVotes)
+            button.ProgressBar.UIStroke.Enabled = (votes[v.Name] or 0) > 0
         end
     end
 end)
