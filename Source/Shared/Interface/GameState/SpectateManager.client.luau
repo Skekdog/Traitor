@@ -46,8 +46,12 @@ local function spectateFunc(action, state)
 	return Enum.ContextActionResult.Sink
 end
 
+local statusId = newproxy()
 local currentCameraMode: "Player" | "Freecam" = "Freecam"
 participant.Status:Connect(function(status)
+	local thisStatusId = newproxy()
+	statusId = thisStatusId
+
 	local isSpectating = status ~= "Alive"
 
 	-- Do not early return here because we need to set camera properties always
@@ -63,6 +67,9 @@ participant.Status:Connect(function(status)
 			if head and head:IsA("BasePart") then
 				camera.CameraSubject = head
 				task.wait(3)
+				if statusId ~= thisStatusId then
+					return -- don't change camera if something else has changed the state
+				end
 			end
 		end
 
