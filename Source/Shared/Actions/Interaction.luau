@@ -21,7 +21,7 @@ local module = {}
 
 module.CorpseInteractDistance = 10
 
-module.InteractTarget = nil :: Instance?
+module.InteractTarget = nil :: Types.MapThing?
 
 local function distanceCheck(target: Vector3, maxDistance: number): boolean
 	local distance = Players.LocalPlayer:DistanceFromCharacter(target)
@@ -65,7 +65,7 @@ local function interactInteractable(interactable: Types.Interactable): ()
 	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Object)
 end
 
-local function tryInteractInteractable(interactablePart: BasePart, input: InputObject?): boolean
+local function tryInteractInteractable(interactablePart: Types.MapThing, input: InputObject?): boolean
 	local interactable = LocalRoundInfo.Interactables()[interactablePart]
 	if not interactable then
 		return false
@@ -73,12 +73,12 @@ local function tryInteractInteractable(interactablePart: BasePart, input: InputO
 
 	local definition = interactable.Definition
 
-	if not distanceCheck(interactablePart.Position, definition.InteractionRange) then
+	if not distanceCheck(GetPrimaryPart(interactablePart).Position, definition.InteractionRange) then
 		return false
 	end
 
 	if definition.IsContinuousInteraction then
-		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(interactablePart.Position, definition.InteractionRange) and module.InteractTarget == interactablePart do
+		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(GetPrimaryPart(interactablePart).Position, definition.InteractionRange) and module.InteractTarget == interactablePart do
 			interactInteractable(interactable)
 			task.wait()
 		end
@@ -107,7 +107,8 @@ local function tryClimbLadder(map: Types.Map): boolean
 	return false
 end
 
-function module.TryInteract(target: Instance?, input: InputObject?): boolean
+function module.TryInteract(target: Types.MapThing?, input: InputObject?): boolean
+	print(target)
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return false
@@ -130,14 +131,14 @@ function module.TryInteract(target: Instance?, input: InputObject?): boolean
 		return false
 	end
 
-	if target:HasTag("Door") and target:IsA("Model") or target:IsA("BasePart") then
+	if target:HasTag("Door") then
 		if input and input.UserInputState ~= Enum.UserInputState.End then
 			return false
 		end
 		return interactDoor(GetPrimaryPart(target))
 	end
 
-	if target:IsA("BasePart") and target:IsDescendantOf(map.Folder) then
+	if target:HasTag("Interactable") then
 		tryInteractInteractable(target, input)
 	end
 
@@ -174,16 +175,15 @@ RunService.PostSimulation:Connect(function()
 	end
 
 	local target = result.Instance
-	module.InteractTarget = target
-	assert(target)
 
-	local prop = GetMapThingWithTag(target, "Prop")
+	local prop = GetMapThingWithTag(target, {"Prop", "Door"})
 
 	if prop then
+		module.InteractTarget = prop
 		if prop:HasTag("Item") or prop:HasTag("AmmoBox") then
 			return Mouse.ShowItemHint(prop)
 		elseif prop:HasTag("Interactable") then
-			return Mouse.ShowInteractableHint(target)
+			return Mouse.ShowInteractableHint(prop)
 		end
 	end
 
@@ -191,6 +191,8 @@ RunService.PostSimulation:Connect(function()
 	if not char then
 		return
 	end
+
+	module.InteractTarget = char
 
 	if char:IsDescendantOf(workspace.Corpses) then
 		return Mouse.ShowCorpseHint(char)
