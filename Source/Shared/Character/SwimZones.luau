@@ -1,10 +1,10 @@
 -- Adapted from @tyridge77's SwimController module: https://devforum.roblox.com/t/smooth-terrain-swimming-but-inside-of-partsv30
 
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
 type CleanupTargets = { Instance | (...any) -> (...any) | RBXScriptConnection }
 
@@ -292,23 +292,20 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 end)
 
-local function addZone(part: BasePart): ()
+local function addZone(part: Instance): ()
+	if not part:HasTag("Water") or not part:IsA("BasePart") then
+		return
+	end
+
 	table.insert(zones, part)
 	part.Destroying:Once(function()
 		table.remove(zones, assert(table.find(zones, part)))
 	end)
 end
 
-LocalRoundInfo.Map:Connect(function(map)
-	if not map then
-		return
-	end
-
-	for _, v in map.Bounds:GetDescendants() do
-		if v:IsA("BasePart") and v.Name == "! Water" and v.Size.Y > 1 then
-			addZone(v)
-		end
-	end
-end, true)
+CollectionService:GetInstanceAddedSignal("Water"):Connect(addZone)
+for _, v in CollectionService:GetTagged("Water") do
+	addZone(v)
+end
 
 return nil

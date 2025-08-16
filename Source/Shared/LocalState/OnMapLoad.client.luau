@@ -21,13 +21,13 @@ local function loadLighting(map: Types.Map): ()
         Lighting:ResetPropertyToDefault(v)
     end
 
-    for _, v in map.LightingModifiers:GetChildren() do
+    for _, v in map.Configuration.LightingSettings:GetChildren() do
         if not Lighting:FindFirstChildOfClass(v.ClassName) then
             v:Clone().Parent = Lighting
         end
     end
 
-    for i, v in map.LightingSettings do
+    for i, v in map.Configuration.LightingSettings:GetAttributes() do
         (Lighting :: any)[i] = v
         if not table.find(knownLightingSettings, i) then
             table.insert(knownLightingSettings, i)

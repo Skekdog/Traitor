@@ -8,6 +8,8 @@ local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local StandardDoor = require(script.Parent.StandardDoor)
@@ -96,7 +98,7 @@ local function tryClimbLadder(map: Types.Map): boolean
 	end
 
 	for _, v in root:GetTouchingParts() do
-		if v.Name == "Ladder" and v:IsDescendantOf(map.Bounds) then
+		if v:HasTag("Ladder") then
 			ClimbLadder.Climb(v)
 			return true
 		end
@@ -128,17 +130,17 @@ function module.TryInteract(target: Instance?, input: InputObject?): boolean
 		return false
 	end
 
-	if target:IsA("BasePart") and target.Parent and target.Parent.Name == "Doors" and target:IsDescendantOf(map.DynamicMap) then
+	if target:HasTag("Door") and target:IsA("Model") or target:IsA("BasePart") then
 		if input and input.UserInputState ~= Enum.UserInputState.End then
 			return false
 		end
-		return interactDoor(target)
+		return interactDoor(GetPrimaryPart(target))
 	end
 
-	if target:IsA("BasePart") and target:IsDescendantOf(map.Interactables) then
+	if target:IsA("BasePart") and target:IsDescendantOf(map.Folder) then
 		tryInteractInteractable(target, input)
 	end
-	
+
 	return false
 end
 
@@ -165,45 +167,27 @@ RunService.PostSimulation:Connect(function()
 
 	Mouse.Reset()
 
-	local validAncestors = {workspace.Characters :: Folder, workspace.Corpses}
-	local map = LocalRoundInfo.Map()
-	if map then
-		table.insert(validAncestors, map.ItemSpawns)
-		table.insert(validAncestors, map.AmmoSpawns)
-		table.insert(validAncestors, map.Interactables)
-		table.insert(validAncestors, map.DynamicMap)
-	end
-
 	module.InteractTarget = nil
 
 	if not result then
 		return
 	end
-	
-	local isValid = false
-	for _, v in validAncestors do
-		if result.Instance:IsDescendantOf(v) then
-			isValid = true
-			break
+
+	local target = result.Instance
+	module.InteractTarget = target
+	assert(target)
+
+	local prop = GetMapThingWithTag(target, "Prop")
+
+	if prop then
+		if prop:HasTag("Item") or prop:HasTag("AmmoBox") then
+			return Mouse.ShowItemHint(prop)
+		elseif prop:HasTag("Interactable") then
+			return Mouse.ShowInteractableHint(target)
 		end
 	end
 
-	if not isValid then
-		return
-	end
-
-	module.InteractTarget = result.Instance
-	assert(module.InteractTarget)
-
-	if map then
-		if module.InteractTarget:IsDescendantOf(map.ItemSpawns) or module.InteractTarget:IsDescendantOf(map.AmmoSpawns) then
-			return Mouse.ShowItemHint(module.InteractTarget)
-		elseif module.InteractTarget:IsDescendantOf(map.Interactables) then
-			return Mouse.ShowInteractableHint(module.InteractTarget :: BasePart)
-		end
-	end
-
-	local char = module.InteractTarget:FindFirstAncestorOfClass("Model")
+	local char = target:FindFirstAncestorOfClass("Model")
 	if not char then
 		return
 	end

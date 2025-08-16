@@ -8,9 +8,9 @@ local DAMAGE = 100
 
 local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
 	local model = item.Model:Clone()
+	assert(model:IsA("BasePart"))
 
-	local map = attacker.Round:GetMap()
-	local didThrow = attacker:TryThrowAssembly(model, THROW_FORCE, map.ItemSpawns, origin, direction, true)
+	local didThrow = attacker:TryThrowAssembly(model, THROW_FORCE, nil, origin, direction, true)
 	if not didThrow then
 		return
 	end
@@ -70,8 +70,8 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 
 	task.wait(1) -- wait, otherwise the attacker immediately picks up the knife
 
-	local itemProp = attacker.Round:LoadItem(model)
-	local newItem = itemProp.Item
+	model.Parent = attacker.Round:GetMap().Map
+	local newItem = attacker.Round:LoadProp(model)
 
 	DNAScanner.AddDNATrace(newItem, attacker, nil, "rbxassetid://14930962070", model)
 end

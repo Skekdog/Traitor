@@ -17,10 +17,10 @@ local function initSnapToLadder(root: BasePart): ()
             return
         end
 
-        if part.Name ~= "Ladder" or not part:IsDescendantOf(map.Bounds) then
+        if not part:HasTag("Ladder") then
             return
         end
-        
+
         if Settings.GetSetting("Snap To Ladders") then
             ClimbLadder.Climb(part)
         end

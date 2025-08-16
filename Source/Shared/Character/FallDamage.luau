@@ -12,8 +12,8 @@ local function checkForWater(root: BasePart): boolean
     end
 
     for _, v in root:GetTouchingParts() do
-        if v.Name == "! Water" and v:IsDescendantOf(map.Bounds) then
-            return true
+        if v:HasTag("Water") then
+			return true
         end
     end
 

@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -86,7 +87,7 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	local sphere = Instance.new("Part")
 	sphere.Shape = Enum.PartType.Ball
 	sphere.Size = Vector3.zero
-	sphere.Position = visualiser.Object.Position
+	sphere.Position = GetPrimaryPart(visualiser.Object).Position
 	sphere.Material = VISUALISE_MATERIAL
 	sphere.Color = VISUALISE_COLOUR
 	sphere.Anchored = false
@@ -96,7 +97,7 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	sphere.CanQuery = false
 
 	local weld = Instance.new("WeldConstraint")
-	weld.Part0 = visualiser.Object
+	weld.Part0 = GetPrimaryPart(visualiser.Object)
 	weld.Part1 = sphere
 	weld.Parent = visualiser.Object
 
@@ -275,6 +276,8 @@ local function forEachVisualiser(visualiser: Visualiser): ()
 	if (visualiser.Extras.LastVisualisedAt or 0) + VISUALISE_INTERVAL > tick() then
 		return
 	end
+
+	assert(visualiser.Object:IsA("BasePart"))
 
 	visualiser.Extras.LastVisualisedAt = tick()
 

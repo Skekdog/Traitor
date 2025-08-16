@@ -29,6 +29,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
         local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
         table.insert(decoyPlayers, v.Extras.Player)
 
+        assert(v.Object:IsA("BasePart"))
         CreateRadarPoint(v.Object.CFrame, if LocalParticipantInfo.GetParticipant().Role().Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
     end
 

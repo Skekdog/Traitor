@@ -2,7 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local spring = require(ReplicatedStorage.Shared.Util.spring)
 local MuzzleFlash = require(script.Parent.MuzzleFlash)
@@ -102,10 +103,6 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     local direction = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2, 1).Direction * 10000
 
     local rayParams = RaycastParams.new()
-    local map = LocalRoundInfo.Map()
-    if map then
-        rayParams:AddToFilter(map.Bounds)
-    end
     rayParams.FilterDescendantsInstances = {viewmodel}
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
@@ -216,43 +213,29 @@ function module.Show(item: Types.AnyItemDefinition): ()
         end
     end
 
-    local model = item.Model:Clone()
-    model.Name = "Item"
+    local model = item.Model:Clone();
+    (model :: PVInstance).Name = "Item"
 
-    model.CastShadow = false
-    for _, v in model:GetDescendants() do
-        if v:IsA("BasePart") then
-            v.CastShadow = false
-        end
-    end
+    ForEachPart(model, function(part)
+        part.Massless = true
+        part.CanCollide = false
+        part.CanTouch = false
+        part.CanQuery = false
+        part.CastShadow = false
+    end)
 
     local motor = Instance.new("Motor6D")
     motor.Part0 = viewmodel.RightHand
-    motor.Part1 = model
+    motor.Part1 = GetPrimaryPart(model)
 
     local c1 = item.Model:GetAttribute("AnimC1")
     if typeof(c1) == "CFrame" then
         motor.C1 = c1
     end
 
-    motor.Parent = model
+    motor.Parent = model;
 
-    local function configure(part: BasePart): ()
-        part.Anchored = false
-        part.CanCollide = false
-        part.CanTouch = false
-        part.CanQuery = false
-        part.Massless = true
-    end
-    
-    configure(model)
-    for _, v in model:GetDescendants() do
-        if v:IsA("BasePart") then
-            configure(v)
-        end
-    end
-
-    model.Parent = viewmodel
+    (model :: PVInstance).Parent = viewmodel
 
     task.defer(function()
         viewmodel.UpperTorso.CanCollide = false

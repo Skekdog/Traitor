@@ -298,17 +298,17 @@ remotes.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unkn
 	end
 
 	local amount = item.Ammo
-	local model = item.Definition.AmmoType.Model:Clone()
+	local model = assert(item.Definition.AmmoType.Model):Clone()
 
-	if not participant:TryThrowAssembly(model, 15, round:GetMap().AmmoSpawns, nil, direction) then
+	if not participant:TryThrowAssembly(model, 15, nil, nil, direction) then
 		return
 	end
 
 	item.Ammo = 0
-	remotes.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0)
+	remotes.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0);
 
-	local prop = round:LoadProp(model, "AmmoProp")
-	assert(prop.Kind == "AmmoProp")
-
-	prop.AmmoBox:SetAmmo(amount)
+	round:LoadProp(model)
+	local ammoBox = round:GetAmmoBox(model)
+	assert(ammoBox)
+	ammoBox:SetAmmo(amount)
 end)

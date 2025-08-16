@@ -4,7 +4,6 @@ local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
-local ShatterGlass = require(ReplicatedStorage.Shared.Combat.ShatterGlass)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -92,7 +91,7 @@ local function validatePrimaryFire(item: Types.AnyItem, by: Types.Participant, o
 
 	if target then
 		local params = RaycastParams.new()
-		params.FilterDescendantsInstances = {by.Round:GetMap().StaticMap}
+		params.FilterDescendantsInstances = {by.Round:GetMap().Map}
 		params.FilterType = Enum.RaycastFilterType.Include
 		params.IgnoreWater = true
 
@@ -184,10 +183,6 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
-local function onWindowHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, hitPart: BasePart, hitPosition: Vector3): ()
-	ShatterGlass(hitPart)
-end
-
 local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3, origin: Vector3?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
@@ -213,12 +208,11 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		return
 	end
 
-	(prop :: Types.MapProp):TryTakeDamage(params)
+	(prop :: Types.Prop):TryTakeDamage(params)
 end
 
 local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): ()
 	local round = by.Round
-	local map = round:GetMap()
 
 	local victim = tryGetParticipantFromPart(round, hitPart)
 
@@ -230,8 +224,6 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 
 	if victim then
 		return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin)
-	elseif hitPart:IsDescendantOf(map.Windows) then
-		return onWindowHit(item, round, by, hitPart, hitPosition)
 	elseif propLike then
 		return onPropHit(item, round, by, propLike, hitPart, hitPosition, origin)
 	end

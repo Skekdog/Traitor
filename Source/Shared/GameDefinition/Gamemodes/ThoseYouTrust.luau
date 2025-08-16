@@ -441,7 +441,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 	if model then
 		model:SetAttribute("Unidentified", enable)
-		participant.Round:LoadProp(model, "CorpseProp")
+		participant.Round:LoadProp(model)
 
 		if not enable then
 			for part, constraints in ropes do

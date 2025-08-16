@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
@@ -143,6 +144,10 @@ local function loadInteractable(instance: Instance): ()
         task.wait()
     end
 
+    if not instance:IsDescendantOf(workspace) then
+        return
+    end
+
     local GetInteractableDefinition = (require)(script.Parent.GetInteractableDefinition)
     local definition: Types.InteractableDefinition = GetInteractableDefinition(instance.Name)
     if not definition then
@@ -157,16 +162,10 @@ local function loadInteractable(instance: Instance): ()
     end
 end
 
-module.Map:Connect(function(map)
-    if not map then
-        return
-    end
-    map.Interactables.ChildAdded:Connect(loadInteractable)
-
-    for _, v in map.Interactables:GetChildren() do
-        loadInteractable(v)
-    end
-end, true)
+CollectionService:GetInstanceAddedSignal("Interactable"):Connect(loadInteractable)
+for _, v in CollectionService:GetTagged("Interactable") do
+    loadInteractable(v)
+end
 
 module.OnReset = DynamicValue.new(nil)
 

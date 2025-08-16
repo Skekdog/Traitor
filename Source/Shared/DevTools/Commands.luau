@@ -6,6 +6,7 @@ local TeleportService = game:GetService("TeleportService")
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
 export type BaseCommand = {
 	Name: string,
@@ -163,11 +164,11 @@ module.xray = {
 			return "No map loaded."
 		end
 
-		local enabled = not (map.StaticMap:GetAttribute("XRayEnabled") :: boolean?)
-		map.StaticMap:SetAttribute("XRayEnabled", enabled)
+		local enabled = not (map.Map:GetAttribute("XRayEnabled") :: boolean?)
+		map.Map:SetAttribute("XRayEnabled", enabled)
 
-		for _, instance in map.StaticMap:GetDescendants() do
-			if not instance:IsA("BasePart") and not instance:IsA("Texture") then
+		for _, instance in map.Map:GetDescendants() do
+			if not instance:IsA("BasePart") and not instance:IsA("Texture") or instance:HasTag("Prop") then
 				continue
 			end
 
@@ -201,11 +202,11 @@ module.showbounds = {
 			return "No map loaded."
 		end
 
-		local enabled = not (map.StaticMap:GetAttribute("ShowBounds") :: boolean?)
-		map.StaticMap:SetAttribute("ShowBounds", enabled)
+		local enabled = not (map.Map:GetAttribute("ShowBounds") :: boolean?)
+		map.Map:SetAttribute("ShowBounds", enabled)
 
-		for _, instance in map.Bounds:GetDescendants() do
-			if not instance:IsA("BasePart") then
+		for _, instance in map.Map:GetDescendants() do
+			if not instance:IsA("BasePart") or instance:HasTag("Prop") then
 				continue
 			end
 
@@ -630,7 +631,7 @@ module.spawninteractable = {
 				continue
 			end
 
-			round:AddInteractable(definition).Object.CFrame = char:GetPivot()
+			GetPrimaryPart(round:AddInteractable(definition).Object).CFrame = char:GetPivot()
 		end
 
 		return `Spawned {interactableName} at {getPlayersString(players)}.`

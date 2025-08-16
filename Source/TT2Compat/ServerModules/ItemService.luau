@@ -32,10 +32,10 @@ function module.SpawnItem(self, item: string, cframe: CFrame, _, _, _, _): ()
 		return
 	end
 
-	local model = definition.Model:Clone()
-	model.Parent = round:GetMap().ItemSpawns
+	local model = definition.Model:Clone();
+	(model :: PVInstance).Parent = round:GetMap().Map
 	model:PivotTo(cframe)
-	round:LoadProp(model, "ItemProp")
+	round:LoadProp(model)
 end
 
 function module.GiveAmmoReserve(self, player: Player, ammoName: string, amount: number): ()

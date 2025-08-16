@@ -170,7 +170,6 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 	end
 
 	local round = participant.Round
-	local map = participant.Round:GetMap()
 
 	local object: IHasDNATraces?
 
@@ -185,12 +184,12 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 			
 			object = round:GetParticipant(model.Name)
 		end
-	elseif hitPart:IsDescendantOf(map.Interactables) then
+	elseif hitPart:HasTag("Interactable") then
 		local interactable = round:GetInteractable(hitPart)
 		if interactable then
 			object = interactable
 		end
-	elseif hitPart:IsDescendantOf(map.ItemSpawns) then
+	elseif hitPart:HasTag("Item") then
 		local mapItem = round:GetItem(hitPart)
 		if mapItem then
 			object = mapItem

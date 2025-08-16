@@ -117,7 +117,7 @@ local function stopBurning(target: BurnTarget): ()
     end
 end
 
-local function burnTouchingParticipants(prop: Types.MapProp): ()
+local function burnTouchingParticipants(prop: Types.Prop): ()
     local burnedParticipants: {Types.Participant} = {}
     for _, v in workspace:GetPartsInPart(prop.Model) do
         local model = v:FindFirstAncestorOfClass("Model")
@@ -163,7 +163,7 @@ local function burnThing(target: BurnTarget, info: BurnInfo): ()
     PlaySound(weaponSounds("FlareBurn"), nil, model, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
     if target.Kind == "Participant" or target.Kind == "MapProp" then
-        local health = (target :: Types.MapProp):GetHealth()
+        local health = (target :: Types.Prop):GetHealth()
         if health and health <= 0 then
             return stopBurning(target)
         end
@@ -181,7 +181,7 @@ local function burnThing(target: BurnTarget, info: BurnInfo): ()
             if target.Kind == "Participant" then
                 ItemKillHighlights(highlight1, highlight2)({Definition = {Name = "Flare Gun"}} :: Types.GunWeapon, target.Round, target, params)
             end
-            (target :: Types.MapProp):TryTakeDamage(params)
+            (target :: Types.Prop):TryTakeDamage(params)
         end
     end
 end

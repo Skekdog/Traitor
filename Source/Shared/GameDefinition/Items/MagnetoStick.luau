@@ -24,8 +24,8 @@ local PROP_DAMAGE_TIME = 5
 
 local module = {}
 
-local serverLastHeldBy: {[Types.MapProp]: {By: Player, At: number}?} = {}
-local serverTouchedConnections: {[Types.MapProp]: RBXScriptConnection?} = {}
+local serverLastHeldBy: {[Types.Prop]: {By: Player, At: number}?} = {}
+local serverTouchedConnections: {[Types.Prop]: RBXScriptConnection?} = {}
 
 local stopControllingPropRemote: RemoteEvent
 if RunService:IsServer() then
@@ -170,7 +170,7 @@ local function getController(prop: Types.DataModelProp): Player?
 	return player
 end
 
-local function onPropTouchedServer(prop: Types.MapProp, otherPart: BasePart, con: RBXScriptConnection): ()
+local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart, con: RBXScriptConnection): ()
 	local part = getPrimaryPart(prop)
 	if not part then
 		return
@@ -239,7 +239,7 @@ local function stopControllingPropClient(doNotFireServer: boolean?): ()
 	animate()
 end
 
-function module.SetLastHeldBy(prop: Types.MapProp, by: Player?): ()
+function module.SetLastHeldBy(prop: Types.Prop, by: Player?): ()
 	if not by then
 		serverLastHeldBy[prop] = nil
 	else

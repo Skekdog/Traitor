@@ -171,9 +171,7 @@ if IS_SERVER then
             return
         end
 
-        local ServerScriptService = game:GetService("ServerScriptService")
-        local RoundHandler = require(ServerScriptService.RoundHandler)
-        if not door.Parent or door.Parent.Name ~= "Doors" or not door:IsDescendantOf(RoundHandler.GetRound():GetMap().DynamicMap) then
+        if not door:HasTag("Door") then
             return
         end
 

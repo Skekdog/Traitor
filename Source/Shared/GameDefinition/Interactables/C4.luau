@@ -37,7 +37,8 @@ local reducedExplosionInfo: Types.ExplosionInfo = {
 	IgnoreSelfDefense = true,
 }
 
-type C4 = Types.Interactable & {
+export type C4 = Types.Interactable & {
+	Object: BasePart,
 	Extras: {
 		ArmId: never?,
 		ArmedBy: Types.Participant?,
@@ -547,17 +548,17 @@ local interactable: Types.InteractableDefinition = {
 	IsContinuousInteraction = false,
 	InteractionRange = 7.5,
 
-	OnInteractClient = function(object: C4): ()
-		showC4Menu(object, true)
+	OnInteractClient = function(object: Types.Interactable): ()
+		showC4Menu(object :: C4, true)
 	end,
 
-	OnLoadClient = function(object: C4): ()
-		c4s()[object.Object] = object
+	OnLoadClient = function(object: Types.Interactable): ()
+		c4s()[object.Object] = object :: C4
 		c4s:Invoke()
 	end,
 
-	OnLoadServer = function(object: C4): ()
-		c4s()[object.Object] = object
+	OnLoadServer = function(object: Types.Interactable): ()
+		c4s()[object.Object] = object :: C4
 		c4s:Invoke()
 
 		object.Object.AncestryChanged:Connect(function()

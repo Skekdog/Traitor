@@ -113,7 +113,7 @@ local function isObscured(origin: Vector3, target: Vector3): boolean
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {char, map.Bounds}
+	params.FilterDescendantsInstances = {char}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 
 	local result = workspace:Raycast(origin, target - origin, params)

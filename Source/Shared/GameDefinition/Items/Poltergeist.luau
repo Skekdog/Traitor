@@ -14,6 +14,7 @@ else
 	Combat = require(ServerScriptService.Combat.Combat)
 end
 
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Ammo = require(script.Parent.Ammo)
@@ -74,7 +75,7 @@ local function beforePrimaryFireClient(item: Types.GunWeapon, targets: {BasePart
 end
 
 local function beforeHitAnything(_, round: Types.Round, hitPart: BasePart): boolean
-	return hitPart:IsDescendantOf(round:GetMap().Props)
+	return hitPart:IsDescendantOf(round:GetMap().Map)
 end
 
 type PoltInfo = {
@@ -83,7 +84,7 @@ type PoltInfo = {
 	Attacker: Types.Participant,
 }
 
-local poltedProps: {[Types.MapProp]: PoltInfo} = {}
+local poltedProps: {[Types.Prop]: PoltInfo} = {}
 
 local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop, params: Types.DamageParams): boolean
 	assert(params.Attacker)
@@ -92,7 +93,7 @@ local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop, params:
 		return false
 	end
 
-	if not NewtonLauncher.CanFling(hitProp.Model) then
+	if not NewtonLauncher.CanFling(GetPrimaryPart(hitProp.Model)) then
 		return false
 	end
 
@@ -121,7 +122,7 @@ local phaseAdvanceTimes = {
 	[6] = 0.8,
 }
 
-local function doPropPolt(prop: Types.MapProp, info: PoltInfo): ()
+local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 	if not prop.Model:IsDescendantOf(workspace) then
 		poltedProps[prop] = nil
 		return
@@ -143,9 +144,11 @@ local function doPropPolt(prop: Types.MapProp, info: PoltInfo): ()
 	local nearestParticipant: Types.Participant?
 	local nearestDistance = math.huge
 
+	local propRoot = GetPrimaryPart(prop.Model)
+
 	for _, participant in prop.Round:GetParticipants() do
 		assert(participant)
-		local distance = participant.Player:DistanceFromCharacter(prop.Model.Position)
+		local distance = participant.Player:DistanceFromCharacter(propRoot.Position)
 		if distance ~= 0 and distance < nearestDistance then
 			nearestDistance = distance
 			nearestParticipant = participant
@@ -168,8 +171,8 @@ local function doPropPolt(prop: Types.MapProp, info: PoltInfo): ()
 
 	MagnetoStick.SetLastHeldBy(prop, info.Attacker.Player)
 
-	local direction = (prop.Model.Position - root.Position).Unit
-	NewtonLauncher.Fling(prop.Model, -direction * 1000 * prop.Model.AssemblyMass / 18)
+	local direction = (propRoot.Position - root.Position).Unit
+	NewtonLauncher.Fling(propRoot, -direction * 1000 * propRoot.AssemblyMass / 18)
 
 	if info.PoltPhase == #phaseAdvanceTimes then
 		local params = ExplosionParams.new({
@@ -182,7 +185,7 @@ local function doPropPolt(prop: Types.MapProp, info: PoltInfo): ()
 			BeforeHitParticipant = function(_, _, hitParticipant: Types.Participant): boolean
 				return hitParticipant ~= info.Attacker
 			end,
-		}, prop.Model.Position, info.Attacker)
+		}, propRoot.Position, info.Attacker)
 		Combat.CreateExplosion(prop.Round, params)
 		return
 	end

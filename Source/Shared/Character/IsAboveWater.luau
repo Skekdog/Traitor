@@ -15,7 +15,7 @@ local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): (
         return false, nil
     end
 
-    return ((result.Material == Enum.Material.Water) or (result.Instance.Name == "! Water" and result.Instance:IsDescendantOf(map.Bounds))), result.Instance
+    return result.Material == Enum.Material.Water or result.Instance:HasTag("Water"), result.Instance
 end
 
 return IsAboveWater

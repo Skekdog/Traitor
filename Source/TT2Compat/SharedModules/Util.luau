@@ -30,10 +30,10 @@ function module.GetPlayerFromInstance(instance: BasePart | Model): Player?
 	return Players:GetPlayerFromCharacter(char)
 end
 
-function module.GetPropFromInstance(instance: BasePart): Types.MapProp?
+function module.GetPropFromInstance(instance: BasePart): Types.Prop?
 	local RoundHandler = require(ServerScriptService.RoundHandler)
 	local round = RoundHandler.GetRound()
-	return round:GetProp(instance) :: Types.MapProp
+	return round:GetProp(instance) :: Types.Prop
 end
 
 function module.GetItemFromInstance(instance: BasePart): Types.AnyItem?

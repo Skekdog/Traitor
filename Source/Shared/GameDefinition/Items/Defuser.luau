@@ -35,7 +35,7 @@ local item: Types.ItemDefinition = {
 		end
 
 		if interactable.Definition == C4.Interactable then
-			C4.TryDisarm(interactable, participant, 1, true)
+			C4.TryDisarm(interactable :: C4.C4, participant, 1, true)
 		end
 	end
 }

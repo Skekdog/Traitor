@@ -6,6 +6,7 @@ local TweenService = game:GetService("TweenService")
 local Discombobulate = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.Discombobulate)
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local BallisticVest = require(script.Parent.BallisticVest)
@@ -56,9 +57,9 @@ local function modify(base: Types.AnyItemDefinition, name: string, edit: {[strin
     new.Name = name
 
     if base.Model then
-        new.Model = base.Model:Clone()
-        new.Model.Name = name
-        new.Model.Parent = ReplicatedStorage.Assets.WeaponModels
+        new.Model = base.Model:Clone();
+        (new.Model :: PVInstance).Name = name;
+        (new.Model :: PVInstance).Parent = ReplicatedStorage.Assets.WeaponModels
     end
 
     return new
@@ -1104,20 +1105,14 @@ local function plantInteractable(item: Types.Item, origin: Vector3, direction: V
         return nil
     end
 
-    local map = participant.Round:GetMap()
-
-    if not result.Instance:IsDescendantOf(map.StaticMap) then
-        return nil
-    end
-
     local interactable = createInteractableForItem(item, participant.Round)
-    local object = interactable.Object
+    local object = interactable.Object;
 
-    object.CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal)
+    GetPrimaryPart(object).CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal)
 
     local weld = Instance.new("WeldConstraint")
     weld.Part0 = result.Instance :: BasePart
-    weld.Part1 = object
+    weld.Part1 = GetPrimaryPart(object)
     weld.Parent = object
 
     participant:RemoveItem(item)
@@ -1156,6 +1151,7 @@ items.C4 = {
         end
 
         local object = interactable.Object
+        assert(object:IsA("BasePart"))
 
         weld.Enabled = false
         object.CFrame *= CFrame.Angles(math.rad(-90), 0, 0)
@@ -1282,8 +1278,10 @@ items.Decoy = {
         end
 
         local object = interactable.Object
+        assert(object:IsA("BasePart"))
+
         weld.Enabled = false
-        object.CFrame *= CFrame.new(0, 0, -interactable.Object.Size.Z / 2)
+        object.CFrame *= CFrame.new(0, 0, -object.Size.Z / 2)
         weld.Enabled = true
 
         interactable.Object:SetAttribute("Player", participant.Player.Name)
