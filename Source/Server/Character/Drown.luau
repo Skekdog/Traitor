@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
@@ -91,9 +92,9 @@ RunService.Heartbeat:Connect(function(dt)
 
 	local submergedParticipants: {[Participant]: true?} = {}
 
-	for _, bound in map.Bounds:GetDescendants() do
-		if bound.Name ~= "! Water" or not bound:IsA("BasePart") then
-			continue
+	for _, bound in CollectionService:GetTagged("Water") do
+		if not bound:IsA("BasePart") or not bound:IsDescendantOf(workspace) then
+			return
 		end
 
 		local size = Vector3.new(bound.Size.X, math.max(bound.Size.Y - 0.5, 0), bound.Size.Z)
