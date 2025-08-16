@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
@@ -25,7 +26,7 @@ local PROP_DAMAGE_TIME = 5
 local module = {}
 
 local serverLastHeldBy: {[Types.Prop]: {By: Player, At: number}?} = {}
-local serverTouchedConnections: {[Types.Prop]: RBXScriptConnection?} = {}
+local serverTouchedConnections: {[Types.Prop]: {RBXScriptConnection}?} = {}
 
 local stopControllingPropRemote: RemoteEvent
 if RunService:IsServer() then
@@ -76,15 +77,15 @@ local function animate(): ()
 	ViewmodelModule.PlayAnimation("rbxassetid://13269497293", "Magneto")
 end
 
-local function getPrimaryInstance(prop: Types.Prop | Types.DataModelProp): Types.DataModelProp
-	local model: Types.DataModelProp
+local function getPrimaryInstance(prop: Types.Prop | Types.MapThing): Types.MapThing
+	local model: Types.MapThing
 	if typeof(prop) == "table" then
 		model = prop.Model
 	else
 		model = prop
 	end
 
-	local instance: Types.DataModelProp = model
+	local instance: Types.MapThing = model
 	if model:IsDescendantOf(workspace.Corpses) then
 		local foundModel = model:FindFirstAncestorOfClass("Model")
 		if foundModel and foundModel:IsDescendantOf(workspace.Corpses) then
@@ -95,7 +96,7 @@ local function getPrimaryInstance(prop: Types.Prop | Types.DataModelProp): Types
 	return instance
 end
 
-local function getPrimaryPart(prop: Types.Prop | Types.DataModelProp): BasePart?
+local function getPrimaryPart(prop: Types.Prop | Types.MapThing): BasePart?
 	local model = getPrimaryInstance(prop)
 
 	if model:IsA("Model") then
@@ -151,7 +152,7 @@ local function setNetworkOwnerOfProp(prop: Types.Prop, owner: NetworkOwnerParame
 	setNetworkOwnerOfPart(part, owner)
 end
 
-local function getControllerObject(prop: Types.DataModelProp): IntValue?
+local function getControllerObject(prop: Types.MapThing): IntValue?
 	local controllerObject = prop:FindFirstChild("MagnetoController")
 	if not controllerObject or not controllerObject:IsA("IntValue") then
 		return nil
@@ -160,7 +161,7 @@ local function getControllerObject(prop: Types.DataModelProp): IntValue?
 	return controllerObject
 end
 
-local function getController(prop: Types.DataModelProp): Player?
+local function getController(prop: Types.MapThing): Player?
 	local controllerObject = getControllerObject(prop)
 	if not controllerObject then
 		return nil
@@ -170,7 +171,7 @@ local function getController(prop: Types.DataModelProp): Player?
 	return player
 end
 
-local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart, con: RBXScriptConnection): ()
+local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart, cons: {RBXScriptConnection}): ()
 	local part = getPrimaryPart(prop)
 	if not part then
 		return
@@ -189,7 +190,10 @@ local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart, con: R
 	local lastHolder = serverLastHeldBy[prop]
 	if not lastHolder or lastHolder.At + PROP_DAMAGE_TIME < workspace:GetServerTimeNow() then
 		serverTouchedConnections[prop] = nil
-		return con:Disconnect()
+		for _, con in cons do
+			con:Disconnect()
+		end
+		return
 	end
 
 	local lastHolderParticipant = prop.Round:GetParticipant(lastHolder.By.Name)
@@ -245,11 +249,17 @@ function module.SetLastHeldBy(prop: Types.Prop, by: Player?): ()
 	else
 		serverLastHeldBy[prop] = {By = by, At = workspace:GetServerTimeNow()}
 		if not serverTouchedConnections[prop] then
-			local con: RBXScriptConnection
-			con = prop.Model.Touched:Connect(function(otherPart)
-				onPropTouchedServer(prop, otherPart, con)
+			local cons: {RBXScriptConnection} = {}
+
+			ForEachPart(prop.Model, function(part)
+				local con: RBXScriptConnection
+				con = part.Touched:Connect(function(otherPart)
+					onPropTouchedServer(prop, otherPart, cons)
+				end)
+				table.insert(cons, con)
 			end)
-			serverTouchedConnections[prop] = con
+
+			serverTouchedConnections[prop] = cons
 
 			prop.Model.Destroying:Once(function()
 				serverTouchedConnections[prop] = nil
@@ -284,12 +294,12 @@ local function stopControllingPropServer(player: Player): ()
 	end
 end
 
-local function canControl(prop: Types.Prop | Types.DataModelProp): boolean
+local function canControl(prop: Types.Prop | Types.MapThing): boolean
 	local controller = getController(getPrimaryInstance(prop))
 	return not controller
 end
 
-local function isControlledBy(prop: Types.DataModelProp, player: Player): boolean
+local function isControlledBy(prop: Types.MapThing, player: Player): boolean
 	local controller = getController(getPrimaryInstance(prop))
 	return controller == player
 end
@@ -456,7 +466,7 @@ local function startControllingPropClient(prop: BasePart): ()
 	animate()
 end
 
-local function pushPropClient(prop: Types.DataModelProp): ()
+local function pushPropClient(prop: Types.MapThing): ()
 	if not canControl(getPrimaryInstance(prop)) then
 		return
 	end
@@ -485,7 +495,7 @@ local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {char, map.Bounds}
+	params.FilterDescendantsInstances = {char}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
@@ -497,7 +507,7 @@ local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 
 	local part = result.Instance :: BasePart
 
-	if not part:IsDescendantOf(map.Props) and not part:IsDescendantOf(map.ItemSpawns) and not part:IsDescendantOf(map.AmmoSpawns) and not part:IsDescendantOf(workspace.Corpses) then
+	if not part:IsDescendantOf(map.Map) and not part:IsDescendantOf(workspace.Corpses) then
 		return nil
 	end
 
@@ -634,15 +644,13 @@ local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function()
 end
 
 local function getPropServer(participant: Types.Participant, origin: Vector3, direction: Vector3): Types.Prop?
-	local map = participant.Round:GetMap()
-
 	local char = participant:GetCharacter()
 	if not char then
 		return nil
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {map.Bounds, char}
+	params.FilterDescendantsInstances = {char}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
@@ -654,7 +662,7 @@ local function getPropServer(participant: Types.Participant, origin: Vector3, di
 
 	local part = result.Instance :: BasePart
 
-	local model: Types.DataModelProp? = part
+	local model: Types.MapThing? = part
 	if part:IsDescendantOf(workspace.Corpses) then
 		model = part:FindFirstAncestorOfClass("Model")
 	end
