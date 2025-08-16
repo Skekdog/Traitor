@@ -140,12 +140,12 @@ end
 module.Interactables = DynamicValue.new({} :: {[Instance]: Types.Interactable?})
 
 local function loadInteractable(instance: Instance): ()
-    while not module.Gamemode() or not module.Map() do
-        task.wait()
-    end
-
     if not instance:IsDescendantOf(workspace) then
         return
+    end
+
+    while not module.Gamemode() or not module.Map() do
+        task.wait()
     end
 
     local GetInteractableDefinition = (require)(script.Parent.GetInteractableDefinition)
