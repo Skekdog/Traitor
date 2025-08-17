@@ -171,7 +171,7 @@ if IS_SERVER then
             return
         end
 
-        if not door:HasTag("Door") then
+        if not door:HasTag("DoorLoaded") then
             return
         end
 

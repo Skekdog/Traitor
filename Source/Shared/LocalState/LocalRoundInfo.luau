@@ -162,8 +162,8 @@ local function loadInteractable(instance: Instance): ()
     end
 end
 
-CollectionService:GetInstanceAddedSignal("Interactable"):Connect(loadInteractable)
-for _, v in CollectionService:GetTagged("Interactable") do
+CollectionService:GetInstanceAddedSignal("InteractableLoaded"):Connect(loadInteractable)
+for _, v in CollectionService:GetTagged("InteractableLoaded") do
     loadInteractable(v)
 end
 

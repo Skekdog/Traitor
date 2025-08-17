@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClimbLadder = require(ReplicatedStorage.Shared.Actions.ClimbLadder)
 local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
-local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local JumpPower = require(script.Parent.JumpPower)
 local LocalCharacter = require(script.Parent.LocalCharacter)
@@ -12,12 +11,7 @@ local clientServer = ReplicatedStorage.Remotes.ClientServer
 
 local function initSnapToLadder(root: BasePart): ()
     root.Touched:Connect(function(part)
-        local map = LocalRoundInfo.Map()
-        if not map then
-            return
-        end
-
-        if not part:HasTag("Ladder") then
+        if not part:HasTag("LadderLoaded") then
             return
         end
 

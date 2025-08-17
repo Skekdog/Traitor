@@ -293,7 +293,7 @@ RunService.Heartbeat:Connect(function(dt)
 end)
 
 local function addZone(part: Instance): ()
-	if not part:HasTag("Water") or not part:IsA("BasePart") then
+	if not part:HasTag("WaterLoaded") or not part:IsA("BasePart") then
 		return
 	end
 
@@ -303,8 +303,8 @@ local function addZone(part: Instance): ()
 	end)
 end
 
-CollectionService:GetInstanceAddedSignal("Water"):Connect(addZone)
-for _, v in CollectionService:GetTagged("Water") do
+CollectionService:GetInstanceAddedSignal("WaterLoaded"):Connect(addZone)
+for _, v in CollectionService:GetTagged("WaterLoaded") do
 	addZone(v)
 end
 

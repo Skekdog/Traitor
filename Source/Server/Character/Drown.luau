@@ -92,8 +92,8 @@ RunService.Heartbeat:Connect(function(dt)
 
 	local submergedParticipants: {[Participant]: true?} = {}
 
-	for _, bound in CollectionService:GetTagged("Water") do
-		if not bound:IsA("BasePart") or not bound:IsDescendantOf(workspace) then
+	for _, bound in CollectionService:GetTagged("WaterLoaded") do
+		if not bound:IsA("BasePart") then
 			return
 		end
 

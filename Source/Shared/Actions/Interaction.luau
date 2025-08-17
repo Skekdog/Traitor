@@ -98,7 +98,7 @@ local function tryClimbLadder(map: Types.Map): boolean
 	end
 
 	for _, v in root:GetTouchingParts() do
-		if v:HasTag("Ladder") then
+		if v:HasTag("LadderLoaded") then
 			ClimbLadder.Climb(v)
 			return true
 		end
@@ -130,14 +130,14 @@ function module.TryInteract(target: Types.MapThing?, input: InputObject?): boole
 		return false
 	end
 
-	if target:HasTag("Door") then
+	if target:HasTag("DoorLoaded") then
 		if input and input.UserInputState ~= Enum.UserInputState.End then
 			return false
 		end
 		return interactDoor(GetPrimaryPart(target))
 	end
 
-	if target:HasTag("Interactable") then
+	if target:HasTag("InteractableLoaded") then
 		tryInteractInteractable(target, input)
 	end
 
@@ -179,9 +179,9 @@ RunService.PostSimulation:Connect(function()
 
 	if prop then
 		module.InteractTarget = prop
-		if prop:HasTag("Item") or prop:HasTag("AmmoBox") then
+		if prop:HasTag("ItemLoaded") or prop:HasTag("AmmoBoxLoaded") then
 			return Mouse.ShowItemHint(prop)
-		elseif prop:HasTag("Interactable") then
+		elseif prop:HasTag("InteractableLoaded") then
 			return Mouse.ShowInteractableHint(prop)
 		end
 	end
