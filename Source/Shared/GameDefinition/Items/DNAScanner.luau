@@ -184,12 +184,12 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 			
 			object = round:GetParticipant(model.Name)
 		end
-	elseif hitPart:HasTag("InteractableLoaded") then
+	elseif hitPart:HasTag("Interactable") then
 		local interactable = round:GetInteractable(hitPart)
 		if interactable then
 			object = interactable
 		end
-	elseif hitPart:HasTag("ItemLoaded") then
+	elseif hitPart:HasTag("Item") then
 		local mapItem = round:GetItem(hitPart)
 		if mapItem then
 			object = mapItem

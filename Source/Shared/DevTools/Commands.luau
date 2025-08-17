@@ -169,7 +169,7 @@ module.xray = {
 		map.Static:SetAttribute("XRayEnabled", enabled)
 
 		for _, instance in map.Static:GetDescendants() do
-			if not instance:IsA("BasePart") and not instance:IsA("Texture") or instance:HasTag("PropLoaded") then
+			if not instance:IsA("BasePart") and not instance:IsA("Texture") or instance:HasTag("Prop") then
 				continue
 			end
 
@@ -207,7 +207,7 @@ module.showbounds = {
 		map.Static:SetAttribute("ShowBounds", enabled)
 
 		for _, instance in map.Static:GetDescendants() do
-			if not instance:IsA("BasePart") or instance:HasTag("PropLoaded") then
+			if not instance:IsA("BasePart") or instance:HasTag("Prop") then
 				continue
 			end
 

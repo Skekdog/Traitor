@@ -12,7 +12,7 @@ local function checkForWater(root: BasePart): boolean
     end
 
     for _, v in root:GetTouchingParts() do
-        if v:HasTag("WaterLoaded") then
+        if v:HasTag("Water") then
 			return true
         end
     end

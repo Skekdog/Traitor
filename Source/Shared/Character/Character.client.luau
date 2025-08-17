@@ -11,7 +11,7 @@ local clientServer = ReplicatedStorage.Remotes.ClientServer
 
 local function initSnapToLadder(root: BasePart): ()
     root.Touched:Connect(function(part)
-        if not part:HasTag("LadderLoaded") then
+        if not part:HasTag("Ladder") then
             return
         end
 
