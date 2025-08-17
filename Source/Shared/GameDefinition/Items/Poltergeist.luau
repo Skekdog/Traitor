@@ -14,6 +14,7 @@ else
 	Combat = require(ServerScriptService.Combat.Combat)
 end
 
+local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
@@ -75,7 +76,8 @@ local function beforePrimaryFireClient(item: Types.GunWeapon, targets: {BasePart
 end
 
 local function beforeHitAnything(_, round: Types.Round, hitPart: BasePart): boolean
-	return hitPart:IsDescendantOf(round:GetMap().Map)
+	local prop = GetMapThingWithTag(hitPart, "Prop")
+	return if prop then NewtonLauncher.CanFling(GetPrimaryPart(prop)) else false
 end
 
 type PoltInfo = {

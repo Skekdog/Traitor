@@ -70,7 +70,7 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 
 	task.wait(1) -- wait, otherwise the attacker immediately picks up the knife
 
-	model.Parent = attacker.Round:GetMap().Map
+	model.Parent = attacker.Round:GetMap().Dynamic
 	local newItem = attacker.Round:LoadProp(model)
 
 	DNAScanner.AddDNATrace(newItem, attacker, nil, "rbxassetid://14930962070", model)

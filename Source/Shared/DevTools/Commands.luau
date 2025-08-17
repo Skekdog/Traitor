@@ -7,6 +7,7 @@ local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
+local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 
 export type BaseCommand = {
 	Name: string,
@@ -164,10 +165,10 @@ module.xray = {
 			return "No map loaded."
 		end
 
-		local enabled = not (map.Map:GetAttribute("XRayEnabled") :: boolean?)
-		map.Map:SetAttribute("XRayEnabled", enabled)
+		local enabled = not (map.Static:GetAttribute("XRayEnabled") :: boolean?)
+		map.Static:SetAttribute("XRayEnabled", enabled)
 
-		for _, instance in map.Map:GetDescendants() do
+		for _, instance in map.Static:GetDescendants() do
 			if not instance:IsA("BasePart") and not instance:IsA("Texture") or instance:HasTag("PropLoaded") then
 				continue
 			end
@@ -202,10 +203,10 @@ module.showbounds = {
 			return "No map loaded."
 		end
 
-		local enabled = not (map.Map:GetAttribute("ShowBounds") :: boolean?)
-		map.Map:SetAttribute("ShowBounds", enabled)
+		local enabled = not (map.Static:GetAttribute("ShowBounds") :: boolean?)
+		map.Static:SetAttribute("ShowBounds", enabled)
 
-		for _, instance in map.Map:GetDescendants() do
+		for _, instance in map.Static:GetDescendants() do
 			if not instance:IsA("BasePart") or instance:HasTag("PropLoaded") then
 				continue
 			end
@@ -579,7 +580,7 @@ module.map = {
 			return `Map {mapName} not found.`
 		end
 		assert(map:IsA("ModuleScript"))
-		round:LoadMap(map)
+		round:LoadMap(Map.fromModuleScript(map))
 
 		return `Map changed to {mapName}.`
 	end

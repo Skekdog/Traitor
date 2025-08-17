@@ -507,7 +507,7 @@ local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 
 	local part = result.Instance :: BasePart
 
-	if not part:IsDescendantOf(map.Map) and not part:IsDescendantOf(workspace.Corpses) then
+	if not part:IsDescendantOf(map.Dynamic) and not part:IsDescendantOf(workspace.Corpses) then
 		return nil
 	end
 

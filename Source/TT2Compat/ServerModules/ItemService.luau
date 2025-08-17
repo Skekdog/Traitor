@@ -33,7 +33,7 @@ function module.SpawnItem(self, item: string, cframe: CFrame, _, _, _, _): ()
 	end
 
 	local model = definition.Model:Clone();
-	(model :: PVInstance).Parent = round:GetMap().Map
+	(model :: PVInstance).Parent = round:GetMap().Dynamic
 	model:PivotTo(cframe)
 	round:LoadProp(model)
 end

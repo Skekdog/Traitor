@@ -14,7 +14,7 @@ local maps = ServerStorage.Maps
 
 local random = Random.new(workspace:GetServerTimeNow())
 
-local currentMap = maps.TestMap
+local currentMap = Map.fromModuleScript(maps.TestMap)
 
 type ClientMapInfo = {
     Name: string,
@@ -177,8 +177,7 @@ local function doMapVote(): ()
         bestMap = votableMaps[1].Name
     end
 
-    currentMap = (maps :: any)[bestMap]
-    assert(currentMap:IsA("ModuleScript"), "Invalid Map")
+    currentMap = Map.fromModuleScript((maps :: any)[bestMap])
 end
 
 local function onRoundEnd(): ()
