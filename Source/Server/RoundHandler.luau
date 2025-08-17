@@ -39,10 +39,10 @@ local function getMapsForVote(): {ClientMapInfo}
         assert(v:IsA("ModuleScript"), "Invalid Map")
 
         if v.Name ~= currentMap.Name and v.Name ~= "TestMap" then
-            local map = Map.fromModuleScript(v)
+            local definition: Types.MapDefinition = (require)(v)
             table.insert(votableMaps, {
-                Name = map.Name,
-                Icons = map.MapIcons
+                Name = definition.Name,
+                Icons = definition.MapIcons
             })
         end
     end
