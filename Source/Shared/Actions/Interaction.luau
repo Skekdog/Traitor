@@ -120,9 +120,9 @@ function module.TryInteract(target: Types.MapThing?, input: InputObject?): boole
 		return tryClimbLadder(map)
 	end
 
-	local model = target:FindFirstAncestorOfClass("Model")
-	if model and model:IsDescendantOf(workspace.Corpses) then
-		return interactCorpse(model)
+	if target:IsDescendantOf(workspace.Corpses) then
+		assert(target:IsA("Model"), "Corpses must be Models")
+		return interactCorpse(target)
 	end
 
 	local char = LocalCharacter.Character()
