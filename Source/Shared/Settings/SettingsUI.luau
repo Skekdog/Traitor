@@ -496,6 +496,29 @@ function module.AdjustForInset(inset: Vector2): ()
 	ui.LayoutDarken.Done.Position = UDim2.new(0.5, inset.X, 0.1, inset.Y)
 end
 
+function module.UpdateButtonValue(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()
+	local page = getPage(definition.Tab)
+	if not page then
+		error("Invalid tab: " .. definition.Tab)
+	end
+
+	local button = page:FindFirstChild("Button_" .. definition.Name) :: Button
+	if not button then
+		error("Invalid button: " .. definition.Name)
+	end
+
+	print(definition.Name, value)
+
+	if definition.Kind == "Boolean" then
+		setBooleanButton(button :: BooleanButton, value :: SettingDefinitions.BooleanValue)
+	elseif definition.Kind == "Choice" then
+		setChoiceButton(button :: ChoiceButton, (button :: ChoiceButton).Choices:FindFirstChild("Choice_" .. value :: string) :: TextButton, value :: SettingDefinitions.ChoiceValue)
+	elseif definition.Kind == "Control" then
+		updateDisplayedKeybind(button :: KeybindButton, "Keyboard", (value :: SettingDefinitions.ControlValue).Keybind.KBMKeybind)
+		updateDisplayedKeybind(button :: KeybindButton, "Controller", (value :: SettingDefinitions.ControlValue).Keybind.ConsoleKeybind)
+	end
+end
+
 ui:GetPropertyChangedSignal("Visible"):Connect(function()
 	if not ui.Visible then
 		Settings.SaveSettings()

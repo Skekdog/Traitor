@@ -67,6 +67,25 @@ function module.SetSetting(name: string, value: SettingDefinitions.SettingValue)
 	end
 end
 
+function module.ResetAll(): {[SettingDefinitions.SettingDefinition]: SettingDefinitions.SettingValue}
+	local reset: {[SettingDefinitions.SettingDefinition]: SettingDefinitions.SettingValue} = {}
+	for name, _ in settingValues do
+		if name == "SETTINGS_VERSION" then
+			continue
+		end
+
+		local definition = module.GetDefinition(name)
+		assert(definition, `Setting {name} does not exist`)
+
+		reset[definition] = definition.Default
+
+		module.SetSetting(name, definition.Default)
+	end
+	settingValues = {SETTINGS_VERSION = module.SETTINGS_VERSION}
+
+	return reset
+end
+
 function module.UpdateControlSetting(name: string, request: UpdateControlSettingRequest): ()
 	local definition = module.GetDefinition(name)
 

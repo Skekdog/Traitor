@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local Settings = require(script.Parent.Settings)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
@@ -50,8 +49,8 @@ SettingsUI.AddClickButton("Reset to Defaults", "Other", "Settings", "Resets all 
 			return
 		end
 
-		for _, v in SettingDefinitions do
-			Settings.SetSetting(v.Name, v.Default)
+		for i, v in Settings.ResetAll() do
+			SettingsUI.UpdateButtonValue(i, v)
 		end
 	end)
 end)
