@@ -355,39 +355,45 @@ end
 
 local darken = ui.LayoutDarken
 
-local tapCon: RBXScriptConnection?
-local function promptUpdateTouchPosition(control: string): UDim2?
+local function tempRegister(control: string, action: (button: ImageButton) -> ()): ()
 	local lastParams = ControlManager.GetRegisteredInfo(control)
 	local button = ControlManager.Register(control, function() return Enum.ContextActionResult.Pass end)
 
 	assert(button)
 
-	ui.Main.Visible = false
-	toggleTooltip()
-	darken.Visible = true
-
-	local position: UDim2?
-
-	task.wait() -- Waiting is necessary as otherwise the tap is detected when clicking the setting button
-	tapCon = UserInputService.TouchTap:Connect(function(pos)
-		local inset = GuiService:GetGuiInset()
-		position = UDim2.fromOffset(inset.X + pos[1].X, inset.Y + pos[1].Y)
-		button.Position = assert(position)
-	end)
-
-	darken.Done.Activated:Wait()
-
-	assert(tapCon)
-	tapCon:Disconnect()
+	action(button)
 
 	if lastParams then
-		ControlManager.Register(control, lastParams.Callback)
+		ControlManager.Register(control, lastParams.Callback, lastParams.Priority)
 	else
 		ControlManager.Unregister(control)
 	end
+end
 
-	ui.Main.Visible = true
-	darken.Visible = false
+local tapCon: RBXScriptConnection?
+local function promptUpdateTouchPosition(control: string): UDim2?
+	local position: UDim2?
+
+	tempRegister(control, function(button: ImageButton): ()
+		ui.Main.Visible = false
+		toggleTooltip()
+		darken.Visible = true
+
+		task.wait() -- Waiting is necessary as otherwise the tap is detected when clicking the setting button
+		tapCon = UserInputService.TouchTap:Connect(function(pos)
+			local inset = GuiService:GetGuiInset()
+			position = UDim2.fromOffset(inset.X + pos[1].X, inset.Y + pos[1].Y)
+			button.Position = assert(position)
+		end)
+
+		darken.Done.Activated:Wait()
+
+		assert(tapCon)
+		tapCon:Disconnect()
+
+		ui.Main.Visible = true
+		darken.Visible = false
+	end)
 
 	return position
 end
@@ -410,14 +416,16 @@ local function updateTouchScale(definition: SettingDefinitions.ControlDefinition
 	if not UserInputService.TouchEnabled then
 		return ScreenMessage("Info", "Touchscreen is not enabled on this device.")
 	end
-	
-	local newScale = TextInput.Create(definition.Name, "Number", "0.5-3", "TouchScale")
-	if newScale then
-		Settings.UpdateControlSetting(definition.Name, {
-			Kind = "TouchScale",
-			New = newScale,
-		})
-	end
+
+	tempRegister(definition.Name, function(button: ImageButton): ()
+		local newScale = TextInput.Create(definition.Name, "Number", "0.5-3", "TouchScale")
+		if newScale then
+			Settings.UpdateControlSetting(definition.Name, {
+				Kind = "TouchScale",
+				New = newScale,
+			})
+		end
+	end)
 end
 
 local function setupButton(buttonArg: Button, name: string, tab: string, category: string, tooltip: string?, addColon: boolean): ()
