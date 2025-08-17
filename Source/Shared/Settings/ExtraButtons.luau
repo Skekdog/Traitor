@@ -35,14 +35,14 @@ SettingsUI.AddClickButton("View Welcome", "Other", "Those You Trust", nil, funct
 	UIManager.WaitForUI("Welcome"):ToggleVisible(true)
 end)
 
-for _, v in ReplicatedStorage.Assets.Licenses:GetChildren() do
-	assert(v:IsA("StringValue"))
-	SettingsUI.AddClickButton(v.Name, "Other", "Acknowledgements", "These are third-party packages, without which the game would not be possible!", function()
-		local ui = UIManager.WaitForUI("Acknowledgements") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Acknowledgements)}
-		ui.Object.ScrollingFrame.License.Text = v.Value
-		ui:ToggleVisible(true)
-	end)
-end
+-- for _, v in ReplicatedStorage.Assets.Licenses:GetChildren() do
+-- 	assert(v:IsA("StringValue"))
+-- 	SettingsUI.AddClickButton(v.Name, "Other", "Acknowledgements", "These are third-party packages, without which the game would not be possible!", function()
+-- 		local ui = UIManager.WaitForUI("Acknowledgements") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Acknowledgements)}
+-- 		ui.Object.ScrollingFrame.License.Text = v.Value
+-- 		ui:ToggleVisible(true)
+-- 	end)
+-- end
 
 SettingsUI.AddClickButton("Reset to Defaults", "Other", "Settings", "Resets all settings to their default values. Cannot be undone.", function()
 	ConfirmationPrompt("Are you sure you want to reset all settings to their defaults?", function(response: boolean): ()
