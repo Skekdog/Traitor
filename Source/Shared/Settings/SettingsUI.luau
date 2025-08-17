@@ -507,8 +507,6 @@ function module.UpdateButtonValue(definition: SettingDefinitions.SettingDefiniti
 		error("Invalid button: " .. definition.Name)
 	end
 
-	print(definition.Name, value)
-
 	if definition.Kind == "Boolean" then
 		setBooleanButton(button :: BooleanButton, value :: SettingDefinitions.BooleanValue)
 	elseif definition.Kind == "Choice" then
