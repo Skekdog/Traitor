@@ -93,6 +93,17 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 	assert(definition.Kind == "Control", `Setting {name} is not a control setting`)
 
 	local value = module.GetSetting(name) :: SettingDefinitions.ControlValue
+	value = {
+		Keybind = {
+			KBMKeybind = value.Keybind.KBMKeybind,
+			ConsoleKeybind = value.Keybind.ConsoleKeybind,
+		},
+		Toggled = value.Toggled,
+		TouchButton = if value.TouchButton then {
+			Position = value.TouchButton.Position,
+			Scale = value.TouchButton.Scale,
+		} else nil,
+	}
 
 	if request.Kind == "KeyboardKeybind" then
 		value.Keybind.KBMKeybind = request.New
