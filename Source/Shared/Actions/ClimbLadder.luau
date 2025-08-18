@@ -30,6 +30,7 @@ end
 local function setStates(hum: Humanoid, enabled: boolean): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, enabled)
     hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, not enabled)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, enabled)
     hum:ChangeState(if enabled then Enum.HumanoidStateType.Freefall else Enum.HumanoidStateType.Climbing)
     hum.PlatformStand = not enabled
     hum.AutoRotate = enabled
@@ -151,10 +152,6 @@ function module.StopClimbing(): ()
     local climbSound = root:FindFirstChild("ClimbSound") :: Sound?
     if climbSound then
         climbSound:Destroy()
-    end
-
-    if hum:GetState() == Enum.HumanoidStateType.Swimming then
-        hum:ChangeState(Enum.HumanoidStateType.GettingUp)
     end
 
     local alignPos = root:FindFirstChild("LadderPositionAlignment") :: AlignPosition?
