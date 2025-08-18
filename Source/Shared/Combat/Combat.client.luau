@@ -99,19 +99,11 @@ local function updateCrosshair(isAiming: boolean): ()
 		return crosshair:ToggleVisible(false)
 	end
 
-	local spread = if item.Kind == "Gun" then item.Definition.Spread * 10 * (if isAiming then item.Definition.AimSpreadMultiplier or 1 else 1) else 0
+	local spread = if item.Kind == "Gun" then item.Definition.Spread * 2000 * (if isAiming then item.Definition.AimSpreadMultiplier or 1 else 1) else 0
 
+	local value = math.max(24 + (math.round(spread / 2) * 2), 36)
 	for _, v in crosshairFrames do
-		local anchorPoint = v.AnchorPoint
-		if anchorPoint.X == 0 then
-			v.Position = UDim2.fromScale(-spread, v.Position.Y.Scale)
-		elseif anchorPoint.X == 1 then
-			v.Position = UDim2.fromScale(1 + spread, v.Position.Y.Scale)
-		elseif anchorPoint.Y == 0 then
-			v.Position = UDim2.fromScale(v.Position.X.Scale, -spread)
-		elseif anchorPoint.Y == 1 then
-			v.Position = UDim2.fromScale(v.Position.X.Scale, 1 + spread)
-		end
+		v.Size = UDim2.fromOffset(value, value)
 	end
 end
 
