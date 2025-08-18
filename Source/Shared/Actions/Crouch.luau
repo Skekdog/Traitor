@@ -44,9 +44,22 @@ local function isBlocked(): boolean
 	return result ~= nil
 end
 
+local crouchDisablers: {[string]: true?} = {}
+
+function module.SetCrouchDisabled(source: string, disabled: boolean): ()
+	if disabled then
+		module.ToggleCrouching(false)
+	end
+	crouchDisablers[source] = if disabled then true else nil
+end
+
 function module.ToggleCrouching(enabled: boolean?): ()
 	if isCrouching == enabled then
 		return
+	end
+
+	for source in crouchDisablers do
+		return -- yeah this looks stupid but actually the table will only have a value if it is disabled
 	end
 
 	isCrouching = if enabled == nil then not isCrouching else enabled
