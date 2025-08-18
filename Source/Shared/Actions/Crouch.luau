@@ -5,6 +5,8 @@ local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 
+local BLOCKED_CHECK_DISTANCE = 1.75
+
 local isCrouching = false
 local track: AnimationTrack?
 
@@ -27,8 +29,32 @@ function module.IsCrouching(): boolean
 	return isCrouching
 end
 
+local params = RaycastParams.new()
+params.FilterDescendantsInstances = {workspace.Characters, workspace.Corpses, workspace.Projectiles}
+params.FilterType = Enum.RaycastFilterType.Exclude
+params.IgnoreWater = true
+
+local function isBlocked(): boolean
+	local root = LocalCharacter.RootPart()
+	if not root then
+		return true
+	end
+
+	local result = workspace:Raycast(root.Position, Vector3.yAxis * BLOCKED_CHECK_DISTANCE, params)
+	return result ~= nil
+end
+
 function module.ToggleCrouching(enabled: boolean?): ()
+	if isCrouching == enabled then
+		return
+	end
+
 	isCrouching = if enabled == nil then not isCrouching else enabled
+
+	if not isCrouching and isBlocked() then
+		isCrouching = true
+		return
+	end
 
 	WalkSpeed.SetModifier("Crouching", if isCrouching then -6 else 0)
 
