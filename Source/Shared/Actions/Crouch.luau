@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
@@ -69,9 +68,14 @@ function module.ToggleCrouching(enabled: boolean?): ()
 		return
 	end
 
+	local hum = LocalCharacter.Humanoid()
+	if isCrouching and hum and hum:GetState() == Enum.HumanoidStateType.Swimming then
+		isCrouching = false
+		return
+	end
+
 	WalkSpeed.SetModifier("Crouching", if isCrouching then -6 else 0)
 
-	local hum = LocalCharacter.Humanoid()
 	if hum then
 		hum.CameraOffset = Vector3.new(0, if isCrouching then -0.9 else 0, 0)
 		JumpPower.SetModifier("Crouching", not isCrouching)
@@ -88,12 +92,17 @@ function module.ToggleCrouching(enabled: boolean?): ()
 	end
 end
 
-Players.LocalPlayer.CharacterAdded:Connect(function(char)
-	local hum = char:WaitForChild("Humanoid")
-	assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
+LocalCharacter.Humanoid:Connect(function(hum)
+	if not hum then
+		return
+	end
 
 	hum:GetPropertyChangedSignal("MoveDirection"):Connect(function()
 		adjustTrackSpeed()
+	end)
+
+	hum.Swimming:Connect(function()
+		module.ToggleCrouching(false)
 	end)
 end)
 
