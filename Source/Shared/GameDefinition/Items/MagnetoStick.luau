@@ -622,6 +622,12 @@ local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function()
 
 	local params = RaycastParams.new()
 	params.FilterDescendantsInstances = {char, part}
+	if part:IsDescendantOf(workspace.Corpses) then
+		local model = part:FindFirstAncestorOfClass("Model")
+		if model then
+			params:AddToFilter(model)
+		end
+	end
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
