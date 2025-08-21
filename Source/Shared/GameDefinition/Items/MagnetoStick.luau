@@ -130,7 +130,7 @@ local function canGrab(part: BasePart): boolean
 	return true
 end
 
-type NetworkOwnerParameter = Player | "Auto"
+type NetworkOwnerParameter = Player | "Auto"?
 local function setNetworkOwnerOfPart(part: BasePart, owner: NetworkOwnerParameter): ()
 	if not part:IsDescendantOf(workspace) then
 		return
@@ -276,6 +276,9 @@ local function stopControllingPropServer(player: Player): ()
 	end
 
 	setNetworkOwnerOfPart(part, "Auto")
+	if prop.Kind == "CorpseProp" and prop.Model.PrimaryPart then
+		setNetworkOwnerOfPart(prop.Model.PrimaryPart, nil)
+	end
 
 	serverGrabbedProps[player] = nil
 
