@@ -21,9 +21,20 @@ LocalParticipantInfo.Participants:Connect(function(participants)
 
         activeConnections[name] = v.Role:Connect(function(role)
             local player = Players:FindFirstChild(name)
-            if not player or not player:IsA("Player") then
+            if not player or not player:IsA("Player") or not player.Character then
                 return
             end
+
+            local icon = player.Character:FindFirstChild("RoleIcon")
+            if icon then
+                icon:Destroy()
+            end
+
+            local highlight = player.Character:FindFirstChild("Highlight")
+            if highlight then
+                highlight:Destroy()
+            end
+
             HighlightPlayer(player)
         end, true)
     end
