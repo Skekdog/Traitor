@@ -3,18 +3,21 @@ local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisp
 local LocalParticipantInfo = require(script.Parent.LocalParticipantInfo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local function makeIcon(player: Player, role: Types.Role): BillboardGui
+local function makeIcon(player: Player, role: Types.Role): BillboardGui?
     local gui = Instance.new("BillboardGui")
     gui.Name = "RoleIcon"
 
-    local head: BasePart -- we need to lie here because it thinks that Adornee cannot be nil, even though it can
-    if player.Character then
-        local found = player.Character:FindFirstChild("Head")
-        if found and found:IsA("BasePart") then
-            head = found
-        end
+    local char = player.Character
+    if not char then
+        return nil
     end
-    gui.Adornee = head
+
+    local root = char.PrimaryPart
+    if not root then
+        return nil
+    end
+
+    gui.Adornee = root
 
     gui.Size = UDim2.new(1, 20, 1, 20)
 
@@ -67,7 +70,7 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui
 
     gui:AddTag("AllyMarker")
     gui.AlwaysOnTop = true
-    gui.StudsOffsetWorldSpace = Vector3.new(0, 1.5, 0)
+    gui.StudsOffsetWorldSpace = Vector3.new(0, 3, 0)
     gui.Parent = player.Character
 
     return gui
