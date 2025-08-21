@@ -477,7 +477,7 @@ local function onDeath(gamemode: Types.GamemodeDefinition, victim: Types.Partici
 
 	if corpse then
 		if corpse.Model then
-			disguiseCorpse(victim, corpse, true)
+			task.spawn(disguiseCorpse, victim, corpse, true)
 		end
 		local attacker = corpse.Killer
 
