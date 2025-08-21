@@ -193,6 +193,11 @@ function movePlr(plr: Player, status: PlayerStatus)
 		clone.SearchedIcon.Visible = false
 	end
 
+	local oldStatus = getStatus(oldOrder)
+	if oldStatus ~= "Alive" and status ~= "Alive" then
+		selectMark(clone.Marks, nil, plr)
+	end
+
 	recalculateCount(status)
 end
 
