@@ -12,6 +12,8 @@ local camera = workspace.CurrentCamera
 local ui = UIManager.WaitForUI("Spectate")
 local uiO = ui.Object :: typeof(UIManager.UnregisteredUIs.Spectate)
 
+local isCurrentlySpectatingPleaseRefactorThisScript = false
+
 local lastKey = 0
 local function spectateFunc(action, state)
 	local chars = {}
@@ -53,6 +55,9 @@ participant.Status:Connect(function(status)
 	statusId = thisStatusId
 
 	local isSpectating = status ~= "Alive"
+	if isCurrentlySpectatingPleaseRefactorThisScript == isSpectating then
+		return
+	end
 
 	-- Do not early return here because we need to set camera properties always
 	if ui.Visible ~= isSpectating then
@@ -82,11 +87,13 @@ participant.Status:Connect(function(status)
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
 		plr.CameraMode = Enum.CameraMode.Classic
+		isCurrentlySpectatingPleaseRefactorThisScript = true
 	else
 		Freecam.StopFreecam()
 		ui:ToggleVisible(false)
 		camera.CameraType = Enum.CameraType.Custom
 		plr.CameraMode = Enum.CameraMode.LockFirstPerson
+		isCurrentlySpectatingPleaseRefactorThisScript = false
 	end
 end, true)
 
