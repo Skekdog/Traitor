@@ -66,6 +66,7 @@ participant.Status:Connect(function(status)
 	end
 
 	if isSpectating then
+		task.wait(0.02) -- some bug that's impossible to reproduce where the camera doesn't follow corpse, i'm just gonna guess its because it doesn't parent quickly enough and hope that waiting fixes it
 		local corpse = workspace.Corpses:FindFirstChild(participant.Name)
 		if corpse then
 			local head = corpse:FindFirstChild("Head")
