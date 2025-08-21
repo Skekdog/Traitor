@@ -10,7 +10,7 @@ local module = {}
 
 local function rehighlightPlayer(name: string): ()
     local player = Players:FindFirstChild(name)
-    if not player or not player:IsA("Player") or not player.Character then
+    if not player or not player:IsA("Player") or not player.Character or player == Players.LocalPlayer then
         return
     end
 
