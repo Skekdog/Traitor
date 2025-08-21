@@ -30,6 +30,10 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
 			return true
 		end
 
+		if not round:IsInProgress() then
+			return true
+		end
+
 		local willDie = params.Amount >= victim:GetHealth()
         if not willDie then
             return true
