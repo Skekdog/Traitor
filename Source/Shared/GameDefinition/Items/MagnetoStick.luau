@@ -119,12 +119,16 @@ local function canGrab(part: BasePart): boolean
 	if part:IsGrounded() then
 		return false
 	end
-	
+
 	if not isPropSmallEnough(part) then
 		return false
 	end
 
 	if part:GetAttribute("NoGrab") then
+		return false
+	end
+
+	if part:IsDescendantOf(workspace.Characters) and not part:HasTag("Corpse") then
 		return false
 	end
 
@@ -483,7 +487,7 @@ end
 local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
+	local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
 
 	local char = LocalCharacter.Character()
 	if not char then
