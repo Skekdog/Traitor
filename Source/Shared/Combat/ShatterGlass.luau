@@ -46,7 +46,7 @@ export type GlassProperties = {
     Reflectance: number,
 }
 
-local function shatterServer(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
+local function shatterServer(glassProperties: BasePart | GlassProperties, direction: Vector3?, force: number?): ()
     assert(typeof(glassProperties) == "Instance")
 
     local properties = {
@@ -61,12 +61,12 @@ local function shatterServer(glassProperties: BasePart | GlassProperties, direct
         Reflectance = glassProperties.Reflectance,
     }
 
-    ReplicatedStorage.Remotes.ServerClient.ShatterGlass:FireAllClients(properties, direction)
+    ReplicatedStorage.Remotes.ServerClient.ShatterGlass:FireAllClients(properties, direction, force)
 
     glassProperties:Destroy()
 end
 
-local function shatterClient(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
+local function shatterClient(glassProperties: BasePart | GlassProperties, direction: Vector3?, force: number?): ()
     assert(typeof(glassProperties) == "table")
 
     local cols = math.max(1, math.floor(glassProperties.Size.X / 3))
@@ -94,11 +94,11 @@ local function shatterClient(glassProperties: BasePart | GlassProperties, direct
 
             table.insert(fragments,
                 createWedgeFragment(glassProperties, Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth),
-                fragmentCFrame1, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one)
+                fragmentCFrame1, (direction or ((if math.random() >= 0.5 then 1 else -1) * Vector3.one)) * (force or 1))
             )
             table.insert(fragments,
                 createWedgeFragment(glassProperties, Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth),
-                fragmentCFrame2, direction or (if math.random() >= 0.5 then 1 else -1) * Vector3.one)
+                fragmentCFrame2, (direction or ((if math.random() >= 0.5 then 1 else -1) * Vector3.one)) * (force or 1))
             )
         end
     end
@@ -122,11 +122,11 @@ local function shatterClient(glassProperties: BasePart | GlassProperties, direct
     end)
 end
 
-local function ShatterGlass(glassProperties: BasePart | GlassProperties, direction: Vector3?): ()
+local function ShatterGlass(glassProperties: BasePart | GlassProperties, direction: Vector3?, force: number?): ()
     if IS_SERVER then
-        return shatterServer(glassProperties, direction)
+        return shatterServer(glassProperties, direction, force)
     end
-    shatterClient(glassProperties, direction)
+    shatterClient(glassProperties, direction, force)
 end
 
 if not IS_SERVER then

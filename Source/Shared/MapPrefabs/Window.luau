@@ -4,7 +4,7 @@ local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrim
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function Window(prop: Types.Prop, params: Types.DamageParams?): ()
-	ShatterGlass(GetPrimaryPart(prop.Model), if params and params.Origin then params.Origin - (params.HitPosition or GetPrimaryPart(prop.Model).Position) else nil)
+	ShatterGlass(GetPrimaryPart(prop.Model), if params and params.Origin then ((params.HitPosition or GetPrimaryPart(prop.Model).Position) - params.Origin).Unit else nil)
 end
 
 return Window
