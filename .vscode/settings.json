@@ -1,3 +1,7 @@
 {
-	"luau-lsp.fflags.enableNewSolver": false
+	"luau-lsp.fflags.enableNewSolver": false,
+	"luau-lsp.completion.imports.ignoreGlobs": [
+		"**/_Index/**",
+		"Source/TT2Compat/**"
+	]
 }
