@@ -1,5 +1,6 @@
-local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
+local GetInteractableDefinition = require(script.Parent.GetInteractableDefinition)
 local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -138,21 +139,24 @@ end
 module.Interactables = DynamicValue.new({} :: {[Instance]: Types.Interactable?})
 
 local function loadInteractable(instance: Instance): ()
+    assert(instance:IsA("BasePart") or instance:IsA("Model"), "Interactable must be a BasePart or Model")
     if not instance:IsDescendantOf(workspace) then
         return
     end
 
-    while not module.Gamemode() or not module.Map() do
+    local gamemode, map = module.Gamemode(), module.Map()
+    while not gamemode or not map do
         task.wait()
+        gamemode, map = module.Gamemode(), module.Map()
     end
+    assert(gamemode and map)
 
-    local GetInteractableDefinition = (require)(script.Parent.GetInteractableDefinition)
-    local definition: Types.InteractableDefinition = GetInteractableDefinition(instance.Name)
+    local definition = GetInteractableDefinition(instance.Name, gamemode, map)
     if not definition then
         return
     end
 
-    local interactable = Interactable.new(definition, instance :: BasePart)
+    local interactable = Interactable.new(definition, instance)
     module.Interactables()[instance] = interactable
 
     if definition.OnLoadClient then
@@ -160,10 +164,20 @@ local function loadInteractable(instance: Instance): ()
     end
 end
 
-CollectionService:GetInstanceAddedSignal("Interactable"):Connect(loadInteractable)
-for _, v in CollectionService:GetTagged("Interactable") do
-    loadInteractable(v)
-end
+module.Map:Connect(function(map)
+    if not map then
+        return
+    end
+
+    map.Dynamic.DescendantAdded:Connect(function(descendant: Instance)
+        if descendant:HasTag("Interactable") then
+            loadInteractable(descendant)
+        end
+    end)
+    for _, v in GetTaggedDescendants(map.Dynamic, "Interactable") do
+        loadInteractable(v)
+    end
+end)
 
 module.OnReset = DynamicValue.new(nil)
 
