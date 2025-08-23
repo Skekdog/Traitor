@@ -579,8 +579,7 @@ module.map = {
 		if not map then
 			return `Map {mapName} not found.`
 		end
-		assert(map:IsA("ModuleScript"))
-		round:LoadMap(Map.fromModuleScript(map))
+		round:LoadMap(Map.fromMapScript(Map.ValidateMapScript(map:Clone())))
 
 		return `Map changed to {mapName}.`
 	end

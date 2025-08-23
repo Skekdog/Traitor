@@ -5,7 +5,8 @@ RoundHandler.Round:Connect(function(round)
 	local lastPauseAttribute = false
 	while true do
 		task.wait()
-		if not round:GetMap().Extras.CompatibilityMode then
+		local map = round:GetMap()
+		if not map.Definition.Extras or not map.Definition.Extras.CompatibilityMode then
 			continue
 		end
 		if round:IsPreGame() then

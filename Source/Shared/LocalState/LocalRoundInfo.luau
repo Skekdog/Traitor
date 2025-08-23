@@ -129,9 +129,7 @@ do
     local map: Types.Map?
     local mapScript = workspace:FindFirstChild("Map")
     if mapScript then
-        if mapScript:IsA("ModuleScript") then
-            map = Map.fromModuleScript(mapScript)
-        end
+        map = Map.fromMapScript(Map.ValidateMapScript(mapScript))
     end
 
     module.Map = DynamicValue.new(map)
@@ -187,11 +185,11 @@ remotes.MapLoaded.OnClientEvent:Connect(function()
         child.ChildAdded:Wait()
     end
 
-    local newMap = Map.fromModuleScript(child)
+    local newMap = Map.fromMapScript(Map.ValidateMapScript(child))
     module.Map:SetValue(newMap)
 
     child.Destroying:Once(function()
-        if module.Map() == newMap then
+        if module.Map() == newMap :: Types.Map? then
             module.Map:SetValue()
         end
     end)

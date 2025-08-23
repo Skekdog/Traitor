@@ -14,7 +14,7 @@ local maps = ServerStorage.Maps
 
 local random = Random.new(workspace:GetServerTimeNow())
 
-local currentMap = Map.fromModuleScript(maps.TestMap)
+local currentMap = Map.fromMapScript(Map.ValidateMapScript(maps.TestMap:Clone()))
 
 type ClientMapInfo = {
     Name: string,
@@ -38,7 +38,7 @@ local function getMapsForVote(): {ClientMapInfo}
 
         assert(v:IsA("ModuleScript"), "Invalid Map")
 
-        if v.Name ~= currentMap.Name and v.Name ~= "TestMap" then
+        if v.Name ~= currentMap.Definition.Name and v.Name ~= "TestMap" then
             local definition: Types.MapDefinition = (require)(v)
             table.insert(votableMaps, {
                 Name = definition.Name,
@@ -177,7 +177,7 @@ local function doMapVote(): ()
         bestMap = votableMaps[1].Name
     end
 
-    currentMap = Map.fromModuleScript((maps :: any)[bestMap])
+    currentMap = Map.fromMapScript((maps :: any)[bestMap]:Clone())
 end
 
 local function onRoundEnd(): ()

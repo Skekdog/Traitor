@@ -7,8 +7,8 @@ assert(RunService:IsClient(), "GetAmmoDefinition should only be called on the cl
 
 local function GetAmmoDefinition(name: string): Types.AmmoDefinition
     local map = LocalRoundInfo.Map()
-    if map and map.AvailableAmmo[name] then
-        return map.AvailableAmmo[name]
+    if map and map.Definition.AvailableAmmo[name] then
+        return map.Definition.AvailableAmmo[name]
     end
 
     local gamemode = LocalRoundInfo.Gamemode()

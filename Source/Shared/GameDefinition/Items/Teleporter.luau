@@ -98,7 +98,7 @@ local function isGrounded(participant: Types.Participant): boolean
 	local map = participant.Round:GetMap()
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles, map.PlayerSpawns}
+	params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles, map.Map.PlayerSpawns}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 
 	local result = workspace:Raycast(origin, Vector3.new(0, -GROUNDED_RAY_DISTANCE, 0), params)

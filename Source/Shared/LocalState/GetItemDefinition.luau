@@ -7,8 +7,8 @@ assert(RunService:IsClient(), "GetItemDefinition should only be called on the cl
 
 local function GetItemDefinition(name: string): Types.AnyItemDefinition?
     local map = LocalRoundInfo.Map()
-    if map and map.AvailableItems[name] then
-        return map.AvailableItems[name]
+    if map and map.Definition.AvailableItems[name] then
+        return map.Definition.AvailableItems[name]
     end
 
     local gamemode = LocalRoundInfo.Gamemode()

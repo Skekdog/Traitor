@@ -21,13 +21,16 @@ local function loadLighting(map: Types.Map): ()
         Lighting:ResetPropertyToDefault(v)
     end
 
-    for _, v in map.Configuration.LightingSettings:GetChildren() do
-        if not Lighting:FindFirstChildOfClass(v.ClassName) then
-            v:Clone().Parent = Lighting
+    local mapLighting = map.Map:FindFirstChild("Lighting")
+    if mapLighting then
+        for i, v in mapLighting:GetChildren() do
+            if not Lighting:FindFirstChildOfClass(v.ClassName) then
+                v:Clone().Parent = Lighting
+            end
         end
     end
 
-    for i, v in map.Configuration.LightingSettings:GetAttributes() do
+    for i, v in map.Definition.LightingSettings do
         (Lighting :: any)[i] = v
         if not table.find(knownLightingSettings, i) then
             table.insert(knownLightingSettings, i)
@@ -40,11 +43,11 @@ LocalRoundInfo.Map:Connect(function(map)
 		return
 	end
 
-	alertUI.Object.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
+	alertUI.Object.Text = `Map Loaded: {GetDisplayName(map.Definition)} by {map.Definition.Authors}`
 	alertUI:ToggleVisible(true)
 
-	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Authors
-	playerlistUI.Object.Info.RoundInfo.Info.Map.Text = `Map: {GetDisplayName(map)}`
+	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Definition.Authors
+	playerlistUI.Object.Info.RoundInfo.Info.Map.Text = `Map: {GetDisplayName(map.Definition)}`
 
 	loadLighting(map)
 
