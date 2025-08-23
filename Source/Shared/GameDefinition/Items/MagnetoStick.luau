@@ -156,22 +156,13 @@ local function setNetworkOwnerOfProp(prop: Types.Prop, owner: NetworkOwnerParame
 	setNetworkOwnerOfPart(part, owner)
 end
 
-local function getControllerObject(prop: Types.MapThing): IntValue?
-	local controllerObject = prop:FindFirstChild("MagnetoController")
-	if not controllerObject or not controllerObject:IsA("IntValue") then
-		return nil
-	end
-	
-	return controllerObject
-end
-
 local function getController(prop: Types.MapThing): Player?
-	local controllerObject = getControllerObject(prop)
-	if not controllerObject then
+	local controllerId = prop:GetAttribute("ControllerId")
+	if typeof(controllerId) ~= "number" then
 		return nil
 	end
 
-	local player = Players:GetPlayerByUserId(controllerObject.Value)
+	local player = Players:GetPlayerByUserId(controllerId)
 	return player
 end
 
@@ -284,10 +275,7 @@ local function stopControllingPropServer(player: Player): ()
 		return
 	end
 
-	local controllerObject = getControllerObject(getPrimaryInstance(prop))
-	if controllerObject then
-		controllerObject.Value = 0
-	end
+	getPrimaryInstance(prop):SetAttribute("ControllerId", nil)
 
 	setNetworkOwnerOfPart(part, "Auto")
 
@@ -718,17 +706,7 @@ local function fireServer(_, mode: "Primary" | "Alternate", origin: Vector3, dir
 			return
 		end
 
-		local controllerObject = getControllerObject(getPrimaryInstance(prop))
-		if not controllerObject then
-			local newObject = Instance.new("IntValue")
-			newObject.Name = "MagnetoController"
-			newObject.Parent = getPrimaryInstance(prop)
-
-			controllerObject = newObject
-		end
-
-		assert(controllerObject)
-		controllerObject.Value = participant.Player.UserId
+		getPrimaryInstance(prop):SetAttribute("ControllerId", participant.Player.UserId)
 
 		serverGrabbedProps[participant.Player] = prop
 	end
