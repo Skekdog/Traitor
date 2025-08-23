@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -514,6 +515,7 @@ module.respawn = {
 	Environment = "Server" :: "Server",
 	Arguments = {"players"},
 	Execute = function(executor: Player, round: Types.Round, args: Args): string
+		local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 		local players = processPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
@@ -521,12 +523,14 @@ module.respawn = {
 
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
-			if not participant then
-				continue
+			if participant then
+				round:RemoveParticipant(participant, true)
+				if participant.Corpse and participant.Corpse.Model then
+					participant.Corpse.Model:Destroy()
+				end
 			end
 
-			round:RemoveParticipant(participant, true)
-			round:AddPlayer(player, participant:GetKarma())
+			round:AddPlayer(player, if participant then participant:GetKarma() else KarmaManager.GetKarma(player))
 		end
 
 		return "Respawned " .. getPlayersString(players) .. "."
