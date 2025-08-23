@@ -1101,7 +1101,7 @@ local function plantInteractable(item: Types.Item, origin: Vector3, direction: V
     params.FilterType = Enum.RaycastFilterType.Exclude
 
     local result = workspace:Raycast(origin, direction * 10, params)
-    if not result then
+    if not result or not result.Instance:IsDescendantOf(participant.Round:GetMap().Static) then
         return nil
     end
 
