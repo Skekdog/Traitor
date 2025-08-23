@@ -1,6 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
@@ -20,8 +19,8 @@ local function projectiles(name: string): BasePart
     return ReplicatedStorage.Assets:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
 end
 
-local function weaponSounds(name: string): string
-    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound).SoundId
+local function weaponSounds(name: string): Sound
+    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound)
 end
 
 local highlight1 = {
@@ -153,7 +152,7 @@ local function burnThing(target: BurnTarget, info: BurnInfo): ()
     
     info.LastBurn = timeNow
 
-    PlaySound(weaponSounds("FlareBurn"), nil, model, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+    PlaySound(weaponSounds("FlareBurn"), nil, if model:IsA("Model") then model.PrimaryPart else model)
 
     if target.Kind == "Participant" or target.Kind == "Prop" then
         local health = (target :: Types.Prop):GetHealth()

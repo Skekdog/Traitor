@@ -3,18 +3,21 @@ local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisp
 local LocalParticipantInfo = require(script.Parent.LocalParticipantInfo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local function makeIcon(player: Player, role: Types.Role): BillboardGui
+local function makeIcon(player: Player, role: Types.Role): BillboardGui?
     local gui = Instance.new("BillboardGui")
     gui.Name = "RoleIcon"
 
-    local head: BasePart -- we need to lie here because it thinks that Adornee cannot be nil, even though it can
-    if player.Character then
-        local found = player.Character:FindFirstChild("Head")
-        if found and found:IsA("BasePart") then
-            head = found
-        end
+    local char = player.Character
+    if not char then
+        return nil
     end
-    gui.Adornee = head
+
+    local root = char.PrimaryPart
+    if not root then
+        return nil
+    end
+
+    gui.Adornee = root
 
     gui.Size = UDim2.new(1, 20, 1, 20)
 
@@ -46,9 +49,10 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui
 
     -- I tried using the WCAG contrast guidelines for this and the results were... eh.
     -- Probably because of the transparency and gradient (modifying the function to account for transparency didn't help)
-    -- So instead we just compare to the denary value of 0.8, 0.8, 0.8 (0.5 is too dark)
     -- Not exactly perfect but well, colour is subjective anyway, and also, who is going to make a role that is so bright??
-    textLabel.TextColor3 = if tonumber("0x" .. role.Definition.Color:ToHex()) > 13421772 then Color3.new() else Color3.new(1, 1, 1)
+    local colour = role.Definition.Color
+    local useBlack = colour.R < 0.8 and colour.G < 0.8 and colour.B < 0.8
+    textLabel.TextColor3 = if useBlack then Color3.new() else Color3.new(1, 1, 1)
 
     textLabel.TextScaled = true
     textLabel.Font = Enum.Font.SourceSans
@@ -67,7 +71,7 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui
 
     gui:AddTag("AllyMarker")
     gui.AlwaysOnTop = true
-    gui.StudsOffsetWorldSpace = Vector3.new(0, 1.5, 0)
+    gui.StudsOffsetWorldSpace = Vector3.new(0, 3, 0)
     gui.Parent = player.Character
 
     return gui

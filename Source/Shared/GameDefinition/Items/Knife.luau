@@ -8,6 +8,8 @@ local DAMAGE = 100
 
 local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
 	local model = item.Model:Clone()
+
+	model.CollisionGroup = "PlayerCharacterParts" -- to prevent collision with head
 	assert(model:IsA("BasePart"))
 
 	local didThrow = attacker:TryThrowAssembly(model, THROW_FORCE, nil, origin, direction, true)

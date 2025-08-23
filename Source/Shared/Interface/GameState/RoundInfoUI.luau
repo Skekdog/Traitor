@@ -56,6 +56,8 @@ local function setRoleText(): ()
 
     if role ~= Defaults.Role and status == "Alive" then
         roundInfo.TopBar.Role.Text = role:GetFormattedName()
+    elseif status == "Alive" then
+        roundInfo.TopBar.Role.Text = "Preparing"
     else
         roundInfo.TopBar.Role.Text = "Spectator"
     end

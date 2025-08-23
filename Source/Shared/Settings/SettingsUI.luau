@@ -355,39 +355,45 @@ end
 
 local darken = ui.LayoutDarken
 
-local tapCon: RBXScriptConnection?
-local function promptUpdateTouchPosition(control: string): UDim2?
+local function tempRegister(control: string, action: (button: ImageButton) -> ()): ()
 	local lastParams = ControlManager.GetRegisteredInfo(control)
 	local button = ControlManager.Register(control, function() return Enum.ContextActionResult.Pass end)
 
 	assert(button)
 
-	ui.Main.Visible = false
-	toggleTooltip()
-	darken.Visible = true
-
-	local position: UDim2?
-
-	task.wait() -- Waiting is necessary as otherwise the tap is detected when clicking the setting button
-	tapCon = UserInputService.TouchTap:Connect(function(pos)
-		local inset = GuiService:GetGuiInset()
-		position = UDim2.fromOffset(inset.X + pos[1].X, inset.Y + pos[1].Y)
-		button.Position = assert(position)
-	end)
-
-	darken.Done.Activated:Wait()
-
-	assert(tapCon)
-	tapCon:Disconnect()
+	action(button)
 
 	if lastParams then
-		ControlManager.Register(control, lastParams.Callback)
+		ControlManager.Register(control, lastParams.Callback, lastParams.Priority)
 	else
 		ControlManager.Unregister(control)
 	end
+end
 
-	ui.Main.Visible = true
-	darken.Visible = false
+local tapCon: RBXScriptConnection?
+local function promptUpdateTouchPosition(control: string): UDim2?
+	local position: UDim2?
+
+	tempRegister(control, function(button: ImageButton): ()
+		ui.Main.Visible = false
+		toggleTooltip()
+		darken.Visible = true
+
+		task.wait() -- Waiting is necessary as otherwise the tap is detected when clicking the setting button
+		tapCon = UserInputService.TouchTap:Connect(function(pos)
+			local inset = GuiService:GetGuiInset()
+			position = UDim2.fromOffset(inset.X + pos[1].X, inset.Y + pos[1].Y)
+			button.Position = assert(position)
+		end)
+
+		darken.Done.Activated:Wait()
+
+		assert(tapCon)
+		tapCon:Disconnect()
+
+		ui.Main.Visible = true
+		darken.Visible = false
+	end)
 
 	return position
 end
@@ -410,14 +416,16 @@ local function updateTouchScale(definition: SettingDefinitions.ControlDefinition
 	if not UserInputService.TouchEnabled then
 		return ScreenMessage("Info", "Touchscreen is not enabled on this device.")
 	end
-	
-	local newScale = TextInput.Create(definition.Name, "Number", "0.5-3", "TouchScale")
-	if newScale then
-		Settings.UpdateControlSetting(definition.Name, {
-			Kind = "TouchScale",
-			New = newScale,
-		})
-	end
+
+	tempRegister(definition.Name, function(button: ImageButton): ()
+		local newScale = TextInput.Create(definition.Name, "Number", "0.5-3", "TouchScale")
+		if newScale then
+			Settings.UpdateControlSetting(definition.Name, {
+				Kind = "TouchScale",
+				New = newScale,
+			})
+		end
+	end)
 end
 
 local function setupButton(buttonArg: Button, name: string, tab: string, category: string, tooltip: string?, addColon: boolean): ()
@@ -494,6 +502,27 @@ end
 function module.AdjustForInset(inset: Vector2): ()
 	ui.LayoutDarken.Hint.Position = UDim2.new(0, inset.X, 0, inset.Y)
 	ui.LayoutDarken.Done.Position = UDim2.new(0.5, inset.X, 0.1, inset.Y)
+end
+
+function module.UpdateButtonValue(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()
+	local page = getPage(definition.Tab)
+	if not page then
+		error("Invalid tab: " .. definition.Tab)
+	end
+
+	local button = page:FindFirstChild("Button_" .. definition.Name) :: Button
+	if not button then
+		error("Invalid button: " .. definition.Name)
+	end
+
+	if definition.Kind == "Boolean" then
+		setBooleanButton(button :: BooleanButton, value :: SettingDefinitions.BooleanValue)
+	elseif definition.Kind == "Choice" then
+		setChoiceButton(button :: ChoiceButton, (button :: ChoiceButton).Choices:FindFirstChild("Choice_" .. value :: string) :: TextButton, value :: SettingDefinitions.ChoiceValue)
+	elseif definition.Kind == "Control" then
+		updateDisplayedKeybind(button :: KeybindButton, "Keyboard", (value :: SettingDefinitions.ControlValue).Keybind.KBMKeybind)
+		updateDisplayedKeybind(button :: KeybindButton, "Controller", (value :: SettingDefinitions.ControlValue).Keybind.ConsoleKeybind)
+	end
 end
 
 ui:GetPropertyChangedSignal("Visible"):Connect(function()

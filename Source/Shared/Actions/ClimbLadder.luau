@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
+local Crouch = require(script.Parent.Crouch)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
 local module = {}
@@ -29,6 +30,7 @@ end
 local function setStates(hum: Humanoid, enabled: boolean): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Freefall, enabled)
     hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, not enabled)
+    hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, enabled)
     hum:ChangeState(if enabled then Enum.HumanoidStateType.Freefall else Enum.HumanoidStateType.Climbing)
     hum.PlatformStand = not enabled
     hum.AutoRotate = enabled
@@ -36,6 +38,7 @@ end
 
 function module.Climb(ladder: BasePart): ()
     module.StopClimbing()
+    Crouch.SetCrouchDisabled("Climbing", true)
 
     local char = LocalCharacter.Character()
     if not char then
@@ -126,6 +129,7 @@ function module.Climb(ladder: BasePart): ()
 end
 
 function module.StopClimbing(): ()
+    Crouch.SetCrouchDisabled("Climbing", false)
     if jumpRequestCon then
         jumpRequestCon:Disconnect()
     end
@@ -148,10 +152,6 @@ function module.StopClimbing(): ()
     local climbSound = root:FindFirstChild("ClimbSound") :: Sound?
     if climbSound then
         climbSound:Destroy()
-    end
-
-    if hum:GetState() == Enum.HumanoidStateType.Swimming then
-        hum:ChangeState(Enum.HumanoidStateType.GettingUp)
     end
 
     local alignPos = root:FindFirstChild("LadderPositionAlignment") :: AlignPosition?

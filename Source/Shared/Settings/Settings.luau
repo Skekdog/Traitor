@@ -67,6 +67,25 @@ function module.SetSetting(name: string, value: SettingDefinitions.SettingValue)
 	end
 end
 
+function module.ResetAll(): {[SettingDefinitions.SettingDefinition]: SettingDefinitions.SettingValue}
+	local reset: {[SettingDefinitions.SettingDefinition]: SettingDefinitions.SettingValue} = {}
+	for name, _ in settingValues do
+		if name == "SETTINGS_VERSION" then
+			continue
+		end
+
+		local definition = module.GetDefinition(name)
+		assert(definition, `Setting {name} does not exist`)
+
+		reset[definition] = definition.Default
+
+		module.SetSetting(name, definition.Default)
+	end
+	settingValues = {SETTINGS_VERSION = module.SETTINGS_VERSION}
+
+	return reset
+end
+
 function module.UpdateControlSetting(name: string, request: UpdateControlSettingRequest): ()
 	local definition = module.GetDefinition(name)
 
@@ -74,6 +93,17 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 	assert(definition.Kind == "Control", `Setting {name} is not a control setting`)
 
 	local value = module.GetSetting(name) :: SettingDefinitions.ControlValue
+	value = {
+		Keybind = {
+			KBMKeybind = value.Keybind.KBMKeybind,
+			ConsoleKeybind = value.Keybind.ConsoleKeybind,
+		},
+		Toggled = value.Toggled,
+		TouchButton = if value.TouchButton then {
+			Position = value.TouchButton.Position,
+			Scale = value.TouchButton.Scale,
+		} else nil,
+	}
 
 	if request.Kind == "KeyboardKeybind" then
 		value.Keybind.KBMKeybind = request.New

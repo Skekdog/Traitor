@@ -3,6 +3,7 @@ require(script.Parent.Controls.KeybindHintManager)
 
 require(script.Parent.Combat.OnHitClient)
 require(script.Parent.Combat.MakeBulletHole)
+require(script.Parent.Util.ClientSound)
 require(script.Parent.Interface.Util.ShowAlert)
 require(script.Parent.Combat.BulletTracer)
 require(script.Parent.Combat.ShatterGlass)

@@ -238,6 +238,8 @@ function module.TransitionUIPage(currentPage: GuiObject, newPage: GuiObject, tar
 				currentPage.Visible = false
 			end
 		end)
+	else
+		currentPage.Visible = false
 	end
 end
 
