@@ -29,7 +29,7 @@ function module.IsCrouching(): boolean
 end
 
 local params = RaycastParams.new()
-params.FilterDescendantsInstances = {workspace.Characters, workspace.Corpses, workspace.Projectiles}
+params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles}
 params.FilterType = Enum.RaycastFilterType.Exclude
 params.IgnoreWater = true
 

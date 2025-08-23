@@ -633,7 +633,7 @@ local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function()
 
 	local params = RaycastParams.new()
 	params.FilterDescendantsInstances = {char, part}
-	if part:IsDescendantOf(workspace.Corpses) then
+	if part:IsDescendantOf(workspace.Characters) then
 		local model = part:FindFirstAncestorOfClass("Model")
 		if model then
 			params:AddToFilter(model)
