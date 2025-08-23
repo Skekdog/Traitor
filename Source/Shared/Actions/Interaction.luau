@@ -120,7 +120,7 @@ function module.TryInteract(target: Types.MapThing?, input: InputObject?): boole
 		return tryClimbLadder(map)
 	end
 
-	if target:IsDescendantOf(workspace.Corpses) then
+	if target:IsDescendantOf(workspace.Characters) and target:HasTag("Corpse") then
 		assert(target:IsA("Model"), "Corpses must be Models")
 		return interactCorpse(target)
 	end
@@ -193,7 +193,7 @@ RunService.PostSimulation:Connect(function()
 
 	module.InteractTarget = char
 
-	if char:IsDescendantOf(workspace.Corpses) then
+	if char:HasTag("Corpse") then
 		return Mouse.ShowCorpseHint(char)
 	elseif char:IsDescendantOf(workspace.Characters) then
 		return Mouse.ShowPlayerInfo(char)

@@ -261,7 +261,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 						local normal = if raycastResult then raycastResult.Normal else nil
 						local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
 
-						if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) and not hitPart:IsDescendantOf(workspace.Corpses) then
+						if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
 							local materialOverride = hitPart:GetAttribute("MaterialOverride")
 							local material = if materialOverride and materialOverride ~= "" then materialOverride else hitPart.Material.Name
 							PlaySound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)

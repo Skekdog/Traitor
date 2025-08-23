@@ -61,8 +61,8 @@ participant.Status:Connect(function(status)
 	end
 
 	if isSpectating then
-		local corpse = workspace.Corpses:FindFirstChild(participant.Name)
-		if corpse then
+		local corpse = workspace.Characters:FindFirstChild(participant.Name)
+		if corpse and corpse:HasTag("Corpse") then
 			local head = corpse:FindFirstChild("Head")
 			if head and head:IsA("BasePart") then
 				camera.CameraSubject = head

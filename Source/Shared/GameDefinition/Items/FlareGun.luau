@@ -111,7 +111,7 @@ local function stopBurning(target: BurnTarget): ()
     if target.Kind ~= "Participant" then
         target.Model:SetAttribute("Burning", false)
 
-        if target.Kind == "CorpseProp" then
+        if target.Model:HasTag("Corpse") then
             target.Model:Destroy()
         end
     end

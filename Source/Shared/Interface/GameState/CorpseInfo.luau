@@ -151,7 +151,7 @@ return function(corpseInfo: Types.CorpseView?)
     corpseName = corpseInfo.Name
     local participant = LocalParticipantInfo.GetParticipant(corpseName)
 
-    corpseModel = workspace.Corpses:FindFirstChild(corpseName)
+    corpseModel = workspace.Characters:FindFirstChild(corpseName)
     local withinRange = getDistanceToCorpse() <= Mouse.CorpseInteractDistance
 
     local bodyIdentified = if corpseModel then not corpseModel:GetAttribute("Unidentified") else false

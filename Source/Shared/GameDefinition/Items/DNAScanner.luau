@@ -175,10 +175,10 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 
 	local hitPart = result.Instance :: BasePart
 
-	if hitPart:IsDescendantOf(workspace.Corpses) then
+	if hitPart:IsDescendantOf(workspace.Characters) then
 		local model = hitPart:FindFirstAncestorOfClass("Model")
 		if model then
-			if model:GetAttribute("Unidentified") then
+			if model:GetAttribute("Unidentified") or not model:HasTag("Corpse") then
 				return
 			end
 			
@@ -244,7 +244,7 @@ if RunService:IsClient() then
 			return
 		end
 	
-		local targetCharacter = workspace.Characters:FindFirstChild(clientCurrentTrace.Target) or workspace.Corpses:FindFirstChild(clientCurrentTrace.Target)
+		local targetCharacter = workspace.Characters:FindFirstChild(clientCurrentTrace.Target)
 		if not targetCharacter or not targetCharacter:IsA("Model") then
 			return
 		end

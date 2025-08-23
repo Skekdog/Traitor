@@ -86,9 +86,9 @@ local function getPrimaryInstance(prop: Types.Prop | Types.MapThing): Types.MapT
 	end
 
 	local instance: Types.MapThing = model
-	if model:IsDescendantOf(workspace.Corpses) then
+	if model:IsDescendantOf(workspace.Characters) then
 		local foundModel = model:FindFirstAncestorOfClass("Model")
-		if foundModel and foundModel:IsDescendantOf(workspace.Corpses) then
+		if foundModel and foundModel:HasTag("Corpse") then
 			instance = foundModel
 		end
 	end
@@ -363,7 +363,7 @@ if RunService:IsServer() then
 		end
 
 		local model = part:FindFirstAncestorOfClass("Model")
-		if not model or not model:IsDescendantOf(workspace.Corpses) then
+		if not model or not model:HasTag("Corpse") then
 			return
 		end
 
@@ -389,7 +389,7 @@ if RunService:IsServer() then
 		end
 
 		local model = part:FindFirstAncestorOfClass("Model")
-		if not model or not model:IsDescendantOf(workspace.Corpses) then
+		if not model or not model:HasTag("Corpse") then
 			return
 		end
 
@@ -483,6 +483,7 @@ end
 local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
 
 	local char = LocalCharacter.Character()
 	if not char then
@@ -507,7 +508,7 @@ local function getPropClient(origin: Vector3, direction: Vector3): BasePart?
 
 	local part = result.Instance :: BasePart
 
-	if not part:IsDescendantOf(map.Dynamic) and not part:IsDescendantOf(workspace.Corpses) then
+	if not part:IsDescendantOf(map.Dynamic) and not GetMapThingWithTag(part, "Corpse") then
 		return nil
 	end
 
@@ -521,7 +522,7 @@ local function tryHang(origin: Vector3, direction: Vector3): boolean
 	end
 	lastHang = tick()
 
-	if not currentGrabClient or not currentGrabClient:IsDescendantOf(workspace.Corpses) then
+	if not currentGrabClient or not currentGrabClient:IsDescendantOf(workspace.Characters) then
 		return false
 	end
 
@@ -536,7 +537,7 @@ local function tryHang(origin: Vector3, direction: Vector3): boolean
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {workspace.Corpses, workspace.Characters}
+	params.FilterDescendantsInstances = {workspace.Characters}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
@@ -663,11 +664,11 @@ local function getPropServer(participant: Types.Participant, origin: Vector3, di
 	local part = result.Instance :: BasePart
 
 	local model: Types.MapThing? = part
-	if part:IsDescendantOf(workspace.Corpses) then
+	if part:IsDescendantOf(workspace.Characters) then
 		model = part:FindFirstAncestorOfClass("Model")
 	end
 
-	if not model then
+	if not model or not model:HasTag("Corpse") then
 		return nil
 	end
 
