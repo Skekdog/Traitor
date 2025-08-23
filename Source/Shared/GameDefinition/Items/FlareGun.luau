@@ -2,6 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -64,32 +66,21 @@ local function burn(attacker: Types.Participant, target: BurnTarget): ()
         end
 
         part = root
-    elseif target.Kind == "MapProp" or target.Kind == "AmmoProp" or target.Kind == "ItemProp" then
-        part = target.Model
-    elseif target.Kind == "CorpseProp" then
-        local root = target.Model.PrimaryPart
-        if not root then
-            return
-        end
-
-        part = root
+    else
+        part = GetPrimaryPart(target.Model)
     end
 
     local fire = Instance.new("Fire")
     fire.Size = 10
     fire.Parent = part
 
-    local burnSound = Instance.new("Sound")
-    burnSound.SoundId = weaponSounds("FlareBurn")
-    burnSound.Parent = part
-
-    if target.Kind == "MapProp" then
-        part:SetAttribute("Burning", true)
-    elseif target.Kind == "CorpseProp" then
+    if target.Kind == "MapProp" and target.Model:HasTag("Corpse") then
         target.Model:SetAttribute("Burning", true)
         if not attacker:IsBadGuy() then
             attacker:SetFreeKill("burned a corpse")
         end
+    else
+        part:SetAttribute("Burning", true)
     end
 
     burningThings[target] = {
@@ -119,28 +110,30 @@ end
 
 local function burnTouchingParticipants(prop: Types.Prop): ()
     local burnedParticipants: {Types.Participant} = {}
-    for _, v in workspace:GetPartsInPart(prop.Model) do
-        local model = v:FindFirstAncestorOfClass("Model")
-        if not model then
-            continue
+    ForEachPart(prop.Model, function(propPart)
+        for _, v in workspace:GetPartsInPart(propPart) do
+            local model = v:FindFirstAncestorOfClass("Model")
+            if not model then
+                continue
+            end
+
+            local participant = prop.Round:GetParticipant(model.Name)
+            if not participant then
+                continue
+            end
+
+            if table.find(burnedParticipants, participant) then
+                continue
+            end
+
+            table.insert(burnedParticipants, participant)
+
+            participant:TryTakeDamage({
+                Amount = 1,
+                Source = "Burn",
+            })
         end
-
-        local participant = prop.Round:GetParticipant(model.Name)
-        if not participant then
-            continue
-        end
-
-        if table.find(burnedParticipants, participant) then
-            continue
-        end
-
-        table.insert(burnedParticipants, participant)
-
-        participant:TryTakeDamage({
-            Amount = 1,
-            Source = "Burn",
-        })
-    end
+    end)
 end
 
 local function burnThing(target: BurnTarget, info: BurnInfo): ()
