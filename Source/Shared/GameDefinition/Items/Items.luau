@@ -314,7 +314,7 @@ guns["Golden Gun"] = {
 
     BeforeHitProp = function(item: Types.ItemBeforeHit, _, target: Types.Prop, params: Types.DamageParams): boolean
         assert(item.Kind == "Gun")
-        if target.Kind ~= "MapProp" then
+        if target.Kind ~= "Prop" then
             return false
         end
         

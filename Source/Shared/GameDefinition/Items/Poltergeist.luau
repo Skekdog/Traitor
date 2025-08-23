@@ -91,7 +91,7 @@ local poltedProps: {[Types.Prop]: PoltInfo} = {}
 local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop, params: Types.DamageParams): boolean
 	assert(params.Attacker)
 
-	if hitProp.Kind ~= "MapProp" then
+	if hitProp.Kind ~= "Prop" then
 		return false
 	end
 

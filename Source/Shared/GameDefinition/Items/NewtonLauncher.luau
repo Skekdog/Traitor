@@ -61,7 +61,7 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 		return true
 	end
 
-    if hit.Kind == "MapProp" then
+    if hit.Kind == "Prop" then
         MagnetoStick.SetLastHeldBy(hit, attacker.Player)
     end
 

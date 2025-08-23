@@ -289,7 +289,7 @@ local function stopControllingPropServer(player: Player): ()
 
 	serverGrabbedProps[player] = nil
 
-	if prop.Kind == "MapProp" and not serverTouchedConnections[prop] then
+	if prop.Kind == "Prop" and not serverTouchedConnections[prop] then
 		module.SetLastHeldBy(prop, player)
 	end
 end

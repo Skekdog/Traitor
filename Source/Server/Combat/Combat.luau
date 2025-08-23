@@ -204,7 +204,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		return
 	end
 
-	if prop.Kind ~= "MapProp" and prop.Kind ~= "Interactable" then
+	if prop.Kind ~= "Prop" and prop.Kind ~= "Interactable" then
 		return
 	end
 

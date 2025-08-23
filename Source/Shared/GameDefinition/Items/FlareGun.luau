@@ -74,7 +74,7 @@ local function burn(attacker: Types.Participant, target: BurnTarget): ()
     fire.Size = 10
     fire.Parent = part
 
-    if target.Kind == "MapProp" and target.Model:HasTag("Corpse") then
+    if target.Kind == "Prop" and target.Model:HasTag("Corpse") then
         target.Model:SetAttribute("Burning", true)
         if not attacker:IsBadGuy() then
             attacker:SetFreeKill("burned a corpse")
@@ -155,13 +155,13 @@ local function burnThing(target: BurnTarget, info: BurnInfo): ()
 
     PlaySound(weaponSounds("FlareBurn"), nil, model, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 
-    if target.Kind == "Participant" or target.Kind == "MapProp" then
+    if target.Kind == "Participant" or target.Kind == "Prop" then
         local health = (target :: Types.Prop):GetHealth()
         if health and health <= 0 then
             return stopBurning(target)
         end
 
-        if target.Kind == "MapProp" then
+        if target.Kind == "Prop" then
             burnTouchingParticipants(target)
         end
 
