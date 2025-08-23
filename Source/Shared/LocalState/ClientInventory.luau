@@ -300,12 +300,21 @@ local function removeItem(itemName: string): ()
 		tryUnequip(equippedItem)
 	end
 	
+	local slot: number?
+
 	local item = GetItemDefinition(itemName)
-	if not item then
-		return
+	if item then
+		slot = item.Slot
+	else
+		for i, v in ourInventory.Slots do
+			if v.Definition.Name == itemName then
+				slot = i
+				break
+			end
+		end
 	end
 
-	if not item.Slot then
+	if not slot then
 		for i, v in ourInventory.Passive do
 			if v.Definition.Name == itemName then
 				table.remove(ourInventory.Passive, i)
@@ -319,7 +328,7 @@ local function removeItem(itemName: string): ()
 	end
 
 	tryRemoveButton(itemName)
-	ourInventory.Slots[item.Slot] = nil
+	ourInventory.Slots[slot] = nil
 end
 
 local function addItem(item: Types.AnyItem): ()
