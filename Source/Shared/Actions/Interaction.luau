@@ -182,10 +182,10 @@ RunService.PostSimulation:Connect(function()
 	if prop then
 		module.InteractPart = target
 		module.InteractProp = prop
-		if prop:HasTag("Item") or prop:HasTag("AmmoBox") then
-			return Mouse.ShowItemHint(prop)
-		elseif prop:HasTag("Interactable") then
+		if prop:HasTag("Interactable") then
 			return Mouse.ShowInteractableHint(prop, target)
+		elseif prop:HasTag("Item") or prop:HasTag("AmmoBox") then
+			return Mouse.ShowItemHint(prop)
 		end
 	end
 
