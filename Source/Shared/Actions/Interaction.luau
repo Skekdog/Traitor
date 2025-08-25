@@ -47,8 +47,8 @@ local function interactCorpse(corpse: Model): boolean
 	return true
 end
 
-local function interactDoor(door: BasePart): boolean
-	if not distanceCheck(door.Position, 10) then
+local function interactDoor(door: Types.MapThing): boolean
+	if not distanceCheck(GetPrimaryPart(door).Position, 10) then
 		return false
 	end
 	local request: StandardDoor.ClientInteraction = {
@@ -135,7 +135,7 @@ function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: Input
 		if input and input.UserInputState ~= Enum.UserInputState.End then
 			return false
 		end
-		return interactDoor(GetPrimaryPart(prop))
+		return interactDoor(prop)
 	end
 
 	if prop:HasTag("Interactable") then

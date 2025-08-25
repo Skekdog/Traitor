@@ -2,14 +2,16 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local remotes = ReplicatedStorage.Remotes
 
 local IS_SERVER = RunService:IsServer()
 
 type BaseDoorRequest = {
-    Door: BasePart,
+    Door: Types.MapThing,
 }
 
 export type ClientInteraction = BaseDoorRequest & {
@@ -75,7 +77,8 @@ local function StandardDoor(request: DoorRequest): ()
     local shouldOpen = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
     door:SetAttribute("Open", shouldOpen)
 
-    local originalDoorCFrame = door.CFrame
+    local part = GetPrimaryPart(door)
+    local originalDoorCFrame = part.CFrame
 
     do
         local attribute = door:GetAttribute("OriginalCFrame")
@@ -86,7 +89,7 @@ local function StandardDoor(request: DoorRequest): ()
         end
     end
 
-    local pivotAttachment = door:FindFirstChild("DoorPivot")
+    local pivotAttachment = part:FindFirstChild("DoorPivot")
     assert(pivotAttachment and pivotAttachment:IsA("Attachment"), "DoorPivot must be an Attachment")
 
     if not IS_SERVER then
@@ -139,10 +142,10 @@ local function StandardDoor(request: DoorRequest): ()
             Door = door,
             Open = shouldOpen,
             TargetAngle = targetAngle,
-            OriginalCFrame = door.CFrame,
+            OriginalCFrame = part.CFrame,
         }
 
-        door.CFrame = targetCFrame
+        part.CFrame = targetCFrame
 
         for _, v in Players:GetPlayers() do
             if v ~= request.Player then
@@ -153,12 +156,12 @@ local function StandardDoor(request: DoorRequest): ()
         return
     end
 
-    local angle = findOrCreateAngleValue(door)
+    local angle = findOrCreateAngleValue(part)
 
     if request.Kind == "ClientInteraction" then
         remotes.ClientServer.OpenDoor:FireServer(door, shouldOpen)
     else
-        door.CFrame = request.OriginalCFrame
+        part.CFrame = request.OriginalCFrame
     end
 
     local tween = TweenService:Create(angle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Value = targetAngle})
@@ -167,7 +170,7 @@ local function StandardDoor(request: DoorRequest): ()
     local con: RBXScriptConnection
     con = RunService.PreSimulation:Connect(function()
         local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, angle.Value)
-        door.CFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
+        part.CFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
 
         if tween.PlaybackState == Enum.PlaybackState.Completed then
             con:Disconnect()
@@ -177,9 +180,10 @@ end
 
 if IS_SERVER then
     remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, open: unknown): ()
-        if typeof(door) ~= "Instance" or not door:IsA("BasePart") then
+        if typeof(door) ~= "Instance" or (not door:IsA("BasePart") and not door:IsA("Model")) then
             return
         end
+        local mapThing = door :: Types.MapThing
 
         if typeof(open) ~= "boolean" then
             return
@@ -189,7 +193,9 @@ if IS_SERVER then
             return
         end
 
-        local distance = plr:DistanceFromCharacter(door.Position)
+        local doorPart = GetPrimaryPart(mapThing)
+
+        local distance = plr:DistanceFromCharacter(doorPart.Position)
         if distance == 0 or distance > 15 then
             return
         end
@@ -197,7 +203,7 @@ if IS_SERVER then
         local request: ServerReceive = {
             Kind = "ServerReceive" :: "ServerReceive",
             Player = plr,
-            Door = door,
+            Door = mapThing,
             Open = open,
         }
         StandardDoor(request)
