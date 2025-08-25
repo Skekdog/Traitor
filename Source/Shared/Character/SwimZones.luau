@@ -297,6 +297,10 @@ local function addZone(part: Instance): ()
 		return
 	end
 
+	if part.Size.Y < 1 then
+		return
+	end
+
 	table.insert(zones, part)
 	part.Destroying:Once(function()
 		table.remove(zones, assert(table.find(zones, part)))
