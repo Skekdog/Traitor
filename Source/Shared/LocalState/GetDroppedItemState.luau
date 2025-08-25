@@ -19,7 +19,7 @@ type AmmoState = {
 
 local function GetDroppedItemState(instance: Instance): ItemState | AmmoState
     assert(instance.Parent, "Expected instance to have a parent")
-    local isAmmoBox = instance.Parent.Name == "AmmoSpawns"
+    local isAmmoBox = instance:HasTag("AmmoBox")
 
     local storedAmmo = instance:GetAttribute("StoredAmmo")
     local ammoType = instance:GetAttribute("AmmoType")
