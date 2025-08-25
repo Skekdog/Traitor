@@ -62,16 +62,18 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     if door:GetAttribute("Locked") then
-        if IS_SERVER then
-            return
-        end
+        if request.Kind ~= "ClientReceive" then
+            if IS_SERVER then
+                return
+            end
 
-        if tick() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
+            if tick() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
+                return
+            end
+            PlaySound(134969396, nil, door)
+            door:SetAttribute("LastPlayedLockedSound", tick())
             return
         end
-        PlaySound(134969396, nil, door)
-        door:SetAttribute("LastPlayedLockedSound", tick())
-        return
     end
 
     local shouldOpen = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
