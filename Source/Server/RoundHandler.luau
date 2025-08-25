@@ -14,7 +14,7 @@ local maps = ServerStorage.Maps
 
 local random = Random.new(workspace:GetServerTimeNow())
 
-local currentMap = Map.fromMapScript(Map.ValidateMapScript(maps.TestMap:Clone()))
+local currentMap = Map.fromMapScript(Map.ValidateMapScript(maps.International:Clone()))
 
 type ClientMapInfo = {
     Name: string,
