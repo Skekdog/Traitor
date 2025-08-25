@@ -177,7 +177,7 @@ module.Map:Connect(function(map)
     for _, v in GetTaggedDescendants(map.Dynamic, "Interactable") do
         loadInteractable(v)
     end
-end)
+end, true)
 
 module.OnReset = DynamicValue.new(nil)
 
