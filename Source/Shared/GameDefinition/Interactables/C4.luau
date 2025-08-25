@@ -553,17 +553,17 @@ local interactable: Types.InteractableDefinition = {
 	end,
 
 	OnLoadClient = function(object: Types.Interactable): ()
-		c4s()[object.Object] = object :: C4
+		c4s()[object.Model] = object :: C4
 		c4s:Invoke()
 	end,
 
 	OnLoadServer = function(object: Types.Interactable): ()
-		c4s()[object.Object] = object :: C4
+		c4s()[object.Model] = object :: C4
 		c4s:Invoke()
 
-		object.Object.AncestryChanged:Connect(function()
-			if not object.Object:IsDescendantOf(workspace) then
-				c4s()[object.Object] = nil
+		object.Model.AncestryChanged:Connect(function()
+			if not object.Model:IsDescendantOf(workspace) then
+				c4s()[object.Model] = nil
 				c4s:Invoke()
 			end
 		end)

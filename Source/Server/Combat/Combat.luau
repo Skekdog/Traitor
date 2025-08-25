@@ -4,6 +4,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
+local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -204,10 +205,6 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		return
 	end
 
-	if prop.Kind ~= "Prop" and prop.Kind ~= "Interactable" then
-		return
-	end
-
 	(prop :: Types.Prop):TryTakeDamage(params)
 end
 
@@ -216,9 +213,9 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 
 	local victim = tryGetParticipantFromPart(round, hitPart)
 
-	local model = hitPart:FindFirstAncestorOfClass("Model")
-	local prop = round:GetProp(if model then model else hitPart)
-	local interactable = round:GetInteractable(hitPart)
+	local mapThing = GetMapThingWithTag(hitPart, "Prop")
+	local prop = round:GetProp(mapThing or hitPart)
+	local interactable = round:GetInteractable(mapThing or hitPart)
 
 	local propLike = prop or interactable
 

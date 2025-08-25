@@ -635,7 +635,7 @@ module.spawninteractable = {
 				continue
 			end
 
-			GetPrimaryPart(round:AddInteractable(definition).Object).CFrame = char:GetPivot()
+			GetPrimaryPart(round:AddInteractable(definition).Model).CFrame = char:GetPivot()
 		end
 
 		return `Spawned {interactableName} at {getPlayersString(players)}.`

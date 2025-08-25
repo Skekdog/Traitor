@@ -63,7 +63,7 @@ local function interactInteractable(interactable: Types.Interactable): ()
 	if interactable.Definition.OnInteractClient then
 		interactable.Definition.OnInteractClient(interactable)
 	end
-	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Object)
+	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Model)
 end
 
 local function tryInteractInteractable(prop: Types.MapThing, part: BasePart, input: InputObject?): boolean

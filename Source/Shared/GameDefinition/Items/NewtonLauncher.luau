@@ -36,7 +36,7 @@ if RunService:IsClient() then
     flingRemote.OnClientEvent:Connect(module.Fling)
 end
 
-local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit: Types.Participant | Types.Prop, params: Types.DamageParams): boolean
+local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit: Types.Participant | Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
 	assert(weapon.Kind == "Gun")
 
 	local model = if hit.Kind == "Participant" then hit:GetCharacter() else hit.Model

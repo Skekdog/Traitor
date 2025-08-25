@@ -312,7 +312,7 @@ guns["Golden Gun"] = {
     AimFOV = 70,
     AimSpreadMultiplier = 0,
 
-    BeforeHitProp = function(item: Types.ItemBeforeHit, _, target: Types.Prop, params: Types.DamageParams): boolean
+    BeforeHitProp = function(item: Types.ItemBeforeHit, _, target: Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
         assert(item.Kind == "Gun")
         if target.Kind ~= "Prop" then
             return false
@@ -1081,11 +1081,11 @@ local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate"
     local round = participant.Round
 
     local interactable = createInteractableForItem(item, round)
-    local success = participant:TryThrowAssembly(interactable.Object, 10, round:GetMap().Dynamic, nil, direction)
+    local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Dynamic, nil, direction)
 
     if not success then
-        round._interactables[interactable.Object] = nil
-        interactable.Object:Destroy()
+        round._interactables[interactable.Model] = nil
+        interactable.Model:Destroy()
         return nil
     end
 
@@ -1106,7 +1106,7 @@ local function plantInteractable(item: Types.Item, origin: Vector3, direction: V
     end
 
     local interactable = createInteractableForItem(item, participant.Round)
-    local object = interactable.Object;
+    local object = interactable.Model;
     (object :: Instance).Parent = participant.Round:GetMap().Dynamic
 
     GetPrimaryPart(object).CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal)
@@ -1151,7 +1151,7 @@ items.C4 = {
             return
         end
 
-        local object = interactable.Object
+        local object = interactable.Model
         assert(object:IsA("BasePart"))
 
         weld.Enabled = false
@@ -1206,7 +1206,7 @@ items.Radio = {
         end
 
         interactable.Extras.Player = participant.Player
-        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://128627317841330", interactable.Object)
+        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://128627317841330", interactable.Model)
     end,
 }
 
@@ -1253,7 +1253,7 @@ items.DeathStation = {
 
         interactable.Extras.Owner = participant
 
-        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://93284379186217", interactable.Object)
+        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://93284379186217", interactable.Model)
     end,
 }
 
@@ -1278,15 +1278,15 @@ items.Decoy = {
             return
         end
 
-        local object = interactable.Object
+        local object = interactable.Model
         assert(object:IsA("BasePart"))
 
         weld.Enabled = false
         object.CFrame *= CFrame.new(0, 0, -object.Size.Z / 2)
         weld.Enabled = true
 
-        interactable.Object:SetAttribute("Player", participant.Player.Name)
-        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://96906503847712", interactable.Object)
+        interactable.Model:SetAttribute("Player", participant.Player.Name)
+        DNAScanner.AddDNATrace(interactable, participant, nil, "rbxassetid://96906503847712", interactable.Model)
     end
 }
 

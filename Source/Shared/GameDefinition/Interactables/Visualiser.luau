@@ -87,7 +87,7 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	local sphere = Instance.new("Part")
 	sphere.Shape = Enum.PartType.Ball
 	sphere.Size = Vector3.zero
-	sphere.Position = GetPrimaryPart(visualiser.Object).Position
+	sphere.Position = GetPrimaryPart(visualiser.Model).Position
 	sphere.Material = VISUALISE_MATERIAL
 	sphere.Color = VISUALISE_COLOUR
 	sphere.Anchored = false
@@ -97,13 +97,13 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 	sphere.CanQuery = false
 
 	local weld = Instance.new("WeldConstraint")
-	weld.Part0 = GetPrimaryPart(visualiser.Object)
+	weld.Part0 = GetPrimaryPart(visualiser.Model)
 	weld.Part1 = sphere
-	weld.Parent = visualiser.Object
+	weld.Parent = visualiser.Model
 
 	TweenService:Create(sphere, SPHERE_TWEEN_INFO, {Size = Vector3.new(VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2)}):Play()
 
-	PlaySound(5114177371, nil, visualiser.Object, {
+	PlaySound(5114177371, nil, visualiser.Model, {
 		Volume = 0.5,
 		RollOffMinDistance = 5,
 		RollOffMaxDistance = 15,
@@ -252,7 +252,7 @@ local function OnInteractServer(interactable: Visualiser, participant: Types.Par
 		return
 	end
 
-	interactable.Object:Destroy()
+	interactable.Model:Destroy()
 	participant:GiveItemFromItemDefinition(visualiserItem)
 end
 
@@ -265,7 +265,7 @@ end
 local function OnLoadServer(interactable: Visualiser): ()
 	interactable.Extras.LastVisualisedAt = tick() - (VISUALISE_INTERVAL - INITIAL_VISUALISE_DELAY)
 
-	interactable.Object.Destroying:Connect(function()
+	interactable.Model.Destroying:Connect(function()
 		removeVisualiser(interactable)
 	end)
 
@@ -277,20 +277,20 @@ local function forEachVisualiser(visualiser: Visualiser): ()
 		return
 	end
 
-	assert(visualiser.Object:IsA("BasePart"))
+	assert(visualiser.Model:IsA("BasePart"))
 
 	visualiser.Extras.LastVisualisedAt = tick()
 
 	local corpsesInRange: {[Model]: DeathData} = {}
 
-	for _, part in workspace:GetPartBoundsInRadius(visualiser.Object.Position, VISUALISATION_RADIUS) do
+	for _, part in workspace:GetPartBoundsInRadius(visualiser.Model.Position, VISUALISATION_RADIUS) do
 		local model = part:FindFirstAncestorOfClass("Model")
 		if not model or corpsesInRange[model] then
 			continue
 		end
 
 		local visualisation = deathData[model]
-		if not visualisation or (visualisation.Victim:GetPivot().Position - visualiser.Object.Position).Magnitude > VISUALISATION_RADIUS then
+		if not visualisation or (visualisation.Victim:GetPivot().Position - visualiser.Model.Position).Magnitude > VISUALISATION_RADIUS then
 			continue
 		end
 		

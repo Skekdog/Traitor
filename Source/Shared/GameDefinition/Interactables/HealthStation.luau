@@ -24,7 +24,7 @@ local stations: {HealthStationServer} = {}
 
 local function setCharge(interactable: HealthStationServer, charge: number): ()
 	interactable.Extras.Charge = math.clamp(charge, 0, module.MAX_CHARGE)
-	interactable.Object:SetAttribute("Charge", interactable.Extras.Charge)
+	interactable.Model:SetAttribute("Charge", interactable.Extras.Charge)
 end
 
 local function OnInteractServer(interactable: HealthStationServer, participant: Types.Participant): ()
@@ -55,7 +55,7 @@ local function OnLoadServer(interactable: HealthStationServer): ()
 	healSound.RollOffMaxDistance = 15
 	healSound.PlaybackRegionsEnabled = true
 	healSound.PlaybackRegion = NumberRange.new(0.2, 1.19)
-	healSound.Parent = interactable.Object
+	healSound.Parent = interactable.Model
 
 	interactable.Extras.HealSound = healSound
 
@@ -63,7 +63,7 @@ local function OnLoadServer(interactable: HealthStationServer): ()
 	noChargeSound.SoundId = "rbxassetid://72729349003330"
 	noChargeSound.RollOffMinDistance = 5
 	noChargeSound.RollOffMaxDistance = 15
-	noChargeSound.Parent = interactable.Object
+	noChargeSound.Parent = interactable.Model
 
 	interactable.Extras.NoChargeSound = noChargeSound
 end
@@ -77,7 +77,7 @@ local function heal(station: HealthStationServer, participant: Types.Participant
 		station.Extras.HealSound:Play()
 	end
 
-	DNAScanner.AddDNATrace(station, participant, nil, "rbxassetid://93284379186217", station.Object)
+	DNAScanner.AddDNATrace(station, participant, nil, "rbxassetid://93284379186217", station.Model)
 end
 
 local lastRecharge = 0
@@ -89,7 +89,7 @@ RunService.Heartbeat:Connect(function()
 	local toRemove: {HealthStationServer} = {}
 
 	for _, station in stations do
-		if not station.Object:IsDescendantOf(workspace) then
+		if not station.Model:IsDescendantOf(workspace) then
 			table.insert(toRemove, station)
 			continue
 		end
@@ -130,12 +130,12 @@ RunService.Heartbeat:Connect(function()
 end)
 
 local function updateCharge(interactable: Types.Interactable): ()
-	local charge = interactable.Object:GetAttribute("Charge") :: number?
+	local charge = interactable.Model:GetAttribute("Charge") :: number?
 	interactable.HintTextClient = `Charge: {charge} / {module.MAX_CHARGE}`
 end
 
 local function OnLoadClient(interactable: Types.Interactable): ()
-	interactable.Object:GetAttributeChangedSignal("Charge"):Connect(function()
+	interactable.Model:GetAttributeChangedSignal("Charge"):Connect(function()
 		updateCharge(interactable)
 	end)
 	updateCharge(interactable)

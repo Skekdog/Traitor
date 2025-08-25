@@ -88,7 +88,7 @@ type PoltInfo = {
 
 local poltedProps: {[Types.Prop]: PoltInfo} = {}
 
-local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop, params: Types.DamageParams): boolean
+local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
 	assert(params.Attacker)
 
 	if hitProp.Kind ~= "Prop" then

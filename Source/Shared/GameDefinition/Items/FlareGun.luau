@@ -37,7 +37,7 @@ local highlight2 = {
     Threshold = 4,
 }
 
-type BurnTarget = Types.Participant | Types.Prop
+type BurnTarget = Types.Participant | Types.Prop | Types.Interactable
 type BurnInfo = {
     LastBurn: number,
     BurnUntil: number,
@@ -232,7 +232,7 @@ local item: Types.GunWeaponDefinition = {
         return true
     end,
 
-    BeforeHitProp = function(_, _, target: Types.Prop, params: Types.DamageParams): boolean
+    BeforeHitProp = function(_, _, target: Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
         local attacker = params.Attacker
         assert(attacker)
 

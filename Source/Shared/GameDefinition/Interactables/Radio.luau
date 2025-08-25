@@ -269,7 +269,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		if radio.Object:FindFirstChild(soundName) then
+		if radio.Model:FindFirstChild(soundName) then
 			return
 		end
 
@@ -304,7 +304,7 @@ if RunService:IsServer() then
 
 		radio.Extras.LastPlayedAt = tick()
 
-		PlaySound(sound, nil, radio.Object, {
+		PlaySound(sound, nil, radio.Model, {
 			SoundGroup = SoundService.AllSounds :: SoundGroup,
 		})
 	end)
@@ -325,7 +325,7 @@ end
 
 local function OnLoadServer(interactable: Radio): ()
 	serverRound = interactable.Round
-	interactable.Object.Destroying:Connect(function()
+	interactable.Model.Destroying:Connect(function()
 		table.remove(activeRadios, table.find(activeRadios, interactable) or error("Radio not found"))
 	end)
 
@@ -346,7 +346,7 @@ local function OnInteractServer(interactable: Radio, participant: Types.Particip
 		return
 	end
 
-	interactable.Object:Destroy()
+	interactable.Model:Destroy()
 	participant:GiveItemFromItemDefinition(radioItem)
 end
 

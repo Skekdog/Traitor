@@ -14,7 +14,7 @@ local function OnLoadServer(interactable: DeathStationServer): ()
 	deniedSound.SoundId = "rbxassetid://72729349003330"
 	deniedSound.RollOffMinDistance = 5
 	deniedSound.RollOffMaxDistance = 15
-	deniedSound.Parent = interactable.Object
+	deniedSound.Parent = interactable.Model
 
 	interactable.Extras.DeniedSound = deniedSound
 end

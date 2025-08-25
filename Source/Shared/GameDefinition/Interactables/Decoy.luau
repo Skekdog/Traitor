@@ -15,7 +15,7 @@ local activeDecoysClient: {Decoy} = {}
 module.ActiveDecoysClient = activeDecoysClient
 
 local function getPlayerFromAttribute(interactable: Decoy): Player?
-	local name = interactable.Object:GetAttribute("Player") :: string?
+	local name = interactable.Model:GetAttribute("Player") :: string?
 	if not name then
 		return nil
 	end
@@ -29,7 +29,7 @@ local function setAssociatedPlayerClient(interactable: Decoy, player: Player?): 
 end
 
 local function OnLoadClient(interactable: Decoy): ()
-	local object = interactable.Object
+	local object = interactable.Model
 	if not object:IsDescendantOf(workspace) then
 		return
 	end
@@ -66,7 +66,7 @@ local function OnInteractServer(interactable: Decoy, participant: Types.Particip
 		return
 	end
 
-	interactable.Object:Destroy()
+	interactable.Model:Destroy()
 	participant:GiveItemFromItemDefinition(decoyItem)
 end
 
