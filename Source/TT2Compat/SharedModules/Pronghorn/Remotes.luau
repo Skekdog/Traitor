@@ -19,7 +19,7 @@ type ClientRemote = {
 }
 
 local function UseClientRemote(self: ClientRemote, ...: any): ()
-	self._fire(...)
+	self:_fire(...)
 end
 
 local function newClientRemote(fire: FireClientRemote): ClientRemote
