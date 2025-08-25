@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
@@ -39,9 +40,10 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 	end
 
 	local size = if mapThing:IsA("BasePart") then mapThing.Size else mapThing:GetExtentsSize()
+	local origin = GetPrimaryPart(mapThing).Position
 
-	if distanceFromBox(mapThing:GetPivot().Position, size, player.Character:GetPivot().Position) > interactable.Definition.InteractionRange * 1.1 then
-		return
+	if distanceFromBox(origin, size, player.Character:GetPivot().Position) > interactable.Definition.InteractionRange * 1.1 then
+		return print(origin)
 	end
 
 	interactable.Definition.OnInteractServer(interactable, participant)
