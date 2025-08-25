@@ -21,7 +21,8 @@ local module = {}
 
 module.CorpseInteractDistance = 10
 
-module.InteractTarget = nil :: Types.MapThing?
+module.InteractProp = nil :: Types.MapThing?
+module.InteractPart = nil :: BasePart?
 
 local function distanceCheck(target: Vector3, maxDistance: number): boolean
 	local distance = Players.LocalPlayer:DistanceFromCharacter(target)
@@ -65,20 +66,20 @@ local function interactInteractable(interactable: Types.Interactable): ()
 	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Object)
 end
 
-local function tryInteractInteractable(interactablePart: Types.MapThing, input: InputObject?): boolean
-	local interactable = LocalRoundInfo.Interactables()[interactablePart]
+local function tryInteractInteractable(prop: Types.MapThing, part: BasePart, input: InputObject?): boolean
+	local interactable = LocalRoundInfo.Interactables()[prop]
 	if not interactable then
 		return false
 	end
 
 	local definition = interactable.Definition
 
-	if not distanceCheck(GetPrimaryPart(interactablePart).Position, definition.InteractionRange) then
+	if not distanceCheck(part.Position, definition.InteractionRange) then
 		return false
 	end
 
 	if definition.IsContinuousInteraction then
-		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(GetPrimaryPart(interactablePart).Position, definition.InteractionRange) and module.InteractTarget == interactablePart do
+		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(part.Position, definition.InteractionRange) and module.InteractProp == prop do
 			interactInteractable(interactable)
 			task.wait()
 		end
@@ -107,22 +108,22 @@ local function tryClimbLadder(map: Types.Map): boolean
 	return false
 end
 
-function module.TryInteract(target: Types.MapThing?, input: InputObject?): boolean
+function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: InputObject?): boolean
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return false
 	end
 
-	if not target then
+	if not prop or not part then
 		if input and input.UserInputState ~= Enum.UserInputState.End then
 			return false
 		end
 		return tryClimbLadder(map)
 	end
 
-	if target:IsDescendantOf(workspace.Characters) and target:HasTag("Corpse") then
-		assert(target:IsA("Model"), "Corpses must be Models")
-		return interactCorpse(target)
+	if prop:IsDescendantOf(workspace.Characters) and prop:HasTag("Corpse") then
+		assert(prop:IsA("Model"), "Corpses must be Models")
+		return interactCorpse(prop)
 	end
 
 	local char = LocalCharacter.Character()
@@ -130,22 +131,22 @@ function module.TryInteract(target: Types.MapThing?, input: InputObject?): boole
 		return false
 	end
 
-	if target:HasTag("Door") then
+	if prop:HasTag("Door") then
 		if input and input.UserInputState ~= Enum.UserInputState.End then
 			return false
 		end
-		return interactDoor(GetPrimaryPart(target))
+		return interactDoor(GetPrimaryPart(prop))
 	end
 
-	if target:HasTag("Interactable") then
-		tryInteractInteractable(target, input)
+	if prop:HasTag("Interactable") then
+		tryInteractInteractable(prop, part, input)
 	end
 
 	return false
 end
 
 local function interactAction(action: string, state: Enum.UserInputState, input: InputObject?): Enum.ContextActionResult
-	return if module.TryInteract(module.InteractTarget, input) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+	return if module.TryInteract(module.InteractProp, module.InteractPart, input) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
 end
 
 ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.High.Value + 1)
@@ -167,7 +168,8 @@ RunService.PostSimulation:Connect(function()
 
 	Mouse.Reset()
 
-	module.InteractTarget = nil
+	module.InteractProp = nil
+	module.InteractPart = nil
 
 	if not result then
 		return
@@ -178,11 +180,12 @@ RunService.PostSimulation:Connect(function()
 	local prop = GetMapThingWithTag(target, {"Prop", "Door"})
 
 	if prop then
-		module.InteractTarget = prop
+		module.InteractPart = target
+		module.InteractProp = prop
 		if prop:HasTag("Item") or prop:HasTag("AmmoBox") then
 			return Mouse.ShowItemHint(prop)
 		elseif prop:HasTag("Interactable") then
-			return Mouse.ShowInteractableHint(prop)
+			return Mouse.ShowInteractableHint(prop, target)
 		end
 	end
 

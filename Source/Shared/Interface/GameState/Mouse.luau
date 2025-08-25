@@ -6,7 +6,6 @@ local GetDroppedItemState = require(ReplicatedStorage.Shared.LocalState.GetDropp
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
-local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -119,7 +118,7 @@ function module.ShowCorpseHint(char: Model)
 	interactableFrame.Visible = true
 end
 
-function module.ShowInteractableHint(interactablePart: Types.MapThing): ()
+function module.ShowInteractableHint(prop: Types.MapThing, part: BasePart): ()
 	local plr = Players.LocalPlayer
 	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 
@@ -127,7 +126,7 @@ function module.ShowInteractableHint(interactablePart: Types.MapThing): ()
 		return
 	end
 
-	local interactable = LocalRoundInfo.Interactables()[interactablePart]
+	local interactable = LocalRoundInfo.Interactables()[prop]
 	if not interactable then
 		return
 	end
@@ -137,7 +136,7 @@ function module.ShowInteractableHint(interactablePart: Types.MapThing): ()
 	end
 
 	local definition = interactable.Definition
-	if not definition or plr:DistanceFromCharacter(GetPrimaryPart(interactablePart).Position) > definition.InteractionRange then
+	if not definition or plr:DistanceFromCharacter(part.Position) > definition.InteractionRange then
 		return
 	end
 
