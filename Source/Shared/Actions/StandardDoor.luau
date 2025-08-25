@@ -94,14 +94,21 @@ local function StandardDoor(request: DoorRequest): ()
 
     if not IS_SERVER then
         local sounds = {}
-        for _, v in door:GetChildren() do
-            if v:IsA("Sound") and v.Name == if shouldOpen then "OpenSound" else "CloseSound" then
-                table.insert(sounds, v)
+        local soundsFolder = door:FindFirstChild("Sounds")
+        if soundsFolder then
+            local soundFolder = soundsFolder:FindFirstChild(if shouldOpen then "Open" else "Close")
+            if soundFolder then
+                for _, v in soundFolder:GetChildren() do
+                    if v:IsA("Sound") then
+                        table.insert(sounds, v)
+                    end
+                end
             end
         end
-        if #sounds ~= 0 then
-            sounds[math.random(1, #sounds)]:Play()
+        if #sounds == 0 then
+            sounds = {PlaySound.MakeSound(if shouldOpen then 316089029 else 316089019, nil)}
         end
+        PlaySound(sounds, nil, door)
     end
 
     local duration = 0.75
