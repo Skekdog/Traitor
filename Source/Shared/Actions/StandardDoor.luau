@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 
 local remotes = ReplicatedStorage.Remotes
 
@@ -55,6 +56,19 @@ local function StandardDoor(request: DoorRequest): ()
 
     local door = request.Door
     if request.Kind ~= "ClientReceive" and door:GetAttribute("Opening") then
+        return
+    end
+
+    if door:GetAttribute("Locked") then
+        if IS_SERVER then
+            return
+        end
+
+        if tick() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
+            return
+        end
+        PlaySound(134969396, nil, door)
+        door:SetAttribute("LastPlayedLockedSound", tick())
         return
     end
 
