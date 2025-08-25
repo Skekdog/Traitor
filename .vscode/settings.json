@@ -3,5 +3,6 @@
 	"luau-lsp.completion.imports.ignoreGlobs": [
 		"**/_Index/**",
 		"Source/TT2Compat/**"
-	]
+	],
+	"luau-lsp.types.robloxSecurityLevel": "None"
 }
