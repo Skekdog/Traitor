@@ -15,8 +15,9 @@ end
 local playerChatted = Instance.new("BindableEvent")
 module.PlayerChatted = playerChatted.Event
 
-TextChatService.MessageReceived:Connect(function(message: TextChatMessage): ()
-	playerChatted:Fire(message.TextSource, message.Text)
-end)
+local RBXGeneral = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
+RBXGeneral.ShouldDeliverCallback = function(message: TextChatMessage): ()
+	playerChatted:Fire(Players:GetPlayerByUserId(message.TextSource.UserId), message.Text)
+end
 
 return module
