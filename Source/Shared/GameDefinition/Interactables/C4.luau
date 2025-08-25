@@ -38,7 +38,7 @@ local reducedExplosionInfo: Types.ExplosionInfo = {
 }
 
 export type C4 = Types.Interactable & {
-	Object: BasePart,
+	Model: BasePart,
 	Extras: {
 		ArmId: never?,
 		ArmedBy: Types.Participant?,
@@ -85,7 +85,7 @@ local function getC4Menu()
 end
 
 local function isArmedClient(c4: C4): boolean
-	return c4.Object:GetAttribute("ExplodesAt") ~= nil
+	return c4.Model:GetAttribute("ExplodesAt") ~= nil
 end
 
 local function setDuration(c4: C4, percent: number): ()
@@ -154,17 +154,17 @@ local function showC4Menu(c4: C4, show: boolean): ()
 		buttons.Arm.MouseButton1Click:Connect(function()
 			showC4Menu(currentC4, false)
 			playBeep(nil, SoundService)
-			remote:FireServer(currentC4.Object, "Arm", currentC4.Extras.ArmDurationClient or error("ArmDurationClient is nil"))
+			remote:FireServer(currentC4.Model, "Arm", currentC4.Extras.ArmDurationClient or error("ArmDurationClient is nil"))
 		end)
 
 		buttons:FindFirstChild("Destroy").Activated:Connect(function()
 			showC4Menu(currentC4, false)
-			remote:FireServer(currentC4.Object, "Destroy")
+			remote:FireServer(currentC4.Model, "Destroy")
 		end)
 
 		buttons.Take.Activated:Connect(function()
 			showC4Menu(currentC4, false)
-			remote:FireServer(currentC4.Object, "Take")
+			remote:FireServer(currentC4.Model, "Take")
 		end)
 
 		buttons.Close.Activated:Connect(function()
@@ -178,7 +178,7 @@ local function showC4Menu(c4: C4, show: boolean): ()
 					gradient.Transparency = NumberSequence.new(0.9)
 
 					showC4Menu(currentC4, false)
-					remote:FireServer(currentC4.Object, "CutWire", tonumber(v.Name:sub(5, 5)))
+					remote:FireServer(currentC4.Model, "CutWire", tonumber(v.Name:sub(5, 5)))
 				end)
 			end
 		end
@@ -217,7 +217,7 @@ if RunService:IsClient() then
 
 	local function updateMarkerVisibility(): ()
 		for _, c4 in c4s() do
-			local marker = c4.Object:FindFirstChild("Marker")
+			local marker = c4.Model:FindFirstChild("Marker")
 			if marker and marker:IsA("BillboardGui") then
 				marker.Enabled = isBadGuy and isArmedClient(c4)
 			end
@@ -227,12 +227,12 @@ if RunService:IsClient() then
 	c4s:Connect(updateMarkerVisibility)
 
 	local function playAboutToExplodeBeeps(c4: C4): ()
-		local part = CreateEmptyPart(c4.Object.CFrame)
+		local part = CreateEmptyPart(c4.Model.CFrame)
 		local weld = Instance.new("WeldConstraint")
-		weld.Part0 = c4.Object
+		weld.Part0 = c4.Model
 		weld.Part1 = part
 		part.Name = "SoundPart"
-		part.Parent = c4.Object
+		part.Parent = c4.Model
 
 		c4.Extras.BeganBeepingClient = true
 		PlaySound(6992631696, nil, part, {
@@ -244,7 +244,7 @@ if RunService:IsClient() then
 	end
 
 	local function forEachC4(c4: C4): ()
-		local timerPart = c4.Object:FindFirstChild("TimerPart")
+		local timerPart = c4.Model:FindFirstChild("TimerPart")
 		if not timerPart then
 			return
 		end
@@ -261,13 +261,13 @@ if RunService:IsClient() then
 
 		local ui = getC4Menu()
 		if currentC4 == c4 and ui.Visible then
-			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Object.Position)
+			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Model.Position)
 			if distance == 0 or distance > c4.Definition.InteractionRange then
 				showC4Menu(c4, false)
 			end
 		end
 
-		local explodeAt = c4.Object:GetAttribute("ExplodesAt") :: number?
+		local explodeAt = c4.Model:GetAttribute("ExplodesAt") :: number?
 		if explodeAt then
 			local timeLeft = explodeAt - workspace:GetServerTimeNow()
 			timer.Text = getTimerText(timeLeft)
@@ -282,7 +282,7 @@ if RunService:IsClient() then
 		else
 			timer.Text = ""
 
-			local soundPart = c4.Object:FindFirstChild("SoundPart")
+			local soundPart = c4.Model:FindFirstChild("SoundPart")
 			if soundPart then
 				soundPart:Destroy()
 			end
@@ -291,14 +291,14 @@ if RunService:IsClient() then
 		end
 
 		if isBadGuy then
-			local marker = (c4.Object :: typeof(ReplicatedStorage.Assets.InteractableModels.C4)):FindFirstChild("Marker")
+			local marker = (c4.Model :: typeof(ReplicatedStorage.Assets.InteractableModels.C4)):FindFirstChild("Marker")
 			if not marker then
 				return -- This is when the C4 is destroyed, e.g. when exploding
 			end
 
-			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Object.Position)
+			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Model.Position)
 			if distance == 0 then
-				distance = (workspace.CurrentCamera.CFrame.Position - c4.Object.Position).Magnitude
+				distance = (workspace.CurrentCamera.CFrame.Position - c4.Model.Position).Magnitude
 			end
 
 			local border = marker.Border
@@ -332,7 +332,7 @@ if RunService:IsClient() then
 		local toRemove: {C4} = {}
 
 		for _, c4 in c4s() do
-			if not c4.Object:IsDescendantOf(workspace) then
+			if not c4.Model:IsDescendantOf(workspace) then
 				table.insert(toRemove, c4)
 				continue
 			end
@@ -341,7 +341,7 @@ if RunService:IsClient() then
 		end
 
 		for _, remove in toRemove do
-			c4s()[remove.Object] = nil
+			c4s()[remove.Model] = nil
 		end
 		c4s:Invoke()
 	end)
@@ -378,12 +378,12 @@ if RunService:IsServer() then
 		c4.Extras.ArmId = nil
 		c4.Extras.ArmedBy = nil
 		c4.Extras.DangerousWires = nil
-		c4.Object:SetAttribute("ExplodesAt", nil)
+		c4.Model:SetAttribute("ExplodesAt", nil)
 	end
 
 	local function destroy(c4: C4): ()
 		disarm(c4)
-		c4.Object:Destroy()
+		c4.Model:Destroy()
 	end
 
 	local function tryExplode(c4: C4, armId: any, reducedPower: boolean?): ()
@@ -396,7 +396,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		if not c4.Object:IsDescendantOf(workspace) then
+		if not c4.Model:IsDescendantOf(workspace) then
 			return
 		end
 		
@@ -407,7 +407,7 @@ if RunService:IsServer() then
 		sound.RollOffMaxDistance = if reducedPower then 70 else 240
 
 		destroy(c4)
-		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Object.Position, armedBy), nil, sound)
+		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Model.Position, armedBy), nil, sound)
 	end
 
 	local function tryArm(c4: C4, participant: Types.Participant, duration: number?): ()
@@ -442,9 +442,9 @@ if RunService:IsServer() then
 		})
 
 		DNAScanner.RemoveDNATraces(c4)
-		DNAScanner.AddDNATrace(c4, participant, nil, "rbxassetid://17229908151", c4.Object)
+		DNAScanner.AddDNATrace(c4, participant, nil, "rbxassetid://17229908151", c4.Model)
 
-		c4.Object:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
+		c4.Model:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
 		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)
 	end
 
@@ -457,11 +457,11 @@ if RunService:IsServer() then
 			return
 		end
 
-		PlaySound(9118822196, c4.Object.Position, nil, {
+		PlaySound(9118822196, c4.Model.Position, nil, {
 			Volume = 1.5,
 			PlaybackRegion = NumberRange.new(0.11, 60000),
 		})
-		playBeep(c4.Object.Position)
+		playBeep(c4.Model.Position)
 
 		local alwaysDisarm = safeDisarm or false
 
@@ -524,7 +524,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		if player:DistanceFromCharacter(c4.Object.Position) > c4.Definition.InteractionRange * 1.1 then
+		if player:DistanceFromCharacter(c4.Model.Position) > c4.Definition.InteractionRange * 1.1 then
 			return
 		end
 
