@@ -22,7 +22,17 @@ local function OnBreak(interactable: Types.Interactable, params: Types.DamagePar
 	(require)(Break)(interactable, params)
 end
 
+local function getUseText(mapThing: Types.MapThing): string?
+	local useText = mapThing:GetAttribute("UseText")
+	if typeof(useText) ~= "string" then
+		useText = nil
+	end
+	return useText :: string?
+end
+
 local function createNewInteractable(mapThing: Types.MapThing): Types.Interactable
+	local useText = getUseText(mapThing)
+
 	local definition: Types.InteractableDefinition = {
 		InteractionRange = 7.5,
 		Model = mapThing,
@@ -34,8 +44,16 @@ local function createNewInteractable(mapThing: Types.MapThing): Types.Interactab
 		OnInteractServer = OnInteract,
 
 		OnBreakServer = OnBreak,
+
+		DefaultHintText = useText,
 	}
+
 	local interactable = Interactable.new(definition, mapThing)
+
+	mapThing:GetAttributeChangedSignal("UseText"):Connect(function()
+		interactable.HintTextClient = getUseText(mapThing)
+	end)
+
 	return interactable
 end
 
@@ -63,6 +81,19 @@ if RunService:IsClient() then
 			local interactable = createNewInteractable(descendant)
 			LocalRoundInfo.Interactables()[descendant] = interactable
 			LocalRoundInfo.Interactables:Invoke()
+
+			descendant:GetAttributeChangedSignal("Button"):Connect(function()
+				local value = descendant:GetAttribute("Button")
+				if value then
+					descendant:AddTag("Interactable")
+					LocalRoundInfo.Interactables()[descendant] = interactable
+					LocalRoundInfo.Interactables:Invoke()
+				else
+					descendant:RemoveTag("Interactable")
+					LocalRoundInfo.Interactables()[descendant] = nil
+					LocalRoundInfo.Interactables:Invoke()
+				end
+			end)
 		end
 	end
 
