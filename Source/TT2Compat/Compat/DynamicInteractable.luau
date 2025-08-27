@@ -4,6 +4,8 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
+local module = {}
+
 local function OnInteract(interactable: Types.Interactable, participant: Types.Participant?): ()
 	local name = if participant then "ButtonServer" else "ButtonClient"
 	local Button = interactable.Model:FindFirstChild(name)
@@ -56,17 +58,6 @@ local function createNewInteractable(mapThing: Types.MapThing): Types.Interactab
 	return interactable
 end
 
-local function tryCreateNewInteractable(mapThing: Types.MapThing): Types.Interactable?
-	local RoundHandler = require(ServerScriptService.RoundHandler)
-	local round = RoundHandler.Round()
-
-	if not mapThing:GetAttribute("Button") or not mapThing:IsDescendantOf(round:GetMap().Dynamic) then
-		return nil
-	end
-
-	return createNewInteractable(mapThing)
-end
-
 if RunService:IsClient() then
 	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 	local GetInteractableDefinition = require(ReplicatedStorage.Shared.LocalState.GetInteractableDefinition)
@@ -113,13 +104,18 @@ if RunService:IsClient() then
 
 		map.Dynamic.DescendantAdded:Connect(onDescendantAdded)
 	end, true)
-	return nil
+	return module
 end
 
-local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
-local originalGetInteractable = Round.GetInteractable
-Round.GetInteractable = function(round: Types.Round, model: Types.MapThing): Types.Interactable?
-	return originalGetInteractable(round, model) or tryCreateNewInteractable(model)
+local RoundHandler = require(ServerScriptService.RoundHandler)
+function module.TryCreateNewInteractable(mapThing: Types.MapThing): Types.Interactable?
+	local round = RoundHandler.Round()
+
+	if not mapThing:GetAttribute("Button") or not mapThing:IsDescendantOf(round:GetMap().Dynamic) then
+		return nil
+	end
+
+	return createNewInteractable(mapThing)
 end
 
-return nil
+return module

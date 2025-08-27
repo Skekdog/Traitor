@@ -3,6 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local RoundHandler = require(ServerScriptService.RoundHandler)
+local DynamicInteractable = require(ReplicatedStorage.Compat.DynamicInteractable)
 
 local function distanceFromBox(origin: Vector3, size: Vector3, point: Vector3): number
 	local minVec = origin - size / 2
@@ -30,7 +31,7 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 		return
 	end
 
-	local interactable = round:GetInteractable(mapThing)
+	local interactable = round:GetInteractable(mapThing) or DynamicInteractable.TryCreateNewInteractable(mapThing)
 	if not interactable then
 		return
 	end
