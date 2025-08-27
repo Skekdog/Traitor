@@ -42,7 +42,7 @@ ReplicatedStorage.Remotes.ClientServer.ActionNode.OnServerEvent:Connect(function
 		return
 	end
 
-	if node.Adornee:GetAttribute("CooldownUntil") :: number? or 0 > workspace:GetServerTimeNow() then
+	if (node.Adornee:GetAttribute("CooldownUntil") :: number? or 0) > workspace:GetServerTimeNow() then
 		return
 	end
 
