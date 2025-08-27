@@ -140,7 +140,7 @@ function module.ShowInteractableHint(prop: Types.MapThing, part: BasePart): ()
 		return
 	end
 
-	corpseHint.Text = GetDisplayName(definition)
+	corpseHint.Text = if definition.HideName then "" else GetDisplayName(definition)
 
 	if interactable.HintTextClient then
 		interactableHint.Text = interactable.HintTextClient

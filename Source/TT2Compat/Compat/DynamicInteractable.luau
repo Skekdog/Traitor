@@ -40,6 +40,7 @@ local function createNewInteractable(mapThing: Types.MapThing): Types.Interactab
 
 		IsContinuousInteraction = false,
 		Name = mapThing.Name,
+		HideName = true,
 
 		OnInteractClient = OnInteract,
 		OnInteractServer = OnInteract,
