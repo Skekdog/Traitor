@@ -209,6 +209,9 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 end
 
 local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): ()
+	if not hitPart.Parent then
+		return -- ?? No idea how but I had an error where the hitPart was unparented. Somehow.
+	end
 	local round = by.Round
 
 	local victim = tryGetParticipantFromPart(round, hitPart)
