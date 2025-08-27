@@ -58,6 +58,8 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	end)
 
 	clickIcon.Activated:Connect(function()
+		info.Visible = false
+		clickIcon.ImageTransparency = 0.5
 		ReplicatedStorage.Remotes.ClientServer.ActionNode:FireServer(params.Adornee)
 	end)
 
