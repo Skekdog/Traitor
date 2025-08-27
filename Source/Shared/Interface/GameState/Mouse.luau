@@ -128,7 +128,7 @@ function module.ShowInteractableHint(prop: Types.MapThing, part: BasePart): ()
 
 	local interactable = LocalRoundInfo.Interactables()[prop]
 	if not interactable then
-		return print("no")
+		return
 	end
 
 	if interactable.Definition.NoActionHint then
