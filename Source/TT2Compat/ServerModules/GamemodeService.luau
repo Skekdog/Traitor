@@ -7,7 +7,7 @@ local Credits = {}
 local Gamemode = {Credits = Credits}
 local GamemodeService = {Gamemode = Gamemode}
 
-setmetatable(Gamemode, {
+setmetatable(Credits, {
 	__index = function(self, index: unknown): any
 		if typeof(index) ~= "Instance" or not index:IsA("Player") then
 			return nil
