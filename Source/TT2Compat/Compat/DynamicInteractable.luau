@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local GetInteractableDefinition = require(ReplicatedStorage.Shared.LocalState.GetInteractableDefinition)
 local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -70,6 +69,7 @@ end
 
 if RunService:IsClient() then
 	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+	local GetInteractableDefinition = require(ReplicatedStorage.Shared.LocalState.GetInteractableDefinition)
 
 	local function onDescendantAdded(descendant: Instance): ()
 		if descendant:GetAttribute("Button") and (descendant:IsA("BasePart") or descendant:IsA("Model")) then
