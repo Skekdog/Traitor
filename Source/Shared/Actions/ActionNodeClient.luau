@@ -3,8 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ActionNodeType = require(script.Parent.ActionNodeType)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
+local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local nodes: {[BillboardGui]: true?} = {}
+local nodes: {[BillboardGui]: ActionNodeType.ActionNodeParams?} = {}
 
 local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	local nodeGui = Instance.new("BillboardGui")
@@ -84,7 +86,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 		nodes[nodeGui] = nil
 	end)
 
-	nodes[nodeGui] = true
+	nodes[nodeGui] = params
 
 	nodeGui.Adornee = params.Adornee
 	nodeGui.Parent = Players.LocalPlayer.PlayerGui -- according to the docs, input events will not work unless parented to PlayerGui
@@ -104,8 +106,10 @@ RunService.PreRender:Connect(function()
 	local timeNow = workspace:GetServerTimeNow()
 	local role = roleValue()
 
-	for gui in nodes do
-		gui.Enabled = (role.Definition.IsBadGuys or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow
+	for gui, params in nodes do
+		assert(params)
+		local distance = Players.LocalPlayer:DistanceFromCharacter(GetPrimaryPart(gui.Adornee :: Types.MapThing).Position)
+		gui.Enabled = (role.Definition.IsBadGuys or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and (distance ~= 0 and distance <= params.Radius)
 	end
 end)
 
