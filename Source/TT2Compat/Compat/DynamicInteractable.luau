@@ -60,7 +60,7 @@ local function tryCreateNewInteractable(mapThing: Types.MapThing): Types.Interac
 	local RoundHandler = require(ServerScriptService.RoundHandler)
 	local round = RoundHandler.Round()
 
-	if not mapThing:HasTag("Interactable") or not mapThing:IsDescendantOf(round:GetMap().Dynamic) then
+	if not mapThing:GetAttribute("Button") or not mapThing:IsDescendantOf(round:GetMap().Dynamic) then
 		return nil
 	end
 
@@ -84,10 +84,12 @@ if RunService:IsClient() then
 			descendant:GetAttributeChangedSignal("Button"):Connect(function()
 				local value = descendant:GetAttribute("Button")
 				if value then
+					descendant:AddTag("Prop")
 					descendant:AddTag("Interactable")
 					LocalRoundInfo.Interactables()[descendant] = interactable
 					LocalRoundInfo.Interactables:Invoke()
 				else
+					descendant:RemoveTag("Prop")
 					descendant:RemoveTag("Interactable")
 					LocalRoundInfo.Interactables()[descendant] = nil
 					LocalRoundInfo.Interactables:Invoke()

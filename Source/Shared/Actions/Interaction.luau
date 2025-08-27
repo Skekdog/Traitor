@@ -63,6 +63,7 @@ local function interactInteractable(interactable: Types.Interactable): ()
 	if interactable.Definition.OnInteractClient then
 		interactable.Definition.OnInteractClient(interactable)
 	end
+	print("servering")
 	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Model)
 end
 
@@ -183,6 +184,7 @@ RunService.PostSimulation:Connect(function()
 		module.InteractPart = target
 		module.InteractProp = prop
 		if prop:HasTag("Interactable") then
+			print("ya")
 			return Mouse.ShowInteractableHint(prop, target)
 		elseif prop:HasTag("Item") or prop:HasTag("AmmoBox") then
 			return Mouse.ShowItemHint(prop)

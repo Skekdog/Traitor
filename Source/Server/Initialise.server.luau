@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+require(ReplicatedStorage.Compat.DynamicInteractable)
 require(script.Parent.Player.SetupPlayer)
 require(script.Parent.PlayerData.SaveData)
 require(script.Parent.Character.RotateHead)
