@@ -33,7 +33,11 @@ export type ClientReceive = BaseReceive & {
     OriginalCFrame: CFrame,
 }
 
-export type DoorRequest = ClientInteraction | ServerReceive | ClientReceive
+export type ServerRun = BaseReceive & {
+    Kind: "ServerRun",
+}
+
+export type DoorRequest = ClientInteraction | ServerReceive | ClientReceive | ServerRun
 
 local function findOrCreateAngleValue(door: BasePart): NumberValue
     local angle = door:FindFirstChild("DoorAngle")
@@ -49,7 +53,7 @@ end
 
 local function StandardDoor(request: DoorRequest): ()
     if IS_SERVER then
-        if request.Kind ~= "ServerReceive" then
+        if request.Kind ~= "ServerReceive" and request.Kind ~= "ServerRun" then
             return
         end
     else
@@ -142,7 +146,7 @@ local function StandardDoor(request: DoorRequest): ()
         end
     end
 
-    if request.Kind == "ServerReceive" then
+    if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
         local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, targetAngle)
         local targetCFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
 
@@ -156,10 +160,14 @@ local function StandardDoor(request: DoorRequest): ()
 
         part.CFrame = targetCFrame
 
-        for _, v in Players:GetPlayers() do
-            if v ~= request.Player then
-                remotes.ClientServer.OpenDoor:FireClient(v, clientReceive)
+        if request.Kind == "ServerReceive" then
+            for _, v in Players:GetPlayers() do
+                if v ~= request.Player then
+                    remotes.ClientServer.OpenDoor:FireClient(v, clientReceive)
+                end
             end
+        else
+            remotes.ClientServer.OpenDoor:FireAllClients(clientReceive)
         end
 
         return
