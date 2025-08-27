@@ -64,30 +64,31 @@ if RunService:IsClient() then
 	local GetInteractableDefinition = require(ReplicatedStorage.Shared.LocalState.GetInteractableDefinition)
 
 	local function onDescendantAdded(descendant: Instance): ()
-		if descendant:GetAttribute("Button") and (descendant:IsA("BasePart") or descendant:IsA("Model")) then
-			local gamemode, map = LocalRoundInfo.Gamemode(), LocalRoundInfo.Map()
-			if not gamemode or not map or GetInteractableDefinition(descendant.Name, gamemode, map) then
-				return
-			end
-			local interactable = createNewInteractable(descendant)
-			LocalRoundInfo.Interactables()[descendant] = interactable
-			LocalRoundInfo.Interactables:Invoke()
-
-			descendant:GetAttributeChangedSignal("Button"):Connect(function()
-				local value = descendant:GetAttribute("Button")
-				if value then
-					descendant:AddTag("Prop")
-					descendant:AddTag("Interactable")
-					LocalRoundInfo.Interactables()[descendant] = interactable
-					LocalRoundInfo.Interactables:Invoke()
-				else
-					descendant:RemoveTag("Prop")
-					descendant:RemoveTag("Interactable")
-					LocalRoundInfo.Interactables()[descendant] = nil
-					LocalRoundInfo.Interactables:Invoke()
-				end
-			end)
+		if (not descendant:IsA("Model") and not descendant:IsA("BasePart")) or not descendant:GetAttribute("Button") or descendant:HasTag("Interactable") then
+			return
 		end
+		local gamemode, map = LocalRoundInfo.Gamemode(), LocalRoundInfo.Map()
+		if not gamemode or not map or GetInteractableDefinition(descendant.Name, gamemode, map) then
+			return
+		end
+		local interactable = createNewInteractable(descendant)
+		LocalRoundInfo.Interactables()[descendant] = interactable
+		LocalRoundInfo.Interactables:Invoke()
+
+		descendant:GetAttributeChangedSignal("Button"):Connect(function()
+			local value = descendant:GetAttribute("Button")
+			if value then
+				descendant:AddTag("Prop")
+				descendant:AddTag("Interactable")
+				LocalRoundInfo.Interactables()[descendant] = interactable
+				LocalRoundInfo.Interactables:Invoke()
+			else
+				descendant:RemoveTag("Prop")
+				descendant:RemoveTag("Interactable")
+				LocalRoundInfo.Interactables()[descendant] = nil
+				LocalRoundInfo.Interactables:Invoke()
+			end
+		end)
 	end
 
 	LocalRoundInfo.Map:Connect(function(map)
