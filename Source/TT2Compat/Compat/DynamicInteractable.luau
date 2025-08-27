@@ -70,10 +70,9 @@ end
 
 if RunService:IsClient() then
 	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-	local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 
 	local function onDescendantAdded(descendant: Instance): ()
-		if descendant:HasTag("Interactable") and (descendant:IsA("BasePart") or descendant:IsA("Model")) then
+		if descendant:GetAttribute("Button") and (descendant:IsA("BasePart") or descendant:IsA("Model")) then
 			local gamemode, map = LocalRoundInfo.Gamemode(), LocalRoundInfo.Map()
 			if not gamemode or not map or GetInteractableDefinition(descendant.Name, gamemode, map) then
 				return
@@ -106,7 +105,7 @@ if RunService:IsClient() then
 			return
 		end
 
-		for _, v in GetTaggedDescendants(map.Dynamic, "Interactable") do
+		for _, v in map.Dynamic:GetDescendants() do
 			onDescendantAdded(v)
 		end
 
