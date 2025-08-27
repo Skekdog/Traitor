@@ -19,62 +19,42 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	frame.Size = UDim2.fromScale(1, 1)
 	frame.BackgroundTransparency = 1
 
-	do
-		local list = Instance.new("UIListLayout")
-		list.SortOrder = Enum.SortOrder.LayoutOrder
-		list.FillDirection = Enum.FillDirection.Horizontal
-		list.VerticalAlignment = Enum.VerticalAlignment.Center
-		list.HorizontalAlignment = Enum.HorizontalAlignment.Left
-		list.Parent = frame
-	end
-
 	local clickIcon = Instance.new("ImageButton", frame)
 	clickIcon.Image = "rbxasset://textures/cursors/KeyboardMouse/ArrowCursor.png"
 	clickIcon.Size = UDim2.fromScale(1, 1)
 	clickIcon.ImageColor3 = Color3.new(1, 0.5, 0.5)
+	clickIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+	clickIcon.Position = UDim2.fromScale(0.5, 0)
+	clickIcon.ScaleType = Enum.ScaleType.Fit
 	clickIcon.BackgroundTransparency = 1
 	clickIcon.ImageTransparency = 0.5
 
+	local info = Instance.new("TextLabel")
+	info.BackgroundTransparency = 1
+	info.Text = params.Title .. (if params.Cost ~= 0 then `\nCosts {params.Cost} {if params.Cost == 1 then "credit" else "credits"}` else "")
+	info.TextScaled = true
+	info.Size = UDim2.fromScale(1, 1)
+	info.Position = UDim2.fromScale(0, 0.5)
+	info.TextColor3 = Color3.new(1, 0.5, 0.5)
+	info.TextXAlignment = Enum.TextXAlignment.Center
+	info.Font = Enum.Font.SourceSans
+	info.BackgroundTransparency = 1
+	info.Visible = false
+	info.Parent = frame
+
 	do
-		local aspectRatio = Instance.new("UIAspectRatioConstraint")
-		aspectRatio.Parent = clickIcon
+		local uiStroke = Instance.new("UIStroke", info)
+		uiStroke.Thickness = 2
 	end
-
-	local infoFrame = Instance.new("Frame")
-	infoFrame.Size = UDim2.fromScale(100, 1)
-	infoFrame.BackgroundTransparency = 1
-	infoFrame.Visible = false
-
-	local title = Instance.new("TextLabel")
-	title.BackgroundTransparency = 1
-	title.Text = params.Title
-	title.TextScaled = true
-	title.Size = UDim2.fromScale(1, 0.5)
-	title.TextColor3 = Color3.new(1, 0, 0)
-	title.TextXAlignment = Enum.TextXAlignment.Left
-	title.AutomaticSize = Enum.AutomaticSize.X
-	title.Font = Enum.Font.SourceSans
-	title.TextStrokeTransparency = 0
-	title.BackgroundTransparency = 1
-	title.Parent = infoFrame
-
-	if params.Cost ~= 0 then
-		local cost = title:Clone()
-		cost.Position = UDim2.fromScale(0, 0.5)
-		cost.Text = `(Costs {params.Cost} {if params.Cost == 1 then "credit" else "credits"})`
-		cost.Parent = infoFrame
-	end
-
-	infoFrame.Parent = frame
 
 	clickIcon.MouseEnter:Connect(function()
 		clickIcon.ImageTransparency = 0
-		infoFrame.Visible = true
+		info.Visible = true
 	end)
 
 	clickIcon.MouseLeave:Connect(function()
 		clickIcon.ImageTransparency = 0.5
-		infoFrame.Visible = false
+		info.Visible = false
 	end)
 
 	clickIcon.Activated:Connect(function()
