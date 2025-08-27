@@ -2,13 +2,13 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local RoundHandler = require(ServerScriptService.RoundHandler)
-local ActionNodeClient = require(ReplicatedStorage.Shared.Actions.ActionNodeClient)
+local ActionNodeType = require(ReplicatedStorage.Shared.Actions.ActionNodeType)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local nodes: {[Types.MapThing]: ActionNodeClient.ActionNodeParams?} = {}
+local nodes: {[Types.MapThing]: ActionNodeType.ActionNodeParams?} = {}
 
-local function replicateNode(node: ActionNodeClient.ActionNodeParams, player: Player?): ()
+local function replicateNode(node: ActionNodeType.ActionNodeParams, player: Player?): ()
 	if player then
 		ReplicatedStorage.Remotes.ClientServer.ActionNode:FireClient(player, node)
 	else
@@ -16,13 +16,13 @@ local function replicateNode(node: ActionNodeClient.ActionNodeParams, player: Pl
 	end
 end
 
-local function useNode(node: ActionNodeClient.ActionNodeParams, participant: Types.Participant): ()
+local function useNode(node: ActionNodeType.ActionNodeParams, participant: Types.Participant): ()
 	participant:SetCredits(participant:GetCredits() - node.Cost)
 	node.Adornee:SetAttribute("CooldownUntil", workspace:GetServerTimeNow() + node.Cooldown)
 	node.Action(participant)
 end
 
-local function ActionNode(params: ActionNodeClient.ActionNodeParams): ()
+local function ActionNode(params: ActionNodeType.ActionNodeParams): ()
 	nodes[params.Adornee] = params
 	replicateNode(params)
 
