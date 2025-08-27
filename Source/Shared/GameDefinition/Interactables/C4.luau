@@ -503,8 +503,8 @@ if RunService:IsServer() then
 		destroy(c4)
 	end
 
-	remote.OnServerEvent:Connect(function(player: Player, instance: Instance, action: unknown, explodeAtOrWireCut: unknown): ()
-		if typeof(action) ~= "string" or (typeof(explodeAtOrWireCut) ~= "number" and typeof(explodeAtOrWireCut) ~= "nil") then
+	remote.OnServerEvent:Connect(function(player: Player, instance: unknown, action: unknown, explodeAtOrWireCut: unknown): ()
+		if typeof(action) ~= "string" or (typeof(explodeAtOrWireCut) ~= "number" and typeof(explodeAtOrWireCut) ~= "nil") or typeof(instance) ~= "Instance" then
 			return
 		end
 
