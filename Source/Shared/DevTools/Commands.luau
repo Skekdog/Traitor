@@ -170,7 +170,11 @@ module.xray = {
 		map.Static:SetAttribute("XRayEnabled", enabled)
 
 		for _, instance in map.Static:GetDescendants() do
-			if not instance:IsA("BasePart") and not instance:IsA("Texture") or instance:HasTag("Prop") then
+			if not instance:IsA("BasePart") and not instance:IsA("Texture") then
+				continue
+			end
+
+			if instance:IsA("BasePart") and instance.CollisionGroup == "Bounds" then
 				continue
 			end
 
@@ -208,7 +212,7 @@ module.showbounds = {
 		map.Static:SetAttribute("ShowBounds", enabled)
 
 		for _, instance in map.Static:GetDescendants() do
-			if not instance:IsA("BasePart") or instance:HasTag("Prop") then
+			if not instance:IsA("BasePart") or instance.CollisionGroup ~= "Bounds" then
 				continue
 			end
 
