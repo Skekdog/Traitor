@@ -106,17 +106,15 @@ local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
 
 	prop:TryTakeDamage(params)
 
-	local model = otherPart:FindFirstAncestorOfClass("Model")
-	if not model then
+	local otherMapThing = GetMapThingWithTag(otherPart, {"Prop", "Character"})
+	if not otherMapThing then
 		return
 	end
 
-	local participant = prop.Round:GetParticipant(model)
-	if not participant then
-		return
+	local damageable = prop.Round:GetProp(otherMapThing) or if otherMapThing:IsA("Model") then prop.Round:GetParticipant(otherMapThing) else nil
+	if damageable then
+		(damageable :: Types.Prop):TryTakeDamage(params)
 	end
-
-	participant:TryTakeDamage(params)
 end
 
 
