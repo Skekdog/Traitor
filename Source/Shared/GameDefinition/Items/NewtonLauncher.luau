@@ -62,7 +62,7 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 	end
 
     if hit.Kind == "Prop" then
-        MagnetoStick.SetLastHeldBy(hit, attacker.Player)
+        MagnetoStick.SetPropLastHeldBy(hit, attacker)
     end
 
     local lookVector = char:GetPivot().LookVector
