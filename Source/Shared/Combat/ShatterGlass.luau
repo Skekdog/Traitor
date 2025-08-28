@@ -5,6 +5,8 @@ local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local IS_SERVER = game:GetService("RunService"):IsServer()
 
+local DEFAULT_FORCE = 2
+
 local function createWedgeFragment(properties: GlassProperties, size: Vector3, cframe: CFrame, direction: Vector3)
     local wedge = Instance.new("WedgePart")
 
@@ -95,11 +97,11 @@ local function shatterClient(glassProperties: BasePart | GlassProperties, direct
 
             table.insert(fragments,
                 createWedgeFragment(glassProperties, Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth),
-                fragmentCFrame1, (direction or ((if math.random() >= 0.5 then 1 else -1) * Vector3.one)) * (force or 1))
+                fragmentCFrame1, (direction or ((if math.random() >= 0.5 then 1 else -1) * Vector3.one)) * (force or DEFAULT_FORCE))
             )
             table.insert(fragments,
                 createWedgeFragment(glassProperties, Vector3.new(fragmentDepth, fragmentHeight, fragmentWidth),
-                fragmentCFrame2, (direction or ((if math.random() >= 0.5 then 1 else -1) * Vector3.one)) * (force or 1))
+                fragmentCFrame2, (direction or ((if math.random() >= 0.5 then 1 else -1) * Vector3.one)) * (force or DEFAULT_FORCE))
             )
         end
     end
