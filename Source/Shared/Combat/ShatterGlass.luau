@@ -27,6 +27,7 @@ local function createWedgeFragment(properties: GlassProperties, size: Vector3, c
     wedge.Name = "GlassFragment"
     wedge.Parent = workspace.Projectiles
 
+    direction *= math.random(0.9, 1.1)
     wedge:ApplyImpulse(direction)
 
     return wedge
