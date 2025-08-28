@@ -87,7 +87,7 @@ local function tryUnequip(item: Types.AnyItem): ()
 
 	ViewmodelModule.Hide()
 
-	if item.Kind == "Item" and item.Definition.OnUnequipClient then
+	if item.Definition.OnUnequipClient then
 		item.Definition.OnUnequipClient(item)
 	end
 
@@ -195,7 +195,7 @@ local function tryEquip(item: Types.AnyItem): ()
 
 	ViewmodelModule.Show(item.Definition)
 
-	if item.Kind == "Item" and item.Definition.OnEquipClient then
+	if item.Definition.OnEquipClient then
 		item.Definition.OnEquipClient(item)
 	end
 
@@ -318,7 +318,7 @@ local function removeItem(itemName: string): ()
 		for i, v in ourInventory.Passive do
 			if v.Definition.Name == itemName then
 				table.remove(ourInventory.Passive, i)
-				if v.Kind == "Item" and v.Definition.OnUnequipClient then
+				if v.Definition.OnUnequipClient then
 					v.Definition.OnUnequipClient(v)
 				end
 				return
@@ -339,7 +339,7 @@ local function addItem(item: Types.AnyItem): ()
 		ourInventory.Slots[item.Definition.Slot] = item
 	else
 		table.insert(ourInventory.Passive, item)
-		if item.Kind == "Item" and item.Definition.OnEquipClient then
+		if item.Definition.OnEquipClient then
 			item.Definition.OnEquipClient(item)
 		end
 	end

@@ -130,7 +130,7 @@ if RunService:IsServer() then
 	end)
 end
 
-local function OnEquipClient(item: Types.Item): ()
+local function OnEquipClient(item: Types.AnyItem): ()
 	ControlManager.Register("Disguise", function(_, state)
 		clientDisguiseActive = not clientDisguiseActive
 		ShowAlert("Disguise: " .. if clientDisguiseActive then "ON" else "OFF")
@@ -150,18 +150,18 @@ local function OnEquipClient(item: Types.Item): ()
 	})
 end
 
-local function OnEquipServer(item: Types.Item, participant: Types.Participant): ()
+local function OnEquipServer(item: Types.AnyItem, participant: Types.Participant): ()
 	serverParticipantTable[participant.Player] = {
 		Participant = participant,
 	}
 end
 
-local function OnUnequipClient(item: Types.Item): ()
+local function OnUnequipClient(item: Types.AnyItem): ()
 	clientDisguiseActive = false
 	ControlManager.Unregister("Disguise")
 end
 
-local function OnUnequipServer(item: Types.Item, participant: Types.Participant): ()
+local function OnUnequipServer(item: Types.AnyItem, participant: Types.Participant): ()
 	local data = serverParticipantTable[participant.Player]
 	if not data then
 		return
