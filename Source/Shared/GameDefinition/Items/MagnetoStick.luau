@@ -74,6 +74,10 @@ local function getController(prop: Types.MapThing): Player?
 end
 
 local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
+	if not otherPart:IsDescendantOf(workspace) then
+		return -- somehow happened, idk
+	end
+
 	if getController(prop.Model) then
 		return
 	end
@@ -112,7 +116,7 @@ local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
 	end
 
 	local damageable = prop.Round:GetProp(otherMapThing) or if otherMapThing:IsA("Model") then prop.Round:GetParticipant(otherMapThing) else nil
-	if damageable then
+	if damageable and damageable ~= lastHeld.By then
 		(damageable :: Types.Prop):TryTakeDamage(params)
 	end
 end
