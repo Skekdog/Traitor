@@ -1,11 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
-local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
-local DeathStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.DeathStation)
-local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
-local HealthStation = require(ReplicatedStorage.Shared.GameDefinition.Interactables.HealthStation)
-local Radio = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Radio)
-local Visualiser = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Visualiser)
+local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
 local Ammo = require(script.Parent.Parent.Items.Ammo)
 local Items = require(script.Parent.Parent.Items.Items)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
@@ -141,14 +136,7 @@ local gamemode: Types.GamemodeDefinition = {
     AvailableItems = Items,
     AvailableAmmo = Ammo,
 
-    InteractableDefinitions = {
-        C4 = C4.Interactable,
-        HealthStation = HealthStation.Interactable,
-        DeathStation = DeathStation,
-        Decoy = Decoy.Interactable,
-        Visualiser = Visualiser,
-        Radio = Radio,
-    },
+    InteractableDefinitions = Interactables,
 
     StartingItems = {Items.Crowbar, Items["Magneto Stick"]},
 
