@@ -5,9 +5,34 @@ local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local module = {}
 
+-- For some fucking reason TT2 chat colours don't match the brick colours available, because fuck you?
+local function remapColor(color: string): BrickColor
+	if BrickColor[color] then
+		return BrickColor[color]()
+	end
+
+	local splitsAt = -1
+	for i, char in color:split("") do
+		if i == 1 then
+			continue
+		end
+		if char == char:upper() and char ~= char:lower() then
+			splitsAt = i
+			break
+		end
+	end
+
+	if splitsAt == -1 then
+		return BrickColor.new(color :: "Bright yellow")
+	end
+
+	local new = (color:sub(1, splitsAt - 1)) .. " " .. (color:sub(splitsAt, -1):lower())
+	return BrickColor.new(new :: "Bright yellow")
+end
+
 function module.GameMessage(self, message: string, colour: string?, _, player: Player?): ()
 	local round = RoundHandler.GetRound()
-	local brickColor = colour and BrickColor.new(colour :: "Bright yellow")
+	local brickColor = if colour then remapColor(colour) else nil
 	local formattedMessage = if brickColor then `<font color='#{brickColor.Color:ToHex()}'>{message}</font>` else message
 	round:SendMessage(player or Players:GetPlayers(), formattedMessage, "Chat")
 end
