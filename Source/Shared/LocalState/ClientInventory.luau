@@ -73,9 +73,13 @@ function module.GetReserveAmmo(kind: string): number
 	return module.Ammo()[kind] or 0
 end
 
-local function tryUnequip(item: Types.AnyItem): ()
+local function tryUnequip(item: Types.AnyItem, force: boolean?): boolean
 	if module.EquippedItem() ~= item then
-		return
+		return false
+	end
+
+	if not force and item.Definition.PreventUnequip then
+		return false
 	end
 	
 	ItemHint()
@@ -95,10 +99,11 @@ local function tryUnequip(item: Types.AnyItem): ()
 
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
 	if not button then
-		return
+		return true
 	end
 
 	button.BackgroundTransparency = 0.75
+	return true
 end
 
 local function isObscured(origin: Vector3, target: Vector3): boolean
@@ -162,7 +167,9 @@ local function tryEquip(item: Types.AnyItem): ()
 		if equippedItem == item then
 			return tryUnequip(item)
 		end
-		tryUnequip(equippedItem)
+		if not tryUnequip(equippedItem) then
+			return
+		end
 	end
 
 	if item.Kind == "Item" then
@@ -182,7 +189,7 @@ local function tryEquip(item: Types.AnyItem): ()
 		end)
 	end
 
-	if item.Definition.CanDrop then
+	if item.Definition.CanDrop and not item.Definition.PreventUnequip then
 		ControlManager.Register("Drop", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
@@ -297,7 +304,7 @@ end
 local function removeItem(itemName: string): ()
 	local equippedItem = module.EquippedItem()
 	if equippedItem and equippedItem.Definition.Name == itemName then
-		tryUnequip(equippedItem)
+		tryUnequip(equippedItem, true)
 	end
 	
 	local slot: number?
