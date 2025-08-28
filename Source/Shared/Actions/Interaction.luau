@@ -9,10 +9,8 @@ local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
-local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ClimbLadder = require(script.Parent.ClimbLadder)
-local StandardDoor = require(script.Parent.StandardDoor)
 local ViewCorpse = require(script.Parent.ViewCorpse)
 
 local participant = LocalParticipantInfo.GetParticipant()
@@ -44,18 +42,6 @@ local function interactCorpse(corpse: Model): boolean
 	
 	ViewCorpse(corpse)
 
-	return true
-end
-
-local function interactDoor(door: Types.MapThing): boolean
-	if not distanceCheck(GetPrimaryPart(door).Position, 10) then
-		return false
-	end
-	local request: StandardDoor.ClientInteraction = {
-		Kind = "ClientInteraction" :: "ClientInteraction",
-		Door = door,
-	}
-	StandardDoor(request)
 	return true
 end
 
@@ -129,13 +115,6 @@ function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: Input
 	local char = LocalCharacter.Character()
 	if not char then
 		return false
-	end
-
-	if prop:HasTag("Door") then
-		if input and input.UserInputState ~= Enum.UserInputState.End then
-			return false
-		end
-		return interactDoor(prop)
 	end
 
 	if prop:HasTag("Interactable") then

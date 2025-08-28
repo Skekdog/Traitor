@@ -151,7 +151,14 @@ local function loadInteractable(instance: Instance): ()
     end
     assert(gamemode and map)
 
-    local definition = GetInteractableDefinition(instance.Name, gamemode, map)
+    local name = instance.Name
+    if instance:HasTag("Door") then
+        name = "Door"
+    elseif instance:HasTag("Ladder") then
+        name = "Ladder"
+    end
+
+    local definition = GetInteractableDefinition(name, gamemode, map)
     if not definition then
         return
     end
