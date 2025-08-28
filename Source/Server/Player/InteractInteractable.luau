@@ -44,7 +44,7 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 	local origin = GetPrimaryPart(mapThing).Position
 
 	if distanceFromBox(origin, size, player.Character:GetPivot().Position) > interactable.Definition.InteractionRange * 1.1 then
-		return print(origin)
+		return
 	end
 
 	interactable.Definition.OnInteractServer(interactable, participant)
