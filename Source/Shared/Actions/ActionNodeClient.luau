@@ -14,6 +14,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	nodeGui.Name = "ActionNodeGui"
 	nodeGui.AlwaysOnTop = true
 	nodeGui.Active = true
+	nodeGui.ResetOnSpawn = false
 
 	local frame = Instance.new("Frame", nodeGui)
 	frame.Size = UDim2.fromScale(1, 1)
