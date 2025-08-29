@@ -188,7 +188,7 @@ local function serverBeginControllingProp(prop: Types.Prop, player: Player): ()
 	serverControlledProps[player] = prop
 end
 
-function module.ServerStopControllingProp(player: Player, fireClient: boolean?): ()
+function module.ServerStopControllingProp(player: Player, part: BasePart?): ()
 	local prop = serverControlledProps[player]
 	if prop then
 		setNetworkOwner(prop, "Auto")
@@ -200,8 +200,8 @@ function module.ServerStopControllingProp(player: Player, fireClient: boolean?):
 			module.SetPropLastHeldBy(prop, participant)
 		end
 
-		if fireClient then
-			releaseRemote:FireClient(player, prop.Model)
+		if part then
+			releaseRemote:FireClient(player, part)
 		end
 	end
 end
