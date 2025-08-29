@@ -144,6 +144,9 @@ local function isSizeValid(size: Vector3): boolean
 end
 
 local function canGrab(prop: Types.MapThing): boolean
+	if prop:HasTag("Interactable") then
+		return false
+	end
 	local part = GetPrimaryPart(prop)
 	return (not part:IsGrounded()) and isSizeValid(if prop:IsA("Model") then prop:GetExtentsSize() else prop.Size)
 end
