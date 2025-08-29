@@ -8,6 +8,7 @@ local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.Get
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
 
 local module = {}
 
@@ -34,27 +35,8 @@ type ClientControl = {
 	AlignPosition: AlignPosition,
 }
 
-local requestControl: RemoteFunction
-if RunService:IsServer() then
-	requestControl = Instance.new("RemoteFunction")
-	requestControl.Name = "RequestControl"
-	requestControl.Parent = script
-else
-	local found = script:WaitForChild("RequestControl")
-	assert(found:IsA("RemoteFunction"), "RequestControl must be a RemoteFunction")
-	requestControl = found
-end
-
-local releaseControl: RemoteEvent
-if RunService:IsServer() then
-	releaseControl = Instance.new("RemoteEvent")
-	releaseControl.Name = "ReleaseControl"
-	releaseControl.Parent = script
-else
-	local found = script:WaitForChild("ReleaseControl")
-	assert(found:IsA("RemoteEvent"), "ReleaseControl must be a RemoteEvent")
-	releaseControl = found
-end
+local grabRemote = GetRemote("Grab")
+local releaseRemote = GetRemote("Release")
 
 local function serverGetRound(): Types.Round
 	local RoundHandler = require(ServerScriptService.RoundHandler)
@@ -206,7 +188,7 @@ local function serverBeginControllingProp(prop: Types.Prop, player: Player): ()
 	serverControlledProps[player] = prop
 end
 
-local function serverStopControllingProp(player: Player): ()
+function module.ServerStopControllingProp(player: Player, fireClient: boolean?): ()
 	local prop = serverControlledProps[player]
 	if prop then
 		setNetworkOwner(prop, "Auto")
@@ -216,6 +198,10 @@ local function serverStopControllingProp(player: Player): ()
 		local participant = serverGetRound():GetParticipant(player)
 		if participant then
 			module.SetPropLastHeldBy(prop, participant)
+		end
+
+		if fireClient then
+			releaseRemote:FireClient(player, prop.Model)
 		end
 	end
 end
@@ -234,7 +220,7 @@ local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
 	end
 
 	if not doNotFireServer then
-		releaseControl:FireServer(part)
+		releaseRemote:FireServer(part)
 	end
 
 	clientAnimate()
@@ -243,18 +229,21 @@ local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
 	clientControl = nil
 end
 
+if RunService:IsClient() then
+	releaseRemote.OnClientEvent:Connect(function(part: BasePart): ()
+		if clientControl and clientControl.Part == part then
+			clientRelease(part, true)
+		end
+	end)
+end
+
 local function clientGrab(part: BasePart): ()
 	local prop = clientGetProp(part)
 	if not prop or not canGrab(prop) then
 		return
 	end
 
-	task.spawn(function()
-		local success: boolean = requestControl:InvokeServer(part)
-		if not success then
-			clientRelease(part, true)
-		end
-	end)
+	grabRemote:FireServer(part)
 
 	clientAnimate()
 
@@ -295,7 +284,7 @@ local function onUnequipClient(): ()
 end
 
 local function onUnequipServer(_, participant: Types.Participant): ()
-	serverStopControllingProp(participant.Player)
+	module.ServerStopControllingProp(participant.Player)
 end
 
 local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): ()
@@ -332,28 +321,30 @@ local function serverGetPropFromPart(part: unknown): Types.Prop?
 end
 
 if RunService:IsServer() then
-	releaseControl.OnServerEvent:Connect(function(player: Player, part: unknown)
+	releaseRemote.OnServerEvent:Connect(function(player: Player, part: unknown)
 		local prop = serverGetPropFromPart(part)
 		if prop == serverControlledProps[player] then
-			serverStopControllingProp(player)
+			module.ServerStopControllingProp(player)
 		end
 	end)
 
-	requestControl.OnServerInvoke = function(player: Player, part: unknown): boolean
+	grabRemote.OnServerEvent:Connect(function(player: Player, part: unknown): ()
 		local prop = serverGetPropFromPart(part)
 		if not prop then
-			return false
+			releaseRemote:FireClient(player, part)
+			return
 		end
 
 		if not canGrab(prop.Model) then
-			return false
+			releaseRemote:FireClient(player, part)
+			return
 		end
 
-		serverStopControllingProp(player)
+		module.ServerStopControllingProp(player)
 		serverBeginControllingProp(prop, player)
 
 		return true
-	end
+	end)
 end
 
 local function clientIsAbovePart(root: BasePart, part: BasePart): boolean
@@ -366,7 +357,7 @@ local function clientIsAbovePart(root: BasePart, part: BasePart): boolean
 end
 
 Players.PlayerRemoving:Connect(function(player)
-	serverStopControllingProp(player)
+	module.ServerStopControllingProp(player)
 end)
 
 local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function(): ()
