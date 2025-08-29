@@ -20,7 +20,7 @@ local ROPE_LENGTH_MULTIPLIER = 1.75
 
 local MAX_SIZE = 6
 
-local PUSH_FORCE_PER_UNIT_MASS = 1000
+local PUSH_FORCE_PER_UNIT_MASS = 2.5
 
 local ALIGNMENT_RESPONSIVENESS = 80
 local ALIGNMENT_DEPTH = 6
@@ -37,6 +37,7 @@ type ClientControl = {
 
 local grabRemote = GetRemote("Grab")
 local releaseRemote = GetRemote("Release")
+local requestControl = GetRemote("RequestControl")
 
 local function serverGetRound(): Types.Round
 	local RoundHandler = require(ServerScriptService.RoundHandler)
@@ -131,6 +132,14 @@ local function canGrab(prop: Types.MapThing): boolean
 	end
 	local part = GetPrimaryPart(prop)
 	return (not part:IsGrounded()) and (not prop:GetAttribute("NoGrab")) and isSizeValid(if prop:IsA("Model") then prop:GetExtentsSize() else prop.Size)
+end
+
+local function canPush(prop: Types.MapThing): boolean
+	if prop:HasTag("Interactable") then
+		return false
+	end
+	local part = GetPrimaryPart(prop)
+	return (not part:IsGrounded()) and (not prop:GetAttribute("NoPush"))
 end
 
 local function createOrFindAttachment(part: BasePart): Attachment
@@ -254,27 +263,37 @@ local function clientGrab(part: BasePart): ()
 	}
 end
 
+local function clientPush(part: BasePart, position: Vector3, origin: Vector3): ()
+	local prop = clientGetProp(part)
+	if not prop or not canPush(prop) or getController(prop) then
+		return
+	end
+
+	requestControl:FireServer(part)
+	part:ApplyImpulseAtPosition((position - origin).Unit * PUSH_FORCE_PER_UNIT_MASS * part.AssemblyMass, position)
+end
+
 local clientRaycastParams = RaycastParams.new()
 clientRaycastParams.FilterType = Enum.RaycastFilterType.Exclude
 clientRaycastParams.CollisionGroup = "WeaponHitTargets"
 clientRaycastParams.IgnoreWater = true
 
-local function clientRaycast(): BasePart?
+local function clientRaycast(): (BasePart?, Vector3?)
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local char = LocalCharacter.Character()
 	local head = LocalCharacter.Head()
 	if not char or not head then
-		return nil
+		return nil, nil
 	end
 
 	clientRaycastParams.FilterDescendantsInstances = {char}
 
-	local result = workspace:Raycast(head.Position, GetCentreRay().Direction * MAX_DISTANCE, clientRaycastParams)
+	local result = workspace:Raycast(head.Position, GetCentreRay().Direction * INTERACT_DISTANCE, clientRaycastParams)
 	if not result then
-		return nil
+		return nil, nil
 	end
 
-	return result.Instance
+	return result.Instance, result.Position
 end
 
 local function onUnequipClient(): ()
@@ -301,6 +320,14 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 	if part then
 		return clientGrab(part)
 	end
+end
+
+local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
+	local part, position = clientRaycast()
+	if not part or not position then
+		return
+	end
+	clientPush(part, position, origin)
 end
 
 local function serverGetPropFromPart(part: unknown): Types.Prop?
@@ -422,7 +449,7 @@ local item: Types.ItemDefinition = {
 
 	AlternateToggled = true,
 
-    -- PrimaryFireClient = primaryFireClient,
+    PrimaryFireClient = primaryFireClient,
     AlternateFireClient = alternateFireClient,
 
 	OnUnequipClient = onUnequipClient,
