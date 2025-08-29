@@ -130,7 +130,7 @@ local function canGrab(prop: Types.MapThing): boolean
 		return false
 	end
 	local part = GetPrimaryPart(prop)
-	return (not part:IsGrounded()) and isSizeValid(if prop:IsA("Model") then prop:GetExtentsSize() else prop.Size)
+	return (not part:IsGrounded()) and (not prop:GetAttribute("NoGrab")) and isSizeValid(if prop:IsA("Model") then prop:GetExtentsSize() else prop.Size)
 end
 
 local function createOrFindAttachment(part: BasePart): Attachment
