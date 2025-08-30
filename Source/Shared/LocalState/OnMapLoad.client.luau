@@ -24,9 +24,7 @@ local function loadLighting(map: Types.Map): ()
     local mapLighting = map.Map:FindFirstChild("Lighting")
     if mapLighting then
         for i, v in mapLighting:GetChildren() do
-            if not Lighting:FindFirstChildOfClass(v.ClassName) then
-                v:Clone().Parent = Lighting
-            end
+            v:Clone().Parent = Lighting
         end
     end
 
