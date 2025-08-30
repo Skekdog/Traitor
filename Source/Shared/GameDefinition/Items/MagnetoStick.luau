@@ -20,7 +20,7 @@ local ROPE_LENGTH_MULTIPLIER = 1.75
 
 local MAX_SIZE = 6
 
-local PUSH_FORCE_PER_UNIT_MASS = 2.5
+local PUSH_FORCE_PER_UNIT_MASS = 0.75
 
 local ALIGNMENT_RESPONSIVENESS = 80
 local ALIGNMENT_DEPTH = 6
@@ -37,7 +37,6 @@ type ClientControl = {
 
 local grabRemote = GetRemote("Grab")
 local releaseRemote = GetRemote("Release")
-local requestControl = GetRemote("RequestControl")
 local hangRemote = GetRemote("Hang")
 
 local function serverGetRound(): Types.Round
@@ -309,7 +308,6 @@ local function clientPush(part: BasePart, position: Vector3, origin: Vector3): (
 		return
 	end
 
-	requestControl:FireServer(part)
 	part:ApplyImpulseAtPosition((position - origin).Unit * PUSH_FORCE_PER_UNIT_MASS * part.AssemblyMass, position)
 end
 
