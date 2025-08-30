@@ -123,35 +123,6 @@ module.help = {
 	end
 }
 
-module.luauserver = {
-	Name = "luauserver",
-	Description = "Executes Luau code server-side. Includes globals: round, cmds, items, players",
-	Environment = "Server" :: "Server",
-	Arguments = {"code"},
-	Execute = function(_, round: Round, args: Args)
-		local code = table.concat(args, " ")
-		
-		local func = loadstring(code, "")
-		if not func then
-			return "ERROR: Invalid syntax."
-		end
-
-		local env = getfenv()
-		env["round"] = round
-		env["cmds"] = module
-		env["items"] = Items
-		env["players"] = Players
-		setfenv(func, env)
-
-		local success, result = pcall(func)
-		if not success then
-			return `ERROR: {result}.`
-		end
-
-		return tostring(result) or ""
-	end
-}
-
 module.xray = {
 	Name = "xray",
 	Description = "Turns all static map parts semi-transparent.",
