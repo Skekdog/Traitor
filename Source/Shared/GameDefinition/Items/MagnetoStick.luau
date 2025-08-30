@@ -38,6 +38,7 @@ type ClientControl = {
 local grabRemote = GetRemote("Grab")
 local releaseRemote = GetRemote("Release")
 local requestControl = GetRemote("RequestControl")
+local hangRemote = GetRemote("Hang")
 
 local function serverGetRound(): Types.Round
 	local RoundHandler = require(ServerScriptService.RoundHandler)
@@ -54,6 +55,32 @@ local function getController(prop: Types.MapThing): Player?
 		return nil
 	end
 	return Players:GetPlayerByUserId(controllerId)
+end
+
+local clientRaycastParams = RaycastParams.new()
+clientRaycastParams.FilterType = Enum.RaycastFilterType.Exclude
+clientRaycastParams.CollisionGroup = "WeaponHitTargets"
+clientRaycastParams.IgnoreWater = true
+
+local function clientRaycast(filter: {Instance} | Instance?): (BasePart?, Vector3?)
+	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+	local char = LocalCharacter.Character()
+	local head = LocalCharacter.Head()
+	if not char or not head then
+		return nil, nil
+	end
+
+	clientRaycastParams.FilterDescendantsInstances = {char}
+	if filter then
+		clientRaycastParams:AddToFilter(filter)
+	end
+
+	local result = workspace:Raycast(head.Position, GetCentreRay().Direction * INTERACT_DISTANCE, clientRaycastParams)
+	if not result then
+		return nil, nil
+	end
+
+	return result.Instance, result.Position
 end
 
 local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
@@ -246,6 +273,19 @@ if RunService:IsClient() then
 	end)
 end
 
+local function destroyRope(part: BasePart): ()
+	local rope = part:FindFirstChild("MagnetoRope")
+	if rope and rope:IsA("RopeConstraint") then
+		if rope.Attachment1 then
+			rope.Attachment1:Destroy()
+		end
+		if rope.Attachment0 then
+			rope.Attachment0:Destroy()
+		end
+		rope:Destroy()
+	end
+end
+
 local function clientGrab(part: BasePart): ()
 	local prop = clientGetProp(part)
 	if not prop or not canGrab(prop) then
@@ -273,27 +313,21 @@ local function clientPush(part: BasePart, position: Vector3, origin: Vector3): (
 	part:ApplyImpulseAtPosition((position - origin).Unit * PUSH_FORCE_PER_UNIT_MASS * part.AssemblyMass, position)
 end
 
-local clientRaycastParams = RaycastParams.new()
-clientRaycastParams.FilterType = Enum.RaycastFilterType.Exclude
-clientRaycastParams.CollisionGroup = "WeaponHitTargets"
-clientRaycastParams.IgnoreWater = true
+local function clientHang(): ()
+	assert(clientControl, "clientControl is nil")
 
-local function clientRaycast(): (BasePart?, Vector3?)
-	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-	local char = LocalCharacter.Character()
-	local head = LocalCharacter.Head()
-	if not char or not head then
-		return nil, nil
+	local to, at = clientRaycast(clientControl.Prop)
+	if not to or not at then
+		return
 	end
 
-	clientRaycastParams.FilterDescendantsInstances = {char}
-
-	local result = workspace:Raycast(head.Position, GetCentreRay().Direction * INTERACT_DISTANCE, clientRaycastParams)
-	if not result then
-		return nil, nil
+	local part = clientControl.Part
+	if (part.Position - at).Magnitude > MAX_ROPE_DISTANCE then
+		return
 	end
 
-	return result.Instance, result.Position
+	hangRemote:FireServer(part, to, at)
+	clientRelease(part, true)
 end
 
 local function onUnequipClient(): ()
@@ -327,6 +361,10 @@ local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
 	if not part or not position then
 		return
 	end
+
+	if clientControl and clientControl.Prop:HasTag("Corpse") then
+		return clientHang()
+	end
 	clientPush(part, position, origin)
 end
 
@@ -355,6 +393,49 @@ if RunService:IsServer() then
 		end
 	end)
 
+	hangRemote.OnServerEvent:Connect(function(player: Player, part: unknown, to: unknown, at: unknown): ()
+		if typeof(part) ~= "Instance" or typeof(to) ~= "Instance" or typeof(at) ~= "Vector3" then
+			return
+		end
+
+		if not part:IsA("BasePart") or not to:IsA("BasePart") then
+			return
+		end
+
+		if (part.Position - at).Magnitude > MAX_ROPE_DISTANCE * 1.1 then
+			return
+		end
+
+		local localPosition = to.CFrame:ToObjectSpace(CFrame.new(at))
+		if localPosition.Position.Magnitude > to.ExtentsSize.Magnitude * 1.1 then
+			return
+		end
+
+		local prop = serverControlledProps[player]
+		if not prop or (part ~= prop.Model :: Instance and not part:IsDescendantOf(prop.Model)) or not prop.Model:HasTag("Corpse") then
+			return
+		end
+
+		-- Here we can also check for whether the attaching to part is not a prop.
+		-- But actually it's funnier if you can hang corpses to props.
+
+		local rope = Instance.new("RopeConstraint")
+		rope.Name = "MagnetoRope"
+		rope.Attachment0 = Instance.new("Attachment", part)
+
+		local attachment = Instance.new("Attachment")
+		attachment.Name = "MagnetoRopeAttachment"
+		attachment.Position = localPosition.Position
+		attachment.Parent = to
+
+		rope.Attachment1 = attachment
+		rope.Visible = true
+		rope.Thickness = 0.25
+		rope.Length = (part.Position - at).Magnitude * ROPE_LENGTH_MULTIPLIER
+
+		rope.Parent = part
+	end)
+
 	grabRemote.OnServerEvent:Connect(function(player: Player, part: unknown): ()
 		local prop = serverGetPropFromPart(part)
 		if not prop then
@@ -362,11 +443,14 @@ if RunService:IsServer() then
 			return
 		end
 
+		assert(typeof(part) == "Instance" and part:IsA("BasePart"))
+
 		if not canGrab(prop.Model) then
 			releaseRemote:FireClient(player, part)
 			return
 		end
 
+		destroyRope(part)
 		module.ServerStopControllingProp(player)
 		serverBeginControllingProp(prop, player)
 
