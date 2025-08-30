@@ -14,7 +14,11 @@ local maps = ServerStorage.Maps
 
 local random = Random.new(workspace:GetServerTimeNow())
 
-local currentMap = Map.fromMapScript(Map.ValidateMapScript(maps.International:Clone()))
+local function getMap(name: string): Types.Map
+    return Map.fromMapScript(Map.ValidateMapScript((maps :: any)[name]:Clone()))
+end
+
+local currentMap = "International"
 
 type ClientMapInfo = {
     Name: string,
@@ -38,7 +42,7 @@ local function getMapsForVote(): {ClientMapInfo}
 
         assert(v:IsA("ModuleScript"), "Invalid Map")
 
-        if v.Name ~= currentMap.Definition.Name and not v:GetAttribute("Experimental") then
+        if v.Name ~= currentMap and not v:GetAttribute("Experimental") then
             local definition: Types.MapDefinition = (require)(v)
             table.insert(votableMaps, {
                 Name = definition.Name,
@@ -109,7 +113,7 @@ local function newRound(): Types.Round
 
     local gamemode = pickNextGamemode()
     module.Round:SetValue(Round.new(gamemode))
-    task.defer(module.Round().LoadMap, module.Round(), currentMap) -- somefuckinghow loading normally will cause recursive require errors on SERVER scripts, not even module scripts. WTF.
+    task.defer(module.Round().LoadMap, module.Round(), getMap(currentMap)) -- somefuckinghow loading normally will cause recursive require errors on SERVER scripts, not even module scripts. WTF.
 
     return module.Round()
 end
@@ -176,8 +180,9 @@ local function doMapVote(): ()
     if not bestMap then
         bestMap = votableMaps[1].Name
     end
+    assert(bestMap)
 
-    currentMap = Map.fromMapScript((maps :: any)[bestMap]:Clone())
+    currentMap = bestMap
 end
 
 local function onRoundEnd(): ()
