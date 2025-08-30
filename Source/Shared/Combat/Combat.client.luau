@@ -239,7 +239,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				local origin = head.Position
 				local direction = GetCentreRay().Direction
 
-				local request: CombatTypes.PrimaryFireRequest
+				local request: CombatTypes.PrimaryFireRequest?
 				if item.Kind == "Melee" or item.Kind == "Gun" then
 					local raycasts: {CombatTypes.RaycastInfo} = {}
 					for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
@@ -297,13 +297,15 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 					}
 					request = throwRequest
 				elseif item.Kind == "Item" then
-					local itemRequest: CombatTypes.PrimaryFireItemRequest = {
-						Kind = "PrimaryFireItemRequest" :: "PrimaryFireItemRequest",
-						ItemName = item.Definition.Name,
-						Origin = origin,
-						Direction = direction,
-					}
-					request = itemRequest
+					if item.Definition.PrimaryFireServer then
+						local itemRequest: CombatTypes.PrimaryFireItemRequest = {
+							Kind = "PrimaryFireItemRequest" :: "PrimaryFireItemRequest",
+							ItemName = item.Definition.Name,
+							Origin = origin,
+							Direction = direction,
+						}
+						request = itemRequest
+					end
 
 					if item.Definition.PrimaryFireClient then
 						item.Definition.PrimaryFireClient(item, "Primary", origin, direction)
@@ -327,9 +329,11 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				end
 				ViewmodelModule.Recoil(item.Definition)
 
-				local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.PrimaryFire:InvokeServer(request)
-				if result ~= "Success" and result ~= "PreGame" then
-					warn("Hit rejected:", result)
+				if request then
+					local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.PrimaryFire:InvokeServer(request)
+					if result ~= "Success" and result ~= "PreGame" then
+						warn("Hit rejected:", result)
+					end
 				end
 
 				if item.Kind == "Gun" and item.Ammo == 0 then
