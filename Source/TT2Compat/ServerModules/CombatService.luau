@@ -45,12 +45,12 @@ function module.DamageWithinRadius(self, _, attacker: Player?, _damage: number, 
 	Combat.CreateExplosion(round, params, nil, Instance.new("Sound"))
 end
 
-function module.Explosion(self, position: Vector3, soundId: number?): ()
+function module.Explosion(self, position: Vector3, soundId: number?, radius: number?, damage: number?): ()
 	local round = RoundHandler.GetRound()
 	local params = ExplosionParams.new({
-		Damage = 0,
+		Damage = damage or 0,
 		FalloffBegin = 5,
-		FalloffEnd = 20,
+		FalloffEnd = radius or 20,
 		Pressure = 10000,
 		VisualRadius = 20,
 	}, position)
