@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local Commands = require(script.Parent.Commands)
+local HasRelaxedPermissions = require(script.Parent.HasRelaxedPermissions)
 local IsAdmin = require(script.Parent.IsAdmin)
 
 local module = {}
@@ -29,13 +30,15 @@ function module.ParseCommand(command: string): ParsedCommand
 end
 
 function module.ClientExecute(command: string): string
-	if not IsAdmin(Players.LocalPlayer) then
-		return "You are not an admin!"
-	end
-
 	local parsed = module.ParseCommand(command)
 	if not parsed.Command then
 		return `Command {parsed.ParsedName} not found.`
+	end
+
+	if not IsAdmin(Players.LocalPlayer) then
+		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not HasRelaxedPermissions(Players.LocalPlayer)) then
+			return "You do not have permission to run this command."
+		end
 	end
 
 	if parsed.Command.Environment == "Client" then

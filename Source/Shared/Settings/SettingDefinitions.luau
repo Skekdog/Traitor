@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local HasRelaxedPermissions = require(ReplicatedStorage.Shared.DevTools.HasRelaxedPermissions)
 local IsAdmin = require(ReplicatedStorage.Shared.DevTools.IsAdmin)
 
 export type ControlValue = {
@@ -56,7 +57,7 @@ export type SettingDefinition = BooleanDefinition | ChoiceDefinition | ControlDe
 local callbacks = script.Parent.Callbacks
 local availableSettings: {SettingDefinition} = {}
 
-local isLocalAdmin = RunService:IsServer() or IsAdmin(Players.LocalPlayer)
+local isLocalAdmin = RunService:IsServer() or IsAdmin(Players.LocalPlayer) or HasRelaxedPermissions(Players.LocalPlayer)
 
 table.insert(availableSettings, {
 	Name = "Shadows",
