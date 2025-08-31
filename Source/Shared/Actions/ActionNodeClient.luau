@@ -21,6 +21,10 @@ function module.Activate(node: ClientNodeData): ()
 	node.Info.Visible = false
 	node.ClickIcon.ImageTransparency = 0.5
 	ReplicatedStorage.Remotes.ClientServer.ActionNode:FireServer(node.Params.Adornee)
+
+	if module.ActiveNode == node then
+		module.ActiveNode = nil
+	end
 end
 
 local function makeGui(params: ActionNodeType.ActionNodeParams): ()

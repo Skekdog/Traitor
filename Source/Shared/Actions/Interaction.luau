@@ -151,6 +151,7 @@ RunService.PostSimulation:Connect(function()
 
 	Mouse.Reset()
 
+	module.ActionNode = nil
 	module.InteractProp = nil
 	module.InteractPart = nil
 
