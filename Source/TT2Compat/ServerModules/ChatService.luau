@@ -30,7 +30,7 @@ local function remapColor(color: string): BrickColor
 	return BrickColor.new(new :: "Bright yellow")
 end
 
-function module.GameMessage(self, message: string, colour: string?, _, player: Player?): ()
+function module.GameMessage(self, message: string, colour: string?, _: nil, player: Player?): ()
 	local round = RoundHandler.GetRound()
 	local brickColor = if colour then remapColor(colour) else nil
 	local formattedMessage = if brickColor then `<font color='#{brickColor.Color:ToHex()}'>{message}</font>` else message
