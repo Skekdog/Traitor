@@ -49,13 +49,15 @@ function module.ClientExecute(command: string): string
 end
 
 function module.ServerExecute(player: Player, round: Types.Round, command: string): string
-	if not IsAdmin(player) then
-		return "You are not an admin!"
-	end
-	
 	local parsed = module.ParseCommand(command)
 	if not parsed.Command then
 		return `Command {parsed.Args[1]} not found.`
+	end
+
+	if not IsAdmin(player) then
+		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not HasRelaxedPermissions(player)) then
+			return "You do not have permission to run this command."
+		end
 	end
 
 	if parsed.Command.Environment ~= "Server" then
