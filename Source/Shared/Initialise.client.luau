@@ -1,6 +1,8 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Shared.DevTools.FirstJoinPermissions)
+
 require(script.Parent.Settings.LoadSettings)
 require(script.Parent.Controls.KeybindHintManager)
-
 require(script.Parent.Combat.OnHitClient)
 require(script.Parent.Combat.MakeBulletHole)
 require(script.Parent.Util.ClientSound)

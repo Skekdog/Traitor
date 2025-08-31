@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+require(ReplicatedStorage.Shared.DevTools.FirstJoinPermissions)
 
 require(script.Parent.Player.SetupPlayer)
 require(script.Parent.PlayerData.SaveData)

@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local Commands = require(script.Parent.Commands)
-local HasRelaxedPermissions = require(script.Parent.HasRelaxedPermissions)
+local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local IsAdmin = require(script.Parent.IsAdmin)
 
 local module = {}
@@ -36,7 +36,7 @@ function module.ClientExecute(command: string): string
 	end
 
 	if not IsAdmin(Players.LocalPlayer) then
-		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not HasRelaxedPermissions(Players.LocalPlayer)) then
+		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not RelaxedPermissions.HasRelaxedPermissions(Players.LocalPlayer)) then
 			return "You do not have permission to run this command."
 		end
 	end
@@ -56,7 +56,7 @@ function module.ServerExecute(player: Player, round: Types.Round, command: strin
 	end
 
 	if not IsAdmin(player) then
-		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not HasRelaxedPermissions(player)) then
+		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not RelaxedPermissions.HasRelaxedPermissions(player)) then
 			return "You do not have permission to run this command."
 		end
 	end

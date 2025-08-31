@@ -9,6 +9,7 @@ local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
+local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 
 export type BaseCommand = {
 	Name: string,
@@ -698,6 +699,26 @@ module.givecredits = {
 		end
 
 		return `Gave {amount} credits to {getPlayersString(players)}.`
+	end
+}
+
+module.relax = {
+	Name = "relax",
+	Description = "Temporarily grants relaxed command permissions to players.",
+	Arguments = {"players"},
+	Environment = "Server" :: "Server",
+	HasRelaxedPermissions = true,
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return `Player {args[1]} not found.`
+		end
+
+		for _, player in players do
+			RelaxedPermissions.GivePermission(player)
+		end
+
+		return `Gave relaxed permissions to {getPlayersString(players)}.`
 	end
 }
 
