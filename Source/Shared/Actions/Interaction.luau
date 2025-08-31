@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-
+local ActionNodeClient = require(script.Parent.ActionNodeClient)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
@@ -21,6 +21,7 @@ module.CorpseInteractDistance = 10
 
 module.InteractProp = nil :: Types.MapThing?
 module.InteractPart = nil :: BasePart?
+module.ActionNode = nil :: ActionNodeClient.ClientNodeData?
 
 local function distanceCheck(target: Vector3, maxDistance: number): boolean
 	local distance = Players.LocalPlayer:DistanceFromCharacter(target)
@@ -94,7 +95,7 @@ local function tryClimbLadder(map: Types.Map): boolean
 	return false
 end
 
-function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: InputObject?): boolean
+function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: InputObject?, actionNode: ActionNodeClient.ClientNodeData?): boolean
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return false
@@ -104,6 +105,12 @@ function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: Input
 		if input and input.UserInputState ~= Enum.UserInputState.End then
 			return false
 		end
+
+		if actionNode then
+			ActionNodeClient.Activate(actionNode)
+			return true
+		end
+
 		return tryClimbLadder(map)
 	end
 
@@ -125,7 +132,7 @@ function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: Input
 end
 
 local function interactAction(action: string, state: Enum.UserInputState, input: InputObject?): Enum.ContextActionResult
-	return if module.TryInteract(module.InteractProp, module.InteractPart, input) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+	return if module.TryInteract(module.InteractProp, module.InteractPart, input, module.ActionNode) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
 end
 
 ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.High.Value + 1)
@@ -141,14 +148,19 @@ RunService.PostSimulation:Connect(function()
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
 		params.FilterDescendantsInstances = {cameraSubject.Parent :: Model}
 	end
-	
-    local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
-	-- 10000 distance because we should still be able to see players. Corpses can be viewed from distance 10, so we include that as a check there.
 
 	Mouse.Reset()
 
 	module.InteractProp = nil
 	module.InteractPart = nil
+
+	if ActionNodeClient.ActiveNode then
+		module.ActionNode = ActionNodeClient.ActiveNode
+		return
+	end
+
+    local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)
+	-- 10000 distance because we should still be able to see players. Corpses can be viewed from distance 10, so we include that as a check there.
 
 	if not result then
 		return

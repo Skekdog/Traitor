@@ -6,7 +6,22 @@ local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalPa
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
+export type ClientNodeData = {
+	Info: TextLabel,
+	ClickIcon: ImageButton,
+	Params: ActionNodeType.ActionNodeParams,
+}
+
+local module = {}
+module.ActiveNode = nil :: ClientNodeData?
+
 local nodes: {[BillboardGui]: ActionNodeType.ActionNodeParams?} = {}
+
+function module.Activate(node: ClientNodeData): ()
+	node.Info.Visible = false
+	node.ClickIcon.ImageTransparency = 0.5
+	ReplicatedStorage.Remotes.ClientServer.ActionNode:FireServer(node.Params.Adornee)
+end
 
 local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	local nodeGui = Instance.new("BillboardGui")
@@ -43,30 +58,38 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	info.Visible = false
 	info.Parent = frame
 
+	local nodeData: ClientNodeData = {
+		Info = info,
+		ClickIcon = clickIcon,
+		Params = params,
+	}
+
 	do
 		local uiStroke = Instance.new("UIStroke", info)
 		uiStroke.Thickness = 2
 	end
 
 	clickIcon.MouseEnter:Connect(function()
+		module.ActiveNode = nodeData
 		clickIcon.ImageTransparency = 0
 		info.Visible = true
 	end)
 
 	clickIcon.MouseLeave:Connect(function()
+		if module.ActiveNode == nodeData then
+			module.ActiveNode = nil
+		end
 		clickIcon.ImageTransparency = 0.5
 		info.Visible = false
-	end)
-
-	clickIcon.Activated:Connect(function()
-		info.Visible = false
-		clickIcon.ImageTransparency = 0.5
-		ReplicatedStorage.Remotes.ClientServer.ActionNode:FireServer(params.Adornee)
 	end)
 
 	params.Adornee.Destroying:Connect(function()
 		nodeGui:Destroy()
 		nodes[nodeGui] = nil
+
+		if module.ActiveNode == nodeData then
+			module.ActiveNode = nil
+		end
 	end)
 
 	nodes[nodeGui] = params
@@ -93,7 +116,11 @@ RunService.PreRender:Connect(function()
 		assert(params)
 		local distance = Players.LocalPlayer:DistanceFromCharacter(GetPrimaryPart(gui.Adornee :: Types.MapThing).Position)
 		gui.Enabled = (role.Definition.IsBadGuys or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and (distance ~= 0 and distance <= params.Radius)
+
+		if not gui.Enabled and module.ActiveNode and module.ActiveNode.Params == params then
+			module.ActiveNode = nil
+		end
 	end
 end)
 
-return nil
+return module
