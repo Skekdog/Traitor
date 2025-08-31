@@ -1,4 +1,6 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 
@@ -7,13 +9,22 @@ local module = {}
 module.TemporaryPermissions = DynamicValue.new({} :: {[number]: boolean})
 
 function module.GivePermission(user: Player): ()
-	print("gave", user)
 	module.TemporaryPermissions()[user.UserId] = true
 	module.TemporaryPermissions:Invoke()
+
+	if RunService:IsServer() then
+		ReplicatedStorage.Remotes.ServerClient.Relax:FireClient(user)
+	end
 
 	user.Destroying:Once(function()
 		module.TemporaryPermissions()[user.UserId] = nil
 		module.TemporaryPermissions:Invoke()
+	end)
+end
+
+if RunService:IsClient() then
+	ReplicatedStorage.Remotes.ServerClient.Relax.OnClientEvent:Connect(function()
+		module.GivePermission(Players.LocalPlayer)
 	end)
 end
 

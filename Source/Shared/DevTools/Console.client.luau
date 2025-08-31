@@ -9,9 +9,11 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local didConnect = false
 local console: (UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Console)})?
 RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
-	print("a")
 	if RelaxedPermissions.HasRelaxedPermissions(Players.LocalPlayer) or IsAdmin(Players.LocalPlayer) then
-		print("b")
+		if console then
+			return
+		end
+
 		console = UIManager.RegisterUI(UIManager.UnregisteredUIs.Console) :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Console)}
 		assert(console)
 
@@ -42,7 +44,6 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 			end)
 		end
 	elseif console then
-		print("c")
 		console:Unregister()
 	end
 end, true)
