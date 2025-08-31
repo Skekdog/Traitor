@@ -135,6 +135,18 @@ for _, v in CollectionService:GetTagged("ControlHint") do
     loadInstance(v)
 end
 
+CollectionService:GetInstanceRemovedSignal("ControlHint"):Connect(function(instance)
+    local hintLabel = instance:FindFirstChild("KeybindHintText")
+    if hintLabel then
+        hintLabel:Destroy()
+    end
+
+    local hintImage = instance:FindFirstChild("KeybindHintImage")
+    if hintImage then
+        hintImage:Destroy()
+    end
+end)
+
 local module = {}
 
 function module.TryUpdateKeybind(name: string): ()

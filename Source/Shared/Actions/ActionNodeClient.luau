@@ -17,14 +17,27 @@ module.ActiveNode = nil :: ClientNodeData?
 
 local nodes: {[BillboardGui]: ActionNodeType.ActionNodeParams?} = {}
 
-function module.Activate(node: ClientNodeData): ()
-	node.Info.Visible = false
-	node.ClickIcon.ImageTransparency = 0.5
-	ReplicatedStorage.Remotes.ClientServer.ActionNode:FireServer(node.Params.Adornee)
-
-	if module.ActiveNode == node then
+local function deselect(nodeData: ClientNodeData): ()
+	if module.ActiveNode == nodeData then
 		module.ActiveNode = nil
 	end
+	nodeData.ClickIcon.ImageTransparency = 0.5
+	nodeData.Info.Visible = false
+	nodeData.ClickIcon:RemoveTag("ControlHint")
+end
+
+function module.Activate(node: ClientNodeData): ()
+	deselect(node)
+	ReplicatedStorage.Remotes.ClientServer.ActionNode:FireServer(node.Params.Adornee)
+end
+
+local function setHintAttributes(instance: Instance): ()
+	instance:SetAttribute("Control", "Interact")
+	instance:SetAttribute("NoStyle", true)
+	instance:SetAttribute("AnchorPoint", Vector2.new(0, 0.25))
+	instance:SetAttribute("Position", UDim2.fromScale(0.75, 0.5))
+	instance:SetAttribute("TextXAlignment", "Left")
+	instance:SetAttribute("AlwaysShow", true)
 end
 
 local function makeGui(params: ActionNodeType.ActionNodeParams): ()
@@ -48,6 +61,10 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	clickIcon.ScaleType = Enum.ScaleType.Fit
 	clickIcon.BackgroundTransparency = 1
 	clickIcon.ImageTransparency = 0.5
+
+	Instance.new("UIAspectRatioConstraint", clickIcon)
+
+	setHintAttributes(clickIcon)
 
 	local info = Instance.new("TextLabel")
 	info.BackgroundTransparency = 1
@@ -77,14 +94,11 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 		module.ActiveNode = nodeData
 		clickIcon.ImageTransparency = 0
 		info.Visible = true
+		clickIcon:AddTag("ControlHint")
 	end)
 
 	clickIcon.MouseLeave:Connect(function()
-		if module.ActiveNode == nodeData then
-			module.ActiveNode = nil
-		end
-		clickIcon.ImageTransparency = 0.5
-		info.Visible = false
+		deselect(nodeData)
 	end)
 
 	params.Adornee.Destroying:Connect(function()
