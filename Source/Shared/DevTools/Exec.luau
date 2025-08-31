@@ -42,7 +42,8 @@ function module.ClientExecute(command: string): string
 	end
 
 	if parsed.Command.Environment == "Client" then
-		return parsed.Command.Execute(Players.LocalPlayer, parsed.Args)
+		local _, result = pcall(parsed.Command.Execute, Players.LocalPlayer, parsed.Args)
+		return result
 	end
 
 	return ReplicatedStorage.Remotes.ClientServer.Exec:InvokeServer(command)
@@ -64,7 +65,8 @@ function module.ServerExecute(player: Player, round: Types.Round, command: strin
 		return `Command {parsed.Command.Name} is not a server command.`
 	end
 
-	return parsed.Command.Execute(player, round, parsed.Args)
+	local _, result = pcall(parsed.Command.Execute, player, round, parsed.Args)
+	return result
 end
 
 return module
