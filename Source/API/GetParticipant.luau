@@ -4,13 +4,17 @@ local GetRound = require(script.Parent.GetRound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function GetParticipant(identifier: Instance | string): Types.Participant?
-	local finalIdentifier
-	if typeof(identifier) == "Instance" then
+	local finalIdentifier: string?
+	if typeof(identifier) == "string" then
+		finalIdentifier = identifier
+	else
 		local char = GetMapThingWithTag(identifier, "Character")
-		finalIdentifier = char
+		if char then
+			finalIdentifier = char.Name
+		end
 	end
 
-	if typeof(finalIdentifier) ~= "string" or not finalIdentifier:IsA("Model") or not finalIdentifier:IsA("BasePart") then
+	if not finalIdentifier then
 		return nil
 	end
 
