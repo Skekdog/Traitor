@@ -17,6 +17,10 @@
         "$path": "Source/Shared"
       },
 
+      "API": {
+        "$path": "Source/SharedAPI"
+      },
+
       "SharedModules": {
         "$className": "Folder",
         "$path": "Source/TT2Compat/SharedModules"
