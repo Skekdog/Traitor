@@ -18,7 +18,11 @@
       },
 
       "API": {
-        "$path": "Source/SharedAPI"
+        "$path": "Source/SharedAPI",
+
+        "Types": {
+          "$path": "Source/Shared/RoundRule/src/Types.luau"
+        }
       },
 
       "SharedModules": {
