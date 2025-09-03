@@ -13,6 +13,7 @@ function module.MakeExplosion(params: {
 	FalloffBegin: number?,
 	FalloffEnd: number,
 	Attacker: Types.Participant?,
+	IgnoreKarma: boolean?,
 }): ()
 	Combat.CreateExplosion(GetRound(), ExplosionParams.new({
 		Damage = params.Damage,
@@ -20,6 +21,9 @@ function module.MakeExplosion(params: {
 		FalloffEnd = params.FalloffEnd,
 		Pressure = params.Damage * 50,
 		VisualRadius = params.FalloffEnd,
+		IgnoreKarma = params.IgnoreKarma,
+		IgnoreScore = params.IgnoreKarma,
+		IgnoreSelfDefense = params.IgnoreKarma,
 	}, params.Position, params.Attacker))
 end
 
