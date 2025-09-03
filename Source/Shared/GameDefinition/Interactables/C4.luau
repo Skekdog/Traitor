@@ -561,11 +561,9 @@ local interactable: Types.InteractableDefinition = {
 		c4s()[object.Model] = object :: C4
 		c4s:Invoke()
 
-		object.Model.AncestryChanged:Connect(function()
-			if not object.Model:IsDescendantOf(workspace) then
-				c4s()[object.Model] = nil
-				c4s:Invoke()
-			end
+		object.Model.Destroying:Connect(function()
+			c4s()[object.Model] = nil
+			c4s:Invoke()
 		end)
 	end,
 }
