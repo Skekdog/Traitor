@@ -6,7 +6,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
-local MIN_ARM_DURATION = 45
+local MIN_ARM_DURATION = 3
 local MAX_ARM_DURATION = 360
 
 local WIRE_COUNT = 6
@@ -40,7 +40,6 @@ local reducedExplosionInfo: Types.ExplosionInfo = {
 export type C4 = Types.Interactable & {
 	Model: BasePart,
 	Extras: {
-		ArmId: never?,
 		ArmedBy: Types.Participant?,
 		DangerousWires: {number}?,
 		ArmDurationClient: number?,
@@ -375,7 +374,6 @@ if RunService:IsServer() then
 	end
 
 	local function disarm(c4: C4): ()
-		c4.Extras.ArmId = nil
 		c4.Extras.ArmedBy = nil
 		c4.Extras.DangerousWires = nil
 		c4.Model:SetAttribute("ExplodesAt", nil)
@@ -386,13 +384,9 @@ if RunService:IsServer() then
 		c4.Model:Destroy()
 	end
 
-	local function tryExplode(c4: C4, armId: any, reducedPower: boolean?): ()
+	local function tryExplode(c4: C4, reducedPower: boolean?): ()
 		local armedBy: Types.Participant? = c4.Extras.ArmedBy
 		if not armedBy then
-			return
-		end
-
-		if armId ~= c4.Extras.ArmId then
 			return
 		end
 
@@ -445,7 +439,6 @@ if RunService:IsServer() then
 		DNAScanner.AddDNATrace(c4, participant, nil, "rbxassetid://17229908151", c4.Model)
 
 		c4.Model:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
-		task.delay(duration, tryExplode, c4, c4.Extras.ArmId)
 	end
 
 	function module.TryDisarm(c4: C4, participant: Types.Participant, cutWire: number?, safeDisarm: boolean?): ()
@@ -473,8 +466,8 @@ if RunService:IsServer() then
 		if alwaysDisarm or not table.find(c4.Extras.DangerousWires, cutWire) then
 			return disarm(c4)
 		end
-		
-		tryExplode(c4, c4.Extras.ArmId, true)
+
+		tryExplode(c4, true)
 	end
 
 	local function tryDestroy(c4: C4): ()
@@ -536,6 +529,14 @@ if RunService:IsServer() then
 			tryTake(c4, participant)
 		elseif action == "Destroy" then
 			tryDestroy(c4)
+		end
+	end)
+
+	RunService.Heartbeat:Connect(function()
+		for _, c4 in c4s() do
+			if (c4.Model:GetAttribute("ExplodesAt") :: number? or math.huge) <= workspace:GetServerTimeNow() then
+				tryExplode(c4)
+			end
 		end
 	end)
 end
