@@ -52,6 +52,9 @@ function module.DisguiseServer(participantData: ParticipantData, enable: boolean
 	end
 
 	enable = if enable == nil then not participant.Player:GetAttribute("IsDisguised") else enable
+	if participant.Player:GetAttribute("IsDisguised") == enable then
+		return
+	end
 	participant.Player:SetAttribute("IsDisguised", enable)
 
 	hum = hum or participant:GetHumanoid()
