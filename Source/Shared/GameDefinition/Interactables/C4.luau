@@ -6,7 +6,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
-local MIN_ARM_DURATION = 3
+local MIN_ARM_DURATION = 45
 local MAX_ARM_DURATION = 360
 
 local WIRE_COUNT = 6
@@ -370,7 +370,7 @@ if RunService:IsServer() then
 	end
 
 	local function isArmed(c4: C4): boolean
-		return c4.Extras.ArmId ~= nil
+		return c4.Model:GetAttribute("ExplodesAt") ~= nil
 	end
 
 	local function disarm(c4: C4): ()
