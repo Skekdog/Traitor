@@ -3,8 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ActionNodeType = require(script.Parent.ActionNodeType)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
-local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 export type ClientNodeData = {
 	Info: TextLabel,
@@ -47,6 +45,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	nodeGui.AlwaysOnTop = true
 	nodeGui.Active = true
 	nodeGui.ResetOnSpawn = false
+	nodeGui.MaxDistance = params.Radius
 
 	local frame = Instance.new("Frame", nodeGui)
 	frame.Size = UDim2.fromScale(1, 1)
@@ -132,8 +131,7 @@ RunService.PreRender:Connect(function()
 
 	for gui, params in nodes do
 		assert(params)
-		local distance = Players.LocalPlayer:DistanceFromCharacter(GetPrimaryPart(gui.Adornee :: Types.MapThing).Position)
-		gui.Enabled = (role.Definition.IsBadGuys or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and (distance ~= 0 and distance <= params.Radius)
+		gui.Enabled = (role.Definition.IsBadGuys or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and not gui.Adornee:GetAttribute("IsDisabled")
 
 		if not gui.Enabled and module.ActiveNode and module.ActiveNode.Params == params then
 			module.ActiveNode = nil
