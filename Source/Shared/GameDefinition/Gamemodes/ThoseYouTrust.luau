@@ -388,7 +388,7 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 end
 
 local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corpse, enable: boolean): ()
-	if not corpse.Model then
+	if not corpse.Model or not corpse.Model.PrimaryPart then
 		return
 	end
 
