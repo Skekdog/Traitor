@@ -65,6 +65,10 @@ for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
         continue
     end
 
+    if v.Name == "Elimination" then
+        continue
+    end
+
     for i = 1, if v.Name == "ThoseYouTrust" then 4 else 1 do
         table.insert(gamemodes, (require)(v))
     end
