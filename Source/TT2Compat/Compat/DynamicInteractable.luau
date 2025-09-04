@@ -65,23 +65,27 @@ if RunService:IsClient() then
 	local GetInteractableDefinition = require(ReplicatedStorage.Shared.LocalState.GetInteractableDefinition)
 
 	local function onDescendantAdded(descendant: Instance): ()
-		if (not descendant:IsA("Model") and not descendant:IsA("BasePart")) or not descendant:GetAttribute("Button") or descendant:HasTag("Interactable") then
+		if (not descendant:IsA("Model") and not descendant:IsA("BasePart")) or descendant:HasTag("Interactable") then
 			return
 		end
 		local gamemode, map = LocalRoundInfo.Gamemode(), LocalRoundInfo.Map()
 		if not gamemode or not map or GetInteractableDefinition(descendant.Name, gamemode, map) then
 			return
 		end
-		local interactable = createNewInteractable(descendant)
-		LocalRoundInfo.Interactables()[descendant] = interactable
-		LocalRoundInfo.Interactables:Invoke()
+
+		local interactable: Types.Interactable?
+		if descendant:GetAttribute("Button") then
+			interactable = createNewInteractable(descendant)
+			LocalRoundInfo.Interactables()[descendant] = interactable
+			LocalRoundInfo.Interactables:Invoke()
+		end
 
 		descendant:GetAttributeChangedSignal("Button"):Connect(function()
 			local value = descendant:GetAttribute("Button")
 			if value then
 				descendant:AddTag("Prop")
 				descendant:AddTag("Interactable")
-				LocalRoundInfo.Interactables()[descendant] = interactable
+				LocalRoundInfo.Interactables()[descendant] = interactable or createNewInteractable(descendant)
 				LocalRoundInfo.Interactables:Invoke()
 			else
 				descendant:RemoveTag("Prop")
