@@ -41,7 +41,7 @@ local function createNewInteractable(mapThing: Types.MapThing): Types.Interactab
 		IsContinuousInteraction = false,
 		Name = mapThing.Name,
 		DisplayName = mapThing:GetAttribute("DisplayName") :: string?,
-		HideName = mapThing:GetAttribute("ShowName") ~= true,
+		HideName = mapThing:GetAttribute("ShowName") ~= true and not mapThing:GetAttribute("DisplayName"),
 
 		OnInteractClient = OnInteract,
 		OnInteractServer = OnInteract,
