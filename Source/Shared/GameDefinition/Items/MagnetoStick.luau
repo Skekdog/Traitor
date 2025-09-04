@@ -482,7 +482,7 @@ local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function()
 	end
 
 	if not part:IsDescendantOf(workspace) then
-		return clientRelease(part)
+		return clientRelease(part, true)
 	end
 
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
