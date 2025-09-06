@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 
-local function tryGetAttachment(root: BasePart): Attachment?
+local function tryGetAttachment(root: Instance): Attachment?
 	local attachment = root:FindFirstChild("FlashlightAttachment")
 	if not attachment then
 		return nil
@@ -13,12 +13,11 @@ local function tryGetAttachment(root: BasePart): Attachment?
 	return attachment
 end
 
-local function getOrCreateFlashlight(root: BasePart): SpotLight
+local function getOrCreateFlashlight(root: Instance): Light
 	local attachment = tryGetAttachment(root)
 	if not attachment then
 		local newAttachment = Instance.new("Attachment")
 		newAttachment.Name = "FlashlightAttachment"
-		newAttachment.Position = Vector3.new(0, 1.5, 0)
 		newAttachment.Parent = root
 		attachment = newAttachment
 	end
@@ -26,17 +25,16 @@ local function getOrCreateFlashlight(root: BasePart): SpotLight
 
 	local light = attachment:FindFirstChild("Flashlight")
 	if not light then
-		local newLight = Instance.new("SpotLight")
+		local newLight = Instance.new("PointLight")
 		newLight.Name = "Flashlight"
-		newLight.Face = Enum.NormalId.Front
-		newLight.Range = 30
-		newLight.Brightness = 5
+		newLight.Range = 12
+		newLight.Brightness = 1
 		newLight.Shadows = true
-		newLight.Angle = 45
 		newLight.Parent = attachment
 		light = newLight
 	end
-	assert(light and light:IsA("SpotLight"))
+
+	assert(light and light:IsA("Light"))
 
 	return light
 end
@@ -51,7 +49,7 @@ local function enableFlashlight(): Enum.ContextActionResult
 		return Enum.ContextActionResult.Pass
 	end
 
-	local light = getOrCreateFlashlight(root)
+	local light = getOrCreateFlashlight(workspace.CurrentCamera)
 	light.Enabled = enabled
 
 	return Enum.ContextActionResult.Sink
@@ -60,40 +58,17 @@ end
 LocalCharacter.Character:Connect(function(char)
 	if not char then
 		ControlManager.Unregister("Flashlight")
+
+		local attachment = tryGetAttachment(workspace.CurrentCamera)
+		if attachment then
+			attachment:Destroy()
+		end
+
+		enabled = false
+
 		return
 	end
 	ControlManager.Register("Flashlight", enableFlashlight)
 end)
-
-local function onCameraCFrameChanged(): ()
-	if not enabled then
-		return
-	end
-
-	local root = LocalCharacter.RootPart()
-	if not root then
-		return
-	end
-
-	local attachment = tryGetAttachment(root)
-	if not attachment then
-		return
-	end
-
-	local x = workspace.CurrentCamera.CFrame:ToOrientation()
-	attachment.CFrame = CFrame.new(attachment.CFrame.Position) * CFrame.fromEulerAnglesYXZ(x, 0, 0)
-end
-
-local lastCameraCon: RBXScriptConnection?
-local function listenToCamera(): ()
-	if lastCameraCon then
-		lastCameraCon:Disconnect()
-	end
-
-	lastCameraCon = workspace.CurrentCamera:GetPropertyChangedSignal("CFrame"):Connect(onCameraCFrameChanged)
-	onCameraCFrameChanged()
-end
-workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(listenToCamera)
-listenToCamera()
 
 return nil
