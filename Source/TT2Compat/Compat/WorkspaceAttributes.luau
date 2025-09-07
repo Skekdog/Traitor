@@ -1,14 +1,16 @@
 local ServerScriptService = game:GetService("ServerScriptService")
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
-RoundHandler.Round:Connect(function(round)
-	local lastPauseAttribute = false
+local lastPauseAttribute = false
+task.spawn(function()
 	while true do
 		task.wait()
+		local round = RoundHandler.Round()
 		local map = round:GetMap()
 		if not map.Definition.Extras or not map.Definition.Extras.CompatibilityMode then
 			continue
 		end
+
 		if round:IsPreGame() then
 			workspace:SetAttribute("RoundState", "Preparing")
 		elseif round:IsInProgress() then
@@ -26,6 +28,7 @@ RoundHandler.Round:Connect(function(round)
 		lastPauseAttribute = round:IsPaused()
 		workspace:SetAttribute("Paused", round:IsPaused())
 	end
-end, true)
+end)
+
 
 return nil
