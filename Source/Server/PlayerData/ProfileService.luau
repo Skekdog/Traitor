@@ -470,8 +470,6 @@ local IsLiveCheckActive = false
 local UseMockDataStore = if IsStudio and script.Parent then true else false -- If cloning the script it will not have a parent, because we want to use it in studio
 local MockDataStore = ProfileService._mock_data_store -- Mock data store used when API access is disabled
 
-print(UseMockDataStore)
-
 local UserMockDataStore = ProfileService._user_mock_data_store -- Separate mock data store accessed via ProfileStore.Mock
 local UseMockTag = {}
 
