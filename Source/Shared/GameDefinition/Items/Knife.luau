@@ -12,7 +12,10 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 	assert(model:IsA("BasePart"))
 	model.CollisionGroup = "PlayerCharacterParts" -- to prevent collision with head
 
-	local didThrow = attacker:TryThrowAssembly(model, THROW_FORCE, nil, origin, direction, true)
+	model:RemoveTag("Item")
+	model:RemoveTag("Prop")
+
+	local didThrow = attacker:TryThrowAssembly(model, THROW_FORCE, attacker.Round:GetMap().Dynamic, origin, direction, true)
 	if not didThrow then
 		return
 	end
@@ -72,7 +75,7 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 
 	task.wait(1) -- wait, otherwise the attacker immediately picks up the knife
 
-	model.Parent = attacker.Round:GetMap().Dynamic
+	model:AddTag("Item")
 	local newItem = attacker.Round:LoadProp(model)
 
 	DNAScanner.AddDNATrace(newItem, attacker, nil, "rbxassetid://14930962070", model)
