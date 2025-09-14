@@ -112,7 +112,10 @@ local function StandardDoor(request: DoorRequest): ()
             end
         end
         if #sounds == 0 then
-            sounds = {PlaySound.MakeSound(if shouldOpen then 316089029 else 316089019, nil)}
+            sounds = {PlaySound.MakeSound(if shouldOpen then 316089029 else 316089019, {
+                RollOffMinDistance = 6,
+                RollOffMaxDistance = 18,
+            })}
         end
         PlaySound(sounds, nil, door)
     end
