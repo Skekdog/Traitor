@@ -330,10 +330,12 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				ViewmodelModule.Recoil(item.Definition)
 
 				if request then
-					local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.PrimaryFire:InvokeServer(request)
-					if result ~= "Success" and result ~= "PreGame" then
-						warn("Hit rejected:", result)
-					end
+					task.spawn(function()
+						local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.PrimaryFire:InvokeServer(request)
+						if result ~= "Success" and result ~= "PreGame" then
+							warn("Hit rejected:", result)
+						end
+					end)
 				end
 
 				if item.Kind == "Gun" and item.Ammo == 0 then
