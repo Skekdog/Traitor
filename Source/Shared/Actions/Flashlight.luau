@@ -30,6 +30,7 @@ local function getOrCreateFlashlight(root: Instance): Light
 		newLight.Range = 12
 		newLight.Brightness = 1
 		newLight.Shadows = true
+		newLight.Enabled = false
 		newLight.Parent = attachment
 		light = newLight
 	end
@@ -59,16 +60,12 @@ LocalCharacter.Character:Connect(function(char)
 	if not char then
 		ControlManager.Unregister("Flashlight")
 
-		local attachment = tryGetAttachment(workspace.CurrentCamera)
-		if attachment then
-			attachment:Destroy()
-		end
-
+		getOrCreateFlashlight(workspace.CurrentCamera).Enabled = false
 		enabled = false
 
 		return
 	end
 	ControlManager.Register("Flashlight", enableFlashlight)
-end)
+end, true)
 
 return nil
