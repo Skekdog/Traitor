@@ -211,6 +211,11 @@ local function setNetworkOwner(prop: Types.Prop, owner: Player | "Auto"): ()
 	end
 
 	local part = GetPrimaryPart(prop.Model)
+
+	if not part:CanSetNetworkOwnership() then
+		return
+	end
+
 	if owner == "Auto" then
 		return part:SetNetworkOwnershipAuto()
 	end
