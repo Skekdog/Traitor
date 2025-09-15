@@ -341,6 +341,10 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				if item.Kind == "Gun" and item.Ammo == 0 then
 					tryReloadWeapon(item)
 				end
+
+				if item.Kind == "Grenade" then
+					break
+				end
 			end
 
 			return Enum.ContextActionResult.Sink
