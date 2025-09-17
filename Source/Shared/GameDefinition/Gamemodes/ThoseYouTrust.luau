@@ -491,7 +491,7 @@ end
 
 local gamemode: Types.GamemodeDefinition = {
 	Name = "ThoseYouTrust",
-	DisplayName = "Those You Trust",
+	DisplayName = "Traitor Town 3",
 	Description = "Spy HQ has been infilitrated by Traitors. Can you separate those you trust, from those you shouldn't?",
 	Authors = "@Scelly_Dog",
 
