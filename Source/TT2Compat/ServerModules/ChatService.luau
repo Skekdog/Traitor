@@ -43,6 +43,7 @@ module.PlayerChatted = playerChatted.Event
 local RBXGeneral = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
 RBXGeneral.ShouldDeliverCallback = function(message: TextChatMessage): ()
 	playerChatted:Fire(Players:GetPlayerByUserId(message.TextSource.UserId), message.Text)
+	return true -- lol! if this doesn't return a truthy value then the message don't get sent 😢
 end
 
 return module
