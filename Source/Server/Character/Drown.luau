@@ -29,16 +29,12 @@ overlapParams.FilterType = Enum.RaycastFilterType.Include
 overlapParams.FilterDescendantsInstances = {workspace.Characters}
 
 local function forEachParticipant(participant: Participant, dt: number, alreadySubmerged: boolean?): ()
-	if tick() - (participant.Extras.LastDrownAt or 0) < DROWN_INTERVAL then
+	local char = participant:GetCharacter()
+	if not char then
 		return
 	end
 
 	if not participant:IsAlive() then
-		return
-	end
-
-	local char = participant:GetCharacter()
-	if not char then
 		return
 	end
 
@@ -53,11 +49,15 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 		local roundedPos = (Vector3.new(math.round(head.Position.X), math.round(head.Position.Y), math.round(head.Position.Z)) // 4) * 4
 		local voxels = workspace.Terrain:ReadVoxelChannels(Region3.new(roundedPos, roundedPos + Vector3.one * 4), 4, {"LiquidOccupancy"})
 		local occupancy = voxels.LiquidOccupancy[1][1][1]
-		isSubmerged = occupancy > 0
+		isSubmerged = occupancy >= 0.5
 	end
 
 	if not isSubmerged then
 		participant.Extras.DrownElapsed = 0
+		return
+	end
+
+	if tick() - (participant.Extras.LastDrownAt or 0) < DROWN_INTERVAL then
 		return
 	end
 
