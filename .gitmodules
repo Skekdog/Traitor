@@ -2,3 +2,6 @@
 [submodule "src/ReplicatedStorage/RoundRule"]
 	path = Source/Shared/RoundRule
 	url = ../RoundRule
+[submodule "Docs"]
+	path = Docs
+	url = https://github.com/skekdog/TT3-Docs.git
