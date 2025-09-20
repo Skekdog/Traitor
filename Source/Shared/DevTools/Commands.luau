@@ -411,7 +411,7 @@ module.setkarma = {
 
 		for _, player in players do
 			KarmaManager.SetKarma(player, karma)
-			
+
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
 				continue
@@ -485,7 +485,7 @@ module.pause = {
 		if round:GetPhase() == "Intermission" or round:GetPhase() == "Waiting" then
 			return "Cannot pause during intermission or waiting phase."
 		end
-	
+
 		round:Pause(not round:IsPaused())
 		return if round:IsPaused() then "Round paused." else "Round unpaused."
 	end
@@ -566,11 +566,18 @@ module.map = {
 	Description = "Changes the map",
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
-	Arguments = {"map name"},
+	Arguments = {"map name / asset id"},
 	Execute = function(_, round: Round, args: Args)
+		local CustomMap = require(ServerScriptService.CustomMap)
 		local mapName = processStringArgument(args[1])
 		if not mapName then
-			return "Missing argument 1 map name."
+			return "Missing argument 1 map name / asset id."
+		end
+
+		local assetId = processNumberArgument(mapName)
+		if assetId then
+			CustomMap.LoadMap(assetId)
+			return `Map changed to asset ID {assetId}.`
 		end
 
 		local map = ServerStorage.Maps:FindFirstChild(mapName)
