@@ -31,7 +31,7 @@ type ClientMapInfo = {
 
 local function getMapsForVote(): {ClientMapInfo}
     local votableMaps: {ClientMapInfo} = {}
-    
+
     local mapChildren = maps:GetChildren()
     random:Shuffle(mapChildren)
 
@@ -65,7 +65,7 @@ for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
         continue
     end
 
-    if v.Name == "Elimination" then
+    if v.Name == "Elimination" or v.Name == "ThoseYouTrust" then
         continue
     end
 
@@ -203,7 +203,7 @@ local function onRoundEnd(): ()
         if module.Round().Gamemode.EnableKarma then
             KarmaManager.SetKarma(v.Player, v:GetKarma())
         end
-        
+
         ScoreManager.AddScore(v.Player, totalScore)
     end
 end
