@@ -228,6 +228,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		modalise.Name = "Modalise"
 		modalise.BackgroundTransparency = 1
 		modalise.TextTransparency = 1
+		modalise.Size = UDim2.fromOffset(1, 1)
 
 		modalise.Visible = true
 
