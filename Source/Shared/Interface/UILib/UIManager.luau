@@ -135,7 +135,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			self:ToggleVisible(false, true, function()
 				self.Object.Parent = UIManager.UnregisteredUIs
 			end)
-			
+
 			if self.Sidebar then
 				local sb = UIManager.GetUI("Sidebar").Object
 				local sbButton = sb:FindFirstChild(self.Name)
@@ -143,15 +143,15 @@ function UIManager.RegisterUI(object: GuiObject): UI
 					sbButton:Destroy()
 				end
 			end
-			
+
 			table.remove(registeredUIs, table.find(registeredUIs, self))
 		end
 	}
-	
+
 	if self.Layer == "Popup" and not object:GetAttribute("NoKeybind") then
 		ControlManager.Register(self.Name, function(act, state, input)
 			local isToggled = (Settings.GetSetting(self.Name) :: SettingDefinitions.ControlValue).Toggled
-			
+
 			if isToggled then
 				if state == Enum.UserInputState.End then
 					self:ToggleVisible()
@@ -167,7 +167,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			return Enum.ContextActionResult.Sink
 		end)
 	end
-	
+
 	if self.Sidebar then
 		local sb = UIManager.GetUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
 
@@ -187,7 +187,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			self:ToggleVisible()
 		end)
 	end
-	
+
 	if not self.NoClose then
 		local close = object:FindFirstChild("CloseUI") :: (ObjectValue & {Value: TextButton})?
 		if close then
@@ -198,12 +198,12 @@ function UIManager.RegisterUI(object: GuiObject): UI
 			warn(self.Name.." does not have a registered Close button!")
 		end
 	end
-	
+
 	if ignoreInset and not object:GetAttribute("InsetAdjusted") then
 		object:SetAttribute("InsetAdjusted", true)
 		object.Size += UDim2.fromOffset(inset.X, inset.Y)
 	end
-	
+
 	if transitionStyle then
 		if not transitionTarget then -- check to make sure transTarget is not already set, because uis like EquipmentShop are registered multiple times
 			local target: UDim2 | number
@@ -219,7 +219,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 	elseif self.Layer == "Popup" then
 		warn(self.Name.." does not have a transition style!")
 	end
-	
+
 	-- Disabled when ui is closing but not fully closed yet
 	if modal and not object:FindFirstChild("Modalise") then
 		local modalise = Instance.new("TextButton")
@@ -228,12 +228,12 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		modalise.Name = "Modalise"
 		modalise.BackgroundTransparency = 1
 		modalise.TextTransparency = 1
-		
+
 		modalise.Visible = true
-		
+
 		modalise.Parent = object
 	end
-	
+
 	object.Parent = plrUi:FindFirstChild(self.Layer)
 	table.insert(registeredUIs, self)
 
@@ -316,7 +316,7 @@ local function register(object: Instance)
 	if object:GetAttribute("DoNotRegister") then
 		return
 	end
-	
+
 	UIManager.RegisterUI(object :: GuiObject)
 end
 
