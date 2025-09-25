@@ -26,6 +26,11 @@ local backgroundMusic = {
 }
 
 local function enterHasteMode(round: Types.Round): ()
+	if round.Extras.HasteMode then
+		return
+	end
+	round.Extras.HasteMode = true
+
 	local framedAlive: {Types.Participant} = {}
 	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
 		if v:IsAlive() then
