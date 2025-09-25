@@ -54,7 +54,13 @@ function Health.InitHeal(participant: Types.Participant): ()
 
 		participant.Extras.FramedHealId = nil
 
+		local id = newproxy()
+		participant.Extras.FramedHealId2 = id
+
 		task.wait(if health < 20 then 6 else 5)
+		if participant.Extras.FramedHealId2 ~= id then
+			return
+		end
 		Health.TriggerHeal(participant)
 	end)
 end
