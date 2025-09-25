@@ -24,7 +24,7 @@ function Health.TriggerHeal(participant: Types.Participant): ()
 		while hum.Parent and hum.Health > 0 and hum.Health < hum.MaxHealth and participant.Extras.FramedHealId == id do
 			hum.Health = math.min(hum.Health + 1, hum.MaxHealth)
 			participant.Extras.FramedLastHealth = hum.Health
-			task.wait(0.5)
+			task.wait(0.05)
 		end
 		participant.Extras.FramedHealId = nil
 	end)
