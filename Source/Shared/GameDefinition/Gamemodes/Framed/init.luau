@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Epilogue = require(script.Epilogue)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local FaceIt = require(script.FaceIt)
 local Health = require(script.Health)
@@ -170,7 +171,8 @@ local function OnStart(_, round: Types.Round): ()
 	round.Extras.FramedBackgroundMusic = PlaySound(backgroundMusic)
 end
 
-local function OnFinish(_, round): ()
+local function OnFinish(_, round: Types.Round): ()
+	Epilogue.Finish()
 	if round.Extras.FramedBackgroundMusic then
 		round.Extras.FramedBackgroundMusic:Destroy()
 	end
@@ -195,8 +197,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 		round:Finish(round:GetRoleFromRoleName("Police"))
 		return
 	elseif #framedAlive == 1 then
-		local lastFramed = framedAlive[1]
-		-- begin epilogue
+		Epilogue.Begin(framedAlive[1])
 	elseif #framedAlive <= 3 then
 		enterHasteMode(round)
 	end
