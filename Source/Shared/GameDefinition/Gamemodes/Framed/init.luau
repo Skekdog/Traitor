@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local FaceIt = require(script.FaceIt)
 local Health = require(script.Health)
 local Targets = require(script.Targets)
@@ -6,6 +7,20 @@ local Types = require(ReplicatedStorage.API.Types)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
+
+local backgroundMusic = {
+	1843504945,
+	1843505232,
+	1847799241,
+	1847245265,
+	1847798833,
+	1838974004,
+	1837472332,
+	1838973846,
+	1848209564,
+	1838730828,
+	1846614488,
+}
 
 local framedRole: Types.RoleDefinition = {
 	Kind = "RoleDefinition",
@@ -127,6 +142,14 @@ local function OnStart(_, round: Types.Round): ()
 	end
 
 	Targets.LoadFirstTargets(framed)
+
+	round.Extras.FramedBackgroundMusic = PlaySound(backgroundMusic)
+end
+
+local function OnFinish(_, round): ()
+	if round.Extras.FramedBackgroundMusic then
+		round.Extras.FramedBackgroundMusic:Destroy()
+	end
 end
 
 local traitorMusic: {Sound} = {}
@@ -198,6 +221,7 @@ local gamemode: Types.GamemodeDefinition = {
 
 	OnCharacterAdded = function() end,
 	OnStart = OnStart,
+	OnFinish = OnFinish,
 }
 
 return gamemode
