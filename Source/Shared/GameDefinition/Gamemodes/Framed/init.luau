@@ -2,11 +2,14 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local FaceIt = require(script.FaceIt)
 local Health = require(script.Health)
+local HighlightCharacter = require(script.HighlightCharacter)
 local Targets = require(script.Targets)
 local Types = require(ReplicatedStorage.API.Types)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
+
+require(script.HighlightCharacter)
 
 local backgroundMusic = {
 	1843504945,
@@ -21,6 +24,22 @@ local backgroundMusic = {
 	1838730828,
 	1846614488,
 }
+
+local function enterHasteMode(round: Types.Round): ()
+	local framedAlive: {Types.Participant} = {}
+	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
+		if v:IsAlive() then
+			table.insert(framedAlive, v)
+		end
+	end
+
+	for _, participant in framedAlive do
+		local char = participant:GetCharacter()
+		if char then
+			HighlightCharacter(char, true, "Kill", framedAlive)
+		end
+	end
+end
 
 local framedRole: Types.RoleDefinition = {
 	Kind = "RoleDefinition",
@@ -174,7 +193,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 		local lastFramed = framedAlive[1]
 		-- begin epilogue
 	elseif #framedAlive <= 3 then
-		-- begin haste mode
+		enterHasteMode(round)
 	end
 
 	Targets.OnDeath(participant)
