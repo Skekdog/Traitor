@@ -12,6 +12,20 @@ function Targets.AssignTarget(participant: Types.Participant, target: Types.Part
 	FramedNotification(target, "💠 You have a new hunter.")
 end
 
+function Targets.OnDeath(participant: Types.Participant): ()
+	local hunter: Types.Participant? = participant.Extras.FramedHunter
+	if not hunter then
+		return
+	end
+
+	local target: Types.Participant? = participant.Extras.FramedTarget
+	if not target then
+		return
+	end
+
+	Targets.AssignTarget(hunter, participant.Extras.FramedTarget)
+end
+
 function Targets.LoadFirstTargets(framed: {Types.Participant}): ()
 	for i, participant in framed do
 		Targets.AssignTarget(participant, framed[i % #framed + 1])

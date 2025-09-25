@@ -152,6 +152,34 @@ local function OnFinish(_, round): ()
 	end
 end
 
+local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
+	if participant:GetRole().Definition.Name ~= "Framed" then
+		return
+	end
+
+
+	local round = participant.Round
+
+	local framedAlive: {Types.Participant} = {}
+	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
+		if v:IsAlive() and v ~= participant then
+			table.insert(framedAlive, v)
+		end
+	end
+
+	if #framedAlive == 0 then
+		round:Finish(round:GetRoleFromRoleName("Police"))
+		return
+	elseif #framedAlive == 1 then
+		local lastFramed = framedAlive[1]
+		-- begin epilogue
+	elseif #framedAlive <= 3 then
+		-- begin haste mode
+	end
+
+	Targets.OnDeath(participant)
+end
+
 local traitorMusic: {Sound} = {}
 for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
 	if v:IsA("Sound") then
@@ -187,7 +215,7 @@ local gamemode: Types.GamemodeDefinition = {
 	EnableFriendlyFire = false,
 	EnableKarma = true,
 
-	StartingItems = {},
+	StartingItems = {Items["Magneto Stick"]},
 
 	Roles = {
 		Framed = framedRole,
@@ -213,7 +241,7 @@ local gamemode: Types.GamemodeDefinition = {
 
 	GetRoundEndMusic = getVictoryMusic,
 
-	OnDeath = function() end,
+	OnDeath = OnDeath,
 
 	Duration = function()
 		return 240
