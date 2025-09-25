@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local FaceIt = require(script.FaceIt)
 local Health = require(script.Health)
+local Targets = require(script.Targets)
 local Types = require(ReplicatedStorage.API.Types)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
@@ -105,7 +106,9 @@ local function AssignRoles(_, participants: {Types.Participant}): ()
 end
 
 local function OnStart(_, round: Types.Round): ()
-	for _, participant in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
+	local framed = round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed"))
+
+	for _, participant in framed do
 		local char = participant:GetCharacter()
 		if char then
 			FaceIt(char)
@@ -122,6 +125,8 @@ local function OnStart(_, round: Types.Round): ()
 
 		Health.InitHeal(participant)
 	end
+
+	Targets.LoadFirstTargets(framed)
 end
 
 local traitorMusic: {Sound} = {}
