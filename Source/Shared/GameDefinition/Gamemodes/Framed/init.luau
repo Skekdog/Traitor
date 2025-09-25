@@ -60,7 +60,7 @@ local framedRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Solo"},
 
-	EquipmentShop = {},
+	EquipmentShop = {Items.Flashbang},
 	StartingItems = {FramedItems.TargetChecker},
 
 	RevealedRoles = {"Police"},
@@ -79,7 +79,7 @@ local policeRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
-	EquipmentShop = {},
+	EquipmentShop = {Items.Flashbang},
 	StartingItems = {},
 
 	Allies = {"Police", "Undercover"},
@@ -99,7 +99,7 @@ local undercoverRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
-	EquipmentShop = {},
+	EquipmentShop = {Items.Flashbang},
 	StartingItems = {},
 
 	Allies = {"Police", "Undercover"},
