@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Epilogue = require(script.Epilogue)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local FaceIt = require(script.FaceIt)
+local FramedItems = require(script.FramedItems)
 local Health = require(script.Health)
 local HighlightCharacter = require(script.HighlightCharacter)
 local Targets = require(script.Targets)
@@ -58,7 +59,7 @@ local framedRole: Types.RoleDefinition = {
 	Allegiance = {Kind = "Solo"},
 
 	EquipmentShop = {},
-	StartingItems = {},
+	StartingItems = {FramedItems.TargetChecker},
 
 	RevealedRoles = {"Police"},
 	HighlightedRoles = {"Police"},
@@ -151,7 +152,7 @@ local function OnStart(_, round: Types.Round): ()
 	for _, participant in framed do
 		local char = participant:GetCharacter()
 		if char then
-			FaceIt(char)
+			FaceIt.FaceIt(char)
 		end
 
 		local hum = participant:GetHumanoid()
@@ -226,6 +227,15 @@ local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTi
 	return innocentMusic[math.random(#innocentMusic)]
 end
 
+local framedItems = {}
+for i, v in Items do
+	framedItems[i] = v
+end
+
+for i, v in FramedItems do
+	framedItems[i] = v
+end
+
 local gamemode: Types.GamemodeDefinition = {
 	Name = "Framed",
 	Description = "Find and kill your targets. Don't get caught red-handed.",
@@ -249,7 +259,7 @@ local gamemode: Types.GamemodeDefinition = {
 	},
 
 	AvailableAmmo = Ammo,
-	AvailableItems = Items,
+	AvailableItems = framedItems,
 	InteractableDefinitions = Interactables,
 
 	DeathSounds = {

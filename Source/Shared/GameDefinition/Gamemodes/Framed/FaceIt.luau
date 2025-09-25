@@ -82,18 +82,29 @@ local function getRandomFace(): string
 	return "rbxassetid://" .. faces[math.random(#faces)]
 end
 
-local function FaceIt(char: Model): ()
+local function GetFaceInstance(char: Model): Decal?
 	local head = char:FindFirstChild("Head")
 	if not head or not head:IsA("BasePart") then
-		return
+		return nil
 	end
 
 	local face = head:FindFirstChild("face")
 	if not face or not face:IsA("Decal") then
-		return
+		return nil
 	end
 
+	return face
+end
+
+local function FaceIt(char: Model): ()
+	local face = GetFaceInstance(char)
+	if not face then
+		return
+	end
 	face.Texture = getRandomFace()
 end
 
-return FaceIt
+return {
+	FaceIt = FaceIt,
+	GetFaceInstance = GetFaceInstance,
+}

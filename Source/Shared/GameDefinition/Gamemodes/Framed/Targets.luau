@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FaceIt = require(script.Parent.FaceIt)
 local FramedNotification = require(script.Parent.FramedNotification)
 local Types = require(ReplicatedStorage.API.Types)
 
@@ -10,6 +11,29 @@ function Targets.AssignTarget(participant: Types.Participant, target: Types.Part
 
 	FramedNotification(participant, "💠 You have received a new target.")
 	FramedNotification(target, "💠 You have a new hunter.")
+
+	local targetChecker = participant:GetItems()["TargetChecker"]
+	if targetChecker then
+		local model = targetChecker.Model :: typeof(script.Parent.FramedItems.TargetChecker.TargetChecker)
+
+		local targetChar = target:GetCharacter()
+		if not targetChar then
+			return
+		end
+
+		local face = FaceIt.GetFaceInstance(targetChar)
+		if not face then
+			return
+		end
+
+		local head = targetChar:FindFirstChild("Head")
+		if not head or not head:IsA("BasePart") then
+			return
+		end
+
+		model.TargetChecker.ImageLabel.Image = face.Texture
+		model.TargetChecker.ImageLabel.ImageColor3 = head.Color
+	end
 end
 
 function Targets.OnDeath(participant: Types.Participant): ()
