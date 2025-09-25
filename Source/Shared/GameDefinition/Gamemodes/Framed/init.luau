@@ -124,6 +124,27 @@ local function OnStart(_, round: Types.Round): ()
 	end
 end
 
+local traitorMusic: {Sound} = {}
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
+	if v:IsA("Sound") then
+		table.insert(traitorMusic, v)
+	end
+end
+
+local innocentMusic: {Sound} = {}
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Innocent:GetChildren() do
+	if v:IsA("Sound") then
+		table.insert(innocentMusic, v)
+	end
+end
+
+local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
+	if victor.Kind == "Participant" then
+		return traitorMusic[math.random(#traitorMusic)]
+	end
+	return innocentMusic[math.random(#innocentMusic)]
+end
+
 local gamemode: Types.GamemodeDefinition = {
 	Name = "Framed",
 	Description = "Find and kill your targets. Don't get caught red-handed.",
@@ -162,22 +183,7 @@ local gamemode: Types.GamemodeDefinition = {
 
 	AssignRoles = AssignRoles,
 
-	GetRoundEndMusic = function()
-		local music = script:FindFirstChild("VictoryMusic")
-		assert(not music or music:IsA("Sound"), "VictoryMusic must be a Sound instance")
-
-		if not music then
-			local newMusic = Instance.new("Sound")
-			newMusic.Name = "VictoryMusic"
-			newMusic.SoundId = "rbxassetid://1847685521"
-			newMusic.Parent = script
-			music = newMusic
-		end
-
-		assert(music, "VictoryMusic must be a Sound instance")
-
-		return music
-	end,
+	GetRoundEndMusic = getVictoryMusic,
 
 	OnDeath = function() end,
 
