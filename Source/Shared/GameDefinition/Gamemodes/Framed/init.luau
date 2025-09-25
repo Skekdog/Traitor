@@ -3,8 +3,10 @@ local Epilogue = require(script.Epilogue)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local FaceIt = require(script.FaceIt)
 local FramedItems = require(script.FramedItems)
+local FramedNotification = require(script.FramedNotification)
 local Health = require(script.Health)
 local HighlightCharacter = require(script.HighlightCharacter)
+local Mistakes = require(script.Mistakes)
 local Targets = require(script.Targets)
 local Types = require(ReplicatedStorage.API.Types)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
@@ -184,6 +186,28 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 		return
 	end
 
+	local corpse = participant.Corpse
+	if not corpse then
+		return
+	end
+
+	local attacker = corpse.Killer
+	if attacker then
+		local relation: "Target" | "Hunter" | "RDM" = "RDM"
+		if Targets.GetHunter(attacker) == participant then
+			relation = "Hunter"
+		elseif Targets.GetTarget(attacker) == participant then
+			relation = "Target"
+		end
+
+		if relation ~= "RDM" then
+			attacker:AddCredits(1)
+			FramedNotification(attacker, `+1 Credit, {relation} Killed!`)
+		else
+			FramedNotification(attacker, "Mistake! Police are hunting you!")
+			Mistakes.MistakeMade(attacker)
+		end
+	end
 
 	local round = participant.Round
 

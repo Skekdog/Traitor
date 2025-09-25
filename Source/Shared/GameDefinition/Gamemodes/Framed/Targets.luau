@@ -36,6 +36,14 @@ function Targets.AssignTarget(participant: Types.Participant, target: Types.Part
 	end
 end
 
+function Targets.GetTarget(participant: Types.Participant): Types.Participant?
+	return participant.Extras.FramedTarget
+end
+
+function Targets.GetHunter(participant: Types.Participant): Types.Participant?
+	return participant.Extras.FramedHunter
+end
+
 function Targets.OnDeath(participant: Types.Participant): ()
 	local hunter: Types.Participant? = participant.Extras.FramedHunter
 	if not hunter then
