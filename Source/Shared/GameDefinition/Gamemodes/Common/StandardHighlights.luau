@@ -228,7 +228,7 @@ local GRANT_THRESHOLD = 2
 
 local SUICIDE_CULT_THRESHOLD = 3
 
-module.OnDeath = function(_, victim)
+function module.OnDeath(_, victim: Types.Participant, _): ()
 	local round = victim.Round
 	local corpse = victim.Corpse
 	if not corpse then
@@ -342,7 +342,7 @@ module.OnDeath = function(_, victim)
 	if round.ElapsedPhaseTime < HATE_THRESHOLD then
 		addHighlight(round, iHateThisGame, victim)
 	end
-end :: typeof((({} :: any) :: Types.GamemodeDefinition).OnDeath)
+end
 
 module.OnIdentifyCorpse = function(gamemode: Types.GamemodeDefinition, corpse: Types.Corpse, searcher: Types.Participant)
 	local round = searcher.Round
