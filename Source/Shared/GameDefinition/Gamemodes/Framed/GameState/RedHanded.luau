@@ -10,7 +10,7 @@ local RedHanded = {}
 
 local remote = GetRemote("RedHanded")
 
-local RED_HANDED_DURATION = 5
+local RED_HANDED_DURATION = 3.5
 
 function RedHanded.Start(participant: Types.Participant): ()
 	local id = GetAliveRoles(participant.Round, {"Police", "Undercover"})
