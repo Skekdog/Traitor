@@ -357,7 +357,6 @@ local gamemode: Types.GamemodeDefinition = {
 		return 240
 	end,
 
-	OnCharacterAdded = function() end,
 	OnStart = OnStart,
 	OnFinish = OnFinish,
 

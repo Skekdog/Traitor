@@ -540,7 +540,6 @@ local gamemode: Types.GamemodeDefinition = {
 		"rbxassetid://9125652675"
 	},
 
-	OnCharacterAdded = function() end,
 	OnDeath = onDeath,
 
 	OnIdentifyCorpse = function(gamemode, corpse, searcher)
