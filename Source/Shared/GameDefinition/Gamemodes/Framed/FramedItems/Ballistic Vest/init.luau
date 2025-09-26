@@ -15,6 +15,7 @@ local Item = Items.CopyModify(Items.GetItem("Ballistic Vest"), "Ballistic Vest",
 
 		hum.MaxHealth += 100
 		hum.Health = math.min(hum.Health + 100, hum.MaxHealth)
+		hum:AddAccessory(script["Ballistic Vest"]:Clone())
 	end
 })
 
