@@ -260,7 +260,10 @@ function BeforeHitParticipant(item, round, participant, params)
 	if participant:GetRole().Definition == policeRole then
 		return HasteMode.IsHasteMode(round)
 	elseif participant:GetRole().Definition == framedRole then
-		return RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round)
+		if attacker:GetRole().Definition == policeRole then
+			return RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round)
+		end
+		return true
 	end
 
 	local willDie = params.Amount >= participant:GetHealth()
