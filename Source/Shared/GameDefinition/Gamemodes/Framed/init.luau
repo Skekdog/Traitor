@@ -211,7 +211,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 end
 
 local function OnItemEquipped(_, participant: Types.Participant, item: Types.AnyItem, equipped: boolean): ()
-	if item.Kind == "Item" then
+	if item.Kind == "Item" or participant:GetRole().Definition ~= framedRole then
 		return
 	end
 
