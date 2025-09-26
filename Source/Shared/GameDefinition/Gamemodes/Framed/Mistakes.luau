@@ -5,7 +5,7 @@ local Types = require(ReplicatedStorage.API.Types)
 
 local Mistakes = {}
 
-local MISTAKE_SLAY_THRESHOLD = 2
+local MISTAKE_SLAY_THRESHOLD = 1
 
 function Mistakes.MistakeMade(participant: Types.Participant): ()
 	local round = participant.Round
@@ -27,14 +27,16 @@ function Mistakes.HasMadeMistake(participant: Types.Participant): boolean
 	return (participant.Extras.FramedMistakes or 0) > 0
 end
 
-function Mistakes.TrySlayForMistakes(participant: Types.Participant): ()
+function Mistakes.TrySlayForMistakes(participant: Types.Participant): boolean
 	if (participant.Extras.FramedMistakes or 0) >= MISTAKE_SLAY_THRESHOLD then
 		participant:TryTakeDamage({
 			Amount = math.huge,
 			Source = "Other",
 		})
 		participant.Round:SendMessage(nil, `[PLAYER-{participant.Player.Name}] was slain for RDM.`, "All")
+		return true
 	end
+	return false
 end
 
 return Mistakes

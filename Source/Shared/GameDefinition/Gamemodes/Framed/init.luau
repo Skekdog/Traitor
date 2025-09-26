@@ -4,6 +4,7 @@ local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local FaceIt = require(script.FaceIt)
 local FramedItems = require(script.FramedItems)
 local FramedNotification = require(script.FramedNotification)
+local GetRelation = require(script.GetRelation)
 local HasteMode = require(script.HasteMode)
 local Health = require(script.Health)
 local Mistakes = require(script.Mistakes)
@@ -173,13 +174,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 
 	local attacker = corpse.Killer
 	if attacker then
-		local relation: "Target" | "Hunter" | "RDM" = "RDM"
-		if Targets.GetHunter(attacker) == participant then
-			relation = "Hunter"
-		elseif Targets.GetTarget(attacker) == participant then
-			relation = "Target"
-		end
-
+		local relation: GetRelation.Relation = GetRelation(attacker, participant)
 		if relation ~= "RDM" then
 			attacker:AddCredits(1)
 			FramedNotification(attacker, `+1 Credit, {relation} Killed!`)
@@ -233,6 +228,13 @@ function BeforeHitParticipant(item, round, participant, params)
 		return HasteMode.IsHasteMode(round)
 	elseif participant:GetRole().Definition == framedRole then
 		return RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round)
+	end
+
+	local willDie = params.Amount >= participant:GetHealth()
+	if willDie and GetRelation(attacker, participant) == "RDM" and Mistakes.HasMadeMistake(attacker) then
+		if Mistakes.TrySlayForMistakes(participant) then
+			return false
+		end
 	end
 
 	return true
