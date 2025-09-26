@@ -196,10 +196,6 @@ local function OnFinish(_, round: Types.Round): ()
 end
 
 local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
-	if participant:GetRole().Definition.Name ~= "Framed" then
-		return
-	end
-
 	local corpse = participant.Corpse
 	if not corpse then
 		return
@@ -215,6 +211,10 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 			FramedNotification(attacker, "⚠️ Mistake! Police are hunting you!")
 			Mistakes.MistakeMade(attacker)
 		end
+	end
+
+	if participant:GetRole().Definition ~= framedRole then
+		return
 	end
 
 	local round = participant.Round
