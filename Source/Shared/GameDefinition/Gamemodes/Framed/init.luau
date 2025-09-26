@@ -18,6 +18,8 @@ local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 
 require(script.GameState.HighlightCharacter)
 
+local RED_HANDED_ITEMS = {"Magneto Stick"}
+
 local framedItems = {}
 for i, v in Items do
 	framedItems[i] = v
@@ -163,7 +165,7 @@ local function OnStart(_, round: Types.Round): ()
 		Health.InitHeal(participant)
 
 		local item = participant:GetEquippedItem()
-		if item and item.Kind ~= "Item" then
+		if item and (item.Kind ~= "Item" or table.find(RED_HANDED_ITEMS, item.Definition.Name)) then
 			RedHanded.Start(participant)
 		end
 	end
@@ -241,7 +243,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 end
 
 local function OnItemEquipped(_, participant: Types.Participant, item: Types.AnyItem, equipped: boolean): ()
-	if item.Kind == "Item" or not participant.Round:IsInProgress() or participant:GetRole().Definition ~= framedRole then
+	if (item.Kind == "Item" and not table.find(RED_HANDED_ITEMS, item.Definition.Name)) or not participant.Round:IsInProgress() or participant:GetRole().Definition ~= framedRole then
 		return
 	end
 
