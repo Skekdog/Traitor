@@ -163,7 +163,17 @@ local function OnStart(_, round: Types.Round): ()
 
 	Targets.LoadFirstTargets(framed)
 
-	round.Extras.FramedBackgroundMusic = PlaySound(backgroundMusic)
+	local music
+	local function playMusic()
+		music = PlaySound(backgroundMusic)
+		assert(music)
+
+		round.Extras.FramedBackgroundMusic = music
+
+		music.Ended:Once(playMusic)
+	end
+
+	playMusic()
 end
 
 local function OnFinish(_, round: Types.Round): ()
