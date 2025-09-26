@@ -23,6 +23,10 @@ function Mistakes.MistakeMade(participant: Types.Participant): ()
 	end
 end
 
+function Mistakes.HasMadeMistake(participant: Types.Participant): boolean
+	return (participant.Extras.FramedMistakes or 0) > 0
+end
+
 function Mistakes.TrySlayForMistakes(participant: Types.Participant): ()
 	if (participant.Extras.FramedMistakes or 0) >= MISTAKE_SLAY_THRESHOLD then
 		participant:TryTakeDamage({

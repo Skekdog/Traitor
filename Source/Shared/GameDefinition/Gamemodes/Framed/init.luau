@@ -31,10 +31,10 @@ local backgroundMusic = {
 }
 
 local function enterHasteMode(round: Types.Round): ()
-	if round.Extras.HasteMode then
+	if round.Extras.FramedHasteMode then
 		return
 	end
-	round.Extras.HasteMode = true
+	round.Extras.FramedHasteMode = true
 
 	local framedAlive: {Types.Participant} = {}
 	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
@@ -243,6 +243,22 @@ local function OnItemEquipped(_, participant: Types.Participant, item: Types.Any
 	end
 end
 
+local BeforeHitParticipant: Types.BeforeHitParticipant
+function BeforeHitParticipant(item, round, participant, params)
+	local attacker = params.Attacker
+	if not attacker then
+		return true
+	end
+
+	if participant:GetRole().Definition == policeRole then
+		return round.Extras.FramedHasteMode
+	elseif participant:GetRole().Definition == framedRole then
+		return RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round)
+	end
+
+	return true
+end
+
 local traitorMusic: {Sound} = {}
 for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
 	if v:IsA("Sound") then
@@ -324,6 +340,8 @@ local gamemode: Types.GamemodeDefinition = {
 	OnFinish = OnFinish,
 
 	OnItemEquipped = OnItemEquipped,
+
+	BeforeHitParticipant = BeforeHitParticipant,
 }
 
 return gamemode

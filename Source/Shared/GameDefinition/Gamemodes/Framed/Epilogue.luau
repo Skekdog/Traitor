@@ -15,9 +15,14 @@ local exitCFrame: CFrame?
 
 local remote = GetRemote("Epilogue")
 
+function Epilogue.IsEpilogue(round: Types.Round): boolean
+	return round.Extras.FramedEpilogue == true
+end
+
 function Epilogue.Begin(framed: Types.Participant): ()
 	participant = framed
 	local round = framed.Round
+	round.Extras.FramedEpilogue = true
 	round:SetPhase("Playing", EPILOGUE_DURATION)
 
 	local exits = round:GetMap().Map.PlayerSpawns:GetChildren()

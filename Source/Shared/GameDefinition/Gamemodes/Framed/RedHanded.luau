@@ -47,6 +47,10 @@ function RedHanded.Stop(participant: Types.Participant): ()
 	end)
 end
 
+function RedHanded.IsRedHanded(participant: Types.Participant): boolean
+	return participant.Extras.FramedRedHanded ~= nil
+end
+
 if RunService:IsClient() then
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 	local ui = UIManager.RegisterUI(script.Parent.FramedRedHandedUI) :: UIManager.UI & {Object: typeof(script.Parent.FramedRedHandedUI)}
