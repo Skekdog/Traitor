@@ -97,7 +97,9 @@ local function createPlr(plr: Player)
 		if not clone.Parent then
 			return
 		end
-		clone.Karma.Text = tostring(plr:GetAttribute("Karma"))
+		karma = karma or 1000
+		assert(karma)
+		clone.Karma.Text = tostring(math.round(karma))
 	end, true)
 
 	InstanceSignal.ListenAttribute(plr, "Score", nil :: number?):Connect(function(score)
