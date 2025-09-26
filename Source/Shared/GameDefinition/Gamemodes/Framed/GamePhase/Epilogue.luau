@@ -87,12 +87,14 @@ if RunService:IsClient() then
 			remote:FireServer()
 		end)
 
-		ScreenMessage("Standard", "Escape!\nPolice are hunting you!", {
+		ScreenMessage("Standard", "Escape!\nPolice are hunting you!", {LabelProperties = {
 			BackgroundTransparency = 0.65,
 			BackgroundColor3 = Color3.new(0, 0, 0),
-			Position = UDim2.fromScale(0.5, 0.3),
-			Size = UDim2.fromScale(1, 0.15),
-		})
+			Size = UDim2.fromScale(1, 0.3),
+			TextColor3 = Color3.fromRGB(240, 44, 28),
+			TextStrokeColor3 = Color3.new(0, 0, 0),
+			TextStrokeTransparency = 0,
+		}})
 	end)
 else
 	remote.OnServerEvent:Connect(function(plr)
