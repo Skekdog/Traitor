@@ -186,6 +186,13 @@ local function OnFinish(_, round: Types.Round): ()
 	if round.Extras.FramedBackgroundMusic then
 		round.Extras.FramedBackgroundMusic:Destroy()
 	end
+
+	for _, participant in round:GetParticipants() do
+		local item = participant:GetEquippedItem()
+		if item and item.Kind ~= "Item" then
+			RedHanded.StopImmediately(participant)
+		end
+	end
 end
 
 local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
@@ -232,7 +239,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 end
 
 local function OnItemEquipped(_, participant: Types.Participant, item: Types.AnyItem, equipped: boolean): ()
-	if item.Kind == "Item" or participant:GetRole().Definition ~= framedRole then
+	if item.Kind == "Item" or not participant.Round:IsInProgress() or participant:GetRole().Definition ~= framedRole then
 		return
 	end
 

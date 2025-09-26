@@ -24,6 +24,10 @@ function RedHanded.Start(participant: Types.Participant): ()
 	participant.Extras.FramedRedHanded = id
 end
 
+function RedHanded.StopImmediately(participant: Types.Participant): ()
+	remote:FireClient(participant.Player, false)
+end
+
 function RedHanded.Stop(participant: Types.Participant): ()
 	local id = participant.Extras.FramedRedHanded
 	if not id then
@@ -63,7 +67,7 @@ if RunService:IsClient() then
 
 		if not stop then
 			ui.Object.Frame.Size = UDim2.fromScale(1, 0.25)
-			ui:ToggleVisible(true)
+			ui:ToggleVisible(stop == nil)
 			return
 		end
 
