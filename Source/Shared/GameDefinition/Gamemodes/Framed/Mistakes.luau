@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GetAliveRoles = require(script.Parent.GetAliveRoles)
 local HighlightCharacter = require(script.Parent.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
-local CombineTable = require(ReplicatedStorage.Shared.Util.CombineTable)
 
 local Mistakes = {}
 
@@ -18,7 +18,7 @@ function Mistakes.MistakeMade(participant: Types.Participant): ()
 			return
 		end
 
-		local law = CombineTable(round:GetParticipantsWithRole(round:GetRoleFromRoleName("Police")), round:GetParticipantsWithRole(round:GetRoleFromRoleName("Undercover")))
+		local law = GetAliveRoles(round, {"Police", "Undercover"})
 		HighlightCharacter(char, true, "Kill", law)
 	end
 end

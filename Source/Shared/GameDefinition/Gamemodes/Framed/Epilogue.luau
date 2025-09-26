@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local GetAliveRoles = require(script.Parent.GetAliveRoles)
 local HighlightCharacter = require(script.Parent.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
 local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
@@ -34,14 +35,7 @@ function Epilogue.Begin(framed: Types.Participant): ()
 		return
 	end
 
-	local aliveLaw: {Types.Participant} = {}
-	for _, v in round:GetParticipants() do
-		if v:IsAlive() and v:GetRole():IsAlliedWith(round:GetRoleFromRoleName("Police")) then
-			table.insert(aliveLaw, v)
-		end
-	end
-
-	HighlightCharacter(char, true, "Kill", aliveLaw)
+	HighlightCharacter(char, true, "Kill", GetAliveRoles(round, {"Police", "Undercover"}))
 end
 
 function Epilogue.Finish(): ()

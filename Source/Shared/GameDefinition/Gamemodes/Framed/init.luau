@@ -7,6 +7,7 @@ local FramedNotification = require(script.FramedNotification)
 local Health = require(script.Health)
 local HighlightCharacter = require(script.HighlightCharacter)
 local Mistakes = require(script.Mistakes)
+local RedHanded = require(script.RedHanded)
 local Targets = require(script.Targets)
 local Types = require(ReplicatedStorage.API.Types)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
@@ -230,6 +231,18 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 	Targets.OnDeath(participant)
 end
 
+local function OnItemEquipped(_, participant: Types.Participant, item: Types.AnyItem, equipped: boolean): ()
+	if item.Kind == "Item" then
+		return
+	end
+
+	if equipped then
+		RedHanded.Start(participant)
+	else
+		RedHanded.Stop(participant)
+	end
+end
+
 local traitorMusic: {Sound} = {}
 for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
 	if v:IsA("Sound") then
@@ -309,6 +322,8 @@ local gamemode: Types.GamemodeDefinition = {
 	OnCharacterAdded = function() end,
 	OnStart = OnStart,
 	OnFinish = OnFinish,
+
+	OnItemEquipped = OnItemEquipped,
 }
 
 return gamemode

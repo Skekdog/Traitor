@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.API.Types)
 local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
 
-export type HighlightContext = "Mark" | "Redhanded" | "Kill"
+export type HighlightContext = "Mark" | "RedHanded" | "Kill"
 
 local remote = GetRemote("HighlightCharacter")
 
@@ -18,6 +18,7 @@ local function makeHighlight(instance: Instance, enable: boolean, context: Highl
 		newHighlight.OutlineColor = Color3.fromRGB(255, 255, 255)
 		newHighlight.FillTransparency = 0.5
 		newHighlight.OutlineTransparency = 0.5
+		newHighlight.DepthMode = if context == "RedHanded" then Enum.HighlightDepthMode.Occluded else Enum.HighlightDepthMode.AlwaysOnTop
 		newHighlight.Name = "FramedHighlight_" .. context
 		newHighlight.Parent = instance
 		highlight = newHighlight
