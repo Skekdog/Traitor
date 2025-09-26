@@ -254,8 +254,8 @@ local function OnItemEquipped(_, participant: Types.Participant, item: Types.Any
 	end
 end
 
-local BeforeHitParticipant: Types.BeforeHitParticipant
-function BeforeHitParticipant(item, round, participant, params)
+local function BeforeHitParticipant(_, participant: Types.Participant, params: Types.DamageParams): boolean
+	local round = participant.Round
 	local attacker = params.Attacker
 	if not attacker then
 		return true
@@ -363,7 +363,7 @@ local gamemode: Types.GamemodeDefinition = {
 
 	OnItemEquipped = OnItemEquipped,
 
-	BeforeHitParticipant = BeforeHitParticipant,
+	BeforeDamageParticipant = BeforeHitParticipant,
 }
 
 return gamemode
