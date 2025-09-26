@@ -1,0 +1,74 @@
+local Players = game:GetService("Players")
+local Face = require(script.Parent.Face)
+
+local TargetsClient = {}
+
+TargetsClient.UI = script.Parent.TargetChecker
+TargetsClient.UI.Parent = Players.LocalPlayer.PlayerGui :: any
+
+TargetsClient.Target = nil :: string?
+TargetsClient.HasIntel = false
+
+function TargetsClient.Set(): ()
+	if not TargetsClient.Target then
+		return
+	end
+
+	local char = workspace.Characters:FindFirstChild(TargetsClient.Target)
+	if not char or not char:IsA("Model") then
+		return
+	end
+
+	local label = TargetsClient.UI.ImageLabel
+	label.Visible = false
+
+	local vp = TargetsClient.UI.Viewport
+	vp.Visible = false
+
+	if TargetsClient.HasIntel then
+		local model = vp:FindFirstChildOfClass("Model")
+		if model then
+			model:Destroy()
+		end
+
+		char.Archivable = true
+		char = char:Clone()
+		char:PivotTo(CFrame.new(0, 0, 0))
+		for _, v in char:GetChildren() do
+			if v:IsA("LuaSourceContainer") or v:IsA("Model") or v.Name == "Item" then
+				v:Destroy()
+			end
+		end
+		char.Parent = vp
+
+		local root = char:FindFirstChild("HumanoidRootPart")
+		if not root or not root:IsA("BasePart") then
+			return
+		end
+
+		local camera = vp:FindFirstChildOfClass("Camera") or Instance.new("Camera")
+		camera.CFrame = CFrame.new(root.CFrame:ToWorldSpace(CFrame.new(0.6, 2, -3)).Position, root.Position)
+		camera.Parent = vp
+		vp.CurrentCamera = camera
+		vp.Visible = true
+
+		return
+	end
+
+	local face = Face.GetFaceInstance(char)
+	if not face then
+		return
+	end
+
+	label.Visible = true
+	label.Image = face.Texture
+end
+
+workspace.CurrentCamera.DescendantAdded:Connect(function(descendant)
+	local item = descendant:FindFirstAncestor("Item")
+	if item and descendant.Name == "Screen" and item:FindFirstChild("TargetChecker") then
+		TargetsClient.UI.Adornee = descendant
+	end
+end)
+
+return TargetsClient

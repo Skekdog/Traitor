@@ -69,39 +69,12 @@ function Targets.LoadFirstTargets(framed: {Types.Participant}): ()
 	end
 end
 
-Targets.ClientTarget = nil :: string?
-
 if RunService:IsClient() then
-	local label: ImageLabel?
-
-	local function set(): ()
-		if not Targets.ClientTarget or not label then
-			return
-		end
-
-		local char = workspace.Characters:FindFirstChild(Targets.ClientTarget)
-		if not char or not char:IsA("Model") then
-			return
-		end
-
-		local face = FaceIt.GetFaceInstance(char)
-		if not face then
-			return
-		end
-
-		label.Image = face.Texture
-	end
-
+	local TargetsClient = require(script.Parent.TargetsClient)
 	remote.OnClientEvent:Connect(function(newName: string)
-		Targets.ClientTarget = newName
-		set()
-	end)
-
-	workspace.CurrentCamera.DescendantAdded:Connect(function(descendant)
-		if descendant.Name == "ImageLabel" and descendant.Parent and descendant.Parent.Name == "TargetChecker" and descendant:IsA("ImageLabel") then
-			label = descendant
-			set()
-		end
+		TargetsClient.Target = newName
+		TargetsClient.HasIntel = false
+		TargetsClient.Set()
 	end)
 end
 
