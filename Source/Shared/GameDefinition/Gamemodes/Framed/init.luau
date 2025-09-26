@@ -4,8 +4,8 @@ local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local FaceIt = require(script.FaceIt)
 local FramedItems = require(script.FramedItems)
 local FramedNotification = require(script.FramedNotification)
+local HasteMode = require(script.HasteMode)
 local Health = require(script.Health)
-local HighlightCharacter = require(script.HighlightCharacter)
 local Mistakes = require(script.Mistakes)
 local RedHanded = require(script.RedHanded)
 local Targets = require(script.Targets)
@@ -29,27 +29,6 @@ local backgroundMusic = {
 	1838730828,
 	1846614488,
 }
-
-local function enterHasteMode(round: Types.Round): ()
-	if round.Extras.FramedHasteMode then
-		return
-	end
-	round.Extras.FramedHasteMode = true
-
-	local framedAlive: {Types.Participant} = {}
-	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
-		if v:IsAlive() then
-			table.insert(framedAlive, v)
-		end
-	end
-
-	for _, participant in framedAlive do
-		local char = participant:GetCharacter()
-		if char then
-			HighlightCharacter(char, true, "Kill", framedAlive)
-		end
-	end
-end
 
 local framedRole: Types.RoleDefinition = {
 	Kind = "RoleDefinition",
@@ -225,7 +204,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 	elseif #framedAlive == 1 then
 		Epilogue.Begin(framedAlive[1])
 	elseif #framedAlive <= 3 then
-		enterHasteMode(round)
+		HasteMode.Start(round)
 	end
 
 	Targets.OnDeath(participant)
@@ -251,7 +230,7 @@ function BeforeHitParticipant(item, round, participant, params)
 	end
 
 	if participant:GetRole().Definition == policeRole then
-		return round.Extras.FramedHasteMode
+		return HasteMode.IsHasteMode(round)
 	elseif participant:GetRole().Definition == framedRole then
 		return RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round)
 	end
