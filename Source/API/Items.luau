@@ -16,7 +16,7 @@ end
 function Items.CopyModify<T>(original: T & Types.AnyItemDefinition, newName: string, edit: {[string]: any}): Types.AnyItemDefinition
 	local new = table.clone(original)
     for i, v in edit do
-        new[i] = v
+        new[i] = if typeof(v) == "table" and v["__nil"] == true then nil else v
     end
 
     new.Name = newName
