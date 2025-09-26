@@ -37,7 +37,7 @@ function Targets.AssignTarget(participant: Types.Participant, target: Types.Part
 
 		remote:FireClient(participant.Player, target.Player.Name)
 		model.TargetChecker.ImageLabel.Image = face.Texture
-		model.TargetChecker.ImageLabel.ImageColor3 = head.Color
+		model.TargetChecker.ImageLabel.BackgroundColor3 = head.Color
 	end
 end
 

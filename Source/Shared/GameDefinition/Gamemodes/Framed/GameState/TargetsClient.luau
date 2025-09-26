@@ -39,7 +39,7 @@ function TargetsClient.Set(): ()
 				v:Destroy()
 			end
 		end
-		char.Parent = vp
+		char.Parent = vp.WorldModel
 
 		local root = char:FindFirstChild("HumanoidRootPart")
 		if not root or not root:IsA("BasePart") then
@@ -47,7 +47,7 @@ function TargetsClient.Set(): ()
 		end
 
 		local camera = vp:FindFirstChildOfClass("Camera") or Instance.new("Camera")
-		camera.CFrame = CFrame.new(root.CFrame:ToWorldSpace(CFrame.new(0.6, 2, -3)).Position, root.Position)
+		camera.CFrame = CFrame.new(Vector3.new(-1.5, 0, -4)) * CFrame.Angles(0, math.rad(-160), 0)
 		camera.Parent = vp
 		vp.CurrentCamera = camera
 		vp.Visible = true
@@ -60,8 +60,14 @@ function TargetsClient.Set(): ()
 		return
 	end
 
+	local head = char:FindFirstChild("Head")
+	if not head or not head:IsA("BasePart") then
+		return
+	end
+
 	label.Visible = true
 	label.Image = face.Texture
+	label.BackgroundColor3 = head.Color
 end
 
 workspace.CurrentCamera.DescendantAdded:Connect(function(descendant)
