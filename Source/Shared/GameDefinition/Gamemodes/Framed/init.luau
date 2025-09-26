@@ -206,7 +206,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 		local relation: GetRelation.Relation = GetRelation(attacker, participant)
 		if relation ~= "RDM" then
 			attacker:AddCredits(1)
-			FramedNotification(attacker, `+1 Credit, {relation} Killed!`)
+			FramedNotification(attacker, `+1 Credit, Killed {relation}!`)
 		else
 			FramedNotification(attacker, "⚠️ Mistake! Police are hunting you!")
 			Mistakes.MistakeMade(attacker)
