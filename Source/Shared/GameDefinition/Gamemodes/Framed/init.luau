@@ -41,7 +41,7 @@ local framedRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Solo"},
 
-	EquipmentShop = {Items.Flashbang},
+	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"]},
 	StartingItems = {FramedItems.TargetChecker},
 
 	RevealedRoles = {"Police"},
@@ -60,7 +60,7 @@ local policeRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
-	EquipmentShop = {Items.Flashbang},
+	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP},
 	StartingItems = {},
 
 	Allies = {"Police", "Undercover"},
@@ -80,7 +80,7 @@ local undercoverRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
-	EquipmentShop = {Items.Flashbang},
+	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP},
 	StartingItems = {},
 
 	Allies = {"Police", "Undercover"},
