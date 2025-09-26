@@ -13,7 +13,7 @@ local remote = GetRemote("RedHanded")
 local RED_HANDED_DURATION = 5
 
 function RedHanded.Start(participant: Types.Participant): ()
-	local id = GetAliveRoles(participant.Round, {"Police", "Undercover", "Framed"})
+	local id = GetAliveRoles(participant.Round, {"Police", "Undercover"})
 
 	local char = participant:GetCharacter()
 	if char then
