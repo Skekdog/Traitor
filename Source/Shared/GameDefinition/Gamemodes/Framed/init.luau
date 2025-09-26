@@ -41,7 +41,7 @@ local framedRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Solo"},
 
-	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"]},
+	EquipmentShop = {Items.Flashbang, Items.Knife, FramedItems.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"]},
 	StartingItems = {FramedItems.TargetChecker},
 
 	RevealedRoles = {"Police"},
