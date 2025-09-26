@@ -65,7 +65,7 @@ for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
         continue
     end
 
-    if v.Name == "Elimination" or v.Name == "ThoseYouTrust" then
+    if v.Name == "Elimination" then
         continue
     end
 
