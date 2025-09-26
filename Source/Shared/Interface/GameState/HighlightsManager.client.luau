@@ -164,7 +164,7 @@ local function setWinnerText(): ()
 	if winnerKind == "Participant" then
 		highlightsPage.Winners.Text = winnerRole:FormatString(winner) .. " wins!"
 	else
-		highlightsPage.Winners.Text = `The {winnerRole:FormatString(winner .. "s")} win!`
+		highlightsPage.Winners.Text = `The {winnerRole:FormatString(winnerRole:GetPluralName())} win!`
 	end
 end
 
@@ -212,7 +212,7 @@ for _, v in SoundService.RoundEndMusic:GetChildren() do
 	onRoundEndMusicChildAdded(v)
 end
 
-local muteMusicButton = highlightsPage.Music.Mute 
+local muteMusicButton = highlightsPage.Music.Mute
 
 local pause = false
 muteMusicButton.MouseButton1Click:Connect(function()

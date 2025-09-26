@@ -65,6 +65,7 @@ local policeRole: Types.RoleDefinition = {
 	Kind = "RoleDefinition",
 
 	Name = "Police",
+	PluralName = "Police",
 	Description = "Kill anyone red-handed. Work with the Undercover.",
 	Color = Color3.fromRGB(16, 108, 172),
 	Sound = "rbxassetid://1848271643",
