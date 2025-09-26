@@ -2,11 +2,13 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Targets = require(script.Parent.Parent.GameState.Targets)
 local Types = require(ReplicatedStorage.API.Types)
 
-export type Relation = "Target" | "Hunter" | "RDM" | "Police" | "Undercover"
+export type Relation = "Target" | "Hunter" | "RDM" | "Police" | "Undercover" | "Framed"
 
 local function GetRelation(attacker: Types.Participant, target: Types.Participant): Relation
 	local relation: Relation = "RDM"
-	if target:GetRole().Definition.Name == "Police" and attacker:GetRole().Definition.Name == "Framed" then
+	if attacker:GetRole().Definition.Name == "Police" or attacker:GetRole().Definition.Name == "Undercover" and target:GetRole().Definition.Name == "Framed" then
+		relation = "Framed"
+	elseif target:GetRole().Definition.Name == "Police" and attacker:GetRole().Definition.Name == "Framed" then
 		relation = "Police"
 	elseif target:GetRole().Definition.Name == "Undercover" and attacker:GetRole().Definition.Name == "Framed" then
 		relation = "Undercover"
