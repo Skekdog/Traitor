@@ -6,7 +6,7 @@ local ActionNodeType = require(ReplicatedStorage.Shared.Actions.ActionNodeType)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local nodes: {[Types.MapThing]: ActionNodeType.ActionNodeParams?} = {}
+local nodes: {[Types.MapObject]: ActionNodeType.ActionNodeParams?} = {}
 
 local function replicateNode(node: ActionNodeType.ActionNodeParams, player: Player?): ()
 	if player then
@@ -35,9 +35,9 @@ ReplicatedStorage.Remotes.ClientServer.ActionNode.OnServerEvent:Connect(function
 	if typeof(adornee) ~= "Instance" or (not adornee:IsA("BasePart") and not adornee:IsA("Model")) then
 		return
 	end
-	local mapThing = adornee :: Types.MapThing
+	local MapObject = adornee :: Types.MapObject
 
-	local node = nodes[mapThing]
+	local node = nodes[MapObject]
 	if not node then
 		return
 	end

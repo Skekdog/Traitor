@@ -118,7 +118,7 @@ function module.ShowCorpseHint(char: Model)
 	interactableFrame.Visible = true
 end
 
-function module.ShowInteractableHint(prop: Types.MapThing, part: BasePart): ()
+function module.ShowInteractableHint(prop: Types.MapObject, part: BasePart): ()
 	local plr = Players.LocalPlayer
 	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 

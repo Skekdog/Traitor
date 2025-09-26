@@ -5,7 +5,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-function module.Use(self, door: Types.MapThing, _: boolean): ()
+function module.Use(self, door: Types.MapObject, _: boolean): ()
 	if RunService:IsServer() then
 		StandardDoor({
 			Door = door,

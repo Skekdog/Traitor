@@ -3,20 +3,20 @@ local ActionNode = require(ReplicatedStorage.Shared.MapPrefabs.ActionNode)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local function TraitorNode(object: Script, tip: string, cost: number, interval: number, radius: number, callback: (Player) -> ()): ()
-	local mapThing: Types.MapThing? = object:FindFirstAncestorWhichIsA("BasePart")
-	if not mapThing then
+	local MapObject: Types.MapObject? = object:FindFirstAncestorWhichIsA("BasePart")
+	if not MapObject then
 		local model = object:FindFirstAncestorWhichIsA("Model")
 		if model then
-			mapThing = model
+			MapObject = model
 		end
 	end
 
-	if not mapThing then
+	if not MapObject then
 		return
 	end
 
 	ActionNode({
-		Adornee = mapThing,
+		Adornee = MapObject,
 		Title = tip,
 		Cost = cost,
 		Cooldown = interval,

@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 export type ActionNodeParams = {
-	Adornee: Types.MapThing,
+	Adornee: Types.MapObject,
 	Title: string,
 	Cost: number,
 	Cooldown: number,

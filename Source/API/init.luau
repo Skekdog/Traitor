@@ -2,7 +2,7 @@ local RunService = game:GetService("RunService")
 
 type APIReturn = {
 	Combat: typeof(require(script.Combat)),
-	GetMapThing: typeof(require(script.GetMapThing)),
+	GetMapObject: typeof(require(script.GetMapObject)),
 	GetParticipant: typeof(require(script.GetParticipant)),
 	GetRound: typeof(require(script.GetRound)),
 	Notification: typeof(require(script.Notification)),
@@ -14,7 +14,7 @@ type APIReturn = {
 
 if RunService:IsClient() then
 	return {
-		GetMapThing = require(script.GetMapThing),
+		GetMapObject = require(script.GetMapObject),
 		Notification = require(script.Notification),
 		PlaySound = require(script.PlaySound),
 		TextColor = require(script.TextColor),
@@ -24,7 +24,7 @@ end
 
 return {
 	Combat = require(script.Combat),
-	GetMapThing = require(script.GetMapThing),
+	GetMapObject = require(script.GetMapObject),
 	GetParticipant = require(script.GetParticipant),
 	GetRound = require(script.GetRound),
 	PlaySound = require(script.PlaySound),

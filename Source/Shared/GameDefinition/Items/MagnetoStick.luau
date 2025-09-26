@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
-local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
+local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -30,7 +30,7 @@ local ALIGNMENT_FORCE_MULTIPLIER = 1000
 local PROP_DAMAGE_TIME = 5
 
 type ClientControl = {
-	Prop: Types.MapThing,
+	Prop: Types.MapObject,
 	Part: BasePart,
 	AlignPosition: AlignPosition,
 }
@@ -48,7 +48,7 @@ end
 local serverLastHeldBy: {[Types.Prop]: {By: Types.Participant, At: number, Cons: {RBXScriptConnection}}?} = {}
 local serverControlledProps: {[Player]: Types.Prop?} = {}
 
-local function getController(prop: Types.MapThing): Player?
+local function getController(prop: Types.MapObject): Player?
 	local controllerId = prop:GetAttribute("ControllerId")
 	if typeof(controllerId) ~= "number" then
 		return nil
@@ -119,12 +119,12 @@ local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
 
 	prop:TryTakeDamage(params)
 
-	local otherMapThing = GetMapThingWithTag(otherPart, {"Prop", "Character"})
-	if not otherMapThing then
+	local otherMapObject = GetMapObjectWithTag(otherPart, {"Prop", "Character"})
+	if not otherMapObject then
 		return
 	end
 
-	local damageable = prop.Round:GetProp(otherMapThing) or if otherMapThing:IsA("Model") then prop.Round:GetParticipant(otherMapThing) else nil
+	local damageable = prop.Round:GetProp(otherMapObject) or if otherMapObject:IsA("Model") then prop.Round:GetParticipant(otherMapObject) else nil
 	if damageable and damageable ~= lastHeld.By then
 		(damageable :: Types.Prop):TryTakeDamage(params)
 	end
@@ -152,7 +152,7 @@ local function isSizeValid(size: Vector3): boolean
 	return size.X <= MAX_SIZE and size.Y <= MAX_SIZE and size.Z <= MAX_SIZE
 end
 
-local function canGrab(prop: Types.MapThing): boolean
+local function canGrab(prop: Types.MapObject): boolean
 	if prop:HasTag("Interactable") then
 		return false
 	end
@@ -160,7 +160,7 @@ local function canGrab(prop: Types.MapThing): boolean
 	return (not part:IsGrounded()) and (not prop:GetAttribute("NoGrab")) and isSizeValid(if prop:IsA("Model") then prop:GetExtentsSize() else prop.Size)
 end
 
-local function canPush(prop: Types.MapThing): boolean
+local function canPush(prop: Types.MapObject): boolean
 	if prop:HasTag("Interactable") then
 		return false
 	end
@@ -246,8 +246,8 @@ function module.ServerStopControllingProp(player: Player, part: BasePart?): ()
 	end
 end
 
-local function clientGetProp(part: BasePart): Types.MapThing?
-	return GetMapThingWithTag(part, "Prop")
+local function clientGetProp(part: BasePart): Types.MapObject?
+	return GetMapObjectWithTag(part, "Prop")
 end
 
 local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
@@ -380,12 +380,12 @@ local function serverGetPropFromPart(part: unknown): Types.Prop?
 		return nil
 	end
 
-	local mapThing = GetMapThingWithTag(part, "Prop")
-	if not mapThing then
+	local MapObject = GetMapObjectWithTag(part, "Prop")
+	if not MapObject then
 		return nil
 	end
 
-	return serverGetRound():GetProp(mapThing)
+	return serverGetRound():GetProp(MapObject)
 end
 
 if RunService:IsServer() then

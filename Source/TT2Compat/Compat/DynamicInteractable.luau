@@ -23,25 +23,25 @@ local function OnBreak(interactable: Types.Interactable, params: Types.DamagePar
 	(require)(Break)(interactable, params)
 end
 
-local function getUseText(mapThing: Types.MapThing): string?
-	local useText = mapThing:GetAttribute("UseText")
+local function getUseText(MapObject: Types.MapObject): string?
+	local useText = MapObject:GetAttribute("UseText")
 	if typeof(useText) ~= "string" then
 		useText = nil
 	end
 	return useText :: string?
 end
 
-local function createNewInteractable(mapThing: Types.MapThing): Types.Interactable
-	local useText = getUseText(mapThing)
+local function createNewInteractable(MapObject: Types.MapObject): Types.Interactable
+	local useText = getUseText(MapObject)
 
 	local definition: Types.InteractableDefinition = {
 		InteractionRange = 7.5,
-		Model = mapThing,
+		Model = MapObject,
 
 		IsContinuousInteraction = false,
-		Name = mapThing.Name,
-		DisplayName = mapThing:GetAttribute("DisplayName") :: string?,
-		HideName = mapThing:GetAttribute("ShowName") ~= true and not mapThing:GetAttribute("DisplayName"),
+		Name = MapObject.Name,
+		DisplayName = MapObject:GetAttribute("DisplayName") :: string?,
+		HideName = MapObject:GetAttribute("ShowName") ~= true and not MapObject:GetAttribute("DisplayName"),
 
 		OnInteractClient = OnInteract,
 		OnInteractServer = OnInteract,
@@ -51,10 +51,10 @@ local function createNewInteractable(mapThing: Types.MapThing): Types.Interactab
 		DefaultHintText = useText,
 	}
 
-	local interactable = Interactable.new(definition, mapThing)
+	local interactable = Interactable.new(definition, MapObject)
 
-	mapThing:GetAttributeChangedSignal("UseText"):Connect(function()
-		interactable.HintTextClient = getUseText(mapThing)
+	MapObject:GetAttributeChangedSignal("UseText"):Connect(function()
+		interactable.HintTextClient = getUseText(MapObject)
 	end)
 
 	return interactable
@@ -115,14 +115,14 @@ if RunService:IsClient() then
 end
 
 local RoundHandler = require(ServerScriptService.RoundHandler)
-function module.TryCreateNewInteractable(mapThing: Types.MapThing): Types.Interactable?
+function module.TryCreateNewInteractable(MapObject: Types.MapObject): Types.Interactable?
 	local round = RoundHandler.Round()
 
-	if not mapThing:GetAttribute("Button") or not mapThing:IsDescendantOf(round:GetMap().Dynamic) then
+	if not MapObject:GetAttribute("Button") or not MapObject:IsDescendantOf(round:GetMap().Dynamic) then
 		return nil
 	end
 
-	return createNewInteractable(mapThing)
+	return createNewInteractable(MapObject)
 end
 
 return module

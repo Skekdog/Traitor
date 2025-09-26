@@ -4,7 +4,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
-local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
+local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -119,7 +119,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	elseif (item.Kind == "Melee") and (requestKind :: string ~= "PrimaryFireRaycastRequest" and requestKind :: string ~= "AlternateFireItemRequest") then
 		return "OtherError"
 	end
-	
+
 	if by:GetHealth() <= 0 then
 		return "Dead"
 	end
@@ -165,7 +165,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		params.IgnoreScore = item.Definition.IgnoreScore
 		params.IgnoreSelfDefense = item.Definition.IgnoreSelfDefense
 	end
-	
+
 	if not item:RunBeforeHit(round, hitPart, params) then
 		return
 	end
@@ -216,9 +216,9 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 
 	local victim = tryGetParticipantFromPart(round, hitPart)
 
-	local mapThing = GetMapThingWithTag(hitPart, "Prop")
-	local prop = round:GetProp(mapThing or hitPart)
-	local interactable = round:GetInteractable(mapThing or hitPart)
+	local MapObject = GetMapObjectWithTag(hitPart, "Prop")
+	local prop = round:GetProp(MapObject or hitPart)
+	local interactable = round:GetInteractable(MapObject or hitPart)
 
 	local propLike = prop or interactable
 

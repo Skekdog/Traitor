@@ -14,7 +14,7 @@ else
 	Combat = require(ServerScriptService.Combat.Combat)
 end
 
-local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
+local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
@@ -36,7 +36,7 @@ local function raycast(char: Model, range: number): RaycastResult?
 end
 
 local function isPartValid(part: BasePart): boolean
-	local prop = GetMapThingWithTag(part, "Prop")
+	local prop = GetMapObjectWithTag(part, "Prop")
 	return if prop then NewtonLauncher.CanFling(GetPrimaryPart(prop)) else false
 end
 

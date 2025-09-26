@@ -8,7 +8,7 @@ local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
+local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local ViewCorpse = require(script.Parent.ViewCorpse)
@@ -19,7 +19,7 @@ local module = {}
 
 module.CorpseInteractDistance = 10
 
-module.InteractProp = nil :: Types.MapThing?
+module.InteractProp = nil :: Types.MapObject?
 module.InteractPart = nil :: BasePart?
 module.ActionNode = nil :: ActionNodeClient.ClientNodeData?
 
@@ -40,7 +40,7 @@ local function interactCorpse(corpse: Model): boolean
 		ShowAlert("Ouch! This corpse is on fire!")
 		return true
 	end
-	
+
 	ViewCorpse(corpse)
 
 	return true
@@ -53,7 +53,7 @@ local function interactInteractable(interactable: Types.Interactable): ()
 	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Model)
 end
 
-local function tryInteractInteractable(prop: Types.MapThing, part: BasePart, input: InputObject?): boolean
+local function tryInteractInteractable(prop: Types.MapObject, part: BasePart, input: InputObject?): boolean
 	local interactable = LocalRoundInfo.Interactables()[prop]
 	if not interactable then
 		return false
@@ -95,7 +95,7 @@ local function tryClimbLadder(map: Types.Map): boolean
 	return false
 end
 
-function module.TryInteract(prop: Types.MapThing?, part: BasePart?, input: InputObject?, actionNode: ActionNodeClient.ClientNodeData?): boolean
+function module.TryInteract(prop: Types.MapObject?, part: BasePart?, input: InputObject?, actionNode: ActionNodeClient.ClientNodeData?): boolean
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return false
@@ -169,7 +169,7 @@ RunService.PostSimulation:Connect(function()
 
 	local target = result.Instance
 
-	local prop = GetMapThingWithTag(target, {"Prop", "Door"})
+	local prop = GetMapObjectWithTag(target, {"Prop", "Door"})
 
 	if prop then
 		module.InteractPart = target

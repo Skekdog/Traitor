@@ -11,7 +11,7 @@ local remotes = ReplicatedStorage.Remotes
 local IS_SERVER = RunService:IsServer()
 
 type BaseDoorRequest = {
-    Door: Types.MapThing,
+    Door: Types.MapObject,
 }
 
 export type ClientInteraction = BaseDoorRequest & {
@@ -203,7 +203,7 @@ if IS_SERVER then
         if typeof(door) ~= "Instance" or (not door:IsA("BasePart") and not door:IsA("Model")) then
             return
         end
-        local mapThing = door :: Types.MapThing
+        local MapObject = door :: Types.MapObject
 
         if typeof(open) ~= "boolean" then
             return
@@ -213,7 +213,7 @@ if IS_SERVER then
             return
         end
 
-        local doorPart = GetPrimaryPart(mapThing)
+        local doorPart = GetPrimaryPart(MapObject)
 
         local distance = plr:DistanceFromCharacter(doorPart.Position)
         if distance == 0 or distance > 15 then
@@ -223,7 +223,7 @@ if IS_SERVER then
         local request: ServerReceive = {
             Kind = "ServerReceive" :: "ServerReceive",
             Player = plr,
-            Door = mapThing,
+            Door = MapObject,
             Open = open,
         }
         StandardDoor(request)

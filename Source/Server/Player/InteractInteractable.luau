@@ -18,7 +18,7 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 	if typeof(interactablePart) ~= "Instance" or (not interactablePart:IsA("BasePart") and not interactablePart:IsA("Model")) then
 		return
 	end
-	local mapThing = interactablePart :: Types.MapThing
+	local MapObject = interactablePart :: Types.MapObject
 
 	if not player.Character then
 		return
@@ -31,7 +31,7 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 		return
 	end
 
-	local interactable = round:GetInteractable(mapThing) or DynamicInteractable.TryCreateNewInteractable(mapThing)
+	local interactable = round:GetInteractable(MapObject) or DynamicInteractable.TryCreateNewInteractable(MapObject)
 	if not interactable then
 		return
 	end
@@ -40,8 +40,8 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 		return
 	end
 
-	local size = if mapThing:IsA("BasePart") then mapThing.Size else mapThing:GetExtentsSize()
-	local origin = GetPrimaryPart(mapThing).Position
+	local size = if MapObject:IsA("BasePart") then MapObject.Size else MapObject:GetExtentsSize()
+	local origin = GetPrimaryPart(MapObject).Position
 
 	if distanceFromBox(origin, size, player.Character:GetPivot().Position) > interactable.Definition.InteractionRange * 1.1 then
 		return
