@@ -12,10 +12,10 @@ local function GetRelation(attacker: Types.Participant, target: Types.Participan
 		relation = "Police"
 	elseif target:GetRole().Definition.Name == "Undercover" and attacker:GetRole().Definition.Name == "Framed" then
 		relation = "Undercover"
-	elseif Targets.GetHunter(attacker) == target then
-		relation = "Hunter"
 	elseif Targets.GetTarget(attacker) == target then
 		relation = "Target"
+	elseif Targets.GetHunter(attacker) == target then
+		relation = "Hunter"
 	end
 	return relation
 end
