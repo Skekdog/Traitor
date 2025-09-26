@@ -34,7 +34,7 @@ local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTi
 	if isTimeout then
 		return timeoutMusic[math.random(#timeoutMusic)]
 	end
-	
+
 	assert(victor.Kind == "Role")
 
 	if victor.Definition.Name == "Traitor" then
@@ -62,10 +62,11 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		ShouldAnnounceDisconnect = true,
 		CanStealCreditsFromCorpses = true,
-		
+
 		AwardCreditsToRolesOnDeath = {
 			Detective = 1,
 		},
+		CorpseHidesSelfDefense = true,
 
 		StartingCredits = 2,
 
@@ -235,7 +236,7 @@ local function getWinner(round: Types.Round): Types.Role?
 			traitors += 1
 		end
 	end
-	
+
 	if innocents == 0 then
 		return round:GetRoleFromRoleName("Traitor")
 	elseif traitors == 0 then
@@ -249,7 +250,7 @@ local function tryEndRound(round: Types.Round): ()
 	if not round:IsInProgress() then
         return
     end
-	
+
 	local winner = getWinner(round)
 	if winner then
 		round:Finish(winner)

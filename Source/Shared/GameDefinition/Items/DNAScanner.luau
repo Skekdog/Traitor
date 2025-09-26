@@ -109,7 +109,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 		return
 	end
 
-	if attacker:HasSelfDefenseAgainstParticipant(participant) or participant:IsFreeKill() then
+	if (attacker:HasSelfDefenseAgainstParticipant(participant) and not participant:GetRole().Definition.CorpseHidesSelfDefense) or participant:IsFreeKill() then
 		return
 	end
 
@@ -181,7 +181,7 @@ local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction
 			if model:GetAttribute("Unidentified") or not model:HasTag("Corpse") then
 				return
 			end
-			
+
 			object = round:GetParticipant(model.Name)
 		end
 	elseif hitPart:HasTag("Interactable") then
@@ -220,7 +220,7 @@ end
 
 if RunService:IsClient() then
 	local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
-	
+
 	local function resetClient(): ()
 		clientAvailableTraces = {}
 		clientCurrentTrace = nil
@@ -233,7 +233,7 @@ if RunService:IsClient() then
 			end
 		end
 	end
-	
+
 	local function tryScan(): ()
 		local item = ClientInventory.Inventory.Slots[ITEM_SLOT]
 		if not item or item.Definition.Name ~= "DNAScanner" then
@@ -243,26 +243,26 @@ if RunService:IsClient() then
 		if not clientCurrentTrace or currentCharge < 100 then
 			return
 		end
-	
+
 		local targetCharacter = workspace.Characters:FindFirstChild(clientCurrentTrace.Target)
 		if not targetCharacter or not targetCharacter:IsA("Model") then
 			return
 		end
-	
+
 		local cframe = targetCharacter:GetPivot()
 		local distance = Players.LocalPlayer:DistanceFromCharacter(cframe.Position)
 		if distance == 0 then
 			return
 		end
-	
+
 		local deplete = math.max(MIN_CHARGE_DEPLETION, CHARGE_DEPLETION_PER_STUD * distance)
 		currentCharge = math.max(currentCharge - deplete, 0)
-	
+
 		local old = workspace.RadarPoints:FindFirstChild("DNATrace")
 		if old then
 			old:Destroy()
 		end
-	
+
 		CreateRadarPoint(cframe, Color3.fromRGB(0, 110, 255), "DNATrace")
 		PlaySound(4578451106, nil, SoundService, {
 			SoundGroup = SoundService.AllSounds :: SoundGroup,
@@ -281,7 +281,7 @@ if RunService:IsClient() then
 				continue
 			end
 			table.insert(clientAvailableTraces, trace)
-			
+
 			local newTrace = ui.Object.DefaultSample:Clone()
 			newTrace.Image = trace.Icon
 			newTrace.Visible = true
