@@ -92,7 +92,7 @@ local undercoverRole: Types.RoleDefinition = {
 	Allegiance = {Kind = "Role", Role = "Police"},
 
 	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"]},
-	StartingItems = {},
+	StartingItems = {Items.FakeTargetChecker},
 
 	Allies = {"Police", "Undercover"},
 	RevealedRoles = {"Police", "Undercover"},
