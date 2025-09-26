@@ -159,6 +159,11 @@ local function OnStart(_, round: Types.Round): ()
 		end
 
 		Health.InitHeal(participant)
+
+		local item = participant:GetEquippedItem()
+		if item and item.Kind ~= "Item" then
+			RedHanded.Start(participant)
+		end
 	end
 
 	Targets.LoadFirstTargets(framed)
