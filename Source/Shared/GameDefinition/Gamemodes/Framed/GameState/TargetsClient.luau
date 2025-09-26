@@ -26,7 +26,7 @@ function TargetsClient.Set(): ()
 	vp.Visible = false
 
 	if TargetsClient.HasIntel then
-		local model = vp:FindFirstChildOfClass("Model")
+		local model = vp.WorldModel:FindFirstChildOfClass("Model")
 		if model then
 			model:Destroy()
 		end
@@ -39,6 +39,12 @@ function TargetsClient.Set(): ()
 				v:Destroy()
 			end
 		end
+
+		local neck = char:FindFirstChild("Neck", true)
+		if neck and neck:IsA("Motor6D") then
+			neck.C0 = CFrame.new(neck.C0.Position)
+		end
+
 		char.Parent = vp.WorldModel
 
 		local root = char:FindFirstChild("HumanoidRootPart")
