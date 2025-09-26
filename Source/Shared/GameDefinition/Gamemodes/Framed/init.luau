@@ -17,6 +17,17 @@ local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 
 require(script.GameState.HighlightCharacter)
 
+local framedItems = {}
+for i, v in Items do
+	framedItems[i] = v
+end
+
+for i, v in FramedItems do
+	framedItems[i] = v
+end
+
+Items = framedItems
+
 local backgroundMusic = {
 	1843504945,
 	1843505232,
@@ -41,8 +52,8 @@ local framedRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Solo"},
 
-	EquipmentShop = {Items.Flashbang, Items.Knife, FramedItems.AWP, Items["Newton Launcher"], FramedItems.BAR, Items["Silenced Pistol"]},
-	StartingItems = {FramedItems.TargetChecker},
+	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"]},
+	StartingItems = {Items.TargetChecker},
 
 	RevealedRoles = {"Police"},
 	HighlightedRoles = {"Police"},
@@ -259,15 +270,6 @@ local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTi
 		return traitorMusic[math.random(#traitorMusic)]
 	end
 	return innocentMusic[math.random(#innocentMusic)]
-end
-
-local framedItems = {}
-for i, v in Items do
-	framedItems[i] = v
-end
-
-for i, v in FramedItems do
-	framedItems[i] = v
 end
 
 local gamemode: Types.GamemodeDefinition = {
