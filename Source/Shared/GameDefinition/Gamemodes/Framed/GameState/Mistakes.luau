@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetAliveRoles = require(script.Parent.Parent.Roles.GetAliveRoles)
 local HighlightCharacter = require(script.Parent.HighlightCharacter)
+local RedHanded = require(script.Parent.RedHanded)
 local Types = require(ReplicatedStorage.API.Types)
 
 local Mistakes = {}
@@ -13,6 +14,7 @@ function Mistakes.MistakeMade(participant: Types.Participant): ()
 	participant.Extras.FramedMistakes = (participant.Extras.FramedMistakes or 0) + 1
 
 	if participant.Extras.FramedMistakes == 1 then
+		RedHanded.SetPermanent(participant)
 		local char = participant:GetCharacter()
 		if not char then
 			return

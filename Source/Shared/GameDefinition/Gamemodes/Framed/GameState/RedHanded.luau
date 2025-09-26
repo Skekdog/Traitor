@@ -13,6 +13,10 @@ local remote = GetRemote("RedHanded")
 local RED_HANDED_DURATION = 3.5
 
 function RedHanded.Start(participant: Types.Participant): ()
+	if RedHanded.IsPermanent(participant) then
+		return
+	end
+
 	local id = GetAliveRoles(participant.Round, {"Police", "Undercover"})
 
 	local char = participant:GetCharacter()
@@ -29,6 +33,10 @@ function RedHanded.StopImmediately(participant: Types.Participant): ()
 end
 
 function RedHanded.Stop(participant: Types.Participant): ()
+	if RedHanded.IsPermanent(participant) then
+		return
+	end
+
 	local id = participant.Extras.FramedRedHanded
 	if not id then
 		return
@@ -51,8 +59,18 @@ function RedHanded.Stop(participant: Types.Participant): ()
 	end)
 end
 
+function RedHanded.IsPermanent(participant: Types.Participant): boolean
+	return participant.Extras.PermanentRedHanded == true and participant:IsAlive()
+end
+
+function RedHanded.SetPermanent(participant: Types.Participant): ()
+	participant.Extras.PermanentRedHanded = true
+	participant.Extras.FramedRedHanded = nil
+	remote:FireClient(participant.Player)
+end
+
 function RedHanded.IsRedHanded(participant: Types.Participant): boolean
-	return participant.Extras.FramedRedHanded ~= nil
+	return RedHanded.IsPermanent(participant) or participant.Extras.FramedRedHanded ~= nil
 end
 
 if RunService:IsClient() then
