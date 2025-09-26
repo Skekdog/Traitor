@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
+local FramedNotification = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Framed.Interface.FramedNotification)
 
 local HasteMode = {}
 
@@ -19,6 +20,10 @@ function HasteMode.Start(round: Types.Round): ()
 		if v:IsAlive() then
 			table.insert(framedAlive, v)
 		end
+	end
+
+	for _, participant in round:GetParticipants() do
+		FramedNotification(participant, "⚠️ Police can now be killed!")
 	end
 
 	for _, participant in framedAlive do
