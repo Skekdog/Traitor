@@ -10,6 +10,7 @@ local Health = require(script.GameState.Health)
 local Mistakes = require(script.GameState.Mistakes)
 local RedHanded = require(script.GameState.RedHanded)
 local Targets = require(script.GameState.Targets)
+local SendScreenMessage = require(script.Interface.SendScreenMessage)
 local Types = require(ReplicatedStorage.API.Types)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
@@ -259,10 +260,20 @@ function BeforeHitParticipant(item, round, participant, params)
 	end
 
 	if participant:GetRole().Definition == policeRole then
-		return HasteMode.IsHasteMode(round)
+		if HasteMode.IsHasteMode(round) then
+			return true
+		end
+
+		SendScreenMessage(attacker, "⚠️ Police cannot be hurt yet!", "Warn")
+		return false
 	elseif participant:GetRole().Definition == framedRole then
 		if attacker:GetRole().Definition == policeRole or attacker:GetRole().Definition == undercoverRole then
-			return RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round)
+			if RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round) then
+				return true
+			end
+
+			SendScreenMessage(attacker, "⚠️ Don't hurt innocents!", "Warn")
+			return false
 		end
 		return true
 	end
