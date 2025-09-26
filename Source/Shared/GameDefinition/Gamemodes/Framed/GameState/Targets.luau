@@ -69,16 +69,17 @@ function Targets.LoadFirstTargets(framed: {Types.Participant}): ()
 	end
 end
 
+Targets.ClientTarget = nil :: string?
+
 if RunService:IsClient() then
-	local name: string?
 	local label: ImageLabel?
 
 	local function set(): ()
-		if not name or not label then
+		if not Targets.ClientTarget or not label then
 			return
 		end
 
-		local char = workspace.Characters:FindFirstChild(name)
+		local char = workspace.Characters:FindFirstChild(Targets.ClientTarget)
 		if not char or not char:IsA("Model") then
 			return
 		end
@@ -92,7 +93,7 @@ if RunService:IsClient() then
 	end
 
 	remote.OnClientEvent:Connect(function(newName: string)
-		name = newName
+		Targets.ClientTarget = newName
 		set()
 	end)
 
