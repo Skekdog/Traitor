@@ -12,6 +12,7 @@ local screenMessageFormats = {
 			TextColor3 = Color3.new(1, 1, 1),
 			TextStrokeColor3 = Color3.new(0, 0, 0),
 			FontFace = Font.fromName("Ubuntu"),
+			Size = UDim2.fromScale(0.8, 0.05),
 			BackgroundTransparency = 1,
 			RichText = false, -- If enabled, UIStroke does not apply
 		}
@@ -50,37 +51,36 @@ local screenMessageFormats = {
 	}
 }
 
-return function(format: string, text: string, formatOverrides: {[string]: any}?): TextLabel
+return function(format: string, text: string, formatOverrides: {LabelProperties: {[string]: any}}?): TextLabel
 	local label = Instance.new("TextLabel")
-	
+
 	local inheritanceOrder = {}
-	
+
 	do
 		local inheritanceStep = format
 		repeat
 			table.insert(inheritanceOrder, 1, inheritanceStep)
 			inheritanceStep = screenMessageFormats[inheritanceStep].InheritsFrom
 		until not inheritanceStep
-		
+
 		if formatOverrides then
 			inheritanceOrder[#inheritanceOrder + 1] = "__formatOverride"
 		end
 	end
-	
+
 	for _, formatName in inheritanceOrder do
 		local formatTable = formatName == "__formatOverride" and formatOverrides or screenMessageFormats[formatName]
-		
+
 		if formatTable.LabelProperties then
 			for i, v in formatTable.LabelProperties do
 				(label :: any)[i] = v
 			end
 		end
 	end
-	
+
 	label.Text = text
 
 	local gui: Frame = (Players.LocalPlayer.PlayerGui:WaitForChild("Special") :: any).ScreenMessage
-	label.Size = UDim2.fromScale(0.8, 0.05)
 	label.AnchorPoint = Vector2.new(0.5, 0)
 	label.Position = UDim2.fromScale(0.5, 0.05 * (#gui:GetChildren() + 1))
 
@@ -97,7 +97,7 @@ return function(format: string, text: string, formatOverrides: {[string]: any}?)
 		end)
 		return label
 	end
-	
+
 	local tween = TweenService:Create(label, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 3), {
 		BackgroundTransparency = 1,
 		TextTransparency = 1,
@@ -122,6 +122,6 @@ return function(format: string, text: string, formatOverrides: {[string]: any}?)
 		label:Destroy()
 	end)
 	tween:Play()
-	
+
 	return label
 end
