@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
-local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
 
 export type HighlightContext = "Mark" | "RedHanded" | "Kill"
 
-local remote = GetRemote("HighlightCharacter")
+local remote = GetRemote("HighlightCharacter", script)
 
 local function makeHighlight(instance: Instance, enable: boolean, context: HighlightContext): ()
 	local highlight = instance:FindFirstChild("FramedHighlight_" .. context)

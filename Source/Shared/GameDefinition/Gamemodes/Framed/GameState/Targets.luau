@@ -1,13 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local FaceIt = require(script.Parent.Parent.GameState.Face)
 local FramedNotification = require(script.Parent.Parent.Interface.FramedNotification)
 local Types = require(ReplicatedStorage.API.Types)
-local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
 
 local Targets = {}
 
-local remote = GetRemote("AssignTarget")
+local remote = GetRemote("AssignTarget", script)
 
 function Targets.AssignTarget(participant: Types.Participant, target: Types.Participant): ()
 	participant.Extras.FramedTarget = target

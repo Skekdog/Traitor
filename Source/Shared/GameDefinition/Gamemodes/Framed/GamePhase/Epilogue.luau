@@ -1,10 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local GetAliveRoles = require(script.Parent.Parent.Roles.GetAliveRoles)
 local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
-local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
 
 local EPILOGUE_DURATION = 45
 
@@ -13,7 +13,7 @@ local Epilogue = {}
 local participant: Types.Participant?
 local exitCFrame: CFrame?
 
-local remote = GetRemote("Epilogue")
+local remote = GetRemote("Epilogue", script)
 
 function Epilogue.IsEpilogue(round: Types.Round): boolean
 	return round.Extras.FramedEpilogue == true

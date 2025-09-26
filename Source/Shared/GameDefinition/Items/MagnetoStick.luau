@@ -3,12 +3,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local GetMapThingWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapThingWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
-local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
 
 local module = {}
 
@@ -35,9 +35,9 @@ type ClientControl = {
 	AlignPosition: AlignPosition,
 }
 
-local grabRemote = GetRemote("Grab")
-local releaseRemote = GetRemote("Release")
-local hangRemote = GetRemote("Hang")
+local grabRemote = GetRemote("Grab", script)
+local releaseRemote = GetRemote("Release", script)
+local hangRemote = GetRemote("Hang", script)
 
 local function serverGetRound(): Types.Round
 	local RoundHandler = require(ServerScriptService.RoundHandler)
