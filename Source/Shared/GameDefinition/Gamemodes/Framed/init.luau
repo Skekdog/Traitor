@@ -261,7 +261,7 @@ function BeforeHitParticipant(item, round, participant, params)
 	if participant:GetRole().Definition == policeRole then
 		return HasteMode.IsHasteMode(round)
 	elseif participant:GetRole().Definition == framedRole then
-		if attacker:GetRole().Definition == policeRole then
+		if attacker:GetRole().Definition == policeRole or attacker:GetRole().Definition == undercoverRole then
 			return RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round)
 		end
 		return true
