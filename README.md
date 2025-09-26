@@ -1,4 +1,4 @@
-# Those You Trust
+# Traitor Town 3
 
 ![Logo](./ExternalAssets/Images/Promotional/Game%20Thumbnail.png)
 
