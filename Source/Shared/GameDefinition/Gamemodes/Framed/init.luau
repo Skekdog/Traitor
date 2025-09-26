@@ -71,7 +71,7 @@ local policeRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
-	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP},
+	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"]},
 	StartingItems = {},
 
 	Allies = {"Police", "Undercover"},
@@ -91,7 +91,7 @@ local undercoverRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
-	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP},
+	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"]},
 	StartingItems = {},
 
 	Allies = {"Police", "Undercover"},
