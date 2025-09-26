@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local FaceIt = require(script.Parent.FaceIt)
-local FramedNotification = require(script.Parent.FramedNotification)
+local FaceIt = require(script.Parent.Parent.GameState.Face)
+local FramedNotification = require(script.Parent.Parent.Interface.FramedNotification)
 local Types = require(ReplicatedStorage.API.Types)
 
 local Targets = {}
@@ -14,7 +14,7 @@ function Targets.AssignTarget(participant: Types.Participant, target: Types.Part
 
 	local targetChecker = participant:GetItems()["TargetChecker"]
 	if targetChecker then
-		local model = targetChecker.Model :: typeof(script.Parent.FramedItems.TargetChecker.TargetChecker)
+		local model = targetChecker.Model :: typeof(script.Parent.Parent.FramedItems.TargetChecker.TargetChecker)
 
 		local targetChar = target:GetCharacter()
 		if not targetChar then

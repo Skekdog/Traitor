@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local HighlightCharacter = require(script.Parent.HighlightCharacter)
+local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
 
 local HasteMode = {}

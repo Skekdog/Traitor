@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetAliveRoles = require(script.Parent.GetAliveRoles)
+local GetAliveRoles = require(script.Parent.Parent.Roles.GetAliveRoles)
 local HighlightCharacter = require(script.Parent.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
 

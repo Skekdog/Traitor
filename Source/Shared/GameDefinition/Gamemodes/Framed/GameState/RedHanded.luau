@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
-local GetAliveRoles = require(script.Parent.GetAliveRoles)
+local GetAliveRoles = require(script.Parent.Parent.Roles.GetAliveRoles)
 local HighlightCharacter = require(script.Parent.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
 local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
@@ -53,7 +53,7 @@ end
 
 if RunService:IsClient() then
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	local ui = UIManager.RegisterUI(script.Parent.FramedRedHandedUI) :: UIManager.UI & {Object: typeof(script.Parent.FramedRedHandedUI)}
+	local ui = UIManager.RegisterUI(script.Parent.Parent.Interface.FramedRedHandedUI) :: UIManager.UI & {Object: typeof(script.Parent.Parent.Interface.FramedRedHandedUI)}
 
 	local currentTween: Tween?
 	remote.OnClientEvent:Connect(function(stop: true?)

@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local GetAliveRoles = require(script.Parent.GetAliveRoles)
-local HighlightCharacter = require(script.Parent.HighlightCharacter)
+local GetAliveRoles = require(script.Parent.Parent.Roles.GetAliveRoles)
+local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
 local GetRemote = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.GetRemote)
 

@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Targets = require(script.Parent.Targets)
+local Targets = require(script.Parent.Parent.GameState.Targets)
 local Types = require(ReplicatedStorage.API.Types)
 
 export type Relation = "Target" | "Hunter" | "RDM" | "Police" | "Undercover"
