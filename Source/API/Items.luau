@@ -13,17 +13,16 @@ function Items.GetItems(): {[string]: Types.AnyItemDefinition}
 end
 
 -- todo: this function is duplicated in ItemDefinitions
-function Items.CopyModify(original: string, newName: string, edit: {[string]: any}): Types.AnyItemDefinition
-	local base = Items.GetItem(original)
-	local new = table.clone(base)
+function Items.CopyModify<T>(original: T & Types.AnyItemDefinition, newName: string, edit: {[string]: any}): Types.AnyItemDefinition
+	local new = table.clone(original)
     for i, v in edit do
         new[i] = v
     end
 
     new.Name = newName
 
-    if base.Model then
-        new.Model = base.Model:Clone();
+    if original.Model then
+        new.Model = original.Model:Clone();
         (new.Model :: PVInstance).Name = newName;
         (new.Model :: PVInstance).Parent = ReplicatedStorage.Assets.WeaponModels
     end
