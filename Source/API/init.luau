@@ -1,11 +1,31 @@
-local API = {}
+local RunService = game:GetService("RunService")
 
-API.Combat = function() return require(script.Combat) end
-API.GetMapThing = function() return require(script.GetMapThing) end
-API.GetParticipant = function() return require(script.GetParticipant) end
-API.GetRound = function() return require(script.GetRound) end
-API.Notification = function() return require(script.Notification) end
-API.PlaySound = function() return require(script.PlaySound) end
-API.TextColor = function() return require(script.TextColor) end
+type APIReturn = {
+	Combat: typeof(require(script.Combat)),
+	GetMapThing: typeof(require(script.GetMapThing)),
+	GetParticipant: typeof(require(script.GetParticipant)),
+	GetRound: typeof(require(script.GetRound)),
+	Notification: typeof(require(script.Notification)),
+	PlaySound: typeof(require(script.PlaySound)),
+	TextColor: typeof(require(script.TextColor)),
+	Items: typeof(require(script.Items)),
+}
 
-return API
+if RunService:IsClient() then
+	return {
+		GetMapThing = require(script.GetMapThing),
+		Notification = require(script.Notification),
+		PlaySound = require(script.PlaySound),
+		TextColor = require(script.TextColor),
+	} :: APIReturn
+end
+
+return {
+	Combat = require(script.Combat),
+	GetMapThing = require(script.GetMapThing),
+	GetParticipant = require(script.GetParticipant),
+	GetRound = require(script.GetRound),
+	PlaySound = require(script.PlaySound),
+	TextColor = require(script.TextColor),
+	Items = require(script.Items),
+} :: APIReturn
