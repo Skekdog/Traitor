@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Items = require(ReplicatedStorage.API.Items)
-local HighlightCharacter = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Framed.GameState.HighlightCharacter)
-local Targets = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Framed.GameState.Targets)
+local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
+local Targets = require(script.Parent.Parent.GameState.Targets)
 
 local Radar = {}
 
@@ -25,8 +25,6 @@ local Item = Items.CopyModify(Items.GetItem("Radar"), "Radar", {
 		HighlightCharacter(char, true, "Kill", nil :: any)
 	end,
 })
-
-print(Item)
 
 Radar.Item = Item
 
