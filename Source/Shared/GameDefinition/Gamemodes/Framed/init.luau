@@ -212,7 +212,7 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 			attacker:AddCredits(1)
 			FramedNotification(attacker, `+1 Credit, {relation} Killed!`)
 		else
-			FramedNotification(attacker, "Mistake! Police are hunting you!")
+			FramedNotification(attacker, "⚠️ Mistake! Police are hunting you!")
 			Mistakes.MistakeMade(attacker)
 		end
 	end
