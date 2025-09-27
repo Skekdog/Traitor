@@ -1,12 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 local ScoreManager = require(ServerScriptService.Player.ScoreManager)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
+
+Round.Config.DeathSounds = DeathSounds
 
 local remotes = ReplicatedStorage.Remotes
 

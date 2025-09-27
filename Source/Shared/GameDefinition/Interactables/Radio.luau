@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
+local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local PLAY_COOLDOWN = 0.25
@@ -156,18 +157,6 @@ local function addSoundsFromGamemode(gamemode: Types.GamemodeDefinition): ()
 			addSound(v.AttackSound, nil, gamemode.Name)
 		end
 	end
-
-	local deathSounds: {Sound} = {}
-	for _, v in gamemode.DeathSounds do
-		local sound = Instance.new("Sound")
-		sound.Name = "Death"
-		sound.SoundId = v
-		sound.RollOffMinDistance = 20
-		sound.RollOffMaxDistance = 50
-		table.insert(deathSounds, sound)
-	end
-
-	addSound(deathSounds, nil, gamemode.Name)
 end
 
 do
@@ -201,6 +190,18 @@ do
 	smallExplosionSound.Name = "Small Explosion"
 
 	addSound(smallExplosionSound)
+
+	local deathSounds: {Sound} = {}
+	for _, v in DeathSounds do
+		local sound = Instance.new("Sound")
+		sound.Name = "Death"
+		sound.SoundId = v
+		sound.RollOffMinDistance = 20
+		sound.RollOffMaxDistance = 50
+		table.insert(deathSounds, sound)
+	end
+
+	addSound(deathSounds)
 end
 
 if RunService:IsClient() then
