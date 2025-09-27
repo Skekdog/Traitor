@@ -4,5 +4,6 @@
 		"**/_Index/**",
 		"Source/TT2Compat/**"
 	],
-	"luau-lsp.types.robloxSecurityLevel": "None"
+	"luau-lsp.types.robloxSecurityLevel": "None",
+	"markdown.validate.enabled": true
 }
