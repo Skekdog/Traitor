@@ -1,12 +1,13 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local IsLabs = require(ReplicatedStorage.Shared.Util.IsLabs)
 
 if not IsLabs then
 	return nil
 end
 
-if game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0 then
+if RunService:IsStudio() or (game.PrivateServerId ~= "" and game.PrivateServerOwnerId ~= 0) then
 	workspace:SetAttribute("LabsGreenLight", true)
 	return nil
 end
