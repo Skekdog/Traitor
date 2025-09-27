@@ -8,7 +8,7 @@ type APIReturn = {
 	Notification: typeof(require(script.Notification)),
 	PlaySound: typeof(require(script.PlaySound)),
 	TextColor: typeof(require(script.TextColor)),
-	Items: typeof(require(script.Items)),
+	StandardGame: typeof(require(script.StandardGame)),
 	GetRemote: typeof(require(script.GetRemote)),
 }
 
@@ -29,6 +29,6 @@ return {
 	GetRound = require(script.GetRound),
 	PlaySound = require(script.PlaySound),
 	TextColor = require(script.TextColor),
-	Items = require(script.Items),
+	StandardGame = require(script.StandardGame),
 	GetRemote = require(script.GetRemote),
 } :: APIReturn

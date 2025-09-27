@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Items = require(ReplicatedStorage.API.Items)
+local Items = require(ReplicatedStorage.API.StandardGame)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 
 local AWP = {}
