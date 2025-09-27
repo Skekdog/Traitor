@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
-local FramedNotification = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Framed.Interface.FramedNotification)
+local FramedNotification = require(script.Parent.Parent.Interface.FramedNotification)
 
 local HasteMode = {}
 

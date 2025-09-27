@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Epilogue = require(script.GamePhase.Epilogue)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
+local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local FaceIt = require(script.GameState.Face)
 local FramedItems = require(script.FramedItems)
 local FramedNotification = require(script.Interface.FramedNotification)
@@ -10,18 +12,14 @@ local Health = require(script.GameState.Health)
 local Mistakes = require(script.GameState.Mistakes)
 local RedHanded = require(script.GameState.RedHanded)
 local Targets = require(script.GameState.Targets)
-local SendScreenMessage = require(script.Interface.SendScreenMessage)
 local Types = require(ReplicatedStorage.API.Types)
-local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
-local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
-local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 
 require(script.GameState.HighlightCharacter)
 
 local RED_HANDED_ITEMS = {"Magneto Stick"}
 
 local framedItems = {}
-for i, v in Items do
+for i, v in StandardGame.GetItems() do
 	framedItems[i] = v
 end
 
@@ -29,7 +27,7 @@ for i, v in FramedItems do
 	framedItems[i] = v
 end
 
-Items = framedItems
+local Items = framedItems
 
 local backgroundMusic = {
 	1843504945,
@@ -266,7 +264,7 @@ local function BeforeHitParticipant(_, participant: Types.Participant, params: T
 			return true
 		end
 
-		SendScreenMessage(attacker, "⚠️ Police cannot be hurt yet!", "Warn")
+		ScreenMessage("⚠️ Police cannot be hurt yet!", "Warn", nil, attacker.Player)
 		return false
 	elseif participant:GetRole().Definition == framedRole then
 		if attacker:GetRole().Definition == policeRole or attacker:GetRole().Definition == undercoverRole then
@@ -274,7 +272,7 @@ local function BeforeHitParticipant(_, participant: Types.Participant, params: T
 				return true
 			end
 
-			SendScreenMessage(attacker, "⚠️ Don't hurt innocents!", "Warn")
+			ScreenMessage("⚠️ Don't hurt innocents!", "Warn", nil, attacker.Player)
 			return false
 		end
 		return true
@@ -333,9 +331,9 @@ local gamemode: Types.GamemodeDefinition = {
 		Undercover = undercoverRole,
 	},
 
-	AvailableAmmo = Ammo,
+	AvailableAmmo = StandardGame.GetAllAmmo(),
 	AvailableItems = framedItems,
-	InteractableDefinitions = Interactables,
+	InteractableDefinitions = StandardGame.GetInteractables(),
 
 	AssignRoles = AssignRoles,
 
