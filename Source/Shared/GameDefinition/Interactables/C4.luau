@@ -212,13 +212,13 @@ local c4s = DynamicValue.new({} :: {[Instance]: C4})
 if RunService:IsClient() then
 	local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 
-	local isBadGuy = false
+	local isEvil = false
 
 	local function updateMarkerVisibility(): ()
 		for _, c4 in c4s() do
 			local marker = c4.Model:FindFirstChild("Marker")
 			if marker and marker:IsA("BillboardGui") then
-				marker.Enabled = isBadGuy and isArmedClient(c4)
+				marker.Enabled = isEvil and isArmedClient(c4)
 			end
 		end
 	end
@@ -289,7 +289,7 @@ if RunService:IsClient() then
 			c4.Extras.BeganBeepingClient = false
 		end
 
-		if isBadGuy then
+		if isEvil then
 			local marker = (c4.Model :: typeof(ReplicatedStorage.Assets.InteractableModels.C4)):FindFirstChild("Marker")
 			if not marker then
 				return -- This is when the C4 is destroyed, e.g. when exploding
@@ -326,7 +326,7 @@ if RunService:IsClient() then
 		local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 
 		local role = LocalParticipantInfo.GetParticipant().Role()
-		isBadGuy = role.Definition.IsBadGuys or false
+		isEvil = role.Definition.IsEvil or false
 
 		local toRemove: {C4} = {}
 
@@ -393,7 +393,7 @@ if RunService:IsServer() then
 		if not c4.Model:IsDescendantOf(workspace) then
 			return
 		end
-		
+
 		local sound = Instance.new("Sound")
 		sound.SoundId = "rbxassetid://252142019"
 		sound.Volume = 1
@@ -414,7 +414,7 @@ if RunService:IsServer() then
 		end
 
 		local role = participant:GetRole()
-		if not role.Definition.IsBadGuys then
+		if not role.Definition.IsEvil then
 			participant:SetFreeKill("armed a C4")
 		end
 
@@ -459,7 +459,7 @@ if RunService:IsServer() then
 		local alwaysDisarm = safeDisarm or false
 
 		local defuserRole = participant:GetRole()
-		if (c4.Extras.ArmedBy == participant) or (defuserRole.Definition.IsBadGuys) then
+		if (c4.Extras.ArmedBy == participant) or (defuserRole.Definition.IsEvil) then
 			alwaysDisarm = true
 		end
 

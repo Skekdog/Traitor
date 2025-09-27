@@ -93,7 +93,7 @@ ClientInventory.EquippedItem:Connect(function(item)
     end
 
     local role = participant.Role()
-    if item.Definition.IsBadGuyItem and not role.Definition.IsBadGuys then
+    if item.Definition.IsEvilItem and not role.Definition.IsEvil then
         return showFreeKillIgnoreReason(true)
     end
 

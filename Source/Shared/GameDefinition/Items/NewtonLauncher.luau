@@ -90,7 +90,7 @@ local item: Types.GunWeaponDefinition = {
     Description = "Flings anything it hits. Low inherent damage, but can be used to crush others with props or throw them off high ledges.",
     Icon = "rbxassetid://1491877109",
 
-    IsBadGuyItem = true,
+    IsEvilItem = true,
 
 	Slot = 8,
     MaxStock = 2,

@@ -30,7 +30,7 @@ local function HeartbeatClient(item: Types.AnyItem): ()
         table.insert(decoyPlayers, v.Extras.Player)
 
         assert(v.Model:IsA("BasePart"))
-        CreateRadarPoint(v.Model.CFrame, if LocalParticipantInfo.GetParticipant().Role().Definition.IsBadGuys then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
+        CreateRadarPoint(v.Model.CFrame, if LocalParticipantInfo.GetParticipant().Role().Definition.IsEvil then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
     end
 
     for _, v in Players:GetPlayers() do

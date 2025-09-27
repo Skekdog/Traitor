@@ -75,7 +75,7 @@ local function burn(attacker: Types.Participant, target: BurnTarget): ()
 
     if target.Kind == "Prop" and target.Model:HasTag("Corpse") then
         target.Model:SetAttribute("Burning", true)
-        if not attacker:IsBadGuy() then
+        if not attacker:IsEvil() then
             attacker:SetFreeKill("burned a corpse")
         end
     else
@@ -149,7 +149,7 @@ local function burnThing(target: BurnTarget, info: BurnInfo): ()
     if timeNow < info.LastBurn + 0.25 then
         return
     end
-    
+
     info.LastBurn = timeNow
 
     PlaySound(weaponSounds("FlareBurn"), nil, if model:IsA("Model") then model.PrimaryPart else model)
@@ -192,7 +192,7 @@ local item: Types.GunWeaponDefinition = {
     CreditCost = 1,
     MaxStock = 1,
 
-    IsBadGuyItem = true,
+    IsEvilItem = true,
 
     Slot = 8,
     CanDrop = true,

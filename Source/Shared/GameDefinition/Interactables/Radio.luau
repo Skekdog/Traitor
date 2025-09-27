@@ -320,7 +320,7 @@ local function BeforeTakeDamage(interactable: Radio, params: Types.DamageParams?
 		return false
 	end
 
-	return not attacker:GetRole().Definition.IsBadGuys
+	return not attacker:GetRole().Definition.IsEvil
 end
 
 local function OnLoadServer(interactable: Radio): ()

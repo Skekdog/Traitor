@@ -195,7 +195,7 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 	mesh.MeshType = Enum.MeshType.FileMesh
 	mesh.Parent = tracer
 	mesh.Scale = Vector3.new(0.1, 0.1, tracerVector.Magnitude / 2)
-	
+
 	tracer.Material = VISUALISE_MATERIAL
 	tracer.Color = VISUALISE_COLOUR
 	tracer.Anchored = true
@@ -204,7 +204,7 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 	tracer.CanQuery = false
 	tracer.Transparency = TRACER_TRANSPARENCY
 	tracer.CFrame = CFrame.lookAt((victimPos + attackerPos) / 2, victimPos)
-	
+
 	task.defer(function()
 		local corpse = participant:GetCharacter()
 		if not corpse then
@@ -235,7 +235,7 @@ local function BeforeTakeDamage(interactable: Visualiser, params: Types.DamagePa
 		return false
 	end
 
-	return attacker:GetRole().Definition.IsBadGuys or false
+	return attacker:GetRole().Definition.IsEvil or false
 end
 
 local function OnInteractServer(interactable: Visualiser, participant: Types.Participant): ()
@@ -293,7 +293,7 @@ local function forEachVisualiser(visualiser: Visualiser): ()
 		if not visualisation or (visualisation.Victim:GetPivot().Position - visualiser.Model.Position).Magnitude > VISUALISATION_RADIUS then
 			continue
 		end
-		
+
 		corpsesInRange[model] = visualisation
 	end
 
@@ -308,7 +308,7 @@ end)
 
 local interactable: Types.InteractableDefinition = {
 	Name = "Visualiser",
-	
+
 	Model = ReplicatedStorage.Assets.InteractableModels.Visualiser,
 
 	InteractionRange = 7.5,

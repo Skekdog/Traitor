@@ -80,7 +80,7 @@ local function BeforeTakeDamage(interactable: Decoy, params: Types.DamageParams?
 		return false
 	end
 
-	return not attacker:GetRole().Definition.IsBadGuys
+	return not attacker:GetRole().Definition.IsEvil
 end
 
 local interactable: Types.InteractableDefinition = {

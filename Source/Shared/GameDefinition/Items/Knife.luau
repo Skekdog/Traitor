@@ -139,7 +139,7 @@ local item: Types.MeleeWeaponDefinition = {
 
 	Slot = 7,
 	CanDrop = true,
-	IsBadGuyItem = true,
+	IsEvilItem = true,
 
 	CreditCost = 1,
 	MaxStock = 2,

@@ -151,7 +151,7 @@ local function BeforeTakeDamage(interactable: HealthStationServer, params: Types
 		return false
 	end
 
-	return attacker:GetRole().Definition.IsBadGuys or false
+	return attacker:GetRole().Definition.IsEvil or false
 end
 
 local interactable: Types.InteractableDefinition = {

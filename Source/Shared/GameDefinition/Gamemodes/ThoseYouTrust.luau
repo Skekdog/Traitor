@@ -55,7 +55,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Color = TRAITOR_COLOUR,
 		Sound = "rbxassetid://9042088276",
 
-		IsBadGuys = true,
+		IsEvil = true,
 
 		IsExclamatory = true,
 		Allegiance = {Kind = "Role", Role = "Traitor"},

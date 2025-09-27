@@ -120,7 +120,7 @@ guns.HUGE = {
 
     Slot = 3,
     CanDrop = true,
-    
+
     Spread = 0.04,
     HasMuzzleFlash = true,
 
@@ -170,7 +170,7 @@ guns.HUGE = {
 guns.Scout = {
     Kind = "Gun" :: "Gun",
     Name = "Scout",
-    
+
     Slot = 3,
     CanDrop = true,
 
@@ -295,7 +295,7 @@ guns["Golden Gun"] = {
     Spread = 0,
 
     LaserColor = Color3.fromRGB(47, 47, 255),
-    
+
     MagazineSize = 1,
 
     Projectile = projectiles("GoldenBullet"),
@@ -317,7 +317,7 @@ guns["Golden Gun"] = {
         if target.Kind ~= "Prop" then
             return false
         end
-        
+
         local attacker = params.Attacker
         target:TryTakeDamage({
             Amount = math.huge,
@@ -376,7 +376,7 @@ guns.SMG = {
 
     Slot = 3,
     CanDrop = true,
-    
+
     Damage = {
         Head = 25,
         Body = 20,
@@ -385,7 +385,7 @@ guns.SMG = {
 
     Spread = 0.02,
     HasMuzzleFlash = true,
-    
+
     AttackInterval = 0.05,
     ReloadTime = 1,
     AmmoType = Ammo.SMG1,
@@ -427,9 +427,9 @@ guns.AWP = {
     Description = "A high-powered sniper rifle. Must be scoped in to shoot.",
     Icon = "rbxassetid://4772214897",
     MaxStock = 1,
-    
-    IsBadGuyItem = true,
-    
+
+    IsEvilItem = true,
+
     Slot = 7,
     CreditCost = 1,
     CanDrop = true,
@@ -528,7 +528,7 @@ guns["Silenced Pistol"] = {
     CreditCost = 1,
     MaxStock = 3,
 
-    IsBadGuyItem = true,
+    IsEvilItem = true,
 
     Slot = 7,
     CanDrop = true,
@@ -542,7 +542,7 @@ guns["Silenced Pistol"] = {
     Spread = 0.01,
 
     HasMuzzleFlash = false,
-    
+
     AimFOV = 70,
     AimSpreadMultiplier = 0.1,
 
@@ -770,7 +770,7 @@ guns.BAR = {
     Icon = "rbxassetid://10243797417",
     MaxStock = 3,
 
-    IsBadGuyItem = true,
+    IsEvilItem = true,
 
     Slot = 3,
     CreditCost = 1,
@@ -818,7 +818,7 @@ grenades.Grenade = {
     CreditCost = 2,
     MaxStock = 2,
 
-    IsBadGuyItem = true,
+    IsEvilItem = true,
 
     Slot = 7,
     CanDrop = true,
@@ -1005,7 +1005,7 @@ grenades["Smoke Grenade"] = {
         smoke.Size = 20
         smoke.Opacity = 1
         smoke.RiseVelocity = 5
-        
+
         local smokePart = CreateEmptyPart(CFrame.new(projectile.Position))
         smoke.Parent = smokePart
         smokePart.Parent = workspace.Projectiles
@@ -1039,7 +1039,7 @@ grenades["Discombobulator"] = {
         Pressure = 75000,
         VisualRadius = 15,
     },
-    
+
     OnHitClient = Discombobulate,
 
     FuseTime = 3,
@@ -1129,7 +1129,7 @@ items.C4 = {
     Slot = 7,
     CanDrop = true,
 
-    IsBadGuyItem = true,
+    IsEvilItem = true,
 
     Description = "Explodes in a massive radius after a set timer.",
     Icon = "rbxassetid://17229908151",
