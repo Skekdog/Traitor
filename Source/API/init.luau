@@ -10,6 +10,7 @@ type APIReturn = {
 	TextColor: typeof(require(script.TextColor)),
 	StandardGame: typeof(require(script.StandardGame)),
 	GetRemote: typeof(require(script.GetRemote)),
+	ScreenMessage: typeof(require(script.ScreenMessage)),
 }
 
 if RunService:IsClient() then
@@ -19,6 +20,7 @@ if RunService:IsClient() then
 		PlaySound = require(script.PlaySound),
 		TextColor = require(script.TextColor),
 		GetRemote = require(script.GetRemote),
+		ScreenMessage = require(script.ScreenMessage),
 	} :: APIReturn
 end
 
@@ -31,4 +33,5 @@ return {
 	TextColor = require(script.TextColor),
 	StandardGame = require(script.StandardGame),
 	GetRemote = require(script.GetRemote),
+	ScreenMessage = require(script.ScreenMessage),
 } :: APIReturn
