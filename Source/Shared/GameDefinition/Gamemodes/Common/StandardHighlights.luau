@@ -228,8 +228,7 @@ local GRANT_THRESHOLD = 2
 
 local SUICIDE_CULT_THRESHOLD = 3
 
-function module.OnDeath(_, victim: Types.Participant, _): ()
-	local round = victim.Round
+function module.OnDeath(round: Types.Round, victim: Types.Participant, _): ()
 	local corpse = victim.Corpse
 	if not corpse then
 		return
@@ -344,9 +343,7 @@ function module.OnDeath(_, victim: Types.Participant, _): ()
 	end
 end
 
-module.OnIdentifyCorpse = function(gamemode: Types.GamemodeDefinition, corpse: Types.Corpse, searcher: Types.Participant)
-	local round = searcher.Round
-
+module.OnIdentifyCorpse = function(round: Types.Round, corpse: Types.Corpse, searcher: Types.Participant): ()
 	searcher.Extras.IdentifiedBodies = (searcher.Extras.IdentifiedBodies or 0) + 1
 	local bodies = searcher.Extras.IdentifiedBodies
 
@@ -359,7 +356,7 @@ module.OnIdentifyCorpse = function(gamemode: Types.GamemodeDefinition, corpse: T
 	end
 end
 
-module.FinishHighlights = function(gamemode: Types.GamemodeDefinition, round: Types.Round): ()
+module.FinishHighlights = function(round: Types.Round): ()
 	assert(round.VictoryData)
 
 	local events = round:GetEventLog()

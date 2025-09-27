@@ -30,7 +30,7 @@ for _, v in ReplicatedStorage.Assets.VictoryMusic.Timeout:GetChildren() do
 	end
 end
 
-local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
+local function getVictoryMusic(round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
 	if isTimeout then
 		return timeoutMusic[math.random(#timeoutMusic)]
 	end
@@ -158,7 +158,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 }
 
 local EXTRA_BETWEEN = vector.create(6, 8)
-local function assignRoles(gamemode: Types.GamemodeDefinition, participants: {Types.Participant}): ()
+local function assignRoles(_, participants: {Types.Participant}): ()
 	local numDetectives = if #participants >= EXTRA_BETWEEN.x and #participants < EXTRA_BETWEEN.y then 1 else #participants // 8
 	local numTraitors = if #participants >= EXTRA_BETWEEN.x and #participants < EXTRA_BETWEEN.y then 2 else math.max(#participants // 4, 1)
 	for i, v in participants do
@@ -172,7 +172,7 @@ local function assignRoles(gamemode: Types.GamemodeDefinition, participants: {Ty
 	end
 end
 
-local function getVictoryEventText(gamemode: Types.GamemodeDefinition, round: Types.Round, victor: Types.Victor, isTimeout: boolean): string?
+local function getVictoryEventText(round: Types.Round, victor: Types.Victor, isTimeout: boolean): string?
 	if victor.Kind == "Participant" then
 		return nil
 	end
@@ -460,14 +460,14 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 	end
 end
 
-local function onFinish(gamemode: Types.GamemodeDefinition, round: Types.Round): ()
+local function onFinish(round: Types.Round): ()
 	for _, v in Players:GetPlayers() do
 		v:SetAttribute("IsDisguised", false)
 	end
 end
 
-local function onDeath(gamemode: Types.GamemodeDefinition, victim: Types.Participant, deferVictoryCheck: boolean): ()
-	StandardHighlights.OnDeath(gamemode, victim, deferVictoryCheck)
+local function onDeath(round: Types.Round, victim: Types.Participant, deferVictoryCheck: boolean): ()
+	StandardHighlights.OnDeath(round, victim, deferVictoryCheck)
 
 	local corpse = victim.Corpse
 
@@ -500,7 +500,7 @@ local gamemode: Types.GamemodeDefinition = {
 
 	RequiredSlayVotes = 2,
 
-	TimeoutVictor = function(gamemode: Types.GamemodeDefinition, round: Types.Round): Types.Victor
+	TimeoutVictor = function(round: Types.Round): Types.Victor
 		return round:GetRoleFromRoleName("Innocent")
 	end,
 
@@ -522,7 +522,7 @@ local gamemode: Types.GamemodeDefinition = {
 		Items["Magneto Stick"],
 	},
 
-	Duration = function(numParticipants: number)
+	Duration = function(_, numParticipants: number)
 		return 120 + 10 * numParticipants
 	end,
 
@@ -542,10 +542,9 @@ local gamemode: Types.GamemodeDefinition = {
 
 	OnDeath = onDeath,
 
-	OnIdentifyCorpse = function(gamemode, corpse, searcher)
-		local round = searcher.Round
+	OnIdentifyCorpse = function(round, corpse, searcher)
 		if not round:IsPostGame() then
-			StandardHighlights.OnIdentifyCorpse(gamemode, corpse, searcher)
+			StandardHighlights.OnIdentifyCorpse(round, corpse, searcher)
 		end
 
 		if corpse.Participant.Extras.CorpseDisguiseData then
@@ -553,8 +552,8 @@ local gamemode: Types.GamemodeDefinition = {
 		end
 	end,
 
-	AddFinishHighlights = function(gamemode, round)
-		StandardHighlights.FinishHighlights(gamemode, round)
+	AddFinishHighlights = function(round)
+		StandardHighlights.FinishHighlights(round)
 		local awardDeadliestAmongEquals: Types.Participant?
 		for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Traitor")) do
 			local corpse = v.Corpse

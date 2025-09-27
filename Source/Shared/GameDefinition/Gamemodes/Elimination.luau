@@ -5,7 +5,7 @@ local Ammo = require(script.Parent.Parent.Items.Ammo)
 local Items = require(script.Parent.Parent.Items.Items)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
 
-local function getBestParticipant(_: unknown, round: Types.Round): Types.Participant
+local function getBestParticipant(round: Types.Round): Types.Participant
     local bestScore, bestParticipant: Types.Participant? = -math.huge, nil
     for _, participant in round:GetParticipants() do
         assert(participant)
@@ -39,7 +39,7 @@ for _, v in ReplicatedStorage.Assets.VictoryMusic.Timeout:GetChildren() do
     end
 end
 
-local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
+local function getVictoryMusic(round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
     if isTimeout then
         return timeoutVictoryMusic[math.random(#timeoutVictoryMusic)]
     end
@@ -102,7 +102,7 @@ local function tryEndRound(round: Types.Round): ()
     if survivor then
         round:Finish(survivor)
     else
-        round:Finish(getBestParticipant(nil, round))
+        round:Finish(getBestParticipant(round))
     end
 end
 
@@ -117,13 +117,13 @@ local gamemode: Types.GamemodeDefinition = {
     TimeoutVictor = getBestParticipant,
     GetRoundEndMusic = getVictoryMusic,
 
-    AssignRoles = function(gamemode: Types.GamemodeDefinition, participants: {Types.Participant})
+    AssignRoles = function(_, participants: {Types.Participant})
         for _, v in participants do
             v:SetRole(roles.Competitor)
         end
     end,
 
-    GetVictoryEventText = function(gamemode: Types.GamemodeDefinition, round: Types.Round, victor: Types.Victor, isTimeout: boolean): string?
+    GetVictoryEventText = function(round: Types.Round, victor: Types.Victor, isTimeout: boolean): string?
         if isTimeout then
             return "The time has run out and the player with the highest score has won."
         end
@@ -140,7 +140,7 @@ local gamemode: Types.GamemodeDefinition = {
 
     StartingItems = {Items.Crowbar, Items["Magneto Stick"]},
 
-    Duration = function(numParticipants: number)
+    Duration = function(_, numParticipants: number)
 		return 120 + 10 * numParticipants
 	end,
 
@@ -156,8 +156,8 @@ local gamemode: Types.GamemodeDefinition = {
 		"rbxassetid://9125652675"
 	},
 
-    OnDeath = function(gamemode: Types.GamemodeDefinition, participant: Types.Participant, deferVictoryCheck: boolean)
-        StandardHighlights.OnDeath(gamemode, participant, deferVictoryCheck)
+    OnDeath = function(round, participant: Types.Participant, deferVictoryCheck: boolean)
+        StandardHighlights.OnDeath(round, participant, deferVictoryCheck)
 
         local corpse = participant.Corpse
         local attacker = if corpse then corpse.Killer else nil
@@ -185,8 +185,8 @@ local gamemode: Types.GamemodeDefinition = {
         end
     end,
 
-    AddFinishHighlights = function(gamemode, round)
-        StandardHighlights.FinishHighlights(gamemode, round)
+    AddFinishHighlights = function(round)
+        StandardHighlights.FinishHighlights(round)
         local mostKillsAmount, mostKillsParticipant: Types.Participant? = 0, nil
         for _, v in round:GetParticipants() do
             local count = #v.KillList

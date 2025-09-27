@@ -144,7 +144,7 @@ local function AssignRoles(_, participants: {Types.Participant}): ()
 	end
 end
 
-local function OnStart(_, round: Types.Round): ()
+local function OnStart(round: Types.Round): ()
 	local framed = round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed"))
 
 	for _, participant in framed do
@@ -185,7 +185,7 @@ local function OnStart(_, round: Types.Round): ()
 	playMusic()
 end
 
-local function OnFinish(_, round: Types.Round): ()
+local function OnFinish(round: Types.Round): ()
 	Epilogue.Finish()
 	if round.Extras.FramedBackgroundMusic then
 		round.Extras.FramedBackgroundMusic:Destroy()
@@ -304,7 +304,7 @@ for _, v in ReplicatedStorage.Assets.VictoryMusic.Innocent:GetChildren() do
 	end
 end
 
-local function getVictoryMusic(_, round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
+local function getVictoryMusic(round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
 	if victor.Kind == "Participant" then
 		return traitorMusic[math.random(#traitorMusic)]
 	end
@@ -318,7 +318,7 @@ local gamemode: Types.GamemodeDefinition = {
 
 	MinimumPlayers = 1,
 
-	TimeoutVictor = function(_, round)
+	TimeoutVictor = function(round)
 		return round:GetRoleFromRoleName("Police")
 	end,
 
