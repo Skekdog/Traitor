@@ -202,7 +202,7 @@ local function isPrimaryFireRequest(value: any): boolean
 	if not isPrimaryFireBaseRequest(value) then
 		return false
 	end
-	
+
 	if value.Kind == "PrimaryFireRaycastRequest" then
 		return isRaycastRequest(value)
 	elseif value.Kind == "PrimaryFireThrowRequest" then
@@ -312,3 +312,5 @@ remotes.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unkn
 	assert(ammoBox)
 	ammoBox:SetAmmo(amount)
 end)
+
+return nil

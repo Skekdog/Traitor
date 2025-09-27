@@ -1,4 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local IsLabs = require(ReplicatedStorage.Shared.Util.IsLabs)
+
+if IsLabs then
+	while not workspace:GetAttribute("LabsGreenLight") do
+		task.wait()
+	end
+end
+
 require(ReplicatedStorage.Shared.DevTools.FirstJoinPermissions)
 
 require(script.Parent.Settings.LoadSettings)

@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+require(ServerScriptService.Labs.LabsRequiresPrivateServer)
 require(ReplicatedStorage.Shared.DevTools.FirstJoinPermissions)
-
 require(script.Parent.Player.SetupPlayer)
 require(script.Parent.PlayerData.SaveData)
 require(script.Parent.Character.RotateHead)
@@ -14,3 +15,4 @@ require(script.Parent.Character.CrouchedStatus)
 require(ReplicatedStorage.Compat.InitialiseCompat)
 require(script.Parent.ServerCommandExecute)
 require(ReplicatedStorage.Shared.SetDefaultSoundGroup)
+require(script.Parent.Combat.CombatEvents)

@@ -5,11 +5,11 @@ local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
-local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
+local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 
 export type BaseCommand = {
 	Name: string,
@@ -396,7 +396,6 @@ module.setkarma = {
 	Environment = "Server" :: "Server",
 	Arguments = {"karma", "players"},
 	Execute = function(executor: Player, round: Round, args: Args)
-		local ServerScriptService = game:GetService("ServerScriptService")
 		local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 
 		local players = processPlayerArgument(executor, args[2])
@@ -535,8 +534,6 @@ module.restart = {
 	Environment = "Server" :: "Server",
 	Arguments = {},
 	Execute = function()
-		local ServerScriptService = game:GetService("ServerScriptService")
-
 		local RestartServer = require(ServerScriptService.Util.RestartServer)
 
 		RestartServer(5)

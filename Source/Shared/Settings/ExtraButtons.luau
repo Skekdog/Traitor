@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(script.Parent.Settings)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local SafeTeleport = require(ReplicatedStorage.Shared.Util.SafeTeleport)
 local ConfirmationPrompt = require(ReplicatedStorage.Shared.Interface.Util.ConfirmationPrompt)
+local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
 local SettingsUI = require(script.Parent.SettingsUI)
 
 local function promptTeleport(name: string, placeId: number): ()

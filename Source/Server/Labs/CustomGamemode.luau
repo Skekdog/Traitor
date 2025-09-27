@@ -1,7 +1,7 @@
 local AssetService = game:GetService("AssetService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RoundHandler = require(script.Parent.Parent.RoundHandler)
 local IsLabs = require(ReplicatedStorage.Shared.Util.IsLabs)
+local RoundHandler = require(script.Parent.Parent.RoundHandler)
 
 local module = {}
 
