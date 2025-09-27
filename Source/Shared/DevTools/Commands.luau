@@ -1,3 +1,4 @@
+local AssetService = game:GetService("AssetService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -554,10 +555,37 @@ module.forcegamemode = {
 		local gamemodeName = processStringArgument(args[1])
 
 		local ServerScriptService = game:GetService("ServerScriptService")
-		local RoundHandler = (require)(ServerScriptService.RoundHandler)
+		local RoundHandler = require(ServerScriptService.RoundHandler)
 		local result = RoundHandler.TrySetForcedGamemode(gamemodeName)
 
 		return if result then `Set forced gamemode to {gamemodeName}.` else `Gamemode {gamemodeName} not found.`
+	end
+}
+
+module.loadgamemode = {
+	Name = "loadgamemode",
+	Description = "Loads a gamemode by asset id.",
+	Environment = "Server" :: "Server",
+	Arguments = {"asset id"},
+	Execute = function(_, round: Round, args: Args): string
+		local assetId = processNumberArgument(args[1])
+		if not assetId then
+			return "Missing argument 1 asset id."
+		end
+
+		local ServerScriptService = game:GetService("ServerScriptService")
+		local RoundHandler = require(ServerScriptService.RoundHandler)
+
+		local result = AssetService:LoadAssetAsync(assetId):FindFirstChildWhichIsA("Instance")
+		if not result then
+			return `Asset {assetId} not found.`
+		end
+
+		result.Parent = ReplicatedStorage.Shared.GameDefinition.Gamemodes
+
+		RoundHandler.UpdateLoadedGamemodes()
+		RoundHandler.TrySetForcedGamemode(result.Name)
+		return `Loaded gamemode {result.Name} from asset id {assetId}.`
 	end
 }
 

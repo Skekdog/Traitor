@@ -62,22 +62,27 @@ local roundCount = -1
 local MAP_VOTE_INTERVAL = 3
 local INTERMISSION_TIME = 15
 
+local module = {}
+
 local gamemodes: {Types.GamemodeDefinition} = {}
-for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
-    if not v:IsA("ModuleScript") then
-        continue
-    end
+function module.UpdateLoadedGamemodes(): ()
+    gamemodes = {}
+    for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
+        if not v:IsA("ModuleScript") then
+            continue
+        end
 
-    if v.Name == "Elimination" then
-        continue
-    end
+        if v.Name == "Elimination" then
+            continue
+        end
 
-    for i = 1, if v.Name == "ThoseYouTrust" then 4 else 1 do
-        table.insert(gamemodes, (require)(v))
+        for i = 1, if v.Name == "ThoseYouTrust" then 4 else 1 do
+            table.insert(gamemodes, (require)(v))
+        end
     end
 end
 
-local module = {}
+module.UpdateLoadedGamemodes()
 
 local forcedGamemode = nil :: Types.GamemodeDefinition?
 
