@@ -94,7 +94,7 @@ LocalCharacter.Humanoid:Connect(function(hum)
     if not hum then
         return
     end
-    
+
     WalkSpeed.Reset()
     JumpPower.Reset()
 
@@ -112,3 +112,5 @@ LocalCharacter.Humanoid:Connect(function(hum)
     initRemoveDeathSound(root)
     initHeadTilt(char)
 end)
+
+return nil

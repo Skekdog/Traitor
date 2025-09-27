@@ -163,3 +163,5 @@ end, true)
 LocalRoundInfo.Credits:Connect(function(credits)
     updateCredits()
 end)
+
+return nil

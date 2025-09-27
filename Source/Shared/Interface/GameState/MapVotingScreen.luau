@@ -62,7 +62,7 @@ ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(func
         clone.Name = v.Name
         clone.Visible = true
         clone.Parent = screen.Object.Choices :: any
-    
+
         clone.MouseButton1Click:Connect(function()
             voteFor(clone)
         end)
@@ -70,3 +70,5 @@ ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(func
 
     screen:ToggleVisible(true)
 end)
+
+return nil

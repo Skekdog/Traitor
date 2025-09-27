@@ -240,3 +240,5 @@ for _, v in Players:GetPlayers() do
 end
 
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+
+return nil

@@ -145,7 +145,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				return Enum.ContextActionResult.Sink
 			end)
 		end
-		
+
 		ControlManager.Register("Reload Weapon", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
@@ -351,3 +351,5 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		end)
 	end
 end)
+
+return nil

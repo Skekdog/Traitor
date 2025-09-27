@@ -26,7 +26,7 @@ local function spectateFunc(action, state)
 			end
 		end
 	end
-	
+
 	if #chars == 0 then
 		uiO.Username.Text = "Nobody to spectate!"
 		return Enum.ContextActionResult.Pass
@@ -34,7 +34,7 @@ local function spectateFunc(action, state)
 
 	camera.CameraType = Enum.CameraType.Track
 	plr.CameraMode = Enum.CameraMode.Classic
-	
+
 	local index: number
 	if action == "Spectate Next" then
 		index = if chars[lastKey + 1] then lastKey + 1 else 1
@@ -43,7 +43,7 @@ local function spectateFunc(action, state)
 	end
 	lastKey = index
 	camera.CameraSubject = chars[index]
-	
+
 	uiO.Username.Text = ((camera.CameraSubject :: Humanoid).Parent :: Instance).Name
 	return Enum.ContextActionResult.Sink
 end
@@ -125,3 +125,5 @@ uiO.CameraMode.Activated:Connect(function()
 	switchCameraMode(if currentCameraMode == "Player" then "Freecam" else "Player")
 end)
 switchCameraMode("Freecam")
+
+return nil

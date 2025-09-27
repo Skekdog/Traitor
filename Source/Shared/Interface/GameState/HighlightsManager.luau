@@ -220,3 +220,5 @@ muteMusicButton.MouseButton1Click:Connect(function()
 	SoundService.RoundEndMusic.Volume = if pause then 0 else 1
 	muteMusicButton.Image = `rbxasset://textures/ui/VoiceChat/SpeakerLight/{if pause then "Muted@3x" else "Unmuted0@3x"}.png`
 end)
+
+return nil

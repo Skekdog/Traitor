@@ -9,6 +9,12 @@ ThemesManager.UpdateTheme("Dark")
 require(script.Parent.Welcome)
 require(script.Parent.GameState.CalledToCorpse)
 
+for _, v in script.Parent.GameState:GetChildren() do
+	if v:IsA("ModuleScript") then
+		(require)(v)
+	end
+end
+
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
 
 if game.PlaceId == PlaceIDs.TestPlace then

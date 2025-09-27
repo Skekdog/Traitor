@@ -47,3 +47,5 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 		console:Unregister()
 	end
 end, true)
+
+return nil

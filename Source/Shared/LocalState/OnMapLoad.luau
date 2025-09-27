@@ -20,3 +20,5 @@ LocalRoundInfo.Map:Connect(function(map)
 	task.wait(5)
 	alertUI:ToggleVisible(false)
 end, true)
+
+return nil

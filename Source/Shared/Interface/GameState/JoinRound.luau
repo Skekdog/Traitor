@@ -38,3 +38,5 @@ end, true)
 participant.Status:Connect(function()
 	this:ToggleVisible(shouldMakeVisible())
 end, true)
+
+return nil
