@@ -9,7 +9,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
-local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
+local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 
 export type BaseCommand = {
 	Name: string,

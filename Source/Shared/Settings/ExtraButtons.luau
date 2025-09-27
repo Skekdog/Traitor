@@ -3,7 +3,9 @@ local Settings = require(script.Parent.Settings)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local SafeTeleport = require(ReplicatedStorage.Shared.Util.SafeTeleport)
 local ConfirmationPrompt = require(ReplicatedStorage.Shared.Interface.Util.ConfirmationPrompt)
-local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
+local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
+local IsTestPlace = require(ReplicatedStorage.Shared.Places.IsTestPlace)
+local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 local SettingsUI = require(script.Parent.SettingsUI)
 
 local function promptTeleport(name: string, placeId: number): ()
@@ -20,17 +22,17 @@ SettingsUI.AddClickButton("Imperium", "Other", "Other Games", "Imperium is a Mon
 	promptTeleport("Imperium", PlaceIDs.Imperium)
 end)
 
-if game.PlaceId == PlaceIDs.TestPlace then
-	SettingsUI.AddClickButton("Main Place", "Other", "Those You Trust", "Return to the main place.", function()
+if IsTestPlace or IsLabs then
+	SettingsUI.AddClickButton("Main Place", "Other", "Traitor Town 3", "Return to the main place.", function()
 		promptTeleport("Main Place", PlaceIDs.MainPlace)
 	end)
-else
-	SettingsUI.AddClickButton("Test Place", "Other", "Those You Trust", "Testing place for new features and updates. Things are likely to break, and may impact main game save data. Join at your own risk!", function()
+elseif not IsLabs then
+	SettingsUI.AddClickButton("Test Place", "Other", "Traitor Town 3", "Testing place for new features and updates. Things are likely to break, and may impact main game save data. Join at your own risk!", function()
 		promptTeleport("Test Place", PlaceIDs.TestPlace)
 	end)
 end
 
-SettingsUI.AddClickButton("View Welcome", "Other", "Those You Trust", nil, function()
+SettingsUI.AddClickButton("View Welcome", "Other", "Traitor Town 3", nil, function()
 	UIManager.WaitForUI("Welcome"):ToggleVisible(true)
 end)
 

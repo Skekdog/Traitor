@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local RoundHandler = require(script.Parent.Parent.RoundHandler)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
-local IsLabs = require(ReplicatedStorage.Shared.Util.IsLabs)
+local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 local module = {}
 

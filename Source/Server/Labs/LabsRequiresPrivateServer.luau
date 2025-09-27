@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local IsLabs = require(ReplicatedStorage.Shared.Util.IsLabs)
+local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 if not IsLabs then
 	return nil

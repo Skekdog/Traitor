@@ -451,7 +451,7 @@ local IssueQueue = ProfileService._issue_queue
 local DataStoreService = game:GetService("DataStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local IsLabs = require(ReplicatedStorage.Shared.Util.IsLabs)
+local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 local PlaceId = game.PlaceId
 local JobId = game.JobId

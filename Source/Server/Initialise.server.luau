@@ -1,7 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 require(ServerScriptService.Labs.LabsRequiresPrivateServer)
-require(ReplicatedStorage.Shared.DevTools.FirstJoinPermissions)
+
+require(ReplicatedStorage.Shared.DevTools.HostPermissions)
 require(script.Parent.Player.SetupPlayer)
 require(script.Parent.PlayerData.SaveData)
 require(script.Parent.Character.RotateHead)

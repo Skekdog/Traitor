@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local IsLabs = require(ReplicatedStorage.Shared.Util.IsLabs)
+local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 if IsLabs then
 	while not workspace:GetAttribute("LabsGreenLight") do
@@ -7,7 +7,7 @@ if IsLabs then
 	end
 end
 
-require(ReplicatedStorage.Shared.DevTools.FirstJoinPermissions)
+require(ReplicatedStorage.Shared.DevTools.HostPermissions)
 
 require(script.Parent.Settings.LoadSettings)
 require(script.Parent.Controls.KeybindHintManager)

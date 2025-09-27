@@ -2,7 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
-local PlaceIDs = require(ReplicatedStorage.Shared.Util.PlaceIDs)
+local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
+local IsTestPlace = require(ReplicatedStorage.Shared.Places.IsTestPlace)
 
 local module = {}
 
@@ -29,7 +30,7 @@ if RunService:IsClient() then
 end
 
 function module.HasRelaxedPermissions(user: number | Player): boolean
-	if game.PlaceId ~= PlaceIDs.TestPlace then
+	if not IsLabs and not IsTestPlace then
 		return false
 	end
 
