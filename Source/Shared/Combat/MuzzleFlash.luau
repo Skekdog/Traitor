@@ -1,4 +1,4 @@
-return function(gun: BasePart): ()
+                    return function(gun: BasePart): ()
     local attachment = gun:FindFirstChild("MuzzleFlash")
     if not attachment or not attachment:IsA("Attachment") then
         return
@@ -9,14 +9,14 @@ return function(gun: BasePart): ()
 
     if not a0 then
         local a = Instance.fromExisting(attachment)
-        a.CFrame *= CFrame.new(0.375, 0.375, 0)
+        a.CFrame *= CFrame.new(0.375, 0.375, 0) * CFrame.Angles(math.rad(0), 0, math.rad(45))
         a.Name = "MuzzleFlash0"
         a.Parent = gun
         a0 = a
     end
     if not a1 then
         local a = Instance.fromExisting(attachment)
-        a.CFrame *= CFrame.new(-0.375, -0.375, 0)
+        a.CFrame *= CFrame.new(-0.375, -0.375, 0) * CFrame.Angles(math.rad(0), 0, math.rad(45))
         a.Name = "MuzzleFlash1"
         a.Parent = gun
         a1 = a
@@ -27,10 +27,10 @@ return function(gun: BasePart): ()
     local beam = Instance.new("Beam")
     beam.Attachment0 = a0
     beam.Attachment1 = a1
-    beam.Transparency = NumberSequence.new(0)
+    beam.Transparency = NumberSequence.new(0.25)
     beam.LightEmission = 1
     beam.Segments = 1
-    beam.TextureSpeed = 0
+    beam.TextureSpeed = math.random(-1, 1)
     beam.Texture = "rbxassetid://872910628"
     beam.Color = ColorSequence.new(Color3.fromRGB(214, 171, 0), Color3.fromRGB(255, 234, 111))
     beam.Name = "MuzzleFlashBeam"
