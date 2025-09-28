@@ -470,7 +470,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 end
 
 local function onDeath(round: Types.Round, victim: Types.Participant, deferVictoryCheck: boolean): ()
-	StandardHighlights.OnDeath(round, victim, deferVictoryCheck)
+	StandardHighlights.OnDeath(round, victim)
 
 	local corpse = victim.Corpse
 

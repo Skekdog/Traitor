@@ -147,7 +147,7 @@ local gamemode: Types.GamemodeDefinition = {
     Roles = roles,
 
     OnDeath = function(round, participant: Types.Participant, deferVictoryCheck: boolean)
-        StandardHighlights.OnDeath(round, participant, deferVictoryCheck)
+        StandardHighlights.OnDeath(round, participant)
 
         local corpse = participant.Corpse
         local attacker = if corpse then corpse.Killer else nil
