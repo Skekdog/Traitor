@@ -356,7 +356,7 @@ if RunService:IsServer() then
 	local ServerScriptService = game:GetService("ServerScriptService")
 	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-local IsNaN = require(ReplicatedStorage.Shared.Util.IsNaN)
+	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 	local Combat = require(ServerScriptService.Combat.Combat)
 
 	local function pickAndRemove<T>(list: {T}): T
@@ -502,7 +502,7 @@ local IsNaN = require(ReplicatedStorage.Shared.Util.IsNaN)
 			return
 		end
 
-		if IsNaN(explodeAtOrWireCut) then
+		if IsBadNumber(explodeAtOrWireCut) then
 			return
 		end
 

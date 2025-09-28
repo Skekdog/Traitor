@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local IsNaN = require(ReplicatedStorage.Shared.Util.IsNaN)
+local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
 ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)
 	local char = plr.Character
@@ -7,7 +7,7 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 		return
 	end
 
-	if typeof(y) ~= "number" or IsNaN(y) then
+	if typeof(y) ~= "number" or IsBadNumber(y) then
 		return
 	end
 
