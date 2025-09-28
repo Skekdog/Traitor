@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
@@ -395,7 +394,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 	local hum = corpse.Model:FindFirstChildOfClass("Humanoid")
 
-	local ropes: {[BasePart]: {{Constraint: RopeConstraint, Attachment0: Attachment}}} = {}
+	local partData: {[BasePart]: {Ropes: {{Constraint: RopeConstraint, Attachment0: Attachment}}?, CFrame: CFrame}} = {}
 	if enable then
 		participant.Extras.CorpseDisguiseData = {
 			Participant = participant,
@@ -405,6 +404,8 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 			if not part:IsA("BasePart") then
 				continue
 			end
+
+			partData[part] = {CFrame = part.CFrame}
 
 			local ropesFolder = part:FindFirstChild("MagnetoRopes")
 			if not ropesFolder then
@@ -421,8 +422,8 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 					continue
 				end
 
-				ropes[part] = ropes[part] or {}
-				table.insert(ropes[part], {
+				partData[part].Ropes = {}
+				table.insert(assert(partData[part].Ropes), {
 					Constraint = constraint:Clone(),
 					Attachment0 = attachment:Clone(),
 				})
@@ -430,19 +431,27 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 		end
 	end
 
+	local originalCFrame = corpse.Model:GetPivot()
 	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, enable, corpse.Model, hum, true)
 
 	local model = MakeRagdoll(participant, corpse.Model.Parent or error("No parent"), corpse.Model)
 	corpse.Model = model
 
 	if model then
+		model:PivotTo(originalCFrame)
 		model:SetAttribute("Unidentified", enable)
 		participant.Round:LoadProp(model)
 
 		if not enable then
-			for part, constraints in ropes do
+			for part, data in partData do
 				local newPart = model:FindFirstChild(part.Name)
-				if not newPart then
+				if not newPart or not newPart:IsA("BasePart") then
+					continue
+				end
+
+				newPart.CFrame = data.CFrame
+
+				if not data.Ropes then
 					continue
 				end
 
@@ -450,19 +459,13 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 				folder.Name = "MagnetoRopes"
 				folder.Parent = newPart
 
-				for _, constraint in constraints do
+				for _, constraint in data.Ropes do
 					constraint.Constraint.Attachment0 = constraint.Attachment0
 					constraint.Attachment0.Parent = newPart
 					constraint.Constraint.Parent = folder
 				end
 			end
 		end
-	end
-end
-
-local function onFinish(round: Types.Round): ()
-	for _, v in Players:GetPlayers() do
-		v:SetAttribute("IsDisguised", false)
 	end
 end
 
@@ -481,6 +484,11 @@ local function onDeath(round: Types.Round, victim: Types.Participant, deferVicto
 			killHighlights(attacker, victim)
 			awardScoreForKill(attacker, victim)
 		end
+
+		task.delay(5, function()
+			assert(round.Gamemode.OnIdentifyCorpse)
+			-- round.Gamemode.OnIdentifyCorpse(round, corpse, victim)
+		end)
 	end
 
 	if deferVictoryCheck then
@@ -602,8 +610,6 @@ local gamemode: Types.GamemodeDefinition = {
 			})
 		end
 	end,
-
-	OnFinish = onFinish,
 }
 
 return gamemode
