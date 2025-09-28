@@ -462,9 +462,6 @@ module.skipphase = {
 	Arguments = {},
 	Execute = function(_, round: Round): string
 		local currentPhase: Types.Phase = round:GetPhase()
-		if currentPhase == "Intermission" then
-			return "Cannot skip intermission phase."
-		end
 
 		round.ElapsedPhaseTime = math.huge
 		RunService.Heartbeat:Wait()

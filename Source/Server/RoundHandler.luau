@@ -169,8 +169,15 @@ local function doMapVote(): ()
     end)
 
     remotes.ServerClient.TriggerMapVote:FireAllClients(true, votableMaps)
-    module.Round():SetPhase("Intermission", INTERMISSION_TIME)
-    task.wait(INTERMISSION_TIME)
+
+    local finished = false
+    module.Round():SetPhase("Intermission", INTERMISSION_TIME, function()
+        finished = true
+    end)
+
+    while not finished do
+        task.wait()
+    end
 
     con:Disconnect()
 
