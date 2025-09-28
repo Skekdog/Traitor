@@ -228,7 +228,7 @@ local GRANT_THRESHOLD = 2
 
 local SUICIDE_CULT_THRESHOLD = 3
 
-function module.OnDeath(round: Types.Round, victim: Types.Participant, _): ()
+function module.OnDeath(round: Types.Round, victim: Types.Participant): ()
 	local corpse = victim.Corpse
 	if not corpse then
 		return

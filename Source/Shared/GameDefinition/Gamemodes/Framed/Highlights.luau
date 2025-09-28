@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
-local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
 
 local Highlights = {}
 
@@ -48,7 +48,7 @@ function Highlights.OnDeath(round: Types.Round, participant: Types.Participant):
 		return
 	end
 
-	StandardHighlights.OnDeath(round, participant, nil)
+	StandardGame.Highlights.OnDeath(round, participant)
 
 	if not round.Extras.FirstBloodAwarded and corpse.Killer and corpse.Killer ~= participant then
 		round.Extras.FirstBloodAwarded = true
