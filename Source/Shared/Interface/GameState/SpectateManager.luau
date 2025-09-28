@@ -55,7 +55,6 @@ participant.Status:Connect(function(status)
 	statusId = thisStatusId
 
 	local isSpectating = status ~= "Alive"
-	print(isCurrentlySpectatingPleaseRefactorThisScript, isSpectating)
 	if isCurrentlySpectatingPleaseRefactorThisScript == isSpectating then
 		return
 	end
