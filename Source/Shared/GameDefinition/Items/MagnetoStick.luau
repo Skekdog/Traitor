@@ -25,7 +25,7 @@ local PUSH_FORCE_PER_UNIT_MASS = 0.75
 local ALIGNMENT_RESPONSIVENESS = 80
 local ALIGNMENT_DEPTH = 6
 local ALIGNMENT_VELOCITY = 100
-local ALIGNMENT_FORCE_MULTIPLIER = 1000
+local ALIGNMENT_FORCE_MULTIPLIER = 2000
 
 local PROP_DAMAGE_TIME = 5
 
@@ -157,7 +157,7 @@ local function canGrab(prop: Types.MapObject): boolean
 		return false
 	end
 	local part = GetPrimaryPart(prop)
-	return (not part:IsGrounded()) and (not prop:GetAttribute("NoGrab")) and isSizeValid(if prop:IsA("Model") then prop:GetExtentsSize() else prop.Size)
+	return (not part:IsGrounded()) and (not prop:GetAttribute("NoGrab")) and isSizeValid(if prop:IsA("Model") then (prop:GetExtentsSize() * if prop:HasTag("Corpse") then 0 else 1) else prop.Size)
 end
 
 local function canPush(prop: Types.MapObject): boolean
@@ -293,7 +293,7 @@ end
 local function clientGrab(part: BasePart): ()
 	local prop = clientGetProp(part)
 	if not prop or not canGrab(prop) then
-		return
+		return print(not prop, if prop then not canGrab(prop) else not nil)
 	end
 
 	grabRemote:FireServer(part)
@@ -346,6 +346,7 @@ end
 local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): ()
 	local part = clientRaycast()
 
+	print(part)
 	if part and clientControl and part == clientControl.Part and clientGetProp(part) == clientControl.Prop then
 		return clientRelease(clientControl.Part)
 	end
@@ -373,6 +374,10 @@ end
 
 local function serverGetPropFromPart(part: unknown): Types.Prop?
 	if typeof(part) ~= "Instance" then
+		return nil
+	end
+
+	if not part.Parent then
 		return nil
 	end
 
