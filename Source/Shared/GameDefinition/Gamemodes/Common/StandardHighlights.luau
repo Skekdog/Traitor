@@ -3,7 +3,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-local function addHighlight(round: Types.Round, highlightParams: Types.Highlight, participant: Types.Participant, ...): ()
+function module.AddHighlight(round: Types.Round, highlightParams: Types.Highlight, participant: Types.Participant, ...): ()
 	local highlight = {
 		Title = highlightParams.Title,
 		Description = highlightParams.Description:format(participant:GetFormattedName(), ...),
@@ -237,33 +237,33 @@ function module.OnDeath(round: Types.Round, victim: Types.Participant, _): ()
 	local attacker = corpse.Killer
 	if attacker == victim then
 		if not round.Extras.SuicideCount then
-			addHighlight(round, suicideHighlight, victim)
+			module.AddHighlight(round, suicideHighlight, victim)
 			round.Extras.SuicideCount = 1
 			round.Extras.FirstSuicide = victim
 		else
 			round.Extras.SuicideCount += 1
 			if round.Extras.SuicideCount >= SUICIDE_CULT_THRESHOLD then
-				addHighlight(round, suicideCultHighlight, round.Extras.FirstSuicide)
+				module.AddHighlight(round, suicideCultHighlight, round.Extras.FirstSuicide)
 			end
 		end
 	end
 
 	if corpse.CorpseView.DamageSource == "Explode" then
 		if attacker == victim then
-			addHighlight(round, fieldResearchHighlight, victim)
+			module.AddHighlight(round, fieldResearchHighlight, victim)
 		elseif attacker then
 			attacker.Extras.ExplosiveKills = (attacker.Extras.ExplosiveKills or 0) + 1
 			if attacker.Extras.ExplosiveKills >= GRANT_THRESHOLD then
-				addHighlight(round, explosivesResearchGrantHighlight, attacker, attacker.Extras.ExplosiveKills)
+				module.AddHighlight(round, explosivesResearchGrantHighlight, attacker, attacker.Extras.ExplosiveKills)
 			end
 		end
 	end
 
 	if corpse.CorpseView.DamageSource == "Fall" then
 		if attacker and attacker ~= victim then
-			addHighlight(round, pushKillHighlight, attacker)
+			module.AddHighlight(round, pushKillHighlight, attacker)
 		elseif not attacker then
-			addHighlight(round, fellHighlight, victim)
+			module.AddHighlight(round, fellHighlight, victim)
 		end
 	end
 
@@ -272,11 +272,11 @@ function module.OnDeath(round: Types.Round, victim: Types.Participant, _): ()
 		local kills = attacker.Extras.BurnKills
 
 		if kills >= BURN_3_THRESHOLD then
-			addHighlight(round, burn3, attacker)
+			module.AddHighlight(round, burn3, attacker)
 		elseif kills >= BURN_2_THRESHOLD then
-			addHighlight(round, burn2, attacker)
+			module.AddHighlight(round, burn2, attacker)
 		elseif kills >= BURN_1_THRESHOLD then
-			addHighlight(round, burn1, attacker)
+			module.AddHighlight(round, burn1, attacker)
 		end
 	end
 
@@ -285,9 +285,9 @@ function module.OnDeath(round: Types.Round, victim: Types.Participant, _): ()
 		local kills = attacker.Extras.CrushKills
 
 		if kills == CRUSH_2_THRESHOLD then
-			addHighlight(round, crush2, attacker, kills)
+			module.AddHighlight(round, crush2, attacker, kills)
 		elseif kills == CRUSH_1_THRESHOLD then
-			addHighlight(round, crush1, attacker, kills)
+			module.AddHighlight(round, crush1, attacker, kills)
 		end
 	end
 
@@ -295,11 +295,11 @@ function module.OnDeath(round: Types.Round, victim: Types.Participant, _): ()
 		attacker.Extras.HeadshotKills = (attacker.Extras.HeadshotKills or 0) + 1
 		local kills = attacker.Extras.HeadshotKills
 		if kills == HEADSHOTS_3_THRESHOLD then
-			addHighlight(round, headshots3, attacker, kills)
+			module.AddHighlight(round, headshots3, attacker, kills)
 		elseif kills == HEADSHOTS_2_THRESHOLD then
-			addHighlight(round, headshots2, attacker, kills)
+			module.AddHighlight(round, headshots2, attacker, kills)
 		elseif kills == HEADSHOTS_1_THRESHOLD then
-			addHighlight(round, headshots1, attacker, kills)
+			module.AddHighlight(round, headshots1, attacker, kills)
 		end
 	end
 
@@ -318,28 +318,28 @@ function module.OnDeath(round: Types.Round, victim: Types.Participant, _): ()
 
 		local killPercent = kills / totalTeammates
 		if kills >= TEAMKILLER_MINIMUM_KILLS and killPercent == 1 then
-			addHighlight(round, teamkiller, attacker)
+			module.AddHighlight(round, teamkiller, attacker)
 		elseif kills >= MORON_MINIMUM_KILLS and killPercent >= 0.5 then
-			addHighlight(round, moron, attacker)
+			module.AddHighlight(round, moron, attacker)
 		elseif kills >= REDNECK_MINIMUM_KILLS and killPercent >= 0.25 then
-			addHighlight(round, redneck, attacker)
+			module.AddHighlight(round, redneck, attacker)
 		elseif kills == 1 then
-			addHighlight(round, oopsie, attacker)
+			module.AddHighlight(round, oopsie, attacker)
 		elseif kills == 2 then
-			addHighlight(round, doubleOops, attacker)
+			module.AddHighlight(round, doubleOops, attacker)
 		elseif kills == 3 then
-			addHighlight(round, karmaConscious, attacker)
+			module.AddHighlight(round, karmaConscious, attacker)
 		elseif kills >= 4 then
-			addHighlight(round, roleplayer, attacker)
+			module.AddHighlight(round, roleplayer, attacker)
 		end
 	end
 
 	if corpse.CorpseView.DamageSource == "Drown" then
-		addHighlight(round, drown, victim)
+		module.AddHighlight(round, drown, victim)
 	end
 
 	if round.ElapsedPhaseTime < HATE_THRESHOLD then
-		addHighlight(round, iHateThisGame, victim)
+		module.AddHighlight(round, iHateThisGame, victim)
 	end
 end
 
@@ -348,11 +348,11 @@ module.OnIdentifyCorpse = function(round: Types.Round, corpse: Types.Corpse, sea
 	local bodies = searcher.Extras.IdentifiedBodies
 
 	if bodies >= BODIES_3_THRESHOLD then
-		addHighlight(round, bodies3, searcher, bodies)
+		module.AddHighlight(round, bodies3, searcher, bodies)
 	elseif bodies >= BODIES_2_THRESHOLD then
-		addHighlight(round, bodies2, searcher, bodies)
+		module.AddHighlight(round, bodies2, searcher, bodies)
 	elseif bodies >= BODIES_1_THRESHOLD then
-		addHighlight(round, bodies1, searcher, bodies)
+		module.AddHighlight(round, bodies1, searcher, bodies)
 	end
 end
 
@@ -373,7 +373,7 @@ module.FinishHighlights = function(round: Types.Round): ()
 		end
 
 		if round.VictoryData.EndedAt - event.Timestamp < PYRRHIC_THRESHOLD then
-			addHighlight(round, pyrrhicVictory, victim)
+			module.AddHighlight(round, pyrrhicVictory, victim)
 		end
 	end
 end
