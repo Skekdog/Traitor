@@ -465,6 +465,21 @@ guns.AWP = {
 
     RecoilX = 0.8,
     RecoilY = 2.5,
+
+    BeforeHitParticipant = ItemKillHighlights(
+		{
+			Title = "Good Job",
+			Description = "%s killed %d people with an AWP.",
+			Priority = 2,
+			Threshold = 1,
+		},
+		{
+			Title = "Challenging Work",
+			Description = "%s killed %d people with an AWP. Possibly out of doors.",
+			Priority = 4,
+			Threshold = 3,
+		}
+	)
 }
 
 guns["Assault Rifle"] = {

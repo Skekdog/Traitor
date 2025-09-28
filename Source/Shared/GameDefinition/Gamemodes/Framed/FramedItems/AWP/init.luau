@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Items = require(ReplicatedStorage.API.StandardGame)
+local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 
 local AWP = {}
 
