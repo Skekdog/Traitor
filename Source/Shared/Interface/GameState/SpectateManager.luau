@@ -55,6 +55,7 @@ participant.Status:Connect(function(status)
 	statusId = thisStatusId
 
 	local isSpectating = status ~= "Alive"
+	print(isCurrentlySpectatingPleaseRefactorThisScript, isSpectating)
 	if isCurrentlySpectatingPleaseRefactorThisScript == isSpectating then
 		return
 	end
@@ -67,6 +68,9 @@ participant.Status:Connect(function(status)
 
 	if isSpectating then
 		task.wait(0.02) -- some bug that's impossible to reproduce where the camera doesn't follow corpse, i'm just gonna guess its because it doesn't parent quickly enough and hope that waiting fixes it
+		if statusId ~= thisStatusId then
+			return -- don't change camera if something else has changed the state
+		end
 		local corpse = workspace.Characters:FindFirstChild(participant.Name)
 		if corpse and corpse:HasTag("Corpse") then
 			local head = corpse:FindFirstChild("Head")
@@ -77,6 +81,10 @@ participant.Status:Connect(function(status)
 					return -- don't change camera if something else has changed the state
 				end
 			end
+		end
+
+		if statusId ~= thisStatusId then
+			return -- don't change camera if something else has changed the state
 		end
 
 		if currentCameraMode == "Player" then

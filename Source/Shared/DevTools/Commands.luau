@@ -512,13 +512,10 @@ module.respawn = {
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if participant then
-				round:RemoveParticipant(participant, true)
-				if participant.Corpse and participant.Corpse.Model then
-					participant.Corpse.Model:Destroy()
-				end
+				participant:SpawnCharacter()
+			else
+				round:AddPlayer(player, KarmaManager.GetKarma(player))
 			end
-
-			round:AddPlayer(player, if participant then participant:GetKarma() else KarmaManager.GetKarma(player))
 		end
 
 		return "Respawned " .. getPlayersString(players) .. "."
