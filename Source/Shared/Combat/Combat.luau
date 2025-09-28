@@ -89,23 +89,24 @@ local lastAmmoConnection: DynamicValue.Connection<typeof(ClientInventory.Ammo:Ge
 
 local function updateCrosshair(isAiming: boolean): ()
 	local item = ClientInventory.EquippedItem()
-	crosshair:ToggleVisible(not not item)
 
-	if not item then
-		return
-	end
-
-	if isAiming and item.Kind == "Gun" and item.Definition.HasScope then
+	if not LocalCharacter.Character() or item and isAiming and item.Kind == "Gun" and item.Definition.HasScope then
 		return crosshair:ToggleVisible(false)
 	end
 
-	local spread = if item.Kind == "Gun" then item.Definition.Spread * 2000 * (if isAiming then item.Definition.AimSpreadMultiplier or 1 else 1) else 0
+	crosshair:ToggleVisible(true)
+
+	local spread = if item and item.Kind == "Gun" then item.Definition.Spread * 2000 * (if isAiming then item.Definition.AimSpreadMultiplier or 1 else 1) else 0
 
 	local value = math.max(24 + (math.round(spread / 2) * 2), 36)
 	for _, v in crosshairFrames do
 		v.Size = UDim2.fromOffset(value, value)
 	end
 end
+
+LocalCharacter.Character:Connect(function()
+	updateCrosshair(Aim.IsAiming())
+end, true)
 
 Aim.IsAiming:Connect(function(isAiming)
 	updateCrosshair(isAiming)
