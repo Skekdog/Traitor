@@ -33,6 +33,18 @@ function Epilogue.Begin(framed: Types.Participant): ()
 		exitCFrame = chosenExit.CFrame * CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))
 	end
 
+	assert(exitCFrame, "Could not find exit")
+
+	local params = RaycastParams.new()
+	params.FilterDescendantsInstances = {round:GetMap().Static}
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.IgnoreWater = true
+	local result = workspace:Raycast(exitCFrame.Position, Vector3.new(0, -10, 0), params)
+
+	if result then
+		exitCFrame = CFrame.new(result.Position) * CFrame.new(0, script.Parent.Escape.Part.Size.X / 2, 0) * CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))
+	end
+
 	remote:FireClient(framed.Player, exitCFrame)
 
 	local char = framed:GetCharacter()
