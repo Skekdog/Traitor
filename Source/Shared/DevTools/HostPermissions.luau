@@ -13,28 +13,51 @@ end
 if RunService:IsClient() then
 	if workspace:GetAttribute("ServerHost") == Players.LocalPlayer.UserId then
 		RelaxedPermissions.GivePermission(Players.LocalPlayer)
-	elseif not workspace:GetAttribute("ServerHost") then
+	elseif not workspace:GetAttribute("ServerHost") and not IsLabs then
 		RelaxedPermissions.GivePermission(Players.LocalPlayer)
 	end
 	return nil
 end
 
-local function set(player: Player): ()
+local function getCurrentHost(): Player?
+	local currentHostId = workspace:GetAttribute("ServerHost")
+	if typeof(currentHostId) == "number" then
+		return Players:GetPlayerByUserId(currentHostId)
+	end
+	return nil
+end
+
+local function trySet(player: Player): ()
+	local currentHost = getCurrentHost()
+	if currentHost then
+		return
+	end
+
+	if IsLabs and game.PrivateServerOwnerId ~= player.UserId then
+		return
+	end
+
 	workspace:SetAttribute("ServerHost", player.UserId)
 	RelaxedPermissions.GivePermission(player)
 end
 
+Players.PlayerRemoving:Connect(function(player)
+	if workspace:GetAttribute("ServerHost") ~= player.UserId then
+		return
+	end
+
+	workspace:SetAttribute("ServerHost", nil)
+	for _, other in Players:GetPlayers() do
+		if other ~= player then
+			trySet(other)
+		end
+	end
+end)
+
 for _, player in Players:GetPlayers() do
-	set(player)
-	break
+	trySet(player)
 end
 
-if not workspace:GetAttribute("ServerHost") then
-	local con: RBXScriptConnection
-	con = Players.PlayerAdded:Connect(function(player)
-		con:Disconnect()
-		set(player)
-	end)
-end
+Players.PlayerAdded:Connect(trySet)
 
 return nil
