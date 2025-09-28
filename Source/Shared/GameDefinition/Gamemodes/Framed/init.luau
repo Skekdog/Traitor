@@ -12,6 +12,7 @@ local Health = require(script.GameState.Health)
 local Mistakes = require(script.GameState.Mistakes)
 local RedHanded = require(script.GameState.RedHanded)
 local Targets = require(script.GameState.Targets)
+local Highlights = require(script.Highlights)
 local Types = require(ReplicatedStorage.API.Types)
 
 require(script.GameState.HighlightCharacter)
@@ -197,11 +198,13 @@ local function OnFinish(round: Types.Round): ()
 	end
 end
 
-local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
+local function OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
 	local corpse = participant.Corpse
 	if not corpse then
 		return
 	end
+
+	Highlights.OnDeath(round, participant)
 
 	local attacker = corpse.Killer
 	if attacker then
@@ -218,8 +221,6 @@ local function OnDeath(_, participant: Types.Participant, defer: boolean): ()
 	if participant:GetRole().Definition ~= framedRole then
 		return
 	end
-
-	local round = participant.Round
 
 	local framedAlive: {Types.Participant} = {}
 	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
@@ -338,6 +339,10 @@ local gamemode: Types.GamemodeDefinition = {
 	AssignRoles = AssignRoles,
 
 	GetRoundEndMusic = getVictoryMusic,
+
+	AddFinishHighlights = function(round)
+		Highlights.AddQuote(round)
+	end,
 
 	OnDeath = OnDeath,
 
