@@ -50,7 +50,7 @@ function Highlights.OnDeath(round: Types.Round, participant: Types.Participant):
 
 	StandardHighlights.OnDeath(round, participant, nil)
 
-	if not round.Extras.FirstBloodAwarded and corpse.Killer then
+	if not round.Extras.FirstBloodAwarded and corpse.Killer and corpse.Killer ~= participant then
 		round.Extras.FirstBloodAwarded = true
 		round:AddHighlight({
 			Title = "First Blood",
