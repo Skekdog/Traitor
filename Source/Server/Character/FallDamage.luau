@@ -1,9 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local IsNaN = require(ReplicatedStorage.Shared.Util.IsNaN)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, velocity: unknown): ()
-    if typeof(velocity) ~= "number" then
+    if typeof(velocity) ~= "number" or IsNaN(velocity) then
         return
     end
 

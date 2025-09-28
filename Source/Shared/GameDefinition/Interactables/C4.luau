@@ -356,6 +356,7 @@ if RunService:IsServer() then
 	local ServerScriptService = game:GetService("ServerScriptService")
 	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
+local IsNaN = require(ReplicatedStorage.Shared.Util.IsNaN)
 	local Combat = require(ServerScriptService.Combat.Combat)
 
 	local function pickAndRemove<T>(list: {T}): T
@@ -498,6 +499,10 @@ if RunService:IsServer() then
 
 	remote.OnServerEvent:Connect(function(player: Player, instance: unknown, action: unknown, explodeAtOrWireCut: unknown): ()
 		if typeof(action) ~= "string" or (typeof(explodeAtOrWireCut) ~= "number" and typeof(explodeAtOrWireCut) ~= "nil") or typeof(instance) ~= "Instance" then
+			return
+		end
+
+		if IsNaN(explodeAtOrWireCut) then
 			return
 		end
 
