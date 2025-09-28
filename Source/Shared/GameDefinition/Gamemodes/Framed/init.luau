@@ -148,7 +148,7 @@ local function OnStart(round: Types.Round): ()
 	for _, participant in framed do
 		local char = participant:GetCharacter()
 		if char then
-			FaceIt.FaceIt(char)
+			FaceIt.FaceIt(round, char)
 		end
 
 		local hum = participant:GetHumanoid()

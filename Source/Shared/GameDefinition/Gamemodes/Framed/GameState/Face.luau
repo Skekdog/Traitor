@@ -1,5 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Types = require(ReplicatedStorage.API.Types)
 
-local faces = {
+local FACES = {
 	7058424,
 	129157225,
 	8056256,
@@ -78,8 +80,8 @@ local faces = {
 	33545586,
 }
 
-local function getRandomFace(): string
-	return "rbxassetid://" .. faces[math.random(#faces)]
+local function popRandomFace(faces: {number}): string
+	return "rbxassetid://" .. (table.remove(faces, math.random(#faces)) or error("No available faces"))
 end
 
 local function GetFaceInstance(char: Model): Decal?
@@ -96,12 +98,15 @@ local function GetFaceInstance(char: Model): Decal?
 	return face
 end
 
-local function FaceIt(char: Model): ()
+local function FaceIt(round: Types.Round, char: Model): ()
 	local face = GetFaceInstance(char)
 	if not face then
 		return
 	end
-	face.Texture = getRandomFace()
+
+	local faces = round.Extras.Faces or table.clone(FACES)
+	round.Extras.Faces = faces
+	face.Texture = popRandomFace(faces)
 end
 
 return {
