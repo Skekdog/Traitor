@@ -1,3 +1,11 @@
 {
-	"className": "ChatWindowConfiguration"
+	"className": "ChatWindowConfiguration",
+	"properties": {
+		"FontFace": {
+			"family": "rbxasset://fonts/families/BuilderSans.json",
+			"weight": "Regular",
+			"style": "Normal"
+		},
+		"TextSize": 18
+	}
 }
