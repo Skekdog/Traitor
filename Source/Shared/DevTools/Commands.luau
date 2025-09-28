@@ -547,8 +547,12 @@ module.forcegamemode = {
 	Execute = function(_, round: Round, args: Args): string
 		local CustomGamemode = require(ServerScriptService.Labs.CustomGamemode)
 		local gamemodeName = processStringArgument(args[1])
+
+		local RoundHandler = require(ServerScriptService.RoundHandler)
+
 		if not gamemodeName then
-			return "Missing argument 1 gamemode name / asset id."
+			RoundHandler.TrySetForcedGamemode()
+			return "Unset forced gamemode."
 		end
 
 		local assetId = processNumberArgument(gamemodeName)
@@ -557,7 +561,6 @@ module.forcegamemode = {
 			return `Set forced gamemode to asset ID {assetId}. Note: gamemodes will not load until the next round.`
 		end
 
-		local RoundHandler = require(ServerScriptService.RoundHandler)
 		local result = RoundHandler.TrySetForcedGamemode(gamemodeName)
 
 		return if result then `Set forced gamemode to {gamemodeName}. Note: gamemodes will not load until the next round.` else `Gamemode {gamemodeName} not found.`

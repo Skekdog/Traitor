@@ -88,7 +88,7 @@ local forcedGamemode = nil :: Types.GamemodeDefinition?
 
 function module.TrySetForcedGamemode(gamemode: string?): boolean
     if not gamemode then
-        module.ForcedGamemode = nil
+        forcedGamemode = nil
         return true
     end
 
