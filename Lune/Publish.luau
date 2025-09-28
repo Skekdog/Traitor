@@ -8,17 +8,30 @@ local baseUrl = "https://apis.roblox.com/universes/v1/{universeId}/places/{place
 assert(fs.isFile(".env"), "Missing .env file")
 local env = serde.decode("toml", fs.readFile(".env"))
 
-local NAME = "Those You Trust"
+local NAME = "TT3"
+
+local STANDARD_UNIVERSE_ID = 1031123722
 
 local MAIN_PLACE_ID = 2848381272
 local TEST_PLACE_ID = 70750259318059
 
+local LABS_PLACE_ID = 118757439615813
+local LABS_UNIVERSE_ID = 8817594273
+
 local place = process.args[1]
-assert(place == "main" or place == "test", `Invalid place: {place}. Expected "main" or "test".`)
+assert(place == "main" or place == "test" or place == "labs", `Invalid place: {place}. Expected "main", "test", or "labs".`)
 
-local placeId = if process.args[1] == "main" then MAIN_PLACE_ID else TEST_PLACE_ID
+local placeId =
+	if process.args[1] == "main" then
+		MAIN_PLACE_ID
+	elseif process.args[1] == "test" then
+		TEST_PLACE_ID
+	elseif process.args[1] == "labs" then
+		LABS_PLACE_ID
+	else
+		error("what")
 
-local UNIVERSE = 1031123722
+local UNIVERSE = if placeId == LABS_PLACE_ID then LABS_UNIVERSE_ID else STANDARD_UNIVERSE_ID
 local API_KEY = env.APIKEY or error("Missing APIKEY in .env")
 
 local PROJECT_FILE_PATH = "default.project.json"
