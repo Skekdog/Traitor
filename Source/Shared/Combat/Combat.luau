@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
@@ -11,6 +12,7 @@ local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInf
 local Aim = require(script.Parent.Aim)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local CombatTypes = require(script.Parent.CombatTypes)
 local HitSounds = require(script.Parent.HitSounds)
@@ -335,6 +337,9 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 						local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.PrimaryFire:InvokeServer(request)
 						if result ~= "Success" and result ~= "PreGame" then
 							warn("Hit rejected:", result)
+							if Settings.GetSetting("Show Hit Rejects") then
+								ScreenMessage("Hit rejected: " .. result, "Warn")
+							end
 						end
 					end)
 				end

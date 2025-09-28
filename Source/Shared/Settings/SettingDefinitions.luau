@@ -111,6 +111,15 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Show Hit Rejects",
+	Tab = "Display",
+	Category = "Debug",
+	Kind = "Boolean" :: "Boolean",
+	Default = false,
+	Tooltip = "Display an on-screen warning when a hit is rejected.",
+})
+
+table.insert(availableSettings, {
 	Name = "Animate UI Transitions",
 	Tab = "Display",
 	Category = "User Interface",
