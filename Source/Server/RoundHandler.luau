@@ -2,12 +2,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
+local GamemodeValidation = require(ReplicatedStorage.Shared.RoundRule.GamemodeValidation)
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 local ScoreManager = require(ServerScriptService.Player.ScoreManager)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
+
+local EXCLUDED_GAMEMODES: {Instance} = {
+    ReplicatedStorage.Shared.GameDefinition.Gamemodes.Elimination
+}
 
 Round.Config.DeathSounds = DeathSounds
 
@@ -72,12 +77,12 @@ function module.UpdateLoadedGamemodes(): ()
             continue
         end
 
-        if v.Name == "Elimination" then
+        if table.find(EXCLUDED_GAMEMODES, v) then
             continue
         end
 
         for i = 1, if v.Name == "ThoseYouTrust" then 4 else 1 do
-            table.insert(gamemodes, (require)(v))
+            table.insert(gamemodes, GamemodeValidation.ValidateGamemodeScript(v))
         end
     end
 end
