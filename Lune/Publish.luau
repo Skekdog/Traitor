@@ -37,8 +37,8 @@ local API_KEY = env.APIKEY or error("Missing APIKEY in .env")
 local PROJECT_FILE_PATH = "default.project.json"
 
 local outputName = NAME .. ".rbxl"
-local buildResult = process.exec("rojo", {"build", "--output", outputName, PROJECT_FILE_PATH})
-assert(buildResult.ok, buildResult.stderr)
+local executionResult = process.exec("rojo", {"build", "--output", outputName, PROJECT_FILE_PATH})
+assert(executionResult.ok, executionResult.stderr)
 
 local outputFile = fs.readFile(outputName)
 
