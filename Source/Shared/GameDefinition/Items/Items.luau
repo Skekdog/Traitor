@@ -138,7 +138,7 @@ guns.HUGE = {
     MagazineSize = 250,
 
     Projectile = bullet,
-    ProjectileSpeed = 140,
+    ProjectileSpeed = 280,
 
     Model = models("HUGE"),
     HoldAnimation = "rbxassetid://12498608892",
@@ -265,7 +265,7 @@ guns.Pistol = {
     ),
 
     Projectile = bullet,
-    ProjectileSpeed = 100,
+    ProjectileSpeed = 250,
 
     RecoilX = 0.2,
     RecoilY = 1.0,
@@ -397,7 +397,7 @@ guns.SMG = {
     ReloadSound = reloadSounds("SMG"),
 
     Projectile = bullet,
-    ProjectileSpeed = 140,
+    ProjectileSpeed = 280,
 
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
@@ -461,7 +461,7 @@ guns.AWP = {
     AttackSound = firedSounds("AWP"),
 
     Projectile = bullet,
-    ProjectileSpeed = 300,
+    ProjectileSpeed = 600,
 
     RecoilX = 0.8,
     RecoilY = 2.5,
@@ -499,7 +499,7 @@ guns["Assault Rifle"] = {
     ReloadSound = reloadSounds("Assault Rifle"),
 
     Projectile = bullet,
-    ProjectileSpeed = 150,
+    ProjectileSpeed = 250,
 
     RecoilX = 0.6,
     RecoilY = 1.5,
@@ -557,7 +557,7 @@ guns["Silenced Pistol"] = {
     ReloadSound = reloadSounds("Silenced Pistol"),
 
     Projectile = projectiles("SilencedBullet"),
-    ProjectileSpeed = 100,
+    ProjectileSpeed = 250,
 
     IsSilent = true,
     BeforeHitParticipant = ItemKillHighlights(
@@ -606,7 +606,7 @@ guns.XM1014 = {
     BulletsPerShot = 6,
 
     Projectile = bullet,
-    ProjectileSpeed = 150,
+    ProjectileSpeed = 220,
 
     Model = models("XM1014"),
     HoldAnimation = "rbxassetid://11436160569",
@@ -665,7 +665,7 @@ guns.Glock = {
     ReloadSound = reloadSounds("Glock"),
 
     Projectile = bullet,
-    ProjectileSpeed = 190,
+    ProjectileSpeed = 280,
 
     RecoilX = 0.2,
     RecoilY = 0.8,
@@ -696,7 +696,7 @@ guns.Deagle = {
     AmmoType = Ammo.Deagle,
 
     Projectile = bullet,
-    ProjectileSpeed = 190,
+    ProjectileSpeed = 450,
 
     Model = models("Deagle"),
     HoldAnimation = "rbxassetid://9253211833",
@@ -755,7 +755,7 @@ guns.UMP = {
     ReloadSound = reloadSounds("UMP"),
 
     Projectile = bullet,
-    ProjectileSpeed = 150,
+    ProjectileSpeed = 250,
 
     OnHitClient = Discombobulate,
 
@@ -797,7 +797,7 @@ guns.BAR = {
     ReloadSound = reloadSounds("BAR"),
 
     Projectile = bullet,
-    ProjectileSpeed = 120,
+    ProjectileSpeed = 280,
 
     AimFOV = 65,
     AimSpreadMultiplier = 0.2,

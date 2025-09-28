@@ -219,7 +219,7 @@ local item: Types.GunWeaponDefinition = {
     AttackSound = firedSounds("Flare Gun"),
 
     Projectile = projectiles("Flare"),
-    ProjectileSpeed = 140,
+    ProjectileSpeed = 280,
 
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
