@@ -17,3 +17,13 @@ require(ReplicatedStorage.Compat.InitialiseCompat)
 require(script.Parent.ServerCommandExecute)
 require(ReplicatedStorage.Shared.SetDefaultSoundGroup)
 require(script.Parent.Combat.CombatEvents)
+require(script.Parent.Logging)
+
+task.wait(5)
+warn("hi this is a warning")
+
+function a()
+error("AHHH ERROR") end
+
+function b() a() end
+b()
