@@ -4,21 +4,27 @@ local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamem
 
 local Highlights = {}
 
+local function format(text: string, role: "Police" | "Framed" | "Undercover"): string
+	local colour = if role == "Police" then Color3.fromRGB(16, 108, 172) elseif role == "Framed" then Color3.fromRGB(200, 44, 28) else Color3.fromRGB(40, 140, 36)
+	return `<font color='#{colour:ToHex()}'>{text}</font>`
+end
+
 local QUOTES = {
 	Police = {
-		"The situation is under control. All spies were captured!",
-		"After the Police were sent in to a local party to stop a spy,\nit was discovered that EVERY partygoer was a spy.",
-		"The Police successfully stopped the violence at a party this evening.",
-		"The local Police force was able to control the situation.",
-		"The Police caught several spies Red-Handed this evening.",
-		"Thanks to the help of undercover cops, the Police cracked down\non several spies today.",
+		`The situation is under control. All spies were captured!`,
+		`After the {format("Police", "Police")} were sent in to a local party to stop a spy,\nit was discovered that EVERY partygoer was a spy.`,
+		`The {format("Police", "Police")} successfully stopped the violence at a party this evening.`,
+		`The local {format("Police", "Police")} force was able to control the situation.`,
+		`The {format("Police", "Police")} caught several spies red-handed this evening.`,
+		`Thanks to the help of {format("Undercover", "Undercover")} cops, the {format("Police", "Police")} cracked down\non several spies today.`,
 	},
+
 	Framed = {
-		"Many are considering that a local resident was only framed for his crimes.",
-		"A local resident escaped from the Police today. His innocence is in question.",
-		"After receiving a tip from an agent, the Police think a local 'spy' may only be Framed.",
-		"'I never do nothing wrong, but I always get Framed', claims local resident.",
-		"Upper-class resident escaped Police this evening at a dangerous party.",
+		`Many are considering that a local resident was only {format("Framed", "Framed")} for his crimes.`,
+		`A local resident escaped from the {format("Police", "Police")} today. His innocence is in question.`,
+		`After receiving a tip from an agent, the {format("Police", "Police")} think a local spy may only be {format("Framed", "Framed")}.`,
+		`"I never do nothing wrong, but I always get {format("Framed", "Framed")}," claims local resident.`,
+		`Upper-class resident escaped {format("Police", "Police")} this evening at a dangerous party.`,
 	},
 }
 
