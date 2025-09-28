@@ -6,7 +6,15 @@ task.spawn(function()
 	while true do
 		task.wait()
 		local round = RoundHandler.Round()
-		local map = round:GetMap()
+
+		local success, map = pcall(round.GetMap, round)
+		-- this sometimes throws an error when we skip the intermission phase.
+		-- I know why it does that, it's because we task.defer the new round,
+		-- but that's needed because of some stupid bullshit with how scripts load
+		if not success then
+			return
+		end
+
 		if not map.Definition.Extras or not map.Definition.Extras.CompatibilityMode then
 			continue
 		end
