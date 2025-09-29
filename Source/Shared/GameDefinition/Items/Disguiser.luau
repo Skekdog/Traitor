@@ -26,6 +26,7 @@ DISGUISED_DESCRIPTION.Pants = DISGUISED_PANTS
 type ParticipantData = {
 	Participant: Types.Participant,
 	HumanoidDescription: HumanoidDescription?,
+	CharacterDestroyingConnection: RBXScriptConnection?,
 }
 
 local serverParticipantTable: {[Player]: ParticipantData?} = {}
@@ -65,6 +66,16 @@ function module.DisguiseServer(participantData: ParticipantData, enable: boolean
 	char = char or participant:GetCharacter()
 	if not char then
 		return
+	end
+
+	if not participantData.CharacterDestroyingConnection then
+		participantData.CharacterDestroyingConnection = char.Destroying:Once(function()
+			if participant.Player:GetAttribute("IsDisguised") then
+				participant.Player:SetAttribute("IsDisguised", false)
+			end
+			participantData.HumanoidDescription = nil
+			participantData.CharacterDestroyingConnection = nil
+		end)
 	end
 
 	hum.ApplyDescriptionFinished:Once(function()
