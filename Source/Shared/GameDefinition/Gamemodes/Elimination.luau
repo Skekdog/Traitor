@@ -110,7 +110,7 @@ local gamemode: Types.GamemodeDefinition = {
     Name = "Elimination",
     Description = "Last player standing wins",
 
-    Authors = "@Scelly_Dog",
+    Authors = "@Skekdogs",
 
     MinimumPlayers = 1,
 
