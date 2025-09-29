@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Epilogue = require(script.GamePhase.Epilogue)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
@@ -17,7 +18,15 @@ local Types = require(ReplicatedStorage.API.Types)
 
 require(script.GameState.HighlightCharacter)
 
+if RunService:IsClient() then
+	require(script.GameState.Mirror)
+end
+
 local RED_HANDED_ITEMS = {"Magneto Stick"}
+
+local function isItemIllegal(item: Types.AnyItem): boolean
+	return item.Kind ~= "Item" or table.find(RED_HANDED_ITEMS, item.Definition.Name) ~= nil
+end
 
 local framedItems = {}
 for i, v in StandardGame.GetItems() do
@@ -55,7 +64,7 @@ local framedRole: Types.RoleDefinition = {
 	Allegiance = {Kind = "Solo"},
 
 	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"], Items.Radar, Items.Intel},
-	StartingItems = {Items.TargetChecker},
+	StartingItems = {Items.TargetChecker, Items.Mirror},
 
 	RevealedRoles = {"Police"},
 	HighlightedRoles = {"Police"},
@@ -192,7 +201,7 @@ local function OnFinish(round: Types.Round): ()
 
 	for _, participant in round:GetParticipants() do
 		local item = participant:GetEquippedItem()
-		if item and item.Kind ~= "Item" then
+		if item and isItemIllegal(item) then
 			RedHanded.StopImmediately(participant)
 		end
 	end
@@ -242,7 +251,7 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 end
 
 local function OnItemEquipped(_, participant: Types.Participant, item: Types.AnyItem, equipped: boolean): ()
-	if (item.Kind == "Item" and not table.find(RED_HANDED_ITEMS, item.Definition.Name)) or not participant.Round:IsInProgress() or participant:GetRole().Definition ~= framedRole then
+	if not isItemIllegal(item) or not participant.Round:IsInProgress() or participant:GetRole().Definition ~= framedRole then
 		return
 	end
 
