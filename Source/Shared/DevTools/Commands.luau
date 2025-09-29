@@ -478,7 +478,7 @@ module.pause = {
 	Environment = "Server" :: "Server",
 	Arguments = {},
 	Execute = function(_, round: Types.Round)
-		if round:GetPhase() == "Intermission" or round:GetPhase() == "Waiting" then
+		if round:GetPhase() == "Waiting" then
 			return "Cannot pause during intermission or waiting phase."
 		end
 
