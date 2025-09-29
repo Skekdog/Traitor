@@ -99,6 +99,11 @@ local function createFace(head: BasePart): ImageLabel
 		faceControls:Destroy()
 	end
 
+	local face = head:FindFirstChild("face")
+	if face and face:IsA("Decal") then
+		face:Destroy()
+	end
+
 	local gui = Instance.new("SurfaceGui")
 	gui.PixelsPerStud = 10000
 	gui.Adornee = head
