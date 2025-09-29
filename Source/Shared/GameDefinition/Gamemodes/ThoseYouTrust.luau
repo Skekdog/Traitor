@@ -395,11 +395,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 	local hum = corpse.Model:FindFirstChildOfClass("Humanoid")
 
 	local partData: {[BasePart]: {Ropes: {{Constraint: RopeConstraint, Attachment0: Attachment}}?, CFrame: CFrame}} = {}
-	if enable then
-		participant.Extras.CorpseDisguiseData = {
-			Participant = participant,
-		}
-	else
+	if not enable then
 		for _, part in corpse.Model:GetChildren() do
 			if not part:IsA("BasePart") then
 				continue
@@ -431,15 +427,17 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 		end
 	end
 
+	local isUnidentified = corpse.Model:GetAttribute("Unidentified")
+
 	local originalCFrame = corpse.Model:GetPivot()
-	Disguiser.DisguiseServer(participant.Extras.CorpseDisguiseData, enable, corpse.Model, hum, true)
+	Disguiser.DisguiseServer(participant, enable, corpse.Model, hum, true)
 
 	local model = MakeRagdoll(participant, corpse.Model.Parent or error("No parent"), corpse.Model)
 	corpse.Model = model
 
 	if model then
 		model:PivotTo(originalCFrame)
-		model:SetAttribute("Unidentified", enable)
+		model:SetAttribute("Unidentified", isUnidentified)
 		participant.Round:LoadProp(model)
 
 		if not enable then
@@ -540,7 +538,7 @@ local gamemode: Types.GamemodeDefinition = {
 			StandardHighlights.OnIdentifyCorpse(round, corpse, searcher)
 		end
 
-		if corpse.Participant.Extras.CorpseDisguiseData then
+		if corpse.Model and corpse.Model:GetAttribute("IsDisguised") then
 			disguiseCorpse(corpse.Participant, corpse, false)
 		end
 	end,

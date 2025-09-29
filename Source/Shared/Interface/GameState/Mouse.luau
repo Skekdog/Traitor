@@ -23,7 +23,7 @@ function module.ShowPlayerInfo(char: Model)
         return
     end
 
-	if plr:GetAttribute("IsDisguised") then
+	if char:GetAttribute("IsDisguised") then
 		return
 	end
 
