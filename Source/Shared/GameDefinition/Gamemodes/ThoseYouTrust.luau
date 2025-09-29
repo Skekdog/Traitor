@@ -484,11 +484,6 @@ local function onDeath(round: Types.Round, victim: Types.Participant, deferVicto
 			killHighlights(attacker, victim)
 			awardScoreForKill(attacker, victim)
 		end
-
-		task.delay(5, function()
-			assert(round.Gamemode.OnIdentifyCorpse)
-			-- round.Gamemode.OnIdentifyCorpse(round, corpse, victim)
-		end)
 	end
 
 	if deferVictoryCheck then
