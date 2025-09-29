@@ -37,7 +37,7 @@ end
 
 local function isPartValid(part: BasePart): boolean
 	local prop = GetMapObjectWithTag(part, "Prop")
-	return if prop then NewtonLauncher.CanFling(GetPrimaryPart(prop)) else false
+	return if prop then NewtonLauncher.CanFling(GetPrimaryPart(prop)) and not prop:HasTag("Interactable") else false
 end
 
 local function clientThing(): boolean
@@ -84,6 +84,7 @@ local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop | Types.
 	assert(params.Attacker)
 
 	if hitProp.Kind ~= "Prop" then
+		print(hitProp)
 		return false
 	end
 
