@@ -394,7 +394,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 	local hum = corpse.Model:FindFirstChildOfClass("Humanoid")
 
-	local partData: {[BasePart]: {Ropes: {{Constraint: RopeConstraint, Attachment0: Attachment}}?, CFrame: CFrame}} = {}
+	local partData: {[BasePart]: {Rope: {Constraint: RopeConstraint, Attachment0: Attachment}?, CFrame: CFrame}} = {}
 	if not enable then
 		for _, part in corpse.Model:GetChildren() do
 			if not part:IsA("BasePart") then
@@ -403,26 +403,12 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 			partData[part] = {CFrame = part.CFrame}
 
-			local ropesFolder = part:FindFirstChild("MagnetoRopes")
-			if not ropesFolder then
-				continue
-			end
-
-			for _, constraint in ropesFolder:GetChildren() do
-				if not constraint:IsA("RopeConstraint") then
-					continue
-				end
-
-				local attachment = constraint.Attachment0
-				if not attachment then
-					continue
-				end
-
-				partData[part].Ropes = {}
-				table.insert(assert(partData[part].Ropes), {
-					Constraint = constraint:Clone(),
-					Attachment0 = attachment:Clone(),
-				})
+			local rope = part:FindFirstChild("MagnetoRope")
+			if rope and rope:IsA("RopeConstraint") and rope.Attachment0 then
+				partData[part].Rope = {
+					Constraint = rope:Clone(),
+					Attachment0 = rope.Attachment0:Clone(),
+				}
 			end
 		end
 	end
@@ -449,18 +435,10 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 				newPart.CFrame = data.CFrame
 
-				if not data.Ropes then
-					continue
-				end
-
-				local folder = newPart:FindFirstChild("MagnetoRopes") or Instance.new("Folder") :: Instance
-				folder.Name = "MagnetoRopes"
-				folder.Parent = newPart
-
-				for _, constraint in data.Ropes do
-					constraint.Constraint.Attachment0 = constraint.Attachment0
-					constraint.Attachment0.Parent = newPart
-					constraint.Constraint.Parent = folder
+				if data.Rope then
+					data.Rope.Constraint.Attachment0 = data.Rope.Attachment0
+					data.Rope.Constraint.Parent = newPart
+					data.Rope.Attachment0.Parent = newPart
 				end
 			end
 		end
