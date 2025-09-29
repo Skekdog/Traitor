@@ -61,18 +61,18 @@ function TargetsClient.Set(): ()
 		return
 	end
 
-	local face = Face.GetFaceInstance(char)
-	if not face then
-		return
-	end
-
 	local head = char:FindFirstChild("Head")
 	if not head or not head:IsA("BasePart") then
 		return
 	end
 
+	local face = Face.GetInstance(head)
+	if not face then
+		return
+	end
+
 	label.Visible = true
-	label.Image = face.Texture
+	label.Image = face.Image
 	label.BackgroundColor3 = head.Color
 end
 

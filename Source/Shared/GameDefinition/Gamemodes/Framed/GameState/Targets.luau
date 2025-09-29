@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Face = require(script.Parent.Face)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
-local FaceIt = require(script.Parent.Parent.GameState.Face)
 local FramedNotification = require(script.Parent.Parent.Interface.FramedNotification)
 local Types = require(ReplicatedStorage.API.Types)
 
@@ -25,18 +25,18 @@ function Targets.AssignTarget(participant: Types.Participant, target: Types.Part
 			return
 		end
 
-		local face = FaceIt.GetFaceInstance(targetChar)
-		if not face then
-			return
-		end
-
 		local head = targetChar:FindFirstChild("Head")
 		if not head or not head:IsA("BasePart") then
 			return
 		end
 
+		local face = Face.GetInstance(head)
+		if not face then
+			return
+		end
+
 		remote:FireClient(participant.Player, target.Player.Name)
-		model.TargetChecker.ImageLabel.Image = face.Texture
+		model.TargetChecker.ImageLabel.Image = face.Image
 		model.TargetChecker.ImageLabel.BackgroundColor3 = head.Color
 	end
 end

@@ -1,13 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Face = require(script.Parent.Face)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
 local MirrorUI = script.Parent.MirrorUI
 
 MirrorUI.Parent = Players.LocalPlayer.PlayerGui :: any
 
-local function set(face: Decal, head: BasePart): ()
-	MirrorUI.ImageLabel.Image = face.Texture
+local function set(face: Face.FaceInstance, head: BasePart): ()
+	MirrorUI.ImageLabel.Image = Face.GetInstance(head).Image
 	if MirrorUI.Adornee then
 		assert(MirrorUI.Adornee:IsA("BasePart"))
 		MirrorUI.Adornee.Color = head.Color
@@ -20,13 +21,21 @@ LocalCharacter.Head:Connect(function(head)
 		return
 	end
 
-	local face = head:WaitForChild("face")
-	assert(face:IsA("Decal"))
+	local face = Face.GetInstance(head)
+	if not face then
+		return
+	end
 
 	set(face, head)
-	face:GetPropertyChangedSignal("Texture"):Connect(function()
-		set(face, head)
-	end)
+	if face:IsA("ImageLabel") then
+		face:GetPropertyChangedSignal("Image"):Connect(function()
+			set(face, head)
+		end)
+	elseif face:IsA("Decal") then
+		face:GetPropertyChangedSignal("Texture"):Connect(function()
+			set(face, head)
+		end)
+	end
 	head:GetPropertyChangedSignal("Color"):Connect(function()
 		set(face, head)
 	end)

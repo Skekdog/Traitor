@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.API.Types)
 
 local FACES = {
@@ -80,36 +81,57 @@ local FACES = {
 	33545586,
 }
 
+local Face = {}
+
 local function popRandomFace(faces: {number}): string
 	return "rbxassetid://" .. (table.remove(faces, math.random(#faces)) or error("No available faces"))
 end
 
-local function GetFaceInstance(char: Model): Decal?
-	local head = char:FindFirstChild("Head")
-	if not head or not head:IsA("BasePart") then
-		return nil
+export type FaceInstance = Decal | ImageLabel
+
+local function createFace(head: BasePart): ImageLabel
+	if head:IsA("MeshPart") then
+		head.TextureContent = Content.none
 	end
 
-	local face = head:FindFirstChild("face")
-	if not face or not face:IsA("Decal") then
-		return nil
+	local faceControls = head:FindFirstChildWhichIsA("FaceControls")
+	if faceControls then
+		faceControls:Destroy()
 	end
 
-	return face
+	local gui = Instance.new("SurfaceGui")
+	gui.PixelsPerStud = 10000
+	gui.Adornee = head
+	gui.Enabled = true
+	gui.Name = "FaceUI"
+
+	local image = Instance.new("ImageLabel")
+	image.Size = UDim2.fromScale(1, 1)
+	image.Name = "Image"
+	image.BackgroundTransparency = 1
+	image.Parent = gui
+
+	gui.Parent = head
+
+	return image
 end
 
-local function FaceIt(round: Types.Round, char: Model): ()
-	local face = GetFaceInstance(char)
+function Face.GetInstance(head: BasePart): ImageLabel
+	local face = if RunService:IsClient() then head:WaitForChild("FaceUI", 1000) else head:FindFirstChild("FaceUI")
 	if not face then
-		return
+		return createFace(head)
 	end
+
+	return face:FindFirstChildWhichIsA("ImageLabel") or error("Malformed face")
+end
+
+function Face.SetFace(round: Types.Round, head: BasePart): ()
+	local face = Face.GetInstance(head)
 
 	local faces = round.Extras.Faces or table.clone(FACES)
 	round.Extras.Faces = faces
-	face.Texture = popRandomFace(faces)
+
+	face.Image = popRandomFace(faces)
 end
 
-return {
-	FaceIt = FaceIt,
-	GetFaceInstance = GetFaceInstance,
-}
+return Face

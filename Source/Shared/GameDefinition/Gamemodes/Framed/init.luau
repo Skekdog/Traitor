@@ -4,7 +4,7 @@ local Epilogue = require(script.GamePhase.Epilogue)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
-local FaceIt = require(script.GameState.Face)
+local Face = require(script.GameState.Face)
 local FramedItems = require(script.FramedItems)
 local FramedNotification = require(script.Interface.FramedNotification)
 local GetRelation = require(script.Roles.GetRelation)
@@ -158,7 +158,10 @@ local function OnStart(round: Types.Round): ()
 	for _, participant in framed do
 		local char = participant:GetCharacter()
 		if char then
-			FaceIt.FaceIt(round, char)
+			local head = char:FindFirstChild("Head")
+			if head and head:IsA("BasePart") then
+				Face.SetFace(round, head)
+			end
 		end
 
 		local hum = participant:GetHumanoid()
