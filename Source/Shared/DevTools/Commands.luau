@@ -479,7 +479,7 @@ module.pause = {
 	Arguments = {},
 	Execute = function(_, round: Types.Round)
 		if round:GetPhase() == "Waiting" then
-			return "Cannot pause during intermission or waiting phase."
+			return "Cannot pause during waiting phase."
 		end
 
 		round:Pause(not round:IsPaused())
