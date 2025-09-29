@@ -293,7 +293,7 @@ end
 local function clientGrab(part: BasePart): ()
 	local prop = clientGetProp(part)
 	if not prop or not canGrab(prop) then
-		return print(not prop, if prop then not canGrab(prop) else not nil)
+		return
 	end
 
 	grabRemote:FireServer(part)
@@ -346,7 +346,6 @@ end
 local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): ()
 	local part = clientRaycast()
 
-	print(part)
 	if part and clientControl and part == clientControl.Part and clientGetProp(part) == clientControl.Prop then
 		return clientRelease(clientControl.Part)
 	end
