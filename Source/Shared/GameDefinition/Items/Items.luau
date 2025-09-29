@@ -469,9 +469,15 @@ guns.AWP = {
     BeforeHitParticipant = ItemKillHighlights(
 		{
 			Title = "Good Job",
-			Description = "%s killed %d people with an AWP.",
+			Description = "%s killed 1 person with an AWP.",
 			Priority = 2,
 			Threshold = 1,
+		},
+        {
+			Title = "Good Job",
+			Description = "%s killed %d people with an AWP.",
+			Priority = 3,
+			Threshold = 2,
 		},
 		{
 			Title = "Challenging Work",
