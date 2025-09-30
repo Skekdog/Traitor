@@ -396,43 +396,39 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 	local hum = model:FindFirstChildOfClass("Humanoid")
 
 	local partData: {[BasePart]: {Rope: {Constraint: RopeConstraint, Attachment0: Attachment}?, CFrame: CFrame}} = {}
-	if not enable then
-		for _, part in model:GetChildren() do
-			if not part:IsA("BasePart") then
-				continue
-			end
+	for _, part in model:GetChildren() do
+		if not part:IsA("BasePart") then
+			continue
+		end
 
-			partData[part] = {CFrame = part.CFrame}
+		partData[part] = {CFrame = part.CFrame}
 
-			local rope = part:FindFirstChild("MagnetoRope")
-			if rope and rope:IsA("RopeConstraint") and rope.Attachment0 then
-				partData[part].Rope = {
-					Constraint = rope:Clone(),
-					Attachment0 = rope.Attachment0:Clone(),
-				}
-			end
+		local rope = part:FindFirstChild("MagnetoRope")
+		if rope and rope:IsA("RopeConstraint") and rope.Attachment0 then
+			partData[part].Rope = {
+				Constraint = rope:Clone(),
+				Attachment0 = rope.Attachment0:Clone(),
+			}
 		end
 	end
 
 	Disguiser.DisguiseServer(participant, enable, model, hum, true)
 
-	Ragdoll(model)
+	model = Ragdoll(model, true)
 	corpse.Model = model
 
-	if not enable then
-		for part, data in partData do
-			local newPart = model:FindFirstChild(part.Name)
-			if not newPart or not newPart:IsA("BasePart") then
-				continue
-			end
+	for part, data in partData do
+		local newPart = model:FindFirstChild(part.Name)
+		if not newPart or not newPart:IsA("BasePart") then
+			continue
+		end
 
-			newPart.CFrame = data.CFrame
+		newPart.CFrame = data.CFrame
 
-			if data.Rope then
-				data.Rope.Constraint.Attachment0 = data.Rope.Attachment0
-				data.Rope.Constraint.Parent = newPart
-				data.Rope.Attachment0.Parent = newPart
-			end
+		if data.Rope then
+			data.Rope.Constraint.Attachment0 = data.Rope.Attachment0
+			data.Rope.Constraint.Parent = newPart
+			data.Rope.Attachment0.Parent = newPart
 		end
 	end
 end
