@@ -11,8 +11,8 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 		return
 	end
 
-	local neck = char:FindFirstChild("Neck", true) :: Motor6D
-	if not neck then
+	local neck = char:FindFirstChild("Neck", true)
+	if not neck or not neck:IsA("Motor6D") then
 		return
 	end
 

@@ -4,7 +4,7 @@ local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactab
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
 local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Disguiser)
-local MakeRagdoll = require(ReplicatedStorage.Shared.RoundRule.MakeRagdoll)
+local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local CombineTable = require(ReplicatedStorage.Shared.Util.CombineTable)
 
@@ -388,15 +388,16 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 end
 
 local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corpse, enable: boolean): ()
-	if not corpse.Model or not corpse.Model.PrimaryPart then
+	local model = corpse.Model
+	if not model or not model.PrimaryPart then
 		return
 	end
 
-	local hum = corpse.Model:FindFirstChildOfClass("Humanoid")
+	local hum = model:FindFirstChildOfClass("Humanoid")
 
 	local partData: {[BasePart]: {Rope: {Constraint: RopeConstraint, Attachment0: Attachment}?, CFrame: CFrame}} = {}
 	if not enable then
-		for _, part in corpse.Model:GetChildren() do
+		for _, part in model:GetChildren() do
 			if not part:IsA("BasePart") then
 				continue
 			end
@@ -413,33 +414,24 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 		end
 	end
 
-	local isUnidentified = corpse.Model:GetAttribute("Unidentified")
+	Disguiser.DisguiseServer(participant, enable, model, hum, true)
 
-	local originalCFrame = corpse.Model:GetPivot()
-	Disguiser.DisguiseServer(participant, enable, corpse.Model, hum, true)
-
-	local model = MakeRagdoll(participant, corpse.Model.Parent or error("No parent"), corpse.Model)
+	Ragdoll(model)
 	corpse.Model = model
 
-	if model then
-		model:PivotTo(originalCFrame)
-		model:SetAttribute("Unidentified", isUnidentified)
-		participant.Round:LoadProp(model)
+	if not enable then
+		for part, data in partData do
+			local newPart = model:FindFirstChild(part.Name)
+			if not newPart or not newPart:IsA("BasePart") then
+				continue
+			end
 
-		if not enable then
-			for part, data in partData do
-				local newPart = model:FindFirstChild(part.Name)
-				if not newPart or not newPart:IsA("BasePart") then
-					continue
-				end
+			newPart.CFrame = data.CFrame
 
-				newPart.CFrame = data.CFrame
-
-				if data.Rope then
-					data.Rope.Constraint.Attachment0 = data.Rope.Attachment0
-					data.Rope.Constraint.Parent = newPart
-					data.Rope.Attachment0.Parent = newPart
-				end
+			if data.Rope then
+				data.Rope.Constraint.Attachment0 = data.Rope.Attachment0
+				data.Rope.Constraint.Parent = newPart
+				data.Rope.Attachment0.Parent = newPart
 			end
 		end
 	end

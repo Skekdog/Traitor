@@ -76,7 +76,7 @@ local function initHeadTilt(char: Model): ()
     while neck:IsDescendantOf(char) do
         task.wait(1 / 20)
 
-        if not neck then
+        if not neck:IsDescendantOf(char) then
             break
         end
 
