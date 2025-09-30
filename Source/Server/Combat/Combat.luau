@@ -282,6 +282,8 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade, params.Position)
 			continue
 		end
+
+		Impulse.ApplyImpulse(v, (v.Position - params.Position).Unit * info.Pressure / 10000, false)
     end
 end
 
