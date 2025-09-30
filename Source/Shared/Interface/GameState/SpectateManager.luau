@@ -66,20 +66,27 @@ participant.Status:Connect(function(status)
 	end
 
 	if isSpectating then
-		task.wait(0.02) -- some bug that's impossible to reproduce where the camera doesn't follow corpse, i'm just gonna guess its because it doesn't parent quickly enough and hope that waiting fixes it
 		if statusId ~= thisStatusId then
 			return -- don't change camera if something else has changed the state
 		end
 		local corpse = workspace.Characters:FindFirstChild(participant.Name)
 		if corpse and corpse:HasTag("Corpse") then
-			local head = corpse:FindFirstChild("Head")
-			if head and head:IsA("BasePart") then
-				camera.CameraSubject = head
-				task.wait(3)
-				if statusId ~= thisStatusId then
-					return -- don't change camera if something else has changed the state
+			local startTime = os.clock()
+			local function onChildAdded(child: Instance): ()
+				if os.clock() - startTime > 3 or statusId ~= thisStatusId then
+					return
+				end
+				if child.Name == "Head" and child:IsA("BasePart") then
+					camera.CameraSubject = child
 				end
 			end
+			local head = corpse:FindFirstChild("Head")
+			if head then
+				onChildAdded(head)
+			end
+			local con = corpse.ChildAdded:Connect(onChildAdded)
+			task.wait(3)
+			con:Disconnect()
 		end
 
 		if statusId ~= thisStatusId then
