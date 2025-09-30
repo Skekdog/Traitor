@@ -163,7 +163,7 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 	end
 
 	local direction = (propRoot.Position - root.Position).Unit
-	Impulse.ApplyImpulse(propRoot, -direction * 1000 * propRoot.AssemblyMass / 18, info.Attacker)
+	Impulse.ApplyImpulse(propRoot, -direction * 50, true, info.Attacker)
 
 	if info.PoltPhase == #phaseAdvanceTimes then
 		local params = ExplosionParams.new({

@@ -66,7 +66,7 @@ function module.Explosion(self, position: Vector3, soundId: number?, radius: num
 end
 
 function module.Impulse(self, target: Model | BasePart, attacker: Player?, origin: Vector3, directionalForce: Vector3, _: boolean, _: boolean, itemName: string): ()
-	Impulse.ApplyImpulse(GetPrimaryPart(target), directionalForce, attacker and GetParticipant(attacker))
+	Impulse.ApplyImpulse(GetPrimaryPart(target), directionalForce, false, attacker and GetParticipant(attacker))
 end
 
 function module.Impact(self, player: Player?, hit: {Position: Vector3}, target: BasePart, material: Enum.Material): ()

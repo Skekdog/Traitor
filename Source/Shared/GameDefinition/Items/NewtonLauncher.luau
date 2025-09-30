@@ -39,13 +39,13 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
     local lookVector = char:GetPivot().LookVector
     lookVector = Vector3.new(lookVector.X, 1, lookVector.Z)
 
-    local force = lookVector * 1000 * part.AssemblyMass / 18
+    local force = lookVector * 50
 
     if hit.Kind == "Participant" then
         force *= Vector3.new(2, 1, 2)
     end
 
-    Impulse.ApplyImpulse(part, force, attacker)
+    Impulse.ApplyImpulse(part, force, true, attacker)
 
 	return true
 end

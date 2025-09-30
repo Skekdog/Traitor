@@ -30,7 +30,7 @@ local function trySetHolder(part: BasePart, participant: Types.Participant?): ()
 	end
 end
 
-function Impulse.ApplyImpulse(part: BasePart, force: Vector3, participant: Types.Participant?): ()
+function Impulse.ApplyImpulse(part: BasePart, force: Vector3, adjustForMass: boolean, participant: Types.Participant?): ()
 	if not Impulse.CanImpulse(part) then
 		return
 	end
@@ -43,7 +43,7 @@ function Impulse.ApplyImpulse(part: BasePart, force: Vector3, participant: Types
         end
     end
 
-    part:ApplyImpulse(force)
+    part:ApplyImpulse(force * if adjustForMass then part.AssemblyMass else 1)
 end
 
 if RunService:IsClient() then

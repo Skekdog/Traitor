@@ -89,7 +89,7 @@ local item: Types.MeleeWeaponDefinition = {
 			})
 		end
 
-		Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, attacker)
+		Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, false, attacker)
     end,
 
     AlternateToggled = true,
