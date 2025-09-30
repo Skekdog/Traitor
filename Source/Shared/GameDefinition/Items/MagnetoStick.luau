@@ -3,7 +3,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local PropDamage = require(ServerScriptService.Combat.PropDamage)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
@@ -160,6 +159,7 @@ function module.ServerStopControllingProp(player: Player, part: BasePart?): ()
 
 		local participant = serverGetRound():GetParticipant(player)
 		if participant then
+			local PropDamage = require(ServerScriptService.Combat.PropDamage)
 			PropDamage.SetLastHolder(prop, participant)
 		end
 

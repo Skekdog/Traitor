@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -24,7 +24,7 @@ end
 local item: Types.MeleeWeaponDefinition = {
     Kind = "Melee" :: "Melee",
     Name = "Crowbar",
-    
+
     Slot = 1,
     CanDrop = false,
 
@@ -89,7 +89,7 @@ local item: Types.MeleeWeaponDefinition = {
 			})
 		end
 
-		NewtonLauncher.Fling(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass)
+		Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, attacker)
     end,
 
     AlternateToggled = true,

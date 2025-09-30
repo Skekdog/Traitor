@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+local Impulse = require(ReplicatedStorage.API.Impulse)
 local DamageSourceRemap = require(ReplicatedStorage.Compat.DamageSourceRemap)
-local NewtonLauncher = require(ReplicatedStorage.Shared.GameDefinition.Items.NewtonLauncher)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Combat = require(ServerScriptService.Combat.Combat)
 local RoundHandler = require(ServerScriptService.RoundHandler)
@@ -64,11 +66,7 @@ function module.Explosion(self, position: Vector3, soundId: number?, radius: num
 end
 
 function module.Impulse(self, target: Model | BasePart, attacker: Player?, origin: Vector3, directionalForce: Vector3, _: boolean, _: boolean, itemName: string): ()
-	local part = if target:IsA("Model") then target.PrimaryPart else target
-	if not part then
-		return
-	end
-	NewtonLauncher.Fling(part, directionalForce)
+	Impulse.ApplyImpulse(GetPrimaryPart(target), directionalForce, attacker and GetParticipant(attacker))
 end
 
 function module.Impact(self, player: Player?, hit: {Position: Vector3}, target: BasePart, material: Enum.Material): ()

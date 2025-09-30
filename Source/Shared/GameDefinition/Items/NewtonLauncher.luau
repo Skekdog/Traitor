@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Impulse = require(ReplicatedStorage.API.Impulse)
 local Ammo = require(script.Parent.Ammo)
-local MagnetoStick = require(script.Parent.MagnetoStick)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local flingRemote: RemoteEvent
@@ -13,27 +13,6 @@ else
 	local found = script:WaitForChild("Fling")
 	assert(found:IsA("RemoteEvent"), "Fling must be a RemoteEvent")
 	flingRemote = found
-end
-
-local module = {}
-
-function module.CanFling(part: BasePart): boolean
-    return not part:IsGrounded()
-end
-
-function module.Fling(part: BasePart, force: Vector3): ()
-    if RunService:IsServer() then
-        local owner = part:GetNetworkOwner()
-        if owner then
-            return flingRemote:FireClient(owner, part, force)
-        end
-    end
-
-    part:ApplyImpulse(force)
-end
-
-if RunService:IsClient() then
-    flingRemote.OnClientEvent:Connect(module.Fling)
 end
 
 local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit: Types.Participant | Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
@@ -49,10 +28,6 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 		return true
 	end
 
-    if not module.CanFling(part) then
-        return true
-    end
-
 	local attacker = params.Attacker
 	assert(attacker)
 
@@ -60,10 +35,6 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 	if not char then
 		return true
 	end
-
-    if hit.Kind == "Prop" then
-        MagnetoStick.SetPropLastHeldBy(hit, attacker)
-    end
 
     local lookVector = char:GetPivot().LookVector
     lookVector = Vector3.new(lookVector.X, 1, lookVector.Z)
@@ -74,12 +45,7 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
         force *= Vector3.new(2, 1, 2)
     end
 
-    local owner = part:GetNetworkOwner()
-    if owner then
-        flingRemote:FireClient(owner, part, force)
-    else
-        module.Fling(part, force)
-    end
+    Impulse.ApplyImpulse(part, force, attacker)
 
 	return true
 end
@@ -122,6 +88,8 @@ local item: Types.GunWeaponDefinition = {
 	BeforeHitParticipant = beforeHit,
 	BeforeHitProp = beforeHit,
 }
+
+local module = {}
 
 module.Item = item
 

@@ -14,13 +14,12 @@ else
 	Combat = require(ServerScriptService.Combat.Combat)
 end
 
+local Impulse = require(ReplicatedStorage.API.Impulse)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Ammo = require(script.Parent.Ammo)
-local MagnetoStick = require(script.Parent.MagnetoStick)
-local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local MAX_RANGE = 10000
@@ -37,7 +36,7 @@ end
 
 local function isPartValid(part: BasePart): boolean
 	local prop = GetMapObjectWithTag(part, "Prop")
-	return if prop then NewtonLauncher.CanFling(GetPrimaryPart(prop)) and not prop:HasTag("Interactable") else false
+	return if prop then Impulse.CanImpulse(part) and not prop:HasTag("Interactable") else false
 end
 
 local function clientThing(): boolean
@@ -84,11 +83,10 @@ local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop | Types.
 	assert(params.Attacker)
 
 	if hitProp.Kind ~= "Prop" then
-		print(hitProp)
 		return false
 	end
 
-	if not NewtonLauncher.CanFling(GetPrimaryPart(hitProp.Model)) then
+	if not isPartValid(GetPrimaryPart(hitProp.Model)) then
 		return false
 	end
 
@@ -164,10 +162,8 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 		return
 	end
 
-	MagnetoStick.SetPropLastHeldBy(prop, info.Attacker)
-
 	local direction = (propRoot.Position - root.Position).Unit
-	NewtonLauncher.Fling(propRoot, -direction * 1000 * propRoot.AssemblyMass / 18)
+	Impulse.ApplyImpulse(propRoot, -direction * 1000 * propRoot.AssemblyMass / 18, info.Attacker)
 
 	if info.PoltPhase == #phaseAdvanceTimes then
 		local params = ExplosionParams.new({
