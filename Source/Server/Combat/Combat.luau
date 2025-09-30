@@ -143,7 +143,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?, origin: Vector3?): ()
+local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?, origin: Vector3): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -157,6 +157,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 
 		HitPosition = hitPosition,
 		Origin = origin,
+		Direction = (hitPosition - origin).Unit,
 		HitPart = hitPart,
 	}
 
@@ -184,7 +185,7 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
-local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3, origin: Vector3?): ()
+local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3, origin: Vector3): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -197,6 +198,7 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		Attacker = by,
 
 		HitPosition = hitPosition,
+		Direction = (hitPosition - origin).Unit,
 		Origin = origin,
 		HitPart = hitPart,
 	}
@@ -264,7 +266,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, prop)
-			onPropHit(params, round, params.Attacker, prop, v, v.Position)
+			onPropHit(params, round, params.Attacker, prop, v, v.Position, params.Position)
 			continue
 		end
 
@@ -274,7 +276,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, interactable)
-			onPropHit(params, round, params.Attacker, interactable, v, v.Position)
+			onPropHit(params, round, params.Attacker, interactable, v, v.Position, params.Position)
 			continue
 		end
 
@@ -284,7 +286,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, participant)
-			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade)
+			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade, params.Position)
 			continue
 		end
     end

@@ -30,7 +30,7 @@ local function trySetHolder(part: BasePart, participant: Types.Participant?): ()
 	end
 end
 
-function Impulse.ApplyImpulse(part: BasePart, force: Vector3, adjustForMass: boolean, participant: Types.Participant?): ()
+function Impulse.ApplyImpulse(part: BasePart, force: Vector3, adjustForMass: boolean, position: Vector3?, participant: Types.Participant?): ()
 	if not Impulse.CanImpulse(part) then
 		return
 	end
@@ -39,11 +39,19 @@ function Impulse.ApplyImpulse(part: BasePart, force: Vector3, adjustForMass: boo
 		trySetHolder(part, participant)
         local owner = part:GetNetworkOwner()
         if owner then
-            return remote:FireClient(owner, part, force)
+            return remote:FireClient(owner, part, force, adjustForMass, position)
         end
     end
 
-    part:ApplyImpulse(force * if adjustForMass then part.AssemblyMass else 1)
+	if adjustForMass then
+		force *= part.AssemblyMass
+	end
+
+	if position then
+		part:ApplyImpulseAtPosition(force, position)
+	else
+    	part:ApplyImpulse(force)
+	end
 end
 
 if RunService:IsClient() then
