@@ -1,15 +1,16 @@
 local fs = require("@lune/fs")
 local net = require("@lune/net")
 local serde = require("@lune/serde")
-local process = require("@lune/process")
 local roblox = require("@lune/roblox")
+local process = require("@lune/process")
+local BuildLib = require("./Lib/BuildLib")
 
 local BASE_URL = "https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType=Published"
 
 assert(fs.isFile(".env"), "Missing .env file")
 local env = serde.decode("toml", fs.readFile(".env"))
 
-local NAME = "TT3"
+local NAME = "TT3.rbxl"
 
 local STANDARD_UNIVERSE_ID = 1031123722
 
@@ -31,16 +32,14 @@ local placeId =
 	else
 		error(`Invalid place: {place}. Expected "main", "test", or "labs".`)
 
-local UNIVERSE = if placeId == LABS_PLACE_ID then LABS_UNIVERSE_ID else STANDARD_UNIVERSE_ID
+local shouldPublish = process.args[2] == "publish"
+
+local universeId = if placeId == LABS_PLACE_ID then LABS_UNIVERSE_ID else STANDARD_UNIVERSE_ID
 local API_KEY = env.APIKEY or error("Missing APIKEY in .env")
 
 local PROJECT_FILE_PATH = "default.project.json"
 
-local outputName = NAME .. ".rbxl"
-local executionResult = process.exec("rojo", {"build", "--output", outputName, PROJECT_FILE_PATH})
-assert(executionResult.ok, executionResult.stderr)
-
-local result = fs.readFile(outputName)
+local game = BuildLib(NAME, PROJECT_FILE_PATH)
 
 local serviceProperties: {[string]: {[string]: any}} = {
 	Lighting = {
@@ -52,7 +51,6 @@ local serviceProperties: {[string]: {[string]: any}} = {
 	},
 }
 
-local game = roblox.deserializePlace(result)
 for serviceName, properties in serviceProperties do
 	local service = game:GetService(serviceName)
 	for property, value in properties do
@@ -60,10 +58,18 @@ for serviceName, properties in serviceProperties do
 	end
 end
 
-result = roblox.serializePlace(game)
+local result = roblox.serializePlace(game)
+
+fs.writeFile(NAME, result)
+
+print(`Built {NAME} for {place} place.`)
+
+if not shouldPublish then
+	return
+end
 
 local response = net.request({
-	url = BASE_URL:gsub("{universeId}", tostring(UNIVERSE)):gsub("{placeId}", tostring(placeId)),
+	url = BASE_URL:gsub("{universeId}", tostring(universeId)):gsub("{placeId}", tostring(placeId)),
 	method = "POST",
 	headers = {
 		["x-api-key"] = API_KEY,
@@ -72,5 +78,5 @@ local response = net.request({
 	body = result,
 })
 
-assert(response.ok, `Failed to upload {outputName}: {response.body}`)
-print(`Uploaded {outputName} with version: {serde.decode("json", response.body).versionNumber} to {place} place.`)
+assert(response.ok, `Failed to upload {NAME}: {response.body}`)
+print(`Uploaded {NAME} with version: {serde.decode("json", response.body).versionNumber} to {place} place.`)
