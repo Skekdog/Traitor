@@ -113,7 +113,7 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     local distance = if result then (attachment.WorldPosition - result.Position).Magnitude else 10000
     local half = distance / 2
 
-    local destination = if result then result.Position else attachment.WorldPosition + (direction * distance)
+    local destination = if result then result.Position else attachment.WorldPosition + direction
 
     laser.Mesh.Scale = Vector3.new(0.05, half, 0.05)
 
