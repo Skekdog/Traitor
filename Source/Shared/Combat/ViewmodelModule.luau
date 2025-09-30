@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
+local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -71,7 +73,7 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
         ball.CanCollide = false
         ball.CanTouch = false
         ball.CanQuery = false
-        
+
         ball.TopSurface = Enum.SurfaceType.Smooth
         ball.BottomSurface = Enum.SurfaceType.Smooth
         ball.LeftSurface = Enum.SurfaceType.Smooth
@@ -99,24 +101,25 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
 
     laser.Color = gun.LaserColor
 
-    local camera = workspace.CurrentCamera
-    local direction = camera:ViewportPointToRay(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2, 1).Direction * 10000
+    local direction = GetCentreRay().Direction * 10000
 
     local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {viewmodel}
+    rayParams.FilterDescendantsInstances = {viewmodel, LocalCharacter.Character() :: Model}
     rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
-    local result = workspace:Raycast(attachment.WorldPosition, direction, rayParams)
+    local result = workspace:Raycast(workspace.CurrentCamera.CFrame.Position, direction, rayParams)
+    CreateEmptyPart(attachment.CFrame).Color = Color3.fromRGB(255,255,255)
 
-    local distance = if result then result.Distance else 10000
+    local distance = if result then (attachment.WorldPosition - result.Position).Magnitude else 10000
     local half = distance / 2
 
-    laser.Mesh.Scale = Vector3.new(0.2, half, 0.2)
+    local destination = if result then result.Position else attachment.WorldPosition + (direction * distance)
 
-    laser.PivotOffset = CFrame.new(0, -half, 0)
-    laser:PivotTo(CFrame.lookAlong(attachment.WorldPosition, direction) * CFrame.Angles(math.rad(-90), 0, 0))
+    laser.Mesh.Scale = Vector3.new(0.05, half, 0.05)
 
-    ball.Position = if result then result.Position else Vector3.new()
+    laser.CFrame = CFrame.lookAt((attachment.WorldPosition + destination) / 2, destination) * CFrame.Angles(math.rad(-90), 0, 0)
+
+    ball.Position = destination
 end
 
 function module.Show(item: Types.AnyItemDefinition): ()
