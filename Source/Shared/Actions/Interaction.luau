@@ -147,6 +147,8 @@ RunService.PostSimulation:Connect(function()
 	local cameraSubject = camera.CameraSubject
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
 		params.FilterDescendantsInstances = {cameraSubject.Parent :: Model}
+	else
+		params.FilterDescendantsInstances = {}
 	end
 
 	Mouse.Reset()
