@@ -1,7 +1,7 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
+local Impulse = require(ReplicatedStorage.API.Impulse)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
@@ -54,20 +54,6 @@ local function getItemDamage(item: Types.AnyWeapon | Types.ExplosionParams, hitP
 	end
 
 	return dmg[hitArea]
-end
-
-local function tryGetParticipantFromPart(round: Types.Round, part: BasePart): Types.Participant?
-	local model = part:FindFirstAncestorOfClass("Model")
-	if not model then
-		return nil
-	end
-
-	local player = Players:GetPlayerFromCharacter(model)
-	if not player then
-		return nil
-	end
-
-	return round:GetParticipant(player.Name)
 end
 
 -- only considers static map
@@ -216,7 +202,12 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	end
 	local round = by.Round
 
-	local victim = tryGetParticipantFromPart(round, hitPart)
+	if (item.Kind == "Gun" or item.Kind == "Melee") and item.Definition.ImpulseForce then
+		Impulse.ApplyImpulse(hitPart, item.Definition.ImpulseForce * (hitPosition - origin).Unit, false, hitPosition, by)
+	end
+
+	local char = GetMapObjectWithTag(hitPart, "Character")
+	local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
 
 	local MapObject = GetMapObjectWithTag(hitPart, "Prop")
 	local prop = round:GetProp(MapObject or hitPart)
@@ -280,7 +271,9 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 			continue
 		end
 
-		local participant = tryGetParticipantFromPart(round, v)
+		local char = GetMapObjectWithTag(v, "Character")
+		local participant = if char and char:IsA("Model") then round:GetParticipant(char) else nil
+
 		if participant then
 			if table.find(hits, participant) then
 				continue

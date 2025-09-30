@@ -192,6 +192,8 @@ local item: Types.GunWeaponDefinition = {
     CreditCost = 1,
     MaxStock = 1,
 
+    ImpulseForce = 5,
+
     IsEvilItem = true,
 
     Slot = 8,

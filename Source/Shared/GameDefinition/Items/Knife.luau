@@ -144,6 +144,8 @@ local item: Types.MeleeWeaponDefinition = {
 	CreditCost = 1,
 	MaxStock = 2,
 
+	ImpulseForce = 1,
+
 	DamageKind = "Stab" :: "Stab",
 	Damage = DAMAGE,
 

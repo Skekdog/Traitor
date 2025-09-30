@@ -30,6 +30,8 @@ local item: Types.MeleeWeaponDefinition = {
 
     DamageKind = "Bludgeon" :: "Bludgeon",
 
+	ImpulseForce = 5,
+
     Model = ReplicatedStorage.Assets.WeaponModels.Crowbar,
     HoldAnimation = "rbxassetid://10247423634",
     AttackAnimation = "rbxassetid://13269497293",

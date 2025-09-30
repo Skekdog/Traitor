@@ -140,6 +140,8 @@ guns.HUGE = {
     Projectile = bullet,
     ProjectileSpeed = 280,
 
+    ImpulseForce = 1,
+
     Model = models("HUGE"),
     HoldAnimation = "rbxassetid://12498608892",
     AimAnimation = "rbxassetid://18691844030",
@@ -189,6 +191,8 @@ guns.Scout = {
 
     Projectile = bullet,
     ProjectileSpeed = 250,
+
+    ImpulseForce = 20,
 
     AttackInterval = 1,
     ReloadTime = 1.5,
@@ -242,6 +246,8 @@ guns.Pistol = {
     AttackInterval = 0.5,
     ReloadTime = 1,
     AmmoType = Ammo["9mm"],
+
+    ImpulseForce = 5,
 
     Model = models("Pistol"),
     HoldAnimation = "rbxassetid://9253211833",
@@ -300,6 +306,8 @@ guns["Golden Gun"] = {
 
     Projectile = projectiles("GoldenBullet"),
     ProjectileSpeed = 250,
+
+    ImpulseForce = 50, -- :troll:
 
     Model = models("Golden Gun"),
     HoldAnimation = "rbxassetid://9253211833",
@@ -399,6 +407,8 @@ guns.SMG = {
     Projectile = bullet,
     ProjectileSpeed = 280,
 
+    ImpulseForce = 1,
+
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
@@ -439,6 +449,8 @@ guns.AWP = {
         Body = 100,
         Limb = 65,
     },
+
+    ImpulseForce = 50,
 
     AmmoType = Ammo.AWP,
 
@@ -522,6 +534,8 @@ guns["Assault Rifle"] = {
     Projectile = bullet,
     ProjectileSpeed = 250,
 
+    ImpulseForce = 5,
+
     RecoilX = 0.6,
     RecoilY = 1.5,
 
@@ -580,6 +594,8 @@ guns["Silenced Pistol"] = {
     Projectile = projectiles("SilencedBullet"),
     ProjectileSpeed = 250,
 
+    ImpulseForce = 5,
+
     IsSilent = true,
     BeforeHitParticipant = ItemKillHighlights(
         {
@@ -628,6 +644,8 @@ guns.XM1014 = {
 
     Projectile = bullet,
     ProjectileSpeed = 220,
+
+    ImpulseForce = 4,
 
     Model = models("XM1014"),
     HoldAnimation = "rbxassetid://11436160569",
@@ -688,6 +706,8 @@ guns.Glock = {
     Projectile = bullet,
     ProjectileSpeed = 280,
 
+    ImpulseForce = 3,
+
     RecoilX = 0.2,
     RecoilY = 0.8,
 }
@@ -718,6 +738,8 @@ guns.Deagle = {
 
     Projectile = bullet,
     ProjectileSpeed = 450,
+
+    ImpulseForce = 15,
 
     Model = models("Deagle"),
     HoldAnimation = "rbxassetid://9253211833",
@@ -778,6 +800,8 @@ guns.UMP = {
     Projectile = bullet,
     ProjectileSpeed = 250,
 
+    ImpulseForce = 5,
+
     OnHitClient = Discombobulate,
 
     RecoilX = 0.75,
@@ -798,6 +822,7 @@ guns.BAR = {
     CanDrop = true,
 
     HasMuzzleFlash = true,
+    ImpulseForce = 15,
 
     Damage = {
         Head = 75,
