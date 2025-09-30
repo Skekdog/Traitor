@@ -283,7 +283,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 			continue
 		end
 
-		Impulse.ApplyImpulse(v, (v.Position - params.Position).Unit * info.Pressure / 10000, false)
+		Impulse.ApplyImpulse(v, (v.Position - params.Position).Unit * info.Pressure / 10000, true)
     end
 end
 
