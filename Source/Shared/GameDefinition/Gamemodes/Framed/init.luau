@@ -224,6 +224,7 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 		if relation ~= "RDM" then
 			attacker:AddCredits(1)
 			FramedNotification(attacker, `+1 Credit, Killed {relation}!`)
+			Health.TriggerHeal(attacker)
 		else
 			FramedNotification(attacker, "⚠️ Mistake! Police are hunting you!")
 			Mistakes.MistakeMade(attacker)
