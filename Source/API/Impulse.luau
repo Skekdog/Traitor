@@ -10,7 +10,7 @@ local Impulse = {}
 local remote = GetRemote("Impulse", ReplicatedStorage.Remotes.ServerClient)
 
 function Impulse.CanImpulse(part: BasePart): boolean
-	return not part:IsGrounded()
+	return not part:IsGrounded() and part:IsDescendantOf(workspace)
 end
 
 local function trySetHolder(part: BasePart, participant: Types.Participant?): ()
