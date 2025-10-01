@@ -52,19 +52,21 @@ end)
 
 local function setRoleText(): ()
     local role = participant.Role()
-    local status = participant.Status()
+    local status: Types.ParticipantStatus = participant.Status() :: Types.ParticipantStatus
+    local phase: Types.Phase = LocalRoundInfo.Phase() :: Types.Phase
 
-    if role ~= Defaults.Role and status == "Alive" then
+    if status ~= "Alive" then
+        roundInfo.TopBar.Role.Text = "Spectating"
+    elseif role ~= Defaults.Role then
         roundInfo.TopBar.Role.Text = role:GetFormattedName()
-    elseif status == "Alive" then
-        roundInfo.TopBar.Role.Text = "Preparing"
     else
-        roundInfo.TopBar.Role.Text = "Spectator"
+        roundInfo.TopBar.Role.Text = phase
     end
 end
 
 participant.Status:Connect(setRoleText, true)
 participant.Role:Connect(setRoleText, true)
+LocalRoundInfo.Phase:Connect(setRoleText, true)
 
 local function updateFreeKillStatus(): ()
     local hasReason = not not LocalRoundInfo.FreeKill()
