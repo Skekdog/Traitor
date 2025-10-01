@@ -9,12 +9,14 @@ local Targets = {}
 
 local remote = GetRemote("AssignTarget", script)
 
-function Targets.AssignTarget(participant: Types.Participant, target: Types.Participant): ()
+function Targets.AssignTarget(participant: Types.Participant, target: Types.Participant, noNotify: boolean?): ()
 	participant.Extras.FramedTarget = target
 	target.Extras.FramedHunter = participant
 
-	FramedNotification(participant, "💠 You have received a new target.")
-	FramedNotification(target, "💠 You have a new hunter.")
+	if not noNotify then
+		FramedNotification(participant, "💠 You have received a new target.")
+		FramedNotification(target, "💠 You have a new hunter.")
+	end
 
 	local targetChecker = participant:GetItems()["TargetChecker"]
 	if targetChecker then
@@ -65,7 +67,7 @@ end
 
 function Targets.LoadFirstTargets(framed: {Types.Participant}): ()
 	for i, participant in framed do
-		Targets.AssignTarget(participant, framed[i % #framed + 1])
+		Targets.AssignTarget(participant, framed[i % #framed + 1], true)
 	end
 end
 
