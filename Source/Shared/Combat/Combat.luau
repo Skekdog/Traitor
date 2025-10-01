@@ -119,7 +119,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 	Aim.ToggleAim(item, false)
 
-	RoundInfoUI.UpdateAmmo(item)
+	RoundInfoUI.UpdateAmmo()
 
 	if lastAmmoConnection then
 		lastAmmoConnection:Disconnect()
@@ -133,9 +133,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		return
 	end
 
-	lastAmmoConnection = ClientInventory.Ammo:Connect(function()
-		RoundInfoUI.UpdateAmmo(item)
-	end)
+	lastAmmoConnection = ClientInventory.Ammo:Connect(RoundInfoUI.UpdateAmmo)
 
 	if item.Kind == "Gun" then
 		if item.Definition.AimAnimation then
@@ -319,7 +317,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 				if item.Kind == "Gun" then
 					item.Ammo -= 1
-					RoundInfoUI.UpdateAmmo(item)
+					RoundInfoUI.UpdateAmmo()
 				end
 
 				if item.Kind == "Melee" then

@@ -158,7 +158,8 @@ Freecam.ListenFreecamChanged(function(freecamEnabled)
     end
 end)
 
-function module.UpdateAmmo(item: Types.AnyItem?): ()
+function module.UpdateAmmo(): ()
+    local item = ClientInventory.EquippedItem()
     if not item or item.Kind ~= "Gun" then
         roundInfo.Frame.AmmoBar.Visible = false
         return
