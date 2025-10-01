@@ -11,6 +11,7 @@ type APIReturn = {
 	StandardGame: typeof(require(script.StandardGame)),
 	GetRemote: typeof(require(script.GetRemote)),
 	ScreenMessage: typeof(require(script.ScreenMessage)),
+	Impulse: typeof(require(script.Impulse)),
 }
 
 if RunService:IsClient() then
@@ -34,4 +35,5 @@ return {
 	StandardGame = require(script.StandardGame),
 	GetRemote = require(script.GetRemote),
 	ScreenMessage = require(script.ScreenMessage),
+	Impulse = require(script.Impulse),
 } :: APIReturn
