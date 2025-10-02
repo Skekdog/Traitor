@@ -205,13 +205,14 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 	tracer.Transparency = TRACER_TRANSPARENCY
 	tracer.CFrame = CFrame.lookAt((victimPos + attackerPos) / 2, victimPos)
 
-	task.defer(function()
-		local corpse = participant:GetCharacter()
-		if not corpse then
+	task.spawn(function()
+		task.wait()
+		local corpse = participant.Corpse
+		if not corpse or not corpse.Model then
 			return
 		end
 
-		deathData[corpse] = {
+		deathData[corpse.Model] = {
 			Visualisers = {},
 			Victim = char,
 			Killer = attackerChar,
