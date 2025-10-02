@@ -203,7 +203,7 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	local round = by.Round
 
 	if (item.Kind == "Gun" or item.Kind == "Melee") and item.Definition.ImpulseForce then
-		Impulse.ApplyImpulse(hitPart, item.Definition.ImpulseForce * (hitPosition - origin).Unit, false, hitPosition, by)
+		Impulse.ApplyImpulse(hitPart, item.Definition.ImpulseForce * (hitPosition - origin).Unit, true, hitPosition, by)
 	end
 
 	local MapObject = GetMapObjectWithTag(hitPart, "Prop")
