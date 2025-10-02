@@ -12,7 +12,7 @@ task.spawn(function()
 		-- I know why it does that, it's because we task.defer the new round,
 		-- but that's needed because of some stupid bullshit with how scripts load
 		if not success then
-			return
+			continue
 		end
 
 		if not map.Definition.Extras or not map.Definition.Extras.CompatibilityMode then
