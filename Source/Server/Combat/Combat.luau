@@ -206,19 +206,20 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 		Impulse.ApplyImpulse(hitPart, item.Definition.ImpulseForce * (hitPosition - origin).Unit, false, hitPosition, by)
 	end
 
-	local char = GetMapObjectWithTag(hitPart, "Character")
-	local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
-
 	local MapObject = GetMapObjectWithTag(hitPart, "Prop")
 	local prop = round:GetProp(MapObject or hitPart)
 	local interactable = round:GetInteractable(MapObject or hitPart)
 
 	local propLike = prop or interactable
 
-	if victim then
-		return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin)
-	elseif propLike then
+	if propLike then
 		return onPropHit(item, round, by, propLike, hitPart, hitPosition, origin)
+	else
+		local char = GetMapObjectWithTag(hitPart, "Character")
+		local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
+		if victim then
+			return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin)
+		end
 	end
 
 	if normal and item.Kind == "Gun" then
