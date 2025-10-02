@@ -9,6 +9,7 @@ local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundIn
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local Aim = require(script.Parent.Aim)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -53,7 +54,9 @@ local function raycast(char: Model, spread: Vector3, range: number, checkInitial
 		overlapParams.FilterType = Enum.RaycastFilterType.Exclude
 		overlapParams.CollisionGroup = "WeaponHitTargets"
 
-		parts = workspace:GetPartBoundsInBox(workspace.CurrentCamera.CFrame, Vector3.new(0.1, 0.1, 0.1), overlapParams)
+		local boundPart = CreateEmptyPart(workspace.CurrentCamera.CFrame)
+		boundPart.Size = Vector3.new(0.1, 0.1, 0.1)
+		parts = workspace:GetPartsInPart(boundPart, overlapParams)
 	end
 
 	local result = workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (GetCentreRay().Direction + spread).Unit * range, params)
