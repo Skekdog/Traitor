@@ -34,10 +34,10 @@ local function getSpreadVector(item: Types.AnyItem): Vector3
 	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
 end
 
-local function raycast(char: Model, spread: Vector3, range: number): RaycastResult?
+local function raycast(char: Model, spread: Vector3, range: number, checkInitialOverlap: boolean): {RaycastResult: RaycastResult?, Parts: {BasePart}?}
 	local map = LocalRoundInfo.Map()
 	if not map then
-		return
+		return {}
 	end
 
 	local params = RaycastParams.new()
@@ -46,7 +46,22 @@ local function raycast(char: Model, spread: Vector3, range: number): RaycastResu
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
 
-	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (GetCentreRay().Direction + spread).Unit * range, params)
+	local parts: {BasePart}?
+	if checkInitialOverlap then
+		local overlapParams = OverlapParams.new()
+		overlapParams.FilterDescendantsInstances = {char}
+		overlapParams.FilterType = Enum.RaycastFilterType.Exclude
+		overlapParams.CollisionGroup = "WeaponHitTargets"
+
+		parts = workspace:GetPartBoundsInBox(workspace.CurrentCamera.CFrame, Vector3.new(0.1, 0.1, 0.1), overlapParams)
+	end
+
+	local result = workspace:Raycast(workspace.CurrentCamera.CFrame.Position, (GetCentreRay().Direction + spread).Unit * range, params)
+
+	return {
+		RaycastResult = result,
+		Parts = parts
+	}
 end
 
 local function playEmptyClipSound(): ()
@@ -246,7 +261,9 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 					for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
 						local spread = getSpreadVector(item)
 
-						local raycastResult = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
+						local result = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE, item.Kind == "Melee")
+						local raycastResult = result.RaycastResult
+						local part = if result.Parts then result.Parts[1] else nil
 
 						local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
 						local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
@@ -260,13 +277,23 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 							PlaySound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
 						end
 
-						table.insert(raycasts, {
-							Destination = targetPosition,
-							HitPart = hitPart,
-							HitPartCenterPosition = hitPartCenterPosition,
-							Normal = normal,
-							RelativeHitCFrame = relativeHitCFrame,
-						})
+						if not part then
+							table.insert(raycasts, {
+								Destination = targetPosition,
+								HitPart = hitPart,
+								HitPartCenterPosition = hitPartCenterPosition,
+								Normal = normal,
+								RelativeHitCFrame = relativeHitCFrame,
+							})
+						else
+							table.insert(raycasts, {
+								Destination = part.Position,
+								HitPart = part,
+								HitPartCenterPosition = part.Position,
+								Normal = Vector3.zero,
+								RelativeHitCFrame = CFrame.identity,
+							})
+						end
 					end
 
 					if item.Kind == "Gun" and item.Definition.BeforePrimaryFireClient then
