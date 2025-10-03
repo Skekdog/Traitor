@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local GetAssemblyMass = require(ReplicatedStorage.API.GetAssemblyMass)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
@@ -21,10 +22,10 @@ local MAX_SIZE = 6
 
 local PUSH_FORCE_PER_UNIT_MASS = 0.75
 
-local ALIGNMENT_RESPONSIVENESS = 80
+local ALIGNMENT_RESPONSIVENESS = 40
 local ALIGNMENT_DEPTH = 6
 local ALIGNMENT_VELOCITY = 100
-local ALIGNMENT_FORCE_MULTIPLIER = 2000
+local ALIGNMENT_FORCE_MULTIPLIER = 500
 
 type ClientControl = {
 	Prop: Types.MapObject,
@@ -119,7 +120,7 @@ local function clientMakeAlignPosition(part: BasePart): AlignPosition
 	alignPosition.ApplyAtCenterOfMass = true
 	alignPosition.Responsiveness = ALIGNMENT_RESPONSIVENESS
 	alignPosition.MaxVelocity = ALIGNMENT_VELOCITY
-	alignPosition.MaxForce = ALIGNMENT_FORCE_MULTIPLIER * part.AssemblyMass
+	alignPosition.MaxForce = ALIGNMENT_FORCE_MULTIPLIER * GetAssemblyMass(part)
 	alignPosition.Attachment0 = createOrFindAttachment(part)
 	alignPosition.Parent = part
 	return alignPosition
@@ -236,7 +237,7 @@ local function clientPush(part: BasePart, position: Vector3, origin: Vector3): (
 		return
 	end
 
-	part:ApplyImpulseAtPosition((position - origin).Unit * PUSH_FORCE_PER_UNIT_MASS * part.AssemblyMass, position)
+	part:ApplyImpulseAtPosition((position - origin).Unit * PUSH_FORCE_PER_UNIT_MASS * GetAssemblyMass(part), position)
 end
 
 local function clientHang(): ()

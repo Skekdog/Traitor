@@ -36,12 +36,10 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 		return true
 	end
 
-    local force = (params.Direction or Vector3.zero) * 50
+    local force = ((params.Direction or Vector3.zero) + if hit.Kind == "Participant" then Vector3.yAxis else Vector3.zero) * 50
 
     if hit.Kind == "Participant" then
         force *= Vector3.new(2, 1, 2)
-    elseif hit.Model:HasTag("Corpse") then
-        force *= 3
     end
 
     Impulse.ApplyImpulse(part, force, true, params.HitPosition, attacker)

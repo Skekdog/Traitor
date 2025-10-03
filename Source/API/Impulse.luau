@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local GetAssemblyMass = require(script.Parent.GetAssemblyMass)
 local GetMapObject = require(script.Parent.GetMapObject)
 local GetRemote = require(script.Parent.GetRemote)
 local Types = require(script.Parent.Types)
@@ -44,7 +45,7 @@ function Impulse.ApplyImpulse(part: BasePart, force: Vector3, adjustForMass: boo
     end
 
 	if adjustForMass then
-		force *= part.AssemblyMass
+		force *= GetAssemblyMass(part)
 	end
 
 	if position then
