@@ -51,6 +51,7 @@ local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
 		Amount = damage,
 		Source = "Crush",
 		Attacker = lastHeld.By,
+		Direction = part.AssemblyLinearVelocity,
 	}
 
 	prop:TryTakeDamage(params)
