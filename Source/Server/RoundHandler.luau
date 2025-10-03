@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local Impulse = require(ReplicatedStorage.API.Impulse)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local GamemodeValidation = require(ReplicatedStorage.Shared.RoundRule.GamemodeValidation)
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
@@ -15,6 +16,16 @@ local EXCLUDED_GAMEMODES: {Instance} = {
 }
 
 Round.Config.DeathSounds = DeathSounds
+
+function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+    if participant.Extras.CombatImpulse and participant.Corpse and participant.Corpse.Model and participant.Corpse.Model.PrimaryPart then
+        Impulse.ApplyImpulse(participant.Corpse.Model.PrimaryPart, participant.Extras.CombatImpulse, true)
+    end
+end
+
+function Round.Config.OnCharacterAdded(round: Types.Round, participant: Types.Participant): ()
+    participant.Extras.CombatImpulse = nil
+end
 
 local remotes = ReplicatedStorage.Remotes
 

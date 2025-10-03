@@ -129,7 +129,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?, origin: Vector3): ()
+local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?, origin: Vector3, impulse: Vector3?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -168,6 +168,12 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	if victim.Round:IsPreGame() then
 		return
 	end
+
+	local willDie = params.Amount >= victim:GetHealth()
+	if willDie then
+		victim.Extras.CombatImpulse = impulse
+	end
+
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
@@ -202,8 +208,10 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	end
 	local round = by.Round
 
+	local impulse: Vector3?
 	if (item.Kind == "Gun" or item.Kind == "Melee") and item.Definition.ImpulseForce then
-		Impulse.ApplyImpulse(hitPart, item.Definition.ImpulseForce * (hitPosition - origin).Unit, true, hitPosition, by)
+		impulse = item.Definition.ImpulseForce * (hitPosition - origin).Unit
+		Impulse.ApplyImpulse(hitPart, assert(impulse), true, hitPosition, by)
 	end
 
 	local MapObject = GetMapObjectWithTag(hitPart, "Prop")
@@ -218,7 +226,7 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 		local char = GetMapObjectWithTag(hitPart, "Character")
 		local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
 		if victim then
-			return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin)
+			return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin, impulse)
 		end
 	end
 
@@ -275,16 +283,18 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 		local char = GetMapObjectWithTag(v, "Character")
 		local participant = if char and char:IsA("Model") then round:GetParticipant(char) else nil
 
+		local impulse = (v.Position - params.Position).Unit * info.Pressure / 10000
+
 		if participant then
 			if table.find(hits, participant) then
 				continue
 			end
 			table.insert(hits, participant)
-			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade, params.Position)
+			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade, params.Position, impulse)
 			continue
 		end
 
-		Impulse.ApplyImpulse(v, (v.Position - params.Position).Unit * info.Pressure / 10000, true)
+		Impulse.ApplyImpulse(v, impulse, true)
     end
 end
 

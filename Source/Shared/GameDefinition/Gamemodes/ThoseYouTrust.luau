@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Impulse = require(ReplicatedStorage.API.Impulse)
 local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
 local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
@@ -393,6 +394,9 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 		return
 	end
 
+	local impulse = participant.Extras.CombatImpulse
+	print(impulse)
+
 	local hum = model:FindFirstChildOfClass("Humanoid")
 
 	local partData: {[BasePart]: {Rope: {Constraint: RopeConstraint, Attachment0: Attachment}?, CFrame: CFrame}} = {}
@@ -431,6 +435,10 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 			data.Rope.Attachment0.Parent = newPart
 		end
 	end
+
+	if enable and impulse then
+        Impulse.ApplyImpulse(model.PrimaryPart, impulse, true)
+    end
 end
 
 local function onDeath(round: Types.Round, victim: Types.Participant, deferVictoryCheck: boolean): ()
