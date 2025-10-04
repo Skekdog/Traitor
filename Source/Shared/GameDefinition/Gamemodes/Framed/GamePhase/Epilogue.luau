@@ -5,6 +5,7 @@ local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local GetAliveRoles = require(script.Parent.Parent.Roles.GetAliveRoles)
 local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
 local Types = require(ReplicatedStorage.API.Types)
+local RedHanded = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Framed.GameState.RedHanded)
 
 local EPILOGUE_DURATION = 45
 
@@ -45,6 +46,7 @@ function Epilogue.Begin(framed: Types.Participant): ()
 		exitCFrame = CFrame.new(result.Position) * CFrame.new(0, script.Parent.Escape.Part.Size.X / 2, 0) * CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))
 	end
 
+	RedHanded.SetPermanent(framed)
 	remote:FireClient(framed.Player, exitCFrame)
 
 	local char = framed:GetCharacter()

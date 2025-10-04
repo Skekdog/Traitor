@@ -282,7 +282,7 @@ local function BeforeHitParticipant(_, participant: Types.Participant, params: T
 		return false
 	elseif participant:GetRole().Definition == framedRole then
 		if attacker:GetRole().Definition == policeRole or attacker:GetRole().Definition == undercoverRole then
-			if RedHanded.IsRedHanded(participant) or Mistakes.HasMadeMistake(participant) or Epilogue.IsEpilogue(round) then
+			if RedHanded.IsRedHanded(participant) then
 				return true
 			end
 
