@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Epilogue = require(script.GamePhase.Epilogue)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Face = require(script.GameState.Face)
@@ -38,20 +37,6 @@ for i, v in FramedItems do
 end
 
 local Items = framedItems
-
-local backgroundMusic = {
-	1843504945,
-	1843505232,
-	1847799241,
-	1847245265,
-	1847798833,
-	1838974004,
-	1837472332,
-	1838973846,
-	1848209564,
-	1838730828,
-	1846614488,
-}
 
 local framedRole: Types.RoleDefinition = {
 	Kind = "RoleDefinition",
@@ -182,18 +167,6 @@ local function OnStart(round: Types.Round): ()
 	end
 
 	Targets.LoadFirstTargets(framed)
-
-	local music
-	local function playMusic()
-		music = PlaySound(backgroundMusic)
-		assert(music)
-
-		round.Extras.FramedBackgroundMusic = music
-
-		music.Ended:Once(playMusic)
-	end
-
-	playMusic()
 end
 
 local function OnFinish(round: Types.Round): ()
