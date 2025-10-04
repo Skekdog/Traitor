@@ -262,7 +262,9 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				local direction = GetCentreRay().Direction
 
 				if (item.Kind == "Melee" or item.Kind == "Gun" or item.Kind == "Grenade") and item.Definition.AttackSound then
-					PlaySound(item.Definition.AttackSound, nil, char.PrimaryPart)
+					if (item.Kind == "Grenade" and LocalRoundInfo.Phase() ~= "Waiting" and LocalRoundInfo.Phase() ~= "Preparing") or (item.Kind ~= "Grenade") then
+						PlaySound(item.Definition.AttackSound :: Sound, nil, char.PrimaryPart)
+					end
 				end
 
 				local request: CombatTypes.PrimaryFireRequest?
