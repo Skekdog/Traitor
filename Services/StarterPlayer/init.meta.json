@@ -4,6 +4,7 @@
 		"EnableMouseLockOption": false,
 		"EnableDynamicHeads": "Enabled",
 		"LoadCharacterLayeredClothing": "Enabled",
+		"CameraMode": "LockFirstPerson",
 		"CharacterJumpPower": 18,
 		"HealthDisplayDistance": 0,
 		"NameDisplayDistance": 0,
