@@ -176,8 +176,7 @@ local function OnFinish(round: Types.Round): ()
 	end
 
 	for _, participant in round:GetParticipants() do
-		local item = participant:GetEquippedItem()
-		if item and isItemIllegal(item) then
+		if RedHanded.IsRedHanded(participant) then
 			RedHanded.StopImmediately(participant)
 		end
 	end
