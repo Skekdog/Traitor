@@ -18,7 +18,7 @@ local item: Types.ItemDefinition = {
 	HoldAnimation = "rbxassetid://122493302142724",
 
 	ItemGroup = {
-		PreferredSlot = 1,
+		PreferredSlot = 6,
 	},
 
 	OnEquipClient = OnEquipClient,
