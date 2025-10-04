@@ -2,9 +2,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
+local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
+local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
@@ -213,6 +215,17 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	if (item.Kind == "Gun" or item.Kind == "Melee") and item.Definition.ImpulseForce then
 		impulse = item.Definition.ImpulseForce * (hitPosition - origin).Unit
 		Impulse.ApplyImpulse(hitPart, assert(impulse), true, hitPosition, by)
+	end
+
+	if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
+		for _, v in Players:GetPlayers() do
+			if v ~= by.Player then
+				PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, hitPosition, nil, {
+					RollOffMinDistance = 0,
+					RollOffMaxDistance = 15,
+				})
+			end
+		end
 	end
 
 	local MapObject = GetMapObjectWithTag(hitPart, "Prop")

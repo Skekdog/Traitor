@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
@@ -285,9 +286,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 						end
 
 						if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
-							local materialOverride = hitPart:GetAttribute("MaterialOverride")
-							local material = if materialOverride and materialOverride ~= "" then materialOverride else hitPart.Material.Name
-							PlaySound(HitSounds[material] or HitSounds.Default, targetPosition or hitPart.Position)
+							PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, targetPosition or hitPart.Position)
 						end
 
 						if not part then
