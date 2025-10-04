@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
@@ -355,7 +356,11 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		end
 
 		if definition.AttackSound then
-			PlaySound(definition.AttackSound, nil, char.PrimaryPart, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+			for _, v in Players:GetPlayers() do
+				if v ~= by.Player then
+					PlaySound(definition.AttackSound, nil, char.PrimaryPart, nil, v)
+				end
+			end
 		end
 	end
 

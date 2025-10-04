@@ -260,6 +260,10 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				local origin = head.Position
 				local direction = GetCentreRay().Direction
 
+				if (item.Kind == "Melee" or item.Kind == "Gun" or item.Kind == "Grenade") and item.Definition.AttackSound then
+					PlaySound(item.Definition.AttackSound, nil, char.PrimaryPart)
+				end
+
 				local request: CombatTypes.PrimaryFireRequest?
 				if item.Kind == "Melee" or item.Kind == "Gun" then
 					local raycasts: {CombatTypes.RaycastInfo} = {}
