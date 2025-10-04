@@ -489,7 +489,7 @@ if RunService:IsServer() then
 			return warn("Could not find C4 item")
 		end
 
-		if c4Item.Slot and participant:IsItemSlotOccupied(c4Item.Slot) then
+		if participant:IsItemGroupOccupied(c4Item.ItemGroup) then
 			return
 		end
 

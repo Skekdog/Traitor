@@ -330,6 +330,8 @@ local gamemode: Types.GamemodeDefinition = {
 
 	MinimumPlayers = 1,
 
+	IsSlotless = true,
+
 	TimeoutVictor = function(round)
 		return round:GetRoleFromRoleName("Police")
 	end,

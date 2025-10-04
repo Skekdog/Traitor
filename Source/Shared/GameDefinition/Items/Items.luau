@@ -4,6 +4,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local Discombobulate = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.Discombobulate)
+local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
@@ -118,7 +119,7 @@ guns.HUGE = {
     Kind = "Gun" :: "Gun",
     Name = "HUGE",
 
-    Slot = 3,
+    ItemGroup = ItemGroups.Primary,
     CanDrop = true,
 
     Spread = 0.04,
@@ -173,7 +174,7 @@ guns.Scout = {
     Kind = "Gun" :: "Gun",
     Name = "Scout",
 
-    Slot = 3,
+    ItemGroup = ItemGroups.Primary,
     CanDrop = true,
 
     Spread = 0,
@@ -228,7 +229,7 @@ guns.Pistol = {
     Name = "Pistol",
     DisplayName = "Five-Seven",
 
-    Slot = 2,
+    ItemGroup = ItemGroups.Secondary,
     CanDrop = true,
 
     Damage = {
@@ -285,7 +286,7 @@ guns["Golden Gun"] = {
     CreditCost = 1,
     MaxStock = 1,
 
-    Slot = 7,
+    ItemGroup = ItemGroups.RoleWeapon,
     CanDrop = true,
 
     HasMuzzleFlash = true,
@@ -382,7 +383,7 @@ guns.SMG = {
     Name = "SMG",
     DisplayName = "M11",
 
-    Slot = 3,
+    ItemGroup = ItemGroups.Primary,
     CanDrop = true,
 
     Damage = {
@@ -440,7 +441,7 @@ guns.AWP = {
 
     IsEvilItem = true,
 
-    Slot = 7,
+    ItemGroup = ItemGroups.RoleWeapon,
     CreditCost = 1,
     CanDrop = true,
 
@@ -505,7 +506,7 @@ guns["Assault Rifle"] = {
     Name = "Assault Rifle",
     DisplayName = "M4A1",
 
-    Slot = 3,
+    ItemGroup = ItemGroups.Primary,
     CanDrop = true,
 
     Spread = 0.015,
@@ -565,7 +566,7 @@ guns["Silenced Pistol"] = {
 
     IsEvilItem = true,
 
-    Slot = 7,
+    ItemGroup = ItemGroups.RoleWeapon,
     CanDrop = true,
 
     Damage = {
@@ -620,7 +621,7 @@ guns.XM1014 = {
     Kind = "Gun" :: "Gun",
     Name = "XM1014",
 
-    Slot = 3,
+    ItemGroup = ItemGroups.Primary,
     CanDrop = true,
 
     Damage = {
@@ -677,7 +678,7 @@ guns.Glock = {
     Name = "Glock",
     DisplayName = "G18",
 
-    Slot = 2,
+    ItemGroup = ItemGroups.Secondary,
     CanDrop = true,
 
     Damage = {
@@ -716,7 +717,7 @@ guns.Deagle = {
     Kind = "Gun" :: "Gun",
     Name = "Deagle",
 
-    Slot = 2,
+    ItemGroup = ItemGroups.Secondary,
     CanDrop = true,
 
     Damage = {
@@ -775,7 +776,7 @@ guns.UMP = {
     MaxStock = 2,
     CreditCost = 1,
     CanDrop = true,
-    Slot = 7,
+    ItemGroup = ItemGroups.RoleWeapon,
 
     HasMuzzleFlash = true,
 
@@ -817,7 +818,7 @@ guns.BAR = {
 
     IsEvilItem = true,
 
-    Slot = 3,
+    ItemGroup = ItemGroups.Primary,
     CreditCost = 1,
     CanDrop = true,
 
@@ -866,7 +867,7 @@ grenades.Grenade = {
 
     IsEvilItem = true,
 
-    Slot = 7,
+    ItemGroup = ItemGroups.RoleWeapon,
     CanDrop = true,
 
     Projectile = projectiles("Grenade"),
@@ -895,7 +896,7 @@ grenades.Flashbang = {
     Icon = "rbxassetid://10753198321",
     MaxStock = 2,
 
-    Slot = 8,
+    ItemGroup = ItemGroups.RoleUtility,
     CreditCost = 1,
     CanDrop = true,
 
@@ -955,7 +956,7 @@ grenades["Incendiary Grenade"] = {
     Kind = "Grenade" :: "Grenade",
     Name = "Incendiary Grenade",
 
-    Slot = 4,
+    ItemGroup = ItemGroups.Grenade,
     CanDrop = true,
 
     Projectile = projectiles("Incendiary Grenade"),
@@ -1032,7 +1033,7 @@ grenades["Smoke Grenade"] = {
     Kind = "Grenade" :: "Grenade",
     Name = "Smoke Grenade",
 
-    Slot = 4,
+    ItemGroup = ItemGroups.Grenade,
     CanDrop = true,
 
     HoldAnimation = "rbxassetid://12498620263",
@@ -1071,7 +1072,7 @@ grenades["Discombobulator"] = {
     Kind = "Grenade" :: "Grenade",
     Name = "Discombobulator",
 
-    Slot = 4,
+    ItemGroup = ItemGroups.Grenade,
     CanDrop = true,
 
     Projectile = projectiles("Discombobulator"),
@@ -1172,7 +1173,7 @@ end
 items.C4 = {
     Kind = "Item" :: "Item",
     Name = "C4",
-    Slot = 7,
+    ItemGroup = ItemGroups.RoleWeapon,
     CanDrop = true,
 
     IsEvilItem = true,
@@ -1212,7 +1213,7 @@ items.C4 = {
 items.Visualiser = {
     Kind = "Item" :: "Item",
     Name = "Visualiser",
-    Slot = 8,
+    ItemGroup = ItemGroups.RoleUtility,
     CanDrop = true,
 
     Description = "Recreates the scene of a player's murder, if they were killed by bullets.",
@@ -1236,7 +1237,7 @@ items.Visualiser = {
 items.Radio = {
     Kind = "Item" :: "Item",
     Name = "Radio",
-    Slot = 8,
+    ItemGroup = ItemGroups.RoleUtility,
     CanDrop = false,
 
     Description = "Remotely plays a sound to confuse nearby spies.",
@@ -1262,7 +1263,7 @@ items.HealthStation = {
     Kind = "Item" :: "Item",
     Name = "HealthStation",
     DisplayName = "Health Station",
-    Slot = 8,
+    ItemGroup = ItemGroups.RoleUtility,
     CanDrop = true,
 
     Description = "Can be used by anyone to restore health, with a slow recharge.",
@@ -1281,7 +1282,7 @@ items.DeathStation = {
     Kind = "Item" :: "Item",
     Name = "DeathStation",
     DisplayName = "Death Station",
-    Slot = 8,
+    ItemGroup = ItemGroups.RoleUtility,
     CanDrop = true,
 
     Description = "Visually mimics a health station. Can be used by good guys to die.",
@@ -1308,7 +1309,7 @@ items.DeathStation = {
 items.Decoy = {
     Kind = "Item" :: "Item",
     Name = "Decoy",
-    Slot = 8,
+    ItemGroup = ItemGroups.RoleUtility,
     CanDrop = false,
 
     CreditCost = 1,

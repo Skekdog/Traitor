@@ -11,7 +11,9 @@ local item: Types.ItemDefinition = {
 	Model = script.Mirror,
 	HoldAnimation = "rbxassetid://136425139325295",
 
-	Slot = 6,
+	ItemGroup = {
+		PreferredSlot = 6,
+	},
 }
 
 Mirror.Item = item

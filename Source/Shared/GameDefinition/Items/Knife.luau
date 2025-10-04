@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local DNAScanner = require(script.Parent.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -137,7 +138,7 @@ local item: Types.MeleeWeaponDefinition = {
 	Description = "A sharp knife, capable of one-hit kills when stabbing or when thrown.",
 	Icon = "rbxassetid://14930962070",
 
-	Slot = 7,
+	ItemGroup = ItemGroups.RoleWeapon,
 	CanDrop = true,
 	IsEvilItem = true,
 

@@ -344,7 +344,9 @@ local item: Types.ItemDefinition = {
 	Name = "DNAScanner",
 	DisplayName = "DNA Scanner",
 
-	Slot = 9,
+	ItemGroup = {
+		PreferredSlot = 9,
+	},
 	CanDrop = true,
 
 	Model = ReplicatedStorage.Assets.WeaponModels.DNAScanner,

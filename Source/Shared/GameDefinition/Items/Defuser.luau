@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
+local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local params = RaycastParams.new()
@@ -13,7 +14,7 @@ local item: Types.ItemDefinition = {
 	Description = "Can be used to safely defuse any C4s.",
 	Icon = "rbxassetid://96183272088937",
 
-	Slot = 8,
+	ItemGroup = ItemGroups.RoleUtility,
 	CanDrop = true,
 
 	Model = ReplicatedStorage.Assets.WeaponModels.Defuser,

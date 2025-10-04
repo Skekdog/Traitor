@@ -456,7 +456,9 @@ end
 local item: Types.ItemDefinition = {
 	Kind = "Item" :: "Item",
 	Name = "Magneto Stick",
-    Slot = 5,
+    ItemGroup = {
+		PreferredSlot = 5,
+	},
     CanDrop = false,
 
     Model = ReplicatedStorage.Assets.WeaponModels["Magneto Stick"],

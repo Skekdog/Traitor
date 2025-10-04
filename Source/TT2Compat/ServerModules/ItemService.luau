@@ -17,7 +17,7 @@ function module.GiveItem(self, player: Player, itemName: string, ammo: number?, 
 		return false
 	end
 
-	if participant:IsItemSlotOccupied(itemDefinition.Slot or -1) then
+	if participant:IsItemGroupOccupied(itemDefinition.ItemGroup) then
 		return false
 	end
 

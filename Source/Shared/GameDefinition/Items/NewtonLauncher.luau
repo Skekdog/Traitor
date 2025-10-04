@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Impulse = require(ReplicatedStorage.API.Impulse)
+local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -55,7 +56,7 @@ local item: Types.GunWeaponDefinition = {
 
     IsEvilItem = true,
 
-	Slot = 8,
+	ItemGroup = ItemGroups.RoleUtility,
     MaxStock = 2,
     CreditCost = 1,
     CanDrop = true,

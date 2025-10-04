@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
@@ -55,11 +56,11 @@ if RunService:IsClient() then
 		local fx = teleportFX:Clone()
 		fx.Position = at - moveVector / 2
 		fx.Parent = workspace.Projectiles
-	
+
 		local tween = TweenService:Create(fx, TweenInfo.new(FX_DURATION, Enum.EasingStyle.Linear), {
 			Position = at + moveVector,
 		})
-	
+
 		tween.Completed:Once(function()
 			fx:Destroy()
 		end)
@@ -69,7 +70,7 @@ if RunService:IsClient() then
 			RollOffMinDistance = 5,
 			RollOffMaxDistance = 12,
 		})
-	
+
 		tween:Play()
 	end
 
@@ -172,7 +173,7 @@ local item: Types.ItemDefinition = {
 	Description = "Can be used to teleport a limited number of times, after marking a target location.",
 	Icon = "rbxassetid://8415311131",
 
-	Slot = 8,
+	ItemGroup = ItemGroups.RoleUtility,
 	CanDrop = true,
 
 	Model = ReplicatedStorage.Assets.WeaponModels.Teleporter,

@@ -15,6 +15,7 @@ else
 end
 
 local Impulse = require(ReplicatedStorage.API.Impulse)
+local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
@@ -213,7 +214,7 @@ local item: Types.GunWeaponDefinition = {
 
 	HoldAnimation = "rbxassetid://10247380824",
 
-	Slot = 8,
+	ItemGroup = ItemGroups.RoleUtility,
 	MaxStock = 2,
 	CreditCost = 1,
 	CanDrop = true,

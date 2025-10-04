@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 
 local module = {}
 
@@ -53,7 +54,7 @@ local item: Types.ItemDefinition = {
 	Description = "Allows corpses to be searched from a distance.",
 	Icon = "rbxassetid://7677183404",
 
-	Slot = 8,
+	ItemGroup = ItemGroups.RoleUtility,
 	CanDrop = true,
 
 	Model = ReplicatedStorage.Assets.WeaponModels.Binoculars,

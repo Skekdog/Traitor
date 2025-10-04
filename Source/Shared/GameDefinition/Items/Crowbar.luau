@@ -25,7 +25,9 @@ local item: Types.MeleeWeaponDefinition = {
     Kind = "Melee" :: "Melee",
     Name = "Crowbar",
 
-    Slot = 1,
+    ItemGroup = {
+		PreferredSlot = 1,
+	},
     CanDrop = false,
 
     DamageKind = "Bludgeon" :: "Bludgeon",

@@ -17,7 +17,9 @@ local item: Types.ItemDefinition = {
 	Model = script.TargetChecker,
 	HoldAnimation = "rbxassetid://122493302142724",
 
-	Slot = 1,
+	ItemGroup = {
+		PreferredSlot = 1,
+	},
 
 	OnEquipClient = OnEquipClient,
 }

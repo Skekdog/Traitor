@@ -62,7 +62,7 @@ local function OnInteractServer(interactable: Decoy, participant: Types.Particip
 		return warn("Could not find Decoy item")
 	end
 
-	if decoyItem.Slot and participant:IsItemSlotOccupied(decoyItem.Slot) then
+	if participant:IsItemGroupOccupied(decoyItem.ItemGroup) then
 		return
 	end
 

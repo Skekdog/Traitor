@@ -28,6 +28,8 @@ module.Inventory = ourInventory
 module.EquippedItem = DynamicValue.new(nil :: Types.AnyItem?)
 module.Ammo = ourAmmo
 
+local selectedSlot: number?
+
 local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "PreAnimation" | "PreRender" | "PreSimulation" | "PostSimulation"): ()
 	for _, v in ourInventory.Passive do
 		if v.Kind == "Item" and v.Definition[schedulerEvent .. "Client"] then
@@ -73,6 +75,14 @@ function module.GetReserveAmmo(kind: string): number
 	return module.Ammo()[kind] or 0
 end
 
+local function getNextFreeSlot(): number
+	local last = 0
+	for i, v in ipairs(ourInventory.Slots) do
+		last = i
+	end
+	return last + 1
+end
+
 local function tryUnequip(item: Types.AnyItem, force: boolean?): boolean
 	if module.EquippedItem() ~= item then
 		return false
@@ -81,7 +91,8 @@ local function tryUnequip(item: Types.AnyItem, force: boolean?): boolean
 	if not force and item.Definition.PreventUnequip then
 		return false
 	end
-	
+
+	selectedSlot = nil
 	ItemHint()
 
 	ControlManager.Unregister("Drop Ammo")
@@ -208,11 +219,14 @@ local function tryEquip(item: Types.AnyItem): ()
 
 	module.EquippedItem:SetValue(item)
 
+	selectedSlot = nil
+
 	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
 	if not button then
 		return
 	end
 
+	selectedSlot = button.LayoutOrder
 	button.BackgroundTransparency = 0.25
 end
 
@@ -221,7 +235,7 @@ local INV_BUTTON_PADDING = 25
 local function move(clone: typeof(sampleButton), order: number, middle: number): ()
 	local difference = order - middle
 	local mult = if difference < 0 then -1 else 1
-	
+
 	local relativePosition
 	if order == middle then
 		relativePosition = UDim2.new()
@@ -238,15 +252,16 @@ local function move(clone: typeof(sampleButton), order: number, middle: number):
 	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + relativePosition})
 end
 
-local function tryAddButton(item: Types.AnyItem): ()
-	if not item.Definition.Slot then
+local function tryAddButton(item: Types.AnyItem, slot: number): ()
+	local gamemode = LocalRoundInfo.Gamemode()
+	if not gamemode then
 		return
 	end
 
 	local clone = sampleButton:Clone()
 	clone.Text = item.Definition.DisplayName or item.Definition.Name
-	clone.TextLabel.Text = `[{item.Definition.Slot}]`
-	clone.LayoutOrder = item.Definition.Slot
+	clone.TextLabel.Text = `[{slot}]`
+	clone.LayoutOrder = slot
 
 	clone.Position = UDim2.fromScale(0.5, 1.2)
 	clone.Visible = true
@@ -278,7 +293,7 @@ local function tryRemoveButton(itemName: string)
 	if found then
 		found.Parent = ui.Object
 		table.remove(buttons, table.find(buttons, found))
-		
+
 		local tween = UIAnimation.Animate(found, TweenInfo.new(0.2), {
 			Position = UDim2.fromScale(0.5, 1.2)
 		})
@@ -306,18 +321,12 @@ local function removeItem(itemName: string): ()
 	if equippedItem and equippedItem.Definition.Name == itemName then
 		tryUnequip(equippedItem, true)
 	end
-	
-	local slot: number?
 
-	local item = GetItemDefinition(itemName)
-	if item then
-		slot = item.Slot
-	else
-		for i, v in ourInventory.Slots do
-			if v.Definition.Name == itemName then
-				slot = i
-				break
-			end
+	local slot: number?
+	for i, v in ourInventory.Slots do
+		if v.Definition.Name == itemName then
+			slot = i
+			break
 		end
 	end
 
@@ -340,15 +349,17 @@ end
 
 local function addItem(item: Types.AnyItem): ()
 	(item :: {Definition: Types.AnyItemDefinition}).Definition = assert(GetItemDefinition(item.Definition.Name), "Item exists on server but not client")
-	tryAddButton(item)
-	
-	if item.Definition.Slot then
-		ourInventory.Slots[item.Definition.Slot] = item
-	else
-		table.insert(ourInventory.Passive, item)
-		if item.Definition.OnEquipClient then
-			item.Definition.OnEquipClient(item)
-		end
+
+	local slot = if item.Definition.ItemGroup then item.Definition.ItemGroup.PreferredSlot or getNextFreeSlot() else nil
+	if slot then
+		tryAddButton(item, slot)
+		ourInventory.Slots[slot] = item
+		return
+	end
+
+	table.insert(ourInventory.Passive, item)
+	if item.Definition.OnEquipClient then
+		item.Definition.OnEquipClient(item)
 	end
 end
 
@@ -390,7 +401,6 @@ ControlManager.Register("Next Item", function()
 		return selectLowest()
 	end
 
-	local selectedSlot = equippedItem.Definition.Slot
 	if not selectedSlot then
 		return Enum.ContextActionResult.Pass
 	end

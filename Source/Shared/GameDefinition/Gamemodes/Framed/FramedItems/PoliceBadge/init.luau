@@ -12,7 +12,9 @@ local item: Types.ItemDefinition = {
 	Model = script.PoliceBadge,
 	HoldAnimation = "rbxassetid://76200494560650",
 
-	Slot = 6,
+	ItemGroup = {
+		PreferredSlot = 6,
+	},
 }
 
 PoliceBadge.Item = item

@@ -249,7 +249,7 @@ local function OnInteractServer(interactable: Visualiser, participant: Types.Par
 		return warn("Could not find Decoy item")
 	end
 
-	if visualiserItem.Slot and participant:IsItemSlotOccupied(visualiserItem.Slot) then
+	if participant:IsItemGroupOccupied(visualiserItem.ItemGroup) then
 		return
 	end
 

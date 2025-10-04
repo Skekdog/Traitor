@@ -71,7 +71,7 @@ local function tryPurchase(): ()
     elseif response == "NotInStock" then
         errorMessage("This item is out of stock.")
     elseif response == "SlotOccupied" then
-        errorMessage(`You already have an item in slot {selectedItem.Slot}.`)
+        errorMessage(`You already have an item of this type.`)
     elseif response == "NotInRound" then
         errorMessage("You are dead.")
     elseif response ~= "Success" then
@@ -138,8 +138,8 @@ local function tryPopulateEquipment(role: Types.Role?): ()
         button.Image = v.Icon or ""
         button.ResampleMode = if v.IsPixelIcon then Enum.ResamplerMode.Pixelated else Enum.ResamplerMode.Default
 
-        button.TextLabel.Text = if v.Slot then `[{v.Slot}]` else ""
-        button.TextLabel.Visible = not not v.Slot
+        button.TextLabel.Text = if v.ItemGroup and v.ItemGroup.PreferredSlot then `[{v.ItemGroup.PreferredSlot}]` else ""
+        button.TextLabel.Visible = (v.ItemGroup and v.ItemGroup.PreferredSlot) ~= nil
 
         button.Visible = true
         button.Parent = list :: any

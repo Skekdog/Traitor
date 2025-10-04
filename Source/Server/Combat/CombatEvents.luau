@@ -101,7 +101,7 @@ remotes.ClientServer.DropItem.OnServerEvent:Connect(function(plr, itemName: unkn
 	end
 
 	local item = participant:GetItems()[itemName]
-	if not item or not item.Definition.Slot then
+	if not item or not item.Definition.ItemGroup then
 		return
 	end
 
