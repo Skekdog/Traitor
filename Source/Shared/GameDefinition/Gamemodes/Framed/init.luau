@@ -219,7 +219,7 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 	Highlights.OnDeath(round, participant)
 
 	local attacker = corpse.Killer
-	if attacker then
+	if attacker and attacker ~= participant then
 		local relation: GetRelation.Relation = GetRelation(attacker, participant)
 		if relation ~= "RDM" then
 			attacker:AddCredits(1)
