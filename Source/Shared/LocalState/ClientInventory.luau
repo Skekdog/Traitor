@@ -80,6 +80,7 @@ local function getNextFreeSlot(): number
 	for i, v in ipairs(ourInventory.Slots) do
 		last = i
 	end
+	print(last)
 	return last + 1
 end
 
@@ -352,6 +353,9 @@ local function addItem(item: Types.AnyItem): ()
 
 	local slot = if item.Definition.ItemGroup then item.Definition.ItemGroup.PreferredSlot or getNextFreeSlot() else nil
 	if slot then
+		if ourInventory.Slots[slot] then
+			slot = getNextFreeSlot()
+		end
 		tryAddButton(item, slot)
 		ourInventory.Slots[slot] = item
 		return
