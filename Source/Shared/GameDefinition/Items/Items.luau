@@ -1367,4 +1367,10 @@ allItems["Golden Gone"] = modify(guns["Golden Gun"], "Golden Gone", {
     AmmoType = Ammo["Super Gun"]
 })
 
+allItems["Isaac Newton"] = modify(guns["Newton Launcher"], "Isaac Newton", {
+    AttackInterval = 0,
+})
+
+allItems["Knice"] = require(script.Parent.Knice)
+
 return allItems
