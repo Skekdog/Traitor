@@ -17,9 +17,7 @@ local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.ThoseYouTrust)
 
-local EXCLUDED_GAMEMODES: {Instance} = {
-    ReplicatedStorage.Shared.GameDefinition.Gamemodes.Elimination
-}
+local EXCLUDED_GAMEMODES: {Instance} = {}
 
 Round.Config.DeathSounds = DeathSounds
 
