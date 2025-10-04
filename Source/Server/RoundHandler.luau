@@ -15,6 +15,8 @@ local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
+local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.ThoseYouTrust)
+
 local EXCLUDED_GAMEMODES: {Instance} = {
     ReplicatedStorage.Shared.GameDefinition.Gamemodes.Elimination
 }
@@ -106,21 +108,19 @@ local INTERMISSION_TIME = 15
 
 local module = {}
 
-local gamemodes: {Types.GamemodeDefinition} = {}
+local varietyGamemodes: {Types.GamemodeDefinition} = {}
 function module.UpdateLoadedGamemodes(): ()
-    gamemodes = {}
+    varietyGamemodes = {}
     for _, v in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
         if not v:IsA("ModuleScript") then
             continue
         end
 
-        if table.find(EXCLUDED_GAMEMODES, v) then
+        if table.find(EXCLUDED_GAMEMODES, v) or defaultGamemode.Name == v.Name then
             continue
         end
 
-        for i = 1, if v.Name == "ThoseYouTrust" then 4 else 1 do
-            table.insert(gamemodes, GamemodeValidation.ValidateGamemodeScript(v))
-        end
+        table.insert(varietyGamemodes, GamemodeValidation.ValidateGamemodeScript(v))
     end
 end
 
@@ -135,7 +135,7 @@ function module.TrySetForcedGamemode(gamemode: string?): boolean
     end
 
     local found: Types.GamemodeDefinition?
-    for _, v in gamemodes do
+    for _, v in varietyGamemodes do
         if v.Name == gamemode then
             found = v
             break
@@ -155,7 +155,10 @@ local function pickNextGamemode(): Types.GamemodeDefinition
         return forcedGamemode
     end
 
-    return gamemodes[math.random(#gamemodes)]
+    if roundCount ~= 0 and roundCount % MAP_VOTE_INTERVAL == 0 then
+        return varietyGamemodes[math.random(#varietyGamemodes)]
+    end
+    return defaultGamemode
 end
 
 module.Round = DynamicValue.new((nil :: any) :: Types.Round)
