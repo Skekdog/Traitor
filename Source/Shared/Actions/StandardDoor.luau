@@ -205,7 +205,6 @@ end
 
 if IS_SERVER then
     remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, direction: unknown): ()
-        if true then return end
         if typeof(door) ~= "Instance" or (not door:IsA("BasePart") and not door:IsA("Model")) then
             return
         end
