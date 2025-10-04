@@ -395,7 +395,6 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 	end
 
 	local impulse = participant.Extras.CombatImpulse
-	print(impulse)
 
 	local hum = model:FindFirstChildOfClass("Humanoid")
 

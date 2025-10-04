@@ -80,7 +80,6 @@ local function getNextFreeSlot(): number
 	for i, v in ipairs(ourInventory.Slots) do
 		last = i
 	end
-	print(last)
 	return last + 1
 end
 
