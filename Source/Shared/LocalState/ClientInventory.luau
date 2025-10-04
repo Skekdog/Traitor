@@ -351,7 +351,12 @@ end
 local function addItem(item: Types.AnyItem): ()
 	(item :: {Definition: Types.AnyItemDefinition}).Definition = assert(GetItemDefinition(item.Definition.Name), "Item exists on server but not client")
 
-	local slot = if item.Definition.ItemGroup then item.Definition.ItemGroup.PreferredSlot or getNextFreeSlot() else nil
+	local gamemode = LocalRoundInfo.Gamemode()
+	if not gamemode then
+		return
+	end
+
+	local slot = if gamemode.IsSlotless then getNextFreeSlot() else item.Definition.ItemGroup and item.Definition.ItemGroup.PreferredSlot
 	if slot then
 		if ourInventory.Slots[slot] then
 			slot = getNextFreeSlot()
