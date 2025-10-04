@@ -87,11 +87,13 @@ local function StandardDoor(request: DoorRequest): ()
     local originalDoorCFrame = part.CFrame
 
     do
-        local attribute = door:GetAttribute("OriginalCFrame")
+        local attribute = door:GetAttribute("OriginalCFrame") or door:GetAttribute("ClientOriginalCFrame")
         if typeof(attribute) == "CFrame" then
             originalDoorCFrame = attribute
         elseif IS_SERVER then
             door:SetAttribute("OriginalCFrame", originalDoorCFrame)
+        else
+            door:SetAttribute("ClientOriginalCFrame", originalDoorCFrame)
         end
     end
 
@@ -203,6 +205,7 @@ end
 
 if IS_SERVER then
     remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, direction: unknown): ()
+        if true then return end
         if typeof(door) ~= "Instance" or (not door:IsA("BasePart") and not door:IsA("Model")) then
             return
         end
