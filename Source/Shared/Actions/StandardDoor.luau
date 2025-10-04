@@ -14,27 +14,27 @@ type BaseDoorRequest = {
     Door: Types.MapObject,
 }
 
+export type Direction = "In" | "Out"?
+
 export type ClientInteraction = BaseDoorRequest & {
     Kind: "ClientInteraction",
 }
 
-type BaseReceive = BaseDoorRequest & {
-    Open: boolean,
-}
-
-export type ServerReceive = BaseReceive & {
+export type ServerReceive = BaseDoorRequest & {
     Kind: "ServerReceive",
+    Direction: Direction,
     Player: Player,
 }
 
-export type ClientReceive = BaseReceive & {
+export type ClientReceive = BaseDoorRequest & {
     Kind: "ClientReceive",
     TargetAngle: number,
     OriginalCFrame: CFrame,
 }
 
-export type ServerRun = BaseReceive & {
+export type ServerRun = BaseDoorRequest & {
     Kind: "ServerRun",
+    Direction: Direction,
 }
 
 export type DoorRequest = ClientInteraction | ServerReceive | ClientReceive | ServerRun
@@ -80,7 +80,7 @@ local function StandardDoor(request: DoorRequest): ()
         end
     end
 
-    local shouldOpen = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? else request.Open
+    local shouldOpen = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? elseif request.Kind == "ClientReceive" then request.TargetAngle ~= 0 else request.Direction ~= nil
     door:SetAttribute("Open", shouldOpen)
 
     local part = GetPrimaryPart(door)
@@ -141,11 +141,14 @@ local function StandardDoor(request: DoorRequest): ()
 
     local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if shouldOpen then math.rad(90) else 0
 
-    if request.Kind ~= "ClientReceive" then
-        local axis = pivotAttachment.WorldAxis
-        local axisScale = axis.X + axis.Y + axis.Z
-        if axisScale >= 0 then
-            targetAngle *= -1
+    local direction: Direction
+    if request.Kind ~= "ClientReceive" and shouldOpen then
+        direction = if request.Kind == "ClientInteraction" then
+            if pivotAttachment.WorldCFrame.LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Out" else "In"
+            else request.Direction
+
+        if direction == "Out" then
+            targetAngle = -targetAngle
         end
     end
 
@@ -179,7 +182,7 @@ local function StandardDoor(request: DoorRequest): ()
     local angle = findOrCreateAngleValue(part)
 
     if request.Kind == "ClientInteraction" then
-        remotes.ClientServer.OpenDoor:FireServer(door, shouldOpen)
+        remotes.ClientServer.OpenDoor:FireServer(door, direction)
     else
         part.CFrame = request.OriginalCFrame
     end
@@ -199,13 +202,13 @@ local function StandardDoor(request: DoorRequest): ()
 end
 
 if IS_SERVER then
-    remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, open: unknown): ()
+    remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, direction: unknown): ()
         if typeof(door) ~= "Instance" or (not door:IsA("BasePart") and not door:IsA("Model")) then
             return
         end
         local MapObject = door :: Types.MapObject
 
-        if typeof(open) ~= "boolean" then
+        if typeof(direction) ~= "nil" and direction ~= "In" and direction ~= "Out" then
             return
         end
 
@@ -224,7 +227,7 @@ if IS_SERVER then
             Kind = "ServerReceive" :: "ServerReceive",
             Player = plr,
             Door = MapObject,
-            Open = open,
+            Direction = direction,
         }
         StandardDoor(request)
     end)
