@@ -1,12 +1,18 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local IS_SERVER = RunService:IsServer()
 
-local function BulletTracer(projectile: BasePart, projectileSpeed: number, start: Vector3, target: Vector3): ()
+local function BulletTracer(projectile: BasePart, projectileSpeed: number, start: Vector3, target: Vector3, except: Player?): ()
 	if IS_SERVER then
-		return ReplicatedStorage.Remotes.ServerClient.BulletTracer:FireAllClients(projectile, projectileSpeed, start, target)
+		for _, player in Players:GetPlayers() do
+			if player ~= except then
+				ReplicatedStorage.Remotes.ServerClient.BulletTracer:FireClient(player, projectile, projectileSpeed, start, target)
+			end
+		end
+		return
 	end
 
 	projectile = projectile:Clone()
@@ -21,7 +27,7 @@ local function BulletTracer(projectile: BasePart, projectileSpeed: number, start
 	tween.Completed:Once(function()
 		projectile:Destroy()
 	end)
-	
+
 	tween:Play()
 end
 

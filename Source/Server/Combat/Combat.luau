@@ -375,7 +375,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			end
 
 			if definition.Kind == "Gun" and definition.Projectile then
-				BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, request.Origin, v.Destination)
+				BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, request.Origin, v.Destination, by.Player)
 			end
 
 			local validateRaycastResult = validatePrimaryFire(item, by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)

@@ -11,6 +11,7 @@ local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInvent
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local Aim = require(script.Parent.Aim)
+local BulletTracer = require(script.Parent.BulletTracer)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
@@ -35,7 +36,7 @@ local function getSpreadVector(item: Types.AnyItem): Vector3
 	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
 end
 
-local function raycast(char: Model, spread: Vector3, range: number, checkInitialOverlap: boolean): {RaycastResult: RaycastResult?, Parts: {BasePart}?}
+local function raycast(char: Model, spread: Vector3, range: number, checkInitialOverlap: boolean): {RaycastResult: RaycastResult?, Parts: {BasePart}?, Origin: Vector3?}
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return {}
@@ -63,7 +64,8 @@ local function raycast(char: Model, spread: Vector3, range: number, checkInitial
 
 	return {
 		RaycastResult = result,
-		Parts = parts
+		Parts = parts,
+		Origin = workspace.CurrentCamera.CFrame.Position,
 	}
 end
 
@@ -273,6 +275,10 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 						local hitPartCenterPosition = if hitPart then hitPart.Position else nil
 						local normal = if raycastResult then raycastResult.Normal else nil
 						local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
+
+						if item.Kind == "Gun" and item.Definition.Projectile and result.Origin then
+							BulletTracer(item.Definition.Projectile, item.Definition.ProjectileSpeed or 100, result.Origin, targetPosition)
+						end
 
 						if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
 							local materialOverride = hitPart:GetAttribute("MaterialOverride")
