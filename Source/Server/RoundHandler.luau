@@ -1,8 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local GamemodeValidation = require(ReplicatedStorage.Shared.RoundRule.GamemodeValidation)
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 local ScoreManager = require(ServerScriptService.Player.ScoreManager)
@@ -25,6 +29,28 @@ end
 
 function Round.Config.OnCharacterAdded(round: Types.Round, participant: Types.Participant): ()
     participant.Extras.CombatImpulse = nil
+end
+
+function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, params: Types.DamageParams): boolean
+    if typeof(params.Source) == "table" and params.Source.Kind == "Melee" then
+        return true
+    end
+
+    local health = prop:GetHealth()
+    local willDestroy = if health then health - params.Amount <= 0 else false
+
+    if not willDestroy then
+        return true
+    end
+
+    local hitPart = params.HitPart or GetPrimaryPart(prop.Model)
+
+    PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, params.HitPosition or hitPart.Position, nil, {
+        RollOffMinDistance = 5,
+        RollOffMaxDistance = 15,
+    })
+
+    return true
 end
 
 local remotes = ReplicatedStorage.Remotes
