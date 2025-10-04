@@ -274,24 +274,27 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 
 	local hits: {Types.Participant | Types.Prop | Types.Interactable} = {}
     for _, v in workspace:GetPartBoundsInRadius(params.Position, info.FalloffEnd) do
-        local prop = round:GetProp(v)
-		if prop then
-			if table.find(hits, prop) then
+		local propObject = GetMapObjectWithTag(v, "Prop")
+		if propObject then
+			local prop = round:GetProp(propObject)
+			if prop then
+				if table.find(hits, prop) then
+					continue
+				end
+				table.insert(hits, prop)
+				onPropHit(params, round, params.Attacker, prop, v, v.Position, params.Position)
 				continue
 			end
-			table.insert(hits, prop)
-			onPropHit(params, round, params.Attacker, prop, v, v.Position, params.Position)
-			continue
-		end
 
-		local interactable = round:GetInteractable(v)
-		if interactable then
-			if table.find(hits, interactable) then
+			local interactable = round:GetInteractable(propObject)
+			if interactable then
+				if table.find(hits, interactable) then
+					continue
+				end
+				table.insert(hits, interactable)
+				onPropHit(params, round, params.Attacker, interactable, v, v.Position, params.Position)
 				continue
 			end
-			table.insert(hits, interactable)
-			onPropHit(params, round, params.Attacker, interactable, v, v.Position, params.Position)
-			continue
 		end
 
 		local char = GetMapObjectWithTag(v, "Character")
