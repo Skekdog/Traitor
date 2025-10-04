@@ -5,12 +5,12 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-function module.Use(self, door: Types.MapObject, _: boolean): ()
+function module.Use(self, door: Types.MapObject, openOutwards: boolean): ()
 	if RunService:IsServer() then
 		StandardDoor({
 			Door = door,
 			Kind = "ServerRun" :: "ServerRun",
-			Open = not door:GetAttribute("Open"),
+			Direction = (if door:GetAttribute("Open") then nil else if not openOutwards then "In" else "Out") :: StandardDoor.Direction,
 		})
 		return
 	end
