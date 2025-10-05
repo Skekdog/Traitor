@@ -181,6 +181,8 @@ function UIManager.RegisterUI(object: GuiObject): UI
         but:SetAttribute("Size", UDim2.fromScale(0.45, 1))
         but:AddTag("ControlHint")
 
+		but.ZIndex = -#sb:GetChildren()
+
 		but.Visible = true
 		but.Parent = sb
 		but.MouseButton1Click:Connect(function()
