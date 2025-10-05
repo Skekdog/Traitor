@@ -311,7 +311,12 @@ if RunService:IsClient() then
 	end)
 
 	RunService.Heartbeat:Connect(function(dt)
+		local lastCharge = currentCharge
 		currentCharge = math.min(currentCharge + RECHARGE_RATE * dt, 100)
+
+		if currentCharge == lastCharge then
+			return
+		end
 
 		if clientAutoScan then
 			tryScan()
