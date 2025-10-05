@@ -61,9 +61,6 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     local door = request.Door
-    if request.Kind ~= "ClientReceive" and door:GetAttribute("Opening") then
-        return
-    end
 
     if door:GetAttribute("Locked") then
         if request.Kind ~= "ClientReceive" then
@@ -135,9 +132,6 @@ local function StandardDoor(request: DoorRequest): ()
             duration = configCloseDuration
         end
     end
-
-    door:SetAttribute("Opening", true)
-    task.delay(duration, door.SetAttribute, door, "Opening", false)
 
     local hingePosition = CFrame.new(pivotAttachment.Position)
 
