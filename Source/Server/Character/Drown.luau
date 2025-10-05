@@ -7,13 +7,14 @@ local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local DROWN_THRESHOLD = 10
+local DROWN_THRESHOLD = 2
 local DROWN_DAMAGE = 10
-local DROWN_INTERVAL = 1
+local DROWN_INTERVAL = 10
 
 local params = RaycastParams.new()
 params.IgnoreWater = false
 params.FilterDescendantsInstances = {workspace.Terrain}
+params.IgnoreWater = false
 params.FilterType = Enum.RaycastFilterType.Include
 
 type Participant = Types.Participant & {
@@ -34,6 +35,11 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 		return
 	end
 
+	local humanoid = participant:GetHumanoid()
+	if not humanoid then
+		return
+	end
+
 	if not participant:IsAlive() then
 		return
 	end
@@ -45,11 +51,13 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 
 	local isSubmerged = alreadySubmerged
 
-	if not isSubmerged then
-		local roundedPos = (Vector3.new(math.round(head.Position.X), math.round(head.Position.Y), math.round(head.Position.Z)) // 4) * 4
-		local voxels = workspace.Terrain:ReadVoxelChannels(Region3.new(roundedPos, roundedPos + Vector3.one * 4), 4, {"LiquidOccupancy"})
-		local occupancy = voxels.LiquidOccupancy[1][1][1]
-		isSubmerged = occupancy >= 0.5
+	if not isSubmerged and humanoid:GetState() == Enum.HumanoidStateType.Swimming then
+		local result = workspace:Raycast(head.Position, Vector3.new(0, -0.5, 0), params)
+
+		-- So this looks silly, but if we are under water then raycasting will return nothing, since the ray already started under water
+		if not result then
+			isSubmerged = true
+		end
 	end
 
 	if not isSubmerged then
