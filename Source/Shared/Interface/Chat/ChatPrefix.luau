@@ -14,7 +14,7 @@ GetChatChannel("RBXGeneral").OnIncomingMessage = function(message): ()
 
 	local participant = LocalParticipantInfo.GetParticipant(sender.Name)
 
-	message.PrefixText = `<b><font color='#{UsernameColor(participant.Name):ToHex()}'>{participant.Name}</font></b>:`
+	message.PrefixText = `<b><font color='#{UsernameColor(participant.Name):ToHex()}'>{participant.Name}</font>:</b>`
 
 	if participant.Status() ~= "Alive" then
 		message.PrefixText = `<b><font color='#{DEAD_COLOR:ToHex()}'>` .. "*DEAD*</font></b> " .. message.PrefixText
