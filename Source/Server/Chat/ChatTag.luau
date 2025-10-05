@@ -1,11 +1,16 @@
 local Players = game:GetService("Players")
 
-Players.PlayerAdded:Connect(function(player)
+local function onPlayerAdded(player: Player): ()
 	local role = player:GetRoleInGroup(game.CreatorId)
-	print(role)
 	if role ~= "Guest" then
 		player:SetAttribute("ChatTag", role)
 	end
-end)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+for _, player in Players:GetPlayers() do
+	onPlayerAdded(player)
+end
 
 return nil
