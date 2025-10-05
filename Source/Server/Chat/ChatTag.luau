@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 
 local function onPlayerAdded(player: Player): ()
 	local role = player:GetRoleInGroup(game.CreatorId)
-	if role ~= "Guest" then
+	if role ~= "Guest" and role ~= "Member" then
 		player:SetAttribute("ChatTag", role)
 	end
 end
