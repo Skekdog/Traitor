@@ -211,6 +211,7 @@ end
 local c4s = DynamicValue.new({} :: {[Instance]: C4})
 if RunService:IsClient() then
 	local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
+	local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 
 	local isEvil = false
 
@@ -323,8 +324,6 @@ if RunService:IsClient() then
 	end
 
 	RunService.Heartbeat:Connect(function()
-		local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
-
 		local role = LocalParticipantInfo.GetParticipant().Role()
 		isEvil = role.Definition.IsEvil or false
 

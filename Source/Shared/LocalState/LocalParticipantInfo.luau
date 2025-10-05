@@ -6,6 +6,8 @@ local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
+local localPlayerName = Players.LocalPlayer.Name
+
 local module = {}
 
 local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
@@ -51,7 +53,7 @@ Players.PlayerAdded:Connect(function(plr: Player): ()
 end)
 
 function module.GetParticipant(name: string?): LocalParticipant
-    name = name or Players.LocalPlayer.Name
+    name = name or localPlayerName
     assert(name)
     return module.Participants()[name] or getOrCreateParticipantValue(name)
 end
