@@ -732,4 +732,17 @@ module.relax = {
 	end
 }
 
+module.seance = {
+	Name = "seance",
+	Description = "Makes chat from dead players visible to everyone.",
+	Arguments = {},
+	Environment = "Server" :: "Server",
+	HasRelaxedPermissions = true,
+	Execute = function(executor: Player, round: Round): string
+		local FilterDead = require(ServerScriptService.Chat.FilterDead)
+		FilterDead.Disabled = not FilterDead.Disabled
+		return `Seance is now {if FilterDead.Disabled then "enabled" else "disabled"}.`
+	end
+}
+
 return module
