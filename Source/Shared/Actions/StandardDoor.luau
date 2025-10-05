@@ -193,7 +193,7 @@ local function StandardDoor(request: DoorRequest): ()
     tween:Play()
 
     local con: RBXScriptConnection
-    con = RunService.PreSimulation:Connect(function()
+    con = RunService.PreRender:Connect(function()
         local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, angle.Value)
         part.CFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
 
