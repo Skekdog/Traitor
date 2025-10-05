@@ -116,7 +116,7 @@ local function StandardDoor(request: DoorRequest): ()
                 RollOffMaxDistance = 18,
             })}
         end
-        PlaySound(sounds, nil, door)
+        PlaySound(sounds, nil, GetPrimaryPart(door))
     end
 
     local duration = 0.75
