@@ -51,6 +51,8 @@ local framedRole: Types.RoleDefinition = {
 	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"], Items.Radar, Items.Intel},
 	StartingItems = {Items.TargetChecker, Items.Mirror, Items.Crowbar},
 
+	WalkSpeed = 18,
+
 	RevealedRoles = {"Police"},
 	HighlightedRoles = {"Police"},
 
@@ -71,6 +73,8 @@ local policeRole: Types.RoleDefinition = {
 	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"]},
 	StartingItems = {Items.PoliceBadge},
 
+	WalkSpeed = 18,
+
 	Allies = {"Police", "Undercover"},
 	RevealedRoles = {"Police", "Undercover"},
 	HighlightedRoles = {"Police", "Undercover"},
@@ -87,6 +91,8 @@ local undercoverRole: Types.RoleDefinition = {
 	Sound = "rbxassetid://1839098267",
 
 	Allegiance = {Kind = "Role", Role = "Police"},
+
+	WalkSpeed = 18,
 
 	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"]},
 	StartingItems = {Items.FakeTargetChecker, Items.PoliceBadge},
