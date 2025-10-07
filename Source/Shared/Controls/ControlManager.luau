@@ -130,7 +130,8 @@ function module.Register(actionName: string, callback: ActionCallback, priority:
 			return Enum.ContextActionResult.Pass
 		end
 
-		return callback(action, state, input)
+		callback(action, state, input)
+		return Enum.ContextActionResult.Pass
 	end
 
 	ContextActionService:BindActionAtPriority(actionName, runCallback, false, priority, table.unpack(binds))
