@@ -14,8 +14,8 @@ local FOV_WHEEL_SPEED = 1.5 -- normal value is 1.0
 local FOV_GAMEPAD_SPEED = 0.25
 local NAV_SHIFT_MUL = 0.25
 
-local INPUT_PRIORITY = Enum.ContextActionPriority.High.Value
-local REDUCED_INPUT_PRIORITY = Enum.ContextActionPriority.Medium.Value
+local INPUT_PRIORITY = Enum.ContextActionPriority.Low.Value
+local REDUCED_INPUT_PRIORITY = Enum.ContextActionPriority.Low.Value
 
 local gamepad = {
 	ButtonX = 0,
@@ -89,7 +89,7 @@ function module.GetCameraPan(): Vector2
 	local kMouse = mouse.Delta * PAN_MOUSE_SPEED
 
 	mouse.Delta = Vector2.new()
-	
+
 	return kGamepad + kMouse
 end
 
