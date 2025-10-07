@@ -12,9 +12,9 @@ local UIAnimation = require(script.Parent.UIAnimation)
 local plr = Players.LocalPlayer
 local plrUi = plr.PlayerGui
 
--- Undocumented behaviour, but GetGuiInset() returns zero sometimes
+-- Undocumented behaviour, but GetGuiInset() returns zero sometimes. But it always returns zero when (emulating) console. fuck you.
 local inset = GuiService:GetGuiInset()
-while inset == Vector2.zero do
+while inset == Vector2.zero and not GuiService:IsTenFootInterface() do
 	inset =  GuiService:GetGuiInset()
 	task.wait()
 end
