@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 local ServerScriptService = game:GetService("ServerScriptService")
-local TextChatService = game:GetService("TextChatService")
+local HookOnMessage = require(ServerScriptService.Chat.HookOnMessage)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local module = {}
@@ -40,10 +40,9 @@ end
 local playerChatted = Instance.new("BindableEvent")
 module.PlayerChatted = playerChatted.Event
 
-local RBXGeneral = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
-RBXGeneral.ShouldDeliverCallback = function(message: TextChatMessage): ()
+HookOnMessage(function(message)
 	playerChatted:Fire(Players:GetPlayerByUserId(message.TextSource.UserId), message.Text)
-	return true -- lol! if this doesn't return a truthy value then the message don't get sent 😢
-end
+	return true
+end)
 
 return module

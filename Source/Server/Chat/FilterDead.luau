@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
+local HookOnMessage = require(script.Parent.HookOnMessage)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local GetRound = require(ReplicatedStorage.API.GetRound)
 
@@ -8,7 +8,7 @@ local FilterDead = {}
 
 FilterDead.Disabled = false
 
-GetChatChannel("RBXGeneral").ShouldDeliverCallback = function(message, source): boolean
+HookOnMessage(function(message, source)
 	if FilterDead.Disabled then
 		return true
 	end
@@ -26,11 +26,10 @@ GetChatChannel("RBXGeneral").ShouldDeliverCallback = function(message, source): 
 	local receiverParticipant = if receiver then GetParticipant(receiver.Name) else nil
 
 	if not senderParticipant or not senderParticipant:IsAlive() then
-		print(not receiverParticipant, if receiverParticipant then not receiverParticipant:IsAlive() else nil)
 		return not receiverParticipant or not receiverParticipant:IsAlive()
 	end
 
 	return true
-end
+end)
 
 return FilterDead
