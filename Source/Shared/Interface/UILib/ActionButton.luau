@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ControlTypes = require(ReplicatedStorage.Shared.Controls.ControlTypes)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local ui = ReplicatedStorage.Assets.UnregisteredUIs.ActionButtons
@@ -15,7 +16,7 @@ function module.GetButton(actionName: string): ActionButton?
 	return ui:FindFirstChild("Button_" .. actionName) :: ActionButton?
 end
 
-local function setCallbacks(actionName: string, button: ActionButton, callback: (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult): ()
+local function setCallbacks(actionName: string, button: ActionButton, callback: ControlTypes.ActionCallback): ()
 	if buttonConnections[button] then
 		for _, v in buttonConnections[button] do
 			v:Disconnect()
@@ -36,7 +37,7 @@ local function setCallbacks(actionName: string, button: ActionButton, callback: 
 	end))
 end
 
-function module.ShowActionButton(actionName: string, callback: (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult, settingOverride: Settings.ControlValue?): ActionButton
+function module.ShowActionButton(actionName: string, callback: ControlTypes.ActionCallback, settingOverride: Settings.ControlValue?): ActionButton
 	local control = settingOverride or Settings.GetSetting(actionName) :: Settings.ControlValue
 	assert(control.TouchButton, `{actionName} is not a touch control`)
 
@@ -61,7 +62,7 @@ function module.ShowActionButton(actionName: string, callback: (actionName: stri
 	button.Name = "Button_" .. actionName
 	button.Parent = ui
 
-	setCallbacks(actionName, button, callback)	
+	setCallbacks(actionName, button, callback)
 
 	return button
 end

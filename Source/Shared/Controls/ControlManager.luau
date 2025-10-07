@@ -2,6 +2,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local ControlTypes = require(script.Parent.ControlTypes)
 local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local ActionButton = require(ReplicatedStorage.Shared.Interface.UILib.ActionButton)
@@ -9,11 +10,10 @@ local InstanceSignal = require(ReplicatedStorage.Shared.Util.InstanceSignal)
 
 local module = {}
 
-export type ActionCallback = (actionName: string, state: Enum.UserInputState, input: InputObject) -> Enum.ContextActionResult
 export type RegistrationInfo = {
 	ActionName: string,
 	Priority: number,
-	Callback: ActionCallback,
+	Callback: ControlTypes.ActionCallback,
 }
 
 export type InputMethod = "Touch" | "Keyboard" | "Controller"
@@ -94,7 +94,7 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 end
 
 -- Returns the Button if it was created
-function module.Register(actionName: string, callback: ActionCallback, priority: number?, settingOverride: Settings.ControlValue?): ActionButton.ActionButton?
+function module.Register(actionName: string, callback: ControlTypes.ActionCallback, priority: number?, settingOverride: Settings.ControlValue?): ActionButton.ActionButton?
 	priority = priority or Enum.ContextActionPriority.Medium.Value
 	assert(priority)
 
