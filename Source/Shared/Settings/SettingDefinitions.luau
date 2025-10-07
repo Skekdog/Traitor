@@ -399,7 +399,7 @@ table.insert(availableSettings, {
 	Default = {
 		Toggled = true,
 		Keybind = {
-			KBMKeybind = Enum.KeyCode.X,
+			KBMKeybind = Enum.KeyCode.E,
 			ConsoleKeybind = Enum.KeyCode.ButtonB,
 		},
 	},
