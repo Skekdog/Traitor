@@ -140,7 +140,19 @@ function module.ShowInteractableHint(prop: Types.MapObject, part: BasePart): ()
 		return
 	end
 
-	corpseHint.Text = if definition.HideName then "" else GetDisplayName(definition)
+	local displayName: string
+	if definition.HideName then
+		displayName = ""
+	else
+		local attr = prop:GetAttribute("DisplayName")
+		if typeof(attr) == "string" then
+			displayName = attr
+		else
+			displayName = GetDisplayName(definition)
+		end
+	end
+
+	corpseHint.Text = if definition.HideName then "" else displayName
 
 	if interactable.HintTextClient then
 		interactableHint.Text = interactable.HintTextClient
