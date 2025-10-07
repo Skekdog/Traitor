@@ -139,8 +139,14 @@ local function StandardDoor(request: DoorRequest): ()
 
     local direction: Direction
     if request.Kind ~= "ClientReceive" and shouldOpen then
+        local referenceCFrame = door:GetAttribute("ReferenceCFrame")
+        if typeof(referenceCFrame) ~= "CFrame" then
+            referenceCFrame = part.CFrame
+        end
+        assert(typeof(referenceCFrame) == "CFrame", "ReferenceCFrame must be a CFrame")
+
         direction = if request.Kind == "ClientInteraction" then
-            if pivotAttachment.WorldCFrame.LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Out" else "In"
+            if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Out" else "In"
             else request.Direction
 
         if direction == "Out" then
@@ -173,6 +179,11 @@ local function StandardDoor(request: DoorRequest): ()
         end
 
         return
+    end
+
+    do
+        local finalRotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, targetAngle)
+        door:SetAttribute("ReferenceCFrame", originalDoorCFrame:ToWorldSpace(hingePosition) * finalRotation * hingePosition:Inverse())
     end
 
     local angle = findOrCreateAngleValue(part)
