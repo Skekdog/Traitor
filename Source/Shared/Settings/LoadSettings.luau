@@ -27,7 +27,7 @@ ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings.OnClientEvent:Connect(f
 
 	if loadedVersion == Settings.SETTINGS_VERSION then
 		local decoded = Serialisation.DeserialiseJSON(toLoad)
-	
+
 		for i, v in decoded do
 			setSetting(i, v)
 		end
@@ -51,6 +51,8 @@ ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings.OnClientEvent:Connect(f
 	UIManager.RegisterUI(SettingsUI.UI)
 
 	SettingsUI.AdjustForInset(UIManager.GuiInset)
+
+	require(script.Parent.ChatTagSetting)
 end)
 
 return nil
