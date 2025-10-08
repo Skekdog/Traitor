@@ -58,7 +58,14 @@ function module.SetSetting(name: string, value: SettingDefinitions.SettingValue)
 	local definition = module.GetDefinition(name)
 	assert(definition, `Setting {name} does not exist`)
 
-	assert(typeof(value) == typeof(definition.Default), `Setting {name} must be of type {typeof(definition.Default)}`)
+	if definition.Kind == "Boolean" then
+		assert(typeof(value) == "boolean", `Setting {name} must be of type boolean`)
+	elseif definition.Kind == "Choice" then
+		assert(typeof(value) == "string", `Setting {name} must be of type string`)
+		assert(table.find(definition.PossibleValues, value), `Setting {name} must be one of: {table.concat(definition.PossibleValues, ", ")}`)
+	elseif definition.Kind == "Control" then
+		assert(typeof(value) == "table", `Setting {name} must be of type table`)
+	end
 
 	settingValues[name] = value
 
