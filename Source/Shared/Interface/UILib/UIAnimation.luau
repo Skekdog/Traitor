@@ -20,7 +20,7 @@ end
 
 function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 	-- If open is true, open animation should play, otherwise close
-	
+
 	local tween: Tween?
 	local style = frame:GetAttribute("TransitionStyle")
 	if style == "Position" or style == "Size" then
@@ -63,18 +63,18 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 				end
 			end
 		end
-		
+
 		local UI_TRANSITION_TIME = 0.2
 		local UI_SCALE_FACTOR = 0.75
-		
+
 		local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
-		
+
 		local info = TweenInfo.new(
 			UI_TRANSITION_TIME,
 			Enum.EasingStyle.Exponential,
 			Enum.EasingDirection.Out
 		)
-		
+
 		local properties: {[string]: any}
 		if isSize then
 			properties = {
@@ -85,9 +85,9 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 				Position = if open then targetUDim else offScreenPosition
 			}
 		end
-		
+
 		tween = module.Animate(frame, info, properties)
-		
+
 		if open then
 			if isSize then
 				frame.Size = startSize
@@ -96,7 +96,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			end
 			frame.Visible = true
 		end
-		
+
 		local modalise = frame:FindFirstChild("Modalise") :: TextButton
 		if modalise then
 			modalise.Visible = open
@@ -161,7 +161,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			end)
 		end
 	end
-	
+
 	return tween
 end
 
@@ -188,7 +188,7 @@ function module.TransitionSwitch(target: GuiObject, disabled: boolean)
 
     local posTween = module.Animate(switch, TweenInfo.new(0.25, Enum.EasingStyle.Quad),
 		{
-			Position = UDim2.fromScale(if disabled then 0.9 else 0.1, 0.5)
+			Position = UDim2.fromScale(if disabled then 0.1 else 0.9, 0.5)
 		}
 	)
 
@@ -210,7 +210,7 @@ function module.TransitionSwitch(target: GuiObject, disabled: boolean)
 		colourTween.Name = "ColourTween"
 		colourTween.Parent = switch
 	end
-	
+
 	switch.Text = if disabled then "O" else "I"
 end
 
@@ -249,9 +249,9 @@ local UNDERLINE_TRANSITION_TIME = 0.5
 function module.TransitionUnderline(underline: Frame, target: TextButton)
 	local halfSize = UDim2.fromOffset(target.AbsoluteSize.X * UNDERLINE_TRANSITION_SCALE, underline.AbsoluteSize.Y)
 	local fullSize = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underline.AbsoluteSize.Y)
-	
+
 	local newPosition = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underline.AbsoluteSize.Y)
-	
+
 	local halfSizeTween = module.Animate(underline, TweenInfo.new(
 		UNDERLINE_TRANSITION_TIME / 2,
 		Enum.EasingStyle.Exponential,
@@ -259,7 +259,7 @@ function module.TransitionUnderline(underline: Frame, target: TextButton)
 	),
 		{ Size = halfSize }
 	)
-	
+
 	local function originalSize()
 		module.Animate(underline, TweenInfo.new(
 			UNDERLINE_TRANSITION_TIME / 2,
