@@ -39,3 +39,5 @@ require(script.Parent.Interface.InitialiseUI)
 require(script.Parent.SetDefaultSoundGroup)
 require(script.Parent.Parent.Compat.DynamicInteractable)
 require(script.Parent.DevTools.Console)
+
+task.spawn(require, script.Parent.Settings.ChatTagSetting)

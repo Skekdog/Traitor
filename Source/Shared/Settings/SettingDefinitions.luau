@@ -60,6 +60,19 @@ local availableSettings: {SettingDefinition} = {}
 local isLocalAdmin = RunService:IsServer() or IsAdmin(Players.LocalPlayer) or RelaxedPermissions.HasRelaxedPermissions(Players.LocalPlayer)
 
 table.insert(availableSettings, {
+	Name = "Chat Tag",
+	Tab = "Display",
+	Category = "Chat",
+	Kind = "Choice" :: "Choice",
+	PossibleValues = {"None"},
+	Default = "None",
+
+	Callback = function(name, value)
+		(require)(callbacks.ChatTag)(name, value)
+	end
+})
+
+table.insert(availableSettings, {
 	Name = "Shadows",
 	Tab = "Display",
 	Category = "Environment",

@@ -99,14 +99,14 @@ local function createCategoryLabel(name: string, page: Page): ()
 	label.Text = name
 	label.Name = "CategoryLabel_" .. name
 	label.Visible = true
-	
+
 	if not categoryIndex[page] then
 		categoryIndex[page] = {}
 	end
 
 	local index = categoryIndex[page]
 	assert(index)
-	
+
 	local count = 0
 	for _ in index do
 		count += 1
@@ -118,7 +118,7 @@ local function createCategoryLabel(name: string, page: Page): ()
 	label.LayoutOrder = index[name] :: number
 	label.Parent = page :: any
 
-	return 
+	return
 end
 
 local function getLayoutOrderForCategory(category: string, page: Page): number?
@@ -252,7 +252,7 @@ local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "
 		imageLabel.Visible = false
 		return
 	end
-	
+
 	if asString:sub(1, 11) == "rbxasset://" then
 		imageLabel.Image = asString
 		imageLabel.Visible = true
@@ -497,6 +497,20 @@ end
 
 function module.AddButton(definition: SettingDefinitions.SettingDefinition, value: SettingDefinitions.SettingValue): ()
 	setupForDefinition(definition, value)
+end
+
+function module.RemoveButton(definition: SettingDefinitions.SettingDefinition): ()
+	local page = getPage(definition.Tab)
+	if not page then
+		return
+	end
+
+	local button = page:FindFirstChild("Button_" .. definition.Name) :: Button
+	if not button then
+		return
+	end
+
+	button:Destroy()
 end
 
 function module.AdjustForInset(inset: Vector2): ()
