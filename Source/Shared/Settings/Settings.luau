@@ -62,7 +62,7 @@ function module.SetSetting(name: string, value: SettingDefinitions.SettingValue)
 		assert(typeof(value) == "boolean", `Setting {name} must be of type boolean`)
 	elseif definition.Kind == "Choice" then
 		assert(typeof(value) == "string", `Setting {name} must be of type string`)
-		assert(table.find(definition.PossibleValues, value), `Setting {name} must be one of: {table.concat(definition.PossibleValues, ", ")}`)
+		assert(definition.IgnoreInvalidChoice or table.find(definition.PossibleValues, value), `Setting {name} must be one of: {table.concat(definition.PossibleValues, ", ")}`)
 	elseif definition.Kind == "Control" then
 		assert(typeof(value) == "table", `Setting {name} must be of type table`)
 	end

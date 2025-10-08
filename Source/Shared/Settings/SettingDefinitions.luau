@@ -30,6 +30,7 @@ export type BaseDefinition = {
 	Category: string,
 	Tooltip: string?,
 	Hidden: boolean?,
+	IgnoreInvalidChoice: boolean?,
 }
 
 export type BooleanDefinition = BaseDefinition & {
@@ -66,6 +67,7 @@ table.insert(availableSettings, {
 	Kind = "Choice" :: "Choice",
 	PossibleValues = {"None"},
 	Default = "None",
+	IgnoreInvalidChoice = true,
 
 	Callback = function(name, value)
 		(require)(callbacks.ChatTag)(name, value)
