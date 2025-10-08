@@ -10,7 +10,14 @@ assert(definition and definition.Kind == "Choice")
 table.insert(tags, 1, "None")
 definition.PossibleValues = tags
 
+local value = Settings.GetSetting(definition.Name) :: string
+if not table.find(tags, value) then
+	value = "None"
+end
+
+Settings.SetSetting(definition.Name, value)
+
 SettingsUI.RemoveButton(definition)
-SettingsUI.AddButton(definition, Settings.GetSetting(definition.Name))
+SettingsUI.AddButton(definition, value)
 
 return nil

@@ -17,7 +17,7 @@ function ChatTags.GetAvailableTags(player: Player): {string}
 
 	local groupRole = player:GetRoleInGroup(game.CreatorId)
 	if groupRole ~= "Guest" and groupRole ~= "Member" then
-		-- table.insert(tags, groupRole)
+		table.insert(tags, groupRole)
 	end
 
 	if BadgeService:UserHasBadgeAsync(player.UserId, 2136698808) then
