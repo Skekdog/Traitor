@@ -74,6 +74,10 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 
 	task.wait(1) -- wait, otherwise the attacker immediately picks up the knife
 
+	if not model.Parent then
+		return
+	end
+
 	model:AddTag("Item")
 	local newItem = attacker.Round:LoadProp(model)
 
