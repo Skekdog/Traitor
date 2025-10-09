@@ -7,7 +7,7 @@ local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local DROWN_THRESHOLD = 2
+local DROWN_THRESHOLD = 10
 local DROWN_DAMAGE = 10
 local DROWN_INTERVAL = 10
 
