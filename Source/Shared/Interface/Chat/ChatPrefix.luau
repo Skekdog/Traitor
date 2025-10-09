@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local HookClientMessage = require(script.Parent.HookClientMessage)
 local TagColors = require(script.Parent.TagColors)
 local UsernameColor = require(script.Parent.UsernameColor)
-local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 
 local DEAD_COLOR = Color3.fromRGB(245, 175, 26)
@@ -10,7 +10,7 @@ local DEAD_ASTERISK_COLOR = Color3.fromRGB(255, 0, 0)
 
 local DEAD_STRING = `<font color='#{DEAD_ASTERISK_COLOR:ToHex()}'>*<font color='#{DEAD_COLOR:ToHex()}'>DEAD</font>*</font> `
 
-GetChatChannel("RBXGeneral").OnIncomingMessage = function(message): ()
+HookClientMessage.Hook(function(message)
 	if not message.TextSource then
 		return -- Sometimes this is nil 🤷‍♂️
 	end
@@ -36,6 +36,6 @@ GetChatChannel("RBXGeneral").OnIncomingMessage = function(message): ()
 	message.PrefixText ..= `<font color='#{UsernameColor(participant.Name):ToHex()}'>{participant.Name}</font>:`
 
 	message.PrefixText ..= "</b>"
-end
+end)
 
 return nil
