@@ -9,7 +9,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local DROWN_THRESHOLD = 10
 local DROWN_DAMAGE = 10
-local DROWN_INTERVAL = 10
+local DROWN_INTERVAL = 1
 
 local params = RaycastParams.new()
 params.IgnoreWater = false
