@@ -274,6 +274,9 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 
 	local hits: {Types.Participant | Types.Prop | Types.Interactable} = {}
     for _, v in workspace:GetPartBoundsInRadius(params.Position, info.FalloffEnd) do
+		if not v:IsDescendantOf(workspace) then
+			continue -- stupid bullshit
+		end
 		local propObject = GetMapObjectWithTag(v, "Prop")
 		if propObject then
 			local prop = round:GetProp(propObject)
