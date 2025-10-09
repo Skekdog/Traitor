@@ -177,9 +177,6 @@ end
 
 local function OnFinish(round: Types.Round): ()
 	Epilogue.Finish()
-	if round.Extras.FramedBackgroundMusic then
-		round.Extras.FramedBackgroundMusic:Destroy()
-	end
 
 	for _, participant in round:GetParticipants() do
 		if RedHanded.IsRedHanded(participant) then
