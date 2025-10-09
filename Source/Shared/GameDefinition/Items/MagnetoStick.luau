@@ -289,9 +289,13 @@ local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
 		return
 	end
 
-	if clientControl and clientControl.Prop:HasTag("Corpse") then
-		return clientHang()
+	if clientControl then
+		if clientControl.Prop:HasTag("Corpse") then
+			clientHang()
+		end
+		return
 	end
+
 	clientPush(part, position, origin)
 end
 
