@@ -301,9 +301,21 @@ if RunService:IsClient() then
 				distance = (workspace.CurrentCamera.CFrame.Position - c4.Model.Position).Magnitude
 			end
 
-			local border = marker.Border
-			local distanceLabel = marker.Distance
-			local timerLabel = marker.Timer
+			-- Instances fucking suck and somehow these instances might not exist
+			local border = marker:FindFirstChild("Border")
+			if not border then
+				return
+			end
+
+			local distanceLabel = marker:FindFirstChild("Distance")
+			if not distanceLabel then
+				return
+			end
+
+			local timerLabel = marker:FindFirstChild("Timer")
+			if not timerLabel then
+				return
+			end
 
 			local colour: Color3
 			if distance > explosionInfo.FalloffEnd then
