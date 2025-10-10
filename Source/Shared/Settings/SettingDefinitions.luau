@@ -153,25 +153,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Quick Chat",
-	Tab = "Keybinds",
-	Category = "Chat",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.V,
-		},
-	},
-
-	Callback = function(name: string, value: ControlValue)
-		(require)(callbacks.Keybind)(name, value)
-	end,
-})
-
-table.insert(availableSettings, {
 	Name = "Crouch",
 	Tab = "Keybinds",
 	Category = "Movement",
@@ -380,26 +361,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Next Item",
-	Tab = "Keybinds",
-	Category = "Inventory",
-	Tooltip = "Cycles to the next item. Primarily used with controllers.",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = true,
-		Keybind = {
-			ConsoleKeybind = Enum.KeyCode.ButtonY,
-		},
-	},
-
-	Callback = function(name: string, value: ControlValue)
-		(require)(callbacks.Keybind)(name, value)
-	end,
-})
-
-table.insert(availableSettings, {
 	Name = "Close UI",
 	Tab = "Keybinds",
 	Category = "Menus",
@@ -521,6 +482,26 @@ table.insert(availableSettings, {
 
 local numberNames = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
 
+table.insert(availableSettings, {
+	Name = "Next Item",
+	Tab = "Keybinds",
+	Category = "Inventory",
+	Tooltip = "Cycles to the next item. Primarily used with controllers.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			ConsoleKeybind = Enum.KeyCode.ButtonY,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
 for i = 1, 9 do
 	table.insert(availableSettings, {
 		Name = "Slot " .. tostring(i),
@@ -541,6 +522,25 @@ for i = 1, 9 do
 		end,
 	})
 end
+
+table.insert(availableSettings, {
+	Name = "Quick Chat",
+	Tab = "Keybinds",
+	Category = "Chat",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.V,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
 
 for i = 1, 9 do
 	table.insert(availableSettings, {
