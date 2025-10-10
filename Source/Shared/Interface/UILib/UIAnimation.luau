@@ -36,7 +36,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 		local direction = frame:GetAttribute("TransitionDirection") -- The direction it moves when OPENING
 		local offScreenPosition = targetUDim
 		if direction == "Right" then
-			offScreenPosition = UDim2.new((frame.Size.X.Scale * frame.AnchorPoint.X) - 1, targetUDim.X.Offset, targetUDim.Y.Scale, targetUDim.Y.Offset)
+			offScreenPosition = UDim2.new((frame.Size.X.Scale * frame.AnchorPoint.X) - frame.Size.X.Scale, targetUDim.X.Offset, targetUDim.Y.Scale, targetUDim.Y.Offset)
 		elseif direction == "Left" then
 			offScreenPosition = UDim2.new((frame.Size.X.Scale * frame.AnchorPoint.X) + 1, targetUDim.X.Offset, targetUDim.Y.Scale, targetUDim.Y.Offset)
 		elseif direction == "Up" then
