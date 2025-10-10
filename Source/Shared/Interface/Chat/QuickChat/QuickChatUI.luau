@@ -14,7 +14,7 @@ if not TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
 	return nil
 end
 
-local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.QuickChat)
+local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs["Quick Chat"])
 
 type ChatButton = typeof(ui.Object.ChatTemplate)
 
