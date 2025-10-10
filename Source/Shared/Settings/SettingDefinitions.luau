@@ -153,7 +153,7 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "QuickChat",
+	Name = "Quick Chat",
 	Tab = "Keybinds",
 	Category = "Chat",
 	Kind = "Control" :: "Control",
