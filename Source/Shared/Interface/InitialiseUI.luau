@@ -10,6 +10,7 @@ ThemesManager.UpdateTheme("Dark")
 require(script.Parent.Welcome)
 require(script.Parent.GameState.CalledToCorpse)
 require(script.Parent.Chat.ChatPrefix)
+require(script.Parent.Chat.QuickChat.QuickChatUI)
 
 for _, v in script.Parent.GameState:GetChildren() do
 	if v:IsA("ModuleScript") then

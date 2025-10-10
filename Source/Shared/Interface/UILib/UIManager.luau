@@ -148,7 +148,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 		end
 	}
 
-	if self.Layer == "Popup" and not object:GetAttribute("NoKeybind") then
+	if (self.Layer == "Popup" and not object:GetAttribute("NoKeybind")) or object:GetAttribute("HasKeybind") then
 		ControlManager.Register(self.Name, function(act, state, input)
 			local isToggled = (Settings.GetSetting(self.Name) :: SettingDefinitions.ControlValue).Toggled
 

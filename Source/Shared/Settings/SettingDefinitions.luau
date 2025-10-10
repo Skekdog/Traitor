@@ -153,6 +153,21 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "QuickChat",
+	Tab = "Keybinds",
+	Category = "Chat",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = true,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.V,
+		},
+	},
+})
+
+table.insert(availableSettings, {
 	Name = "Crouch",
 	Tab = "Keybinds",
 	Category = "Movement",
@@ -380,29 +395,6 @@ table.insert(availableSettings, {
 	end,
 })
 
-local numberNames = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
-
-for i = 1, 9 do
-	table.insert(availableSettings, {
-		Name = "Slot " .. tostring(i),
-		Tab = "Keybinds",
-		Category = "Inventory",
-		Kind = "Control" :: "Control",
-		SpecifyToggle = false,
-
-		Default = {
-			Toggled = true,
-			Keybind = {
-				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]],
-			},
-		},
-
-		Callback = function(name: string, value: ControlValue)
-			(require)(callbacks.Keybind)(name, value)
-		end,
-	})
-end
-
 table.insert(availableSettings, {
 	Name = "Close UI",
 	Tab = "Keybinds",
@@ -522,5 +514,45 @@ table.insert(availableSettings, {
 		(require)(callbacks.Keybind)(name, value)
 	end,
 })
+
+local numberNames = {"One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"}
+
+for i = 1, 9 do
+	table.insert(availableSettings, {
+		Name = "Slot " .. tostring(i),
+		Tab = "Keybinds",
+		Category = "Inventory",
+		Kind = "Control" :: "Control",
+		SpecifyToggle = false,
+
+		Default = {
+			Toggled = true,
+			Keybind = {
+				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]],
+			},
+		},
+
+		Callback = function(name: string, value: ControlValue)
+			(require)(callbacks.Keybind)(name, value)
+		end,
+	})
+end
+
+for i = 1, 9 do
+	table.insert(availableSettings, {
+		Name = "Quick Chat " .. tostring(i),
+		Tab = "Keybinds",
+		Category = "Quick Chat Slots",
+		Kind = "Control" :: "Control",
+		SpecifyToggle = false,
+
+		Default = {
+			Toggled = true,
+			Keybind = {
+				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]]
+			}
+		}
+	})
+end
 
 return availableSettings
