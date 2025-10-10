@@ -63,7 +63,7 @@ end
 
 UIManager.RegisteredEvent = DynamicValue.new("")
 
-function UIManager.RegisterUI(object: GuiObject): UI
+function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
 	local modal = object:GetAttribute("Modal") :: boolean?
 	local transitionStyle = object:GetAttribute("TransitionStyle") :: "Position" | "Size"
@@ -242,7 +242,7 @@ function UIManager.RegisterUI(object: GuiObject): UI
 
 	UIManager.RegisteredEvent:SetValue(self.Name)
 
-	return self
+	return self :: UI & {Object: T}
 end
 
 function UIManager.TryGetUI(name: string): UI?
