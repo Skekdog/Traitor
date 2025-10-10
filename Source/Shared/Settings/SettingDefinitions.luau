@@ -555,7 +555,11 @@ for i = 1, 9 do
 			Keybind = {
 				KBMKeybind = (Enum.KeyCode :: any)[numberNames[i]]
 			}
-		}
+		},
+
+		Callback = function(name: string, value: ControlValue)
+			(require)(callbacks.Keybind)(name, value)
+		end,
 	})
 end
 
