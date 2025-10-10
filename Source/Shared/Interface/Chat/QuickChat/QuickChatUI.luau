@@ -6,6 +6,7 @@ local QuickChat = require(script.Parent.QuickChat)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local ID_DURATION = 5
+local AUTO_HIDE_AFTER = 5
 
 local ui = UIManager.WaitForUI("QuickChat") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.QuickChat)}
 
@@ -14,13 +15,22 @@ local function chat(button: TextButton): ()
 	QuickChat.Chat(button.Text)
 end
 
+local lastShow
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+	local thisShow = newproxy()
+	lastShow = thisShow
 	if not ui.Object.Visible then
 		for i = 1, 9 do
 			ControlManager.Unregister("Quick Chat " .. i)
 		end
 		return
 	end
+
+	task.delay(AUTO_HIDE_AFTER, function()
+		if lastShow == thisShow then
+			ui:ToggleVisible(false)
+		end
+	end)
 
 	for _, v in ui.Object:GetChildren() do
 		if v:IsA("TextButton") and v.Name ~= "ChatTemplate" then
