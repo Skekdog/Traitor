@@ -546,7 +546,7 @@ for i = 1, 9 do
 	table.insert(availableSettings, {
 		Name = "Quick Chat " .. tostring(i),
 		Tab = "Keybinds",
-		Category = "Quick Chat Slots",
+		Category = "Chat",
 		Kind = "Control" :: "Control",
 		SpecifyToggle = false,
 
