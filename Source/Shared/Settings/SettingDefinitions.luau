@@ -157,7 +157,7 @@ table.insert(availableSettings, {
 	Tab = "Keybinds",
 	Category = "Chat",
 	Kind = "Control" :: "Control",
-	SpecifyToggle = true,
+	SpecifyToggle = false,
 
 	Default = {
 		Toggled = true,
