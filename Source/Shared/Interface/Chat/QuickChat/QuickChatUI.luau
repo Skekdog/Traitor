@@ -1,5 +1,7 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local TextChatService = game:GetService("TextChatService")
 local Interaction = require(ReplicatedStorage.Shared.Actions.Interaction)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local QuickChat = require(script.Parent.QuickChat)
@@ -8,7 +10,11 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ID_DURATION = 5
 local AUTO_HIDE_AFTER = 5
 
-local ui = UIManager.WaitForUI("QuickChat") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.QuickChat)}
+if not TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
+	return nil
+end
+
+local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.QuickChat)
 
 local function chat(button: TextButton): ()
 	ui:ToggleVisible(false)
@@ -17,7 +23,7 @@ end
 
 local lastShow
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
-	local thisShow = newproxy()
+local thisShow = newproxy()
 	lastShow = thisShow
 	if not ui.Object.Visible then
 		for i = 1, 9 do
