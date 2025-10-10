@@ -16,9 +16,11 @@ end
 
 local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.QuickChat)
 
-local function chat(button: TextButton): ()
+type ChatButton = typeof(ui.Object.ChatTemplate)
+
+local function chat(button: ChatButton): ()
 	ui:ToggleVisible(false)
-	QuickChat.Chat(button.Text)
+	QuickChat.Chat(button.TextLabel.Text)
 end
 
 local lastShow
@@ -51,7 +53,7 @@ local thisShow = newproxy()
 				if not button or not button:IsA("TextButton") then
 					return
 				end
-				chat(button)
+				chat(button :: ChatButton)
 			end)
 		end
 	end
@@ -78,10 +80,11 @@ RunService.Heartbeat:Connect(function()
 	local id = if Interaction.LastId.At + ID_DURATION < os.clock() then nil else Interaction.LastId.Id
 	for _, v in ui.Object:GetChildren() do
 		if v:IsA("TextButton") and v.Name ~= "ChatTemplate" then
-			v.Visible = true
+			local button = v :: ChatButton
+			button.Visible = true
 
-			local baseMessage = QuickChat.AvailableMessages[tonumber(v.Name) or error("not a number")]
-			v.Text = QuickChat.FormatMessage(baseMessage, id)
+			local baseMessage = QuickChat.AvailableMessages[tonumber(button.Name) or error("not a number")]
+			button.TextLabel.Text = QuickChat.FormatMessage(baseMessage, id)
 		end
 	end
 end)
