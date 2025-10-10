@@ -17,8 +17,6 @@ local participant = LocalParticipantInfo.GetParticipant()
 
 local module = {}
 
-module.CorpseInteractDistance = 10
-
 module.InteractProp = nil :: Types.MapObject?
 module.InteractPart = nil :: BasePart?
 module.ActionNode = nil :: ActionNodeClient.ClientNodeData?
@@ -31,7 +29,7 @@ end
 local function interactCorpse(corpse: Model): boolean
 	local status = participant.Status()
 	if status == "Alive" then
-		if not distanceCheck(corpse:GetPivot().Position, module.CorpseInteractDistance) then
+		if not distanceCheck(corpse:GetPivot().Position, Mouse.CorpseInteractDistance) then
 			return false
 		end
 	end
