@@ -332,6 +332,8 @@ if RunService:IsClient() then
 		clientAutoScan = not clientAutoScan
 		UIAnimation.TransitionSwitch(ui.Object.AutoScanButton.Value, clientAutoScan)
 	end)
+
+	UIAnimation.TransitionSwitch(getUI().Object.AutoScanButton.Value, clientAutoScan)
 end
 
 local function OnEquipClient(): ()
