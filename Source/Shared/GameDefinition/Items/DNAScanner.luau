@@ -307,6 +307,10 @@ if RunService:IsClient() then
 			clientCurrentTrace = traces[1]
 			local button = ui.Object.Samples:FindFirstChild(tostring(clientCurrentTrace)) or error("no button");
 			(button:FindFirstChildOfClass("UIStroke") or error("no ui stroke")).Enabled = true
+
+			if clientAutoScan then
+				tryScan()
+			end
 		end
 	end)
 
@@ -331,6 +335,9 @@ if RunService:IsClient() then
 	ui.Object.AutoScanButton.Activated:Connect(function()
 		clientAutoScan = not clientAutoScan
 		UIAnimation.TransitionSwitch(ui.Object.AutoScanButton.Value, clientAutoScan)
+		if clientAutoScan then
+			tryScan()
+		end
 	end)
 
 	UIAnimation.TransitionSwitch(getUI().Object.AutoScanButton.Value, clientAutoScan)
