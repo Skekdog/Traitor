@@ -25,7 +25,7 @@ end
 
 local lastShow
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
-local thisShow = newproxy()
+	local thisShow = newproxy()
 	lastShow = thisShow
 	if not ui.Object.Visible then
 		for i = 1, 9 do
