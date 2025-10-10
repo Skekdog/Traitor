@@ -165,6 +165,10 @@ table.insert(availableSettings, {
 			KBMKeybind = Enum.KeyCode.V,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
