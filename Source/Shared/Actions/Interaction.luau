@@ -135,7 +135,7 @@ function module.TryInteract(prop: Types.MapObject?, part: BasePart?, input: Inpu
 end
 
 local function interactAction(action: string, state: Enum.UserInputState, input: InputObject?): Enum.ContextActionResult
-	return if module.TryInteract(module.InteractProp, module.InteractPart, input, module.ActionNode) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+	return if module.TryInteract(module.InteractProp, module.InteractPart, input, module.ActionNode) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
 end
 
 ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.High.Value + 1)

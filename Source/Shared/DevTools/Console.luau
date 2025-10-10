@@ -24,7 +24,7 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 				console.Object.Input:CaptureFocus()
 			end
 
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end)
 
 		local object = console.Object

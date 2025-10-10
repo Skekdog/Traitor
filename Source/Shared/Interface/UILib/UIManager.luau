@@ -164,7 +164,7 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 				end
 			end
 
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end)
 	end
 
@@ -332,7 +332,7 @@ ControlManager.Register("Close UI", function()
 	for _, v in UIManager.GetUIs("Popup") do
 		if v.Visible and not v.NoClose then
 			v:ToggleVisible(false)
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end
 	end
 	return Enum.ContextActionResult.Pass

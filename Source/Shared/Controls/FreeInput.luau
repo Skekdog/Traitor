@@ -104,33 +104,33 @@ end
 
 local function Keypress(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 	keyboard[input.KeyCode.Name] = state == Enum.UserInputState.Begin and 1 or 0
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local function GpButton(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 	gamepad[input.KeyCode.Name] = state == Enum.UserInputState.Begin and 1 or 0
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local function MousePan(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 	local delta = input.Delta
 	mouse.Delta = Vector2.new(-delta.Y, -delta.X)
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local function Thumb(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 	gamepad[input.KeyCode.Name] = input.Position :: any
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local function Trigger(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 	gamepad[input.KeyCode.Name] = input.Position.Z
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local function MouseWheel(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 	mouse[input.UserInputType.Name] = -input.Position.Z
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local function TouchPan(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
@@ -142,7 +142,7 @@ local function TouchPan(action: string, state: Enum.UserInputState, input: Input
 	end
 
 	mouse.Delta = Vector2.new(-delta.Y, -delta.X) * MOBILE_PAN_SENSITIVITY_MULTIPLIER
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local function Zero(t: {[any]: any})

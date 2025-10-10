@@ -164,7 +164,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				end
 
 				Aim.ToggleAim(item)
-				return Enum.ContextActionResult.Sink
+				return Enum.ContextActionResult.Pass
 			end)
 		end
 
@@ -173,7 +173,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				return Enum.ContextActionResult.Pass
 			end
 
-			return if tryReloadWeapon(item) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
+			return if tryReloadWeapon(item) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
 		end)
 	else
 		ControlManager.Unregister("Reload Weapon")
@@ -218,7 +218,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				end
 			end
 
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end)
 	end
 
@@ -234,7 +234,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 				if item.Kind == "Gun" and item.Definition.ScopeRequired and not Aim.IsAiming() then
 					playEmptyClipSound()
-					return Enum.ContextActionResult.Sink -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
+					return Enum.ContextActionResult.Pass -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
 				end
 
 				if item.Kind == "Melee" or item.Kind == "Gun" then
@@ -392,7 +392,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				end
 			end
 
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end)
 	end
 end)

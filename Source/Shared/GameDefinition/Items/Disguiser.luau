@@ -134,7 +134,7 @@ local function OnEquipClient(item: Types.AnyItem): ()
 		ShowAlert("Disguise: " .. if clientDisguiseActive then "ON" else "OFF")
 		remote:FireServer(clientDisguiseActive)
 
-		return Enum.ContextActionResult.Sink
+		return Enum.ContextActionResult.Pass
 	end, nil, {
 		Toggled = true,
 		Keybind = {

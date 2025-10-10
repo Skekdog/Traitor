@@ -45,7 +45,7 @@ local function spectateFunc(action, state)
 	camera.CameraSubject = chars[index]
 
 	uiO.Username.Text = ((camera.CameraSubject :: Humanoid).Parent :: Instance).Name
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 local statusId = newproxy()

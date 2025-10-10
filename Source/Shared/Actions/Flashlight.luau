@@ -53,7 +53,7 @@ local function enableFlashlight(): Enum.ContextActionResult
 	local light = getOrCreateFlashlight(workspace.CurrentCamera)
 	light.Enabled = enabled
 
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 LocalCharacter.Character:Connect(function(char)

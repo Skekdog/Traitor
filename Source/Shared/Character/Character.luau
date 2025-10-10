@@ -24,7 +24,7 @@ end
 local function registerCrouch(): ()
     ControlManager.Register("Crouch", function()
         Crouch.ToggleCrouching()
-        return Enum.ContextActionResult.Sink
+        return Enum.ContextActionResult.Pass
     end)
 end
 

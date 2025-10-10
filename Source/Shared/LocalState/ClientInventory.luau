@@ -196,7 +196,7 @@ local function tryEquip(item: Types.AnyItem): ()
 			end
 
 			tryDropAmmo(item, GetCentreRay().Direction)
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end)
 	end
 
@@ -207,7 +207,7 @@ local function tryEquip(item: Types.AnyItem): ()
 			end
 
 			tryDropItem(item, GetCentreRay().Direction)
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end)
 	end
 
@@ -376,7 +376,7 @@ for i = 1, 9 do
 		local item = ourInventory.Slots[i]
 		if item then
 			tryEquip(item)
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end
 		return Enum.ContextActionResult.Pass
 	end)
@@ -400,7 +400,7 @@ local function selectLowest()
 		return Enum.ContextActionResult.Pass
 	end
 	tryEquip(ourInventory.Slots[lowest])
-	return Enum.ContextActionResult.Sink
+	return Enum.ContextActionResult.Pass
 end
 
 ControlManager.Register("Next Item", function()
@@ -419,13 +419,13 @@ ControlManager.Register("Next Item", function()
 
 	if table.maxn(ourInventory.Slots) == selectedSlot then
 		tryUnequip(ourInventory.Slots[selectedSlot])
-		return Enum.ContextActionResult.Sink
+		return Enum.ContextActionResult.Pass
 	end
 
 	for i = selectedSlot + 1, 9 do
 		if ourInventory.Slots[i] then
 			tryEquip(ourInventory.Slots[i])
-			return Enum.ContextActionResult.Sink
+			return Enum.ContextActionResult.Pass
 		end
 	end
 

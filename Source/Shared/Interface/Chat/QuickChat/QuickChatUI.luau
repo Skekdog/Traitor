@@ -51,9 +51,10 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 			ControlManager.Register("Quick Chat " .. i, function()
 				local button = ui.Object:FindFirstChild(tostring(i))
 				if not button or not button:IsA("TextButton") then
-					return
+					return Enum.ContextActionResult.Pass
 				end
 				chat(button :: ChatButton)
+				return Enum.ContextActionResult.Sink
 			end)
 		end
 	end
