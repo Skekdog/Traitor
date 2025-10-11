@@ -8,6 +8,7 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ChatWindow = {}
 
 local MAX_LENGTH = 200
+local AUTO_SCROLL_THRESHOLD = 5
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 
@@ -32,7 +33,13 @@ TextChatService.MessageReceived:Connect(function(message)
 	messageBox.TextTransparency = if isOutgoing then 0.5 else 0
 	messageBox.Visible = true
 
+	local shouldScroll = ((ChatWindow.MessagesFrame.AbsoluteCanvasSize.Y - ChatWindow.MessagesFrame.AbsoluteWindowSize.Y) - ChatWindow.MessagesFrame.CanvasPosition.Y) < AUTO_SCROLL_THRESHOLD
+
 	messageBox.Parent = ChatWindow.MessagesFrame
+
+	if shouldScroll then
+		ChatWindow.MessagesFrame.CanvasPosition = Vector2.new(0, ChatWindow.MessagesFrame.AbsoluteCanvasSize.Y * 10) -- calculating the new position based on message size doesn't work correctly
+	end
 end)
 
 local function sendChat(): ()
