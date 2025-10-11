@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TextChatService = game:GetService("TextChatService")
@@ -64,6 +65,10 @@ ChatWindow.InputBox:GetPropertyChangedSignal("Text"):Connect(function()
 
 	ChatWindow.InputBox.Text = text:sub(1, MAX_LENGTH)
 end)
+
+if not TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
+	ChatWindow.InputBox.Visible = false
+end
 
 sendButton.Activated:Connect(sendChat)
 
