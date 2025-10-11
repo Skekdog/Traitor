@@ -524,6 +524,25 @@ for i = 1, 9 do
 end
 
 table.insert(availableSettings, {
+	Name = "Chat",
+	Tab = "Keybinds",
+	Category = "Chat",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.Slash,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end
+})
+
+table.insert(availableSettings, {
 	Name = "Quick Chat",
 	Tab = "Keybinds",
 	Category = "Chat",

@@ -65,6 +65,7 @@ UIManager.RegisteredEvent = DynamicValue.new("")
 
 function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
+	local accountForInset = object:GetAttribute("AccountForInset") :: boolean?
 	local modal = object:GetAttribute("Modal") :: boolean?
 	local transitionStyle = object:GetAttribute("TransitionStyle") :: "Position" | "Size"
 	local transitionTarget = object:GetAttribute("TransitionTarget") :: UDim2
@@ -199,6 +200,12 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 		elseif self.Layer == "Popup" then
 			warn(self.Name.." does not have a registered Close button!")
 		end
+	end
+
+	if accountForInset and not object:GetAttribute("InsetAdjusted") then
+		object:SetAttribute("InsetAdjusted", true)
+		object.Size -= UDim2.fromOffset(inset.X, inset.Y)
+		object.Position += UDim2.fromOffset(inset.X, inset.Y)
 	end
 
 	if ignoreInset and not object:GetAttribute("InsetAdjusted") then

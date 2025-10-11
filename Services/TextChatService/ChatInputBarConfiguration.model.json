@@ -6,6 +6,7 @@
 			"weight": "Regular",
 			"style": "Normal"
 		},
-		"TextSize": 18
+		"TextSize": 18,
+		"Enabled": false
 	}
 }
