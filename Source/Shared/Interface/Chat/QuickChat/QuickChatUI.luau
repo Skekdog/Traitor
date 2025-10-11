@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local TextChatService = game:GetService("TextChatService")
 local Interaction = require(ReplicatedStorage.Shared.Actions.Interaction)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local ChatWindow = require(ReplicatedStorage.Shared.Interface.Chat.ChatWindow)
 local QuickChat = require(script.Parent.QuickChat)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
@@ -71,6 +72,10 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 			chat(button)
 		end)
 	end
+end)
+
+ChatWindow.QuickChatButton.Activated:Connect(function()
+	ui:ToggleVisible()
 end)
 
 RunService.Heartbeat:Connect(function()

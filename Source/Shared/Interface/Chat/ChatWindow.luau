@@ -26,6 +26,8 @@ local inputFrame = frame.Input
 ChatWindow.InputBox = inputFrame.InputFrame.TextBox
 local sendButton = inputFrame.SendButton
 
+ChatWindow.QuickChatButton = inputFrame.QuickChatButton
+
 TextChatService.MessageReceived:Connect(function(message)
 	if message.Status ~= Enum.TextChatMessageStatus.Success and message.Status ~= Enum.TextChatMessageStatus.Sending then
 		return
@@ -80,4 +82,4 @@ ControlManager.Register("Chat", function()
 	return Enum.ContextActionResult.Pass
 end)
 
-return nil
+return ChatWindow
