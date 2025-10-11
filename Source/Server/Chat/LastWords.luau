@@ -23,7 +23,7 @@ remote.OnServerEvent:Connect(function(player, lastWords: unknown): ()
 	participant:AddCorpseIcon({
 		Name = "Last Words",
 		Description = "Something tells you that this spy was about to say: " .. result:GetNonChatStringForBroadcastAsync(),
-		Icon = "rbxassetid://129271406012583",
+		Icon = "rbxassetid://87874288021572",
 	})
 end)
 
