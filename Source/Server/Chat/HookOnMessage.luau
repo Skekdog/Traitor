@@ -7,12 +7,13 @@ type Callback = (message: TextChatMessage, source: TextSource) -> boolean
 local hooks: {Callback} = {}
 
 RBXGeneral.ShouldDeliverCallback = function(message, source)
+	local doNotDeliver = false
 	for _, callback in hooks do
 		if not callback(message, source) then
-			return false
+			doNotDeliver = true
 		end
 	end
-	return true
+	return not doNotDeliver
 end
 
 local function HookOnMessage(callback: Callback): ()
