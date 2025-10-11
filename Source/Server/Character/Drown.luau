@@ -1,8 +1,8 @@
-local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local SoundService = game:GetService("SoundService")
+local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -100,7 +100,7 @@ RunService.Heartbeat:Connect(function(dt)
 
 	local submergedParticipants: {[Participant]: true?} = {}
 
-	for _, bound in CollectionService:GetTagged("Water") do
+	for _, bound in GetTaggedDescendants(map.Map, "Water") do
 		if not bound:IsA("BasePart") then
 			return
 		end
