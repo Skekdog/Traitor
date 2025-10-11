@@ -27,6 +27,9 @@ ChatWindow.InputBox = inputFrame.InputFrame.TextBox
 local sendButton = inputFrame.SendButton
 
 TextChatService.MessageReceived:Connect(function(message)
+	if message.Status ~= Enum.TextChatMessageStatus.Success and message.Status ~= Enum.TextChatMessageStatus.Sending then
+		return
+	end
 	local isOutgoing = message.Status == Enum.TextChatMessageStatus.Sending
 
 	local messageBox = messageTemplate:Clone()
