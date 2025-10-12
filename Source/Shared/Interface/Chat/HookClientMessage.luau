@@ -1,12 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
-local RBXGeneral = GetChatChannel("RBXGeneral")
+local TextChatService = game:GetService("TextChatService")
 
 type Callback = (message: TextChatMessage) -> ()
 
 local hooks: {[Callback]: true} = {}
 
-RBXGeneral.OnIncomingMessage = function(message): ()
+TextChatService.OnIncomingMessage = function(message): ()
 	for callback in hooks do
 		callback(message)
 	end
