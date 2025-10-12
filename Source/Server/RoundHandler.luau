@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local TeamChat = require(ServerScriptService.Chat.TeamChat)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
@@ -51,6 +52,10 @@ function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, par
     })
 
     return true
+end
+
+function Round.Config.OnRoleAssigned(round: Types.Round, participant: Types.Participant): ()
+    TeamChat.TryAssign(participant)
 end
 
 local remotes = ReplicatedStorage.Remotes
@@ -165,6 +170,8 @@ local didEnd = false
 local function newRound(): Types.Round
     didEnd = false
     roundCount += 1
+
+    TeamChat.Clear()
 
     local gamemode = pickNextGamemode()
     module.Round:SetValue(Round.new(gamemode))
