@@ -5,7 +5,11 @@ local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalPa
 local participant = LocalParticipantInfo.GetParticipant()
 
 participant.Role:Connect(function(role)
-	ChatWindow.AllowTeamChat(role.Definition)
+	ChatWindow.AllowTeamChat(role.Definition, participant.Status())
 end, true)
+
+participant.Status:Connect(function(status)
+	ChatWindow.AllowTeamChat(participant.Role().Definition, status)
+end)
 
 return nil

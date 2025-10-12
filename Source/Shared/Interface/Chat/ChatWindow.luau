@@ -43,12 +43,14 @@ local function activateTeamChat(): ()
 	end
 end
 
-function ChatWindow.AllowTeamChat(role: Types.RoleDefinition): ()
-	ChatWindow.TeamChatButton.Icon.Visible = role.CanTeamChat or false
+function ChatWindow.AllowTeamChat(role: Types.RoleDefinition, status: Types.ParticipantStatus | "Spectating"): ()
+	local allow = (role.CanTeamChat and status == "Alive") or false
+	ChatWindow.TeamChatButton.Icon.Visible = allow
+
 	selectedTeamChat = false
 	activateTeamChat()
 
-	if not role.CanTeamChat then
+	if not allow then
 		teamChannel = nil
 		return
 	end

@@ -26,6 +26,8 @@ function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant
     if participant.Extras.CombatImpulse and participant.Corpse and participant.Corpse.Model and participant.Corpse.Model.PrimaryPart then
         Impulse.ApplyImpulse(participant.Corpse.Model.PrimaryPart, participant.Extras.CombatImpulse, true)
     end
+
+    TeamChat.TryRemove(participant.Player.UserId)
 end
 
 function Round.Config.OnCharacterAdded(round: Types.Round, participant: Types.Participant): ()

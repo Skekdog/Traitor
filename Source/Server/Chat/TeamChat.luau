@@ -6,22 +6,21 @@ local TeamChat = {}
 
 local channels: {[Types.RoleDefinition]: TextChannel?} = {}
 
-function TeamChat.TryAssign(participant: Types.Participant): ()
-	local role = participant:GetRole()
-
+function TeamChat.TryRemove(id: number): ()
 	for definition, channel in channels do
 		assert(channel)
-		if definition == role.Definition then
-			return
-		end
-
 		for _, user in channel:GetChildren() do
-			if user:IsA("TextSource") and user.UserId == participant.Player.UserId then
+			if user:IsA("TextSource") and user.UserId == id then
 				user:Destroy()
 				break
 			end
 		end
 	end
+end
+
+function TeamChat.TryAssign(participant: Types.Participant): ()
+	local role = participant:GetRole()
+	TeamChat.TryRemove(participant.Player.UserId)
 
 	if not role.Definition.CanTeamChat then
 		return
