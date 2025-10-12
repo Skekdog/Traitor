@@ -72,6 +72,10 @@ TextChatService.MessageReceived:Connect(function(message)
 	end
 	local isOutgoing = message.Status == Enum.TextChatMessageStatus.Sending
 
+	if message.TextChannel.Name:sub(1, 5) == "Team_" then
+		message.PrefixText = "<font color='#ff0000'>[TEAM]</font> " .. message.PrefixText
+	end
+
 	local messageBox = messageTemplate:Clone()
 	messageBox.Text = message.PrefixText .. " " .. message.Text
 	messageBox.TextTransparency = if isOutgoing then 0.5 else 0
