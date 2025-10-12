@@ -12,6 +12,7 @@ require(script.Parent.GameState.CalledToCorpse)
 require(script.Parent.Chat.ChatPrefix)
 require(script.Parent.Chat.QuickChat.QuickChatUI)
 require(script.Parent.Chat.ChatWindow)
+require(script.Parent.Chat.TeamChat)
 
 for _, v in script.Parent.GameState:GetChildren() do
 	if v:IsA("ModuleScript") then

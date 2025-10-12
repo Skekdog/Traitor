@@ -543,6 +543,21 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Team Chat",
+	Tab = "Keybinds",
+	Category = "Chat",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.T,
+		},
+	},
+})
+
+table.insert(availableSettings, {
 	Name = "Quick Chat",
 	Tab = "Keybinds",
 	Category = "Chat",

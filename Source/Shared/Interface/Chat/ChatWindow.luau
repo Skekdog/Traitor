@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TextChatService = game:GetService("TextChatService")
 local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
+local Types = require(ReplicatedStorage.API.Types)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
@@ -16,7 +17,7 @@ StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.Chat)
 ui:ToggleVisible(true)
 
-local RBXGeneral = GetChatChannel("RBXGeneral")
+ChatWindow.TargetChannel = GetChatChannel("RBXGeneral")
 
 local frame = ui.Object
 ChatWindow.MessagesFrame = frame.Messages.ScrollingFrame
@@ -27,6 +28,43 @@ ChatWindow.InputBox = inputFrame.InputFrame.TextBox
 local sendButton = inputFrame.SendButton
 
 ChatWindow.QuickChatButton = inputFrame.QuickChatButton
+ChatWindow.TeamChatButton = inputFrame.TeamChatButton
+
+local selectedTeamChat = false
+local teamChannel: TextChannel?
+local function activateTeamChat(): ()
+	if selectedTeamChat then
+		assert(teamChannel, "Team channel not found")
+		ChatWindow.TargetChannel = teamChannel
+		ChatWindow.TeamChatButton.Icon.ImageTransparency = 0
+	else
+		ChatWindow.TargetChannel = GetChatChannel("RBXGeneral")
+		ChatWindow.TeamChatButton.Icon.ImageTransparency = 0.75
+	end
+end
+
+function ChatWindow.AllowTeamChat(role: Types.RoleDefinition): ()
+	ChatWindow.TeamChatButton.Icon.Visible = role.CanTeamChat or false
+	selectedTeamChat = false
+	activateTeamChat()
+
+	if not role.CanTeamChat then
+		teamChannel = nil
+		return
+	end
+
+	ChatWindow.TeamChatButton.Icon.ImageTransparency = 0.75
+
+	local foundTeamChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("Team_" .. role.Name)
+	if foundTeamChannel:IsA("TextChannel") then
+		teamChannel = foundTeamChannel
+	end
+end
+
+ChatWindow.TeamChatButton.Activated:Connect(function()
+	selectedTeamChat = not selectedTeamChat
+	activateTeamChat()
+end)
 
 TextChatService.MessageReceived:Connect(function(message)
 	if message.Status ~= Enum.TextChatMessageStatus.Success and message.Status ~= Enum.TextChatMessageStatus.Sending then
@@ -52,7 +90,7 @@ local function sendChat(): ()
 	if ChatWindow.InputBox.Text == "" then
 		return
 	end
-	RBXGeneral:SendAsync(ChatWindow.InputBox.Text)
+	ChatWindow.TargetChannel:SendAsync(ChatWindow.InputBox.Text)
 	ChatWindow.InputBox.Text = ""
 end
 
@@ -60,6 +98,8 @@ ChatWindow.InputBox.FocusLost:Connect(function(enterPressed)
 	if enterPressed then
 		sendChat()
 	end
+	selectedTeamChat = false
+	activateTeamChat()
 end)
 
 ChatWindow.InputBox:GetPropertyChangedSignal("Text"):Connect(function()
@@ -75,9 +115,23 @@ if not TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
 	ChatWindow.InputBox.Visible = false
 end
 
-sendButton.Activated:Connect(sendChat)
+sendButton.Activated:Connect(function()
+	sendChat()
+	selectedTeamChat = false
+	activateTeamChat()
+end)
 
 ControlManager.Register("Chat", function()
+	ChatWindow.InputBox:CaptureFocus()
+	return Enum.ContextActionResult.Pass
+end)
+
+ControlManager.Register("Team Chat", function()
+	if not teamChannel then
+		return Enum.ContextActionResult.Pass
+	end
+	selectedTeamChat = true
+	activateTeamChat()
 	ChatWindow.InputBox:CaptureFocus()
 	return Enum.ContextActionResult.Pass
 end)
