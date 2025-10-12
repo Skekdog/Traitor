@@ -15,9 +15,11 @@ function TeamChat.TryAssign(participant: Types.Participant): ()
 			return
 		end
 
-		local source = channel:FindFirstChild(participant.Player.Name)
-		if source then
-			source:Destroy()
+		for _, user in channel:GetChildren() do
+			if user:IsA("TextSource") and user.UserId == participant.Player.UserId then
+				user:Destroy()
+				break
+			end
 		end
 	end
 
