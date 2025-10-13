@@ -10,6 +10,24 @@ local remotes = ReplicatedStorage.Remotes
 
 local IS_SERVER = RunService:IsServer()
 
+export type HingeDoorServerReceive = {
+    Kind: "HingeDoorServerReceive",
+    Direction: Direction,
+}
+
+export type HingeDoorClientReceive = {
+    Kind: "HingeDoorClientReceive",
+    TargetAngle: number,
+}
+
+export type SlideDoorServerReceive = {
+    Kind: "SlideDoorServerReceive",
+}
+
+export type SlideDoorClientReceive = {
+    Kind: "SlideDoorClientReceive",
+}
+
 type BaseDoorRequest = {
     Door: Types.MapObject,
 }
@@ -20,24 +38,24 @@ export type ClientInteraction = BaseDoorRequest & {
     Kind: "ClientInteraction",
 }
 
-export type ServerReceive = BaseDoorRequest & {
+export type ServerReceive<ServerReceiveType = HingeDoorServerReceive | SlideDoorServerReceive> = BaseDoorRequest & {
     Kind: "ServerReceive",
-    Direction: Direction,
+    Receive: ServerReceiveType,
     Player: Player,
 }
 
-export type ClientReceive = BaseDoorRequest & {
+export type ClientReceive<ClientReceiveType = HingeDoorClientReceive | SlideDoorClientReceive> = BaseDoorRequest & {
     Kind: "ClientReceive",
-    TargetAngle: number,
+    Receive: ClientReceiveType,
     OriginalCFrame: CFrame,
 }
 
-export type ServerRun = BaseDoorRequest & {
+export type ServerRun<ServerReceiveType = HingeDoorServerReceive | SlideDoorServerReceive> = BaseDoorRequest & {
     Kind: "ServerRun",
-    Direction: Direction,
+    Receive: ServerReceiveType,
 }
 
-export type DoorRequest = ClientInteraction | ServerReceive | ClientReceive | ServerRun
+export type DoorRequest<ReceiveType = HingeDoorClientReceive | HingeDoorServerReceive | SlideDoorClientReceive | SlideDoorServerReceive> = ClientInteraction | ServerReceive<ReceiveType> | ClientReceive<ReceiveType> | ServerRun<ReceiveType>
 
 local function findOrCreateAngleValue(door: BasePart): NumberValue
     local angle = door:FindFirstChild("DoorAngle")
@@ -51,91 +69,21 @@ local function findOrCreateAngleValue(door: BasePart): NumberValue
     return angle
 end
 
-local function StandardDoor(request: DoorRequest): ()
-    if IS_SERVER then
-        if request.Kind ~= "ServerReceive" and request.Kind ~= "ServerRun" then
-            return
-        end
-    else
-        assert(request.Kind == "ClientInteraction" or request.Kind == "ClientReceive", "Expected ClientInteraction or ClientReceive")
-    end
-
+local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoorServerReceive>, part: BasePart, originalDoorCFrame: CFrame, shouldOpen: boolean, duration: number): ()
     local door = request.Door
 
-    if door:GetAttribute("Locked") then
-        if request.Kind ~= "ClientReceive" then
-            if IS_SERVER then
-                return
-            end
-
-            if tick() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
-                return
-            end
-            PlaySound(134969396, nil, door)
-            door:SetAttribute("LastPlayedLockedSound", tick())
-            return
-        end
-    end
-
-    local shouldOpen = if request.Kind == "ClientInteraction" then not door:GetAttribute("Open") :: boolean? elseif request.Kind == "ClientReceive" then request.TargetAngle ~= 0 else request.Direction ~= nil
-    door:SetAttribute("Open", shouldOpen)
-
-    local part = GetPrimaryPart(door)
-    local originalDoorCFrame = part.CFrame
-
-    do
-        local attribute = door:GetAttribute("OriginalCFrame") or door:GetAttribute("ClientOriginalCFrame")
-        if typeof(attribute) == "CFrame" then
-            originalDoorCFrame = attribute
-        elseif IS_SERVER then
-            door:SetAttribute("OriginalCFrame", originalDoorCFrame)
-        else
-            door:SetAttribute("ClientOriginalCFrame", originalDoorCFrame)
-        end
-    end
-
     local pivotAttachment = part:FindFirstChild("DoorPivot")
-    assert(pivotAttachment and pivotAttachment:IsA("Attachment"), "DoorPivot must be an Attachment")
-
-    if not IS_SERVER then
-        local sounds = {}
-        local soundsFolder = door:FindFirstChild("Sounds")
-        if soundsFolder then
-            local soundFolder = soundsFolder:FindFirstChild(if shouldOpen then "Open" else "Close")
-            if soundFolder then
-                for _, v in soundFolder:GetChildren() do
-                    if v:IsA("Sound") then
-                        table.insert(sounds, v)
-                    end
-                end
-            end
-        end
-        if #sounds == 0 then
-            sounds = {PlaySound.MakeSound(if shouldOpen then 316089029 else 316089019, {
-                RollOffMinDistance = 6,
-                RollOffMaxDistance = 18,
-            })}
-        end
-        PlaySound(sounds, nil, GetPrimaryPart(door))
-    end
-
-    local duration = 0.75
-
-    if shouldOpen then
-        local configOpenDuration = door:GetAttribute("Opening_Duration")
-        if typeof(configOpenDuration) == "number" then
-            duration = configOpenDuration
-        end
-    else
-        local configCloseDuration = door:GetAttribute("Closing_Duration")
-        if typeof(configCloseDuration) == "number" then
-            duration = configCloseDuration
-        end
-    end
+    assert(pivotAttachment and pivotAttachment:IsA("Attachment"), "Hinge doors must have a DoorPivot Attachment")
 
     local hingePosition = CFrame.new(pivotAttachment.Position)
 
-    local targetAngle = if request.Kind == "ClientReceive" then request.TargetAngle else if shouldOpen then math.rad(90) else 0
+    local targetAngle: number
+    if request.Kind == "ClientReceive" then
+        assert(request.Receive.Kind == "HingeDoorClientReceive")
+        targetAngle = request.Receive.TargetAngle
+    else
+        targetAngle = if shouldOpen then math.rad(90) else 0
+    end
 
     local direction: Direction
     if request.Kind ~= "ClientReceive" and shouldOpen then
@@ -145,9 +93,12 @@ local function StandardDoor(request: DoorRequest): ()
         end
         assert(typeof(referenceCFrame) == "CFrame", "ReferenceCFrame must be a CFrame")
 
-        direction = if request.Kind == "ClientInteraction" then
-            if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Out" else "In"
-            else request.Direction
+        if request.Kind == "ClientInteraction" then
+            direction = if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Out" else "In"
+        else
+            assert(request.Receive.Kind == "HingeDoorServerReceive")
+            direction = request.Receive.Direction
+        end
 
         if direction == "Out" then
             targetAngle = -targetAngle
@@ -156,14 +107,17 @@ local function StandardDoor(request: DoorRequest): ()
 
     if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
         local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, targetAngle)
+        print(targetAngle)
         local targetCFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
 
-        local clientReceive: ClientReceive = {
+        local clientReceive: ClientReceive<HingeDoorClientReceive> = {
             Kind = "ClientReceive" :: "ClientReceive",
             Door = door,
-            Open = shouldOpen,
-            TargetAngle = targetAngle,
             OriginalCFrame = part.CFrame,
+            Receive = {
+                Kind = "HingeDoorClientReceive" :: "HingeDoorClientReceive",
+                TargetAngle = targetAngle,
+            },
         }
 
         part.CFrame = targetCFrame
@@ -208,8 +162,103 @@ local function StandardDoor(request: DoorRequest): ()
     end)
 end
 
+local function StandardDoor(request: DoorRequest): ()
+    if IS_SERVER then
+        if request.Kind ~= "ServerReceive" and request.Kind ~= "ServerRun" then
+            return
+        end
+    else
+        assert(request.Kind == "ClientInteraction" or request.Kind == "ClientReceive", "Expected ClientInteraction or ClientReceive")
+    end
+
+    local door = request.Door
+
+    if door:GetAttribute("Locked") then
+        if request.Kind ~= "ClientReceive" then
+            if IS_SERVER then
+                return
+            end
+
+            if tick() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
+                return
+            end
+            PlaySound(134969396, nil, door)
+            door:SetAttribute("LastPlayedLockedSound", tick())
+            return
+        end
+    end
+
+    local shouldOpen: boolean
+    if request.Kind == "ClientInteraction" or request.Receive.Kind == "SlideDoorServerReceive" or request.Receive.Kind == "SlideDoorClientReceive" then
+        shouldOpen = not door:GetAttribute("Open")
+    elseif request.Receive.Kind == "HingeDoorClientReceive" then
+        shouldOpen = request.Receive.TargetAngle ~= 0
+    else
+        shouldOpen = request.Receive.Direction ~= nil
+    end
+
+    door:SetAttribute("Open", shouldOpen)
+
+    local part = GetPrimaryPart(door)
+    local originalDoorCFrame = part.CFrame
+
+    do
+        local attribute = door:GetAttribute("OriginalCFrame") or door:GetAttribute("ClientOriginalCFrame")
+        if typeof(attribute) == "CFrame" then
+            originalDoorCFrame = attribute
+        elseif IS_SERVER then
+            door:SetAttribute("OriginalCFrame", originalDoorCFrame)
+        else
+            door:SetAttribute("ClientOriginalCFrame", originalDoorCFrame)
+        end
+    end
+
+    if not IS_SERVER then
+        local sounds = {}
+        local soundsFolder = door:FindFirstChild("Sounds")
+        if soundsFolder then
+            local soundFolder = soundsFolder:FindFirstChild(if shouldOpen then "Open" else "Close")
+            if soundFolder then
+                for _, v in soundFolder:GetChildren() do
+                    if v:IsA("Sound") then
+                        table.insert(sounds, v)
+                    end
+                end
+            end
+        end
+        if #sounds == 0 then
+            sounds = {PlaySound.MakeSound(if shouldOpen then 316089029 else 316089019, {
+                RollOffMinDistance = 6,
+                RollOffMaxDistance = 18,
+            })}
+        end
+        PlaySound(sounds, nil, GetPrimaryPart(door))
+    end
+
+    local duration = 0.75
+
+    if shouldOpen then
+        local configOpenDuration = door:GetAttribute("Opening_Duration")
+        if typeof(configOpenDuration) == "number" then
+            duration = configOpenDuration
+        end
+    else
+        local configCloseDuration = door:GetAttribute("Closing_Duration")
+        if typeof(configCloseDuration) == "number" then
+            duration = configCloseDuration
+        end
+    end
+
+    if door:GetAttribute("Door_Kind") == "Slide" then
+
+    else
+        hingeDoor(request :: DoorRequest<HingeDoorClientReceive | HingeDoorServerReceive>, part, originalDoorCFrame, shouldOpen, duration)
+    end
+end
+
 if IS_SERVER then
     remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, direction: unknown): ()
+        print(plr, door, direction)
         if typeof(door) ~= "Instance" or (not door:IsA("BasePart") and not door:IsA("Model")) then
             return
         end
@@ -234,7 +283,10 @@ if IS_SERVER then
             Kind = "ServerReceive" :: "ServerReceive",
             Player = plr,
             Door = MapObject,
-            Direction = direction,
+            Receive = {
+                Kind = "HingeDoorServerReceive" :: "HingeDoorServerReceive",
+                Direction = direction,
+            },
         }
         StandardDoor(request)
     end)
