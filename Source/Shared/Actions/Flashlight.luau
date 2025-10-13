@@ -41,8 +41,8 @@ local function getOrCreateFlashlight(root: Instance): Light
 end
 
 local enabled = false
-local function enableFlashlight(): Enum.ContextActionResult
-	enabled = not enabled
+local function enableFlashlight(doEnable: boolean?): Enum.ContextActionResult
+	enabled = if typeof(doEnable) == "boolean" then doEnable else not enabled
 
 	local root = LocalCharacter.RootPart()
 	if not root then
@@ -65,7 +65,20 @@ LocalCharacter.Character:Connect(function(char)
 
 		return
 	end
-	ControlManager.Register("Flashlight", enableFlashlight)
+
+	if ControlManager.PreferredInput() == Enum.PreferredInput.Touch then
+		return enableFlashlight(true)
+	end
+
+	ControlManager.Register("Flashlight", function()
+		return enableFlashlight()
+	end)
+end, true)
+
+ControlManager.PreferredInput:Connect(function(preferred)
+	if preferred == Enum.PreferredInput.Touch then
+		enableFlashlight(true)
+	end
 end, true)
 
 return nil

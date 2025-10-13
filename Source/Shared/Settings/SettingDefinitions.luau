@@ -322,11 +322,6 @@ table.insert(availableSettings, {
 			KBMKeybind = Enum.KeyCode.F,
 			ConsoleKeybind = Enum.KeyCode.ButtonL1,
 		},
-
-		TouchButton = {
-			Position = UDim2.fromScale(0.15, 0.4),
-			Scale = 1,
-		},
 	},
 
 	Callback = function(name: string, value: ControlValue)
