@@ -3,7 +3,7 @@ local UIManager = require(script.Parent.Parent.UILib.UIManager)
 local textInput = {}
 
 local ui = UIManager.WaitForUI("TextInput") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.TextInput)}
-local object = ui.Object
+local object = ui.Object.Frame
 
 local box = object.TextBox
 local confirm = object.TextButton
@@ -25,13 +25,13 @@ function textInput.Create(text: string, inputType: "Number", range: string, cont
 	if val then
 		val:Destroy()
 	end
-	
+
 	val = Instance.new(inputType.."Value") :: NumberValue
 	assert(val)
-	
+
 	local min = tonumber(string.split(range, "-")[1]) :: number
 	local max = tonumber(string.split(range, "-")[2]) :: number
-	
+
 	table.insert(cons, confirm.MouseButton1Click:Once(function()
 		local num = tonumber(box.Text)
 		if inputType == "Number" then
@@ -41,11 +41,11 @@ function textInput.Create(text: string, inputType: "Number", range: string, cont
 			return
 		end
 	end))
-	
+
 	table.insert(cons, cancel.MouseButton1Click:Once(function()
 		val.Value = -math.huge
 	end))
-	
+
 	val.Changed:Wait()
 
 	ui:ToggleVisible(false)
