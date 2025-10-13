@@ -22,10 +22,12 @@ export type HingeDoorClientReceive = {
 
 export type SlideDoorServerReceive = {
     Kind: "SlideDoorServerReceive",
+    Open: boolean,
 }
 
 export type SlideDoorClientReceive = {
     Kind: "SlideDoorClientReceive",
+    Open: boolean,
 }
 
 type BaseDoorRequest = {
@@ -69,6 +71,18 @@ local function findOrCreateAngleValue(door: BasePart): NumberValue
     return angle
 end
 
+local function sendToClients(request: DoorRequest<HingeDoorServerReceive | SlideDoorServerReceive>, receive: ClientReceive): ()
+    if request.Kind == "ServerReceive" then
+        for _, v in Players:GetPlayers() do
+            if v ~= request.Player then
+                remotes.ClientServer.OpenDoor:FireClient(v, receive)
+            end
+        end
+    else
+        remotes.ClientServer.OpenDoor:FireAllClients(receive)
+    end
+end
+
 local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoorServerReceive>, part: BasePart, originalDoorCFrame: CFrame, shouldOpen: boolean, duration: number): ()
     local door = request.Door
 
@@ -107,7 +121,6 @@ local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoor
 
     if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
         local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, targetAngle)
-        print(targetAngle)
         local targetCFrame = originalDoorCFrame:ToWorldSpace(hingePosition * rotation * hingePosition:Inverse())
 
         local clientReceive: ClientReceive<HingeDoorClientReceive> = {
@@ -122,15 +135,7 @@ local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoor
 
         part.CFrame = targetCFrame
 
-        if request.Kind == "ServerReceive" then
-            for _, v in Players:GetPlayers() do
-                if v ~= request.Player then
-                    remotes.ClientServer.OpenDoor:FireClient(v, clientReceive)
-                end
-            end
-        else
-            remotes.ClientServer.OpenDoor:FireAllClients(clientReceive)
-        end
+        sendToClients(request :: any, clientReceive)
 
         return
     end
@@ -162,6 +167,37 @@ local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoor
     end)
 end
 
+local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoorServerReceive>, part: BasePart, originalDoorCFrame: CFrame, shouldOpen: boolean, duration: number): ()
+    local door = request.Door
+
+    local targetCFrame = originalDoorCFrame:ToWorldSpace(CFrame.new(0, 0, part.Size.Z * 0.9))
+
+    if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
+        local clientReceive: ClientReceive<SlideDoorClientReceive> = {
+            Kind = "ClientReceive" :: "ClientReceive",
+            Door = door,
+            OriginalCFrame = part.CFrame,
+            Receive = {
+                Kind = "SlideDoorClientReceive" :: "SlideDoorClientReceive",
+                Open = shouldOpen,
+            },
+        }
+
+        part.CFrame = targetCFrame
+
+        return sendToClients(request :: any, clientReceive)
+    end
+
+    if request.Kind == "ClientInteraction" then
+        remotes.ClientServer.OpenDoor:FireServer(door, if shouldOpen then "In" else "Out")
+    else
+        part.CFrame = request.OriginalCFrame
+    end
+
+    local tween = TweenService:Create(part, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
+    tween:Play()
+end
+
 local function StandardDoor(request: DoorRequest): ()
     if IS_SERVER then
         if request.Kind ~= "ServerReceive" and request.Kind ~= "ServerRun" then
@@ -189,8 +225,10 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     local shouldOpen: boolean
-    if request.Kind == "ClientInteraction" or request.Receive.Kind == "SlideDoorServerReceive" or request.Receive.Kind == "SlideDoorClientReceive" then
+    if request.Kind == "ClientInteraction" then
         shouldOpen = not door:GetAttribute("Open")
+    elseif request.Receive.Kind == "SlideDoorServerReceive" or request.Receive.Kind == "SlideDoorClientReceive" then
+        shouldOpen = request.Receive.Open
     elseif request.Receive.Kind == "HingeDoorClientReceive" then
         shouldOpen = request.Receive.TargetAngle ~= 0
     else
@@ -250,7 +288,7 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     if door:GetAttribute("Door_Kind") == "Slide" then
-
+        slideDoor(request :: DoorRequest<SlideDoorClientReceive | SlideDoorServerReceive>, part, originalDoorCFrame, shouldOpen, duration)
     else
         hingeDoor(request :: DoorRequest<HingeDoorClientReceive | HingeDoorServerReceive>, part, originalDoorCFrame, shouldOpen, duration)
     end
@@ -258,7 +296,6 @@ end
 
 if IS_SERVER then
     remotes.ClientServer.OpenDoor.OnServerEvent:Connect(function(plr: Player, door: unknown, direction: unknown): ()
-        print(plr, door, direction)
         if typeof(door) ~= "Instance" or (not door:IsA("BasePart") and not door:IsA("Model")) then
             return
         end
@@ -279,14 +316,24 @@ if IS_SERVER then
             return
         end
 
+        local receive: HingeDoorServerReceive | SlideDoorServerReceive
+        if door:GetAttribute("Door_Kind") == "Slide" then
+            receive = {
+                Kind = "SlideDoorServerReceive" :: "SlideDoorServerReceive",
+                Open = direction == "In",
+            }
+        else
+            receive = {
+                Kind = "HingeDoorServerReceive" :: "HingeDoorServerReceive",
+                Direction = direction,
+            }
+        end
+
         local request: ServerReceive = {
             Kind = "ServerReceive" :: "ServerReceive",
             Player = plr,
             Door = MapObject,
-            Receive = {
-                Kind = "HingeDoorServerReceive" :: "HingeDoorServerReceive",
-                Direction = direction,
-            },
+            Receive = receive,
         }
         StandardDoor(request)
     end)
