@@ -42,6 +42,12 @@ local controls: {ControlInfo} = {
 	{
 		Control = "Next Item",
 	},
+	{
+		Control = "Quick Chat",
+	},
+	{
+		Control = "Team Chat",
+	}
 }
 
 for i, info in controls do
@@ -53,7 +59,7 @@ for i, info in controls do
 
 	frame:SetAttribute("Control", info.Control)
 	frame:AddTag("ControlHint")
-	
+
 	frame.Parent = ui.Object.Controls
 end
 
