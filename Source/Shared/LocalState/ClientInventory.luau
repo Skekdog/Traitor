@@ -276,7 +276,14 @@ local function tryAddButton(item: Types.AnyItem, slot: number): ()
 		tryEquip(item)
 	end)
 
-	local buttons = ui.Object.Container:GetChildren() :: {any} -- trying to use {TextButton} errors, presumably because reasons
+	local children = ui.Object.Container:GetChildren()
+	local buttons: {typeof(sampleButton)} = {}
+	for _, v in children do
+		if v:IsA("TextButton") then
+			table.insert(buttons, v :: typeof(sampleButton))
+		end
+	end
+
 	table.sort(buttons, function(a, b)
 		return a.LayoutOrder < b.LayoutOrder
 	end)
@@ -288,7 +295,14 @@ end
 
 local function tryRemoveButton(itemName: string)
 	local found = ui.Object.Container:FindFirstChild("Item " .. itemName) :: ItemButton?
-	local buttons = (ui.Object.Container:GetChildren() :: {any}) :: {ItemButton}
+	local children = ui.Object.Container:GetChildren()
+
+	local buttons: {typeof(sampleButton)} = {}
+	for _, v in children do
+		if v:IsA("TextButton") then
+			table.insert(buttons, v :: typeof(sampleButton))
+		end
+	end
 
 	if found then
 		found.Parent = ui.Object
