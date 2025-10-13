@@ -68,7 +68,7 @@ ChatWindow.TeamChatButton.Activated:Connect(function()
 	activateTeamChat()
 end)
 
-TextChatService.MessageReceived:Connect(function(message)
+local function displayMessage(message: TextChatMessage): ()
 	if message.Status ~= Enum.TextChatMessageStatus.Success and message.Status ~= Enum.TextChatMessageStatus.Sending then
 		return
 	end
@@ -78,7 +78,15 @@ TextChatService.MessageReceived:Connect(function(message)
 		message.PrefixText = "<font color='#ff0000'>[TEAM]</font> " .. message.PrefixText
 	end
 
+	local originalLabel = ChatWindow.MessagesFrame:FindFirstChild(message.MessageId)
+	if originalLabel and originalLabel:IsA("TextLabel") then
+		originalLabel.Text = message.PrefixText .. " " .. message.Text
+		originalLabel.TextTransparency = if isOutgoing then 0.5 else 0
+		return
+	end
+
 	local messageBox = messageTemplate:Clone()
+	messageBox.Name = message.MessageId
 	messageBox.Text = message.PrefixText .. " " .. message.Text
 	messageBox.TextTransparency = if isOutgoing then 0.5 else 0
 	messageBox.Visible = true
@@ -90,7 +98,10 @@ TextChatService.MessageReceived:Connect(function(message)
 	if shouldScroll then
 		ChatWindow.MessagesFrame.CanvasPosition = Vector2.new(0, ChatWindow.MessagesFrame.AbsoluteCanvasSize.Y * 10) -- calculating the new position based on message size doesn't work correctly
 	end
-end)
+end
+
+TextChatService.MessageReceived:Connect(displayMessage)
+TextChatService.SendingMessage:Connect(displayMessage)
 
 local function sendChat(): ()
 	if ChatWindow.InputBox.Text == "" then
