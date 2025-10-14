@@ -10,7 +10,10 @@ function module.Use(self, door: Types.MapObject, openOutwards: boolean): ()
 		StandardDoor({
 			Door = door,
 			Kind = "ServerRun" :: "ServerRun",
-			Direction = (if door:GetAttribute("Open") then nil else if not openOutwards then "In" else "Out") :: StandardDoor.Direction,
+			Receive = {
+				Kind = "HingeDoorServerReceive" :: "HingeDoorServerReceive",
+				Direction = (if door:GetAttribute("Open") then nil else if not openOutwards then "In" else "Out") :: StandardDoor.Direction
+			},
 		})
 		return
 	end
