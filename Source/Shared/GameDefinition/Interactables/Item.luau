@@ -24,17 +24,16 @@ local definition: Types.InteractableDefinition = {
 	end,
 
 	OnInteractServer = function(interactable: ItemInteractable, participant: Types.Participant): ()
-		print("hi")
 		local foundItem = participant:GetItemOccupyingGroup(interactable.Extras.Item.Definition.ItemGroup)
 		if foundItem then
 			if foundItem.Definition.PreventUnequip or not foundItem.Definition.CanDrop then
-				return print("goodbye")
+				return
 			end
-			print("au revoir")
-			participant:TryDropItem(foundItem)
+
+			local char = participant:GetCharacter()
+			participant:DropItem(foundItem, if char then (interactable.Extras.Item.Model:GetPivot().Position - char:GetPivot().Position).Unit else nil)
 		end
 
-		print("salut")
 		participant:AddItem(interactable.Extras.Item)
 	end,
 }
