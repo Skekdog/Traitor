@@ -51,7 +51,7 @@ local controls: {ControlInfo} = {
 }
 
 for i, info in controls do
-	local frame = ui.Object.Controls.Template:Clone()
+	local frame = ui.Object.Controls.Frame.Template:Clone()
 	frame.Name = info.Control
 	frame.TextLabel.Text = info.Text or info.Control
 	frame.Visible = true
@@ -60,7 +60,7 @@ for i, info in controls do
 	frame:SetAttribute("Control", info.Control)
 	frame:AddTag("ControlHint")
 
-	frame.Parent = ui.Object.Controls
+	frame.Parent = ui.Object.Controls.Frame
 end
 
 ui:ToggleVisible(true)
