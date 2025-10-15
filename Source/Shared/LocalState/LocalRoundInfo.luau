@@ -156,6 +156,8 @@ local function loadInteractable(instance: Instance): ()
         name = "Door"
     elseif instance:HasTag("Ladder") then
         name = "Ladder"
+    elseif instance:HasTag("Item") then
+        name = "Item"
     end
 
     local definition = GetInteractableDefinition(name, gamemode, map)

@@ -343,7 +343,7 @@ local function OnInteractServer(interactable: Radio, participant: Types.Particip
 		return warn("Could not find Radio item")
 	end
 
-	if participant:IsItemGroupOccupied(radioItem.ItemGroup) then
+	if participant:GetItemOccupyingGroup(radioItem.ItemGroup) then
 		return
 	end
 

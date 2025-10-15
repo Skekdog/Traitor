@@ -500,7 +500,7 @@ if RunService:IsServer() then
 			return warn("Could not find C4 item")
 		end
 
-		if participant:IsItemGroupOccupied(c4Item.ItemGroup) then
+		if participant:GetItemOccupyingGroup(c4Item.ItemGroup) then
 			return
 		end
 
