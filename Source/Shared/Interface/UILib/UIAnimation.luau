@@ -260,10 +260,11 @@ local underlineConnections: {[Frame]: {RBXScriptConnection}?} = {}
 local UNDERLINE_TRANSITION_SCALE = 0.125
 local UNDERLINE_TRANSITION_TIME = 0.5
 function module.TransitionUnderline(underline: Frame, target: TextButton)
-	local halfSize = UDim2.fromOffset(target.AbsoluteSize.X * UNDERLINE_TRANSITION_SCALE, underline.AbsoluteSize.Y)
-	local fullSize = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underline.AbsoluteSize.Y)
+	local underlineSizeY = 2
+	local halfSize = UDim2.fromOffset(target.AbsoluteSize.X * UNDERLINE_TRANSITION_SCALE, underlineSizeY)
+	local fullSize = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underlineSizeY)
 
-	local newPosition = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underline.AbsoluteSize.Y)
+	local newPosition = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underlineSizeY)
 
 	local halfSizeTween = module.Animate(underline, TweenInfo.new(
 		UNDERLINE_TRANSITION_TIME / 2,
@@ -296,11 +297,11 @@ function module.TransitionUnderline(underline: Frame, target: TextButton)
 	end
 
 	local function recalculatePositioning(): ()
-		underline.Size = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underline.AbsoluteSize.Y)
-		underline.Position = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underline.AbsoluteSize.Y)
+		underline.Size = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underlineSizeY)
+		underline.Position = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underlineSizeY)
 	end
 
-	underlineConnections[underline] = {target:GetPropertyChangedSignal("AbsoluteSize"):Connect(recalculatePositioning), target:GetPropertyChangedSignal("Position"):Connect(recalculatePositioning)}
+	underlineConnections[underline] = {target:GetPropertyChangedSignal("AbsoluteSize"):Connect(recalculatePositioning), target:GetPropertyChangedSignal("AbsolutePosition"):Connect(recalculatePositioning)}
 
 	-- Tween position
 	module.Animate(underline, TweenInfo.new(
