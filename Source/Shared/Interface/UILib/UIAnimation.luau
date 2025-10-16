@@ -47,27 +47,39 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			error("Invalid direction for " .. frame.Name)
 		end
 
+		local UI_TRANSITION_TIME = 0.2
+		local UI_SCALE_FACTOR = 0.75
+
+		local scale = frame:FindFirstChild("UIAnimationScale")
+		if not scale then
+			local newScale = Instance.new("UIScale")
+			newScale.Name = "UIAnimationScale"
+			newScale.Parent = frame
+			scale = newScale
+		end
+
+		if isSize then
+			assert(scale and scale:IsA("UIScale"), "Expected UIAnimationScale to be a UIScale")
+		end
+
 		local function onFinish()
 			if open then
 				if isSize then
-					frame.Size = targetUDim
+					assert(scale and scale:IsA("UIScale"))
+					scale.Scale = 1
 				else
 					frame.Position = targetUDim
 				end
 			else
 				frame.Visible = false
 				if isSize then
-					frame.Size = UDim2.new()
+					assert(scale and scale:IsA("UIScale"))
+					scale.Scale = UI_SCALE_FACTOR
 				else
 					frame.Position = offScreenPosition
 				end
 			end
 		end
-
-		local UI_TRANSITION_TIME = 0.2
-		local UI_SCALE_FACTOR = 0.75
-
-		local startSize = UDim2.new(targetUDim.X.Scale * UI_SCALE_FACTOR, targetUDim.X.Offset * UI_SCALE_FACTOR, targetUDim.Y.Scale * UI_SCALE_FACTOR, targetUDim.Y.Offset * UI_SCALE_FACTOR)
 
 		local info = TweenInfo.new(
 			UI_TRANSITION_TIME,
@@ -78,7 +90,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 		local properties: {[string]: any}
 		if isSize then
 			properties = {
-				Size = if open then targetUDim else startSize
+				Scale = if open then 1 else UI_SCALE_FACTOR
 			}
 		else
 			properties = {
@@ -86,11 +98,12 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			}
 		end
 
-		tween = module.Animate(frame, info, properties)
+		tween = module.Animate(if isSize then scale :: UIScale else frame, info, properties)
 
 		if open then
 			if isSize then
-				frame.Size = startSize
+				assert(scale and scale:IsA("UIScale"))
+				scale.Scale = UI_SCALE_FACTOR
 			else
 				frame.Position = offScreenPosition
 			end
