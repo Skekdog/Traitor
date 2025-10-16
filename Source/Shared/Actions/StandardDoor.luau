@@ -275,6 +275,11 @@ local function StandardDoor(request: DoorRequest): ()
 
     local duration = 0.75
 
+    local durationAttribute = door:GetAttribute("Duration")
+    if typeof(durationAttribute) == "number" then
+        duration = durationAttribute
+    end
+
     if shouldOpen then
         local configOpenDuration = door:GetAttribute("Opening_Duration")
         if typeof(configOpenDuration) == "number" then
