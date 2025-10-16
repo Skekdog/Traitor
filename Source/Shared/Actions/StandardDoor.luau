@@ -170,7 +170,7 @@ end
 local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoorServerReceive>, part: BasePart, originalDoorCFrame: CFrame, shouldOpen: boolean, duration: number): ()
     local door = request.Door
 
-    local targetCFrame = originalDoorCFrame:ToWorldSpace(CFrame.new(0, 0, part.Size.Z * 0.9))
+    local targetCFrame = if shouldOpen then originalDoorCFrame:ToWorldSpace(CFrame.new(0, 0, part.Size.Z * 0.9)) else originalDoorCFrame
 
     if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
         local clientReceive: ClientReceive<SlideDoorClientReceive> = {
