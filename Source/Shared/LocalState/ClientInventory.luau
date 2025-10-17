@@ -230,7 +230,7 @@ local function tryEquip(item: Types.AnyItem): ()
 	button.BackgroundTransparency = 0.25
 end
 
-local INV_BUTTON_SIZE = 0.065
+local INV_BUTTON_SIZE = 80
 local INV_BUTTON_PADDING = 25
 local function move(clone: typeof(sampleButton), order: number, middle: number): ()
 	local difference = order - middle
@@ -246,7 +246,7 @@ local function move(clone: typeof(sampleButton), order: number, middle: number):
 			sizeMult = 1.25
 			padding /= 2
 		end
-		relativePosition = UDim2.new((INV_BUTTON_SIZE * sizeMult * difference), padding, 0, 0)
+		relativePosition = UDim2.new(0, padding + (INV_BUTTON_SIZE * sizeMult * difference), 0, 0)
 	end
 
 	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + relativePosition})
