@@ -170,6 +170,8 @@ end
 local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoorServerReceive>, part: BasePart, originalDoorCFrame: CFrame, shouldOpen: boolean, duration: number): ()
     local door = request.Door
 
+    door:SetAttribute("Locked", true)
+
     local targetCFrame = if shouldOpen then originalDoorCFrame:ToWorldSpace(CFrame.new(0, 0, part.Size.Z * 0.9)) else originalDoorCFrame
 
     if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
@@ -196,6 +198,12 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
 
     local tween = TweenService:Create(part, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
     tween:Play()
+
+    tween.Completed:Connect(function(status)
+        if status == Enum.PlaybackState.Completed then
+            door:SetAttribute("Locked", false)
+        end
+    end)
 end
 
 local function StandardDoor(request: DoorRequest): ()
@@ -289,6 +297,23 @@ local function StandardDoor(request: DoorRequest): ()
         local configCloseDuration = door:GetAttribute("Closing_Duration")
         if typeof(configCloseDuration) == "number" then
             duration = configCloseDuration
+        end
+    end
+
+    if IS_SERVER then
+        local autoCloseAfter = door:GetAttribute("AutoCloseAfter")
+        if typeof(autoCloseAfter) == "number" then
+            task.delay(autoCloseAfter + duration, function()
+                local closeRequest: ServerRun<SlideDoorServerReceive> = {
+                    Kind = "ServerRun" :: "ServerRun",
+                    Door = door,
+                    Receive = {
+                        Kind = "SlideDoorServerReceive" :: "SlideDoorServerReceive",
+                        Open = false,
+                    },
+                }
+                slideDoor(closeRequest :: DoorRequest<SlideDoorServerReceive>, part, originalDoorCFrame, false, duration)
+            end)
         end
     end
 
