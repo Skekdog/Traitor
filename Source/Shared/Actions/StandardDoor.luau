@@ -10,6 +10,12 @@ local remotes = ReplicatedStorage.Remotes
 
 local IS_SERVER = RunService:IsServer()
 
+local DEFAULT_HINGE_OPEN_SOUND = 316089029
+local DEFAULT_HINGE_CLOSE_SOUND = 316089019
+
+local DEFAULT_SLIDE_OPEN_SOUND = 927222098
+local DEFAULT_SLIDE_CLOSE_SOUND = 927222098
+
 export type HingeDoorServerReceive = {
     Kind: "HingeDoorServerReceive",
     Direction: Direction,
@@ -187,7 +193,6 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
 
         local id = door:GetAttribute("Id")
         task.delay(duration, function()
-            print(door:GetAttribute("Id"):sub(-2), "expected", id:sub(-2))
             if id ~= door:GetAttribute("Id") then
                 return
             end
@@ -282,7 +287,8 @@ local function StandardDoor(request: DoorRequest): ()
             end
         end
         if #sounds == 0 then
-            sounds = {PlaySound.MakeSound(if shouldOpen then 316089029 else 316089019, {
+            local id = if shouldOpen then if door:GetAttribute("Door_Kind") == "Slide" then DEFAULT_SLIDE_OPEN_SOUND else DEFAULT_HINGE_OPEN_SOUND else if door:GetAttribute("Door_Kind") == "Slide" then DEFAULT_SLIDE_CLOSE_SOUND else DEFAULT_HINGE_CLOSE_SOUND
+            sounds = {PlaySound.MakeSound(id, {
                 RollOffMinDistance = 6,
                 RollOffMaxDistance = 18,
             })}
@@ -312,7 +318,6 @@ local function StandardDoor(request: DoorRequest): ()
     if IS_SERVER then
         local id = tostring(newproxy())
         door:SetAttribute("Id", id)
-        print("Updated id", id:sub(-2))
 
         if shouldOpen then
             local autoCloseAfter = door:GetAttribute("AutoCloseAfter")
