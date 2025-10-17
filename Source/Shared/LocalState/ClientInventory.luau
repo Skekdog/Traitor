@@ -230,9 +230,9 @@ local function tryEquip(item: Types.AnyItem): ()
 	button.BackgroundTransparency = 0.25
 end
 
-local INV_BUTTON_SIZE = 80
+
 local INV_BUTTON_PADDING = 25
-local function move(clone: typeof(sampleButton), order: number, middle: number): ()
+local function getRelativePosition(clone: typeof(sampleButton), order: number, middle: number): UDim2
 	local difference = order - middle
 	local mult = if difference < 0 then -1 else 1
 
@@ -246,10 +246,23 @@ local function move(clone: typeof(sampleButton), order: number, middle: number):
 			sizeMult = 1.25
 			padding /= 2
 		end
-		relativePosition = UDim2.new(0, padding + (INV_BUTTON_SIZE * sizeMult * difference), 0, 0)
+		relativePosition = UDim2.new(0, padding + (clone.AbsoluteSize.X * sizeMult * difference), 0, 0)
 	end
 
-	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + relativePosition})
+	return relativePosition
+end
+
+local function move(clone: typeof(sampleButton), order: number, middle: number): ()
+	clone:SetAttribute("Order", order)
+	clone:SetAttribute("Middle", middle)
+	if not clone:GetAttribute("ListeningToSize") then
+		clone:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
+			clone.Position = UDim2.fromScale(0.5, 0) + getRelativePosition(clone, clone:GetAttribute("Order") :: number, clone:GetAttribute("Middle") :: number)
+		end)
+		clone:SetAttribute("ListeningToSize", true)
+	end
+
+	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + getRelativePosition(clone, order, middle)})
 end
 
 local function tryAddButton(item: Types.AnyItem, slot: number): ()
