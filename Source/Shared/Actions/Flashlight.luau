@@ -56,8 +56,8 @@ local function enableFlashlight(doEnable: boolean?): Enum.ContextActionResult
 	return Enum.ContextActionResult.Pass
 end
 
-LocalCharacter.Character:Connect(function(char)
-	if not char then
+LocalCharacter.RootPart:Connect(function(part)
+	if not part then
 		ControlManager.Unregister("Flashlight")
 
 		getOrCreateFlashlight(workspace.CurrentCamera).Enabled = false
