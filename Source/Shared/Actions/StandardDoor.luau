@@ -178,7 +178,13 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
 
     door:SetAttribute("Locked", true)
 
-    local targetCFrame = if shouldOpen then originalDoorCFrame:ToWorldSpace(CFrame.new(0, 0, part.Size.Z * 0.9)) else originalDoorCFrame
+    local axis = door:GetAttribute("SlideAxis")
+    if typeof(axis) ~= "Vector3" then
+        axis = Vector3.zAxis
+    end
+    assert(typeof(axis) == "Vector3")
+
+    local targetCFrame = if shouldOpen then originalDoorCFrame:ToWorldSpace(CFrame.new(axis * part.Size * 0.9)) else originalDoorCFrame
 
     if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
         local clientReceive: ClientReceive<SlideDoorClientReceive> = {
