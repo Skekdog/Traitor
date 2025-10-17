@@ -185,6 +185,15 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
             },
         }
 
+        local id = door:GetAttribute("Id")
+        task.delay(duration, function()
+            print(door:GetAttribute("Id"):sub(-2), "expected", id:sub(-2))
+            if id ~= door:GetAttribute("Id") then
+                return
+            end
+            door:SetAttribute("Locked", false)
+        end)
+
         part.CFrame = targetCFrame
 
         return sendToClients(request :: any, clientReceive)
@@ -199,7 +208,7 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
     local tween = TweenService:Create(part, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
     tween:Play()
 
-    tween.Completed:Connect(function(status)
+    tween.Completed:Once(function(status)
         if status == Enum.PlaybackState.Completed then
             door:SetAttribute("Locked", false)
         end
@@ -218,7 +227,7 @@ local function StandardDoor(request: DoorRequest): ()
     local door = request.Door
 
     if door:GetAttribute("Locked") then
-        if request.Kind ~= "ClientReceive" then
+        if request.Kind ~= "ClientReceive" and request.Kind ~= "ServerRun" then
             if IS_SERVER then
                 return
             end
@@ -301,19 +310,28 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     if IS_SERVER then
-        local autoCloseAfter = door:GetAttribute("AutoCloseAfter")
-        if typeof(autoCloseAfter) == "number" then
-            task.delay(autoCloseAfter + duration, function()
-                local closeRequest: ServerRun<SlideDoorServerReceive> = {
-                    Kind = "ServerRun" :: "ServerRun",
-                    Door = door,
-                    Receive = {
-                        Kind = "SlideDoorServerReceive" :: "SlideDoorServerReceive",
-                        Open = false,
-                    },
-                }
-                slideDoor(closeRequest :: DoorRequest<SlideDoorServerReceive>, part, originalDoorCFrame, false, duration)
-            end)
+        local id = tostring(newproxy())
+        door:SetAttribute("Id", id)
+        print("Updated id", id:sub(-2))
+
+        if shouldOpen then
+            local autoCloseAfter = door:GetAttribute("AutoCloseAfter")
+            if typeof(autoCloseAfter) == "number" then
+                task.delay(autoCloseAfter + duration, function()
+                    if id ~= door:GetAttribute("Id") then
+                        return
+                    end
+                    local closeRequest: ServerRun<SlideDoorServerReceive> = {
+                        Kind = "ServerRun" :: "ServerRun",
+                        Door = door,
+                        Receive = {
+                            Kind = "SlideDoorServerReceive" :: "SlideDoorServerReceive",
+                            Open = false,
+                        },
+                    }
+                    StandardDoor(closeRequest)
+                end)
+            end
         end
     end
 
