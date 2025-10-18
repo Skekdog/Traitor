@@ -31,7 +31,7 @@ end
 local function moveDown(frame: Frame)
 	for _, v in frame:GetChildren() do
 		if v:IsA("TextLabel") then
-			local target = v:GetAttribute("TargetPosition") :: UDim2 + UDim2.fromScale(0, 0.2)
+			local target = v:GetAttribute("TargetPosition") :: UDim2 + UDim2.fromOffset(0, v.AbsoluteSize.Y + 10)
 			v:SetAttribute("TargetPosition", target)
 			UIAnimation.Animate(v, TweenInfo.new(0.5), { Position = target})
 		end
@@ -41,8 +41,8 @@ end
 local function makeLabel(isTeam: boolean, text: string)
 	local label = ui.Label:Clone()
 	label.Text = text
-	label:SetAttribute("TargetPosition", UDim2.fromScale(label.Position.X.Scale, 0))
-	label.Position = UDim2.fromScale(label.Position.X.Scale, -0.3)
+	label:SetAttribute("TargetPosition", UDim2.fromOffset(label.AbsolutePosition.X, 0))
+	label.Position = UDim2.fromOffset(label.AbsolutePosition.X, -label.AbsoluteSize.Y * 2)
 	label.BackgroundTransparency = 1
 	label.TextTransparency = 1
 	label.Visible = true
