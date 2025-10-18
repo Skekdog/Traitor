@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 local GetInteractableDefinition = require(script.Parent.GetInteractableDefinition)
@@ -144,6 +145,10 @@ local function loadInteractable(instance: Instance): ()
         return
     end
 
+    if module.Interactables()[instance] then
+        return
+    end
+
     local gamemode, map = module.Gamemode(), module.Map()
     while not gamemode or not map do
         task.wait()
@@ -187,6 +192,8 @@ module.Map:Connect(function(map)
         loadInteractable(v)
     end
 end, true)
+
+CollectionService:GetInstanceAddedSignal("Interactable"):Connect(loadInteractable)
 
 module.OnReset = DynamicValue.new(nil)
 
