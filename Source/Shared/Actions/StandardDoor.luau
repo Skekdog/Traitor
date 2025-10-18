@@ -89,6 +89,24 @@ local function sendToClients(request: DoorRequest<HingeDoorServerReceive | Slide
     end
 end
 
+local function getTweenInfo(door: Types.MapObject, duration: number): TweenInfo
+    local easingStyleName = door:GetAttribute("EasingStyle")
+    if typeof(easingStyleName) ~= "string" then
+        easingStyleName = "Linear"
+    end
+    assert(typeof(easingStyleName) == "string")
+    local easingStyle = Enum.EasingStyle:FromName(easingStyleName)
+
+    local easingDirectionName = door:GetAttribute("EasingDirection")
+    if typeof(easingDirectionName) ~= "string" then
+        easingDirectionName = "In"
+    end
+    assert(typeof(easingDirectionName) == "string")
+    local easingDirection = Enum.EasingDirection:FromName(easingDirectionName)
+
+    return TweenInfo.new(duration, easingStyle, easingDirection)
+end
+
 local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoorServerReceive>, part: BasePart, originalDoorCFrame: CFrame, shouldOpen: boolean, duration: number): ()
     local door = request.Door
 
@@ -159,7 +177,7 @@ local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoor
         part.CFrame = request.OriginalCFrame
     end
 
-    local tween = TweenService:Create(angle, TweenInfo.new(duration, Enum.EasingStyle.Linear), {Value = targetAngle})
+    local tween = TweenService:Create(angle, getTweenInfo(door, duration), {Value = targetAngle})
     tween:Play()
 
     local con: RBXScriptConnection
@@ -216,7 +234,7 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
         part.CFrame = request.OriginalCFrame
     end
 
-    local tween = TweenService:Create(part, TweenInfo.new(duration, Enum.EasingStyle.Linear), {CFrame = targetCFrame})
+    local tween = TweenService:Create(part, getTweenInfo(door, duration), {CFrame = targetCFrame})
     tween:Play()
 
     tween.Completed:Once(function(status)
