@@ -100,6 +100,10 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 		deselect(nodeData)
 	end)
 
+	clickIcon.TouchTap:Connect(function()
+		module.Activate(nodeData)
+	end)
+
 	params.Adornee.Destroying:Connect(function()
 		nodeGui:Destroy()
 		nodes[nodeGui] = nil
