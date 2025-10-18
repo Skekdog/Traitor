@@ -52,7 +52,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	frame.BackgroundTransparency = 1
 
 	local clickIcon = Instance.new("ImageButton", frame)
-	clickIcon.Image = "rbxasset://textures/cursors/KeyboardMouse/ArrowCursor.png"
+	clickIcon.Image = "rbxassetid://91264198270381"
 	clickIcon.Size = UDim2.fromScale(1, 1)
 	clickIcon.ImageColor3 = Color3.new(1, 0.5, 0.5)
 	clickIcon.AnchorPoint = Vector2.new(0.5, 0.5)
