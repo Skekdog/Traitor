@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local MakeGolden = require(ReplicatedStorage.API.MakeGolden)
 local Discombobulate = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.Discombobulate)
 local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
@@ -31,10 +32,6 @@ end
 
 local function interactableModels(name: string): BasePart
 	return ReplicatedStorage.Assets:WaitForChild("InteractableModels"):WaitForChild(name) :: BasePart
-end
-
-local function weaponSounds(name: string): Sound
-    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild(name) :: Sound)
 end
 
 local function firedSounds(name: string): Sound
@@ -77,42 +74,6 @@ flashbangEqualiser.Enabled = true
 
 local flashbangTweenStart = TweenInfo.new(0.15)
 local flashbangTweenFinish = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 4)
-
-local function makeGolden(victim: Types.Participant)
-    local char = assert(victim:GetCharacter(), "Participant has no character")
-    local root = char:FindFirstChild("HumanoidRootPart")
-    local bodyColors = char:FindFirstChildOfClass("BodyColors")
-    if bodyColors then
-        bodyColors:Destroy()
-    end
-
-    if root then
-        local deathSound = root:FindFirstChild("DeathSound") :: Sound?
-        if deathSound then
-            deathSound:Destroy()
-        end
-
-        local sound = weaponSounds("GoldenGunHit"):Clone()
-        sound.Name = "DeathSound"
-        sound.Parent = root
-    end
-    for _, v in char:GetChildren() do
-        if v:IsA("BasePart") then
-            v.Material = Enum.Material.Metal
-            v.BrickColor = BrickColor.new("Gold")
-        end
-    end
-
-    local shirt = char:FindFirstChildOfClass("Shirt")
-    if shirt then
-        shirt:Destroy()
-    end
-
-    local pants = char:FindFirstChildOfClass("Pants")
-    if pants then
-        pants:Destroy()
-    end
-end
 
 local guns: {[string]: Types.GunWeaponDefinition} = {}
 guns.HUGE = {
@@ -346,7 +307,7 @@ guns["Golden Gun"] = {
         assert(attacker)
 
         if attacker:IsDamageJustifiedAgainstParticipant(target) then
-            makeGolden(target)
+            MakeGolden(target)
             target:TryTakeDamage({
                 Amount = math.huge,
                 Attacker = attacker,
@@ -358,7 +319,7 @@ guns["Golden Gun"] = {
                 HitPart = params.HitPart,
             })
         else
-            makeGolden(attacker)
+            MakeGolden(attacker)
             attacker:TryTakeDamage({
                 Amount = math.huge,
                 Attacker = attacker,
