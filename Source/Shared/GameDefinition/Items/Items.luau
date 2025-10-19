@@ -1089,6 +1089,7 @@ local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate"
     local round = participant.Round
 
     local interactable = createInteractableForItem(item, round)
+    interactable.Model:RemoveTag("Item")
     interactable.Extras.PlantedBy = participant
     local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Dynamic, nil, direction)
 
@@ -1116,7 +1117,8 @@ local function plantInteractable(item: Types.Item, origin: Vector3, direction: V
 
     local interactable = createInteractableForItem(item, participant.Round)
     interactable.Extras.PlantedBy = participant
-    local object = interactable.Model;
+    local object = interactable.Model
+    object:RemoveTag("Item");
     (object :: Instance).Parent = participant.Round:GetMap().Dynamic
 
     GetPrimaryPart(object).CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal)
