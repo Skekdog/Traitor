@@ -76,7 +76,7 @@ local function isSizeValid(size: Vector3): boolean
 end
 
 local function canGrab(prop: Types.MapObject): boolean
-	if prop:HasTag("Interactable") then
+	if prop:HasTag("Interactable") and not prop:HasTag("Item") then
 		return false
 	end
 	local part = GetPrimaryPart(prop)
