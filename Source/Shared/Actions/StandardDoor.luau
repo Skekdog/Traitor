@@ -328,12 +328,12 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     if shouldOpen then
-        local configOpenDuration = door:GetAttribute("Opening_Duration")
+        local configOpenDuration = door:GetAttribute("OpeningDuration")
         if typeof(configOpenDuration) == "number" then
             duration = configOpenDuration
         end
     else
-        local configCloseDuration = door:GetAttribute("Closing_Duration")
+        local configCloseDuration = door:GetAttribute("ClosingDuration")
         if typeof(configCloseDuration) == "number" then
             duration = configCloseDuration
         end
