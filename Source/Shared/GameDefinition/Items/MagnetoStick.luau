@@ -84,7 +84,7 @@ local function canGrab(prop: Types.MapObject): boolean
 end
 
 local function canPush(prop: Types.MapObject): boolean
-	if prop:HasTag("Interactable") then
+	if prop:HasTag("Interactable") and not prop:HasTag("Item") then
 		return false
 	end
 	local part = GetPrimaryPart(prop)
