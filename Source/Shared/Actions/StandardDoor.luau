@@ -350,13 +350,19 @@ local function StandardDoor(request: DoorRequest): ()
                     if id ~= door:GetAttribute("Id") then
                         return
                     end
-                    local closeRequest: ServerRun<SlideDoorServerReceive> = {
+
+                    assert(request.Kind == "ServerReceive" or request.Kind == "ServerRun")
+
+                    local closeRequest: ServerRun = {
                         Kind = "ServerRun" :: "ServerRun",
                         Door = door,
-                        Receive = {
+                        Receive = if request.Receive.Kind == "SlideDoorServerReceive" then {
                             Kind = "SlideDoorServerReceive" :: "SlideDoorServerReceive",
                             Open = false,
-                        },
+                        } elseif request.Receive.Kind == "HingeDoorServerReceive" then {
+                            Kind = "HingeDoorServerReceive" :: "HingeDoorServerReceive",
+                            Direction = nil,
+                        } else error("Invalid request"),
                     }
                     StandardDoor(closeRequest)
                 end)
