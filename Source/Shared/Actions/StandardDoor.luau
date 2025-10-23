@@ -311,7 +311,7 @@ local function StandardDoor(request: DoorRequest): ()
             end
         end
         if #sounds == 0 then
-            local id = if shouldOpen then if door:GetAttribute("Door_Kind") == "Slide" then DEFAULT_SLIDE_OPEN_SOUND else DEFAULT_HINGE_OPEN_SOUND else if door:GetAttribute("Door_Kind") == "Slide" then DEFAULT_SLIDE_CLOSE_SOUND else DEFAULT_HINGE_CLOSE_SOUND
+            local id = if shouldOpen then if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_OPEN_SOUND else DEFAULT_HINGE_OPEN_SOUND else if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_CLOSE_SOUND else DEFAULT_HINGE_CLOSE_SOUND
             sounds = {PlaySound.MakeSound(id, {
                 RollOffMinDistance = 6,
                 RollOffMaxDistance = 18,
@@ -364,7 +364,7 @@ local function StandardDoor(request: DoorRequest): ()
         end
     end
 
-    if door:GetAttribute("Door_Kind") == "Slide" then
+    if door:GetAttribute("DoorKind") == "Slide" then
         slideDoor(request :: DoorRequest<SlideDoorClientReceive | SlideDoorServerReceive>, part, originalDoorCFrame, shouldOpen, duration)
     else
         hingeDoor(request :: DoorRequest<HingeDoorClientReceive | HingeDoorServerReceive>, part, originalDoorCFrame, shouldOpen, duration)
@@ -394,7 +394,7 @@ if IS_SERVER then
         end
 
         local receive: HingeDoorServerReceive | SlideDoorServerReceive
-        if door:GetAttribute("Door_Kind") == "Slide" then
+        if door:GetAttribute("DoorKind") == "Slide" then
             receive = {
                 Kind = "SlideDoorServerReceive" :: "SlideDoorServerReceive",
                 Open = direction == "In",
