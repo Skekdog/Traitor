@@ -9,11 +9,11 @@ local GAMEMODES_PATH = "Source/Shared/GameDefinition/Gamemodes"
 local MAPS_PATH = "Assets/Maps"
 
 local ASSET_IDS = {
-	["TestMap"] = 138781832678807,
-	["Facility"] = 132481062170883,
-	["ThoseYouTrust"] = 103037367582885,
-	["Framed"] = 121973656567076,
-	["Elimination"] = 80732458427790,
+	["TestMap"] = 72787247468299,
+	["Facility"] = 122192823669641,
+	["ThoseYouTrust"] = 117084689582342,
+	["Framed"] = 85240118809989,
+	["Elimination"] = 73629714476044,
 }
 
 local function GetAssetPath(assetName: string, kind: "map" | "gamemode"): string
