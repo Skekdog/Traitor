@@ -37,6 +37,7 @@ print("Executing AssetService:CreateAssetVersionAsync")
 
 local result, number = createAssetVersionAsync(AssetService, asset, ASSET_TYPE, ASSET_ID, {
 	CreatorId = CREATOR_ID,
+	IsPackage = false,
 })
 
 print(result, number)
