@@ -4,11 +4,9 @@ local serde = require("@lune/serde")
 local roblox = require("@lune/roblox")
 local process = require("@lune/process")
 local BuildLib = require("./Lib/BuildLib")
+local Env = require("./Lib/Env")
 
 local BASE_URL = "https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType=Published"
-
-assert(fs.isFile(".env"), "Missing .env file")
-local env = serde.decode("toml", fs.readFile(".env"))
 
 local NAME = "TT3.rbxl"
 
@@ -35,7 +33,7 @@ local placeId =
 local shouldPublish = process.args[2] == "publish"
 
 local universeId = if placeId == LABS_PLACE_ID then LABS_UNIVERSE_ID else STANDARD_UNIVERSE_ID
-local API_KEY = env.APIKEY or error("Missing APIKEY in .env")
+local API_KEY = Env.APIKEY or error("Missing APIKEY in .env")
 
 local PROJECT_FILE_PATH = "default.project.json"
 
