@@ -9,7 +9,7 @@ local GAMEMODES_PATH = "Source/Shared/GameDefinition/Gamemodes"
 local MAPS_PATH = "Assets/Maps"
 
 local ASSET_IDS = {
-	["TestMap"] = 72787247468299,
+	["TestMap"] = 125557102994928,
 	["Facility"] = 122192823669641,
 	["ThoseYouTrust"] = 117084689582342,
 	["Framed"] = 85240118809989,
