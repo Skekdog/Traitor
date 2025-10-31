@@ -207,7 +207,7 @@ end)
 
 remotes.MapLoaded.OnClientEvent:Connect(function()
     local child = workspace:FindFirstChild("Map")
-    if not child or not child:IsA("ModuleScript") then
+    if not child then
         return
     end
 
