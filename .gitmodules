@@ -5,3 +5,6 @@
 [submodule "Docs"]
 	path = Docs
 	url = https://github.com/skekdog/TT3-Docs.git
+[submodule "Lune/Lib/poke"]
+	path = Lune/Lib/poke
+	url = https://github.com/jackdotink/poke.git
