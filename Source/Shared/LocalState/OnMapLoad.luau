@@ -11,11 +11,11 @@ LocalRoundInfo.Map:Connect(function(map)
 		return
 	end
 
-	alertUI.Object.Text = `Map Loaded: {GetDisplayName(map.Definition)} by {map.Definition.Authors}`
+	alertUI.Object.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
 	alertUI:ToggleVisible(true)
 
-	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Definition.Authors
-	playerlistUI.Object.Info.RoundInfo.Info.Map.Text = `Map: {GetDisplayName(map.Definition)}`
+	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Authors
+	playerlistUI.Object.Info.RoundInfo.Info.Map.Text = `Map: {GetDisplayName(map)}`
 
 	task.wait(5)
 	alertUI:ToggleVisible(false)

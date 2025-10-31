@@ -101,15 +101,15 @@ if RunService:IsClient() then
 			return
 		end
 
-		if not map.Definition.Extras or not map.Definition.Extras.CompatibilityMode then
+		if not map.Structure:GetAttribute("CompatibilityMode") then
 			return
 		end
 
-		for _, v in map.Dynamic:GetDescendants() do
+		for _, v in map.Structure.Dynamic:GetDescendants() do
 			onDescendantAdded(v)
 		end
 
-		map.Dynamic.DescendantAdded:Connect(onDescendantAdded)
+		map.Structure.Dynamic.DescendantAdded:Connect(onDescendantAdded)
 	end, true)
 	return module
 end
@@ -118,7 +118,7 @@ local RoundHandler = require(ServerScriptService.RoundHandler)
 function module.TryCreateNewInteractable(MapObject: Types.MapObject): Types.Interactable?
 	local round = RoundHandler.Round()
 
-	if not MapObject:GetAttribute("Button") or not MapObject:IsDescendantOf(round:GetMap().Dynamic) then
+	if not MapObject:GetAttribute("Button") or not MapObject:IsDescendantOf(round:GetMap().Structure.Dynamic) then
 		return nil
 	end
 

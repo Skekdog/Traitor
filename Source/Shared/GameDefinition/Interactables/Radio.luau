@@ -144,9 +144,9 @@ local function removeSoundsByGamemode(newGamemode: string): ()
 end
 
 local function addSoundsFromMap(map: Types.Map): ()
-	for _, v in map.Definition.AvailableItems do
+	for _, v in map.ItemDefinitions do
 		if v.Kind == "Gun" and v.AttackSound then
-			addSound(v.AttackSound, map.Definition.Name, nil)
+			addSound(v.AttackSound, map.Name, nil)
 		end
 	end
 end
@@ -226,7 +226,7 @@ if RunService:IsClient() then
 			return
 		end
 		if lastMap then
-			removeSoundsByMap(lastMap.Definition.Name)
+			removeSoundsByMap(lastMap.Name)
 		end
 		lastMap = map
 		addSoundsFromMap(map)
@@ -285,7 +285,7 @@ if RunService:IsServer() then
 		local map = serverRound:GetMap()
 		if lastMap ~= map :: Types.Map? then
 			if lastMap then
-				removeSoundsByMap(lastMap.Definition.Name)
+				removeSoundsByMap(lastMap.Name)
 			end
 			lastMap = map
 			addSoundsFromMap(map)

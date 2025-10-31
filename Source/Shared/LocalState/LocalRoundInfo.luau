@@ -131,7 +131,7 @@ do
     local map: Types.Map?
     local mapScript = workspace:FindFirstChild("Map")
     if mapScript then
-        map = Map.fromMapScript(Map.ValidateMapScript(mapScript))
+        map = Map.new(Map.ValidateStructure(mapScript))
     end
 
     module.Map = DynamicValue.new(map)
@@ -183,12 +183,12 @@ module.Map:Connect(function(map)
         return
     end
 
-    map.Dynamic.DescendantAdded:Connect(function(descendant: Instance)
+    map.Structure.Dynamic.DescendantAdded:Connect(function(descendant: Instance)
         if descendant:HasTag("Interactable") then
             loadInteractable(descendant)
         end
     end)
-    for _, v in GetTaggedDescendants(map.Dynamic, "Interactable") do
+    for _, v in GetTaggedDescendants(map.Structure.Dynamic, "Interactable") do
         loadInteractable(v)
     end
 end, true)
@@ -215,7 +215,7 @@ remotes.MapLoaded.OnClientEvent:Connect(function()
         child.ChildAdded:Wait()
     end
 
-    local newMap = Map.fromMapScript(Map.ValidateMapScript(child))
+    local newMap = Map.new(Map.ValidateStructure(child))
     module.Map:SetValue(newMap)
 
     child.Destroying:Once(function()

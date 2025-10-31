@@ -25,7 +25,7 @@ function module.LoadMap(assetId: number): ()
 	end
 
 	mapScript.Parent = ServerStorage.Maps
-	RoundHandler.Round():LoadMap(Map.fromMapScript(Map.ValidateMapScript(mapScript)))
+	RoundHandler.Round():LoadMap(Map.ValidateStructure(mapScript))
 end
 
 return module

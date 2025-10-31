@@ -15,7 +15,7 @@ task.spawn(function()
 			continue
 		end
 
-		if not map.Definition.Extras or not map.Definition.Extras.CompatibilityMode then
+		if not map.Structure:GetAttribute("CompatibilityMode") then
 			continue
 		end
 

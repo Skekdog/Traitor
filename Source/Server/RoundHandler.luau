@@ -7,6 +7,7 @@ local Impulse = require(ReplicatedStorage.API.Impulse)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
+local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local GamemodeValidation = require(ReplicatedStorage.Shared.RoundRule.GamemodeValidation)
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
@@ -66,19 +67,15 @@ local maps = ServerStorage.Maps
 
 local random = Random.new(workspace:GetServerTimeNow())
 
-local function getMap(name: string): Types.Map
-    return Map.fromMapScript(Map.ValidateMapScript((maps :: any)[name]:Clone()))
+local function getMap(name: string): Types.MapStructure
+    return Map.ValidateStructure((maps :: any)[name]:Clone())
 end
 
 local currentMap = "International"
 
 type ClientMapInfo = {
     Name: string,
-    Icons: {
-        ["16:9"]: string?,
-        ["4:3"]: string?,
-        ["1:1"]: string?,
-    }
+    Icon: string?,
 }
 
 local function getMapsForVote(): {ClientMapInfo}
@@ -95,10 +92,10 @@ local function getMapsForVote(): {ClientMapInfo}
         assert(v:IsA("ModuleScript"), "Invalid Map")
 
         if v.Name ~= currentMap and not v:GetAttribute("Experimental") then
-            local definition: Types.MapDefinition = (require)(v)
+            local map = Map.new(Map.ValidateStructure(v))
             table.insert(votableMaps, {
-                Name = definition.Name,
-                Icons = definition.MapIcons
+                Name = GetDisplayName(map),
+                Icon = map.Icon
             })
         end
     end

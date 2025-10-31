@@ -1091,7 +1091,7 @@ local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate"
     local interactable = createInteractableForItem(item, round)
     interactable.Model:RemoveTag("Item")
     interactable.Extras.PlantedBy = participant
-    local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Dynamic, nil, direction)
+    local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Structure.Dynamic, nil, direction)
 
     if not success then
         round._interactables[interactable.Model] = nil
@@ -1111,7 +1111,7 @@ local function plantInteractable(item: Types.Item, origin: Vector3, direction: V
     params.FilterType = Enum.RaycastFilterType.Exclude
 
     local result = workspace:Raycast(origin, direction * 10, params)
-    if not result or not result.Instance:IsDescendantOf(participant.Round:GetMap().Static) then
+    if not result or not result.Instance:IsDescendantOf(participant.Round:GetMap().Structure.Static) then
         return nil
     end
 
@@ -1119,7 +1119,7 @@ local function plantInteractable(item: Types.Item, origin: Vector3, direction: V
     interactable.Extras.PlantedBy = participant
     local object = interactable.Model
     object:RemoveTag("Item");
-    (object :: Instance).Parent = participant.Round:GetMap().Dynamic
+    (object :: Instance).Parent = participant.Round:GetMap().Structure.Dynamic
 
     GetPrimaryPart(object).CFrame = CFrame.lookAt(result.Position, result.Position + result.Normal)
 

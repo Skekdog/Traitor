@@ -100,7 +100,7 @@ RunService.Heartbeat:Connect(function(dt)
 
 	local submergedParticipants: {[Participant]: true?} = {}
 
-	for _, bound in GetTaggedDescendants(map.Map, "Water") do
+	for _, bound in GetTaggedDescendants(map.Structure, "Water") do
 		if not bound:IsA("BasePart") then
 			return
 		end

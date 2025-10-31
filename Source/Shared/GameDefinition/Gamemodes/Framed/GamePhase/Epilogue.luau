@@ -26,7 +26,7 @@ function Epilogue.Begin(framed: Types.Participant): ()
 	round.Extras.FramedEpilogue = true
 	round:SetPhase("Playing", EPILOGUE_DURATION)
 
-	local exits = round:GetMap().Map.PlayerSpawns:GetChildren()
+	local exits = round:GetMap().Structure.PlayerSpawns:GetChildren()
 	local chosenExit = exits[math.random(1, #exits)]
 
 	exitCFrame = nil
@@ -37,7 +37,7 @@ function Epilogue.Begin(framed: Types.Participant): ()
 	assert(exitCFrame, "Could not find exit")
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {round:GetMap().Static}
+	params.FilterDescendantsInstances = {round:GetMap().Structure.Static}
 	params.FilterType = Enum.RaycastFilterType.Include
 	params.IgnoreWater = true
 	local result = workspace:Raycast(exitCFrame.Position, Vector3.new(0, -10, 0), params)
@@ -90,7 +90,7 @@ if RunService:IsClient() then
 
 		exit.Name = "FramedEpilogueExit"
 		exit:PivotTo(escapeCFrame)
-		exit.Parent = map.Dynamic :: any
+		exit.Parent = map.Structure.Dynamic :: any
 
 		exit.Part.Touched:Connect(function(part)
 			local char = Players.LocalPlayer.Character

@@ -141,10 +141,10 @@ module.xray = {
 			return "No map loaded."
 		end
 
-		local enabled = not (map.Static:GetAttribute("XRayEnabled") :: boolean?)
-		map.Static:SetAttribute("XRayEnabled", enabled)
+		local enabled = not (map.Structure.Static:GetAttribute("XRayEnabled") :: boolean?)
+		map.Structure.Static:SetAttribute("XRayEnabled", enabled)
 
-		for _, instance in map.Static:GetDescendants() do
+		for _, instance in map.Structure.Static:GetDescendants() do
 			if not instance:IsA("BasePart") and not instance:IsA("Texture") then
 				continue
 			end
@@ -184,10 +184,10 @@ module.showbounds = {
 			return "No map loaded."
 		end
 
-		local enabled = not (map.Static:GetAttribute("ShowBounds") :: boolean?)
-		map.Static:SetAttribute("ShowBounds", enabled)
+		local enabled = not (map.Structure.Static:GetAttribute("ShowBounds") :: boolean?)
+		map.Structure.Static:SetAttribute("ShowBounds", enabled)
 
-		for _, instance in map.Static:GetDescendants() do
+		for _, instance in map.Structure.Static:GetDescendants() do
 			if not instance:IsA("BasePart") or instance.CollisionGroup ~= "Bounds" then
 				continue
 			end
@@ -587,7 +587,7 @@ module.map = {
 		if not map then
 			return `Map {mapName} not found.`
 		end
-		round:LoadMap(Map.fromMapScript(Map.ValidateMapScript(map:Clone())))
+		round:LoadMap(Map.ValidateStructure(map:Clone()))
 
 		return `Map changed to {mapName}.`
 	end
@@ -644,7 +644,7 @@ module.spawninteractable = {
 			local interactable = round:AddInteractable(definition)
 			interactable.Model:RemoveTag("Item")
 			GetPrimaryPart(interactable.Model).CFrame = char:GetPivot();
-			(interactable.Model :: Instance).Parent = round:GetMap().Dynamic
+			(interactable.Model :: Instance).Parent = round:GetMap().Structure.Dynamic
 		end
 
 		return `Spawned {interactableName} at {getPlayersString(players)}.`
