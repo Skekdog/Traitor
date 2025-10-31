@@ -59,18 +59,36 @@ local function BuildPlace(assetName: string, assetPath: string): string
 	return result
 end
 
+local function publish(name: string, kind: "map" | "gamemode"): ()
+
+
+	local assetId = ASSET_IDS[name]
+
+	local placeData = BuildPlace(name, GetAssetPath(name, kind))
+	local scriptContents = fs.readFile("Lune/Tasks/PublishAsset.luau")
+		:gsub("0%d%d%d%d%d%d%d%d%d", tostring(assetId))
+		:gsub("Enum%.AssetType%.Plugin", "Enum.AssetType.Model")
+
+
+	CloudTask(placeData, scriptContents)
+end
+
 local kind = process.args[1]
-assert(kind == "map" or kind == "gamemode", "Invalid kind. Expected usage: PublishSDKExample map|gamemode mapName|gamemodeName")
+assert(kind == "map" or kind == "gamemode" or kind == "all", "Invalid kind. Expected usage: PublishSDKExample map|gamemode|all mapName|gamemodeName")
+
+if kind == "all" then
+	for _, map in EXAMPLE_MAPS do
+		print("Publishing map: " .. map)
+		publish(map, "map")
+	end
+	for _, gamemode in EXAMPLE_GAMEMODES do
+		print("Publishing gamemode: " .. gamemode)
+		publish(gamemode, "gamemode")
+	end
+	return
+end
 
 local name = process.args[2]
 assert(name, "Invalid name. Expected usage: PublishSDKExample map|gamemode mapName|gamemodeName")
 
-local assetId = ASSET_IDS[name]
-
-local placeData = BuildPlace(name, GetAssetPath(name, kind))
-local scriptContents = fs.readFile("Lune/Tasks/PublishAsset.luau")
-	:gsub("0%d%d%d%d%d%d%d%d%d", tostring(assetId))
-	:gsub("Enum%.AssetType%.Plugin", "Enum.AssetType.Model")
-
-
-CloudTask(placeData, scriptContents)
+publish(name, kind)
