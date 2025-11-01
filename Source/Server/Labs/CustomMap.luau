@@ -12,9 +12,9 @@ function module.LoadMap(assetId: number): ()
 		error("Custom maps are only available in Labs.")
 	end
 
-	local mapScript = AssetService:LoadAssetAsync(assetId):FindFirstChildWhichIsA("ModuleScript")
+	local mapScript = AssetService:LoadAssetAsync(assetId):FindFirstChildWhichIsA("Instance")
 	if not mapScript then
-		error("Asset is not a valid map script")
+		error("Asset is not a valid map")
 	end
 
 	mapScript.Sandboxed = false
