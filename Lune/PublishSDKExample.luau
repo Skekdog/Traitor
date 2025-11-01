@@ -1,6 +1,6 @@
 local process = require("@lune/process")
 local fs = require("@lune/fs")
-local CloudTask = require("./Lib/CloudTask")
+local PublishAsset = require("./Lib/PublishAsset")
 
 local EXAMPLE_MAPS = {"TestMap", "Facility"}
 local EXAMPLE_GAMEMODES = {"ThoseYouTrust", "Framed", "Elimination"}
@@ -36,41 +36,8 @@ local function GetAssetPath(assetName: string, kind: "map" | "gamemode"): string
 	error("Gamemode file not found.")
 end
 
-local ASSET_PROJECT = [[{"name":"Publish Asset","tree":{"$className":"DataModel","ReplicatedStorage":{"[NAME]":{"$path":"[PATH]"}}}}]]
-
-local function BuildPlace(assetName: string, assetPath: string): string
-	local project = ASSET_PROJECT
-		:gsub("%[NAME%]", assetName)
-		:gsub("%[PATH%]", assetPath)
-
-	local projectPath = "Asset.project.json"
-	fs.writeFile(projectPath, project)
-
-	local executionResult = process.exec("rojo", {"build", "--output", assetName .. ".rbxl", projectPath})
-
-	fs.removeFile(projectPath)
-
-	assert(executionResult.ok, executionResult.stderr)
-
-	local result = fs.readFile(assetName .. ".rbxl")
-
-	fs.removeFile(assetName .. ".rbxl")
-
-	return result
-end
-
-local function publish(name: string, kind: "map" | "gamemode"): ()
-
-
-	local assetId = ASSET_IDS[name]
-
-	local placeData = BuildPlace(name, GetAssetPath(name, kind))
-	local scriptContents = fs.readFile("Lune/Tasks/PublishAsset.luau")
-		:gsub("0%d%d%d%d%d%d%d%d%d", tostring(assetId))
-		:gsub("Enum%.AssetType%.Plugin", "Enum.AssetType.Model")
-
-
-	CloudTask(placeData, scriptContents)
+local function publish(assetName: string, kind: "map" | "gamemode"): ()
+	PublishAsset(ASSET_IDS[assetName], assetName, GetAssetPath(assetName, kind))
 end
 
 local kind = process.args[1]
