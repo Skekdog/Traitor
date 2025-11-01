@@ -47,6 +47,9 @@ local serviceProperties: {[string]: {[string]: any}} = {
 	Players = {
 		BanningEnabled = placeId ~= LABS_PLACE_ID,
 	},
+	AssetService = {
+		AllowInsertFreeAssets = placeId == LABS_PLACE_ID,
+	},
 }
 
 for serviceName, properties in serviceProperties do
