@@ -6,5 +6,8 @@
 		"Assets/Maps/**",
 		"ServerStorage/Maps/**"
 	],
+	"luau-lsp.ignoreGlobs": [
+		"Lune/Lib/poke/**"
+	],
 	"luau-lsp.types.robloxSecurityLevel": "None",
 }
