@@ -145,7 +145,7 @@ local function createPlr(plr: Player)
 	end, true)
 
 	if plr == Players.LocalPlayer then
-		TweenService:Create(clone, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.In, -1, true), {Transparency = 0}):Play()
+		TweenService:Create(clone, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.In, -1, true), {BackgroundColor3 = Color3.new(1, 1, 1)}):Play()
 	end
 
 	return clone :: PlayerElement
