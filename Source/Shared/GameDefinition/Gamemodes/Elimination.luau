@@ -1,9 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
-local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
-local Ammo = require(script.Parent.Parent.Items.Ammo)
-local Items = require(script.Parent.Parent.Items.Items)
+local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
+
+local Ammo = StandardGame.GetAllAmmo()
+local Items = StandardGame.GetItems()
+local Interactables = StandardGame.GetInteractables()
+
+local Highlights = StandardGame.Highlights
 
 local function getBestParticipant(round: Types.Round): Types.Participant
     local bestScore, bestParticipant: Types.Participant? = -math.huge, nil
@@ -147,7 +150,7 @@ local gamemode: Types.GamemodeDefinition = {
     Roles = roles,
 
     OnDeath = function(round, participant: Types.Participant, deferVictoryCheck: boolean)
-        StandardHighlights.OnDeath(round, participant)
+        Highlights.OnDeath(round, participant)
 
         local corpse = participant.Corpse
         local attacker = if corpse then corpse.Killer else nil
@@ -176,7 +179,7 @@ local gamemode: Types.GamemodeDefinition = {
     end,
 
     AddFinishHighlights = function(round)
-        StandardHighlights.FinishHighlights(round)
+        Highlights.FinishHighlights(round)
         local mostKillsAmount, mostKillsParticipant: Types.Participant? = 0, nil
         for _, v in round:GetParticipants() do
             local count = #v.KillList
