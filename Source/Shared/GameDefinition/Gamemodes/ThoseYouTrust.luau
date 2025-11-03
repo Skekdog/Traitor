@@ -1,13 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
-local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
-local Ammo = require(ReplicatedStorage.Shared.GameDefinition.Items.Ammo)
-local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
+local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Disguiser)
 local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local CombineTable = require(ReplicatedStorage.Shared.Util.CombineTable)
+
+local Items = StandardGame.GetItems()
 
 local traitorMusic: {Sound} = {}
 for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
@@ -441,7 +440,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 end
 
 local function onDeath(round: Types.Round, victim: Types.Participant, deferVictoryCheck: boolean): ()
-	StandardHighlights.OnDeath(round, victim)
+	StandardGame.Highlights.OnDeath(round, victim)
 
 	local corpse = victim.Corpse
 
@@ -486,10 +485,10 @@ local gamemode: Types.GamemodeDefinition = {
 	EnableFriendlyFire = true,
 	EnableKarma = true,
 
-	AvailableAmmo = Ammo,
+	AvailableAmmo = StandardGame.GetAllAmmo(),
 	AvailableItems = Items,
 
-	InteractableDefinitions = Interactables,
+	InteractableDefinitions = StandardGame.GetInteractables(),
 
 	StartingItems = {
 		Items.Crowbar,
@@ -508,7 +507,7 @@ local gamemode: Types.GamemodeDefinition = {
 
 	OnIdentifyCorpse = function(round, corpse, searcher)
 		if not round:IsPostGame() then
-			StandardHighlights.OnIdentifyCorpse(round, corpse, searcher)
+			StandardGame.Highlights.OnIdentifyCorpse(round, corpse, searcher)
 		end
 
 		if corpse.Model and corpse.Model:GetAttribute("IsDisguised") then
@@ -517,7 +516,7 @@ local gamemode: Types.GamemodeDefinition = {
 	end,
 
 	AddFinishHighlights = function(round)
-		StandardHighlights.FinishHighlights(round)
+		StandardGame.Highlights.FinishHighlights(round)
 		local awardDeadliestAmongEquals: Types.Participant?
 		for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Traitor")) do
 			local corpse = v.Corpse
