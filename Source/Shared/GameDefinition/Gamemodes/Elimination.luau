@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
-local Types = require(script.Parent.Parent.Parent.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local Ammo = StandardGame.GetAllAmmo()
 local Items = StandardGame.GetItems()
