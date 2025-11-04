@@ -64,6 +64,7 @@ local function OnEquipClient(): ()
 		local highlight = Instance.new("Highlight")
 		highlight.FillColor = Color3.fromRGB(255, 208, 0)
 		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+		highlight.DepthMode = Enum.HighlightDepthMode.Occluded
 		highlight.Name = "BinocularsHighlight"
 		highlight.Parent = corpse
 
