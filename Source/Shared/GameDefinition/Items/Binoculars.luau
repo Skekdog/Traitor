@@ -68,7 +68,7 @@ local function OnEquipClient(): ()
 		highlight.Parent = corpse
 
 		corpse:GetAttributeChangedSignal("Unidentified"):Connect(function(): ()
-			highlight.Enabled = not corpse:GetAttribute("Unidentified")
+			highlight.Enabled = corpse:GetAttribute("Unidentified") == true
 		end)
 
 		corpse.Destroying:Connect(function()
