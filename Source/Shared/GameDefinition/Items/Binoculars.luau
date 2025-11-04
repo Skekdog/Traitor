@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
@@ -34,9 +35,48 @@ local function AlternateFireClient(): ()
 	doZoomClient()
 end
 
+local bodies: {[Types.MapObject]: Highlight} = {}
+
 local function OnUnequipClient(): ()
 	module.IsZoomedIn = false
 	doZoomClient()
+
+	for corpse, highlight in bodies do
+		highlight.Enabled = false
+	end
+end
+
+local function OnEquipClient(): ()
+	for _, corpse in CollectionService:GetTagged("Corpse") do
+		if not corpse:IsA("Model") and not corpse:IsA("BasePart") then
+			continue
+		end
+
+		if bodies[corpse] then
+			bodies[corpse].Enabled = corpse:GetAttribute("Unidentified") == true
+			continue
+		end
+
+		if not corpse:GetAttribute("Unidentified") then
+			continue
+		end
+
+		local highlight = Instance.new("Highlight")
+		highlight.FillColor = Color3.fromRGB(255, 208, 0)
+		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+		highlight.Name = "BinocularsHighlight"
+		highlight.Parent = corpse
+
+		corpse:GetAttributeChangedSignal("Unidentified"):Connect(function(): ()
+			highlight.Enabled = not corpse:GetAttribute("Unidentified")
+		end)
+
+		corpse.Destroying:Connect(function()
+			bodies[corpse] = nil
+		end)
+
+		bodies[corpse] = highlight
+	end
 end
 
 local function OnUnequipServer(_, participant: Types.Participant): ()
@@ -51,7 +91,7 @@ local item: Types.ItemDefinition = {
 	Kind = "Item" :: "Item",
 
 	Name = "Binoculars",
-	Description = "Allows corpses to be searched from a distance.",
+	Description = "Corpses can be searched from a long distance. Additionally, unidentified bodies will be highlighted.",
 	Icon = "rbxassetid://7677183404",
 
 	ItemGroup = ItemGroups.RoleUtility,
@@ -67,6 +107,7 @@ local item: Types.ItemDefinition = {
 
 	AlternateFireClient = AlternateFireClient,
 	OnUnequipClient = OnUnequipClient,
+	OnEquipClient = OnEquipClient,
 
 	OnEquipServer = OnEquipServer,
 	OnUnequipServer = OnUnequipServer,
