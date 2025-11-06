@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
+local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
@@ -43,7 +44,7 @@ end
 local function updateCredits(): boolean
 	local credits = LocalRoundInfo.Credits()
 
-	shopPage.Data.CurrentCredits.Text = "You have " .. credits .. " credits."
+	shopPage.Data.CurrentCredits.Text = "You have " .. credits .. Plural(credits, " credit", " credits") .. "."
 	shopPage.Data.CurrentCredits.TextColor3 = COLOUR_GOOD
 
 	if selectedItem and selectedItem.CreditCost then
