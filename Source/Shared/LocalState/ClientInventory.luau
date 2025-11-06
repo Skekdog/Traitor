@@ -21,7 +21,7 @@ local module = {}
 local sampleButton = ui.Object.Sample
 type ItemButton = typeof(sampleButton)
 
-local ourInventory: {Passive: {Types.AnyItem}, Slots: {[number]: Types.AnyItem}, [number]: never} = {Passive = {}, Slots = {}}
+local ourInventory: {Passive: {Types.AnyItem}, Slots: DynamicValue.DynamicValue<{[number]: Types.AnyItem}>, [number]: never} = {Passive = {}, Slots = DynamicValue.new({})}
 local ourAmmo: DynamicValue.DynamicValue<{[string]: number?}> = DynamicValue.new({})
 
 module.Inventory = ourInventory
@@ -37,7 +37,7 @@ local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "
 		end
 	end
 
-	for _, v in ourInventory.Slots do
+	for _, v in ourInventory.Slots() do
 		if v.Kind == "Item" and v.Definition[schedulerEvent .. "Client"] then
 			v.Definition[schedulerEvent .. "Client"](v, dt)
 		end
@@ -77,7 +77,7 @@ end
 
 local function getNextFreeSlot(): number
 	local last = 0
-	for i, v in ipairs(ourInventory.Slots) do
+	for i, v in ipairs(ourInventory.Slots()) do
 		last = i
 	end
 	return last + 1
@@ -350,7 +350,7 @@ local function removeItem(itemName: string): ()
 	end
 
 	local slot: number?
-	for i, v in ourInventory.Slots do
+	for i, v in ourInventory.Slots() do
 		if v.Definition.Name == itemName then
 			slot = i
 			break
@@ -371,7 +371,8 @@ local function removeItem(itemName: string): ()
 	end
 
 	tryRemoveButton(itemName)
-	ourInventory.Slots[slot] = nil
+	ourInventory.Slots()[slot] = nil
+	ourInventory.Slots:Invoke()
 end
 
 local function addItem(item: Types.AnyItem): ()
@@ -384,11 +385,12 @@ local function addItem(item: Types.AnyItem): ()
 
 	local slot = if gamemode.IsSlotless then getNextFreeSlot() else item.Definition.ItemGroup and item.Definition.ItemGroup.PreferredSlot
 	if slot then
-		if ourInventory.Slots[slot] then
+		if ourInventory.Slots()[slot] then
 			slot = getNextFreeSlot()
 		end
 		tryAddButton(item, slot)
-		ourInventory.Slots[slot] = item
+		ourInventory.Slots()[slot] = item
+		ourInventory.Slots:Invoke()
 		return
 	end
 
@@ -400,7 +402,7 @@ end
 
 for i = 1, 9 do
 	ControlManager.Register("Slot " .. i, function()
-		local item = ourInventory.Slots[i]
+		local item = ourInventory.Slots()[i]
 		if item then
 			tryEquip(item)
 			return Enum.ContextActionResult.Pass
@@ -422,11 +424,11 @@ local function getMinIndex(tbl: {[number]: any}): number
 end
 
 local function selectLowest()
-	local lowest = getMinIndex(ourInventory.Slots)
+	local lowest = getMinIndex(ourInventory.Slots())
 	if lowest == 0 then
 		return Enum.ContextActionResult.Pass
 	end
-	tryEquip(ourInventory.Slots[lowest])
+	tryEquip(ourInventory.Slots()[lowest])
 	return Enum.ContextActionResult.Pass
 end
 
@@ -440,18 +442,18 @@ ControlManager.Register("Next Item", function()
 		return Enum.ContextActionResult.Pass
 	end
 
-	if selectedSlot + 1 > table.maxn(ourInventory.Slots) then
+	if selectedSlot + 1 > table.maxn(ourInventory.Slots()) then
 		return selectLowest()
 	end
 
-	if table.maxn(ourInventory.Slots) == selectedSlot then
-		tryUnequip(ourInventory.Slots[selectedSlot])
+	if table.maxn(ourInventory.Slots()) == selectedSlot then
+		tryUnequip(ourInventory.Slots()[selectedSlot])
 		return Enum.ContextActionResult.Pass
 	end
 
 	for i = selectedSlot + 1, 9 do
-		if ourInventory.Slots[i] then
-			tryEquip(ourInventory.Slots[i])
+		if ourInventory.Slots()[i] then
+			tryEquip(ourInventory.Slots()[i])
 			return Enum.ContextActionResult.Pass
 		end
 	end
@@ -472,7 +474,7 @@ ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect
 			removeItem(v.Definition.Name)
 		end
 
-		for _, v in ourInventory.Slots do
+		for _, v in ourInventory.Slots() do
 			removeItem(v.Definition.Name)
 		end
 	else
@@ -496,7 +498,7 @@ ReplicatedStorage.Shared.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Conne
 end)
 
 ReplicatedStorage.Remotes.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemName: string, amount: number): ()
-	for _, v in ourInventory.Slots do
+	for _, v in ourInventory.Slots() do
 		if v.Definition.Name == itemName then
 			assert(v.Kind == "Gun", "Item is not a gun")
 			v.IsReloading = false
@@ -507,7 +509,7 @@ ReplicatedStorage.Remotes.ClientServer.ReloadWeapon.OnClientEvent:Connect(functi
 end)
 
 ReplicatedStorage.Remotes.ServerClient.UpdateAmmo.OnClientEvent:Connect(function(itemName: string, amount: number): ()
-	for _, v in ourInventory.Slots do
+	for _, v in ourInventory.Slots() do
 		if v.Definition.Name == itemName then
 			assert(v.Kind == "Gun", "Item is not a gun")
 			v.Ammo = amount

@@ -235,7 +235,7 @@ if RunService:IsClient() then
 	end
 
 	local function tryScan(): ()
-		local item = ClientInventory.Inventory.Slots[ITEM_SLOT]
+		local item = ClientInventory.Inventory.Slots()[ITEM_SLOT]
 		if not item or item.Definition.Name ~= "DNAScanner" then
 			return
 		end
