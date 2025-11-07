@@ -101,10 +101,6 @@ if RunService:IsClient() then
 			return
 		end
 
-		if not map.Structure:GetAttribute("CompatibilityMode") then
-			return
-		end
-
 		for _, v in map.Structure.Dynamic:GetDescendants() do
 			onDescendantAdded(v)
 		end
