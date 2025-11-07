@@ -110,11 +110,10 @@ local function addSound(sound: Sound | {Sound}, map: string?, gamemode: string?)
 end
 
 local function removeSound(index: number): ()
-	table.remove(sounds, index)
-
 	if RunService:IsClient() then
 		local ui = getEquipmentMenu()
 		if not ui then
+			table.remove(sounds, index)
 			return
 		end
 
@@ -125,6 +124,8 @@ local function removeSound(index: number): ()
 			button:Destroy()
 		end
 	end
+
+	table.remove(sounds, index)
 end
 
 local function removeSoundsByMap(newMap: string): ()
