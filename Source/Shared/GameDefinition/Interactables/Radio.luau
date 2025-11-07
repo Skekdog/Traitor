@@ -45,9 +45,6 @@ end
 
 local function addToMenu(sound: Sound | {Sound}): ()
 	local ui = getEquipmentMenu()
-	if not ui then
-		return
-	end
 
 	local page = ui.Object.Page.Radio
 	local button = page.RadioButton:Clone()
@@ -73,9 +70,6 @@ if RunService:IsClient() then
 		end
 
 		local ui = getEquipmentMenu()
-		if not ui then
-			return
-		end
 
 		for _, v in ui.Object.Page.Radio.ScrollingFrame:GetChildren() do
 			if v:IsA("TextButton") then
@@ -112,10 +106,6 @@ end
 local function removeSound(index: number): ()
 	if RunService:IsClient() then
 		local ui = getEquipmentMenu()
-		if not ui then
-			table.remove(sounds, index)
-			return
-		end
 
 		local page = ui.Object.Page.Radio
 		local sound = sounds[index].Sound
