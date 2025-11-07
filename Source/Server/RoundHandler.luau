@@ -89,8 +89,6 @@ local function getMapsForVote(): {ClientMapInfo}
             break
         end
 
-        assert(v:IsA("ModuleScript"), "Invalid Map")
-
         if v.Name ~= currentMap and not v:GetAttribute("Experimental") then
             local map = Map.new(Map.ValidateStructure(v))
             table.insert(votableMaps, {
