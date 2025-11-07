@@ -39,7 +39,7 @@ end
 
 local function getEquipmentMenu()
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	local ui = UIManager.TryGetUI("Equipment Shop") :: (UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])})?
+	local ui = UIManager.WaitForUI("Equipment Shop") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])}
 	return ui
 end
 
