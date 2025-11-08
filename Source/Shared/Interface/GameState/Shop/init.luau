@@ -51,13 +51,13 @@ end
 local function updateCredits(): boolean
 	local credits = LocalRoundInfo.Credits()
 
-	shopPage.Data.CurrentCredits.Text = "You have " .. credits .. Plural(credits, " credit", " credits") .. "."
+	shopPage.Data.CurrentCredits.Text = "You have " .. credits .. Plural(credits, " credit.", " credits.")
 	shopPage.Data.CurrentCredits.TextColor3 = COLOUR_GOOD
 
 	if selectedItem and selectedItem.CreditCost then
 		local canAfford = selectedItem.CreditCost <= credits
 
-		shopPage.Data.CreditCost.Text = "This costs " .. selectedItem.CreditCost .. " credits."
+		shopPage.Data.CreditCost.Text = "This costs " .. selectedItem.CreditCost .. Plural(selectedItem.CreditCost, " credit.", " credits.")
 		shopPage.Data.CreditCost.TextColor3 = if canAfford then COLOUR_GOOD else COLOUR_BAD
 
 		shopPage.Data.CurrentCredits.TextColor3 = if canAfford then COLOUR_GOOD else COLOUR_BAD
@@ -180,6 +180,7 @@ shopPage.Purchase.Activated:Connect(function()
 
 	if response == "Success" then
 		purchases[item] = (purchases[item] or 0) + 1
+		purchaseAllowed()
 	end
 end)
 
