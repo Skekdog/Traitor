@@ -8,19 +8,24 @@ local ui = UIManager.WaitForUI("Equipment") :: UIManager.UI & {Object: typeof(UI
 
 local currentPage: GuiObject?
 
-function EquipmentMenu.AddPage(page: GuiObject): ()
+function EquipmentMenu.AddPage(page: GuiObject, primary: boolean?): ()
 	local tabButton = ui.Object.TabHolder.TabTemplate:Clone()
+
+	local displayName = page:GetAttribute("DisplayName") or page.Name
+	assert(typeof(displayName) == "string", "DisplayName must be a string")
+
 	tabButton.Name = page.Name
-	tabButton.Text = page.Name
+	tabButton.Text = displayName
 	tabButton.Visible = true
+	tabButton.LayoutOrder = if primary then -1 else #ui.Object.Page:GetChildren() + 1
 	tabButton.Parent = ui.Object.TabHolder.Tabs :: any
 
 	page.AnchorPoint = Vector2.new(0.5, 0)
 	page.Position = UDim2.fromScale(0.5, 0)
-	page.LayoutOrder = #ui.Object.Page:GetChildren()
+	page.LayoutOrder = if primary then -1 else #ui.Object.Page:GetChildren()
 	page.Visible = false
 
-	if not currentPage then
+	if not currentPage and primary then
 		page.Visible = true
 		currentPage = page
 	end
