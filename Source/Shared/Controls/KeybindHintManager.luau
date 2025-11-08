@@ -36,7 +36,7 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
         label.TextStrokeTransparency = 0
         label.AutomaticSize = Enum.AutomaticSize.X
         label.TextXAlignment = (Enum :: any).TextXAlignment[textXAlignment or "Center"]
-        
+
         if not noStyle then
             label:AddTag("StyledUI")
         else
@@ -104,28 +104,28 @@ end
 
 local function loadInstance(instance: Instance): ()
     local control = instance:GetAttribute("Control") :: string?
-    assert(typeof(control) == "string", "Expected attribute 'Control' to be a string")
+    assert(typeof(control) == "string", "Expected attribute 'Control' to be a string: " .. instance:GetFullName())
 
     local definition = Settings.GetDefinition(control)
-    assert(definition, "Control not found: " .. control)
+    assert(definition, "Control not found: " .. control .. " " .. instance:GetFullName())
 
     local position = instance:GetAttribute("Position") :: UDim2?
-    assert(typeof(position) == "UDim2" or position == nil, "Expected attribute 'Position' to be a UDim2 or nil")
+    assert(typeof(position) == "UDim2" or position == nil, "Expected attribute 'Position' to be a UDim2 or nil " .. instance:GetFullName())
 
     local size = instance:GetAttribute("Size") :: UDim2?
-    assert(typeof(size) == "UDim2" or size == nil, "Expected attribute 'Size' to be a UDim2 or nil")
+    assert(typeof(size) == "UDim2" or size == nil, "Expected attribute 'Size' to be a UDim2 or nil " .. instance:GetFullName())
 
     local anchorPoint = instance:GetAttribute("AnchorPoint") :: Vector2?
-    assert(typeof(anchorPoint) == "Vector2" or anchorPoint == nil, "Expected attribute 'AnchorPoint' to be a Vector2 or nil")
+    assert(typeof(anchorPoint) == "Vector2" or anchorPoint == nil, "Expected attribute 'AnchorPoint' to be a Vector2 or nil " .. instance:GetFullName())
 
     local textXAlignment = instance:GetAttribute("TextXAlignment") :: "Left" | "Right" | "Center"?
-    assert(textXAlignment == "Left" or textXAlignment == "Right" or textXAlignment == "Center" or textXAlignment == nil, "Expected attribute 'TextXAlignment' to be a 'Left' | 'Right' | 'Center' or nil")
+    assert(textXAlignment == "Left" or textXAlignment == "Right" or textXAlignment == "Center" or textXAlignment == nil, "Expected attribute 'TextXAlignment' to be a 'Left' | 'Right' | 'Center' or nil " .. instance:GetFullName())
 
     local noStyle = instance:GetAttribute("NoStyle") :: boolean?
-    assert(typeof(noStyle) == "boolean" or noStyle == nil, "Expected attribute 'NoStyle' to be a boolean or nil")
+    assert(typeof(noStyle) == "boolean" or noStyle == nil, "Expected attribute 'NoStyle' to be a boolean or nil " .. instance:GetFullName())
 
     local alwaysShow = instance:GetAttribute("AlwaysShow") :: boolean?
-    assert(typeof(alwaysShow) == "boolean" or alwaysShow == nil, "Expected attribute 'AlwaysShow' to be a boolean or nil")
+    assert(typeof(alwaysShow) == "boolean" or alwaysShow == nil, "Expected attribute 'AlwaysShow' to be a boolean or nil " .. instance:GetFullName())
 
     createLabels(control, instance, position, size, anchorPoint, noStyle, textXAlignment)
 end
