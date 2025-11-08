@@ -1082,7 +1082,7 @@ items.Disguiser = Disguiser.Item
 local function createInteractableForItem(item: Types.Item, round: Types.Round): Types.Interactable
     local interactableDefinition = round:GetInteractableDefinition(item.Definition.Name)
     assert(interactableDefinition, "Could not find interactable definition for " .. item.Definition.Name)
-    return round:AddInteractable(interactableDefinition)
+    return round:AddInteractable(interactableDefinition, nil, true)
 end
 
 local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate", origin: Vector3, direction: Vector3, participant: Types.Participant): Types.Interactable?
@@ -1091,6 +1091,7 @@ local function throwInteractable(item: Types.Item, mode: "Primary" | "Alternate"
     local interactable = createInteractableForItem(item, round)
     interactable.Model:RemoveTag("Item")
     interactable.Extras.PlantedBy = participant
+    interactable.Extras.Player = participant.Player
     local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Structure.Dynamic, nil, direction)
 
     if not success then

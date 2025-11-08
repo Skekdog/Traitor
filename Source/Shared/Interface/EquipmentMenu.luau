@@ -6,7 +6,7 @@ local EquipmentMenu = {}
 
 local ui = UIManager.WaitForUI("Equipment") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment"])}
 
-local currentPage: GuiObject
+local currentPage: GuiObject?
 
 function EquipmentMenu.AddPage(page: GuiObject): ()
 	local tabButton = ui.Object.TabHolder.TabTemplate:Clone()
@@ -31,9 +31,35 @@ function EquipmentMenu.AddPage(page: GuiObject): ()
 		if page == currentPage then
 			return
 		end
+		assert(currentPage, "No current page")
 		UIAnimation.TransitionUIPage(currentPage, page, UDim2.fromScale(0.5, 0))
 		currentPage = page
 	end)
+end
+
+function EquipmentMenu.RemovePage(page: GuiObject): ()
+	local tabButton = ui.Object.TabHolder.Tabs:FindFirstChild(page.Name)
+	if tabButton then
+		tabButton:Destroy()
+	end
+
+	if currentPage == page then
+		local nextPage: GuiObject?
+		for _, p in ui.Object.Page:GetChildren() do
+			if p:IsA("GuiObject") then
+				nextPage = p
+				break
+			end
+		end
+
+		if nextPage then
+			UIAnimation.TransitionUIPage(page, nextPage, UDim2.fromScale(0.5, 0))
+		end
+
+		currentPage = nil
+	end
+
+	page.Parent = nil
 end
 
 return EquipmentMenu

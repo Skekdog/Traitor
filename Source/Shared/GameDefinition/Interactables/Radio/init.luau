@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -25,16 +26,8 @@ type SoundEntry = {
 
 local sounds: {SoundEntry} = {}
 
-local remote: RemoteEvent
-if RunService:IsServer() then
-	remote = Instance.new("RemoteEvent")
-	remote.Name = "RadioUse"
-	remote.Parent = script
-else
-	local found = script:WaitForChild("RadioUse")
-	assert(found:IsA("RemoteEvent"), "RadioUse must be a RemoteEvent")
-	remote = found
-end
+local playSoundRemote = GetRemote("RadioUse", script)
+local addMenuRemote = GetRemote("AddRadioMenu", script)
 
 local page = script.Radio
 
@@ -48,7 +41,7 @@ local function addToMenu(sound: Sound | {Sound}): ()
 	button.Visible = true
 
 	button.Activated:Connect(function()
-		remote:FireServer(soundName)
+		playSoundRemote:FireServer(soundName)
 	end)
 
 	button.Parent = page.ScrollingFrame :: any
@@ -56,7 +49,14 @@ end
 
 if RunService:IsClient() then
 	local EquipmentMenu = require(ReplicatedStorage.Shared.Interface.EquipmentMenu)
-	EquipmentMenu.AddPage(page)
+	addMenuRemote.OnClientEvent:Connect(function(enabled: boolean): ()
+		print(enabled)
+		if enabled then
+			EquipmentMenu.AddPage(page)
+		else
+			EquipmentMenu.RemovePage(page)
+		end
+	end)
 end
 
 -- jesus fucking christ this is horrible
@@ -205,7 +205,7 @@ if RunService:IsServer() then
 	local lastGamemode: Types.GamemodeDefinition?
 	local lastMap: Types.Map?
 
-	remote.OnServerEvent:Connect(function(player, soundName: unknown): ()
+	playSoundRemote.OnServerEvent:Connect(function(player, soundName: unknown): ()
 		if typeof(soundName) ~= "string" then
 			return
 		end
@@ -291,9 +291,17 @@ end
 local function OnLoadServer(interactable: Radio): ()
 	serverRound = interactable.Round
 	interactable.Model.Destroying:Connect(function()
+		if interactable.Extras.Player then
+			addMenuRemote:FireClient(interactable.Extras.Player, false)
+		end
 		table.remove(activeRadios, table.find(activeRadios, interactable) or error("Radio not found"))
 	end)
 
+	if interactable.Extras.Player then
+		print("yay")
+		addMenuRemote:FireClient(interactable.Extras.Player, true)
+	end
+	print("okay")
 	table.insert(activeRadios, interactable)
 end
 
