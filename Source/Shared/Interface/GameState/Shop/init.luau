@@ -1,22 +1,21 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
+local EquipmentMenu = require(ReplicatedStorage.Shared.Interface.EquipmentMenu)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
-local UIManager = require(script.Parent.Parent.UILib.UIManager)
 
 local COLOUR_GOOD = Color3.fromRGB(75, 255, 62)
 local COLOUR_BAD = Color3.fromRGB(167, 0, 0)
 
 local selectedItem: Types.AnyItemDefinition?
-local ui = UIManager.WaitForUI("Equipment Shop") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])}
-
-local shopPage = ui.Object.Page.Shop
 
 local purchases: {[Types.AnyItemDefinition]: number?} = {}
+
+local shopPage = script.Shop
 
 local function updateName(): ()
 	shopPage.ItemName.Text = if selectedItem then GetDisplayName(selectedItem) else "Item Name"
@@ -174,5 +173,7 @@ shopPage.Purchase.Activated:Connect(function()
 		purchases[item] = (purchases[item] or 0) + 1
 	end
 end)
+
+EquipmentMenu.AddPage(shopPage)
 
 return nil

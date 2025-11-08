@@ -36,17 +36,9 @@ else
 	remote = found
 end
 
-
-local function getEquipmentMenu()
-	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	local ui = UIManager.WaitForUI("Equipment Shop") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Equipment Shop"])}
-	return ui
-end
+local page = script.Radio
 
 local function addToMenu(sound: Sound | {Sound}): ()
-	local ui = getEquipmentMenu()
-
-	local page = ui.Object.Page.Radio
 	local button = page.RadioButton:Clone()
 
 	local soundName = if typeof(sound) == "table" then sound[1].Name else sound.Name
@@ -63,24 +55,8 @@ local function addToMenu(sound: Sound | {Sound}): ()
 end
 
 if RunService:IsClient() then
-	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	UIManager.RegisteredEvent:Connect(function(name: string)
-		if name ~= "Equipment Shop" then
-			return
-		end
-
-		local ui = getEquipmentMenu()
-
-		for _, v in ui.Object.Page.Radio.ScrollingFrame:GetChildren() do
-			if v:IsA("TextButton") then
-				v:Destroy()
-			end
-		end
-
-		for _, v in sounds do
-			addToMenu(v.Sound)
-		end
-	end)
+	local EquipmentMenu = require(ReplicatedStorage.Shared.Interface.EquipmentMenu)
+	EquipmentMenu.AddPage(page)
 end
 
 -- jesus fucking christ this is horrible
@@ -105,9 +81,6 @@ end
 
 local function removeSound(index: number): ()
 	if RunService:IsClient() then
-		local ui = getEquipmentMenu()
-
-		local page = ui.Object.Page.Radio
 		local sound = sounds[index].Sound
 		local button = page:FindFirstChild("Button_" .. if typeof(sound) == "table" then sound[1].Name else sound.Name)
 		if button then

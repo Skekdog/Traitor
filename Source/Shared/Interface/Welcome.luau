@@ -13,8 +13,8 @@ local controls: {ControlInfo} = {
 		Text = "Crouch & Covert Search",
 	},
 	{
-		Control = "Equipment Shop",
-		Text = "(As Special Role) Shop",
+		Control = "Equipment",
+		Text = "Equipment Menu",
 	},
 	{
 		Control = "Drop",

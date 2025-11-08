@@ -396,10 +396,10 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Equipment Shop",
+	Name = "Equipment",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
-	Tooltip = "Opens the Equipment Shop. Only certain roles have access to the Equipment Shop.",
+	Tooltip = "Opens the Equipment menu.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = true,
 
