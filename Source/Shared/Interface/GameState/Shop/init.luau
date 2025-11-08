@@ -22,7 +22,15 @@ local function updateName(): ()
 end
 
 local function updateDescription(): ()
-	shopPage.Description.Text = if selectedItem then selectedItem.Description or "" else "Click on an item to view more information."
+	if selectedItem then
+		shopPage.Description.Text = selectedItem.Description or "No description available."
+		return
+	end
+
+	shopPage.Description.Text = if shopPage.ScrollHolder.ScrollingFrame.Visible then
+		"Click on an item to view more information."
+	else
+		"Nothing here. Only certain roles have access to the shop."
 end
 
 local function updateStock(): boolean
@@ -105,18 +113,15 @@ local function populateShop(role: Types.Role): ()
 		end
 	end
 
-	selectItem()
-
 	if role.Definition.EquipmentShop then
 		local gamemode = LocalRoundInfo.Gamemode() or error("Gamemode is not loaded")
+		shopPage.ScrollHolder.ScrollingFrame.Visible = true
 		for _, definition in role.Definition.EquipmentShop do
 			assert(definition.CreditCost, "missing credit cost for " .. definition.Name)
-			assert(definition.Description, "missing description for " .. definition.Name)
-			assert(definition.Icon, "missing icon for " .. definition.Name)
 
 			local button = shopPage.EquipmentEntry:Clone()
 			button.Name = "Equipment_" .. definition.Name
-			button.Image = definition.Icon
+			button.Image = definition.Icon or "rbxassetid://13488010851"
 
 			button.ResampleMode = if definition.IsPixelIcon then Enum.ResamplerMode.Pixelated else Enum.ResamplerMode.Default
 
@@ -130,7 +135,11 @@ local function populateShop(role: Types.Role): ()
 				selectItem(definition)
 			end)
 		end
+	else
+		shopPage.ScrollHolder.ScrollingFrame.Visible = false
 	end
+
+	selectItem()
 end
 
 local lastRole: Types.Role? = nil
