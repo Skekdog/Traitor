@@ -15,7 +15,7 @@ local selectedItem: Types.AnyItemDefinition?
 
 local purchases: {[Types.AnyItemDefinition]: number?} = {}
 
-local shopPage = script.Shop
+local shopPage = ReplicatedStorage.Assets.EquipmentPages.Shop
 
 local function updateName(): ()
 	shopPage.ItemName.Text = if selectedItem then GetDisplayName(selectedItem) else "Item Name"

@@ -29,7 +29,7 @@ local sounds: {SoundEntry} = {}
 local playSoundRemote = GetRemote("RadioUse", script)
 local addMenuRemote = GetRemote("AddRadioMenu", script)
 
-local page = script.Radio
+local page = ReplicatedStorage.Assets.EquipmentPages.Radio
 
 local function addToMenu(sound: Sound | {Sound}): ()
 	local button = page.RadioButton:Clone()
