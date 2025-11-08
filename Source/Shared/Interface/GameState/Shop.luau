@@ -184,6 +184,6 @@ shopPage.Purchase.Activated:Connect(function()
 	end
 end)
 
-EquipmentMenu.AddPage(shopPage)
+EquipmentMenu.AddPage(shopPage, true)
 
 return nil
