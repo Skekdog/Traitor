@@ -7,6 +7,8 @@ local function GetParticipant(identifier: Instance | string): Types.Participant?
 	local finalIdentifier: string?
 	if typeof(identifier) == "string" then
 		finalIdentifier = identifier
+	elseif identifier:IsA("Player") then
+		finalIdentifier = identifier.Name
 	else
 		local char = GetMapObjectWithTag(identifier, "Character")
 		if char then
