@@ -72,6 +72,11 @@ local function displayMessage(message: TextChatMessage): ()
 	if message.Status ~= Enum.TextChatMessageStatus.Success and message.Status ~= Enum.TextChatMessageStatus.Sending then
 		return
 	end
+
+	if message.Metadata:find("MUTED") then
+		return
+	end
+
 	local isOutgoing = message.Status == Enum.TextChatMessageStatus.Sending
 
 	if message.TextChannel.Name:sub(1, 5) == "Team_" then

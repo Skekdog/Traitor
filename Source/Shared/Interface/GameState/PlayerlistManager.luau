@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local ViewCorpse = require(ReplicatedStorage.Shared.Actions.ViewCorpse)
+local HookClientMessage = require(ReplicatedStorage.Shared.Interface.Chat.HookClientMessage)
 local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
@@ -62,6 +63,17 @@ local function toggleMarksVisible(clone: PlayerElement, visible: boolean): ()
 	end
 end
 
+HookClientMessage.Hook(function(message)
+	if not message.TextSource then
+		return
+	end
+
+	local plr = Players:GetPlayerByUserId(message.TextSource.UserId)
+	if plr and plr:GetAttribute("Muted") then
+		message.Metadata ..= " MUTED"
+	end
+end)
+
 local function createPlr(plr: Player)
 	local participant = LocalParticipantInfo.GetParticipant(plr.Name)
 	local clone = ui.PlayerFrame:Clone()
@@ -84,6 +96,18 @@ local function createPlr(plr: Player)
 		v.MouseButton1Click:Connect(function()
 			selectMark(clone.Marks, v, plr)
 		end)
+	end
+
+	if plr ~= Players.LocalPlayer then
+		clone.Mute.Text = if plr:GetAttribute("Muted") then "<s>Aa</s>" else "Aa"
+		clone.Mute.Activated:Connect(function()
+			local isMuted = not plr:GetAttribute("Muted")
+			plr:SetAttribute("Muted", isMuted)
+
+			clone.Mute.Text = if isMuted then "<s>Aa</s>" else "Aa"
+		end)
+	else
+		clone.Mute.Text = ""
 	end
 
 	clone.MouseButton1Click:Connect(function()
