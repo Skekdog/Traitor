@@ -193,7 +193,7 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 
 	if not self.NoClose then
 		local close = object:FindFirstChild("CloseUI") :: (ObjectValue & {Value: TextButton})?
-		if close then
+		if close and close.Value then
 			close.Value.MouseButton1Click:Connect(function()
 				self:ToggleVisible(false)
 			end)
