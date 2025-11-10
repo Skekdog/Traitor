@@ -13,6 +13,7 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 	assert(model:IsA("BasePart"))
 	model.CollisionGroup = "PlayerCharacterParts" -- to prevent collision with head
 
+	model:RemoveTag("Interactable")
 	model:RemoveTag("Item")
 	model:RemoveTag("Prop")
 
