@@ -180,41 +180,51 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 	end
 
 	if (item.Kind == "Item" or item.Kind == "Melee") and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer) then
-		ControlManager.Register("Alternate Fire", function(_, state)
-			if item.Definition.AlternateToggled and state ~= Enum.UserInputState.End then
-				return Enum.ContextActionResult.Pass
-			end
+		ControlManager.Register("Alternate Fire", function(_, _, input)
+			local stop = false
+			while not stop and ClientInventory.EquippedItem() == item and (if item.Kind == "Item" and item.Definition.AlternateToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End) and input.UserInputState ~= Enum.UserInputState.Cancel do
+				task.wait()
 
-			if item.Kind == "Melee" then
-				if item.LastAttackTime + item.Definition.AttackInterval > tick() then
-					return Enum.ContextActionResult.Pass
+				if item.Kind == "Item" and item.Definition.AlternateToggled and input.UserInputState == Enum.UserInputState.End then
+					stop = true
 				end
-				item.LastAttackTime = tick()
 
-				ViewmodelModule.Recoil(item.Definition)
-			end
+				if item.Kind == "Melee" then
+					if item.LastAttackTime + item.Definition.AttackInterval > tick() then
+						continue
+					end
+					item.LastAttackTime = tick()
 
-			local head = char:WaitForChild("Head")
-			assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
+					ViewmodelModule.Recoil(item.Definition)
+				end
 
-			local origin = head.Position
-			local direction = GetCentreRay().Direction
+				local head = char:WaitForChild("Head")
+				assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
 
-			local itemRequest: CombatTypes.AlternateFireItemRequest = {
-				Kind = "AlternateFireItemRequest" :: "AlternateFireItemRequest",
-				ItemName = item.Definition.Name,
-				Origin = origin,
-				Direction = direction,
-			}
+				local origin = head.Position
+				local direction = GetCentreRay().Direction
 
-			if item.Definition.AlternateFireClient then
-				(item.Definition.AlternateFireClient :: Types.FireActionClient)(item :: Types.Item, "Alternate", origin, direction)
-			end
+				local itemRequest: CombatTypes.AlternateFireItemRequest = {
+					Kind = "AlternateFireItemRequest" :: "AlternateFireItemRequest",
+					ItemName = item.Definition.Name,
+					Origin = origin,
+					Direction = direction,
+				}
 
-			if item.Definition.AlternateFireServer then
-				local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.AlternateFire:InvokeServer(itemRequest)
-				if result ~= "Success" then
-					warn("Item alternate fire rejected:", result)
+				if item.Definition.AlternateFireClient then
+					(item.Definition.AlternateFireClient :: Types.FireActionClient)(item :: Types.Item, "Alternate", origin, direction)
+				end
+
+				if item.Definition.AlternateFireServer then
+					task.spawn(function()
+						local result: CombatTypes.ValidateItemUsageResult = ReplicatedStorage.Remotes.ClientServer.AlternateFire:InvokeServer(itemRequest)
+						if result ~= "Success"then
+							warn("Hit rejected:", result)
+							if Settings.GetSetting("Show Hit Rejects") then
+								ScreenMessage("Hit rejected: " .. result, "Warn")
+							end
+						end
+					end)
 				end
 			end
 
