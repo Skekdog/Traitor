@@ -8,7 +8,7 @@ local fruitSounds = {9114540315, 9114539908, 9114542474, 9114540327, 9114541282}
 
 return {
     Default = plasticSounds,
-    
+
     Fruit = fruitSounds,
     Body = fruitSounds,
     Water = fruitSounds,
@@ -17,12 +17,15 @@ return {
     Fabric = fabricSounds,
     Carpet = fabricSounds,
     Sand = fabricSounds,
-    
+    Leather = fabricSounds,
+
     -- Wood stuff
     Wood = woodSounds,
     WoodPlanks = woodSounds,
     CardboardBox = woodSounds,
     WoodCrate = woodSounds,
+    WoodBox = woodSounds,
+    WoodPanel = woodSounds,
 
     -- Metal stuff
     Metal = metalSounds,
