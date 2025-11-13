@@ -314,7 +314,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 			continue
 		end
 
-		Impulse.ApplyImpulse(v, impulse, true)
+		Impulse.ApplyImpulse(v, impulse, true, nil, params.Attacker)
     end
 end
 
