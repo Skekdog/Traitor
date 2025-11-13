@@ -303,7 +303,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 		local char = GetMapObjectWithTag(v, "Character")
 		local participant = if char and char:IsA("Model") then round:GetParticipant(char) else nil
 
-		local impulse = (v.Position - params.Position).Unit * info.Pressure / 10000
+		local impulse = (v.Position - params.Position).Unit * info.Pressure / 1000
 
 		if participant then
 			if table.find(hits, participant) then
@@ -311,7 +311,6 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 			end
 			table.insert(hits, participant)
 			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade, params.Position, impulse)
-			continue
 		end
 
 		Impulse.ApplyImpulse(v, impulse, true, nil, params.Attacker)
