@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local PossessiveApostrophe = require(ReplicatedStorage.Shared.Grammar.PossessiveApostrophe)
 local Mouse = require(script.Parent.Mouse)
 local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWithDeterminer)
 local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
@@ -245,11 +246,11 @@ return function(corpseInfo: Types.CorpseView?)
     local role = participant.Role()
 
     if role ~= Defaults.Role then
-        corpseUi.Object.TitleBar.Title.Text = `{role:FormatString(`@{corpseName}'s`)} Corpse | {role:GetFormattedName()}`
+        corpseUi.Object.TitleBar.Title.Text = `{role:FormatString(`@{PossessiveApostrophe(corpseName)}`)} Corpse | {role:GetFormattedName()}`
         local determiner = StringWithDeterminer(GetDisplayName(role.Definition)):split(" ")[1]
         object.Avatar:SetAttribute("Description", `This is the body of {role:FormatString(corpseName)}. They were {determiner} {role:GetFormattedName()}.`)
     else
-        corpseUi.Object.TitleBar.Title.Text = `@{corpseName}'s Corpse`
+        corpseUi.Object.TitleBar.Title.Text = `@{PossessiveApostrophe(corpseName)} Corpse`
         object.Avatar:SetAttribute("Description", `This is the body of {corpseName}.`)
     end
 

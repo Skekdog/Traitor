@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PossessiveApostrophe = require(ReplicatedStorage.Shared.Grammar.PossessiveApostrophe)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local GetAmmoDefinition = require(ReplicatedStorage.Shared.LocalState.GetAmmoDefinition)
 local GetDroppedItemState = require(ReplicatedStorage.Shared.LocalState.GetDroppedItemState)
@@ -109,7 +110,7 @@ function module.ShowCorpseHint(char: Model)
 		corpseHint.Text = `<font color='#ffff00'>Unidentified</font> Body`
 	else
 		local role = LocalParticipantInfo.GetParticipant(char.Name).Role()
-		corpseHint.Text = `{role:FormatString(char.Name .. "'s")} Body`
+		corpseHint.Text = `{role:FormatString(PossessiveApostrophe(char.Name))} Body`
 	end
 
 	interactableHint.Text = "Crouch to search covertly."
