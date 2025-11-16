@@ -1,4 +1,4 @@
-# Traitor Town 3
+# Traitor!
 
 ![Logo](./ExternalAssets/Images/Promotional/Game%20Thumbnail.png)
 

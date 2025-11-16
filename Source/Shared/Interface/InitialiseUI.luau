@@ -26,7 +26,7 @@ if game.PlaceId == PlaceIDs.TestPlace then
 	UIManager.RegisterUI(UIManager.UnregisteredUIs.TestPlaceLabel):ToggleVisible(true)
 elseif game.PlaceId == PlaceIDs.Labs then
 	local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.TestPlaceLabel) :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.TestPlaceLabel)}
-	ui.Object.Text = "Labs<br/>Traitor Town 3"
+	ui.Object.Text = "Labs<br/>Traitor!"
 	ui:ToggleVisible(true)
 end
 

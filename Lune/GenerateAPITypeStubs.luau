@@ -178,5 +178,5 @@ createScript("Types", outputFolder, fs.readFile("Source/Shared/RoundRule/src/Typ
 local output = roblox.serializeModel({outputFolder})
 fs.writeFile("API.rbxm", output)
 
-pcall(PublishAsset, ASSET_ID, "TT3 API", "API.rbxm")
+pcall(PublishAsset, ASSET_ID, "Traitor! API", "API.rbxm")
 fs.removeFile("API.rbxm")

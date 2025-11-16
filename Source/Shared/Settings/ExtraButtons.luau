@@ -23,16 +23,16 @@ SettingsUI.AddClickButton("Imperium", "Other", "Other Games", "Imperium is a Mon
 end)
 
 if IsTestPlace or IsLabs then
-	SettingsUI.AddClickButton("Main Place", "Other", "Traitor Town 3", "Return to the main place.", function()
+	SettingsUI.AddClickButton("Main Place", "Other", "Traitor!", "Return to the main place.", function()
 		promptTeleport("Main Place", PlaceIDs.MainPlace)
 	end)
 elseif not IsLabs then
-	SettingsUI.AddClickButton("Test Place", "Other", "Traitor Town 3", "Testing place for new features and updates. Things are likely to break, and may impact main game save data. Join at your own risk!", function()
+	SettingsUI.AddClickButton("Test Place", "Other", "Traitor!", "Testing place for new features and updates. Things are likely to break, and may impact main game save data. Join at your own risk!", function()
 		promptTeleport("Test Place", PlaceIDs.TestPlace)
 	end)
 end
 
-SettingsUI.AddClickButton("View Welcome", "Other", "Traitor Town 3", nil, function()
+SettingsUI.AddClickButton("View Welcome", "Other", "Traitor!", nil, function()
 	UIManager.WaitForUI("Welcome"):ToggleVisible(true)
 end)
 

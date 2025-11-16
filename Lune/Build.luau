@@ -8,7 +8,7 @@ local Env = require("./Lib/Env")
 
 local BASE_URL = "https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType=Published"
 
-local NAME = "TT3.rbxl"
+local NAME = "Traitor.rbxl"
 
 local STANDARD_UNIVERSE_ID = 1031123722
 
