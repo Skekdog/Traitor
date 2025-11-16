@@ -183,4 +183,17 @@ function module.UpdateAmmo(): ()
     UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, item.Ammo, item.Definition.AmmoType.Capacity)
 end
 
+function module.UpdatePunchMeter(punchMeter: number?, maxPunchMeter: number): ()
+    if not punchMeter then
+        roundInfo.Frame.PunchOMeter.Visible = false
+        roundInfo.Frame.AmmoBar.Visible = false
+        return
+    end
+
+    roundInfo.Frame.PunchOMeter.Visible = true
+    roundInfo.Frame.AmmoBar.Visible = true
+    roundInfo.Frame.AmmoBar.AmmoLabel.Text = ""
+    UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, punchMeter, maxPunchMeter)
+end
+
 return module

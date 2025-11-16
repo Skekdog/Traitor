@@ -5,6 +5,8 @@ local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local Types = require(ReplicatedStorage.API.Types)
 local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 local FreeInput = require(ReplicatedStorage.Shared.Controls.FreeInput)
+local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
+local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
 local IMPULSE_MULTIPLIER = 5
@@ -35,10 +37,19 @@ local function possess(prop: Types.MapObject): ()
 
 	FreeInput.StartCapture()
 
+	RoundInfoUI.UpdatePunchMeter(0, MAX_PUNCHES)
+
+	local lastWhole = punchMeter
 	punchConnection = RunService.PreSimulation:Connect(function(dt)
 		if not primaryPart:IsDescendantOf(workspace) then
 			PossessProp.Stop()
 			return
+		end
+
+		local whole = math.floor(punchMeter)
+		if whole ~= lastWhole then
+			lastWhole = whole
+			RoundInfoUI.UpdatePunchMeter(whole, MAX_PUNCHES)
 		end
 
 		if punchMeter < 1 then
@@ -66,8 +77,9 @@ local function possess(prop: Types.MapObject): ()
 end
 
 function PossessProp.Stop(): ()
+	RoundInfoUI.UpdatePunchMeter(nil, MAX_PUNCHES)
 	ReplicatedStorage.Remotes.ClientServer.PossessProp:FireServer()
-	camera.CameraType = Enum.CameraType.Scriptable
+	camera.CameraType = Enum.CameraType.Custom
 	camera.CameraSubject = nil
 	currentPossess = nil
 
@@ -98,7 +110,13 @@ function PossessProp.TryPossess(part: BasePart): ()
 end
 
 RunService.Heartbeat:Connect(function(dt)
-	punchMeter += PUNCH_RATE * dt
+	punchMeter = math.min(punchMeter + PUNCH_RATE * dt, MAX_PUNCHES)
+end)
+
+LocalParticipantInfo.GetParticipant().Status:Connect(function(status)
+	if status == "Alive" then
+		PossessProp.Stop()
+	end
 end)
 
 return PossessProp
