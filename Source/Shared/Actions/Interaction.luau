@@ -11,6 +11,7 @@ local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInf
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ClimbLadder = require(script.Parent.ClimbLadder)
+local PossessProp = require(script.Parent.PossessProp)
 local ViewCorpse = require(script.Parent.ViewCorpse)
 
 local participant = LocalParticipantInfo.GetParticipant()
@@ -120,6 +121,10 @@ function module.TryInteract(prop: Types.MapObject?, part: BasePart?, input: Inpu
 	if prop:IsDescendantOf(workspace.Characters) and prop:HasTag("Corpse") then
 		assert(prop:IsA("Model"), "Corpses must be Models")
 		return interactCorpse(prop)
+	end
+
+	if not prop:HasTag("Interactable") and LocalParticipantInfo.GetParticipant().Status() ~= "Alive" then
+		PossessProp.TryPossess(part)
 	end
 
 	local char = LocalCharacter.Character()

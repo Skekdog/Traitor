@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = Players.LocalPlayer
 
+local PossessProp = require(ReplicatedStorage.Shared.Actions.PossessProp)
 local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
@@ -16,6 +17,8 @@ local isCurrentlySpectatingPleaseRefactorThisScript = false
 
 local lastKey = 0
 local function spectateFunc(action, state)
+	PossessProp.Stop()
+
 	local chars = {}
 	for _, v in Players:GetPlayers() do
 		local char = v.Character
@@ -121,6 +124,7 @@ uiO.Back.MouseButton1Click:Connect(function()
 end)
 
 local function switchCameraMode(mode: "Player" | "Freecam")
+	PossessProp.Stop()
 	currentCameraMode = mode
 
 	uiO.CameraMode.Text = "Camera Mode: " .. currentCameraMode
