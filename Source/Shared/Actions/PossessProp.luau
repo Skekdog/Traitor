@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetAssemblyMass = require(ReplicatedStorage.API.GetAssemblyMass)
@@ -96,6 +97,17 @@ function PossessProp.TryPossess(part: BasePart): ()
 	local prop = GetMapObject(part, "Prop")
 	if not prop then
 		return
+	end
+
+	local id = prop:GetAttribute("PossessedBy")
+	if typeof(id) == "number" then
+		local possessingPlayer = Players:GetPlayerByUserId(id)
+		if possessingPlayer then
+			local participant = LocalParticipantInfo.GetParticipant(possessingPlayer.Name)
+			if participant.Status() ~= "Alive" then
+				return
+			end
+		end
 	end
 
 	if currentPossess then

@@ -40,7 +40,7 @@ ReplicatedStorage.Remotes.ClientServer.PossessProp.OnServerEvent:Connect(functio
 		local possessingPlayer = Players:GetPlayerByUserId(id)
 		if possessingPlayer then
 			local participant = GetParticipant(possessingPlayer)
-			if participant and participant:IsAlive() then
+			if not participant or (participant and participant:IsAlive()) then
 				return
 			end
 		end
