@@ -17,6 +17,8 @@ local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
+local module = {}
+
 local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.ThoseYouTrust)
 
 local EXCLUDED_GAMEMODES: {Instance} = {}
@@ -31,8 +33,13 @@ function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant
     TeamChat.TryRemove(participant.Player.UserId)
 end
 
+module.OnCharacterAdded = {} :: {(Types.Round, Types.Participant) -> ()}
 function Round.Config.OnCharacterAdded(round: Types.Round, participant: Types.Participant): ()
     participant.Extras.CombatImpulse = nil
+
+    for _, v in module.OnCharacterAdded do
+        v(round, participant)
+    end
 end
 
 function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, params: Types.DamageParams): boolean
@@ -105,8 +112,6 @@ local roundCount = -1
 
 local MAP_VOTE_INTERVAL = 3
 local INTERMISSION_TIME = 15
-
-local module = {}
 
 local varietyGamemodes: {Types.GamemodeDefinition} = {}
 function module.UpdateLoadedGamemodes(): ()

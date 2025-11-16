@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerScriptService = game:GetService("ServerScriptService")
+local RoundHandler = require(ServerScriptService.RoundHandler)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
@@ -75,6 +77,10 @@ ReplicatedStorage.Remotes.ClientServer.PossessProp.OnServerEvent:Connect(functio
 	possessedProps[prop] = destroying
 
 	primaryPart:SetNetworkOwner(player)
+end)
+
+table.insert(RoundHandler.OnCharacterAdded, function(_, participant)
+	stopPossess(participant.Player)
 end)
 
 return nil
