@@ -9,7 +9,13 @@ local participant = LocalParticipantInfo.GetParticipant()
 local function highlightProp(prop: Instance): ()
 	assert(prop:IsA("BasePart") or prop:IsA("Model"))
 
-	if prop:GetAttribute("PossessedBy") == Players.LocalPlayer.UserId then
+	local id = prop:GetAttribute("PossessedBy")
+	local player: Player?
+	if typeof(id) == "number" then
+		player = Players:GetPlayerByUserId(id)
+	end
+
+	if not player or player == Players.LocalPlayer then
 		return
 	end
 
@@ -46,7 +52,7 @@ local function highlightProp(prop: Instance): ()
 		label.TextStrokeTransparency = 0
 		label.TextStrokeColor3 = Color3.new(0, 0, 0)
 		label.TextScaled = true
-		label.Text = prop.Name
+		label.Text = player.Name
 		label.Parent = newBillboard
 
 		newBillboard.Parent = prop
