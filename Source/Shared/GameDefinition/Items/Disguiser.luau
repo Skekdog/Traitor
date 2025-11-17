@@ -76,6 +76,15 @@ function module.DisguiseServer(participant: Types.Participant, enable: boolean, 
 		end
 	end)
 
+	local partData: {[BasePart]: {Material: Enum.Material, Color: Color3}} = {}
+	for _, part in char:GetChildren() do
+		if not part:IsA("BasePart") then
+			continue
+		end
+
+		partData[part] = {Material = part.Material, Color = part.Color}
+	end
+
 	local foundDescription = char:FindFirstChild("DisguiserHumanoidDescription")
 	assert(not foundDescription or foundDescription:IsA("HumanoidDescription"), "DisguiserHumanoidDescription must be a HumanoidDescription")
 
@@ -96,6 +105,37 @@ function module.DisguiseServer(participant: Types.Participant, enable: boolean, 
 			hum:ApplyDescriptionReset(foundDescription, Enum.AssetTypeVerification.Always)
 		else
 			hum:ApplyDescription(foundDescription, Enum.AssetTypeVerification.Always)
+		end
+	end
+
+	if char:GetAttribute("RemoveClothing") then
+		local shirt = char:FindFirstChildOfClass("Shirt")
+		if shirt then
+			shirt:Destroy()
+		end
+
+		local pants = char:FindFirstChildOfClass("Pants")
+		if pants then
+			pants:Destroy()
+		end
+
+		local tshirt: ShirtGraphic?
+		repeat
+			tshirt = char:FindFirstChildOfClass("ShirtGraphic")
+			if tshirt then
+				tshirt:Destroy()
+			end
+		until not tshirt
+	end
+
+	if char:GetAttribute("PreservePartAppearance") then
+		for part, data in partData do
+			local newPart = char:FindFirstChild(part.Name)
+			if not newPart or not newPart:IsA("BasePart") then
+				continue
+			end
+			newPart.Material = data.Material
+			newPart.Color = data.Color
 		end
 	end
 end

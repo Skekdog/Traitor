@@ -35,6 +35,17 @@ local function makeGolden(victim: Types.Participant)
     if pants then
         pants:Destroy()
     end
+
+    local tshirt: ShirtGraphic?
+    repeat
+        tshirt = char:FindFirstChildOfClass("ShirtGraphic")
+        if tshirt then
+            tshirt:Destroy()
+        end
+    until not tshirt
+
+    char:SetAttribute("RemoveClothing", true) -- for corpse disguising
+    char:SetAttribute("PreservePartAppearance", true) -- likewise
 end
 
 return makeGolden
