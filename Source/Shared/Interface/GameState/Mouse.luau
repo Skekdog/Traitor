@@ -121,42 +121,53 @@ end
 
 function module.ShowInteractableHint(prop: Types.MapObject, part: BasePart): ()
 	local plr = Players.LocalPlayer
-	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 
-	if status ~= "Alive" then
-		return
-	end
+	local hintText: string?
+	local displayName: string
 
 	local interactable = LocalRoundInfo.Interactables()[prop]
-	if not interactable then
-		return
-	end
 
-	if interactable.Definition.NoActionHint then
-		return
-	end
+	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 
-	local definition = interactable.Definition
-	if not definition or plr:DistanceFromCharacter(part.Position) > definition.InteractionRange then
-		return
-	end
-
-	local displayName: string
-	if definition.HideName then
-		displayName = ""
-	else
-		local attr = prop:GetAttribute("DisplayName")
-		if typeof(attr) == "string" then
-			displayName = attr
+	if not prop:HasTag("Interactable") and not interactable then
+		if status ~= "Alive" then
+			hintText = "Possess"
+			displayName = "Prop"
 		else
-			displayName = GetDisplayName(definition)
+			return
 		end
+	else
+		if status ~= "Alive" or not interactable then
+			return
+		end
+
+		if interactable.Definition.NoActionHint then
+			return
+		end
+
+		local definition = interactable.Definition
+		if not definition or plr:DistanceFromCharacter(part.Position) > definition.InteractionRange then
+			return
+		end
+
+		if definition.HideName then
+			displayName = ""
+		else
+			local attr = prop:GetAttribute("DisplayName")
+			if typeof(attr) == "string" then
+				displayName = attr
+			else
+				displayName = GetDisplayName(definition)
+			end
+		end
+
+		hintText = interactable.HintTextClient
 	end
 
-	corpseHint.Text = if definition.HideName then "" else displayName
+	corpseHint.Text = displayName
 
-	if interactable.HintTextClient then
-		interactableHint.Text = interactable.HintTextClient
+	if hintText then
+		interactableHint.Text = hintText
 		interactableHint.Visible = true
 	else
 		interactableHint.Visible = false

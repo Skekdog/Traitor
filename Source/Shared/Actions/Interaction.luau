@@ -189,7 +189,7 @@ RunService.PostSimulation:Connect(function()
 			Mouse.ShowItemHint(prop)
 			ret = true
 		end
-		if prop:HasTag("Interactable") then
+		if prop:HasTag("Interactable") or (LocalParticipantInfo.GetParticipant().Status() ~= "Alive" and not PossessProp.IsPossessed(prop) and not prop:HasTag("Corpse")) then
 			Mouse.ShowInteractableHint(prop, target)
 			ret = true
 		end

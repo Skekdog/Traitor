@@ -89,6 +89,10 @@ function PossessProp.Stop(): ()
 	end
 end
 
+function PossessProp.IsPossessed(prop: Types.MapObject): boolean
+	return currentPossess == prop
+end
+
 function PossessProp.TryPossess(part: BasePart): ()
 	if part:IsGrounded() then
 		return
