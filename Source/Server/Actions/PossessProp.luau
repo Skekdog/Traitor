@@ -18,7 +18,7 @@ local function stopPossess(player: Player): ()
 			destroying:Disconnect()
 
 			local primaryPart = GetPrimaryPart(prop)
-			if primaryPart then
+			if primaryPart and primaryPart:IsDescendantOf(workspace) then
 				primaryPart:SetNetworkOwnershipAuto()
 			end
 
