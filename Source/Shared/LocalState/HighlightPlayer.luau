@@ -55,7 +55,7 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui?
     textLabel.TextColor3 = if useBlack then Color3.new() else Color3.new(1, 1, 1)
 
     textLabel.TextScaled = true
-    textLabel.Font = Enum.Font.SourceSans
+    textLabel.Font = Enum.Font.BuilderSans
     textLabel.BackgroundTransparency = 1
     textLabel.Size = UDim2.fromScale(1, 1)
     textLabel.Parent = frame

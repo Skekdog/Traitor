@@ -32,7 +32,7 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
         label.Name = "KeybindHintText"
 
         label.TextScaled = true
-        label.Font = Enum.Font.SourceSans
+        label.Font = Enum.Font.BuilderSans
         label.TextStrokeTransparency = 0
         label.AutomaticSize = Enum.AutomaticSize.X
         label.TextXAlignment = (Enum :: any).TextXAlignment[textXAlignment or "Center"]

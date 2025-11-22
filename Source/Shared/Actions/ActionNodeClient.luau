@@ -73,7 +73,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	info.Position = UDim2.fromScale(0, 0.5)
 	info.TextColor3 = Color3.new(1, 0.5, 0.5)
 	info.TextXAlignment = Enum.TextXAlignment.Center
-	info.Font = Enum.Font.SourceSans
+	info.Font = Enum.Font.BuilderSans
 	info.BackgroundTransparency = 1
 	info.Visible = false
 	info.Parent = frame
