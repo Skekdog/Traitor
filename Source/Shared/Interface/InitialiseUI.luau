@@ -24,7 +24,7 @@ StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Health, false)
 
 if game.PlaceId ~= PlaceIDs.MainPlace then
 	local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.TestPlaceLabel) :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.TestPlaceLabel)}
-	ui.Object.Text = "<br/>Traitor!" .. (if game.PlaceId == PlaceIDs.TestPlace then "Test Place" else "Labs")
+	ui.Object.Text = "Traitor!".. "\n" .. (if game.PlaceId == PlaceIDs.TestPlace then "Test" else "Labs")
 	ui:ToggleVisible(true)
 end
 
