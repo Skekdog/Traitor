@@ -356,6 +356,66 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Action 1",
+	Tab = "Keybinds",
+	Category = "Gameplay",
+	Tooltip = "Activates action 1, if present.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.N,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
+	Name = "Action 2",
+	Tab = "Keybinds",
+	Category = "Gameplay",
+	Tooltip = "Activates action 2, if present.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.M,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
+	Name = "Action 3",
+	Tab = "Keybinds",
+	Category = "Gameplay",
+	Tooltip = "Activates action 3, if present.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.Comma,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
 	Name = "Close UI",
 	Tab = "Keybinds",
 	Category = "Menus",
