@@ -1,10 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local CustomActions = {}
 
 local actions: {[number]: string} = {}
 
-function CustomActions.Register(name: string, callback: () -> ()?, preferredSlot: number?): ()
+local ui = (UIManager.WaitForUI("RoundInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RoundInfo)}).Object
+
+function CustomActions.Register(name: string, callback: () -> (), preferredSlot: number?): ()
 	assert(preferredSlot == nil or preferredSlot > 0 and preferredSlot < 4, "preferredSlot must be between 1 and 3, or nil")
 
 	for _, action in actions do
@@ -16,13 +19,21 @@ function CustomActions.Register(name: string, callback: () -> ()?, preferredSlot
 	local slot = if not preferredSlot or actions[preferredSlot] then #actions + 1 else preferredSlot
 	actions[slot] = name
 
-	print("Registered action " .. name .. " on slot " .. slot)
+	local button = ui.Actions.ButtonTemplate:Clone()
+	button.TextLabel.Text = name
+	button.LayoutOrder = slot
+	button.Name = tostring(slot)
+	button:SetAttribute("Control", "Action " .. slot)
+	button:AddTag("ControlHint")
+	button.Visible = true
+	button.Parent = ui.Actions
+
+	button.Activated:Connect(function()
+		callback()
+	end)
 
 	ControlManager.Register("Action " .. slot, function()
-		if callback then
-			callback()
-		end
-
+		callback()
 		return Enum.ContextActionResult.Pass
 	end)
 end
@@ -32,7 +43,12 @@ function CustomActions.Unregister(name: string): ()
 		if action == name then
 			actions[index] = nil
 			ControlManager.Unregister("Action " .. index)
-			print("Unregistered action " .. name .. " on slot " .. index)
+
+			local button = ui.Actions:FindFirstChild(tostring(index))
+			if button then
+				button:Destroy()
+			end
+
 			break
 		end
 	end
