@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Epilogue = require(script.GamePhase.Epilogue)
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
@@ -17,7 +18,10 @@ local Types = require(ReplicatedStorage.API.Types)
 
 require(script.GameState.HighlightCharacter)
 
+local loadMarkingRemote = GetRemote("LoadMarking", script.Mark)
+
 if RunService:IsClient() then
+	require(script.Mark)
 	require(script.GameState.Mirror)
 end
 
@@ -173,12 +177,17 @@ local function OnStart(round: Types.Round): ()
 	end
 
 	Targets.LoadFirstTargets(framed)
+
+	for _, participant in round:GetParticipants() do
+		loadMarkingRemote:FireClient(participant.Player, true)
+	end
 end
 
 local function OnFinish(round: Types.Round): ()
 	Epilogue.Finish()
 
 	for _, participant in round:GetParticipants() do
+		loadMarkingRemote:FireClient(participant.Player, false)
 		if RedHanded.IsRedHanded(participant) then
 			RedHanded.StopImmediately(participant)
 		end
@@ -186,6 +195,8 @@ local function OnFinish(round: Types.Round): ()
 end
 
 local function OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+	loadMarkingRemote:FireClient(participant.Player, false)
+
 	local corpse = participant.Corpse
 	if not corpse then
 		return
