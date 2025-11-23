@@ -1,6 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -169,23 +168,12 @@ if RunService:IsServer() then
 end
 
 local function OnEquipClient(item: Types.AnyItem): ()
-	ControlManager.Register("Disguise", function(_, state)
+	local CustomActions = require(ReplicatedStorage.API.CustomActions)
+	CustomActions.Register("Disguise", function()
 		clientDisguiseActive = not clientDisguiseActive
 		ShowAlert("Disguise: " .. if clientDisguiseActive then "ON" else "OFF")
 		remote:FireServer(clientDisguiseActive)
-
-		return Enum.ContextActionResult.Pass
-	end, nil, {
-		Toggled = true,
-		Keybind = {
-			ConsoleKeybind = Enum.KeyCode.ButtonR1,
-			KBMKeybind = Enum.KeyCode.Semicolon,
-		},
-		TouchButton = {
-			Position = UDim2.fromOffset(50, 250),
-			Scale = 1,
-		}
-	})
+	end, 1)
 end
 
 local function OnEquipServer(item: Types.AnyItem, participant: Types.Participant): ()
@@ -193,8 +181,9 @@ local function OnEquipServer(item: Types.AnyItem, participant: Types.Participant
 end
 
 local function OnUnequipClient(item: Types.AnyItem): ()
+	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	clientDisguiseActive = false
-	ControlManager.Unregister("Disguise")
+	CustomActions.Unregister("Disguise")
 end
 
 local function OnUnequipServer(item: Types.AnyItem, participant: Types.Participant): ()
