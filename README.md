@@ -2,7 +2,7 @@
 
 ![Logo](./ExternalAssets/Images/Promotional/Game%20Thumbnail.png)
 
-A Roblox game of deception and betrayal. Can you separate those you should trust, from those you should not?
+Spy HQ has been infiltrated by traitor spies - will you find them, or will they find you?
 
 Play here: https://www.roblox.com/games/2848381272/
 
