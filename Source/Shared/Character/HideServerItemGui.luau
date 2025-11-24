@@ -1,7 +1,7 @@
 local LocalCharacter = require(script.Parent.LocalCharacter)
 
 local function hide(child: Instance): ()
-	if child:IsA("LayerCollector") then
+	if child:IsA("LayerCollector") and child:FindFirstAncestor("Item") then
 		child.Enabled = false
 	end
 end
