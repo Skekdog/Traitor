@@ -40,7 +40,7 @@ local function interactCorpse(corpse: Model): boolean
 		end
 	end
 
-	if corpse:GetAttribute("Burning") then
+	if corpse:HasTag("Burning") then
 		ShowAlert("Ouch! This corpse is on fire!")
 		return true
 	end
