@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Fire = require(ReplicatedStorage.API.Fire)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 
@@ -42,7 +43,7 @@ RunService.Heartbeat:Connect(function(dt)
 				end
 
 				local participant = GetParticipant(model.Name)
-				if not participant then
+				if not participant or not participant:IsAlive() then
 					continue
 				end
 
@@ -57,6 +58,8 @@ RunService.Heartbeat:Connect(function(dt)
 					Source = "Burn",
 					Attacker = Fire.Attackers[object],
 				})
+
+				PlaySound(ReplicatedStorage.Assets.WeaponSounds.FlareBurn, nil, v)
 			end
 		end)
 	end
