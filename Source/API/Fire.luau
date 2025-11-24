@@ -21,7 +21,7 @@ function Fire.Ignite(object: Types.MapObject, attacker: Types.Participant?): ()
 end
 
 function Fire.Extinguish(object: Types.MapObject): ()
-	local primaryPart = GetPrimaryPart(object)
+	local primaryPart = if object:IsDescendantOf(game) then GetPrimaryPart(object) else nil
 	if primaryPart then
 		local visuals = primaryPart:FindFirstChild("FireParticles")
 		if visuals then
