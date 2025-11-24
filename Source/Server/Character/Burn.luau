@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Fire = require(ReplicatedStorage.API.Fire)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+local GetRound = require(ReplicatedStorage.API.GetRound)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
@@ -33,6 +34,8 @@ RunService.Heartbeat:Connect(function(dt)
 
 	cumulativeDt = 0
 
+	local round = GetRound()
+
 	for _, object in burningObjects do
 		local burnedParticipants: {Types.Participant} = {}
 		ForEachPart(object, function(part)
@@ -62,6 +65,15 @@ RunService.Heartbeat:Connect(function(dt)
 				PlaySound(ReplicatedStorage.Assets.WeaponSounds.FlareBurn, nil, v)
 			end
 		end)
+
+		local prop = round:GetProp(object)
+		if prop then
+			prop:TryTakeDamage({
+				Amount = 1,
+				Source = "Burn",
+				Attacker = Fire.Attackers[object]
+			})
+		end
 	end
 end)
 
