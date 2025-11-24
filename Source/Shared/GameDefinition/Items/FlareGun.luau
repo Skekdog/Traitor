@@ -95,7 +95,13 @@ local item: Types.GunWeaponDefinition = {
 
         Fire.Ignite(target.Model, attacker)
 
-        task.delay(math.random(9, 11), Fire.Extinguish, target.Model)
+        task.delay(math.random(9, 11), function()
+            if target.Model:HasTag("Corpse") then
+                target.Model:Destroy()
+            else
+                Fire.Extinguish(target.Model)
+            end
+        end)
 
         return true
     end,
