@@ -1,5 +1,4 @@
 local Lighting = game:GetService("Lighting")
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
@@ -18,6 +17,7 @@ local DNAScanner = require(script.Parent.DNAScanner)
 local Defuser = require(script.Parent.Defuser)
 local Disguiser = require(script.Parent.Disguiser)
 local FlareGun = require(script.Parent.FlareGun)
+local IncendiaryGrenade = require(script.Parent.IncendiaryGrenade)
 local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
@@ -913,82 +913,7 @@ grenades.Flashbang = {
     AttackSound = firedSounds("Grenade"),
 }
 
-grenades["Incendiary Grenade"] = {
-    Kind = "Grenade" :: "Grenade",
-    Name = "Incendiary Grenade",
-
-    ItemGroup = ItemGroups.Grenade,
-    CanDrop = true,
-
-    Projectile = projectiles("Incendiary Grenade"),
-    HoldAnimation = "rbxassetid://12498620263",
-    Model = models("Incendiary Grenade"),
-
-    ExplosionInfo = {
-        Damage = 10,
-        FalloffBegin = 0,
-        FalloffEnd = 15,
-        Pressure = 10000,
-        VisualRadius = 15,
-    },
-
-    OnExplode = function(weapon: Types.GrenadeWeapon, attacker: Types.Participant, projectile: BasePart)
-        if not attacker then
-            return
-        end
-
-        local firePart = CreateEmptyPart(CFrame.new(projectile.Position), nil, false, true, true)
-        firePart.Size = Vector3.new(15, 1, 15)
-        firePart.Parent = workspace.Projectiles
-
-        local overlapParams = OverlapParams.new()
-        overlapParams.FilterDescendantsInstances = {workspace.Characters}
-        overlapParams.FilterType = Enum.RaycastFilterType.Include
-        overlapParams.RespectCanCollide = false
-
-        task.spawn(function()
-            while firePart:IsDescendantOf(workspace) do
-                local found: {Model} = {}
-                for _, v in workspace:GetPartBoundsInBox(firePart.CFrame, firePart.Size, overlapParams) do
-                    local model = v:FindFirstAncestorOfClass("Model")
-                    if not model or table.find(found, model) then
-                        continue
-                    end
-                    table.insert(found, model)
-
-                    local plr = Players:GetPlayerFromCharacter(model)
-                    if not plr then
-                        continue
-                    end
-
-                    local participant = attacker.Round:GetParticipant(plr.Name)
-                    if not participant or not participant:GetCharacter() then
-                        continue
-                    end
-
-                    PlaySound(ReplicatedStorage.Assets.WeaponSounds.FlareBurn, nil, v, {SoundGroup = SoundService.AllSounds :: SoundGroup})
-                    participant:TryTakeDamage({
-                        Amount = 1,
-                        Source = "Burn",
-                    })
-                end
-                task.wait(0.1)
-            end
-        end)
-
-        local fire = Instance.new("Fire")
-        fire.Size = 40
-        fire.Parent = firePart
-
-        task.delay(30, firePart.Destroy, firePart)
-    end,
-
-    FuseTime = 3,
-
-    ProjectileForce = 60,
-
-    AttackSound = firedSounds("Grenade"),
-}
+grenades["Incendiary Grenade"] = IncendiaryGrenade.Item
 
 grenades["Smoke Grenade"] = {
     Kind = "Grenade" :: "Grenade",
