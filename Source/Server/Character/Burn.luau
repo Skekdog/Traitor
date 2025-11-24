@@ -1,6 +1,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Fire = require(ReplicatedStorage.API.Fire)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
@@ -54,6 +55,7 @@ RunService.Heartbeat:Connect(function(dt)
 				participant:TryTakeDamage({
 					Amount = 1,
 					Source = "Burn",
+					Attacker = Fire.Attackers[object],
 				})
 			end
 		end)
