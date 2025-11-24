@@ -57,7 +57,7 @@ local item: Types.GrenadeWeaponDefinition = {
 
     ProjectileForce = 60,
 
-    AttackSound = ReplicatedStorage.Assets.WeaponSounds.FlareBurn,
+    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Grenade,
 }
 
 IncendiaryGrenade.Item = item
