@@ -84,6 +84,8 @@ local item: Types.GunWeaponDefinition = {
 
         Fire.Ignite(character, attacker)
 
+        task.delay(math.random(9, 11), Fire.Extinguish, character)
+
         return true
     end,
 
@@ -92,6 +94,8 @@ local item: Types.GunWeaponDefinition = {
         assert(attacker)
 
         Fire.Ignite(target.Model, attacker)
+
+        task.delay(math.random(9, 11), Fire.Extinguish, target.Model)
 
         return true
     end,
