@@ -82,6 +82,10 @@ local item: Types.GunWeaponDefinition = {
         local character = target:GetCharacter()
         assert(character)
 
+        if Fire.IsBurning(character) then
+            return true
+        end
+
         Fire.Ignite(character, attacker)
 
         task.delay(math.random(9, 11), Fire.Extinguish, character)
@@ -92,6 +96,10 @@ local item: Types.GunWeaponDefinition = {
     BeforeHitProp = function(_, _, target: Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
         local attacker = params.Attacker
         assert(attacker)
+
+        if Fire.IsBurning(target.Model) then
+            return true
+        end
 
         Fire.Ignite(target.Model, attacker)
 

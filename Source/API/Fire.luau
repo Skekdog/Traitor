@@ -12,6 +12,10 @@ function Fire.MakeVisuals(object: Types.MapObject): ()
 end
 
 function Fire.Ignite(object: Types.MapObject, attacker: Types.Participant?): ()
+	if Fire.IsBurning(object) then
+		return
+	end
+
 	Fire.MakeVisuals(object)
 	object:AddTag("Burning")
 
