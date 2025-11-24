@@ -1010,9 +1010,10 @@ grenades["Smoke Grenade"] = {
 
     OnExplode = function(weapon: Types.GrenadeWeapon, attacker: Types.Participant, projectile: BasePart)
         local smoke = Instance.new("Smoke")
-        smoke.Size = 20
-        smoke.Opacity = 1
-        smoke.RiseVelocity = 5
+        smoke.Size = 7.5
+        smoke.Opacity = 0.75
+        smoke.RiseVelocity = 2
+        smoke.Color = Color3.fromRGB(127, 127, 127)
 
         local smokePart = CreateEmptyPart(CFrame.new(projectile.Position))
         smoke.Parent = smokePart
