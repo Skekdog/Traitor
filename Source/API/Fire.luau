@@ -21,9 +21,12 @@ function Fire.Ignite(object: Types.MapObject, attacker: Types.Participant?): ()
 end
 
 function Fire.Extinguish(object: Types.MapObject): ()
-	local visuals = object:FindFirstChild("FireParticles")
-	if visuals then
-		visuals:Destroy()
+	local primaryPart = GetPrimaryPart(object)
+	if primaryPart then
+		local visuals = primaryPart:FindFirstChild("FireParticles")
+		if visuals then
+			visuals:Destroy()
+		end
 	end
 
 	Fire.Attackers[object] = nil
