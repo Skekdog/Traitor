@@ -125,13 +125,14 @@ local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoor
 
     local direction: Direction
     if request.Kind ~= "ClientReceive" and shouldOpen then
-        local referenceCFrame = door:GetAttribute("ReferenceCFrame")
-        if typeof(referenceCFrame) ~= "CFrame" then
-            referenceCFrame = part.CFrame
-        end
-        assert(typeof(referenceCFrame) == "CFrame", "ReferenceCFrame must be a CFrame")
-
         if request.Kind == "ClientInteraction" then
+            local referenceCFrame = door:GetAttribute("ReferenceCFrame")
+            if typeof(referenceCFrame) ~= "CFrame" then
+                referenceCFrame = part.CFrame
+                door:SetAttribute("ReferenceCFrame", part.CFrame)
+            end
+
+            assert(typeof(referenceCFrame) == "CFrame", "ReferenceCFrame must be a CFrame")
             direction = if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Out" else "In"
         else
             assert(request.Receive.Kind == "HingeDoorServerReceive")
@@ -254,6 +255,14 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     local door = request.Door
+
+    if request.Kind == "ServerReceive" and request.Receive.Kind == "HingeDoorServerReceive" then
+        if request.Receive.Direction == nil and not door:GetAttribute("Open") then
+            return
+        elseif request.Receive.Direction ~= nil and door:GetAttribute("Open") then
+            return
+        end
+    end
 
     if door:GetAttribute("Locked") then
         if request.Kind ~= "ClientReceive" and request.Kind ~= "ServerRun" then
