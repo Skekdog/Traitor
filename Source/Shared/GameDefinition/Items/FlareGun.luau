@@ -101,7 +101,13 @@ local item: Types.GunWeaponDefinition = {
             return true
         end
 
-        Fire.Ignite(target.Model, attacker)
+        Fire.Ignite(target.Model)
+
+        if target.Model:HasTag("Corpse") then
+            if not attacker:IsEvil() then
+                attacker:SetFreeKill("flared a corpse")
+            end
+        end
 
         task.delay(math.random(9, 11), function()
             if target.Model:HasTag("Corpse") then
