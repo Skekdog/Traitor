@@ -17,6 +17,7 @@ local DNAScanner = require(script.Parent.DNAScanner)
 local Defuser = require(script.Parent.Defuser)
 local Disguiser = require(script.Parent.Disguiser)
 local FlareGun = require(script.Parent.FlareGun)
+local FreezeGrenade = require(script.Parent.FreezeGrenade)
 local IncendiaryGrenade = require(script.Parent.IncendiaryGrenade)
 local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
@@ -914,6 +915,8 @@ grenades.Flashbang = {
 }
 
 grenades["Incendiary Grenade"] = IncendiaryGrenade.Item
+
+grenades.FreezeGrenade = FreezeGrenade.Item
 
 grenades["Smoke Grenade"] = {
     Kind = "Grenade" :: "Grenade",
