@@ -40,7 +40,7 @@ type BaseDoorRequest = {
     Door: Types.MapObject,
 }
 
-export type Direction = "In" | "Out"?
+export type Direction = "Clockwise" | "CounterClockwise"?
 
 export type ClientInteraction = BaseDoorRequest & {
     Kind: "ClientInteraction",
@@ -133,13 +133,13 @@ local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoor
             end
 
             assert(typeof(referenceCFrame) == "CFrame", "ReferenceCFrame must be a CFrame")
-            direction = if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Out" else "In"
+            direction = if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "CounterClockwise" else "Clockwise"
         else
             assert(request.Receive.Kind == "HingeDoorServerReceive")
             direction = request.Receive.Direction
         end
 
-        if direction == "Out" then
+        if direction == "CounterClockwise" then
             targetAngle = -targetAngle
         end
     end
@@ -393,7 +393,7 @@ if IS_SERVER then
         end
         local MapObject = door :: Types.MapObject
 
-        if typeof(direction) ~= "nil" and direction ~= "In" and direction ~= "Out" then
+        if typeof(direction) ~= "nil" and direction ~= "Clockwise" and direction ~= "CounterClockwise" then
             return
         end
 
@@ -412,7 +412,7 @@ if IS_SERVER then
         if door:GetAttribute("DoorKind") == "Slide" then
             receive = {
                 Kind = "SlideDoorServerReceive" :: "SlideDoorServerReceive",
-                Open = direction == "In",
+                Open = direction == "Clockwise",
             }
         else
             receive = {
