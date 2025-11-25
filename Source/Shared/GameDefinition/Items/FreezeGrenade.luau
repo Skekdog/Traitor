@@ -11,11 +11,14 @@ model.Name = "FreezeGrenade"
 
 local function OnHitClient(item: Types.AnyItemDefinition): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 
 	local root = LocalCharacter.RootPart()
 	if not root then
 		return
 	end
+
+	JumpPower.SetModifier("FreezeGrenade", false)
 
 	local attachment = Instance.new("Attachment")
 	attachment.Name = "FreezeGrenadeAttachment"
