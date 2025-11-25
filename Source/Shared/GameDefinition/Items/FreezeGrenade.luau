@@ -17,6 +17,7 @@ image.ImageTransparency = 1
 image.Name = "FreezeOverlay"
 image:SetAttribute("Layer", "HUD")
 
+local currentFreezeId: never & {}
 local function OnHitClient(item: Types.AnyItemDefinition): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
@@ -26,6 +27,9 @@ local function OnHitClient(item: Types.AnyItemDefinition): ()
 	if not root then
 		return
 	end
+
+	local thisFreezeId = newproxy()
+	currentFreezeId = thisFreezeId
 
 	PlaySound(6092902279)
 
@@ -50,6 +54,10 @@ local function OnHitClient(item: Types.AnyItemDefinition): ()
 	task.delay(FREEZE_TIME, function()
 		attachment:Destroy()
 		alignPosition:Destroy()
+
+		if currentFreezeId ~= thisFreezeId then
+			return
+		end
 
 		JumpPower.SetModifier("FreezeGrenade", true)
 
