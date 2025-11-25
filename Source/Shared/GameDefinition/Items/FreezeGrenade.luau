@@ -44,11 +44,14 @@ local item: Types.GrenadeWeaponDefinition = {
 	Name = "FreezeGrenade",
 	DisplayName = "Freeze Grenade",
 	Description = "Stops players from moving within the blast radius. Explodes on impact.",
+	Icon = "",
 
 	HoldAnimation = "rbxassetid://12498620263",
 	Model = model,
 
 	ItemGroup = ItemGroups.Grenade,
+	CreditCost = 2,
+	MaxStock = 1,
 
 	FuseTime = -1,
 	Projectile = model :: BasePart,
