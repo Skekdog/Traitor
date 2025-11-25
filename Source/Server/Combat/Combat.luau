@@ -427,14 +427,23 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 
 		by:TryThrowAssembly(projectile, 45, workspace.Projectiles, request.Origin, request.Direction, true)
 
-		task.wait(item.Definition.FuseTime)
-		projectile:Destroy()
+		local function explode()
+			projectile:Destroy()
 
-		local explosionParams = ExplosionParams.new(item.Definition.ExplosionInfo, projectile.Position, by)
-		module.CreateExplosion(by.Round, explosionParams, item)
+			local explosionParams = ExplosionParams.new(item.Definition.ExplosionInfo, projectile.Position, by)
+			module.CreateExplosion(by.Round, explosionParams, item)
 
-		if item.Definition.OnExplode then
-			item.Definition.OnExplode(item, by, projectile)
+			if item.Definition.OnExplode then
+				item.Definition.OnExplode(item, by, projectile)
+			end
+		end
+
+		if item.Definition.FuseTime < 0 then
+			task.wait(0.1)
+			projectile.Touched:Once(explode)
+		else
+			task.wait(item.Definition.FuseTime)
+			explode()
 		end
 	elseif request.Kind == "PrimaryFireItemRequest" then
 		if item.Kind ~= "Item" then

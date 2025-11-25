@@ -47,7 +47,7 @@ local item: Types.GrenadeWeaponDefinition = {
 
 	ItemGroup = ItemGroups.Grenade,
 
-	FuseTime = 0,
+	FuseTime = -1,
 	Projectile = model :: BasePart,
 	ProjectileForce = 100,
 
