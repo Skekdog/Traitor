@@ -67,7 +67,7 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
 	local accountForInset = object:GetAttribute("AccountForInset") :: boolean?
 	local modal = object:GetAttribute("Modal") :: boolean?
-	local transitionStyle = object:GetAttribute("TransitionStyle") :: "Position" | "Size"
+	local transitionStyle = object:GetAttribute("TransitionStyle") :: "Position" | "Size" | "Transparency"
 	local transitionTarget = object:GetAttribute("TransitionTarget") :: UDim2
 
 	local self: UI = {
