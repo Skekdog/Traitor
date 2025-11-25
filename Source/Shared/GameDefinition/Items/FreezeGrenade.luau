@@ -50,12 +50,16 @@ local function OnHitClient(item: Types.AnyItemDefinition): ()
 	task.delay(FREEZE_TIME, function()
 		attachment:Destroy()
 		alignPosition:Destroy()
+
+		JumpPower.SetModifier("FreezeGrenade", true)
+
 		PlaySound(80536376961252)
+
 		local tween = TweenService:Create(image, TweenInfo.new(0.5), {ImageTransparency = 1})
-		tween:Play()
 		tween.Completed:Once(function()
 			ui:Unregister()
 		end)
+		tween:Play()
 	end)
 end
 
