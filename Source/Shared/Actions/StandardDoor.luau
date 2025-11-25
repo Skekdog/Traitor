@@ -124,43 +124,45 @@ local function hingeDoor(request: DoorRequest<HingeDoorClientReceive | HingeDoor
     end
 
     local direction: Direction
-    if request.Kind ~= "ClientReceive" and shouldOpen then
-        if door:GetAttribute("HingeRestrictDirection") then
-            direction = "CounterClockwise"
-        elseif door:GetAttribute("HingeRestrictDirectionClockwise") then
-            direction = "Clockwise"
-        else
-            if request.Kind == "ClientInteraction" then
-                local referenceCFrame = door:GetAttribute("ReferenceCFrame")
-                if typeof(referenceCFrame) ~= "CFrame" then
-                    referenceCFrame = part.CFrame
-                    door:SetAttribute("ReferenceCFrame", part.CFrame)
-                end
-
-                assert(typeof(referenceCFrame) == "CFrame", "ReferenceCFrame must be a CFrame")
-                direction = if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Clockwise" else "CounterClockwise"
+    if request.Kind ~= "ClientReceive" then
+        if shouldOpen then
+            if door:GetAttribute("HingeRestrictDirection") then
+                direction = "CounterClockwise"
+            elseif door:GetAttribute("HingeRestrictDirectionClockwise") then
+                direction = "Clockwise"
             else
-                assert(request.Receive.Kind == "HingeDoorServerReceive")
-                direction = request.Receive.Direction
+                if request.Kind == "ClientInteraction" then
+                    local referenceCFrame = door:GetAttribute("ReferenceCFrame")
+                    if typeof(referenceCFrame) ~= "CFrame" then
+                        referenceCFrame = part.CFrame
+                        door:SetAttribute("ReferenceCFrame", part.CFrame)
+                    end
+
+                    assert(typeof(referenceCFrame) == "CFrame", "ReferenceCFrame must be a CFrame")
+                    direction = if referenceCFrame:ToWorldSpace(pivotAttachment.CFrame).LookVector:Dot(workspace.CurrentCamera.CFrame.LookVector) < 0 then "Clockwise" else "CounterClockwise"
+                else
+                    assert(request.Receive.Kind == "HingeDoorServerReceive")
+                    direction = request.Receive.Direction
+                end
             end
         end
-    end
 
-    if direction == "Clockwise" then
-        local angle = door:GetAttribute("HingeOpenAngleCW")
-        if typeof(angle) == "number" then
-            targetAngle = math.rad(angle)
+        if direction == "Clockwise" then
+            local angle = door:GetAttribute("HingeOpenAngleCW")
+            if typeof(angle) == "number" then
+                targetAngle = math.rad(angle)
+            end
+        elseif direction == "CounterClockwise" then
+            local angle = door:GetAttribute("HingeOpenAngleCCW")
+            if typeof(angle) == "number" then
+                targetAngle = math.rad(angle)
+            else
+                targetAngle = -targetAngle
+            end
         end
-    elseif direction == "CounterClockwise" then
-        local angle = door:GetAttribute("HingeOpenAngleCCW")
-        if typeof(angle) == "number" then
-            targetAngle = math.rad(angle)
-        else
-            targetAngle = -targetAngle
-        end
-    end
 
-    targetAngle *= -1
+        targetAngle *= -1
+    end
 
     if request.Kind == "ServerReceive" or request.Kind == "ServerRun" then
         local rotation = CFrame.fromAxisAngle(pivotAttachment.SecondaryAxis, targetAngle)
