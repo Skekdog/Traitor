@@ -1,4 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local Types = require(ReplicatedStorage.API.Types)
 
@@ -6,14 +8,30 @@ local FreezeGrenade = {}
 
 local FREEZE_TIME = 5
 
+local image = Instance.new("ImageLabel")
+image.ImageContent = Content.fromAssetId(107638966927414)
+image.BackgroundTransparency = 1
+image.ZIndex = -math.huge
+image.Size = UDim2.fromScale(1, 1)
+image.ImageTransparency = 1
+image.Name = "FreezeOverlay"
+image:SetAttribute("Layer", "HUD")
+
 local function OnHitClient(item: Types.AnyItemDefinition): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 	local root = LocalCharacter.RootPart()
 	if not root then
 		return
 	end
+
+	PlaySound(6092902279)
+
+	local ui = UIManager.RegisterUI(image)
+
+	TweenService:Create(image, TweenInfo.new(0.5), {ImageTransparency = 0}):Play()
 
 	JumpPower.SetModifier("FreezeGrenade", false)
 
@@ -32,6 +50,12 @@ local function OnHitClient(item: Types.AnyItemDefinition): ()
 	task.delay(FREEZE_TIME, function()
 		attachment:Destroy()
 		alignPosition:Destroy()
+		PlaySound(80536376961252)
+		local tween = TweenService:Create(image, TweenInfo.new(0.5), {ImageTransparency = 1})
+		tween:Play()
+		tween.Completed:Once(function()
+			ui:Unregister()
+		end)
 	end)
 end
 
