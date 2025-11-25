@@ -6,9 +6,6 @@ local FreezeGrenade = {}
 
 local FREEZE_TIME = 5
 
-local model = Instance.new("Part")
-model.Name = "FreezeGrenade"
-
 local function OnHitClient(item: Types.AnyItemDefinition): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
@@ -44,17 +41,17 @@ local item: Types.GrenadeWeaponDefinition = {
 	Name = "FreezeGrenade",
 	DisplayName = "Freeze Grenade",
 	Description = "Stops players from moving within the blast radius. Explodes on impact.",
-	Icon = "",
+	Icon = "rbxassetid://102415235814315",
 
 	HoldAnimation = "rbxassetid://12498620263",
-	Model = model,
+	Model = ReplicatedStorage.Assets.WeaponModels.FreezeGrenade,
 
 	ItemGroup = ItemGroups.Grenade,
 	CreditCost = 2,
 	MaxStock = 1,
 
 	FuseTime = -1,
-	Projectile = model :: BasePart,
+	Projectile = ReplicatedStorage.Assets.WeaponModels.FreezeGrenade :: BasePart,
 	ProjectileForce = 100,
 
 	OnHitClient = OnHitClient,
