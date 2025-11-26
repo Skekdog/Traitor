@@ -14,7 +14,7 @@ function module.MakeExplosion(params: {
 	FalloffEnd: number,
 	Attacker: Types.Participant?,
 	IgnoreKarma: boolean?,
-}, sound: Sound): ()
+}, sound: Sound?): ()
 	Combat.CreateExplosion(GetRound(), ExplosionParams.new({
 		Damage = params.Damage,
 		FalloffBegin = params.FalloffBegin or 0,

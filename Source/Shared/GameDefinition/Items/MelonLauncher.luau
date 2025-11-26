@@ -14,7 +14,7 @@ local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
 		Damage = 50,
 		FalloffEnd = 15,
 		FalloffBegin = 5,
-	}, Instance.new("Sound"))
+	})
 	return true
 end
 
