@@ -5,6 +5,13 @@ local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.
 
 local MelonLauncher = {}
 
+local function reduceAmount(_, _, hitParticipant: Types.Participant, params: Types.DamageParams): boolean
+	if hitParticipant == params.Attacker then
+		params.Amount /= 5
+	end
+	return true
+end
+
 local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
 	local Combat = require(ReplicatedStorage.API.Combat)
 	assert(params.Attacker and params.HitPosition)
@@ -14,6 +21,9 @@ local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
 		Damage = 50,
 		FalloffEnd = 15,
 		FalloffBegin = 5,
+		Pressure = 100000,
+
+		BeforeHitParticipant = reduceAmount,
 	})
 	return true
 end
@@ -56,6 +66,7 @@ local item: Types.GunWeaponDefinition = {
 	ReloadTime = 0,
 
 	BeforeHitAnything = BeforeHitAnything,
+	BeforeHitParticipant = reduceAmount,
 }
 
 MelonLauncher.Item = item

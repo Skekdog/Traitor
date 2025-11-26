@@ -14,16 +14,20 @@ function module.MakeExplosion(params: {
 	FalloffEnd: number,
 	Attacker: Types.Participant?,
 	IgnoreKarma: boolean?,
+	Pressure: number?,
+	VisualRadius: number?,
+	BeforeHitParticipant: Types.BeforeHitParticipant?,
 }, sound: Sound?): ()
 	Combat.CreateExplosion(GetRound(), ExplosionParams.new({
 		Damage = params.Damage,
 		FalloffBegin = params.FalloffBegin or 0,
 		FalloffEnd = params.FalloffEnd,
-		Pressure = params.Damage * 50,
-		VisualRadius = params.FalloffEnd,
+		Pressure = params.Pressure or params.Damage * 50,
+		VisualRadius = params.VisualRadius or params.FalloffEnd,
 		IgnoreKarma = params.IgnoreKarma,
 		IgnoreScore = params.IgnoreKarma,
 		IgnoreSelfDefense = params.IgnoreKarma,
+		BeforeHitParticipant = params.BeforeHitParticipant,
 	}, params.Position, params.Attacker), nil, sound)
 end
 
