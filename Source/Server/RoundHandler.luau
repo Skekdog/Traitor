@@ -7,6 +7,8 @@ local Impulse = require(ReplicatedStorage.API.Impulse)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
+local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWithDeterminer)
+local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local GamemodeValidation = require(ReplicatedStorage.Shared.RoundRule.GamemodeValidation)
@@ -31,6 +33,21 @@ function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant
     end
 
     TeamChat.TryRemove(participant.Player.UserId)
+
+    if participant.Corpse then
+        local attacker = participant.Corpse.Killer
+        if attacker and attacker ~= participant then
+            assert(participant.Corpse)
+            local roleName = GetDisplayName(attacker:GetRole().Definition)
+            local formattedRoleName = attacker:GetRole():GetFormattedName()
+            local determiner = StringWithDeterminer(roleName):split(" ")[1]
+            if participant:IsAlliedWithParticipant(attacker) then
+                ShowAlert(`You were killed by {attacker:GetFormattedName()}{if participant.Corpse.CorpseView.WasSelfDefense then " in self-defense" else ""}. They were {determiner} {formattedRoleName}.`, participant.Player)
+            else
+                ShowAlert(`You were killed by {determiner} {formattedRoleName}!`, participant.Player)
+            end
+        end
+    end
 end
 
 module.OnCharacterAdded = {} :: {(Types.Round, Types.Participant) -> ()}
