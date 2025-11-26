@@ -455,7 +455,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		end
 
 		if item.Definition.FuseTime < 0 then
-			task.wait(0.1)
+			task.wait(0.05)
 			projectile.Touched:Once(explode)
 		else
 			task.wait(item.Definition.FuseTime)
@@ -484,7 +484,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			local force = request.Direction * item.Definition.ProjectileSpeed * GetAssemblyMass(projectile)
 			projectile:ApplyImpulse(force)
 
-			task.delay(0.1, function()
+			task.delay(0.05, function()
 				projectile.Touched:Once(function(part)
 					onPartHit(item, by, part, projectile.Position, nil, request.Origin)
 					projectile:Destroy()
