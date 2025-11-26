@@ -27,7 +27,7 @@ local item: Types.GunWeaponDefinition = {
 
 	ItemGroup = ItemGroups.RoleWeapon,
 
-	PhysicallySimulated = true,
+	IsPhysicallySimulated = true,
 
 	Damage = 50,
 	Spread = 1,
