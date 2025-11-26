@@ -11,6 +11,7 @@ local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
+local RunBeforeHit = require(ReplicatedStorage.Shared.RoundRule.RunBeforeHit)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local module = {}
 
@@ -244,6 +245,20 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 			return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin, impulse)
 		end
 	end
+
+	local params: Types.DamageParams = {
+		Amount = getItemDamage(item, hitPart),
+		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
+
+		Attacker = by,
+
+		HitPosition = hitPosition,
+		Direction = (hitPosition - origin).Unit,
+		Origin = origin,
+		HitPart = hitPart,
+	}
+
+	RunBeforeHit(item, by.Round, hitPart, params)
 
 	if normal and item.Kind == "Gun" then
 		if relativeHitCFrame and relativeHitCFrame.Position.Magnitude <= hitPart.ExtentsSize.Magnitude * 1.1 then

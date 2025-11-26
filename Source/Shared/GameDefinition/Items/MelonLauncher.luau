@@ -2,11 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.API.Types)
 local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local MelonLauncher = {}
-
-local model = Instance.new("Part")
-model.Name = "MelonLauncher"
 
 local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
 	local Combat = require(ReplicatedStorage.API.Combat)
@@ -29,8 +27,10 @@ local item: Types.GunWeaponDefinition = {
 	Description = "boom",
 	Icon = "",
 
-	Model = model,
-	HoldAnimation = "rbxassetid://132951688645757",
+	Model = ReplicatedStorage.Assets.WeaponModels.MelonLauncher,
+	HoldAnimation = "rbxassetid://4772214897",
+
+	AttackSound = PlaySound.MakeSound(7129285090),
 
 	CanDrop = true,
 	CreditCost = 1,
@@ -42,7 +42,7 @@ local item: Types.GunWeaponDefinition = {
 
 	IsPhysicallySimulated = true,
 
-	Projectile = model,
+	Projectile = ReplicatedStorage.Assets.Projectiles.Watermelon,
 	ProjectileSpeed = 100,
 
 	Damage = 50,
