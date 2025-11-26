@@ -33,8 +33,8 @@ local item: Types.GunWeaponDefinition = {
 
 	Name = "MelonLauncher",
 	DisplayName = "Melon Launcher",
-	Description = "boom",
-	Icon = "",
+	Description = "Launches explosive melons.",
+	Icon = "rbxassetid://4793387432",
 
 	Model = ReplicatedStorage.Assets.WeaponModels.MelonLauncher,
 	HoldAnimation = "rbxassetid://10247529531",
