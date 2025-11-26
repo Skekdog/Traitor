@@ -279,67 +279,84 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 				local request: CombatTypes.PrimaryFireRequest?
 				if item.Kind == "Melee" or item.Kind == "Gun" then
-					local raycasts: {CombatTypes.RaycastInfo} = {}
-					for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
-						local spread = getSpreadVector(item)
+					if item.Kind == "Gun" and item.Definition.IsPhysicallySimulated then
+						for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
+							local spread = getSpreadVector(item)
 
-						local result = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE, item.Kind == "Melee")
-						local raycastResult = result.RaycastResult
-						local part = if result.Parts then result.Parts[1] else nil
+							local finalDirection = (direction + spread).Unit
 
-						local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
-						local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
-						local hitPartCenterPosition = if hitPart then hitPart.Position else nil
-						local normal = if raycastResult then raycastResult.Normal else nil
-						local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
+							local itemRequest: CombatTypes.PrimaryFireItemRequest = {
+								Kind = "PrimaryFireItemRequest" :: "PrimaryFireItemRequest",
+								ItemName = item.Definition.Name,
+								Origin = origin,
+								Direction = finalDirection,
+							}
 
-						if item.Kind == "Gun" and item.Definition.Projectile and result.Origin then
-							BulletTracer(item.Definition.Projectile, item.Definition.ProjectileSpeed or 100, result.Origin, targetPosition)
+							request = itemRequest
 						end
+					else
+						local raycasts: {CombatTypes.RaycastInfo} = {}
+						for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
+							local spread = getSpreadVector(item)
 
-						if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
-							PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, targetPosition or hitPart.Position)
-						end
+							local result = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE, item.Kind == "Melee")
+							local raycastResult = result.RaycastResult
+							local part = if result.Parts then result.Parts[1] else nil
 
-						if not part then
-							table.insert(raycasts, {
-								Destination = targetPosition,
-								HitPart = hitPart,
-								HitPartCenterPosition = hitPartCenterPosition,
-								Normal = normal,
-								RelativeHitCFrame = relativeHitCFrame,
-							})
-						else
-							table.insert(raycasts, {
-								Destination = part.Position,
-								HitPart = part,
-								HitPartCenterPosition = part.Position,
-								Normal = Vector3.zero,
-								RelativeHitCFrame = CFrame.identity,
-							})
-						end
-					end
+							local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE)
+							local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
+							local hitPartCenterPosition = if hitPart then hitPart.Position else nil
+							local normal = if raycastResult then raycastResult.Normal else nil
+							local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
 
-					if item.Kind == "Gun" and item.Definition.BeforePrimaryFireClient then
-						local parts: {BasePart} = {}
-						for _, v in raycasts do
-							if v.HitPart then
-								table.insert(parts, v.HitPart)
+							if item.Kind == "Gun" and item.Definition.Projectile and result.Origin then
+								BulletTracer(item.Definition.Projectile, item.Definition.ProjectileSpeed or 100, result.Origin, targetPosition)
+							end
+
+							if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
+								PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, targetPosition or hitPart.Position)
+							end
+
+							if not part then
+								table.insert(raycasts, {
+									Destination = targetPosition,
+									HitPart = hitPart,
+									HitPartCenterPosition = hitPartCenterPosition,
+									Normal = normal,
+									RelativeHitCFrame = relativeHitCFrame,
+								})
+							else
+								table.insert(raycasts, {
+									Destination = part.Position,
+									HitPart = part,
+									HitPartCenterPosition = part.Position,
+									Normal = Vector3.zero,
+									RelativeHitCFrame = CFrame.identity,
+								})
 							end
 						end
 
-						if not item.Definition.BeforePrimaryFireClient(item, parts) then
-							continue
-						end
-					end
+						if item.Kind == "Gun" and item.Definition.BeforePrimaryFireClient then
+							local parts: {BasePart} = {}
+							for _, v in raycasts do
+								if v.HitPart then
+									table.insert(parts, v.HitPart)
+								end
+							end
 
-					local raycastRequest: CombatTypes.PrimaryFireRaycastRequest = {
-						Kind = "PrimaryFireRaycastRequest" :: "PrimaryFireRaycastRequest",
-						ItemName = item.Definition.Name,
-						Raycasts = raycasts,
-						Origin = origin,
-					}
-					request = raycastRequest
+							if not item.Definition.BeforePrimaryFireClient(item, parts) then
+								continue
+							end
+						end
+
+						local raycastRequest: CombatTypes.PrimaryFireRaycastRequest = {
+							Kind = "PrimaryFireRaycastRequest" :: "PrimaryFireRaycastRequest",
+							ItemName = item.Definition.Name,
+							Raycasts = raycasts,
+							Origin = origin,
+						}
+						request = raycastRequest
+					end
 				elseif item.Kind == "Grenade" then
 					local throwRequest: CombatTypes.PrimaryFireThrowRequest = {
 						Kind = "PrimaryFireThrowRequest" :: "PrimaryFireThrowRequest",

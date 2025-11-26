@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
+local GetAssemblyMass = require(ReplicatedStorage.API.GetAssemblyMass)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
@@ -103,7 +104,7 @@ end
 local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, requestKind: string): CombatTypes.ValidateItemUsageResult
 	if (item.Kind == "Grenade") and (requestKind :: string ~= "PrimaryFireThrowRequest") then
 		return "OtherError"
-	elseif (item.Kind == "Gun") and (requestKind :: string ~= "PrimaryFireRaycastRequest") then
+	elseif (item.Kind == "Gun") and (requestKind :: string ~= "PrimaryFireRaycastRequest" and requestKind :: string ~= "PrimaryFireItemRequest") then
 		return "OtherError"
 	elseif (item.Kind == "Melee") and (requestKind :: string ~= "PrimaryFireRaycastRequest" and requestKind :: string ~= "AlternateFireItemRequest") then
 		return "OtherError"
@@ -446,15 +447,35 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			explode()
 		end
 	elseif request.Kind == "PrimaryFireItemRequest" then
-		if item.Kind ~= "Item" then
+		if item.Kind ~= "Item" and item.Kind ~= "Gun" then
 			return "OtherError"
 		end
 
-		if not item.Definition.PrimaryFireServer then
-			return "OtherError"
-		end
+		if item.Kind == "Item" then
+			if not item.Definition.PrimaryFireServer then
+				return "OtherError"
+			end
 
-		item.Definition.PrimaryFireServer(item, "Primary", request.Origin, request.Direction, by)
+			item.Definition.PrimaryFireServer(item, "Primary", request.Origin, request.Direction, by)
+		else
+			if not item.Definition.IsPhysicallySimulated or not item.Definition.Projectile or not item.Definition.ProjectileSpeed then
+				return "OtherError"
+			end
+
+			local projectile = item.Definition.Projectile:Clone()
+			projectile.CFrame = CFrame.lookAlong(request.Origin, request.Direction)
+			projectile.Parent = workspace.Projectiles
+
+			local force = request.Direction * item.Definition.ProjectileSpeed * GetAssemblyMass(projectile)
+			projectile:ApplyImpulse(force)
+
+			task.delay(0.1, function()
+				projectile.Touched:Once(function(part)
+					onPartHit(item, by, part, projectile.Position, nil, request.Origin)
+					projectile:Destroy()
+				end)
+			end)
+		end
 	end
 
 	return "Success"

@@ -8,6 +8,19 @@ local MelonLauncher = {}
 local model = Instance.new("Part")
 model.Name = "MelonLauncher"
 
+local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
+	local Combat = require(ReplicatedStorage.API.Combat)
+	assert(params.Attacker and params.HitPosition)
+	Combat.MakeExplosion({
+		Attacker = params.Attacker,
+		Position = params.HitPosition,
+		Damage = 50,
+		FalloffEnd = 15,
+		FalloffBegin = 5,
+	}, Instance.new("Sound"))
+	return true
+end
+
 local item: Types.GunWeaponDefinition = {
 	Kind = "Gun" :: "Gun",
 
@@ -29,8 +42,11 @@ local item: Types.GunWeaponDefinition = {
 
 	IsPhysicallySimulated = true,
 
+	Projectile = model,
+	ProjectileSpeed = 100,
+
 	Damage = 50,
-	Spread = 1,
+	Spread = 0.03,
 
 	AmmoType = Ammo.MelonLauncher,
 	AttackInterval = 1.5,
@@ -39,6 +55,8 @@ local item: Types.GunWeaponDefinition = {
 	RecoilY = 10,
 
 	ReloadTime = 0,
+
+	BeforeHitAnything = BeforeHitAnything,
 }
 
 MelonLauncher.Item = item
