@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.API.Types)
 local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local MelonLauncher = {}
 
@@ -28,9 +27,9 @@ local item: Types.GunWeaponDefinition = {
 	Icon = "",
 
 	Model = ReplicatedStorage.Assets.WeaponModels.MelonLauncher,
-	HoldAnimation = "rbxassetid://4772214897",
+	HoldAnimation = "rbxassetid://10247529531",
 
-	AttackSound = PlaySound.MakeSound(7129285090),
+	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.MelonLauncher,
 
 	CanDrop = true,
 	CreditCost = 1,
