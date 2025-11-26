@@ -21,6 +21,7 @@ local FreezeGrenade = require(script.Parent.FreezeGrenade)
 local IncendiaryGrenade = require(script.Parent.IncendiaryGrenade)
 local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
+local MelonLauncher = require(script.Parent.MelonLauncher)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local Poltergeist = require(script.Parent.Poltergeist)
 local Radar = require(script.Parent.Radar)
@@ -770,6 +771,8 @@ guns.UMP = {
     RecoilX = 0.75,
     RecoilY = 1.75,
 }
+
+guns.MelonLauncher = MelonLauncher.Item
 
 guns.BAR = {
     Kind = "Gun" :: "Gun",

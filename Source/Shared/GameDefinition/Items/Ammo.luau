@@ -32,6 +32,15 @@ module.AWP = {
     CanDrop = false,
 }
 
+module.MelonLauncher = {
+    Kind = "Ammo",
+    Name = "MelonLauncher",
+    Capacity = 4,
+    ReserveCapacity = 0,
+    Model = NO_PART,
+    CanDrop = false,
+}
+
 module.Flare = {
     Kind = "Ammo",
     Name = "Flare",
