@@ -5,7 +5,7 @@ return function(str: string): string
 	local lowered = str:lower()
 
 	local determiner = "a "
-	if table.find(vowels, lowered:sub(1)) or table.find(vowelSequences, lowered:sub(1, 3)) then
+	if table.find(vowels, lowered:sub(1, 1)) or table.find(vowelSequences, lowered:sub(1, 3)) then
 		determiner = "an "
 	end
 
