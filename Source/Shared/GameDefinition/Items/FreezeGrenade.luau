@@ -86,6 +86,8 @@ local item: Types.GrenadeWeaponDefinition = {
 	CreditCost = 2,
 	MaxStock = 1,
 
+	CanDrop = true,
+
 	FuseTime = -1,
 	Projectile = ReplicatedStorage.Assets.WeaponModels.FreezeGrenade :: BasePart,
 	ProjectileForce = 100,
