@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PossessProp = require(ReplicatedStorage.Shared.Actions.PossessProp)
 local PossessiveApostrophe = require(ReplicatedStorage.Shared.Grammar.PossessiveApostrophe)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local GetAmmoDefinition = require(ReplicatedStorage.Shared.LocalState.GetAmmoDefinition)
@@ -130,7 +131,7 @@ function module.ShowInteractableHint(prop: Types.MapObject, part: BasePart): ()
 	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 
 	if not prop:HasTag("Interactable") and not interactable then
-		if status ~= "Alive" then
+		if status ~= "Alive" and PossessProp.CanPossess(part) then
 			hintText = "Possess"
 			displayName = "Prop"
 		else

@@ -95,14 +95,14 @@ function PossessProp.IsPossessed(prop: Types.MapObject): boolean
 	return currentPossess == prop
 end
 
-function PossessProp.TryPossess(part: BasePart): ()
+function PossessProp.CanPossess(part: BasePart): boolean
 	if part:IsGrounded() then
-		return
+		return false
 	end
 
 	local prop = GetMapObject(part, "Prop")
 	if not prop then
-		return
+		return false
 	end
 
 	local id = prop:GetAttribute("PossessedBy")
@@ -111,9 +111,22 @@ function PossessProp.TryPossess(part: BasePart): ()
 		if possessingPlayer then
 			local participant = LocalParticipantInfo.GetParticipant(possessingPlayer.Name)
 			if participant.Status() ~= "Alive" then
-				return
+				return false
 			end
 		end
+	end
+
+	return true
+end
+
+function PossessProp.TryPossess(part: BasePart): ()
+	if not PossessProp.CanPossess(part) then
+		return
+	end
+
+	local prop = GetMapObject(part, "Prop")
+	if not prop then
+		return
 	end
 
 	if currentPossess then
