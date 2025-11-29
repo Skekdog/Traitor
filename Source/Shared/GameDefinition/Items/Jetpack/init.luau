@@ -1,11 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
 
 local Jetpack = {}
 
 local VELOCITY = 20
 
-local function OnEquipClient()
+local visualsRemote = GetRemote("JetpackVisuals", script)
+
+local function OnEquipClient(): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 
@@ -34,12 +38,59 @@ local function OnEquipClient()
 
 	CustomActions.Register("Jetpack", function()
 		velocity.Enabled = not velocity.Enabled
+		visualsRemote:FireServer(velocity.Enabled)
 	end)
 end
 
-local function OnUnequipClient()
+local function OnUnequipClient(): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	CustomActions.Unregister("Jetpack")
+end
+
+local function OnEquipServer(_, participant: Types.Participant): ()
+	local humanoid = participant:GetHumanoid()
+	if not humanoid then
+		return
+	end
+
+	humanoid:AddAccessory(script.JetpackModel:Clone())
+end
+
+local function OnUnequipServer(_, participant: Types.Participant): ()
+	local humanoid = participant:GetHumanoid()
+	if not humanoid then
+		return
+	end
+
+	for _, accessory in humanoid:GetAccessories() do
+		if accessory.Name == "JetpackModel" then
+			accessory:Destroy()
+		end
+	end
+end
+
+if RunService:IsServer() then
+	visualsRemote.OnServerEvent:Connect(function(player, enabled: unknown): ()
+		if typeof(enabled) ~= "boolean" then
+			return
+		end
+
+		local character = player.Character
+		if not character then
+			return
+		end
+
+		local jetpackModel = character:FindFirstChild("JetpackModel")
+		if not jetpackModel then
+			return
+		end
+
+		local particles = jetpackModel:QueryDescendants("ParticleEmitter")
+		for _, particle in particles do
+			assert(particle:IsA("ParticleEmitter"))
+			particle.Enabled = enabled
+		end
+	end)
 end
 
 local item: Types.ItemDefinition = {
@@ -55,6 +106,9 @@ local item: Types.ItemDefinition = {
 
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
+
+	OnEquipServer = OnEquipServer,
+	OnUnequipServer = OnUnequipServer,
 }
 
 Jetpack.Item = item
