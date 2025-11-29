@@ -127,6 +127,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		StartingItems = {
 			Items["DNAScanner"],
 			Items["Ballistic Vest"],
+			Items["Jetpack"],
 		},
 
 		EquipmentShop = {
