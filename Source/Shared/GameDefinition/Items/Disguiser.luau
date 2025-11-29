@@ -37,9 +37,29 @@ end
 
 local clientDisguiseActive = false
 
-function module.DisguiseServer(participant: Types.Participant, enable: boolean, char: Model?, hum: Humanoid?, applyReset: boolean?): ()
+function module.DisguiseServer(source: string, participant: Types.Participant, enable: boolean, char: Model?, hum: Humanoid?, applyReset: boolean?): ()
 	-- this is to prevent an error in studio when stopping the game.
 	if not participant.Player.Parent then
+		return
+	end
+
+	local activeSources: {string} = participant.Extras.DisguiseSources or {}
+	participant.Extras.DisguiseSources = activeSources
+
+	if enable then
+		if not table.find(activeSources, source) then
+			table.insert(activeSources, source)
+		end
+	else
+		local index = table.find(activeSources, source)
+		if index then
+			table.remove(activeSources, index)
+		end
+	end
+
+	if enable and #activeSources > 1 then
+		return
+	elseif not enable and #activeSources > 0 then
 		return
 	end
 
@@ -163,7 +183,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		module.DisguiseServer(participant, enable)
+		module.DisguiseServer("Disguiser", participant, enable)
 	end)
 end
 
@@ -191,7 +211,7 @@ local function OnUnequipServer(item: Types.AnyItem, participant: Types.Participa
 	if not data then
 		return
 	end
-	module.DisguiseServer(data, false)
+	module.DisguiseServer("Disguiser", data, false)
 	serverParticipantTable[participant.Player] = nil
 end
 
