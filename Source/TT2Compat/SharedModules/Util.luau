@@ -15,7 +15,11 @@ function module.GetCharactersArray(position: Vector3, distance: number): {Model}
 	return characters
 end
 
-function module.GetPlayerFromInstance(instance: BasePart | Model): Player?
+function module.GetPlayerFromInstance(instance: BasePart | Model?): Player?
+	if not instance then
+		return nil
+	end
+
 	local char: Model?
 	if instance:IsA("BasePart") then
 		char = instance:FindFirstAncestorOfClass("Model")
