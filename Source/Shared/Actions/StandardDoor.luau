@@ -250,7 +250,7 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
     end
 
     if request.Kind == "ClientInteraction" then
-        remotes.ClientServer.OpenDoor:FireServer(door, if shouldOpen then "In" else "Out")
+        remotes.ClientServer.OpenDoor:FireServer(door, if shouldOpen then "Clockwise" else "CounterClockwise")
     else
         part.CFrame = request.OriginalCFrame
     end
