@@ -161,13 +161,13 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 local EXTRA_BETWEEN = vector.create(6, 8)
 local function assignRoles(_, participants: {Types.Participant}): ()
-	local numDetectives = if #participants >= EXTRA_BETWEEN.x and #participants < EXTRA_BETWEEN.y then 1 else #participants // 8
+	local numDetectives = math.max(#participants // 8, 1)
 	local numTraitors = if #participants >= EXTRA_BETWEEN.x and #participants < EXTRA_BETWEEN.y then 2 else math.max(#participants // 4, 1)
 	for i, v in participants do
-		if i <= numDetectives then
-			v:SetRole(roles.Detective)
-		elseif i <= numDetectives + numTraitors then
+		if i <= numTraitors then
 			v:SetRole(roles.Traitor)
+		elseif i <= numTraitors + numDetectives then
+			v:SetRole(roles.Detective)
 		else
 			v:SetRole(roles.Innocent)
 		end
