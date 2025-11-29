@@ -6,8 +6,37 @@ local Types = require(ReplicatedStorage.API.Types)
 local Jetpack = {}
 
 local VELOCITY = 20
+local MAX_FUEL = 8
+local FUEL_THRESHOLD = 2
+local FUEL_CONSUMPTION_RATE = 2
+local FUEL_RECHARGE_RATE = 0.5
+
+local fuel = MAX_FUEL
 
 local visualsRemote = GetRemote("JetpackVisuals", script)
+
+local function toggleJetpack(velocity: LinearVelocity): ()
+	velocity.Enabled = not velocity.Enabled
+	visualsRemote:FireServer(velocity.Enabled)
+end
+
+local velocity: LinearVelocity?
+if RunService:IsClient() then
+	RunService.Heartbeat:Connect(function(dt)
+		if not velocity then
+			return
+		end
+
+		if velocity.Enabled then
+			fuel = math.max(0, fuel - FUEL_CONSUMPTION_RATE * dt)
+			if fuel <= 0 then
+				toggleJetpack(velocity)
+			end
+		else
+			fuel = math.min(MAX_FUEL, fuel + FUEL_RECHARGE_RATE * dt)
+		end
+	end)
+end
 
 local function OnEquipClient(): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
@@ -18,7 +47,9 @@ local function OnEquipClient(): ()
 		return
 	end
 
-	local velocity = Instance.new("LinearVelocity")
+	velocity = Instance.new("LinearVelocity")
+	assert(velocity)
+
 	velocity.RelativeTo = Enum.ActuatorRelativeTo.Attachment0
 	velocity.VelocityConstraintMode = Enum.VelocityConstraintMode.Plane
 	velocity.PlaneVelocity = Vector2.new(0, VELOCITY)
@@ -37,14 +68,21 @@ local function OnEquipClient(): ()
 	velocity.Parent = root
 
 	CustomActions.Register("Jetpack", function()
-		velocity.Enabled = not velocity.Enabled
-		visualsRemote:FireServer(velocity.Enabled)
+		if not velocity or not velocity.Enabled and fuel < FUEL_THRESHOLD then
+			return
+		end
+		toggleJetpack(velocity)
 	end)
 end
 
 local function OnUnequipClient(): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	CustomActions.Unregister("Jetpack")
+
+	if velocity then
+		velocity:Destroy()
+		velocity = nil
+	end
 end
 
 local function OnEquipServer(_, participant: Types.Participant): ()
