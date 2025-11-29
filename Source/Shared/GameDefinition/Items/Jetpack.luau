@@ -48,7 +48,7 @@ local item: Types.ItemDefinition = {
 	Name = "Jetpack",
 	Description = "Fly around, while fuel lasts.",
 
-	Icon = "rbxassetid://447051857",
+	Icon = "rbxassetid://17576355326",
 
 	CreditCost = 1,
 	MaxStock = 1,
