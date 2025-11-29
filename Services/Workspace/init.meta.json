@@ -5,7 +5,7 @@
       "BinaryString": "AQ0ABPf5//8HRGVmYXVsdAEEefj//xRQbGF5ZXJDaGFyYWN0ZXJQYXJ0cwIEdfn//wdDb3Jwc2VzAwQS4P//BkJvdW5kcwQE//f//xBTdHVkaW9TZWxlY3RhYmxlBQRX8P//EFdlYXBvbkhpdFRhcmdldHMGBHf5//8MRHJvcHBlZEl0ZW1zBwSR4P//DlNoYXR0ZXJlZEdsYXNzCARV8f//CEdyZW5hZGVzCQQQ4P//ClJhZGFyUG9pbnQKBBDg//8RUGxheWVyQWNjZXNzb3JpZXMLBEfw//8MTW91c2VJbmZvUmF5DAR3+f//DUludGVyYWN0YWJsZXM="
     },
     "FallenPartsDestroyHeight": -500,
-    "Gravity": 80,
+    "Gravity": 50,
     "MeshPartHeadsAndAccessories": "Enabled",
     "PhysicsSteppingMethod": "Adaptive",
     "PlayerCharacterDestroyBehavior": "Enabled",
