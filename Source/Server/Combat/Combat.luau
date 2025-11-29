@@ -486,11 +486,15 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			local force = request.Direction * item.Definition.ProjectileSpeed * GetAssemblyMass(projectile)
 			projectile:ApplyImpulse(force)
 
-			task.delay(0.05, function()
-				projectile.Touched:Once(function(part)
-					onPartHit(item, by, part, projectile.Position, nil, request.Origin)
-					projectile:Destroy()
-				end)
+			local char = by:GetCharacter()
+
+			local startTime = os.clock()
+			projectile.Touched:Connect(function(part)
+				if os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char) then
+					return
+				end
+				onPartHit(item, by, part, projectile.Position, nil, request.Origin)
+				projectile:Destroy()
 			end)
 		end
 	end
