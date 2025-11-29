@@ -127,7 +127,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 		StartingItems = {
 			Items["DNAScanner"],
 			Items["Ballistic Vest"],
-			Items["Jetpack"],
 		},
 
 		EquipmentShop = {
@@ -141,6 +140,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Binoculars"],
 			Items["Flashbang"],
 			Items["FreezeGrenade"],
+			Items["Jetpack"],
 		},
 
 		AwardCreditsToRolesOnDeath = {
