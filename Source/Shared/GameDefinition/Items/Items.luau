@@ -19,6 +19,7 @@ local Disguiser = require(script.Parent.Disguiser)
 local FlareGun = require(script.Parent.FlareGun)
 local FreezeGrenade = require(script.Parent.FreezeGrenade)
 local IncendiaryGrenade = require(script.Parent.IncendiaryGrenade)
+local Jetpack = require(script.Parent.Jetpack)
 local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local MelonLauncher = require(script.Parent.MelonLauncher)
@@ -1006,6 +1007,8 @@ items.Radar = Radar
 items.Defuser = Defuser
 
 items.Binoculars = Binoculars.Item
+
+items.Jetpack = Jetpack.Item
 
 items["Ballistic Vest"] = BallisticVest.Item
 
