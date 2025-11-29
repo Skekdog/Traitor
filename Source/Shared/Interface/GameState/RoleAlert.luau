@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local GetDeterminer = require(ReplicatedStorage.Shared.Grammar.GetDeterminer)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
@@ -24,6 +25,7 @@ participant.Role:Connect(function(role)
 	UI:FindFirstChild("HintLabel").Text = role.Definition.Description
 	UI:FindFirstChild("RoleLabel").Text = GetDisplayName(role.Definition)
 	UI:FindFirstChild("RoleLabel").TextColor3 = role.Definition.Color
+	UI.TextLabel.Text = "You are " .. GetDeterminer(GetDisplayName(role.Definition)) .. "..."
 
 	ui:ToggleVisible(true)
 	task.delay(5, ui.ToggleVisible, ui, false)
