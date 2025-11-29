@@ -20,6 +20,12 @@ local function toggleJetpack(velocity: LinearVelocity): ()
 	visualsRemote:FireServer(velocity.Enabled)
 end
 
+local function getUi()
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+	local ui: typeof(UIManager.RegisterUI(script.JetpackFuel)) = UIManager.TryGetUI("JetpackFuel") :: typeof(UIManager.RegisterUI(script.JetpackFuel))? or UIManager.RegisterUI(script.JetpackFuel)
+	return ui
+end
+
 local velocity: LinearVelocity?
 if RunService:IsClient() then
 	RunService.Heartbeat:Connect(function(dt)
@@ -35,6 +41,8 @@ if RunService:IsClient() then
 		else
 			fuel = math.min(MAX_FUEL, fuel + FUEL_RECHARGE_RATE * dt)
 		end
+
+		getUi().Object.Background.Size = UDim2.fromScale(fuel / MAX_FUEL, 1)
 	end)
 end
 
@@ -73,6 +81,8 @@ local function OnEquipClient(): ()
 		end
 		toggleJetpack(velocity)
 	end)
+
+	getUi():ToggleVisible(true)
 end
 
 local function OnUnequipClient(): ()
@@ -83,6 +93,9 @@ local function OnUnequipClient(): ()
 		velocity:Destroy()
 		velocity = nil
 	end
+
+	getUi():ToggleVisible(false)
+	fuel = MAX_FUEL
 end
 
 local function OnEquipServer(_, participant: Types.Participant): ()
