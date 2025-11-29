@@ -47,7 +47,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			error("Invalid direction for " .. frame.Name)
 		end
 
-		local UI_TRANSITION_TIME = 0.2
+		local UI_TRANSITION_TIME = if isSize then 0.2 else 0.4
 		local UI_SCALE_FACTOR = 0.75
 
 		local scale = frame:FindFirstChild("UIAnimationScale")
