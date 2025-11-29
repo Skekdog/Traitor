@@ -55,7 +55,7 @@ local item: Types.GunWeaponDefinition = {
 	ProjectileSpeed = 100,
 
 	Damage = 50,
-	Spread = 0.03,
+	Spread = 0.01,
 
 	AmmoType = Ammo.MelonLauncher,
 	AttackInterval = 1.5,
