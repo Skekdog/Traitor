@@ -715,6 +715,40 @@ module.givecredits = {
 	end
 }
 
+module.sethealth = {
+	Name = "sethealth",
+	Description = "Sets health of players to a specified value",
+	HasRelaxedPermissions = true,
+	Environment = "Server" :: "Server",
+	Arguments = {"health", "players"},
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
+		end
+
+		local health = processNumberArgument(args[1])
+		if not health then
+			return "Invalid argument 1 health."
+		end
+
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local humanoid = participant:GetHumanoid()
+			if humanoid then
+				humanoid.MaxHealth = math.max(health, humanoid.MaxHealth)
+				humanoid.Health = health
+			end
+		end
+
+		return `Set health to {health} for {getPlayersString(players)}.`
+	end
+}
+
 module.relax = {
 	Name = "relax",
 	Description = "Temporarily grants relaxed command permissions to players.",
