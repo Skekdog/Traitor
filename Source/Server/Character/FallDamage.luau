@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local CalculateFallDamage = require(ReplicatedStorage.Shared.Character.CalculateFallDamage)
 local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
@@ -13,11 +14,10 @@ ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(playe
         return
     end
 
-    if velocity <= 45 then
+    local damage = CalculateFallDamage(velocity)
+    if damage == 0 then
         return
     end
-
-    local damage = (0.00591 * (velocity ^ 2)) + (0.62055 * velocity) - 40
 
     participant:TryTakeDamage({
         Amount = damage,

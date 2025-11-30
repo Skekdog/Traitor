@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local CalculateFallDamage = require(script.Parent.CalculateFallDamage)
 local IsAboveWater = require(script.Parent.IsAboveWater)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
@@ -41,8 +42,10 @@ LocalCharacter.Humanoid:Connect(function(hum)
 		end
 
 		local velocity = math.abs(root.AssemblyLinearVelocity.Y)
+		local damage = CalculateFallDamage(velocity)
 
-		if velocity <= 45 then
+		print(velocity, damage)
+		if damage == 0 then
 			return
 		end
 
