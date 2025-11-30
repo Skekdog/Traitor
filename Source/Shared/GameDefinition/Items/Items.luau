@@ -1272,4 +1272,9 @@ allItems["Isaac Newton"] = modify(guns["Newton Launcher"], "Isaac Newton", {
 
 allItems["Knice"] = require(script.Parent.Knice)
 
+allItems["Meloncholy"] = modify(guns["MelonLauncher"], "Meloncholy", {
+    DisplayName = "Meloncholy",
+    AmmoType = Ammo.Infinite,
+})
+
 return allItems
