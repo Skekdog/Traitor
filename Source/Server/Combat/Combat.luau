@@ -1,3 +1,4 @@
+local PhysicsService = game:GetService("PhysicsService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
@@ -455,8 +456,14 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		end
 
 		if item.Definition.FuseTime < 0 then
-			task.wait(0.05)
-			projectile.Touched:Once(explode)
+			local char = by:GetCharacter()
+			local startTime = os.clock()
+			projectile.Touched:Connect(function(part)
+				if (os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(projectile.CollisionGroup, part.CollisionGroup) then
+					return
+				end
+				explode()
+			end)
 		else
 			task.wait(item.Definition.FuseTime)
 			explode()
@@ -488,7 +495,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 
 			local startTime = os.clock()
 			projectile.Touched:Connect(function(part)
-				if os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char) then
+				if (os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(projectile.CollisionGroup, part.CollisionGroup) then
 					return
 				end
 				onPartHit(item, by, part, projectile.Position, nil, request.Origin)
