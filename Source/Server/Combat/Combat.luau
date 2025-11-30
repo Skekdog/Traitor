@@ -478,6 +478,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			end
 
 			local projectile = item.Definition.Projectile:Clone()
+			projectile.CollisionGroup = "WeaponHitTargets"
 			projectile.Parent = workspace.Projectiles
 
 			projectile:SetNetworkOwner(nil)
