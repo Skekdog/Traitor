@@ -1278,4 +1278,6 @@ allItems["Meloncholy"] = modify(guns["MelonLauncher"], "Meloncholy", {
     AttackInterval = 0.5,
 })
 
+allItems["Flypack"] = require(script.Parent.Flypack).Item
+
 return allItems
