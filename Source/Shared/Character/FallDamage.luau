@@ -43,8 +43,6 @@ LocalCharacter.Humanoid:Connect(function(hum)
 
 		local velocity = math.abs(root.AssemblyLinearVelocity.Y)
 		local damage = CalculateFallDamage(velocity)
-
-		print(velocity, damage)
 		if damage == 0 then
 			return
 		end
