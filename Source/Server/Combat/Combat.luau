@@ -83,6 +83,7 @@ local function validatePrimaryFire(item: Types.AnyItem, by: Types.Participant, o
 	if target then
 		local params = RaycastParams.new()
 		params.FilterDescendantsInstances = {by.Round:GetMap().Structure.Static}
+		params.CollisionGroup = "WeaponHitTargets"
 		params.FilterType = Enum.RaycastFilterType.Include
 		params.IgnoreWater = true
 
