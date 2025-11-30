@@ -6,6 +6,8 @@ local Types = require(ReplicatedStorage.API.Types)
 local Jetpack = {}
 
 local VELOCITY = 20
+local WALKSPEED_BONUS = 2
+
 local MAX_FUEL = 8
 local FUEL_THRESHOLD = 2
 local FUEL_CONSUMPTION_RATE = 2
@@ -16,7 +18,11 @@ local fuel = MAX_FUEL
 local visualsRemote = GetRemote("JetpackVisuals", script)
 
 local function toggleJetpack(velocity: LinearVelocity): ()
+	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
+
 	velocity.Enabled = not velocity.Enabled
+	WalkSpeed.SetModifier("UsingJetpack", if velocity.Enabled then WALKSPEED_BONUS else 0)
+
 	visualsRemote:FireServer(velocity.Enabled)
 end
 
