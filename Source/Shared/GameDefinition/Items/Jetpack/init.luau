@@ -141,6 +141,15 @@ if RunService:IsServer() then
 			assert(particle:IsA("ParticleEmitter"))
 			particle.Enabled = enabled
 		end
+
+		local sound = jetpackModel:FindFirstChild("Thruster", true)
+		if sound and sound:IsA("Sound") then
+			if enabled then
+				sound:Play()
+			else
+				sound:Stop()
+			end
+		end
 	end)
 end
 
