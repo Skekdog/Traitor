@@ -478,13 +478,10 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 			end
 
 			local projectile = item.Definition.Projectile:Clone()
-			projectile.CFrame = CFrame.lookAlong(request.Origin, request.Direction)
 			projectile.Parent = workspace.Projectiles
 
 			projectile:SetNetworkOwner(nil)
-
-			local force = request.Direction * item.Definition.ProjectileSpeed * GetAssemblyMass(projectile)
-			projectile:ApplyImpulse(force)
+			by:TryThrowAssembly(projectile, item.Definition.ProjectileSpeed, nil, request.Origin, request.Direction)
 
 			local char = by:GetCharacter()
 
