@@ -86,17 +86,17 @@ guns.HUGE = {
     ItemGroup = ItemGroups.Primary,
     CanDrop = true,
 
-    Spread = 0.04,
+    Spread = 0.1,
     HasMuzzleFlash = true,
 
     Damage = {
-        Head = 15,
-        Body = 10,
-        Limb = 5,
+        Head = 10,
+        Body = 5,
+        Limb = 2,
     },
 
     AimFOV = 60,
-    AimSpreadMultiplier = 0.3,
+    AimSpreadMultiplier = 0.9,
 
     AttackInterval = 0.01,
     ReloadTime = 0,
@@ -113,8 +113,8 @@ guns.HUGE = {
 
     AttackSound = firedSounds("HUGE"),
 
-    RecoilX = 1,
-    RecoilY = 2,
+    RecoilX = 1.5,
+    RecoilY = 2.5,
 
     AmmoType = Ammo.HUGE,
 
