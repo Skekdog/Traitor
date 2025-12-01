@@ -250,7 +250,7 @@ function module.Show(item: Types.AnyItemDefinition): ()
         renderCon:Disconnect()
     end
 
-    renderCon = RunService.RenderStepped:Connect(function(dt: number)
+    renderCon = RunService.PreRender:Connect(function(dt: number)
         local timeNow = os.clock()
 
         breathingSpring.target = Vector3.new(math.cos(timeNow) / 2, math.cos(timeNow), math.cos(timeNow) / 2) / 5
