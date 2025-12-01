@@ -442,7 +442,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		projectile.Anchored = false
 		projectile.CollisionGroup = "Grenades"
 
-		by:TryThrowAssembly(projectile, 45, workspace.Projectiles, request.Origin, request.Direction, true)
+		by:TryThrowAssembly(projectile, 35, workspace.Projectiles, request.Origin, request.Direction, true)
 
 		local function explode()
 			projectile:Destroy()
