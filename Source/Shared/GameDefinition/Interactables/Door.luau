@@ -13,7 +13,6 @@ local definition: Types.InteractableDefinition = {
 	Name = "Door",
 	InteractionRange = 7.5,
 	IsContinuousInteraction = false,
-	Model = Instance.new("Part"),
 
 	OnLoadClient = function(interactable: Types.Interactable): ()
 		setLockedHint(interactable)
