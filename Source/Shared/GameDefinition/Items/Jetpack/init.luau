@@ -8,22 +8,36 @@ local Jetpack = {}
 local VELOCITY = 20
 local WALKSPEED_BONUS = 2
 
-local MAX_FUEL = 8
-local FUEL_THRESHOLD = 2
-local FUEL_CONSUMPTION_RATE = 2
+local MAX_FUEL = 5
+local FUEL_THRESHOLD = 1
+local FUEL_CONSUMPTION_RATE = 5
 local FUEL_RECHARGE_RATE = 0.5
+local RECHARGE_COOLDOWN = 0.5
 
 local fuel = MAX_FUEL
 
 local visualsRemote = GetRemote("JetpackVisuals", script)
 
-local function toggleJetpack(velocity: LinearVelocity): ()
+local lastUseTime = 0
+local function toggleJetpack(velocity: LinearVelocity?, enable: boolean): ()
 	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 
-	velocity.Enabled = not velocity.Enabled
-	WalkSpeed.SetModifier("UsingJetpack", if velocity.Enabled then WALKSPEED_BONUS else 0)
+	if not velocity then
+		return
+	end
 
-	visualsRemote:FireServer(velocity.Enabled)
+	if enable == velocity.Enabled or enable and fuel < FUEL_THRESHOLD then
+		return
+	end
+
+	if not enable then
+		lastUseTime = os.clock()
+	end
+
+	velocity.Enabled = enable
+	WalkSpeed.SetModifier("UsingJetpack", if enable then WALKSPEED_BONUS else 0)
+
+	visualsRemote:FireServer(enable)
 end
 
 local function getUi()
@@ -42,9 +56,12 @@ if RunService:IsClient() then
 		if velocity.Enabled then
 			fuel = math.max(0, fuel - FUEL_CONSUMPTION_RATE * dt)
 			if fuel <= 0 then
-				toggleJetpack(velocity)
+				toggleJetpack(velocity, false)
 			end
 		else
+			if os.clock() - lastUseTime < RECHARGE_COOLDOWN then
+				return
+			end
 			fuel = math.min(MAX_FUEL, fuel + FUEL_RECHARGE_RATE * dt)
 		end
 
@@ -54,7 +71,7 @@ end
 
 local function OnEquipClient(): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-	local CustomActions = require(ReplicatedStorage.API.CustomActions)
+	local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 
 	local root = LocalCharacter.RootPart()
 	if not root then
@@ -81,12 +98,21 @@ local function OnEquipClient(): ()
 	velocity.Attachment0 = attachment
 	velocity.Parent = root
 
-	CustomActions.Register("Jetpack", function()
-		if not velocity or not velocity.Enabled and fuel < FUEL_THRESHOLD then
-			return
+	ControlManager.Register("Jetpack", function(_, state)
+		if state == Enum.UserInputState.Begin then
+			toggleJetpack(velocity, true)
+		else
+			toggleJetpack(velocity, false)
 		end
-		toggleJetpack(velocity)
-	end)
+
+		return Enum.ContextActionResult.Pass
+	end, nil, {
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.Space,
+			ConsoleKeybind = Enum.KeyCode.ButtonA,
+		},
+		Toggled = false,
+	})
 
 	getUi():ToggleVisible(true)
 end
