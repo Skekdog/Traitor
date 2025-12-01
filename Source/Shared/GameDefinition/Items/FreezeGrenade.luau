@@ -90,7 +90,6 @@ local item: Types.GrenadeWeaponDefinition = {
 
 	FuseTime = -1,
 	Projectile = ReplicatedStorage.Assets.WeaponModels.FreezeGrenade :: BasePart,
-	ProjectileForce = 100,
 
 	OnHitClient = OnHitClient,
 

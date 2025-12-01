@@ -850,8 +850,6 @@ grenades.Grenade = {
 
     FuseTime = 5,
 
-    ProjectileForce = 0.75,
-
     AttackSound = firedSounds("Grenade"),
 }
 
@@ -913,8 +911,6 @@ grenades.Flashbang = {
 
     FuseTime = 3,
 
-    ProjectileForce = 30,
-
     AttackSound = firedSounds("Grenade"),
 }
 
@@ -957,7 +953,6 @@ grenades["Smoke Grenade"] = {
     FuseTime = 3,
 
     Projectile = models("Smoke Grenade"),
-    ProjectileForce = 60,
 
     AttackSound = firedSounds("Grenade"),
 }
@@ -984,8 +979,6 @@ grenades["Discombobulator"] = {
     OnHitClient = Discombobulate,
 
     FuseTime = 3,
-
-    ProjectileForce = 60,
 
     AttackSound = firedSounds("Grenade"),
 }
