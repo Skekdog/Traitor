@@ -49,19 +49,23 @@ function EquipmentMenu.RemovePage(page: GuiObject): ()
 	end
 
 	if currentPage == page then
+		currentPage = nil
+
 		local nextPage: GuiObject?
+		local bestLayoutOrder = math.huge
 		for _, p in ui.Object.Page:GetChildren() do
-			if p:IsA("GuiObject") then
+			if p:IsA("GuiObject") and p.LayoutOrder < bestLayoutOrder then
+				bestLayoutOrder = p.LayoutOrder
 				nextPage = p
-				break
 			end
 		end
 
 		if nextPage then
+			currentPage = nextPage
 			UIAnimation.TransitionUIPage(page, nextPage, UDim2.fromScale(0.5, 0))
 		end
 
-		currentPage = nil
+		assert(currentPage, "Failed to set new page after removing previous page")
 	end
 
 	page.Parent = nil
