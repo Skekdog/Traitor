@@ -107,6 +107,9 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 				end
 			else
 				object.Visible = newVisible
+				if callback then
+					callback(Enum.PlaybackState.Completed)
+				end
 			end
 
 			if ignoreOtherUIs or self.Layer ~= "Popup" or self.Object:GetAttribute("IgnoreStacking") then
@@ -134,7 +137,7 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 			end
 			ControlManager.Unregister(self.Name)
 			self:ToggleVisible(false, true, function()
-				self.Object.Parent = UIManager.UnregisteredUIs
+				object.Parent = UIManager.UnregisteredUIs
 			end)
 
 			if self.Sidebar then
