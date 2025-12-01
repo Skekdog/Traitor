@@ -17,11 +17,16 @@ image.ImageTransparency = 1
 image.Name = "FreezeOverlay"
 image:SetAttribute("Layer", "HUD")
 
+local function getUi()
+	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+	local ui: typeof(UIManager.RegisterUI(image)) = UIManager.TryGetUI("JetpackFuel") :: typeof(UIManager.RegisterUI(image))? or UIManager.RegisterUI(image)
+	return ui
+end
+
 local currentFreezeId: never & {}
 local function OnHitClient(item: Types.AnyItemDefinition): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
-	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 	local root = LocalCharacter.RootPart()
 	if not root then
@@ -33,7 +38,7 @@ local function OnHitClient(item: Types.AnyItemDefinition): ()
 
 	PlaySound(6092902279)
 
-	local ui = UIManager.RegisterUI(image)
+	getUi():ToggleVisible(true)
 
 	TweenService:Create(image, TweenInfo.new(0.5), {ImageTransparency = 0}):Play()
 
@@ -65,7 +70,10 @@ local function OnHitClient(item: Types.AnyItemDefinition): ()
 
 		local tween = TweenService:Create(image, TweenInfo.new(0.5), {ImageTransparency = 1})
 		tween.Completed:Once(function()
-			ui:Unregister()
+			if currentFreezeId ~= thisFreezeId then
+				return
+			end
+			getUi():ToggleVisible(false)
 		end)
 		tween:Play()
 	end)
