@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
@@ -113,6 +114,29 @@ local function OnEquipClient(): ()
 		},
 		Toggled = false,
 	})
+
+	do
+		local touchGui = Players.LocalPlayer.PlayerGui:FindFirstChild("TouchGui")
+		if not touchGui then
+			return
+		end
+
+		local touchControlFrame = touchGui:FindFirstChild("TouchControlFrame")
+		if not touchControlFrame then
+			return
+		end
+
+		local jumpButton = touchControlFrame:FindFirstChild("JumpButton")
+		if not jumpButton then
+			return
+		end
+
+		assert(jumpButton:IsA("GuiButton"), "What")
+
+		jumpButton:GetPropertyChangedSignal("GuiState"):Connect(function()
+			toggleJetpack(velocity, jumpButton.GuiState == Enum.GuiState.Press)
+		end)
+	end
 
 	getUi():ToggleVisible(true)
 end
