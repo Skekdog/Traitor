@@ -81,7 +81,7 @@ end
 local function removeSound(index: number): ()
 	if RunService:IsClient() then
 		local sound = sounds[index].Sound
-		local button = page:FindFirstChild("Button_" .. if typeof(sound) == "table" then sound[1].Name else sound.Name)
+		local button = page.ScrollingFrame:FindFirstChild("Button_" .. if typeof(sound) == "table" then sound[1].Name else sound.Name)
 		if button then
 			button:Destroy()
 		end
