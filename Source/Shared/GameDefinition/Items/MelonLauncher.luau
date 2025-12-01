@@ -39,7 +39,7 @@ local item: Types.GunWeaponDefinition = {
 	Model = ReplicatedStorage.Assets.WeaponModels.MelonLauncher,
 	HoldAnimation = "rbxassetid://10247529531",
 
-	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.MelonLauncher,
+	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired["Melon Launcher"],
 
 	CanDrop = true,
 	CreditCost = 1,
