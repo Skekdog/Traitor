@@ -50,7 +50,6 @@ end
 if RunService:IsClient() then
 	local EquipmentMenu = require(ReplicatedStorage.Shared.Interface.EquipmentMenu)
 	addMenuRemote.OnClientEvent:Connect(function(enabled: boolean): ()
-		print(enabled)
 		if enabled then
 			EquipmentMenu.AddPage(page)
 		else
@@ -298,10 +297,8 @@ local function OnLoadServer(interactable: Radio): ()
 	end)
 
 	if interactable.Extras.Player then
-		print("yay")
 		addMenuRemote:FireClient(interactable.Extras.Player, true)
 	end
-	print("okay")
 	table.insert(activeRadios, interactable)
 end
 
