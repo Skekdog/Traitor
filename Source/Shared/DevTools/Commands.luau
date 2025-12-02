@@ -715,6 +715,33 @@ module.givecredits = {
 	end
 }
 
+module.spawndummy = {
+	Name = "spawndummy",
+	Description = "Spawns a test dummy that can be damaged.",
+	HasRelaxedPermissions = true,
+	Environment = "Server" :: "Server",
+	Arguments = {"at players"},
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return `Player {args[1]} not found.`
+		end
+
+		for _, player in players do
+			if not player.Character then
+				continue
+			end
+
+			local dummy = ReplicatedStorage.Assets.TestDummy:Clone()
+			dummy:PivotTo(player.Character:GetPivot())
+
+			dummy.Parent = round:GetMap().Structure.Dynamic :: any
+		end
+
+		return `Spawned test dummy at {getPlayersString(players)}.`
+	end
+}
+
 module.sethealth = {
 	Name = "sethealth",
 	Description = "Sets health of players to a specified value",
