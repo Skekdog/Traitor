@@ -193,7 +193,7 @@ local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
 	clientControl.AlignPosition:Destroy()
 	clientControl = nil
 
-	UpdateItemHint(module.Item, "primary", "Push Prop")
+	UpdateItemHint((module :: any).Item, "primary", "Push Prop")
 end
 
 if RunService:IsClient() then
