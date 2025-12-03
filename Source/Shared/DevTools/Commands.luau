@@ -651,6 +651,54 @@ module.spawninteractable = {
 	end
 }
 
+module.spawnitem = {
+	Name = "spawnitem",
+	Description = "Spawns an item at players",
+	HasRelaxedPermissions = true,
+	Environment = "Server" :: "Server",
+	Arguments = {"item name", "players"},
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
+		end
+
+		local itemName = processStringArgument(args[1])
+		if not itemName then
+			return "Missing argument 1 item name."
+		end
+
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local char = participant:GetCharacter()
+			if not char then
+				continue
+			end
+
+			local item = round:GetItemDefinition(itemName)
+			if not item then
+				return `Item {itemName} not found.`
+			end
+
+			if not item.Model then
+				return `Item has no model and cannot be spawned, consider using giveitem instead.`
+			end
+
+			local model = item.Model:Clone()
+			model:PivotTo(char:GetPivot())
+			model:AddTag("Item")
+			model:AddTag("Prop");
+			(model :: Instance).Parent = round:GetMap().Structure.Dynamic
+		end
+
+		return `Spawned {itemName} at {getPlayersString(players)}.`
+	end
+}
+
 module.giveitem = {
 	Name = "giveitem",
 	Description = "Gives an item to players",
