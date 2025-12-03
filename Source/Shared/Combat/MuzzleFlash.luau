@@ -1,4 +1,4 @@
-                    return function(gun: BasePart): ()
+return function(gun: BasePart): ()
     local attachment = gun:FindFirstChild("MuzzleFlash")
     if not attachment or not attachment:IsA("Attachment") then
         return
