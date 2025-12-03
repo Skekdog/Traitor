@@ -175,6 +175,7 @@ local function clientGetProp(part: BasePart): Types.MapObject?
 end
 
 local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
+	local UpdateItemHint = require(ReplicatedStorage.API.UpdateItemHint)
 	if not clientControl then
 		return
 	end
@@ -191,6 +192,8 @@ local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
 
 	clientControl.AlignPosition:Destroy()
 	clientControl = nil
+
+	UpdateItemHint(module.Item, "primary", "Push Prop")
 end
 
 if RunService:IsClient() then
@@ -215,9 +218,14 @@ local function destroyRope(part: BasePart): ()
 end
 
 local function clientGrab(part: BasePart): ()
+	local UpdateItemHint = require(ReplicatedStorage.API.UpdateItemHint)
 	local prop = clientGetProp(part)
 	if not prop or not canGrab(prop) then
 		return
+	end
+
+	if prop:HasTag("Corpse") then
+		UpdateItemHint(module.Item, "primary", "Pin Limb")
 	end
 
 	grabRemote:FireServer(part)
