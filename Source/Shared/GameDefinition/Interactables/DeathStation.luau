@@ -52,11 +52,15 @@ local function BeforeTakeDamage(interactable: DeathStationServer, params: Types.
 	return not attacker:GetRole().Definition.IsEvil
 end
 
+local model = ReplicatedStorage.Assets.InteractableModels.HealthStation:Clone()
+model.Name = "DeathStation"
+model.Parent = ReplicatedStorage.Assets.InteractableModels
+
 local interactable: Types.InteractableDefinition = {
 	Name = "DeathStation",
 	DisplayName = "Health Station",
 
-	Model = ReplicatedStorage.Assets.InteractableModels.HealthStation,
+	Model = model,
 
 	InteractionRange = 7.5,
 	IsContinuousInteraction = true,
