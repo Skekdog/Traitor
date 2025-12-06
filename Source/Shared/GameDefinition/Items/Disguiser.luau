@@ -115,15 +115,15 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 			new.Parent = char
 		end
 		if applyReset then
-			hum:ApplyDescriptionResetAsync(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+			hum:ApplyDescriptionReset(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
 		else
-			hum:ApplyDescriptionAsync(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
+			hum:ApplyDescription(DISGUISED_DESCRIPTION, Enum.AssetTypeVerification.Always)
 		end
 	elseif foundDescription then
 		if applyReset then
-			hum:ApplyDescriptionResetAsync(foundDescription, Enum.AssetTypeVerification.Always)
+			hum:ApplyDescriptionReset(foundDescription, Enum.AssetTypeVerification.Always)
 		else
-			hum:ApplyDescriptionAsync(foundDescription, Enum.AssetTypeVerification.Always)
+			hum:ApplyDescription(foundDescription, Enum.AssetTypeVerification.Always)
 		end
 	end
 
