@@ -63,7 +63,7 @@ local item: Types.GunWeaponDefinition = {
 	ReloadTime = 0,
 
 	Model = ReplicatedStorage.Assets.WeaponModels.NyanGun,
-	HoldAnimation = "rbxassetid://10247380824",
+	HoldAnimation = "rbxassetid://12481091962",
 
 	Projectile = ReplicatedStorage.Assets.Projectiles.NyanBullet,
 	ProjectileSpeed = 280,
