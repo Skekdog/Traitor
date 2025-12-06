@@ -52,7 +52,7 @@ local framedRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Solo"},
 
-	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"], Items.Radar, Items.Intel},
+	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"], Items.Radar, Items.Intel, Items.NyanGun},
 	StartingItems = {Items.TargetChecker, Items.Mirror, Items.Crowbar},
 
 	WalkSpeed = 18,
@@ -74,7 +74,7 @@ local policeRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
-	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"]},
+	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"], Items.NyanGun},
 	StartingItems = {Items.PoliceBadge},
 
 	WalkSpeed = 18,
@@ -98,7 +98,7 @@ local undercoverRole: Types.RoleDefinition = {
 
 	WalkSpeed = 18,
 
-	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"]},
+	EquipmentShop = {Items.Flashbang, Items.AWP, Items["Newton Launcher"], Items.UMP, Items["Ballistic Vest"], Items.NyanGun},
 	StartingItems = {Items.FakeTargetChecker, Items.PoliceBadge},
 
 	Allies = {"Police", "Undercover"},
