@@ -46,6 +46,9 @@ local item: Types.GunWeaponDefinition = {
 	DisplayName = "Nyan Gun",
 	Description = "Because a cat gun is unethical.",
 
+	CreditCost = 1,
+	MaxStock = 4,
+
 	ItemGroup = ItemGroups.RoleWeapon,
 	CanDrop = true,
 
