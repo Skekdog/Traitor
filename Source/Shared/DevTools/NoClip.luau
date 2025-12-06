@@ -8,10 +8,10 @@ local module = {}
 
 local SPEED = 1
 
-local isEnabled = false
+module.IsEnabled = false
 
 local function tryMove(dt: number): ()
-	if not isEnabled then
+	if not module.IsEnabled then
 		return
 	end
 
@@ -34,10 +34,10 @@ local function trySetupCharacter(root: BasePart, hum: Humanoid): ()
 		return
 	end
 
-	root.Anchored = isEnabled
-	hum.PlatformStand = isEnabled
+	root.Anchored = module.IsEnabled
+	hum.PlatformStand = module.IsEnabled
 
-	if not isEnabled then
+	if not module.IsEnabled then
 		root.AssemblyLinearVelocity = Vector3.zero
 	end
 end
@@ -45,8 +45,8 @@ end
 RunService.PreSimulation:Connect(tryMove)
 
 function module.Enable(enabled: boolean?): boolean
-	if isEnabled == enabled then
-		return isEnabled
+	if module.IsEnabled == enabled then
+		return module.IsEnabled
 	end
 
 	local root = LocalCharacter.RootPart()
@@ -55,21 +55,21 @@ function module.Enable(enabled: boolean?): boolean
 		return false
 	end
 
-	isEnabled = if enabled == nil then not isEnabled else enabled
+	module.IsEnabled = if enabled == nil then not module.IsEnabled else enabled
 	trySetupCharacter(root, hum)
 
-	if isEnabled then
+	if module.IsEnabled then
 		FreeInput.StartCapture()
 	else
 		FreeInput.StopCapture()
 	end
 
-	if not isEnabled then
+	if not module.IsEnabled then
 		hum:ChangeState(Enum.HumanoidStateType.Running)
 		task.delay(0, hum.ChangeState, hum, Enum.HumanoidStateType.Freefall)
 	end
 
-	return isEnabled
+	return module.IsEnabled
 end
 
 Players.LocalPlayer.CharacterRemoving:Connect(function()

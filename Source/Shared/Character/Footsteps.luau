@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local NoClip = require(ReplicatedStorage.Shared.DevTools.NoClip)
 local FootstepIDs = require(script.Parent.FootstepIDs)
 local IsAboveWater = require(script.Parent.IsAboveWater)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
@@ -65,6 +66,10 @@ end
 local function doFootstep(state: PlayerState): ()
 	local hum, root, currentSound, lastMaterial = state.Humanoid, state.Root, state.CurrentSound, state.LastMaterial
 	if not hum or not root then
+		return stopSound(currentSound)
+	end
+
+	if state.Player == Players.LocalPlayer and NoClip.IsEnabled then
 		return stopSound(currentSound)
 	end
 
