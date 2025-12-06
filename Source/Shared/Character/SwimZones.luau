@@ -181,7 +181,7 @@ local function startSwimming(zone: BasePart): ()
 	end))
 end
 
-RunService.Heartbeat:Connect(function(dt)
+RunService.PreSimulation:Connect(function(dt)
 	if not root or not hum then
 		return
 	end
@@ -264,7 +264,7 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 
 	if isSwimming then
-		local velocity = root.AssemblyLinearVelocity
+		local velocity = root.AssemblyLinearVelocity * ((1 / 60) / dt)
 
 		if shouldRecalculateForces or assemblyMass ~= root.AssemblyMass then
 			recalculateForces(root, hum)
