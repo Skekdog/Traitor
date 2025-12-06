@@ -181,6 +181,10 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 	if (item.Kind == "Item" or item.Kind == "Melee") and (item.Definition.AlternateFireClient or item.Definition.AlternateFireServer) then
 		ControlManager.Register("Alternate Fire", function(_, _, input)
+			if item.Definition.OnAlternateActivateClient then
+				(item.Definition :: any).OnAlternateActivateClient(item)
+			end
+
 			local stop = false
 			while not stop and ClientInventory.EquippedItem() == item and (if item.Kind == "Item" and item.Definition.AlternateToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End) and input.UserInputState ~= Enum.UserInputState.Cancel do
 				task.wait()
@@ -228,12 +232,20 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				end
 			end
 
+			if item.Definition.OnAlternateDeactivateClient then
+				(item.Definition :: any).OnAlternateDeactivateClient(item)
+			end
+
 			return Enum.ContextActionResult.Pass
 		end)
 	end
 
 	if (item.Kind == "Item" and (item.Definition.PrimaryFireClient or item.Definition.PrimaryFireServer)) or item.Kind == "Grenade" or item.Kind == "Gun" or item.Kind == "Melee" then
 		ControlManager.Register("Primary Fire", function(_, _, input)
+			if item.Definition.OnActivateClient then
+				(item.Definition :: any).OnActivateClient(item)
+			end
+
 			local stop = false
 			while not stop and ClientInventory.EquippedItem() == item and (if item.Kind == "Item" and item.Definition.PrimaryToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End) and input.UserInputState ~= Enum.UserInputState.Cancel do
 				task.wait()
@@ -417,6 +429,10 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				if item.Kind == "Grenade" then
 					break
 				end
+			end
+
+			if item.Definition.OnDeactivateClient then
+				(item.Definition :: any).OnDeactivateClient(item)
 			end
 
 			return Enum.ContextActionResult.Pass

@@ -24,6 +24,7 @@ local Knife = require(script.Parent.Knife)
 local MagnetoStick = require(script.Parent.MagnetoStick)
 local MelonLauncher = require(script.Parent.MelonLauncher)
 local NewtonLauncher = require(script.Parent.NewtonLauncher)
+local NyanGun = require(script.Parent.NyanGun)
 local Poltergeist = require(script.Parent.Poltergeist)
 local Radar = require(script.Parent.Radar)
 local Teleporter = require(script.Parent.Teleporter)
@@ -464,6 +465,8 @@ guns.AWP = {
 		}
 	)
 }
+
+guns.NyanGun = NyanGun.Item
 
 guns["Assault Rifle"] = {
     Kind = "Gun" :: "Gun",
