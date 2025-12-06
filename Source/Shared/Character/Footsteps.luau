@@ -72,6 +72,10 @@ local function doFootstep(state: PlayerState): ()
 		return stopSound(currentSound)
 	end
 
+	if hum:GetState() == Enum.HumanoidStateType.Swimming then
+		return stopSound(currentSound)
+	end
+
 	local newMaterial = getFloorMaterial(hum, root)
 
 	if hum:GetAttribute("IsCrouching") and newMaterial ~= Enum.Material.Water then
