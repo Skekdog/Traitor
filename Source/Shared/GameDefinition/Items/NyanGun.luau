@@ -45,6 +45,7 @@ local item: Types.GunWeaponDefinition = {
 	Name = "NyanGun",
 	DisplayName = "Nyan Gun",
 	Description = "Because a cat gun is unethical.",
+	Icon = "rbxassetid://83079381",
 
 	CreditCost = 1,
 	MaxStock = 4,
