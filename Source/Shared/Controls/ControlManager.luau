@@ -47,7 +47,7 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 		elseif keycode == Enum.KeyCode.LeftAlt then
 			return "Alt"
 		elseif keycode == Enum.KeyCode.RightControl then
-			return "RAlt"
+			return "RCtrl"
 		elseif keycode == Enum.KeyCode.RightShift then
 			return "RShift"
 		elseif keycode == Enum.KeyCode.RightAlt then
