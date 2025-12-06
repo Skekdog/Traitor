@@ -60,7 +60,7 @@ function Round.Config.OnCharacterAdded(round: Types.Round, participant: Types.Pa
 end
 
 function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, params: Types.DamageParams): boolean
-    if typeof(params.Source) == "table" and params.Source.Kind == "Melee" then
+    if typeof(params.Source) == "table" and (params.Source.Kind == "Melee" or params.Source.Kind == "Gun") then
         return true
     end
 

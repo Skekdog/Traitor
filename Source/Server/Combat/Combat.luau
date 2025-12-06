@@ -220,13 +220,13 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 		Impulse.ApplyImpulse(hitPart, assert(impulse), true, hitPosition, by)
 	end
 
-	if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
+	if hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
 		for _, v in Players:GetPlayers() do
 			if v ~= by.Player then
 				PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, hitPosition, nil, {
 					RollOffMinDistance = 0,
-					RollOffMaxDistance = 15,
-				})
+					RollOffMaxDistance = 20,
+				}, v)
 			end
 		end
 	end

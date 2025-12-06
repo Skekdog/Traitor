@@ -325,8 +325,10 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 								BulletTracer(item.Definition.Projectile, item.Definition.ProjectileSpeed or 100, result.Origin, targetPosition)
 							end
 
-							if item.Kind == "Melee" and hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
-								PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, targetPosition or hitPart.Position)
+							if hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
+								PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, targetPosition or hitPart.Position, nil, {
+									RollOffMaxDistance = 20,
+								})
 							end
 
 							if not part then
