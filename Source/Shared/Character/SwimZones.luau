@@ -34,12 +34,6 @@ local function InPart(part: BasePart, pos: Vector3, heightOffset: number): boole
 	return false
 end
 
-local MaterialDensities = {}
-
-for _, mat in Enum.Material:GetEnumItems() do
-	MaterialDensities[mat] = PhysicalProperties.new(mat).Density
-end
-
 local zones: {BasePart} = {}
 local isSwimming = false
 
@@ -114,8 +108,8 @@ local function recalculateForces(root: BasePart, hum: Humanoid): ()
 		end
 
 		if mass ~= 0 then
-			local physicalProperties = v.CustomPhysicalProperties
-			local density = if physicalProperties then physicalProperties.Density else MaterialDensities[v.Material] or 1
+			local physicalProperties = v.CurrentPhysicalProperties
+			local density = physicalProperties.Density
 			local volume = mass / density
 			buoyancyForce += volume * gravity
 			totalVolume += volume
