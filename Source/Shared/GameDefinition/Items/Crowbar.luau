@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
@@ -19,6 +18,52 @@ local function raycast(head: BasePart, direction: Vector3): RaycastResult?
 	params.CollisionGroup = "WeaponHitTargets"
 
 	return workspace:Raycast(head.Position, direction * MAX_DISTANCE, params)
+end
+
+function module.Push(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
+	local char = attacker:GetCharacter()
+	if not char then
+		return
+	end
+
+	local head = char:FindFirstChild("Head")
+	if not head or not head:IsA("BasePart") then
+		return
+	end
+
+	if item.Definition.AttackSound then
+		PlaySound(item.Definition.AttackSound, nil, char.PrimaryPart)
+	end
+
+	local id = assert(tonumber((item.Definition.AttackAnimation):split("://")[2]), "Invalid attack animation: " .. tostring(item.Definition.AttackAnimation))
+	attacker:TryPlayAnimation(id, "MeleeAttack")
+
+	local raycastResult = raycast(head, direction)
+	if not raycastResult then
+		return
+	end
+
+	local hitPart = raycastResult.Instance :: BasePart
+	local model = hitPart:FindFirstAncestorOfClass("Model")
+
+	if not model then
+		return
+	end
+
+	local hitParticipant = attacker.Round:GetParticipant(model.Name)
+	if not hitParticipant then
+		return
+	end
+
+	hitParticipant:SetLastDamagedBy(attacker, RESPONSIBLE_DURATION)
+	if not attacker:HasSelfDefenseAgainstParticipant(hitParticipant) then
+		hitParticipant:AddSelfDefenseEntry({
+			Against = attacker,
+			Duration = RESPONSIBLE_DURATION,
+		})
+	end
+
+	Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, false, nil, attacker)
 end
 
 local item: Types.MeleeWeaponDefinition = {
@@ -55,46 +100,7 @@ local item: Types.MeleeWeaponDefinition = {
 		Threshold = 4,
 	}),
 
-    AlternateFireServer = function(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
-        local char = attacker:GetCharacter()
-        if not char then
-            return
-        end
-
-        local head = char:FindFirstChild("Head")
-        if not head or not head:IsA("BasePart") then
-            return
-        end
-
-		PlaySound(item.Definition.AttackSound :: Sound, nil, char.PrimaryPart, {SoundGroup = SoundService.AllSounds :: SoundGroup})
-
-        local raycastResult = raycast(head, direction)
-		if not raycastResult then
-			return
-		end
-
-		local hitPart = raycastResult.Instance :: BasePart
-		local model = hitPart:FindFirstAncestorOfClass("Model")
-
-		if not model then
-			return
-		end
-
-		local hitParticipant = attacker.Round:GetParticipant(model.Name)
-		if not hitParticipant then
-			return
-		end
-
-		hitParticipant:SetLastDamagedBy(attacker, RESPONSIBLE_DURATION)
-		if not attacker:HasSelfDefenseAgainstParticipant(hitParticipant) then
-			hitParticipant:AddSelfDefenseEntry({
-				Against = attacker,
-				Duration = RESPONSIBLE_DURATION,
-			})
-		end
-
-		Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, false, nil, attacker)
-    end,
+    AlternateFireServer = module.Push,
 
     AlternateToggled = true,
 }
