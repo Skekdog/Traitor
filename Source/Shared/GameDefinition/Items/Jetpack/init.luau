@@ -9,11 +9,11 @@ local Jetpack = {}
 local VELOCITY = 20
 local WALKSPEED_BONUS = 2
 
-local MAX_FUEL = 5
+local MAX_FUEL = 10
 local FUEL_THRESHOLD = 1
 local FUEL_CONSUMPTION_RATE = 5
-local FUEL_RECHARGE_RATE = 0.5
-local RECHARGE_COOLDOWN = 0.5
+local FUEL_RECHARGE_RATE = 0.75
+local RECHARGE_COOLDOWN = 1
 
 local fuel = MAX_FUEL
 
@@ -70,6 +70,29 @@ if RunService:IsClient() then
 	end)
 end
 
+local function tryConnectTouchGui(): ()
+	local touchGui = Players.LocalPlayer.PlayerGui:FindFirstChild("TouchGui")
+	if not touchGui then
+		return
+	end
+
+	local touchControlFrame = touchGui:FindFirstChild("TouchControlFrame")
+	if not touchControlFrame then
+		return
+	end
+
+	local jumpButton = touchControlFrame:FindFirstChild("JumpButton")
+	if not jumpButton then
+		return
+	end
+
+	assert(jumpButton:IsA("GuiButton"), "What")
+
+	jumpButton:GetPropertyChangedSignal("GuiState"):Connect(function()
+		toggleJetpack(velocity, jumpButton.GuiState == Enum.GuiState.Press)
+	end)
+end
+
 local function OnEquipClient(): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
@@ -115,28 +138,7 @@ local function OnEquipClient(): ()
 		Toggled = false,
 	})
 
-	do
-		local touchGui = Players.LocalPlayer.PlayerGui:FindFirstChild("TouchGui")
-		if not touchGui then
-			return
-		end
-
-		local touchControlFrame = touchGui:FindFirstChild("TouchControlFrame")
-		if not touchControlFrame then
-			return
-		end
-
-		local jumpButton = touchControlFrame:FindFirstChild("JumpButton")
-		if not jumpButton then
-			return
-		end
-
-		assert(jumpButton:IsA("GuiButton"), "What")
-
-		jumpButton:GetPropertyChangedSignal("GuiState"):Connect(function()
-			toggleJetpack(velocity, jumpButton.GuiState == Enum.GuiState.Press)
-		end)
-	end
+	tryConnectTouchGui()
 
 	getUi():ToggleVisible(true)
 end
