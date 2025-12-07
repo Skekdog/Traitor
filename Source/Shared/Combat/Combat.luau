@@ -168,13 +168,15 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 			end)
 		end
 
-		ControlManager.Register("Reload Weapon", function(_, state)
-			if state ~= Enum.UserInputState.End then
-				return Enum.ContextActionResult.Pass
-			end
+		if item.Definition.AmmoType.Capacity ~= math.huge and item.Definition.AmmoType.ReserveCapacity ~= 0 then
+			ControlManager.Register("Reload Weapon", function(_, state)
+				if state ~= Enum.UserInputState.End then
+					return Enum.ContextActionResult.Pass
+				end
 
-			return if tryReloadWeapon(item) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
-		end)
+				return if tryReloadWeapon(item) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
+			end)
+		end
 	else
 		ControlManager.Unregister("Reload Weapon")
 	end
