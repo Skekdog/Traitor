@@ -196,7 +196,7 @@ local shopItem: Types.ItemDefinition = {
 	Kind = "Item" :: "Item",
 
 	Name = "Spoon",
-	Description = "Spoon beats crowbar. Also you can eat food to heal.",
+	Description = "Flings people at high speeds, and can be used to eat a healing bowl of soup.",
 	Icon = "",
 
 	CreditCost = 2,
