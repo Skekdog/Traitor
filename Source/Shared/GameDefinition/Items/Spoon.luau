@@ -30,6 +30,8 @@ local function OnEquipClient(item: Types.AnyItem): ()
 			return
 		end
 
+		item.PreventUnequip = true
+
 		remote:FireServer()
 		WalkSpeed.SetModifier("EatSpoon", -math.huge)
 		JumpPower.SetModifier("EatSpoon", false)
@@ -128,7 +130,9 @@ if RunService:IsServer() then
 		bowl.Parent = char :: any
 
 		participant.Extras.IsEatingWithSpoon = true
-		participant:TryPlayAnimation(139173308057702, "SpoonEat")
+		participant:TryPlayAnimation(139173308057702, "SpoonEat");
+
+		(foundItem :: Types.Item).PreventUnequip = true
 
 		local cooldownRequired = participant:GetHealth() < humanoid.MaxHealth
 
@@ -159,7 +163,9 @@ if RunService:IsServer() then
 					participant.Extras.SpoonNextHealAllowedAt = cooldownUntil
 				end
 
-				bowl:Destroy()
+				bowl:Destroy();
+
+				(foundItem :: Types.Item).PreventUnequip = false
 
 				participant:TryStopAnimation("SpoonEat")
 				participant:SetHealth(participant:GetHealth() + HEAL)
@@ -187,6 +193,7 @@ else
 		player.CameraMode = Enum.CameraMode.LockFirstPerson
 
 		if clientItem then
+			clientItem.PreventUnequip = false
 			clientItem.Extras.CooldownUntil = cooldownUntil
 		end
 	end)
