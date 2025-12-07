@@ -404,7 +404,7 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 	end
 
 	if definition.Kind == "Melee" then
-		local id = assert(tonumber((definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(definition.HoldAnimation))
+		local id = assert(tonumber((definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(definition.AttackAnimation))
 		by:TryPlayAnimation(id, "MeleeAttack")
 	end
 
