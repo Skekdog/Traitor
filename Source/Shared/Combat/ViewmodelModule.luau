@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
@@ -25,6 +26,8 @@ module.IsAiming = false
 local shirtCon: RBXScriptConnection?
 local coloursCon: RBXScriptConnection?
 local childCon: RBXScriptConnection?
+
+local isTempHidden = false
 
 local function clearViewmodelAppearanceConnections(): ()
     if shirtCon then
@@ -120,6 +123,40 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
     laser.CFrame = CFrame.lookAt((attachment.WorldPosition + destination) / 2, destination) * CFrame.Angles(math.rad(-90), 0, 0)
 
     ball.Position = destination
+end
+
+local function tempHideViewmodel(): ()
+    isTempHidden = true
+
+    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
+    if not viewmodel then
+        return
+    end
+
+    for _, part in viewmodel:GetDescendants() do
+        if part:IsA("BasePart") then
+            part:SetAttribute("OriginalTransparency", part.Transparency)
+            part.Transparency = 1
+        end
+    end
+end
+
+local function tempShowViewmodel(): ()
+    isTempHidden = false
+
+    local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
+    if not viewmodel then
+        return
+    end
+
+    for _, part in viewmodel:GetDescendants() do
+        if part:IsA("BasePart") then
+            local originalTransparency = part:SetAttribute("OriginalTransparency")
+            if typeof(originalTransparency) == "number" then
+                part.Transparency = originalTransparency
+            end
+        end
+    end
 end
 
 function module.Show(item: Types.AnyItemDefinition): ()
@@ -283,7 +320,19 @@ function module.Show(item: Types.AnyItemDefinition): ()
             laser(viewmodel, item)
         end
     end)
+
+    if isTempHidden then
+        tempHideViewmodel()
+    end
 end
+
+Players.LocalPlayer:GetPropertyChangedSignal("CameraMode"):Connect(function()
+    if Players.LocalPlayer.CameraMode == Enum.CameraMode.Classic then
+        tempHideViewmodel()
+    else
+        tempShowViewmodel()
+    end
+end)
 
 function module.PlayAnimation(uri: string, name: string?): ()
     local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
