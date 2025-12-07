@@ -113,8 +113,10 @@ if RunService:IsServer() then
 		participant.Extras.IsEatingWithSpoon = true
 		participant:TryPlayAnimation(139173308057702, "SpoonEat")
 
+		local cooldownRequired = participant:GetHealth() < humanoid.MaxHealth
+
 		task.spawn(function()
-			for i = 1, 3 do
+			for i = 1, EAT_DURATION do
 				if not participant:IsAlive() or not participant.Extras.IsEatingWithSpoon then
 					return
 				end
@@ -134,6 +136,8 @@ if RunService:IsServer() then
 					RollOffMinDistance = 5,
 				})
 
+				participant:SetHealth(participant:GetHealth() + HEAL / EAT_DURATION)
+
 				task.wait(1)
 			end
 		end)
@@ -143,7 +147,7 @@ if RunService:IsServer() then
 				participant.Extras.IsEatingWithSpoon = false
 
 				local cooldownUntil: number?
-				if participant:GetHealth() < humanoid.MaxHealth then
+				if cooldownRequired then
 					cooldownUntil = workspace:GetServerTimeNow() + EAT_COOLDOWN
 					participant.Extras.SpoonNextHealAllowedAt = cooldownUntil
 				end
