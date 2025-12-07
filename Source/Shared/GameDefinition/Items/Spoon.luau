@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Crowbar = require(script.Parent.Crowbar)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
@@ -31,6 +32,8 @@ local function OnEquipClient(item: Types.AnyItem): ()
 		end
 
 		item.PreventUnequip = true
+		item.PreventPrimaryFire = true
+		item.PreventAlternateFire = true
 
 		remote:FireServer()
 		WalkSpeed.SetModifier("EatSpoon", -math.huge)
@@ -84,6 +87,8 @@ local itemDefinition: Types.MeleeWeaponDefinition = {
 
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
+
+	AlternateFireServer = Crowbar.Push,
 }
 
 if RunService:IsServer() then
@@ -103,6 +108,8 @@ if RunService:IsServer() then
 		if not foundItem or foundItem.Definition ~= itemDefinition then
 			return
 		end
+
+		assert(foundItem.Kind == "Melee")
 
 		local humanoid = participant:GetHumanoid()
 		if not humanoid then
@@ -132,7 +139,9 @@ if RunService:IsServer() then
 		participant.Extras.IsEatingWithSpoon = true
 		participant:TryPlayAnimation(139173308057702, "SpoonEat");
 
-		(foundItem :: Types.Item).PreventUnequip = true
+		foundItem.PreventUnequip = true
+		foundItem.PreventAlternateFire = true
+		foundItem.PreventPrimaryFire = true
 
 		local cooldownRequired = participant:GetHealth() < humanoid.MaxHealth
 
@@ -165,7 +174,9 @@ if RunService:IsServer() then
 
 				bowl:Destroy();
 
-				(foundItem :: Types.Item).PreventUnequip = false
+				foundItem.PreventUnequip = false
+				foundItem.PreventAlternateFire = false
+				foundItem.PreventPrimaryFire = false
 
 				participant:TryStopAnimation("SpoonEat")
 				participant:SetHealth(participant:GetHealth() + HEAL)
@@ -194,6 +205,8 @@ else
 
 		if clientItem then
 			clientItem.PreventUnequip = false
+			clientItem.PreventAlternateFire = false
+			clientItem.PreventPrimaryFire = false
 			clientItem.Extras.CooldownUntil = cooldownUntil
 		end
 	end)
