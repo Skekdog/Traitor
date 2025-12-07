@@ -79,6 +79,7 @@ local roles: {[string]: Types.RoleDefinition} = {
             Items["Radio"],
             Items["Jetpack"],
             Items.NyanGun,
+            Items.Spoon,
         },
 
         CanSeeMissingInAction = true,
