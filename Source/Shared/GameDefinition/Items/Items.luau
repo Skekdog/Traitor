@@ -27,6 +27,7 @@ local NewtonLauncher = require(script.Parent.NewtonLauncher)
 local NyanGun = require(script.Parent.NyanGun)
 local Poltergeist = require(script.Parent.Poltergeist)
 local Radar = require(script.Parent.Radar)
+local Spoon = require(script.Parent.Spoon)
 local Teleporter = require(script.Parent.Teleporter)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -991,8 +992,12 @@ local melees: {[string]: Types.MeleeWeaponDefinition} = {}
 melees.Crowbar = Crowbar.Item
 melees.Knife = Knife
 
+melees.SpoonItem = Spoon.Item
+
 local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item
+
+items.Spoon = Spoon.ShopItem
 
 items.DNAScanner = DNAScanner.Item
 
