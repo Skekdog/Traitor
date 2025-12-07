@@ -7,11 +7,11 @@ local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.
 
 local NyanGun = {}
 
-local equipLoop = PlaySound.MakeSound(7834135677, {Looped = true})
+local equipLoop = PlaySound.MakeSound(7834135677, {Looped = true, Volume = 0.1})
 equipLoop.Name = "NyanEquip"
 equipLoop.Parent = SoundService
 
-local shootLoop = PlaySound.MakeSound(78552787219713, {Looped = true})
+local shootLoop = PlaySound.MakeSound(78552787219713, {Looped = true, Volume = 0.1})
 shootLoop.Name = "NyanShoot"
 shootLoop.Parent = SoundService
 
