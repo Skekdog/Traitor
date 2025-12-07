@@ -7,7 +7,7 @@ local actions: {[number]: string} = {}
 
 local ui = (UIManager.WaitForUI("RoundInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RoundInfo)}).Object
 
-function CustomActions.Register(name: string, callback: () -> (), preferredSlot: number?): ()
+function CustomActions.Register(name: string, callback: () -> (), preferredSlot: number?, displayName: string?): ()
 	assert(preferredSlot == nil or preferredSlot > 0 and preferredSlot < 4, "preferredSlot must be between 1 and 3, or nil")
 
 	for _, action in actions do
@@ -20,7 +20,7 @@ function CustomActions.Register(name: string, callback: () -> (), preferredSlot:
 	actions[slot] = name
 
 	local button = ui.Actions.ButtonTemplate:Clone()
-	button.TextLabel.Text = name
+	button.TextLabel.Text = if displayName then displayName else name
 	button.LayoutOrder = slot
 	button.Name = tostring(slot)
 	button:SetAttribute("Control", "Action " .. slot)
