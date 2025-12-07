@@ -113,6 +113,31 @@ if RunService:IsServer() then
 		participant.Extras.IsEatingWithSpoon = true
 		participant:TryPlayAnimation(139173308057702, "SpoonEat")
 
+		task.spawn(function()
+			for i = 1, 3 do
+				if not participant:IsAlive() or not participant.Extras.IsEatingWithSpoon then
+					return
+				end
+
+				local char = participant:GetCharacter()
+				if not char then
+					return
+				end
+
+				local root = char.PrimaryPart
+				if not root then
+					return
+				end
+
+				PlaySound(3043029786, nil, root, {
+					RollOffMaxDistance = 20,
+					RollOffMinDistance = 5,
+				})
+
+				task.wait(1)
+			end
+		end)
+
 		task.delay(EAT_DURATION, function()
 			if participant:IsAlive() then
 				participant.Extras.IsEatingWithSpoon = false
