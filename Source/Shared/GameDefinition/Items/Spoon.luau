@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
@@ -12,9 +13,18 @@ local remote = GetRemote("Eat", script)
 local function OnEquipClient(): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
+	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
+
+	local player = Players.LocalPlayer
 
 	CustomActions.Register("SpoonEat", function()
 		remote:FireServer()
+		WalkSpeed.SetModifier("EatSpoon", -math.huge)
+		JumpPower.SetModifier("EatSpoon", false)
+
+		player.CameraMinZoomDistance = 10
+		player.CameraMaxZoomDistance = 10
+		player.CameraMode = Enum.CameraMode.Classic
 	end, 3, "Feast")
 
 	WalkSpeed.SetModifier("HoldingSpoon", 3)
@@ -48,7 +58,7 @@ local item: Types.MeleeWeaponDefinition = {
 	AttackSound = attackSound,
 
 	Damage = 30,
-	AttackInterval = 0.6,
+	AttackInterval = 0.75,
 	DamageKind = "Bludgeon" :: "Bludgeon",
 	MaxDistance = 10,
 
@@ -69,7 +79,7 @@ if RunService:IsServer() then
 		local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 
 		local participant = GetParticipant(player)
-		if not participant then
+		if not participant or not participant:IsAlive() then
 			return
 		end
 
@@ -78,7 +88,12 @@ if RunService:IsServer() then
 			return
 		end
 
-		print("yum")
+		local humanoid = participant:GetHumanoid()
+		if not humanoid then
+			return
+		end
+
+		participant:TryPlayAnimation(139173308057702, "SpoonEat")
 	end)
 end
 
