@@ -197,7 +197,7 @@ local shopItem: Types.ItemDefinition = {
 
 	Name = "Spoon",
 	Description = "Flings people at high speeds, and can be used to eat a healing bowl of soup.",
-	Icon = "",
+	Icon = "rbxassetid://10974184304",
 
 	CreditCost = 2,
 	MaxStock = 2,
