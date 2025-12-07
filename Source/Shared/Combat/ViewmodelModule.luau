@@ -151,7 +151,7 @@ local function tempShowViewmodel(): ()
 
     for _, part in viewmodel:GetDescendants() do
         if part:IsA("BasePart") then
-            local originalTransparency = part:SetAttribute("OriginalTransparency")
+            local originalTransparency = part:GetAttribute("OriginalTransparency")
             if typeof(originalTransparency) == "number" then
                 part.Transparency = originalTransparency
             end
