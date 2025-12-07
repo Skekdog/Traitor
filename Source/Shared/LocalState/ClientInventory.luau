@@ -88,7 +88,7 @@ local function tryUnequip(item: Types.AnyItem, force: boolean?): boolean
 		return false
 	end
 
-	if not force and item.Definition.PreventUnequip then
+	if not force and item.PreventUnequip then
 		return false
 	end
 
@@ -200,7 +200,7 @@ local function tryEquip(item: Types.AnyItem): ()
 		end)
 	end
 
-	if item.Definition.CanDrop and not item.Definition.PreventUnequip then
+	if item.Definition.CanDrop and not item.PreventUnequip then
 		ControlManager.Register("Drop", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
