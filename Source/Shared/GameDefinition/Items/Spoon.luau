@@ -2,7 +2,6 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
-local Crowbar = require(script.Parent.Crowbar)
 local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
@@ -80,8 +79,6 @@ local itemDefinition: Types.MeleeWeaponDefinition = {
 	ItemGroup = {
 		PreferredSlot = 1,
 	},
-
-	AlternateFireServer = Crowbar.Push,
 
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
