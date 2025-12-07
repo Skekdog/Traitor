@@ -6,18 +6,31 @@ local Crowbar = require(script.Parent.Crowbar)
 local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
-local Spoonbar = {}
+local Spoon = {}
+
+local EAT_DURATION = 3
+local EAT_COOLDOWN = 10
+local HEAL = 45
+
+local clientItem: Types.MeleeWeapon?
 
 local remote = GetRemote("Eat", script)
 
-local function OnEquipClient(): ()
+local function OnEquipClient(item: Types.AnyItem): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 
+	assert(item.Kind == "Melee")
+	clientItem = item
+
 	local player = Players.LocalPlayer
 
 	CustomActions.Register("SpoonEat", function()
+		if workspace:GetServerTimeNow() < (item.Extras.CooldownUntil or 0) then
+			return
+		end
+
 		remote:FireServer()
 		WalkSpeed.SetModifier("EatSpoon", -math.huge)
 		JumpPower.SetModifier("EatSpoon", false)
@@ -43,7 +56,7 @@ local attackSound = PlaySound.MakeSound(329792582, {
 	RollOffMinDistance = 10,
 })
 
-local item: Types.MeleeWeaponDefinition = {
+local itemDefinition: Types.MeleeWeaponDefinition = {
 	Kind = "Melee" :: "Melee",
 
 	Name = "SpoonItem",
@@ -83,8 +96,12 @@ if RunService:IsServer() then
 			return
 		end
 
+		if participant.Extras.IsEatingWithSpoon or (participant.Extras.SpoonNextHealAllowedAt or 0) > workspace:GetServerTimeNow() then
+			return
+		end
+
 		local foundItem = participant:GetEquippedItem()
-		if not foundItem or foundItem.Definition ~= item then
+		if not foundItem or foundItem.Definition ~= itemDefinition then
 			return
 		end
 
@@ -93,7 +110,47 @@ if RunService:IsServer() then
 			return
 		end
 
+		participant.Extras.IsEatingWithSpoon = true
 		participant:TryPlayAnimation(139173308057702, "SpoonEat")
+
+		task.delay(EAT_DURATION, function()
+			if participant:IsAlive() then
+				participant.Extras.IsEatingWithSpoon = false
+
+				local cooldownUntil: number?
+				if participant:GetHealth() < humanoid.MaxHealth then
+					cooldownUntil = workspace:GetServerTimeNow() + EAT_COOLDOWN
+					participant.Extras.SpoonNextHealAllowedAt = cooldownUntil
+				end
+
+				participant:TryStopAnimation("SpoonEat")
+				participant:SetHealth(participant:GetHealth() + HEAL)
+				remote:FireClient(player, cooldownUntil)
+			end
+		end)
+	end)
+else
+	remote.OnClientEvent:Connect(function(cooldownUntil: number?)
+		local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
+		local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
+		local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
+
+		if LocalParticipantInfo.GetParticipant().Status() ~= "Alive" then
+			return
+		end
+
+		WalkSpeed.SetModifier("EatSpoon", 0)
+		JumpPower.SetModifier("EatSpoon", true)
+
+		local player = Players.LocalPlayer
+
+		player.CameraMinZoomDistance = 128
+		player.CameraMaxZoomDistance = 0.5
+		player.CameraMode = Enum.CameraMode.LockFirstPerson
+
+		if clientItem then
+			clientItem.Extras.CooldownUntil = cooldownUntil
+		end
 	end)
 end
 
@@ -113,11 +170,11 @@ local shopItem: Types.ItemDefinition = {
 			participant:TryDropItem(occupyingItem)
 		end
 
-		participant:GiveItemFromItemDefinition(item)
+		participant:GiveItemFromItemDefinition(itemDefinition)
 	end,
 }
 
-Spoonbar.ShopItem = shopItem
-Spoonbar.Item = item
+Spoon.ShopItem = shopItem
+Spoon.Item = itemDefinition
 
-return Spoonbar
+return Spoon
