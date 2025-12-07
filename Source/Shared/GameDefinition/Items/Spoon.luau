@@ -69,7 +69,7 @@ local itemDefinition: Types.MeleeWeaponDefinition = {
 
 	AttackSound = attackSound,
 
-	Damage = 30,
+	Damage = 45,
 	AttackInterval = 0.75,
 	DamageKind = "Bludgeon" :: "Bludgeon",
 	MaxDistance = 10,
