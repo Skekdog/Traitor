@@ -110,6 +110,26 @@ if RunService:IsServer() then
 			return
 		end
 
+		local char = participant:GetCharacter()
+		if not char then
+			return
+		end
+
+		local root = char.PrimaryPart
+		if not root then
+			return
+		end
+
+		local bowl = ReplicatedStorage.Assets.ItemAssets.SpoonBowl:Clone()
+
+		local motor = Instance.new("Motor6D")
+		motor.Part0 = root
+		motor.Part1 = bowl
+		motor.Parent = bowl
+
+		bowl.Name = "Bowl"
+		bowl.Parent = char :: any
+
 		participant.Extras.IsEatingWithSpoon = true
 		participant:TryPlayAnimation(139173308057702, "SpoonEat")
 
@@ -118,16 +138,6 @@ if RunService:IsServer() then
 		task.spawn(function()
 			for i = 1, EAT_DURATION do
 				if not participant:IsAlive() or not participant.Extras.IsEatingWithSpoon then
-					return
-				end
-
-				local char = participant:GetCharacter()
-				if not char then
-					return
-				end
-
-				local root = char.PrimaryPart
-				if not root then
 					return
 				end
 
@@ -151,6 +161,8 @@ if RunService:IsServer() then
 					cooldownUntil = workspace:GetServerTimeNow() + EAT_COOLDOWN
 					participant.Extras.SpoonNextHealAllowedAt = cooldownUntil
 				end
+
+				bowl:Destroy()
 
 				participant:TryStopAnimation("SpoonEat")
 				participant:SetHealth(participant:GetHealth() + HEAL)
