@@ -188,7 +188,14 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 			end
 
 			local stop = false
-			while not stop and ClientInventory.EquippedItem() == item and (if item.Kind == "Item" and item.Definition.AlternateToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End) and input.UserInputState ~= Enum.UserInputState.Cancel do
+			while
+				not stop
+				and ClientInventory.EquippedItem() == item
+				and
+					(if item.Kind == "Item" and item.Definition.AlternateToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End)
+				and input.UserInputState ~= Enum.UserInputState.Cancel
+				and not item.PreventAlternateFire
+			do
 				task.wait()
 
 				if item.Kind == "Item" and item.Definition.AlternateToggled and input.UserInputState == Enum.UserInputState.End then
@@ -249,7 +256,13 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 			end
 
 			local stop = false
-			while not stop and ClientInventory.EquippedItem() == item and (if item.Kind == "Item" and item.Definition.PrimaryToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End) and input.UserInputState ~= Enum.UserInputState.Cancel do
+			while
+				not stop
+				and ClientInventory.EquippedItem() == item
+				and (if item.Kind == "Item" and item.Definition.PrimaryToggled then input.UserInputState == Enum.UserInputState.End else input.UserInputState ~= Enum.UserInputState.End)
+				and input.UserInputState ~= Enum.UserInputState.Cancel
+				and not item.PreventPrimaryFire
+			do
 				task.wait()
 
 				if item.Kind == "Item" and item.Definition.PrimaryToggled and input.UserInputState == Enum.UserInputState.End then

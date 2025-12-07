@@ -1,8 +1,8 @@
-export type ValidatePrimaryFire = "TargetTooFar" | "ShooterTooFar" | "StaticObscured" | "Success" | "OtherError"
+export type ValidatePrimaryFire = "PrimaryFireDisabled" | "TargetTooFar" | "ShooterTooFar" | "StaticObscured" | "Success" | "OtherError"
 
 export type ValidateRaycastResult = "TargetTooFar" | "StaticObscured" | "Success"
 
-export type ValidateItemUsageResult = "PreGame" | "Reloading" | "Dead" | "NotEnoughAmmo" | "FiringTooFast" | "NotEquipped" | "Success" | "UnknownItem" | "NotInRound" | ValidatePrimaryFire
+export type ValidateItemUsageResult = "PreGame" | "Reloading" | "Dead" | "NotEnoughAmmo" | "FiringTooFast" | "NotEquipped" | "Success" | "UnknownItem" | "NotInRound" | ValidatePrimaryFire | "AlternateFireDisabled"
 
 export type RaycastInfo = {
 	Destination: Vector3,

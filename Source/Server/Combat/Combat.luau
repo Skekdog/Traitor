@@ -63,6 +63,10 @@ end
 
 -- only considers static map
 local function validatePrimaryFire(item: Types.AnyItem, by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): CombatTypes.ValidatePrimaryFire
+	if item.PreventPrimaryFire then
+		return "PrimaryFireDisabled"
+	end
+
 	local char = by:GetCharacter()
 	if not char then
 		return "ShooterTooFar"
@@ -110,6 +114,10 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 		return "OtherError"
 	elseif (item.Kind == "Melee") and (requestKind :: string ~= "PrimaryFireRaycastRequest" and requestKind :: string ~= "AlternateFireItemRequest") then
 		return "OtherError"
+	end
+
+	if requestKind == "AlternateFireItemRequest" and item.PreventAlternateFire then
+		return "AlternateFireDisabled"
 	end
 
 	if by:GetHealth() <= 0 then
