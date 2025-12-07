@@ -9,7 +9,7 @@ local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Spoon = {}
 
 local EAT_DURATION = 3
-local EAT_COOLDOWN = 10
+local EAT_COOLDOWN = 30
 local HEAL = 45
 
 local clientItem: Types.MeleeWeapon?
