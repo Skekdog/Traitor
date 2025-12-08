@@ -12,6 +12,7 @@ local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Ammo = require(script.Parent.Ammo)
 local BallisticVest = require(script.Parent.BallisticVest)
 local Binoculars = require(script.Parent.Binoculars)
+local Cheeze = require(script.Parent.Cheeze)
 local Crowbar = require(script.Parent.Crowbar)
 local DNAScanner = require(script.Parent.DNAScanner)
 local Defuser = require(script.Parent.Defuser)
@@ -998,6 +999,8 @@ local items: {[string]: Types.ItemDefinition} = {}
 items["Magneto Stick"] = MagnetoStick.Item
 
 items.Spoon = Spoon.ShopItem
+
+items.Cheeze = Cheeze.Item
 
 items.DNAScanner = DNAScanner.Item
 
