@@ -220,7 +220,7 @@ local shopItem: Types.ItemDefinition = {
 	Icon = "rbxassetid://10974184304",
 
 	CreditCost = 2,
-	MaxStock = 2,
+	MaxStock = 1,
 
 	OnEquipServer = function(_, participant: Types.Participant): ()
 		local occupyingItem = participant:GetItemOccupyingGroup({PreferredSlot = 1})
