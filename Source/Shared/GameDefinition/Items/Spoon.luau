@@ -96,16 +96,15 @@ if RunService:IsServer() then
 			return
 		end
 
-		if participant.Extras.IsEatingWithSpoon or (participant.Extras.SpoonNextHealAllowedAt or 0) > workspace:GetServerTimeNow() then
-			return
-		end
-
 		local foundItem = participant:GetEquippedItem()
 		if not foundItem or foundItem.Definition ~= itemDefinition then
 			return
 		end
-
 		assert(foundItem.Kind == "Melee")
+
+		if foundItem.Extras.IsEating or (foundItem.Extras.NextHealAllowedAt or 0) > workspace:GetServerTimeNow() then
+			return
+		end
 
 		local humanoid = participant:GetHumanoid()
 		if not humanoid then
@@ -132,7 +131,7 @@ if RunService:IsServer() then
 		bowl.Name = "Bowl"
 		bowl.Parent = char :: any
 
-		participant.Extras.IsEatingWithSpoon = true
+		foundItem.Extras.IsEating = true
 		participant:TryPlayAnimation(139173308057702, "SpoonEat");
 
 		foundItem.PreventUnequip = true
@@ -143,7 +142,7 @@ if RunService:IsServer() then
 
 		task.spawn(function()
 			for i = 1, EAT_DURATION do
-				if not participant:IsAlive() or not participant.Extras.IsEatingWithSpoon then
+				if not participant:IsAlive() or not foundItem.Extras.IsEating then
 					return
 				end
 
@@ -160,12 +159,12 @@ if RunService:IsServer() then
 
 		task.delay(EAT_DURATION, function()
 			if participant:IsAlive() then
-				participant.Extras.IsEatingWithSpoon = false
+				foundItem.Extras.IsEating = false
 
 				local cooldownUntil: number?
 				if cooldownRequired then
 					cooldownUntil = workspace:GetServerTimeNow() + EAT_COOLDOWN
-					participant.Extras.SpoonNextHealAllowedAt = cooldownUntil
+					foundItem.Extras.NextHealAllowedAt = cooldownUntil
 				end
 
 				bowl:Destroy();
