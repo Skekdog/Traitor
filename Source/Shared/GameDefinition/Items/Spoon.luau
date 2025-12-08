@@ -1,4 +1,3 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Crowbar = require(script.Parent.Crowbar)
@@ -20,11 +19,10 @@ local function OnEquipClient(item: Types.AnyItem): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
+	local Camera = require(ReplicatedStorage.API.Camera)
 
 	assert(item.Kind == "Melee")
 	clientItem = item
-
-	local player = Players.LocalPlayer
 
 	CustomActions.Register("SpoonEat", function()
 		if workspace:GetServerTimeNow() < (item.Extras.CooldownUntil or 0) then
@@ -39,9 +37,7 @@ local function OnEquipClient(item: Types.AnyItem): ()
 		WalkSpeed.SetModifier("EatSpoon", -math.huge)
 		JumpPower.SetModifier("EatSpoon", false)
 
-		player.CameraMinZoomDistance = 10
-		player.CameraMaxZoomDistance = 10
-		player.CameraMode = Enum.CameraMode.Classic
+		Camera.EnterAnimationView()
 	end, 3, "Feast")
 
 	WalkSpeed.SetModifier("HoldingSpoon", 3)
@@ -189,6 +185,7 @@ else
 		local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 		local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 		local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
+		local Camera = require(ReplicatedStorage.API.Camera)
 
 		if LocalParticipantInfo.GetParticipant().Status() ~= "Alive" then
 			return
@@ -197,11 +194,7 @@ else
 		WalkSpeed.SetModifier("EatSpoon", 0)
 		JumpPower.SetModifier("EatSpoon", true)
 
-		local player = Players.LocalPlayer
-
-		player.CameraMinZoomDistance = 128
-		player.CameraMaxZoomDistance = 0.5
-		player.CameraMode = Enum.CameraMode.LockFirstPerson
+		Camera.EnterFirstPerson()
 
 		if clientItem then
 			clientItem.PreventUnequip = false
