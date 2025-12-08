@@ -22,6 +22,8 @@ local function PrimaryFireServer(item: Types.Item, _, _, _, participant: Types.P
 	item.PreventUnequip = true
 	item.Extras.IsEating = true
 
+	participant:TryPlayAnimation(82123370330518, "EatCheeze")
+
 	task.delay(EAT_DURATION, function()
 		if not participant:IsAlive() then
 			return
@@ -38,16 +40,20 @@ local function PrimaryFireServer(item: Types.Item, _, _, _, participant: Types.P
 end
 
 local function PrimaryFireClient(item: Types.Item): ()
+	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
+
 	if item.Extras.IsEating or (item.Extras.CooldownUntil or 0) > workspace:GetServerTimeNow() then
 		return
 	end
 
 	item.PreventUnequip = true
 	item.Extras.IsEating = true
+
+	ViewmodelModule.PlayAnimation("rbxassetid://82123370330518")
 end
 
-local function AlternateFireServer(): ()
-
+local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types.Participant): ()
+	participant:TryPlayAnimation(115786020255555, "ThrowCheeze")
 end
 
 local function OnEquipClient(item: Types.AnyItem): ()
@@ -71,6 +77,9 @@ local definition: Types.ItemDefinition = {
 	Name = "Cheeze",
 	Description = "Can be consumed to instantly heal, or thrown on the ground to allow others to heal.",
 	Icon = "",
+
+	Model = ReplicatedStorage.Assets.WeaponModels.Cheeze,
+	HoldAnimation = "rbxassetid://85447019535859",
 
 	CreditCost = 2,
 	MaxStock = 1,
