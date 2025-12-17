@@ -421,7 +421,14 @@ if IS_SERVER then
             return
         end
 
-        local doorPart = GetPrimaryPart(MapObject)
+        local doorPart: BasePart
+        local success = pcall(function() -- TODO: REMOVE THIS LOGGING
+            doorPart = GetPrimaryPart(MapObject)
+        end)
+
+        if not success then
+            error("No primary part found for door: " .. door:GetFullName())
+        end
 
         local distance = plr:DistanceFromCharacter(doorPart.Position)
         if distance == 0 or distance > 15 then
