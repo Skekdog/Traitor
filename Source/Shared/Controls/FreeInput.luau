@@ -45,7 +45,7 @@ local mouse = {
 }
 
 local K_CURVATURE = 2.0
-		local K_DEADZONE = 0.15
+local K_DEADZONE = 0.15
 
 local function fCurve(x: number)
 	return (math.exp(K_CURVATURE * x) - 1) / (math.exp(K_CURVATURE) - 1)
