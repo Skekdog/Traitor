@@ -216,9 +216,9 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 	(prop :: Types.Prop):TryTakeDamage(params)
 end
 
-local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): ()
+local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): "Part" | "Prop" | "Participant"?
 	if not hitPart.Parent then
-		return -- ?? No idea how but I had an error where the hitPart was unparented. Somehow.
+		return nil -- ?? No idea how but I had an error where the hitPart was unparented. Somehow.
 	end
 	local round = by.Round
 
@@ -246,12 +246,14 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	local propLike = prop or interactable
 
 	if propLike then
-		return onPropHit(item, round, by, propLike, hitPart, hitPosition, origin)
+		onPropHit(item, round, by, propLike, hitPart, hitPosition, origin)
+		return "Prop"
 	else
 		local char = GetMapObjectWithTag(hitPart, "Character")
 		local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
 		if victim then
-			return onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin, impulse)
+			onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin, impulse)
+			return "Participant"
 		end
 	end
 
@@ -274,6 +276,8 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 			ReplicatedStorage.Remotes.ServerClient.MakeBulletHole:FireAllClients(hitPart, relativeHitCFrame, normal)
 		end
 	end
+
+	return "Part"
 end
 
 function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, grenade: Types.GrenadeWeapon?, sound: Sound?): ()
@@ -466,11 +470,19 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 		if item.Definition.FuseTime < 0 then
 			local char = by:GetCharacter()
 			local startTime = os.clock()
+
+			local maxBounces = item.Definition.MaxBounces or 1
+			local bounces = 0
+
 			projectile.Touched:Connect(function(part)
 				if (os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(projectile.CollisionGroup, part.CollisionGroup) then
 					return
 				end
-				explode()
+
+				bounces += 1
+				if bounces >= maxBounces then
+					explode()
+				end
 			end)
 		else
 			task.wait(item.Definition.FuseTime)
@@ -501,13 +513,21 @@ function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryF
 
 			local char = by:GetCharacter()
 
+			local bounces = 0
+			local maxBounces = item.Definition.MaxBounces or 1
+
 			local startTime = os.clock()
 			projectile.Touched:Connect(function(part)
 				if (os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(projectile.CollisionGroup, part.CollisionGroup) then
 					return
 				end
-				onPartHit(item, by, part, projectile.Position, nil, request.Origin)
-				projectile:Destroy()
+
+				bounces += 1
+
+				local result = onPartHit(item, by, part, projectile.Position, nil, request.Origin)
+				if result == "Participant" or bounces >= maxBounces then
+					projectile:Destroy()
+				end
 			end)
 		end
 	end
