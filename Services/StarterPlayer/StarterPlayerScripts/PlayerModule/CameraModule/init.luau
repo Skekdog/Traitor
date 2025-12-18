@@ -82,7 +82,7 @@ local instantiatedCameraControllers = {}
 local instantiatedOcclusionModules = {}
 
 if not Players.LocalPlayer then
-	return {}
+	return ({} :: any) :: CameraModule
 end
 assert(Players.LocalPlayer, "Strict typing check")
 
@@ -336,7 +336,7 @@ function CameraModule:ShouldUseVehicleCamera(): boolean
 	return isEligibleSubject and isEligibleType and isEligibleOcclusionMode
 end
 
-function CameraModule:ActivateCameraController(cameraMovementMode: Enum.ComputerCameraMovementMode? | Enum.DevComputerCameraMovementMode?, legacyCameraType: Enum.CameraType?) -- remove args with FFlagUserRespectLegacyCameraOptions 
+function CameraModule:ActivateCameraController(cameraMovementMode: Enum.ComputerCameraMovementMode? | Enum.DevComputerCameraMovementMode?, legacyCameraType: Enum.CameraType?) -- remove args with FFlagUserRespectLegacyCameraOptions
 	if FFlagUserRespectLegacyCameraOptions then
 		-- legacyCameraType should always be respected
 		legacyCameraType = (workspace.CurrentCamera :: Camera).CameraType

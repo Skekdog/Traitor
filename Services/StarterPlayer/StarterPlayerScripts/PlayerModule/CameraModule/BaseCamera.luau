@@ -77,11 +77,11 @@ BaseCamera.__index = BaseCamera
 
 function BaseCamera.new()
 	local self = setmetatable({}, BaseCamera)
-	
+
 	self._connections = ConnectionUtil.new()
-	
+
 	self.gamepadZoomLevels = {0, 10, 20} -- zoom levels that are cycled through on a gamepad R3 press
-	
+
 	-- So that derived classes have access to this
 	self.FIRST_PERSON_DISTANCE_THRESHOLD = FIRST_PERSON_DISTANCE_THRESHOLD
 
@@ -130,10 +130,10 @@ function BaseCamera.new()
 
 	-- Mouse locked formerly known as shift lock mode
 	self.mouseLockOffset = ZERO_VECTOR3
-	
+
 	UserGameSettings:SetCameraYInvertVisible()
 	UserGameSettings:SetGamepadCameraSensitivityVisible()
-	
+
 
 	return self
 end
@@ -482,15 +482,15 @@ function BaseCamera:GamepadZoomPress()
 
 	local max = player.CameraMaxZoomDistance
 
-	-- check from largest to smallest, set the first zoom level which is 
+	-- check from largest to smallest, set the first zoom level which is
 	-- below the threshold
 	for i = #self.gamepadZoomLevels, 1, -1 do
 		local zoom = self.gamepadZoomLevels[i]
-	
+
 		if max < zoom then
 			continue
 		end
-		
+
 		if zoom < player.CameraMinZoomDistance then
 			zoom = player.CameraMinZoomDistance
 			if FFlagUserFixGamepadMaxZoom then
@@ -516,7 +516,7 @@ function BaseCamera:GamepadZoomPress()
 
 		max = zoom
 	end
-	
+
 	-- cycle back to the largest, relies on the fact that SetCameraToSubjectDistance will clamp max and min
 	self:SetCameraToSubjectDistance(self.gamepadZoomLevels[#self.gamepadZoomLevels])
 end
@@ -578,9 +578,9 @@ function BaseCamera:Cleanup()
 		self.viewportSizeChangedConn:Disconnect()
 		self.viewportSizeChangedConn = nil
 	end
-	if self.cameraChangedConn then 
+	if self.cameraChangedConn then
 		self.cameraChangedConn:Disconnect()
-		self.cameraChangedConn = nil 
+		self.cameraChangedConn = nil
 	end
 
 	self.lastCameraTransform = nil
@@ -743,7 +743,7 @@ end
 
 function BaseCamera:CalculateNewLookVectorVRFromArg(rotateInput: Vector2): Vector3
 	local subjectPosition: Vector3 = self:GetSubjectPosition()
-	local vecToSubject: Vector3 = (subjectPosition - (game.Workspace.CurrentCamera :: Camera).CFrame.p)
+	local vecToSubject: Vector3 = (subjectPosition - (game.Workspace.CurrentCamera :: Camera).CFrame.Position)
 	local currLookVector: Vector3 = (vecToSubject * X1_Y0_Z1).unit
 	local vrRotateInput: Vector2 = Vector2.new(rotateInput.X, 0)
 	local startCFrame: CFrame = CFrame.new(ZERO_VECTOR3, currLookVector)
@@ -769,7 +769,7 @@ function BaseCamera:GetHumanoid(): Humanoid?
 	return nil
 end
 
-function BaseCamera:GetHumanoidPartToFollow(humanoid: Humanoid, humanoidStateType: Enum.HumanoidStateType) -- BasePart
+function BaseCamera:GetHumanoidPartToFollow(humanoid, humanoidStateType: Enum.HumanoidStateType) -- BasePart
 	if humanoidStateType == Enum.HumanoidStateType.Dead then
 		local character = humanoid.Parent
 		if character then
