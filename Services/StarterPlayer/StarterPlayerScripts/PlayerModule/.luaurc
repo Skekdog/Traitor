@@ -1,0 +1,17 @@
+{
+  "languageMode": "strict",
+  "lint": {
+    "*": true,
+    "LocalUnused": false,
+    "ImplicitReturn": false,
+    "ImportUnused": false,
+    "FunctionUnused": false,
+    "LocalShadow": false
+  },
+  "lintErrors": false,
+  "typeErrors": true,
+  "globals": [],
+  "aliases": {
+    "lune": "~/.lune/.typedefs/0.10.4/"
+  }
+}
