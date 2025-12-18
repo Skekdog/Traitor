@@ -1,5 +1,5 @@
 {
-  "languageMode": "strict",
+  "languageMode": "nocheck",
   "lint": {
     "*": true,
     "LocalUnused": false,
@@ -9,9 +9,6 @@
     "LocalShadow": false
   },
   "lintErrors": false,
-  "typeErrors": true,
-  "globals": [],
-  "aliases": {
-    "lune": "~/.lune/.typedefs/0.10.4/"
-  }
+  "typeErrors": false,
+  "globals": ["workspace", "game"]
 }
