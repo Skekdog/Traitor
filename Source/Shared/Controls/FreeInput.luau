@@ -3,13 +3,12 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
 
+local UserGameSettings = UserSettings():GetService("UserGameSettings")
+
 local module = {}
 
-local MOBILE_PAN_SENSITIVITY_MULTIPLIER = 4
 local NAV_GAMEPAD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
 local NAV_KEYBOARD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
-local PAN_MOUSE_SPEED = Vector2.new(1, 1) * (math.pi / 64)
-local PAN_GAMEPAD_SPEED = Vector2.new(1, 1) * (math.pi / 8)
 local FOV_WHEEL_SPEED = 1.5 -- normal value is 1.0
 local FOV_GAMEPAD_SPEED = 0.25
 local NAV_SHIFT_MUL = 0.25
@@ -23,8 +22,8 @@ local gamepad = {
 	DPadUp = 0,
 	ButtonL2 = 0,
 	ButtonR2 = 0,
-	Thumbstick1 = Vector2.new(),
-	Thumbstick2 = Vector2.new(),
+	Thumbstick1 = Vector3.new(),
+	Thumbstick2 = Vector3.new(),
 }
 
 local keyboard = {
@@ -39,12 +38,28 @@ local keyboard = {
 }
 
 local mouse = {
-	Delta = Vector2.new(),
+	Delta = Vector3.new(),
 	MouseWheel = 0,
 }
 
+local touchDelta: Vector3 = Vector3.zero
+
 local K_CURVATURE = 2.0
 local K_DEADZONE = 0.15
+
+-- Taken from PlayerModule.BaseCamera
+local MIN_Y = math.rad(-80)
+local MAX_Y = math.rad(80)
+
+local ROTATION_SPEED_GAMEPAD = Vector3.new(1, 0.77)*math.rad(4) -- (rad/s)
+
+-- these speeds should not be scaled by dt because the input returned is not normalized.
+-- that is, at lower framerates, the magnitude of the input delta will be larger because the pointer/mouse/touch
+-- has moved more pixels between frames.
+local ROTATION_SPEED_MOUSE = Vector3.new(1, 0.77)*math.rad(0.5) -- (rad/inputdelta)
+local ROTATION_SPEED_TOUCH = Vector3.new(1, 0.66)*math.rad(1) -- (rad/inputdelta)
+
+local MIN_TOUCH_SENSITIVITY_FRACTION = 0.25 -- 25% sensitivity at 90°
 
 local function fCurve(x: number)
 	return (math.exp(K_CURVATURE * x) - 1) / (math.exp(K_CURVATURE) - 1)
@@ -78,18 +93,64 @@ function module.GetVelocity(dt: number): Vector3
 	return ((kGamepad + kKeyboard + kTouch) * (if shift then NAV_SHIFT_MUL else 1)) * 60 * dt
 end
 
--- we don't actually need deltatime here because mouse.Delta is... well it's a delta
-function module.GetCameraPan(): Vector2
-	local kGamepad = Vector2.new(
-		thumbstickCurve(gamepad.Thumbstick2.Y),
-		thumbstickCurve(-gamepad.Thumbstick2.X)
-	) * PAN_GAMEPAD_SPEED
+-- Adjust the touch sensitivity so that sensitivity is reduced when swiping up
+-- or down, but stays the same when swiping towards the middle of the screen
+local function adjustTouchPitchSensitivity(delta: Vector3): Vector3
+	local camera = workspace.CurrentCamera
 
-	local kMouse = mouse.Delta * PAN_MOUSE_SPEED
+	-- get the camera pitch in world space
+	local pitch = camera.CFrame:ToEulerAnglesYXZ()
 
-	mouse.Delta = Vector2.new()
+	if delta.Y * pitch >= 0 then
+		-- do not reduce sensitivity when pitching towards the horizon
+		return delta
+	end
 
-	return kGamepad + kMouse
+	-- set up a line to fit:
+	-- 1 = f(0)
+	-- 0 = f(±pi/2)
+	local curveY = 1 - (2*math.abs(pitch)/math.pi)^0.75
+
+	-- remap curveY from [0, 1] -> [MIN_TOUCH_SENSITIVITY_FRACTION, 1]
+	local sensitivity = curveY*(1 - MIN_TOUCH_SENSITIVITY_FRACTION) + MIN_TOUCH_SENSITIVITY_FRACTION
+
+	return Vector3.new(1, sensitivity) * delta
+end
+
+local function getRawCameraRotation(dt: number): Vector3
+	local inversionVector = Vector3.new(1, UserGameSettings:GetCameraYInvertValue())
+
+	local kGamepad = gamepad.Thumbstick2 * UserGameSettings.GamepadCameraSensitivity
+	kGamepad *= dt
+
+	local kMouse = mouse.Delta
+	local kTouch = adjustTouchPitchSensitivity(touchDelta)
+
+	local result =
+		kGamepad * ROTATION_SPEED_GAMEPAD +
+		kMouse * ROTATION_SPEED_MOUSE +
+		kTouch * ROTATION_SPEED_TOUCH
+
+	mouse.Delta = Vector3.new()
+	touchDelta = Vector3.new()
+
+	return result * inversionVector
+end
+
+local function getConstrainedCameraRotateInput(dt: number): Vector3
+	local rotateInput = getRawCameraRotation(dt)
+
+	local currLookVector = workspace.CurrentCamera.CFrame.LookVector
+	local currPitchAngle = math.asin(currLookVector.Y)
+	local yTheta = math.clamp(rotateInput.Y, -MAX_Y + currPitchAngle, -MIN_Y + currPitchAngle)
+	local constrainedRotateInput = Vector3.new(-yTheta, -rotateInput.X)
+
+	return constrainedRotateInput
+end
+
+function module.GetCameraPan(dt: number): Vector3
+	local result = getConstrainedCameraRotateInput(dt)
+	return result
 end
 
 function module.GetFov(dt: number): number
@@ -112,8 +173,7 @@ local function GpButton(action: string, state: Enum.UserInputState, input: Input
 end
 
 local function MousePan(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
-	local delta = input.Delta
-	mouse.Delta = Vector2.new(-delta.Y, -delta.X)
+	mouse.Delta = input.Delta
 	return Enum.ContextActionResult.Pass
 end
 
@@ -156,7 +216,7 @@ local function TouchPan(input: InputObject): Enum.ContextActionResult
 		return Enum.ContextActionResult.Pass
 	end
 
-	mouse.Delta = Vector2.new(-delta.Y, -delta.X) * MOBILE_PAN_SENSITIVITY_MULTIPLIER
+	touchDelta = Vector3.new(delta.X, delta.Y)
 	return Enum.ContextActionResult.Pass
 end
 
