@@ -233,10 +233,10 @@ function ControlModule:GetEstimatedVRTorsoFrame(): CFrame
 	local headFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
 	local _, headAngle, _ = headFrame:ToEulerAnglesYXZ()
 	headAngle = -headAngle
-	if not VRService:GetUserCFrameEnabled(Enum.UserCFrame.RightHand) or 
+	if not VRService:GetUserCFrameEnabled(Enum.UserCFrame.RightHand) or
 		not VRService:GetUserCFrameEnabled(Enum.UserCFrame.LeftHand) then
 		self.currentTorsoAngle = headAngle;
-	else	
+	else
 		local leftHandPos = VRService:GetUserCFrame(Enum.UserCFrame.LeftHand)
 		local rightHandPos = VRService:GetUserCFrame(Enum.UserCFrame.RightHand)
 
@@ -252,11 +252,11 @@ function ControlModule:GetEstimatedVRTorsoFrame(): CFrame
 		local averageHandAngleValid =
 			averageHandAngleRelativeToCurrentAngle > -math.pi/2 and
 			averageHandAngleRelativeToCurrentAngle < math.pi/2
-		
+
 		if not averageHandAngleValid then
 			averageHandAngleRelativeToCurrentAngle = headAngleRelativeToCurrentAngle
 		end
-		
+
 		local minimumValidAngle = math.min(averageHandAngleRelativeToCurrentAngle, headAngleRelativeToCurrentAngle)
 		local maximumValidAngle = math.max(averageHandAngleRelativeToCurrentAngle, headAngleRelativeToCurrentAngle)
 
@@ -282,7 +282,7 @@ function ControlModule:UpdateActiveControlModuleEnabled()
 	-- helpers for disable/enable
 	local disable = function()
 		self.activeController:Enable(false)
-		if self.touchJumpController then 
+		if self.touchJumpController then
 			self.touchJumpController:Enable(false)
 		end
 
@@ -355,11 +355,11 @@ function ControlModule:Enable(enable: boolean?)
 		enable = true
 	end
 	if self.controlsEnabled == enable then return end
-	
+
 	if enable == false then
 		return
 	end
-	
+
 	self.controlsEnabled = enable
 
 	if not self.activeController then
@@ -458,9 +458,9 @@ function ControlModule:calculateRawMoveVector(humanoid: Humanoid, cameraRelative
 
 	if VRService.VREnabled and humanoid.RootPart then
 		local vrFrame = VRService:GetUserCFrame(Enum.UserCFrame.Head)
-		
+
 		vrFrame = self:GetEstimatedVRTorsoFrame()
-					
+
 		-- movement relative to VR frustum
 		local cameraDelta = camera.Focus.Position - cameraCFrame.Position
 		if cameraDelta.Magnitude < 3 then -- "nearly" first person
@@ -470,7 +470,7 @@ function ControlModule:calculateRawMoveVector(humanoid: Humanoid, cameraRelative
 		end
 	end
 
-	if humanoid:GetState() == Enum.HumanoidStateType.Swimming then	
+	if humanoid:GetState() == Enum.HumanoidStateType.Swimming then
 		if VRService.VREnabled then
 			cameraRelativeMoveVector = Vector3.new(cameraRelativeMoveVector.X, 0, cameraRelativeMoveVector.Z)
 			if cameraRelativeMoveVector.Magnitude < 0.01 then
@@ -563,9 +563,9 @@ function ControlModule:updateVRMoveVector(moveVector)
 	-- movement relative to VR frustum
 	local cameraDelta = curCamera.Focus.Position - curCamera.CFrame	.Position
 	local firstPerson = cameraDelta.Magnitude < FIRST_PERSON_THRESHOLD_DISTANCE and true
-	
+
 	-- if the player is not moving via input in first person, follow the VRHead
-	if moveVector.Magnitude == 0 and firstPerson and VRService.AvatarGestures and self.humanoid 
+	if moveVector.Magnitude == 0 and firstPerson and VRService.AvatarGestures and self.humanoid
 		and not self.humanoid.Sit then
 
 		local vrHeadOffset = VRService:GetUserCFrame(Enum.UserCFrame.Head)
@@ -574,7 +574,7 @@ function ControlModule:updateVRMoveVector(moveVector)
 		-- get the position in world space and offset at the neck
 		local neck_offset = NECK_OFFSET * self.humanoid.RootPart.Size.Y / 2
 		local vrHeadWorld = curCamera.CFrame * vrHeadOffset * CFrame.new(0, neck_offset, 0)
-		
+
 		local moveOffset = vrHeadWorld.Position - self.humanoid.RootPart.CFrame.Position
 		return Vector3.new(moveOffset.x, 0, moveOffset.z)
 	end
@@ -623,8 +623,8 @@ end
 
 function ControlModule:UpdateTouchGuiVisibility()
 	if self.touchGui then
-		local doShow = self.humanoid and GuiService.TouchControlsEnabled
-		self.touchGui.Enabled = not not doShow -- convert to bool
+		local doShow = GuiService.TouchControlsEnabled
+		self.touchGui.Enabled = doShow
 	end
 end
 

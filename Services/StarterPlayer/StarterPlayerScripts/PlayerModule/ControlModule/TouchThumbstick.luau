@@ -37,6 +37,8 @@ function TouchThumbstick:Enable(enable: boolean?, uiParentFrame)
 	enable = enable and true or false				-- Force anything non-nil to boolean before comparison
 	if self.enabled == enable then return true end	-- If no state change, return true indicating already in requested state
 
+	if not enable then return false end
+
 	self.moveVector = ZERO_VECTOR3
 	self.isJumping = false
 
@@ -117,7 +119,7 @@ function TouchThumbstick:Create(parentFrame)
 
 	ResizeThumbstick()
 	self.absoluteSizeChangedConn = parentFrame:GetPropertyChangedSignal("AbsoluteSize"):Connect(ResizeThumbstick)
-	
+
 	outerImage.Parent = self.thumbstickFrame
 	self.stickImage.Parent = self.thumbstickFrame
 
