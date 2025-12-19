@@ -15,7 +15,6 @@ local FOV_GAMEPAD_SPEED = 0.25
 local NAV_SHIFT_MUL = 0.25
 
 local INPUT_PRIORITY = Enum.ContextActionPriority.Low.Value
-local REDUCED_INPUT_PRIORITY = Enum.ContextActionPriority.Low.Value
 
 local gamepad = {
 	ButtonX = 0,
@@ -133,8 +132,24 @@ local function MouseWheel(action: string, state: Enum.UserInputState, input: Inp
 	return Enum.ContextActionResult.Pass
 end
 
-local function TouchPan(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
+local function TouchPan(input: InputObject): Enum.ContextActionResult
 	local delta = input.Delta
+
+	if input.UserInputState == Enum.UserInputState.Begin then
+		local guiOccupying = false
+		for _, object in Players.LocalPlayer.PlayerGui:GetGuiObjectsAtPosition(input.Position.X, input.Position.Y) do
+			if object.BackgroundTransparency < 1 or ((object:IsA("ImageButton") or object:IsA("ImageLabel")) and object.ImageTransparency < 1) then
+				guiOccupying = true
+				break
+			end
+		end
+
+		input:SetAttribute("Invalid", guiOccupying)
+	end
+
+	if input:GetAttribute("Invalid") then
+		return Enum.ContextActionResult.Pass
+	end
 
 	-- Assume this is just a tap
 	if delta.Magnitude < 1 then
@@ -166,8 +181,16 @@ function module.StartCapture(): ()
 		Enum.KeyCode.E,
 		Enum.KeyCode.Q
 	)
+
+	-- Using CAS to detect touch fails when touching buttons, thus we have to do this
+	UserInputService.TouchStarted:Connect(function(input)
+		TouchPan(input)
+		input.Changed:Connect(function()
+			TouchPan(input)
+		end)
+	end)
+
 	ContextActionService:BindActionAtPriority("FreeInputMousePan",          MousePan,    false, INPUT_PRIORITY,         Enum.UserInputType.MouseMovement)
-	ContextActionService:BindActionAtPriority("FreeInputTouchPan",          TouchPan,    false, REDUCED_INPUT_PRIORITY, Enum.UserInputType.Touch)
 	ContextActionService:BindActionAtPriority("FreeInputMouseWheel",        MouseWheel,  false, INPUT_PRIORITY,         Enum.UserInputType.MouseWheel)
 	ContextActionService:BindActionAtPriority("FreeInputGamepadButton",     GpButton,    false, INPUT_PRIORITY,         Enum.KeyCode.ButtonX, Enum.KeyCode.ButtonY)
 	ContextActionService:BindActionAtPriority("FreeInputGamepadTrigger",    Trigger,     false, INPUT_PRIORITY,         Enum.KeyCode.ButtonR2, Enum.KeyCode.ButtonL2)
