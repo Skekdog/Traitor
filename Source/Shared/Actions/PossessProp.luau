@@ -17,6 +17,8 @@ local MAX_PUNCHES = 5
 local PUNCH_RATE = 1
 local PUNCH_COOLDOWN = 0.1
 
+local POSSESS_DISTANCE = 10
+
 local PossessProp = {}
 
 local punchMeter = 0
@@ -96,6 +98,10 @@ function PossessProp.IsPossessed(prop: Types.MapObject): boolean
 end
 
 function PossessProp.CanPossess(part: BasePart): boolean
+	if (workspace.CurrentCamera.CFrame.Position - part.Position).Magnitude > POSSESS_DISTANCE then
+		return false
+	end
+
 	if part:IsGrounded() then
 		return false
 	end
