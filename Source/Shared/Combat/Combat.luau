@@ -37,7 +37,7 @@ local function getSpreadVector(item: Types.AnyItem): Vector3
 	return Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
 end
 
-local function raycast(char: Model, spread: Vector3, range: number, checkInitialOverlap: boolean, origin: Vector3, direction: Vector3): {RaycastResult: RaycastResult?, Parts: {BasePart}?, Origin: Vector3?}
+local function raycast(char: Model, spread: Vector3, range: number, checkInitialOverlap: boolean, origin: Vector3, direction: Vector3, fallbackToBlockcast: boolean): {RaycastResult: RaycastResult?, Parts: {BasePart}?, Origin: Vector3?}
 	local map = LocalRoundInfo.Map()
 	if not map then
 		return {}
@@ -61,7 +61,12 @@ local function raycast(char: Model, spread: Vector3, range: number, checkInitial
 		parts = workspace:GetPartsInPart(boundPart, overlapParams)
 	end
 
-	local result = workspace:Raycast(origin, (direction + spread).Unit * range, params)
+	direction = (direction + spread).Unit * range
+	local result = workspace:Raycast(origin, direction, params)
+
+	if not result and fallbackToBlockcast then
+		result = workspace:Blockcast(CFrame.new(origin), Vector3.one * 1.5, direction, params)
+	end
 
 	return {
 		RaycastResult = result,
@@ -326,7 +331,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 						for i = 1, if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1 do
 							local spread = getSpreadVector(item)
 
-							local result = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE, item.Kind == "Melee", origin, direction)
+							local result = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, if item.Kind == "Melee" then item.Definition.MaxDistance else MAX_RANGE, item.Kind == "Melee", origin, direction, item.Kind == "Melee")
 							local raycastResult = result.RaycastResult
 							local part = if result.Parts then result.Parts[1] else nil
 
