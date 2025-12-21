@@ -66,12 +66,19 @@ local function AlternateFireClient(item: Types.Item): ()
 end
 
 local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types.Participant): ()
+	if item.Extras.IsEating or item.Extras.IsThrowing then
+		return
+	end
+
 	item.PreventUnequip = true
 	item.Extras.IsThrowing = true
 
 	local track = participant:TryPlayAnimation(115786020255555, "ThrowCheeze")
 
 	local function onFinish(): ()
+		assert(item.Model)
+
+		participant:TryThrowAssembly(item.Model:Clone(), 10, participant.Round:GetMap().Structure.Dynamic)
 		participant:RemoveItem(item)
 	end
 
