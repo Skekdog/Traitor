@@ -125,7 +125,6 @@ local function getRawCameraRotation(dt: number): Vector3
 	kGamepad *= dt
 
 	local kMouse = mouse.Delta
-	if touchDelta.Magnitude > 1 then print("FreeInput:", touchDelta.Magnitude) end
 	local kTouch = adjustTouchPitchSensitivity(touchDelta)
 
 	local result =
