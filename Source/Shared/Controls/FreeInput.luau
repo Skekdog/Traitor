@@ -199,7 +199,7 @@ local function TouchPan(input: InputObject): Enum.ContextActionResult
 	if input.UserInputState == Enum.UserInputState.Begin then
 		local guiOccupying = false
 		for _, object in Players.LocalPlayer.PlayerGui:GetGuiObjectsAtPosition(input.Position.X, input.Position.Y) do
-			if object.BackgroundTransparency < 1 or ((object:IsA("ImageButton") or object:IsA("ImageLabel")) and object.ImageTransparency < 1) then
+			if object.Name == "DynamicThumbstickFrame" or object.BackgroundTransparency < 1 or ((object:IsA("ImageButton") or object:IsA("ImageLabel")) and object.ImageTransparency < 1) then
 				guiOccupying = true
 				break
 			end
