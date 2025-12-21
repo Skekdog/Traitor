@@ -1,5 +1,6 @@
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
 
@@ -42,7 +43,7 @@ local mouse = {
 	MouseWheel = 0,
 }
 
-local touchDelta: Vector3 = Vector3.zero
+local touchDelta = Vector3.zero
 
 local K_CURVATURE = 2.0
 local K_DEADZONE = 0.15
@@ -124,6 +125,7 @@ local function getRawCameraRotation(dt: number): Vector3
 	kGamepad *= dt
 
 	local kMouse = mouse.Delta
+	if touchDelta.Magnitude > 1 then print("FreeInput:", touchDelta.Magnitude) end
 	local kTouch = adjustTouchPitchSensitivity(touchDelta)
 
 	local result =
@@ -131,8 +133,7 @@ local function getRawCameraRotation(dt: number): Vector3
 		kMouse * ROTATION_SPEED_MOUSE +
 		kTouch * ROTATION_SPEED_TOUCH
 
-	mouse.Delta = Vector3.new()
-	touchDelta = Vector3.new()
+	mouse.Delta = Vector3.zero
 
 	return result * inversionVector
 end
@@ -211,12 +212,7 @@ local function TouchPan(input: InputObject): Enum.ContextActionResult
 		return Enum.ContextActionResult.Pass
 	end
 
-	-- Assume this is just a tap
-	if delta.Magnitude < 1 then
-		return Enum.ContextActionResult.Pass
-	end
-
-	touchDelta = Vector3.new(delta.X, delta.Y)
+	touchDelta += Vector3.new(delta.X, delta.Y)
 	return Enum.ContextActionResult.Pass
 end
 
@@ -227,6 +223,7 @@ local function Zero(t: {[any]: any})
 end
 
 local activeCapturers = 0
+local inputBeganConn: RBXScriptConnection?
 function module.StartCapture(): ()
 	activeCapturers += 1
 	if activeCapturers ~= 1 then
@@ -243,11 +240,22 @@ function module.StartCapture(): ()
 	)
 
 	-- Using CAS to detect touch fails when touching buttons, thus we have to do this
-	UserInputService.TouchStarted:Connect(function(input)
-		TouchPan(input)
-		input.Changed:Connect(function()
+	if not inputBeganConn then
+		inputBeganConn = UserInputService.InputBegan:Connect(function(input, proc)
+			if input.UserInputType ~= Enum.UserInputType.Touch or proc then
+				return
+			end
+
 			TouchPan(input)
+
+			input:GetPropertyChangedSignal("Delta"):Connect(function()
+				TouchPan(input)
+			end)
 		end)
+	end
+
+	RunService:BindToRenderStep("FreeInputResetTouchCameraPan", Enum.RenderPriority.Last.Value, function()
+		touchDelta = Vector3.zero
 	end)
 
 	ContextActionService:BindActionAtPriority("FreeInputMousePan",          MousePan,    false, INPUT_PRIORITY,         Enum.UserInputType.MouseMovement)
@@ -273,6 +281,13 @@ function module.StopCapture(): ()
 	ContextActionService:UnbindAction("FreeInputGamepadButton")
 	ContextActionService:UnbindAction("FreeInputGamepadTrigger")
 	ContextActionService:UnbindAction("FreeInputGamepadThumbstick")
+
+	if inputBeganConn then
+		inputBeganConn:Disconnect()
+		inputBeganConn = nil
+	end
+
+	RunService:UnbindFromRenderStep("FreeInputResetTouchCameraPan")
 end
 
 return module
