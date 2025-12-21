@@ -190,13 +190,13 @@ local definition: Types.ItemDefinition = {
 
 	Name = "Cheeze",
 	Description = "Can be consumed to instantly heal, or thrown on the ground to allow others to heal.",
-	Icon = "",
+	Icon = "rbxassetid://9506964263",
 
 	Model = ReplicatedStorage.Assets.WeaponModels.Cheeze,
 	HoldAnimation = "rbxassetid://85447019535859",
 
-	CreditCost = 2,
-	MaxStock = 1,
+	CreditCost = 1,
+	MaxStock = 2,
 
 	ItemGroup = ItemGroups.RoleUtility,
 
