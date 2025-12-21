@@ -154,7 +154,7 @@ local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types
 
 			model.Touched:Connect(function(playerPart)
 				local otherParticipant: Types.Participant? = GetParticipant(playerPart) -- type annotation needed here because otherwise "Code is too complex" type error
-				if false and otherParticipant == participant then
+				if otherParticipant == participant then
 					if participant:GetItemOccupyingGroup(ItemGroups.RoleUtility) then
 						return
 					end
