@@ -67,9 +67,15 @@ end
 
 local function getPlayersString(players: {Player}): string
 	local ret = ""
+
 	for _, player in players do
 		ret ..= `{player.Name}{if player ~= players[#players] then ", " else ""}`
 	end
+
+	if ret == "" then
+		ret = "nobody"
+	end
+
 	return ret
 end
 
