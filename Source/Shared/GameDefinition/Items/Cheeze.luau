@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.API.Types)
 local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local Cheeze = {}
 
@@ -12,6 +13,16 @@ local ALIGN_MAX_VELOCITY = 10
 
 local ROTATE_VELOCITY = 2
 
+local function playEatSound(participant: Types.Participant): ()
+	local char = participant:GetCharacter()
+	local root = if char then char.PrimaryPart else nil
+
+	PlaySound(3043029786, nil, root, {
+		RollOffMaxDistance = 20,
+		RollOffMinDistance = 5,
+	})
+end
+
 local function PrimaryFireServer(item: Types.Item, _, _, _, participant: Types.Participant): ()
 	if item.Extras.IsEating or item.Extras.IsThrowing then
 		return
@@ -21,6 +32,8 @@ local function PrimaryFireServer(item: Types.Item, _, _, _, participant: Types.P
 	item.Extras.IsEating = true
 
 	participant:TryPlayAnimation(82123370330518, "EatCheeze")
+
+	playEatSound(participant)
 
 	task.delay(EAT_DURATION, function()
 		if not participant:IsAlive() then
@@ -141,7 +154,7 @@ local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types
 
 			model.Touched:Connect(function(playerPart)
 				local otherParticipant: Types.Participant? = GetParticipant(playerPart) -- type annotation needed here because otherwise "Code is too complex" type error
-				if otherParticipant == participant then
+				if false and otherParticipant == participant then
 					if participant:GetItemOccupyingGroup(ItemGroups.RoleUtility) then
 						return
 					end
@@ -157,6 +170,8 @@ local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types
 					if hum and hum.Health < hum.MaxHealth then
 						model:Destroy()
 						otherParticipant:SetHealth(otherParticipant:GetHealth() + HEAL_AMOUNT)
+
+						playEatSound(otherParticipant)
 					end
 				end
 			end)
