@@ -285,6 +285,7 @@ module.teleport = {
 			return `Player {to[1].Name} has no character.`
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, target in targets do
 			local char = target.Character
 			if char then
@@ -293,10 +294,11 @@ module.teleport = {
 					root.AssemblyLinearVelocity = Vector3.zero
 				end
 				char:PivotTo(toChar:GetPivot())
+				table.insert(affectedPlayers, target)
 			end
 		end
 
-		return `Teleported {getPlayersString(targets)} to {to[1].Name}.`
+		return `Teleported {getPlayersString(affectedPlayers)} to {to[1].Name}.`
 	end
 }
 
@@ -317,21 +319,24 @@ module.setrole = {
 			return "Missing argument 1 role name."
 		end
 
+		local success, result = pcall(round.GetRoleFromRoleName, round, roleName)
+		if not success then
+			return `Role {roleName} not found.`
+		end
+
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
 				continue
 			end
 
-			local success, result = pcall(round.GetRoleFromRoleName, round, roleName)
-			if not success then
-				return `Role {roleName} not found.`
-			end
-
 			participant:SetRole(result.Definition)
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Set roles of {getPlayersString(players)} to {roleName}.`
+		return `Set roles of {getPlayersString(affectedPlayers)} to {roleName}.`
 	end
 }
 
@@ -349,6 +354,7 @@ module.setfreekill = {
 
 		local reason = processStringArgument(args[1])
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
@@ -356,9 +362,11 @@ module.setfreekill = {
 			end
 
 			participant:SetFreeKill(if reason == "nil" then nil else reason)
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Set free kill reason of {getPlayersString(players)} to {reason}.`
+		return `Set free kill reason of {getPlayersString(affectedPlayers)} to {reason}.`
 	end
 }
 
@@ -374,6 +382,7 @@ module.kill = {
 			return `Player {args[1]} not found.`
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
@@ -384,9 +393,11 @@ module.kill = {
 				Amount = math.huge,
 				Source = "Other"
 			})
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Killed {getPlayersString(players)}.`
+		return `Killed {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -408,6 +419,7 @@ module.setkarma = {
 			return "Missing argument 1 karma."
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			KarmaManager.SetKarma(player, karma)
 
@@ -417,9 +429,11 @@ module.setkarma = {
 			end
 
 			participant:SetKarma(karma)
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Set karma of {getPlayersString(players)} to {karma}.`
+		return `Set karma of {getPlayersString(affectedPlayers)} to {karma}.`
 	end
 }
 
@@ -630,6 +644,7 @@ module.spawninteractable = {
 			return `Player {args[2]} not found.`
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
@@ -645,9 +660,11 @@ module.spawninteractable = {
 			interactable.Model:RemoveTag("Item")
 			GetPrimaryPart(interactable.Model).CFrame = char:GetPivot();
 			(interactable.Model :: Instance).Parent = round:GetMap().Structure.Dynamic
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Spawned {interactableName} at {getPlayersString(players)}.`
+		return `Spawned {interactableName} at {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -668,6 +685,16 @@ module.spawnitem = {
 			return "Missing argument 1 item name."
 		end
 
+		local item = round:GetItemDefinition(itemName)
+		if not item then
+			return `Item {itemName} not found.`
+		end
+
+		if not item.Model then
+			return `Item has no model and cannot be spawned, consider using giveitem instead.`
+		end
+
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
@@ -679,23 +706,16 @@ module.spawnitem = {
 				continue
 			end
 
-			local item = round:GetItemDefinition(itemName)
-			if not item then
-				return `Item {itemName} not found.`
-			end
-
-			if not item.Model then
-				return `Item has no model and cannot be spawned, consider using giveitem instead.`
-			end
-
 			local model = item.Model:Clone()
 			model:PivotTo(char:GetPivot())
 			model:AddTag("Item")
 			model:AddTag("Prop");
 			(model :: Instance).Parent = round:GetMap().Structure.Dynamic
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Spawned {itemName} at {getPlayersString(players)}.`
+		return `Spawned {itemName} at {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -716,20 +736,23 @@ module.giveitem = {
 			return "Missing argument 1 item name."
 		end
 
+		local item = round:GetItemDefinition(itemName)
+		if not item then
+			return `Item {itemName} not found.`
+		end
+
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
-			if not participant then
+			if not participant or participant:GetItemOccupyingGroup(item.ItemGroup) then
 				continue
 			end
 
-			local item = round:GetItemDefinition(itemName)
-			if not item then
-				return `Item {itemName} not found.`
-			end
 			participant:GiveItemFromItemDefinition(item)
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Gave {itemName} to {getPlayersString(players)}.`
+		return `Gave {itemName} to {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -750,6 +773,7 @@ module.givecredits = {
 			return "Invalid argument 1 amount."
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
@@ -757,9 +781,11 @@ module.givecredits = {
 			end
 
 			participant:AddCredits(amount)
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Gave {amount} credits to {getPlayersString(players)}.`
+		return `Gave {amount} credits to {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -775,6 +801,7 @@ module.spawndummy = {
 			return `Player {args[1]} not found.`
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			if not player.Character then
 				continue
@@ -784,9 +811,11 @@ module.spawndummy = {
 			dummy:PivotTo(player.Character:GetPivot())
 
 			dummy.Parent = round:GetMap().Structure.Dynamic :: any
+
+			table.insert(affectedPlayers, player)
 		end
 
-		return `Spawned test dummy at {getPlayersString(players)}.`
+		return `Spawned test dummy at {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -807,6 +836,7 @@ module.sethealth = {
 			return "Invalid argument 1 health."
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
@@ -817,10 +847,11 @@ module.sethealth = {
 			if humanoid then
 				humanoid.MaxHealth = math.max(health, humanoid.MaxHealth)
 				humanoid.Health = health
+				table.insert(affectedPlayers, player)
 			end
 		end
 
-		return `Set health to {health} for {getPlayersString(players)}.`
+		return `Set health to {health} for {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -836,11 +867,15 @@ module.relax = {
 			return `Player {args[1]} not found.`
 		end
 
+		local affectedPlayers: {Player} = {}
 		for _, player in players do
-			RelaxedPermissions.GivePermission(player)
+			if not RelaxedPermissions.HasRelaxedPermissions(player) then
+				RelaxedPermissions.GivePermission(player)
+				table.insert(affectedPlayers, player)
+			end
 		end
 
-		return `Gave relaxed permissions to {getPlayersString(players)}.`
+		return `Gave relaxed permissions to {getPlayersString(affectedPlayers)}.`
 	end
 }
 
