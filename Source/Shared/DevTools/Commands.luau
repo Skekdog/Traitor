@@ -780,7 +780,7 @@ module.spawndummy = {
 				continue
 			end
 
-			local dummy = ReplicatedStorage.Assets.TestDummy:Clone()
+			local dummy = ServerStorage.Assets.TestDummy:Clone()
 			dummy:PivotTo(player.Character:GetPivot())
 
 			dummy.Parent = round:GetMap().Structure.Dynamic :: any
