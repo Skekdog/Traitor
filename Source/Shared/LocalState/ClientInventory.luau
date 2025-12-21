@@ -375,6 +375,10 @@ local function removeItem(itemName: string): ()
 	ourInventory.Slots:Invoke()
 end
 
+function module.RemoveItem(item: Types.AnyItem): ()
+	removeItem(item.Definition.Name)
+end
+
 local function addItem(item: Types.AnyItem): ()
 	(item :: {Definition: Types.AnyItemDefinition}).Definition = assert(GetItemDefinition(item.Definition.Name), "Item exists on server but not client")
 

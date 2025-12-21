@@ -334,10 +334,10 @@ Players.LocalPlayer:GetPropertyChangedSignal("CameraMode"):Connect(function()
     end
 end)
 
-function module.PlayAnimation(uri: string, name: string?): ()
+function module.PlayAnimation(uri: string, name: string?): AnimationTrack?
     local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
     if not viewmodel then
-        return
+        return nil
     end
 
     local animation = Instance.new("Animation")
@@ -346,6 +346,8 @@ function module.PlayAnimation(uri: string, name: string?): ()
     local track = viewmodel.Humanoid.Animator:LoadAnimation(animation)
     track.Name = name or ""
     track:Play()
+
+    return track
 end
 
 function module.StopAnimation(name: string): ()

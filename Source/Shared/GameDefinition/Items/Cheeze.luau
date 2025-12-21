@@ -1,21 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
-local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
 local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 
 local Cheeze = {}
 
-local EAT_DURATION = 3
+local EAT_DURATION = 1
 local HEAL_AMOUNT = 90
-local COOLDOWN = 30
-
-local remote = GetRemote("Cheeze", script)
-
-local clientItem: Types.Item?
 
 local function PrimaryFireServer(item: Types.Item, _, _, _, participant: Types.Participant): ()
-	if item.Extras.IsEating or (item.Extras.CooldownUntil or 0) > workspace:GetServerTimeNow() then
+	if item.Extras.IsEating or item.Extras.IsThrowing then
 		return
 	end
 
@@ -31,18 +24,14 @@ local function PrimaryFireServer(item: Types.Item, _, _, _, participant: Types.P
 
 		participant:SetHealth(participant:GetHealth() + HEAL_AMOUNT)
 
-		local cooldownUntil = workspace:GetServerTimeNow() + COOLDOWN
-		item.Extras.CooldownUntil = cooldownUntil
-		item.Extras.IsEating = false
-
-		remote:FireClient(participant.Player, cooldownUntil)
+		participant:RemoveItem(item)
 	end)
 end
 
 local function PrimaryFireClient(item: Types.Item): ()
 	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
 
-	if item.Extras.IsEating or (item.Extras.CooldownUntil or 0) > workspace:GetServerTimeNow() then
+	if item.Extras.IsEating or item.Extras.IsThrowing then
 		return
 	end
 
@@ -52,23 +41,45 @@ local function PrimaryFireClient(item: Types.Item): ()
 	ViewmodelModule.PlayAnimation("rbxassetid://82123370330518")
 end
 
+local function AlternateFireClient(item: Types.Item): ()
+	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
+	local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
+
+	if item.Extras.IsEating or item.Extras.IsThrowing then
+		return
+	end
+
+	item.PreventUnequip = true
+	item.Extras.IsThrowing = true
+
+	local track = ViewmodelModule.PlayAnimation("rbxassetid://115786020255555")
+
+	local function onFinish(): ()
+		ClientInventory.RemoveItem(item)
+	end
+
+	if track then
+		track:GetMarkerReachedSignal("RemoveCheeze"):Once(onFinish)
+	else
+		onFinish()
+	end
+end
+
 local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types.Participant): ()
-	participant:TryPlayAnimation(115786020255555, "ThrowCheeze")
-end
+	item.PreventUnequip = true
+	item.Extras.IsThrowing = true
 
-local function OnEquipClient(item: Types.AnyItem): ()
-	clientItem = item :: Types.Item
-end
+	local track = participant:TryPlayAnimation(115786020255555, "ThrowCheeze")
 
-if RunService:IsClient() then
-	remote.OnClientEvent:Connect(function(cooldownUntil: number?)
-		if not clientItem then
-			return
-		end
+	local function onFinish(): ()
+		participant:RemoveItem(item)
+	end
 
-		clientItem.Extras.IsEating = false
-		clientItem.Extras.CooldownUntil = cooldownUntil
-	end)
+	if track then
+		track:GetMarkerReachedSignal("RemoveCheeze"):Once(onFinish)
+	else
+		onFinish()
+	end
 end
 
 local definition: Types.ItemDefinition = {
@@ -89,7 +100,7 @@ local definition: Types.ItemDefinition = {
 	PrimaryFireServer = PrimaryFireServer,
 	PrimaryFireClient = PrimaryFireClient,
 	AlternateFireServer = AlternateFireServer,
-	OnEquipClient = OnEquipClient,
+	AlternateFireClient = AlternateFireClient,
 }
 
 Cheeze.Item = definition
