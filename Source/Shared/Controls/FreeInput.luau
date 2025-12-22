@@ -2,6 +2,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local ControlManager = require(script.Parent.ControlManager)
 local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
 
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
@@ -28,14 +29,13 @@ local gamepad = {
 }
 
 local keyboard = {
-	W = 0,
-	A = 0,
-	S = 0,
-	D = 0,
-	E = 0,
-	Q = 0,
-	LeftShift = 0,
-	RightShift = 0,
+	Forward = 0,
+	Left = 0,
+	Backward = 0,
+	Right = 0,
+	["Freecam Up"] = 0,
+	["Freecam Down"] = 0,
+	["Freecam Slow"] = 0,
 }
 
 local mouse = {
@@ -82,14 +82,14 @@ function module.GetVelocity(dt: number): Vector3
 	) * NAV_GAMEPAD_SPEED
 
 	local kKeyboard = Vector3.new(
-		keyboard.D - keyboard.A,
-		keyboard.E - keyboard.Q,
-		keyboard.S - keyboard.W
+		keyboard.Right - keyboard.Left,
+		keyboard["Freecam Up"] - keyboard["Freecam Down"],
+		keyboard.Backward - keyboard.Forward
 	) * NAV_KEYBOARD_SPEED
 
 	local kTouch = Controls:GetMoveVector() :: Vector3
 
-	local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
+	local shift = keyboard["Freecam Slow"] > 0
 
 	return ((kGamepad + kKeyboard + kTouch) * (if shift then NAV_SHIFT_MUL else 1)) * 60 * dt
 end
@@ -163,7 +163,7 @@ function module.GetFov(dt: number): number
 end
 
 local function Keypress(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
-	keyboard[input.KeyCode.Name] = state == Enum.UserInputState.Begin and 1 or 0
+	keyboard[action] = state == Enum.UserInputState.Begin and 1 or 0
 	return Enum.ContextActionResult.Pass
 end
 
@@ -229,14 +229,13 @@ function module.StartCapture(): ()
 		return
 	end
 
-	ContextActionService:BindActionAtPriority("FreeInputKeyboard", Keypress, false, INPUT_PRIORITY,
-		Enum.KeyCode.W,
-		Enum.KeyCode.A,
-		Enum.KeyCode.S,
-		Enum.KeyCode.D,
-		Enum.KeyCode.E,
-		Enum.KeyCode.Q
-	)
+	ControlManager.Register("Forward", Keypress, INPUT_PRIORITY)
+	ControlManager.Register("Left", Keypress, INPUT_PRIORITY)
+	ControlManager.Register("Backward", Keypress, INPUT_PRIORITY)
+	ControlManager.Register("Right", Keypress, INPUT_PRIORITY)
+	ControlManager.Register("Freecam Up", Keypress, INPUT_PRIORITY)
+	ControlManager.Register("Freecam Down", Keypress, INPUT_PRIORITY)
+	ControlManager.Register("Freecam Slow", Keypress, INPUT_PRIORITY)
 
 	-- Using CAS to detect touch fails when touching buttons, thus we have to do this
 	if not inputBeganConn then
@@ -273,7 +272,15 @@ function module.StopCapture(): ()
 	Zero(gamepad)
 	Zero(keyboard)
 	Zero(mouse)
-	ContextActionService:UnbindAction("FreeInputKeyboard")
+
+	ControlManager.Unregister("Forward")
+	ControlManager.Unregister("Left")
+	ControlManager.Unregister("Backward")
+	ControlManager.Unregister("Right")
+	ControlManager.Unregister("Freecam Up")
+	ControlManager.Unregister("Freecam Down")
+	ControlManager.Unregister("Freecam Slow")
+
 	ContextActionService:UnbindAction("FreeInputMousePan")
 	ContextActionService:UnbindAction("FreeInputTouchPan")
 	ContextActionService:UnbindAction("FreeInputMouseWheel")
