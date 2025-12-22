@@ -16,7 +16,7 @@ export type RegistrationInfo = {
 	Callback: ControlTypes.ActionCallback,
 }
 
-export type InputMethod = "Touch" | "Keyboard" | "Gamepad"
+export type InputMethod = "Touch" | "KBM" | "Gamepad"
 
 local registered: {[string]: RegistrationInfo} = {}
 

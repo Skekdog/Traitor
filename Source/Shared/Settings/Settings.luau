@@ -5,7 +5,7 @@ local SettingDefinitions = require(script.Parent.SettingDefinitions)
 local module = {}
 
 export type UpdateControlSettingRequest = {
-	Kind: "KeyboardKeybind",
+	Kind: "KBMKeybind",
 	New: Enum.UserInputType | Enum.KeyCode?,
 } | {
 	Kind: "GamepadKeybind",
@@ -112,7 +112,7 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 		} else nil,
 	}
 
-	if request.Kind == "KeyboardKeybind" then
+	if request.Kind == "KBMKeybind" then
 		value.Keybind.KBMKeybind = request.New
 	elseif request.Kind == "GamepadKeybind" then
 		value.Keybind.Gamepad = request.New

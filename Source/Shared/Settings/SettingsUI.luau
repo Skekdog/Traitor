@@ -240,10 +240,10 @@ local function listenForInput(kbm: boolean): Enum.UserInputType | Enum.KeyCode?
 	return if result then result else nil
 end
 
-local function updateDisplayedKeybind(frame: KeybindButton, kind: "Keyboard" | "Gamepad", key: Enum.UserInputType | Enum.KeyCode?): ()
+local function updateDisplayedKeybind(frame: KeybindButton, kind: "KBM" | "Gamepad", key: Enum.UserInputType | Enum.KeyCode?): ()
 	local asString = ControlManager.GetStringForKeyCode(key)
 
-	local bind = if kind == "Keyboard" then frame.Keyboard else frame.Controller
+	local bind = if kind == "KBM" then frame.Keyboard else frame.Controller
 	local imageLabel = bind.KeycodeImage :: ImageButton
 	local textLabel = bind.Keycode :: TextButton
 
@@ -282,18 +282,18 @@ local function updateKeybindToggled(frame: KeybindButton, definition: SettingDef
 	updateDisplayedToggle(frame, new)
 end
 
-local function updateKeyboardKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, key: Enum.UserInputType | Enum.KeyCode?): ()
+local function updateKBMKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition, key: Enum.UserInputType | Enum.KeyCode?): ()
 	Settings.UpdateControlSetting(definition.Name, {
-		Kind = "KeyboardKeybind",
+		Kind = "KBMKeybind",
 		New = key,
 	})
-	updateDisplayedKeybind(frame, "Keyboard", key)
+	updateDisplayedKeybind(frame, "KBM", key)
 end
 
-local function promptUpdateKeyboardKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition): ()
+local function promptUpdateKBMKeybind(frame: KeybindButton, definition: SettingDefinitions.ControlDefinition): ()
 	local key = listenForInput(true)
 	if key then
-		updateKeyboardKeybind(frame, definition, key)
+		updateKBMKeybind(frame, definition, key)
 	end
 end
 
@@ -316,18 +316,18 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	local frame = templates.KeybindSetting:Clone()
 	frame.Label.Text = definition.Name .. ":"
 
-	updateDisplayedKeybind(frame, "Keyboard", value.Keybind.KBMKeybind)
+	updateDisplayedKeybind(frame, "KBM", value.Keybind.KBMKeybind)
 	updateDisplayedKeybind(frame, "Gamepad", value.Keybind.Gamepad)
 
 	frame.Toggled.Visible = definition.SpecifyToggle or false
 	updateDisplayedToggle(frame, value.Toggled)
 
 	frame.Keyboard.Keycode.Activated:Connect(function()
-		updateKeyboardKeybind(frame, definition, nil)
+		updateKBMKeybind(frame, definition, nil)
 	end)
 
 	frame.Keyboard.KeycodeImage.Activated:Connect(function()
-		updateKeyboardKeybind(frame, definition, nil)
+		updateKBMKeybind(frame, definition, nil)
 	end)
 
 	frame.Controller.Keycode.Activated:Connect(function()
@@ -339,7 +339,7 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	end)
 
 	frame.Keyboard.Activated:Connect(function()
-		promptUpdateKeyboardKeybind(frame, definition)
+		promptUpdateKBMKeybind(frame, definition)
 	end)
 
 	frame.Controller.Activated:Connect(function()
@@ -534,7 +534,7 @@ function module.UpdateButtonValue(definition: SettingDefinitions.SettingDefiniti
 	elseif definition.Kind == "Choice" then
 		setChoiceButton(button :: ChoiceButton, (button :: ChoiceButton).Choices:FindFirstChild("Choice_" .. value :: string) :: TextButton, value :: SettingDefinitions.ChoiceValue)
 	elseif definition.Kind == "Control" then
-		updateDisplayedKeybind(button :: KeybindButton, "Keyboard", (value :: SettingDefinitions.ControlValue).Keybind.KBMKeybind)
+		updateDisplayedKeybind(button :: KeybindButton, "KBM", (value :: SettingDefinitions.ControlValue).Keybind.KBMKeybind)
 		updateDisplayedKeybind(button :: KeybindButton, "Gamepad", (value :: SettingDefinitions.ControlValue).Keybind.Gamepad)
 	end
 end
