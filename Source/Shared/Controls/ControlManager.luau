@@ -33,7 +33,7 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 		end
 
 		local str = UserInputService:GetStringForKeyCode(keycode :: Enum.KeyCode)
-		if str ~= "" and keycode ~= Enum.KeyCode.Space then
+		if str ~= "" then
 			if str:sub(1, 6) == "Button" then
 				return `\{{str:sub(7, -1)}\}`
 			end
@@ -54,8 +54,6 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 			return "RAlt"
 		elseif keycode == Enum.KeyCode.Tab then
 			return "Tab"
-		elseif keycode == Enum.KeyCode.Space then
-			return "Space"
 		elseif (keycode.Name:sub(1, 1) == "F") and (tonumber(keycode.Name:sub(2))) then
 			return keycode.Name
 		end

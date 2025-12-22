@@ -8,7 +8,6 @@
 --[[ Roblox Services ]]--
 local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CommonUtils = script.Parent.Parent:WaitForChild("CommonUtils")
 
@@ -16,7 +15,6 @@ local CommonUtils = script.Parent.Parent:WaitForChild("CommonUtils")
 local ZERO_VECTOR3 = Vector3.new()
 
 --[[ The Module ]]--
-local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local BaseCharacterController = require(script.Parent:WaitForChild("BaseCharacterController"))
 local Keyboard = setmetatable({}, BaseCharacterController)
 Keyboard.__index = Keyboard
@@ -48,7 +46,7 @@ function Keyboard:Enable(enable: boolean)
 	self.backwardValue = 0
 	self.leftValue = 0
 	self.rightValue = 0
-	self.moveVector = ZERO_VECTOR3
+	self.moveVector = ZERO_VECTOR3 
 	self.jumpRequested = false
 	self:UpdateJump()
 
@@ -65,7 +63,7 @@ end
 
 function Keyboard:UpdateMovement(inputState)
 	if inputState == Enum.UserInputState.Cancel then
-		self.moveVector = ZERO_VECTOR3
+		self.moveVector = ZERO_VECTOR3 
 	else
 		self.moveVector = Vector3.new(self.leftValue + self.rightValue, 0, self.forwardValue + self.backwardValue)
 	end
@@ -113,18 +111,22 @@ function Keyboard:BindContextActions()
 
 	-- TODO: Revert to KeyCode bindings so that in the future the abstraction layer from actual keys to
 	-- movement direction is done in Lua
-
-	ControlManager.Register("Forward", handleMoveForward, self.CONTROL_ACTION_PRIORITY)
-	ControlManager.Register("Backward", handleMoveBackward, self.CONTROL_ACTION_PRIORITY)
-	ControlManager.Register("Left", handleMoveLeft, self.CONTROL_ACTION_PRIORITY)
-	ControlManager.Register("Right", handleMoveRight, self.CONTROL_ACTION_PRIORITY)
-	ControlManager.Register("Jump", handleJumpAction, self.CONTROL_ACTION_PRIORITY)
-
-	self._connectionUtil:trackBoundFunction("Forward", function() ControlManager.Unregister("Forward") end)
-	self._connectionUtil:trackBoundFunction("Backward", function() ControlManager.Unregister("Backward") end)
-	self._connectionUtil:trackBoundFunction("Left", function() ControlManager.Unregister("Left") end)
-	self._connectionUtil:trackBoundFunction("Right", function() ControlManager.Unregister("Right") end)
-	self._connectionUtil:trackBoundFunction("Jump", function() ControlManager.Unregister("Jump") end)
+	ContextActionService:BindActionAtPriority("moveForwardAction", handleMoveForward, false,
+		self.CONTROL_ACTION_PRIORITY, Enum.PlayerActions.CharacterForward)
+	ContextActionService:BindActionAtPriority("moveBackwardAction", handleMoveBackward, false,
+		self.CONTROL_ACTION_PRIORITY, Enum.PlayerActions.CharacterBackward)
+	ContextActionService:BindActionAtPriority("moveLeftAction", handleMoveLeft, false,
+		self.CONTROL_ACTION_PRIORITY, Enum.PlayerActions.CharacterLeft)
+	ContextActionService:BindActionAtPriority("moveRightAction", handleMoveRight, false,
+		self.CONTROL_ACTION_PRIORITY, Enum.PlayerActions.CharacterRight)
+	ContextActionService:BindActionAtPriority("jumpAction", handleJumpAction, false,
+		self.CONTROL_ACTION_PRIORITY, Enum.PlayerActions.CharacterJump)
+	
+	self._connectionUtil:trackBoundFunction("moveForwardAction", function() ContextActionService:UnbindAction("moveForwardAction") end)
+	self._connectionUtil:trackBoundFunction("moveBackwardAction", function() ContextActionService:UnbindAction("moveBackwardAction") end)
+	self._connectionUtil:trackBoundFunction("moveLeftAction", function() ContextActionService:UnbindAction("moveLeftAction") end)
+	self._connectionUtil:trackBoundFunction("moveRightAction", function() ContextActionService:UnbindAction("moveRightAction") end)
+	self._connectionUtil:trackBoundFunction("jumpAction", function() ContextActionService:UnbindAction("jumpAction") end)
 end
 
 function Keyboard:ConnectFocusEventListeners()
