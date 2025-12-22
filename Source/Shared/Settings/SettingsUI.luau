@@ -243,7 +243,7 @@ end
 local function updateDisplayedKeybind(frame: KeybindButton, kind: "KBM" | "Gamepad", key: Enum.UserInputType | Enum.KeyCode?): ()
 	local asString = ControlManager.GetStringForKeyCode(key)
 
-	local bind = if kind == "KBM" then frame.Keyboard else frame.Controller
+	local bind = if kind == "KBM" then frame.KBM else frame.Gamepad
 	local imageLabel = bind.KeycodeImage :: ImageButton
 	local textLabel = bind.Keycode :: TextButton
 
@@ -322,27 +322,27 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 	frame.Toggled.Visible = definition.SpecifyToggle or false
 	updateDisplayedToggle(frame, value.Toggled)
 
-	frame.Keyboard.Keycode.Activated:Connect(function()
+	frame.KBM.Keycode.Activated:Connect(function()
 		updateKBMKeybind(frame, definition, nil)
 	end)
 
-	frame.Keyboard.KeycodeImage.Activated:Connect(function()
+	frame.KBM.KeycodeImage.Activated:Connect(function()
 		updateKBMKeybind(frame, definition, nil)
 	end)
 
-	frame.Controller.Keycode.Activated:Connect(function()
+	frame.Gamepad.Keycode.Activated:Connect(function()
 		updateGamepadKeybind(frame, definition, nil)
 	end)
 
-	frame.Controller.KeycodeImage.Activated:Connect(function()
+	frame.Gamepad.KeycodeImage.Activated:Connect(function()
 		updateGamepadKeybind(frame, definition, nil)
 	end)
 
-	frame.Keyboard.Activated:Connect(function()
+	frame.Gamepad.Activated:Connect(function()
 		promptUpdateKBMKeybind(frame, definition)
 	end)
 
-	frame.Controller.Activated:Connect(function()
+	frame.Gamepad.Activated:Connect(function()
 		promptUpdateGamepadKeybind(frame, definition)
 	end)
 
