@@ -274,63 +274,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Freecam Up",
-	Tab = "Keybinds",
-	Category = "Movement",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = false,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.E,
-		}
-	},
-
-	Callback = function(name: string, value: ControlValue)
-		(require)(callbacks.Keybind)(name, value)
-	end,
-})
-
-table.insert(availableSettings, {
-	Name = "Freecam Down",
-	Tab = "Keybinds",
-	Category = "Movement",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = false,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Q,
-		}
-	},
-
-	Callback = function(name: string, value: ControlValue)
-		(require)(callbacks.Keybind)(name, value)
-	end,
-})
-
-table.insert(availableSettings, {
-	Name = "Freecam Slow",
-	Tab = "Keybinds",
-	Category = "Movement",
-	Kind = "Control" :: "Control",
-	SpecifyToggle = false,
-
-	Default = {
-		Toggled = false,
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.LeftShift,
-		}
-	},
-
-	Callback = function(name: string, value: ControlValue)
-		(require)(callbacks.Keybind)(name, value)
-	end,
-})
-
-table.insert(availableSettings, {
 	Name = "Primary Fire",
 	Tab = "Keybinds",
 	Category = "Items",
