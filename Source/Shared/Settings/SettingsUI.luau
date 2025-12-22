@@ -338,7 +338,7 @@ local function setupKeybindButton(definition: SettingDefinitions.ControlDefiniti
 		updateGamepadKeybind(frame, definition, nil)
 	end)
 
-	frame.Gamepad.Activated:Connect(function()
+	frame.KBM.Activated:Connect(function()
 		promptUpdateKBMKeybind(frame, definition)
 	end)
 
