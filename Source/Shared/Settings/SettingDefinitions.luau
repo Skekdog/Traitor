@@ -179,6 +179,101 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Forward",
+	Tab = "Keybinds",
+	Category = "Movement",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = false,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.W,
+		}
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
+	Name = "Left",
+	Tab = "Keybinds",
+	Category = "Movement",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = false,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.A,
+		}
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
+	Name = "Backward",
+	Tab = "Keybinds",
+	Category = "Movement",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = false,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.S,
+		}
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
+	Name = "Right",
+	Tab = "Keybinds",
+	Category = "Movement",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = false,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.D,
+		}
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
+	Name = "Jump",
+	Tab = "Keybinds",
+	Category = "Movement",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = false,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.Space,
+		}
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
 	Name = "Primary Fire",
 	Tab = "Keybinds",
 	Category = "Items",
