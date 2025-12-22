@@ -8,7 +8,7 @@ export type ControlValue = {
 	Toggled: boolean,
 	Keybind: {
 		KBMKeybind: Enum.UserInputType | Enum.KeyCode?,
-		ConsoleKeybind: Enum.UserInputType | Enum.KeyCode?,
+		Gamepad: Enum.UserInputType | Enum.KeyCode?,
 	},
 
 	TouchButton: {
@@ -164,7 +164,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.LeftControl,
-			ConsoleKeybind = Enum.KeyCode.ButtonR3,
+			Gamepad = Enum.KeyCode.ButtonR3,
 		},
 
 		TouchButton = {
@@ -285,7 +285,7 @@ table.insert(availableSettings, {
 		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.UserInputType.MouseButton1,
-			ConsoleKeybind = Enum.KeyCode.ButtonR2,
+			Gamepad = Enum.KeyCode.ButtonR2,
 		},
 
 		TouchButton = {
@@ -311,7 +311,7 @@ table.insert(availableSettings, {
 		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.UserInputType.MouseButton2,
-			ConsoleKeybind = Enum.KeyCode.ButtonL2,
+			Gamepad = Enum.KeyCode.ButtonL2,
 		},
 
 		TouchButton = {
@@ -337,7 +337,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Z,
-			ConsoleKeybind = Enum.KeyCode.DPadRight,
+			Gamepad = Enum.KeyCode.DPadRight,
 		},
 
 		TouchButton = {
@@ -363,7 +363,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Q,
-			ConsoleKeybind = Enum.KeyCode.DPadDown,
+			Gamepad = Enum.KeyCode.DPadDown,
 		},
 
 		TouchButton = {
@@ -389,7 +389,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.R,
-			ConsoleKeybind = Enum.KeyCode.ButtonX,
+			Gamepad = Enum.KeyCode.ButtonX,
 		},
 
 		TouchButton = {
@@ -415,7 +415,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.F,
-			ConsoleKeybind = Enum.KeyCode.ButtonL1,
+			Gamepad = Enum.KeyCode.ButtonL1,
 		},
 	},
 
@@ -436,7 +436,7 @@ table.insert(availableSettings, {
 		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.E,
-			ConsoleKeybind = Enum.KeyCode.ButtonA,
+			Gamepad = Enum.KeyCode.ButtonA,
 		},
 
 		TouchButton = {
@@ -522,7 +522,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.X,
-			ConsoleKeybind = Enum.KeyCode.ButtonB,
+			Gamepad = Enum.KeyCode.ButtonB,
 		},
 	},
 
@@ -562,7 +562,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.C,
-			ConsoleKeybind = Enum.KeyCode.DPadUp,
+			Gamepad = Enum.KeyCode.DPadUp,
 		},
 	},
 
@@ -582,7 +582,7 @@ table.insert(availableSettings, {
 		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Tab,
-			ConsoleKeybind = Enum.KeyCode.ButtonL3,
+			Gamepad = Enum.KeyCode.ButtonL3,
 		},
 	},
 
@@ -602,7 +602,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.G,
-			ConsoleKeybind = Enum.KeyCode.DPadLeft,
+			Gamepad = Enum.KeyCode.DPadLeft,
 		},
 	},
 
@@ -636,14 +636,14 @@ table.insert(availableSettings, {
 	Name = "Next Item",
 	Tab = "Keybinds",
 	Category = "Inventory",
-	Tooltip = "Cycles to the next item. Primarily used with controllers.",
+	Tooltip = "Cycles to the next item. Intended for use with gamepads.",
 	Kind = "Control" :: "Control",
 	SpecifyToggle = false,
 
 	Default = {
 		Toggled = true,
 		Keybind = {
-			ConsoleKeybind = Enum.KeyCode.ButtonY,
+			Gamepad = Enum.KeyCode.ButtonY,
 		},
 	},
 

@@ -8,7 +8,7 @@ export type UpdateControlSettingRequest = {
 	Kind: "KeyboardKeybind",
 	New: Enum.UserInputType | Enum.KeyCode?,
 } | {
-	Kind: "ControllerKeybind",
+	Kind: "GamepadKeybind",
 	New: Enum.UserInputType | Enum.KeyCode?,
 } | {
 	Kind: "TouchPosition",
@@ -103,7 +103,7 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 	value = {
 		Keybind = {
 			KBMKeybind = value.Keybind.KBMKeybind,
-			ConsoleKeybind = value.Keybind.ConsoleKeybind,
+			Gamepad = value.Keybind.Gamepad,
 		},
 		Toggled = value.Toggled,
 		TouchButton = if value.TouchButton then {
@@ -114,8 +114,8 @@ function module.UpdateControlSetting(name: string, request: UpdateControlSetting
 
 	if request.Kind == "KeyboardKeybind" then
 		value.Keybind.KBMKeybind = request.New
-	elseif request.Kind == "ControllerKeybind" then
-		value.Keybind.ConsoleKeybind = request.New
+	elseif request.Kind == "GamepadKeybind" then
+		value.Keybind.Gamepad = request.New
 	elseif request.Kind == "TouchPosition" then
 		assert(value.TouchButton, `Setting {name} is not a touch setting`)
 		value.TouchButton.Position = request.New

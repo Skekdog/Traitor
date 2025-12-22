@@ -16,7 +16,7 @@ export type RegistrationInfo = {
 	Callback: ControlTypes.ActionCallback,
 }
 
-export type InputMethod = "Touch" | "Keyboard" | "Controller"
+export type InputMethod = "Touch" | "Keyboard" | "Gamepad"
 
 local registered: {[string]: RegistrationInfo} = {}
 
@@ -86,8 +86,8 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 		return "NONE"
 	end
 
-	if preferred == Enum.PreferredInput.Gamepad and keybinds.ConsoleKeybind then
-		return module.GetStringForKeyCode(keybinds.ConsoleKeybind)
+	if preferred == Enum.PreferredInput.Gamepad and keybinds.Gamepad then
+		return module.GetStringForKeyCode(keybinds.Gamepad)
 	elseif preferred == Enum.PreferredInput.KeyboardAndMouse and keybinds.KBMKeybind then
 		return module.GetStringForKeyCode(keybinds.KBMKeybind)
 	end
@@ -115,8 +115,8 @@ function module.Register(actionName: string, callback: ControlTypes.ActionCallba
 	local toggled = setting.Toggled
 
 	local binds: {Enum.KeyCode | Enum.UserInputType} = {}
-	if setting.Keybind.ConsoleKeybind then
-		table.insert(binds, setting.Keybind.ConsoleKeybind)
+	if setting.Keybind.Gamepad then
+		table.insert(binds, setting.Keybind.Gamepad)
 	end
 
 	if setting.Keybind.KBMKeybind then
@@ -194,13 +194,13 @@ function module.IsActionActive(actionName: string): boolean
 	local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
 
 	local kbmKey = setting.Keybind.KBMKeybind
-	local consoleKey = setting.Keybind.ConsoleKeybind
+	local gamepadKey = setting.Keybind.Gamepad
 
 	if kbmKey and isKeyActive(kbmKey) then
 		return true
 	end
 
-	if consoleKey and isKeyActive(consoleKey) then
+	if gamepadKey and isKeyActive(gamepadKey) then
 		return true
 	end
 

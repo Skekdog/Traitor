@@ -133,7 +133,7 @@ local function OnEquipClient(): ()
 	end, nil, {
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Space,
-			ConsoleKeybind = Enum.KeyCode.ButtonA,
+			Gamepad = Enum.KeyCode.ButtonA,
 		},
 		Toggled = false,
 	})
