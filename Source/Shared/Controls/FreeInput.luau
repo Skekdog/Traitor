@@ -84,9 +84,9 @@ end
 
 function module.GetVelocity(dt: number): Vector3
 	local kGamepad = Vector3.new(
-		thumbstickCurve(gamepad.Thumbstick1.X),
+		gamepad.Thumbstick1.X,
 		thumbstickCurve(gamepad.ButtonR2) - thumbstickCurve(gamepad.ButtonL2),
-		thumbstickCurve(-gamepad.Thumbstick1.Y)
+		gamepad.Thumbstick1.Y
 	) * NAV_GAMEPAD_SPEED
 
 	local kKeyboard = Vector3.new(
@@ -189,7 +189,8 @@ local function MousePan(action: string, state: Enum.UserInputState, input: Input
 end
 
 local function Thumb(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
-	gamepad[input.KeyCode.Name] = input.Position :: any
+	local position = input.Position
+	gamepad[input.KeyCode.Name] = Vector3.new(thumbstickCurve(position.X), -thumbstickCurve(position.Y)) :: any
 	return Enum.ContextActionResult.Pass
 end
 
