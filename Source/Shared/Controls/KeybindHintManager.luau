@@ -65,7 +65,7 @@ local function updateText(control: string, instance: Instance): ()
     local imageLabel = instance:FindFirstChild("KeybindHintImage") :: ImageLabel?
     local textLabel = instance:FindFirstChild("KeybindHintText") :: TextLabel?
 
-    if text:sub(1, 11) == "rbxasset://" then
+    if text:find("://") then
         if not imageLabel then
             return
         end
