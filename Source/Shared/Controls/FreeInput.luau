@@ -1,12 +1,16 @@
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local GetFlag = require(ReplicatedStorage.Shared.Util.GetFlag)
 local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
 
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
 local module = {}
+
+local FFlagUserCameraInputDt = GetFlag("UserCameraInputDt")
 
 local NAV_GAMEPAD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
 local NAV_KEYBOARD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
@@ -53,6 +57,10 @@ local MIN_Y = math.rad(-80)
 local MAX_Y = math.rad(80)
 
 local ROTATION_SPEED_GAMEPAD = Vector3.new(1, 0.77)*math.rad(4) -- (rad/s)
+
+if FFlagUserCameraInputDt then
+	ROTATION_SPEED_GAMEPAD *= 60 -- inline with FFlagUserCameraInputDt
+end
 
 -- these speeds should not be scaled by dt because the input returned is not normalized.
 -- that is, at lower framerates, the magnitude of the input delta will be larger because the pointer/mouse/touch
@@ -122,7 +130,10 @@ local function getRawCameraRotation(dt: number): Vector3
 	local inversionVector = Vector3.new(1, UserGameSettings:GetCameraYInvertValue())
 
 	local kGamepad = gamepad.Thumbstick2 * UserGameSettings.GamepadCameraSensitivity
-	kGamepad *= dt
+
+	if GetFlag("UserCameraInputDt") then
+		kGamepad *= dt
+	end
 
 	local kMouse = mouse.Delta
 	local kTouch = adjustTouchPitchSensitivity(touchDelta)
