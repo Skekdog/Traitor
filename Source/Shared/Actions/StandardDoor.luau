@@ -215,7 +215,7 @@ end
 local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoorServerReceive>, part: BasePart, originalDoorCFrame: CFrame, shouldOpen: boolean, duration: number): ()
     local door = request.Door
 
-    door:SetAttribute("Locked", true)
+    door:SetAttribute("NoInteract", true)
 
     local axis = door:GetAttribute("SlideAxis")
     if typeof(axis) ~= "Vector3" then
@@ -241,7 +241,7 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
             if id ~= door:GetAttribute("Id") then
                 return
             end
-            door:SetAttribute("Locked", false)
+            door:SetAttribute("NoInteract", false)
         end)
 
         part.CFrame = targetCFrame
@@ -260,7 +260,7 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
 
     tween.Completed:Once(function(status)
         if status == Enum.PlaybackState.Completed then
-            door:SetAttribute("Locked", false)
+            door:SetAttribute("NoInteract", false)
         end
     end)
 end
@@ -275,6 +275,10 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     local door = request.Door
+
+    if door:GetAttribute("NoInteract") and request.Kind :: any ~= "ClientReceive" and request.Kind :: any ~= "ServerRun" then
+        return
+    end
 
     if request.Kind == "ServerReceive" and request.Receive.Kind == "HingeDoorServerReceive" then
         if request.Receive.Direction == nil and not door:GetAttribute("Open") then
