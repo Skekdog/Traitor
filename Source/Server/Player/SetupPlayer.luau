@@ -25,7 +25,7 @@ local function tryAwardTesterBadge(plr: Player): ()
 	local suc = false
 	repeat
 		suc = pcall(function()
-			BadgeService:AwardBadge(plr.UserId, 2136698808)
+			BadgeService:AwardBadgeAsync(plr.UserId, 2136698808)
 		end)
 		task.wait(1)
 	until suc or tries > 3
@@ -50,7 +50,7 @@ local function setupPlayer(plr: Player): ()
 	if ServerStorage:GetAttribute("ServerLocked") then
 		return plr:Kick("This server is shutting down.")
 	end
-	
+
     loadAttributes(plr)
 	loadProfile(plr)
 
