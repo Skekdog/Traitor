@@ -1,5 +1,5 @@
 {
-  "languageMode": "nocheck",
+  "languageMode": "nonstrict",
   "lint": {
     "*": true,
     "LocalUnused": false,
@@ -7,9 +7,8 @@
     "ImportUnused": false,
     "FunctionUnused": false,
     "LocalShadow": false,
-    "DeprecatedApi": false
+    "DeprecatedApi": true
   },
   "lintErrors": false,
-  "typeErrors": false,
-  "globals": ["workspace", "game"]
+  "typeErrors": true
 }
