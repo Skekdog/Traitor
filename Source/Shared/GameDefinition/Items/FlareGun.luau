@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fire = require(ReplicatedStorage.API.Fire)
+local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
+local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -116,6 +118,24 @@ local item: Types.GunWeaponDefinition = {
                 Fire.Extinguish(target.Model)
             end
         end)
+
+        return true
+    end,
+
+    BeforeHitAnything = function(_, _, hitPart: BasePart, params: Types.DamageParams): boolean
+        assert(params.HitPosition)
+
+        if GetMapObject(hitPart, "Prop") or GetMapObject(hitPart, "Character") then
+            return true
+        end
+
+        local part = CreateEmptyPart(CFrame.new(params.HitPosition))
+        part.Size = Vector3.one
+        part.Parent = workspace.Projectiles
+
+        Fire.Ignite(part)
+
+        task.delay(math.random(9, 11), Fire.Extinguish, part)
 
         return true
     end,
