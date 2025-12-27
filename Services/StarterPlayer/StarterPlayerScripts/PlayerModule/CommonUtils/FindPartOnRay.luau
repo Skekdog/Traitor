@@ -8,9 +8,13 @@ function FindPartOnRay.Including(ray: Ray, include: {Instance}, ignoreWater: boo
 	params.FilterDescendantsInstances = include
 	params.FilterType = Enum.RaycastFilterType.Exclude
 
-	local result = workspace:Raycast(ray.Origin, ray.Unit.Direction * math.huge) or {}
+	local result = workspace:Raycast(ray.Origin, ray.Unit.Direction * math.huge)
 
-	return result.Instance, result.Position, result.Normal, result.Material
+	if result then
+		return result.Instance, result.Position, result.Normal, result.Material
+	else
+		return nil, nil, nil, nil
+	end
 end
 
 function FindPartOnRay.Excluding(ray: Ray, exclude: {Instance}, terrainCellsAreCubes: boolean?, ignoreWater: boolean?): (BasePart?, Vector3?, Vector3?, Enum.Material?)
@@ -20,9 +24,13 @@ function FindPartOnRay.Excluding(ray: Ray, exclude: {Instance}, terrainCellsAreC
 	params.FilterDescendantsInstances = exclude
 	params.FilterType = Enum.RaycastFilterType.Exclude
 
-	local result = workspace:Raycast(ray.Origin, ray.Unit.Direction * math.huge, params) or {}
+	local result = workspace:Raycast(ray.Origin, ray.Unit.Direction * math.huge, params)
 
-	return result.Instance, result.Position, result.Normal, result.Material
+	if result then
+		return result.Instance, result.Position, result.Normal, result.Material
+	else
+		return nil, nil, nil, nil
+	end
 end
 
 return FindPartOnRay
