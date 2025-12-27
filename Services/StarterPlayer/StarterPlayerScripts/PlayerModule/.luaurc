@@ -6,7 +6,8 @@
     "ImplicitReturn": false,
     "ImportUnused": false,
     "FunctionUnused": false,
-    "LocalShadow": false
+    "LocalShadow": false,
+    "DeprecatedApi": false
   },
   "lintErrors": false,
   "typeErrors": false,
