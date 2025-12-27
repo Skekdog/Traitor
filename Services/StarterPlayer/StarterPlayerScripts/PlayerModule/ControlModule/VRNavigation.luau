@@ -14,6 +14,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local StarterGui = game:GetService("StarterGui")
 
 local CommonUtils = script.Parent.Parent:WaitForChild("CommonUtils")
+local FindPartOnRay = require(CommonUtils.FindPartOnRay)
 local FlagUtil = require(CommonUtils:WaitForChild("FlagUtil"))
 
 --local MasterControl = require(script.Parent)
@@ -374,7 +375,7 @@ function VRNavigation:OnHeartbeat(dt)
 			if FFlagUserRaycastUpdateAPI then
 				raycastParams.FilterDescendantsInstances = { (game.Players.LocalPlayer :: Player).Character, workspace.CurrentCamera}
 				local raycastResult = workspace:Raycast(currentPosition - Vector3.yAxis, moveDir * 3, raycastParams)
-			
+
 				if raycastResult then
 					raycastResult = workspace:Raycast(raycastResult.Position + moveDir * 0.5 + HEIGHT_OFFSET, -HEIGHT_OFFSET, raycastParams)
 
@@ -389,12 +390,12 @@ function VRNavigation:OnHeartbeat(dt)
 					workspace.CurrentCamera
 				}
 				local obstructRay = Ray.new(currentPosition - Vector3.new(0, 1, 0), moveDir * 3)
-				local obstructPart, obstructPoint, obstructNormal = workspace:FindPartOnRayWithIgnoreList(obstructRay, ignoreTable)
+				local obstructPart, obstructPoint, obstructNormal = FindPartOnRay.Excluding(obstructRay, ignoreTable)
 
 				if obstructPart then
 					local heightOffset = Vector3.new(0, 100, 0)
 					local jumpCheckRay = Ray.new(obstructPoint + moveDir * 0.5 + heightOffset, -heightOffset)
-					local jumpCheckPart, jumpCheckPoint, jumpCheckNormal = workspace:FindPartOnRayWithIgnoreList(jumpCheckRay, ignoreTable)
+					local jumpCheckPart, jumpCheckPoint, jumpCheckNormal = FindPartOnRay.Excluding(jumpCheckRay, ignoreTable)
 
 					local heightDifference = jumpCheckPoint.Y - currentPosition.Y
 					if heightDifference < 6 and heightDifference > -2 then

@@ -8,6 +8,7 @@
 local PlayersService = game:GetService("Players")
 
 local CommonUtils = script.Parent.Parent:WaitForChild("CommonUtils")
+local FindPartOnRay = require(CommonUtils.FindPartOnRay)
 local FlagUtil = require(CommonUtils:WaitForChild("FlagUtil"))
 
 --[[ Flags ]]--
@@ -254,7 +255,7 @@ function Invisicam:CharacterOutlineBehavior(castPoints)
 			end
 		else
 			local ray = Ray.new(centerPoint + offset, -3 * offset)
-			local hit, hitPoint = game.Workspace:FindPartOnRayWithWhitelist(ray, partsWhitelist, false)
+			local hit, hitPoint = FindPartOnRay.Including(ray, partsWhitelist, false)
 
 			if hit then
 				-- Use hit point as the cast point, but nudge it slightly inside the character so that bumping up against
@@ -301,7 +302,7 @@ function Invisicam:SmartCircleBehavior(castPoints)
 		-- Vector from camera to point on the circle being tested
 		local vp = circlePoint - self.camera.CFrame.p
 
-		
+
 		if FFlagUserRaycastUpdateAPI then
 			excludeParams.FilterDescendantsInstances = { self.char }
 			local raycastResult = game.Workspace:Raycast(torsoPoint, circlePoint - torsoPoint, excludeParams)
@@ -351,7 +352,7 @@ function Invisicam:SmartCircleBehavior(castPoints)
 			castPoints[#castPoints + 1] = castPoint
 		else
 			local ray = Ray.new(torsoPoint, circlePoint - torsoPoint)
-			local hit, hp, hitNormal = game.Workspace:FindPartOnRayWithIgnoreList(ray, {self.char}, false, false )
+			local hit, hp, hitNormal = FindPartOnRay.Excluding(ray, {self.char}, false, false )
 			local castPoint = circlePoint
 
 			if hit then
@@ -373,7 +374,7 @@ function Invisicam:SmartCircleBehavior(castPoints)
 
 					if castPoint.Magnitude > 0 then
 						local ray = Ray.new(hprime, castPoint - hprime)
-						local hit, hitPoint, hitNormal = game.Workspace:FindPartOnRayWithIgnoreList(ray, {self.char}, false, false )
+						local hit, hitPoint, hitNormal = FindPartOnRay.Excluding(ray, {self.char}, false, false )
 
 						if hit then
 							local hprime2 = hitPoint + 0.1 * hitNormal.unit
@@ -387,7 +388,7 @@ function Invisicam:SmartCircleBehavior(castPoints)
 				end
 
 				local ray = Ray.new(torsoPoint, (castPoint - torsoPoint))
-				local hit, hitPoint, hitNormal = game.Workspace:FindPartOnRayWithIgnoreList(ray, {self.char}, false, false )
+				local hit, hitPoint, hitNormal = FindPartOnRay.Excluding(ray, {self.char}, false, false )
 
 				if hit then
 					local castPoint2 = hitPoint - 0.1 * (castPoint - torsoPoint).unit

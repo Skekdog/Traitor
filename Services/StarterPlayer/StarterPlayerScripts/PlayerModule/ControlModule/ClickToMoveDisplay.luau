@@ -290,7 +290,7 @@ function FailureWaypoint:NewDisplayModel(position)
 end
 
 function FailureWaypoint:RunFailureTween()
-	wait(FAILURE_TWEEN_LENGTH) -- Delay one tween length betfore starting tweening
+	task.wait(FAILURE_TWEEN_LENGTH) -- Delay one tween length betfore starting tweening
 	-- Tween out from center
 	local tweenInfo = TweenInfo.new(FAILURE_TWEEN_LENGTH/2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
 	local tweenLeft = TweenService:Create(self.DisplayModel.FailureWaypointBillboard, tweenInfo,
@@ -335,7 +335,7 @@ function FailureWaypoint:RunFailureTween()
 
 	tweenCenter.Completed:wait()
 
-	wait(FAILURE_TWEEN_LENGTH) -- Delay one tween length betfore removing
+	task.wait(FAILURE_TWEEN_LENGTH) -- Delay one tween length betfore removing
 end
 
 function FailureWaypoint.new(position)

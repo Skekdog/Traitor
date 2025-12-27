@@ -551,7 +551,7 @@ local function Pather(endPoint, surfaceNormal, overrideUseDirectPath: boolean?)
 						-- Give time to the humanoid's state to change
 						-- Otherwise, the jump flag in Humanoid
 						-- will be reset by the state change
-						wait(0.1)
+						task.wait(0.1)
 					end
 				end
 
@@ -569,7 +569,7 @@ local function Pather(endPoint, surfaceNormal, overrideUseDirectPath: boolean?)
 		-- (plane normal is perpendicular to the y plane and is from next waypoint towards current one (provided the two waypoints are not at the same location))
 		-- (plane location is at next waypoint)
 		this.CurrentWaypointPlaneNormal = currentWaypoint.Position - nextWaypoint.Position
-		
+
 		-- plane normal isn't perpendicular to the y plane when climbing up
 		if not FFlagUserClickToMoveSupportAgentCanClimb or (nextWaypoint.Label ~= "Climb") then
 			this.CurrentWaypointPlaneNormal = Vector3.new(this.CurrentWaypointPlaneNormal.X, 0, this.CurrentWaypointPlaneNormal.Z)
@@ -643,7 +643,7 @@ local function Pather(endPoint, surfaceNormal, overrideUseDirectPath: boolean?)
 	if FFlagUserRaycastUpdateAPI then
 		raycastParams.FilterDescendantsInstances = getIgnoreList()
 		local raycastResult = Workspace:Raycast(offsetPoint, -Vector3.yAxis * 50, raycastParams)
-	
+
 		if raycastResult then
 			this.TargetPoint = raycastResult.Position
 		end
@@ -748,7 +748,7 @@ function OnTap(tapPositions: {Vector3}, goToPoint: Vector3?, wasTouchTap: boolea
 	if #tapPositions == 1 or goToPoint then
 		if camera then
 			local unitRay = camera:ScreenPointToRay(tapPositions[1].X, tapPositions[1].Y)
-			
+
 			if FFlagUserRaycastUpdateAPI then
 				local humanoidResult, characterResult, raycastResult
 				local ignoreList = getIgnoreList() or {}
@@ -790,7 +790,7 @@ function OnTap(tapPositions: {Vector3}, goToPoint: Vector3?, wasTouchTap: boolea
 				end
 
 				local position = raycastResult.Position
-				if goToPoint then 
+				if goToPoint then
 					position = goToPoint
 					characterResult = nil
 				end

@@ -131,7 +131,7 @@ function TransparencyController:SetupTransparency(character)
 			end)
 			if self.toolDescendantRemovingConns[object] then self.toolDescendantRemovingConns[object]:disconnect() end
 			self.toolDescendantRemovingConns[object] = object.DescendantRemoving:Connect(function(formerToolChild)
-				wait() -- wait for new parent
+				task.wait() -- wait for new parent
 				if character and formerToolChild and formerToolChild:IsDescendantOf(character) then
 					if self:IsValidPartToModify(formerToolChild) then
 						self.cachedParts[formerToolChild] = true

@@ -668,7 +668,7 @@ function ControlModule:PreferredInputChanged()
 		local touchModule, success = self:SelectTouchModule()
 		if success then
 			while not self.touchControlFrame do
-				wait()
+				task.wait()
 			end
 			self:SwitchToController(touchModule)
 		end
@@ -694,7 +694,7 @@ function ControlModule:OnLastInputTypeChanged(newLastInputType)
 		local touchModule, success = self:SelectTouchModule()
 		if success then
 			while not self.touchControlFrame do
-				wait()
+				task.wait()
 			end
 			self:SwitchToController(touchModule)
 		end
@@ -721,7 +721,7 @@ function ControlModule:OnTouchMovementModeChange()
 	local touchModule, success = self:SelectTouchModule()
 	if success then
 		while not self.touchControlFrame do
-			wait()
+			task.wait()
 		end
 		self:SwitchToController(touchModule)
 	end

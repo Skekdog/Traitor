@@ -7,6 +7,7 @@
 local Players = game:GetService("Players")
 
 local CommonUtils = script.Parent.Parent.Parent:WaitForChild("CommonUtils")
+local FindPartOnRay = require(CommonUtils.FindPartOnRay)
 local FlagUtil = require(CommonUtils:WaitForChild("FlagUtil"))
 local CameraWrapper = require(CommonUtils:WaitForChild("CameraWrapper"))
 local ConnectionUtil = require(CommonUtils:WaitForChild("ConnectionUtil"))
@@ -82,12 +83,12 @@ else
 			projY = 2*tan(fov/2)
 			projX = ar*projY
 		end
-	
+
 		camera:GetPropertyChangedSignal("FieldOfView"):Connect(updateProjection)
 		camera:GetPropertyChangedSignal("ViewportSize"):Connect(updateProjection)
-	
+
 		updateProjection()
-	
+
 		nearPlaneZ = camera.NearPlaneZ
 		camera:GetPropertyChangedSignal("NearPlaneZ"):Connect(function()
 			nearPlaneZ = camera.NearPlaneZ
@@ -215,7 +216,7 @@ local SCAN_SAMPLE_OFFSETS = {
 	Vector2.new( 0.0, 0.2),
 }
 
--- Maximum number of rays that can be cast 
+-- Maximum number of rays that can be cast
 local QUERY_POINT_CAST_LIMIT = 64
 
 --------------------------------------------------------------------------------
@@ -238,7 +239,7 @@ local function getCollisionPoint(origin, dir)
 		local originalSize = #excludeList
 
 		repeat
-			local hitPart, hitPoint = workspace:FindPartOnRayWithIgnoreList(
+			local hitPart, hitPoint = FindPartOnRay.Excluding(
 				ray(origin, dir), excludeList, false, true
 			)
 
@@ -272,7 +273,7 @@ local function queryPoint(origin, unitDir, dist, lastPos)
 	local movingOrigin = origin
 
 	local numPierced = 0
-	
+
 	if FFlagUserRaycastUpdateAPI then
 		excludeParams.FilterDescendantsInstances = excludeList
 		repeat
@@ -316,16 +317,16 @@ local function queryPoint(origin, unitDir, dist, lastPos)
 		until hardLimit < inf or not entryInstance
 	else
 		repeat
-			local entryPart, entryPos = workspace:FindPartOnRayWithIgnoreList(ray(movingOrigin, target - movingOrigin), excludeList, false, true)
+			local entryPart, entryPos = FindPartOnRay.Excluding(ray(movingOrigin, target - movingOrigin), excludeList, false, true)
 			numPierced += 1
 
 			if entryPart then
 				-- forces the current iteration into a hard limit to cap the number of raycasts
 				local earlyAbort = numPierced >= QUERY_POINT_CAST_LIMIT
-				
+
 				if canOcclude(entryPart) or earlyAbort then
 					local wl = {entryPart}
-					local exitPart = workspace:FindPartOnRayWithWhitelist(ray(target, entryPos - target), wl, true)
+					local exitPart = FindPartOnRay.Including(ray(target, entryPos - target), wl, true)
 
 					local lim = (entryPos - origin).Magnitude
 
@@ -333,8 +334,8 @@ local function queryPoint(origin, unitDir, dist, lastPos)
 						local promote = false
 						if lastPos then
 							promote =
-								workspace:FindPartOnRayWithWhitelist(ray(lastPos, target - lastPos), wl, true) or
-								workspace:FindPartOnRayWithWhitelist(ray(target, lastPos - target), wl, true)
+								FindPartOnRay.Including(ray(lastPos, target - lastPos), wl, true) or
+								FindPartOnRay.Including(ray(target, lastPos - target), wl, true)
 						end
 
 						if promote then

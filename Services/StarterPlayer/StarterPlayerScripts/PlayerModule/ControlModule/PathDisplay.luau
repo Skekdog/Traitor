@@ -2,6 +2,7 @@
 
 local CommonUtils = script.Parent.Parent:WaitForChild("CommonUtils")
 local FlagUtil = require(CommonUtils:WaitForChild("FlagUtil"))
+local FindPartOnRay = require(CommonUtils.FindPartOnRay)
 
 local FFlagUserRaycastUpdateAPI = FlagUtil.getUserFlag("UserRaycastUpdateAPI")
 
@@ -71,14 +72,14 @@ local function renderPoint(point: Vector3, isLast): ImageHandleAdornment?
 		pointInstance.Parent = pointModel
 	else
 		local rayDown = Ray.new(point + Vector3.new(0, 2, 0), Vector3.new(0, -8, 0))
-		local hitPart, hitPoint, hitNormal = workspace:FindPartOnRayWithIgnoreList(rayDown, { (game.Players.LocalPlayer :: Player).Character :: Model, workspace.CurrentCamera :: Camera })
+		local hitPart, hitPoint, hitNormal = FindPartOnRay.Excluding(rayDown, { (game.Players.LocalPlayer :: Player).Character :: Model, workspace.CurrentCamera :: Camera })
 		if not hitPart then
 			return nil
 		end
 
 		local pointCFrame = CFrame.new(hitPoint, hitPoint + hitNormal)
 
-		
+
 		pointInstance.CFrame = pointCFrame
 		pointInstance.Parent = pointModel
 	end
