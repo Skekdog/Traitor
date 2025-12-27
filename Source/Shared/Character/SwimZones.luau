@@ -25,10 +25,18 @@ local generalCleanup: CleanupTargets = {}
 local stateCleanup: CleanupTargets = {}
 local recalcCleanup: CleanupTargets = {}
 
-local function InPart(part: BasePart, pos: Vector3, heightOffset: number): boolean
-	local rel = part.CFrame:PointToObjectSpace(pos)
+local function InPart(part: BasePart, part2: BasePart, heightOffset: number): boolean
+	local rel = part.CFrame:PointToObjectSpace(part2.Position)
 	local size = part.Size
+
 	if math.abs(rel.X) <= size.X/2 and math.abs(rel.Y) <= size.Y/2 + (heightOffset or 0) and math.abs(rel.Z) <= size.Z/2 then
+		if not part:IsA("Part") or part.Shape ~= Enum.PartType.Block or part:FindFirstChildWhichIsA("DataModelMesh") then
+			local params = OverlapParams.new()
+			params.FilterDescendantsInstances = {part2}
+			params.FilterType = Enum.RaycastFilterType.Include
+
+			return #workspace:GetPartsInPart(part) > 0
+		end
 		return true
 	end
 	return false
@@ -187,18 +195,17 @@ RunService.PreSimulation:Connect(function(dt)
 	end
 
 	local humanState = hum:GetState()
-	local rootPos = root.Position
 	local currentZone: BasePart?
 
 	for _, v in zones do
-		if InPart(v, rootPos, if didJump then -SURFACE_DEPTH - NEAR_SURFACE_THRESHOLD else 0) then
+		if InPart(v, root, if didJump then -SURFACE_DEPTH - NEAR_SURFACE_THRESHOLD else 0) then
 			currentZone = v
 			break
 		end
 	end
 
 	if lastZone ~= currentZone then
-		if not lastZone or not InPart(lastZone, rootPos, 2) then
+		if not lastZone or not InPart(lastZone, root, 2) then
 			lastZone = currentZone
 
 			if currentZone then
@@ -273,7 +280,7 @@ RunService.PreSimulation:Connect(function(dt)
 		local drag = velocity * dragMultiplier
 		local upForce = antiGravForce
 
-		local offsetToSurface = (surfaceY - SURFACE_DEPTH) - rootPos.Y
+		local offsetToSurface = (surfaceY - SURFACE_DEPTH) - root.Position.Y
 
 		didJump = false
 		nearSurface = offsetToSurface < NEAR_SURFACE_THRESHOLD
