@@ -14,6 +14,7 @@
 
 	Release notes:
 		7/14/2025 - Use PreferredInput instead of LastInputType for enabling/disabling virtual thumbstick
+		7/24/2025 - Use PreferredInput instead of TouchEnabled for setting movement modes, camera modes, and shift lock
 
 ]]--
 
@@ -43,13 +44,6 @@ local FFlagUserDynamicThumbstickSafeAreaUpdate do
 	FFlagUserDynamicThumbstickSafeAreaUpdate = success and result
 end
 
-local FFlagUserControlModuleUsePreferredInput do
-	local success, result = pcall(function()
-		return UserSettings():IsUserFeatureEnabled("UserControlModuleUsePreferredInput")
-	end)
-	FFlagUserControlModuleUsePreferredInput = success and result
-end
-
 local TouchThumbstick = require(script:WaitForChild("TouchThumbstick"))
 
 -- These controllers handle only walk/run movement, jumping is handled by the
@@ -63,7 +57,7 @@ local CONTROL_ACTION_PRIORITY = Enum.ContextActionPriority.Medium.Value
 local NECK_OFFSET = -0.7
 local FIRST_PERSON_THRESHOLD_DISTANCE = 5
 
--- Mapping from movement mode and lastInputType enum values to control modules to avoid huge if elseif switching
+-- Mapping from movement mode enum values to control modules to avoid huge if elseif switching
 local movementEnumToModuleMap = {
 	[Enum.TouchMovementMode.DPad] = DynamicThumbstick,
 	[Enum.DevTouchMovementMode.DPad] = DynamicThumbstick,
@@ -87,22 +81,6 @@ local movementEnumToModuleMap = {
 	[Enum.DevComputerMovementMode.ClickToMove] = ClickToMove,
 }
 
--- Keyboard controller is really keyboard and mouse controller
-local computerInputTypeToModuleMap = {
-	[Enum.UserInputType.Keyboard] = Keyboard,
-	[Enum.UserInputType.MouseButton1] = Keyboard,
-	[Enum.UserInputType.MouseButton2] = Keyboard,
-	[Enum.UserInputType.MouseButton3] = Keyboard,
-	[Enum.UserInputType.MouseWheel] = Keyboard,
-	[Enum.UserInputType.MouseMovement] = Keyboard,
-	[Enum.UserInputType.Gamepad1] = Gamepad,
-	[Enum.UserInputType.Gamepad2] = Gamepad,
-	[Enum.UserInputType.Gamepad3] = Gamepad,
-	[Enum.UserInputType.Gamepad4] = Gamepad,
-}
-
-local lastInputType
-
 function ControlModule.new()
 	local self = setmetatable({},ControlModule)
 
@@ -115,7 +93,6 @@ function ControlModule.new()
 	self.touchJumpController = nil
 	self.moveFunction = Players.LocalPlayer.Move
 	self.humanoid = nil
-	self.lastInputType = Enum.UserInputType.None
 	self.controlsEnabled = true
 
 	-- For Roblox self.vehicleController
@@ -139,25 +116,18 @@ function ControlModule.new()
 		self:OnRenderStepped(dt)
 	end)
 
-	if not FFlagUserControlModuleUsePreferredInput then
-		UserInputService.LastInputTypeChanged:Connect(function(newLastInputType)
-			self:OnLastInputTypeChanged(newLastInputType)
-		end)
-	end
-
-
 	UserGameSettings:GetPropertyChangedSignal("TouchMovementMode"):Connect(function()
-		self:OnTouchMovementModeChange()
+		self:UpdateMovementMode()
 	end)
 	Players.LocalPlayer:GetPropertyChangedSignal("DevTouchMovementMode"):Connect(function()
-		self:OnTouchMovementModeChange()
+		self:UpdateMovementMode()
 	end)
 
 	UserGameSettings:GetPropertyChangedSignal("ComputerMovementMode"):Connect(function()
-		self:OnComputerMovementModeChange()
+		self:UpdateMovementMode()
 	end)
 	Players.LocalPlayer:GetPropertyChangedSignal("DevComputerMovementMode"):Connect(function()
-		self:OnComputerMovementModeChange()
+		self:UpdateMovementMode()
 	end)
 
 	--[[ Touch Device UI ]]--
@@ -166,42 +136,27 @@ function ControlModule.new()
 	self.playerGuiAddedConn = nil
 
 	GuiService:GetPropertyChangedSignal("TouchControlsEnabled"):Connect(function()
-		self:UpdateTouchGuiVisibility()
+		self:UpdateMovementMode()
 		self:UpdateActiveControlModuleEnabled()
 	end)
 
-	if UserInputService.TouchEnabled then
-		self.playerGui = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui")
-		if self.playerGui then
-			self:CreateTouchGuiContainer()
-			if not FFlagUserControlModuleUsePreferredInput then
-				self:OnLastInputTypeChanged(UserInputService:GetLastInputType())
+	UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function()
+		self:UpdateMovementMode()
+	end)
+
+	self.playerGui = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui")
+	if not self.playerGui then
+		self.playerGuiAddedConn = Players.LocalPlayer.ChildAdded:Connect(function(child)
+			if child:IsA("PlayerGui") then
+				self.playerGui = child
+				self.playerGuiAddedConn:Disconnect()
+				self.playerGuiAddedConn = nil
+				self:UpdateMovementMode()
 			end
-		else
-			self.playerGuiAddedConn = Players.LocalPlayer.ChildAdded:Connect(function(child)
-				if child:IsA("PlayerGui") then
-					self.playerGui = child
-					self:CreateTouchGuiContainer()
-					self.playerGuiAddedConn:Disconnect()
-					self.playerGuiAddedConn = nil
-					if not FFlagUserControlModuleUsePreferredInput then
-						self:OnLastInputTypeChanged(UserInputService:GetLastInputType())
-					end
-				end
-			end)
-		end
-	else
-		if not FFlagUserControlModuleUsePreferredInput then
-			self:OnLastInputTypeChanged(UserInputService:GetLastInputType())
-		end
+		end)
 	end
 
-	if FFlagUserControlModuleUsePreferredInput then
-		UserInputService:GetPropertyChangedSignal("PreferredInput"):Connect(function()
-			self:PreferredInputChanged()
-		end)
-		self:PreferredInputChanged()
-	end
+	self:UpdateMovementMode()
 
 	return self
 end
@@ -292,8 +247,7 @@ function ControlModule:UpdateActiveControlModuleEnabled()
 	end
 
 	local enable = function()
-		if
-			self.touchControlFrame
+		if self.touchControlFrame and (UserInputService.PreferredInput == Enum.PreferredInput.Touch)
 			and (
 				self.activeControlModule == ClickToMove
 				or self.activeControlModule == TouchThumbstick
@@ -339,7 +293,7 @@ function ControlModule:UpdateActiveControlModuleEnabled()
 
 	-- GuiService.TouchControlsEnabled == false and the active controller is a touch controller,
 	-- disable controls
-	if not GuiService.TouchControlsEnabled and UserInputService.TouchEnabled and
+	if not GuiService.TouchControlsEnabled and UserInputService.PreferredInput == Enum.PreferredInput.Touch and
 		(self.activeControlModule == ClickToMove or self.activeControlModule == TouchThumbstick or
 			self.activeControlModule == DynamicThumbstick) then
 		disable()
@@ -385,18 +339,14 @@ function ControlModule:SelectComputerMovementModule(): ({}?, boolean)
 	local DevMovementMode = Players.LocalPlayer.DevComputerMovementMode
 
 	if DevMovementMode == Enum.DevComputerMovementMode.UserChoice then
-		if FFlagUserControlModuleUsePreferredInput then
-			if UserInputService.PreferredInput == Enum.PreferredInput.Gamepad then
-				computerModule = Gamepad
-			elseif UserInputService.PreferredInput == Enum.PreferredInput.KeyboardAndMouse then
-				computerModule = Keyboard
-			end
-		else
-			computerModule = computerInputTypeToModuleMap[lastInputType]
+		if UserInputService.PreferredInput == Enum.PreferredInput.Gamepad then
+			computerModule = Gamepad
+		elseif UserInputService.PreferredInput == Enum.PreferredInput.KeyboardAndMouse then
+			computerModule = Keyboard
 		end
 
 		if UserGameSettings.ComputerMovementMode == Enum.ComputerMovementMode.ClickToMove and computerModule == Keyboard then
-			-- User has ClickToMove set in Settings, prefer ClickToMove controller for keyboard and mouse lastInputTypes
+			-- User has ClickToMove set in Settings, prefer ClickToMove controller when using keyboard and mouse
 			computerModule = ClickToMove
 		end
 	else
@@ -424,9 +374,6 @@ end
 -- Choose current Touch control module based on settings (user, dev)
 -- Returns module (possibly nil) and success code to differentiate returning nil due to error vs Scriptable
 function ControlModule:SelectTouchModule(): ({}?, boolean)
-	if not UserInputService.TouchEnabled then
-		return nil, false
-	end
 	local touchModule
 	local DevMovementMode = Players.LocalPlayer.DevTouchMovementMode
 	if DevMovementMode == Enum.DevTouchMovementMode.UserChoice then
@@ -604,8 +551,6 @@ function ControlModule:OnCharacterAdded(char)
 		self.humanoid = char:FindFirstChildOfClass("Humanoid")
 	end
 
-	self:UpdateTouchGuiVisibility()
-
 	if self.humanoidSeatedConn then
 		self.humanoidSeatedConn:Disconnect()
 		self.humanoidSeatedConn = nil
@@ -613,17 +558,24 @@ function ControlModule:OnCharacterAdded(char)
 	self.humanoidSeatedConn = self.humanoid.Seated:Connect(function(active, currentSeatPart)
 		self:OnHumanoidSeated(active, currentSeatPart)
 	end)
+
+	self:UpdateMovementMode()
 end
 
 function ControlModule:OnCharacterRemoving(char)
 	self.humanoid = nil
 
-	self:UpdateTouchGuiVisibility()
+	self:UpdateMovementMode()
 end
 
 function ControlModule:UpdateTouchGuiVisibility()
+	local doShow = GuiService.TouchControlsEnabled and UserInputService.PreferredInput == Enum.PreferredInput.Touch
+
+	if doShow and not self.touchGui then
+		self:CreateTouchGuiContainer()
+	end
+
 	if self.touchGui then
-		local doShow = GuiService.TouchControlsEnabled
 		self.touchGui.Enabled = doShow
 	end
 end
@@ -663,71 +615,38 @@ function ControlModule:SwitchToController(controlModule)
 	end
 end
 
-function ControlModule:PreferredInputChanged()
+--[[
+When any of the following values change, we need to recalculate which movement mode should be active and switch to it, as well as create the touch GUI if appropriate:
+		PreferredInput
+		TouchMovementMode
+		ComputerMovementMode
+		DevTouchMovementMode
+		DevComputerMovementMode
+		TouchControlsEnabled
+		self.playerGui			- the touch gui is attached here
+		self.humanoid			- this affects if the touch gui is enabled
+]]--
+function ControlModule:UpdateMovementMode()
+	self:UpdateTouchGuiVisibility()
+
 	if UserInputService.PreferredInput == Enum.PreferredInput.Touch then
 		local touchModule, success = self:SelectTouchModule()
 		if success then
-			while not self.touchControlFrame do
-				task.wait()
+			if self.touchControlFrame then
+				self:SwitchToController(touchModule)
 			end
-			self:SwitchToController(touchModule)
 		end
 	else
 		local computerModule = self:SelectComputerMovementModule()
-		if computerModule then
-			self:SwitchToController(computerModule)
-		end
-	end
-
-	self:UpdateTouchGuiVisibility()
-end
-
--- remove with FFlagUserControlModuleUsePreferredInput
-function ControlModule:OnLastInputTypeChanged(newLastInputType)
-	if lastInputType == newLastInputType then
-		warn("LastInputType Change listener called with current type.")
-	end
-	lastInputType = newLastInputType
-
-	if lastInputType == Enum.UserInputType.Touch then
-		-- TODO: Check if touch module already active
-		local touchModule, success = self:SelectTouchModule()
-		if success then
-			while not self.touchControlFrame do
-				task.wait()
-			end
-			self:SwitchToController(touchModule)
-		end
-	elseif computerInputTypeToModuleMap[lastInputType] ~= nil then
-		local computerModule = self:SelectComputerMovementModule()
-		if computerModule then
-			self:SwitchToController(computerModule)
-		end
-	end
-
-	self:UpdateTouchGuiVisibility()
-end
-
--- Called when any relevant values of GameSettings or LocalPlayer change, forcing re-evalulation of
--- current control scheme
-function ControlModule:OnComputerMovementModeChange()
-	local controlModule, success =  self:SelectComputerMovementModule()
-	if success then
-		self:SwitchToController(controlModule)
-	end
-end
-
-function ControlModule:OnTouchMovementModeChange()
-	local touchModule, success = self:SelectTouchModule()
-	if success then
-		while not self.touchControlFrame do
-			task.wait()
-		end
-		self:SwitchToController(touchModule)
+		self:SwitchToController(computerModule)
 	end
 end
 
 function ControlModule:CreateTouchGuiContainer()
+	if not self.playerGui then
+		return
+	end
+
 	if self.touchGui then self.touchGui:Destroy() end
 
 	-- Container for all touch device guis
@@ -735,7 +654,6 @@ function ControlModule:CreateTouchGuiContainer()
 	self.touchGui.Name = "TouchGui"
 	self.touchGui.ResetOnSpawn = false
 	self.touchGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	self:UpdateTouchGuiVisibility()
 
 	if FFlagUserDynamicThumbstickSafeAreaUpdate then
 		self.touchGui.ClipToDeviceSafeArea = false;
