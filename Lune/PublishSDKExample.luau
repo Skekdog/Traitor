@@ -68,6 +68,6 @@ if kind == "all" then
 end
 
 local name = if kind == "items" then "Items" else process.args[2]
-assert(name, "Invalid name. Expected usage: PublishSDKExample map|gamemode mapName|gamemodeName")
+assert(name, "Invalid name. Expected usage: PublishSDKExample map|gamemode|items|all mapName|gamemodeName")
 
 publish(name, kind)
