@@ -44,8 +44,15 @@ local function GetAssetPath(assetName: string, kind: "map" | "gamemode" | "items
 	error("Invalid asset kind")
 end
 
+local function GetIgnoreGlobs(assetName: string, kind: "map" | "gamemode" | "items"): {string}?
+	if kind == "items" then
+		return {"Source/Shared/GameDefinition/Items/Items.luau"}
+	end
+	return nil
+end
+
 local function publish(assetName: string, kind: "map" | "gamemode" | "items"): ()
-	PublishAsset(ASSET_IDS[assetName], assetName, GetAssetPath(assetName, kind))
+	PublishAsset(ASSET_IDS[assetName], assetName, GetAssetPath(assetName, kind), GetIgnoreGlobs(assetName, kind))
 end
 
 local kind = process.args[1]
