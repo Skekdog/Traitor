@@ -358,6 +358,10 @@ function module.StopAnimation(name: string): ()
 
     for _, v in viewmodel.Humanoid.Animator:GetPlayingAnimationTracks() do
         if v.Name == name then
+            -- Otherwise Animation tracks remain loaded :/
+            v.Ended:Once(function()
+                v:Destroy()
+            end)
             v:Stop()
         end
     end
