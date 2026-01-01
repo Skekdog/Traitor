@@ -68,7 +68,7 @@ function VRVehicleCamera.new()
 	return self
 end
 
--- Reset member function is for initialization, not for camera snaps or transitions 
+-- Reset member function is for initialization, not for camera snaps or transitions
 function VRVehicleCamera:Reset()
 	self.vehicleCameraCore = VehicleCameraCore.new(self:GetSubjectCFrame())
 	if FFlagUserVRVehicleCamera then
@@ -262,9 +262,9 @@ function VRVehicleCamera:addDrift(currentCamera, focus)
 
 		local headVectorDirection = Vector3.new(angleLook.X, 0, angleLook.Z).Unit * zoom
 		local goalHeadPosition = focus.Position - headVectorDirection
-		
-		-- place the camera at currentposition + difference between goalHead and currentHead 
-		local moveGoalCameraCFrame = CFrame.new(camera.CFrame.Position + goalHeadPosition - headCframe.Position) * camera.CFrame.Rotation 
+
+		-- place the camera at currentposition + difference between goalHead and currentHead
+		local moveGoalCameraCFrame = CFrame.new(camera.CFrame.Position + goalHeadPosition - headCframe.Position) * camera.CFrame.Rotation
 
 		currentCamera = currentCamera:Lerp(moveGoalCameraCFrame, 0.01)
 	end
@@ -394,7 +394,7 @@ function VRVehicleCamera:UpdateStepRotation(dt)
 		self:StartFadeFromBlack()
 		self:ResetZoom()
 	end
-	
+
 	if self.recentered then
 		focus *= subjectCFrame.Rotation
 		cf = focus * CFrame.new(0, 0, zoom)

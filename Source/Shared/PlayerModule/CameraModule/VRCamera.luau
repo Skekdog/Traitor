@@ -33,7 +33,7 @@ function VRCamera.new()
 	self:Reset()
 
 	self.controlModule = require(PlayersService.LocalPlayer:WaitForChild("PlayerScripts").PlayerModule:WaitForChild("ControlModule"))
-	self.savedAutoRotate = true 
+	self.savedAutoRotate = true
 
 	return self
 end
@@ -67,7 +67,7 @@ function VRCamera:Update(timeDelta)
 	local lastSubjPos = self.lastSubjectPosition
 	local subjectPosition: Vector3 = self:GetSubjectPosition()
 	-- transition from another camera or from spawn
-	if self.needsBlackout then 
+	if self.needsBlackout then
 		self:StartFadeFromBlack()
 
 		local dt = math.clamp(timeDelta, 0.0001, 0.1)
@@ -161,7 +161,7 @@ function VRCamera:UpdateImmersionCamera(timeDelta, newCameraCFrame, newCameraFoc
 		return curCamera.CFrame, curCamera.Focus
 	end
 	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-	if not humanoidRootPart then 
+	if not humanoidRootPart then
 		return curCamera.CFrame, curCamera.Focus
 	end
 	self.characterOrientation = humanoidRootPart:FindFirstChild("CharacterAlignOrientation")
@@ -184,7 +184,7 @@ function VRCamera:UpdateImmersionCamera(timeDelta, newCameraCFrame, newCameraFoc
 	-- just entered first person, or need to reset camera
 	if self.needsReset then
 		self.needsReset = false
-		
+
 		self.savedAutoRotate = humanoid.AutoRotate
 		humanoid.AutoRotate = false
 
@@ -192,7 +192,7 @@ function VRCamera:UpdateImmersionCamera(timeDelta, newCameraCFrame, newCameraFoc
 			self.NoRecenter = false
 			VRService:RecenterUserHeadCFrame()
 		end
-		
+
 		self:StartFadeFromBlack()
 
 		-- place the VR head at the subject's CFrame
@@ -342,24 +342,24 @@ function VRCamera:UpdateThirdPersonFollowTransform(timeDelta, newCameraCFrame, n
 		self:ResetZoom()
 		self:StartFadeFromBlack()
 	end
-	
+
 	if self.recentered then
 		local subjectCFrame = self:GetSubjectCFrame()
 		if not subjectCFrame then -- can't perform a reset until the subject is valid
 			return camera.CFrame, camera.Focus
 		end
-		
+
 		-- set the camera and focus to zoom distance behind the subject
 		newCameraCFrame = vrFocus * subjectCFrame.Rotation * CFrame.new(0, 0, zoom)
 
 		self.focusOffset = vrFocus:ToObjectSpace(newCameraCFrame) -- GetVRFocus returns a CFrame with no rotation
-		
+
 		self.recentered = false
 		return newCameraCFrame, vrFocus
 	end
 
 	local trackCameraCFrame = vrFocus:ToWorldSpace(self.focusOffset)
-	
+
 	-- figure out if the player is moving
 	local player = PlayersService.LocalPlayer
 	local subjectDelta = lastSubjPos - subjectPosition
@@ -378,9 +378,9 @@ function VRCamera:UpdateThirdPersonFollowTransform(timeDelta, newCameraCFrame, n
 
 		local headVectorDirection = Vector3.new(headLook.X, 0, headLook.Z).Unit * zoom
 		local goalHeadPosition = vrFocus.Position - headVectorDirection
-		
-		-- place the camera at currentposition + difference between goalHead and currentHead 
-		local moveGoalCameraCFrame = CFrame.new(camera.CFrame.Position + goalHeadPosition - headCframe.Position) * trackCameraCFrame.Rotation 
+
+		-- place the camera at currentposition + difference between goalHead and currentHead
+		local moveGoalCameraCFrame = CFrame.new(camera.CFrame.Position + goalHeadPosition - headCframe.Position) * trackCameraCFrame.Rotation
 
 		newCameraCFrame = trackCameraCFrame:Lerp(moveGoalCameraCFrame, 0.01)
 	else
@@ -409,7 +409,7 @@ end
 
 function VRCamera:LeaveFirstPerson()
 	VRBaseCamera.LeaveFirstPerson(self)
-	
+
 	self.needsReset = true
 	if self.VRBlur then
 		self.VRBlur.Visible = false
