@@ -279,7 +279,7 @@ local function StandardDoor(request: DoorRequest): ()
     local door = request.Door
 
     if door:GetAttribute("NoInteract") then
-        if request.Kind ~= "ClientReceive" and (request.Kind ~= "ServerRun" or request.Force) then
+        if request.Kind ~= "ClientReceive" and (request.Kind ~= "ServerRun" or not request.Force) then
             return
         end
     end
@@ -293,7 +293,7 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     if door:GetAttribute("Locked") then
-        if request.Kind ~= "ClientReceive" and (request.Kind ~= "ServerRun" or request.Force) then
+        if request.Kind ~= "ClientReceive" and (request.Kind ~= "ServerRun" or not request.Force) then
             if IS_SERVER then
                 return
             end
