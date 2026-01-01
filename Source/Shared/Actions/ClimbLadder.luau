@@ -1,10 +1,10 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local UserInputService = game:GetService("UserInputService")
 local Crouch = require(script.Parent.Crouch)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local PlayerModule = require(ReplicatedStorage.Shared.PlayerModule)
 
 local module = {}
 
@@ -89,8 +89,7 @@ function module.Climb(ladder: BasePart): ()
     alignPos.Attachment1 = ladderAttachment
     alignPos.Enabled = true
 
-    local PlayerModule = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
-    local ControlModule = PlayerModule:GetControls()
+    local ControlModule = PlayerModule.controls
     thread = coroutine.create(function()
         while true do
             local dt = RunService.PreSimulation:Wait()

@@ -1,6 +1,6 @@
-local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CameraInput = require(ReplicatedStorage.Shared.PlayerModule.CameraModule.CameraInput)
 
-local CameraInput = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"):WaitForChild("CameraModule"):WaitForChild("CameraInput"))
 local OriginalFunction = CameraInput.getRotation
 
 return function(multiplier: number): ()

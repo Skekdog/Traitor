@@ -3,8 +3,10 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local PlayerModule = require(ReplicatedStorage.Shared.PlayerModule)
 local GetFlag = require(ReplicatedStorage.Shared.Util.GetFlag)
-local Controls = (require)(Players.LocalPlayer.PlayerScripts:WaitForChild("PlayerModule")):GetControls()
+
+local Controls = PlayerModule.controls
 
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
