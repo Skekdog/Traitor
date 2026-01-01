@@ -4,7 +4,7 @@
 		"**/_Index/**",
 		"Source/TT2Compat/**",
 		"Assets/Maps/**",
-		"ServerStorage/Maps/**"
+		"Services/**",
 	],
 	"luau-lsp.ignoreGlobs": [
 		"Lune/Lib/poke/**"
