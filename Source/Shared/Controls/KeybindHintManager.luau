@@ -47,6 +47,13 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
         label.ScaleType = Enum.ScaleType.Fit
         label.Name = "KeybindHintImage"
 
+        do
+            local uiAspectRatio = Instance.new("UIAspectRatioConstraint")
+            uiAspectRatio.AspectType = Enum.AspectType.ScaleWithParentSize
+            uiAspectRatio.DominantAxis = Enum.DominantAxis.Height
+            uiAspectRatio.Parent = label
+        end
+
         if not noStyle then
             label:AddTag("StyledUI")
         else
