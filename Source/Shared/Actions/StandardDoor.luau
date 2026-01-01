@@ -258,8 +258,9 @@ local function slideDoor(request: DoorRequest<SlideDoorClientReceive | SlideDoor
     local tween = TweenService:Create(part, getTweenInfo(door, duration), {CFrame = targetCFrame})
     tween:Play()
 
+    local id = door:GetAttribute("Id")
     tween.Completed:Once(function(status)
-        if status == Enum.PlaybackState.Completed then
+        if status == Enum.PlaybackState.Completed and id == door:GetAttribute("Id") then
             door:SetAttribute("NoInteract", false)
         end
     end)
@@ -276,8 +277,10 @@ local function StandardDoor(request: DoorRequest): ()
 
     local door = request.Door
 
-    if door:GetAttribute("NoInteract") and request.Kind :: any ~= "ClientReceive" and request.Kind :: any ~= "ServerRun" then
-        return
+    if door:GetAttribute("NoInteract") then
+        if request.Kind ~= "ClientReceive" and request.Kind ~= "ServerRun" then
+            return
+        end
     end
 
     if request.Kind == "ServerReceive" and request.Receive.Kind == "HingeDoorServerReceive" then
