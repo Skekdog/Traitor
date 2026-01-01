@@ -32,6 +32,7 @@ local VehicleCamera = require(script.Parent:WaitForChild("VehicleCamera"))
 local VehicleCameraCore =  require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraCore")) :: any
 local VehicleCameraConfig = require(script.Parent.VehicleCamera:FindFirstChild("VehicleCameraConfig")) :: any
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
 
@@ -229,7 +230,7 @@ function VRVehicleCamera:addDrift(currentCamera, focus)
 	local zoom = self:GetCameraToSubjectDistance()
 	local subjectVel: Vector3 = self:GetSubjectVelocity()
 	local subjectCFrame: CFrame = self:GetSubjectCFrame()
-	local controlModule = require(localPlayer:WaitForChild("PlayerScripts").PlayerModule:WaitForChild("ControlModule"))
+	local controlModule = require(ReplicatedStorage.Shared.PlayerModule:WaitForChild("ControlModule"))
 
 	-- while moving, slowly adjust camera so the avatar is in front of your head
 	if subjectVel.Magnitude > 0.1 then -- is the subject moving?

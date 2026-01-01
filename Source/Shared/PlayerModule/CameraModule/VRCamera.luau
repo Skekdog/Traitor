@@ -7,6 +7,7 @@
 --[[ Services ]]--
 
 local PlayersService = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local VRService = game:GetService("VRService")
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
@@ -32,7 +33,7 @@ function VRCamera.new()
 	self.focusOffset = CFrame.new()
 	self:Reset()
 
-	self.controlModule = require(PlayersService.LocalPlayer:WaitForChild("PlayerScripts").PlayerModule:WaitForChild("ControlModule"))
+	self.controlModule = require(ReplicatedStorage.Shared.PlayerModule:WaitForChild("ControlModule"))
 	self.savedAutoRotate = true
 
 	return self
