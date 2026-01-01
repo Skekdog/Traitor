@@ -284,11 +284,19 @@ local function StandardDoor(request: DoorRequest): ()
         end
     end
 
-    if request.Kind == "ServerReceive" and request.Receive.Kind == "HingeDoorServerReceive" then
-        if request.Receive.Direction == nil and not door:GetAttribute("Open") then
-            return
-        elseif request.Receive.Direction ~= nil and door:GetAttribute("Open") then
-            return
+    if request.Kind == "ServerReceive" then
+        if request.Receive.Kind == "HingeDoorServerReceive" then
+            if request.Receive.Direction == nil and not door:GetAttribute("Open") then
+                return
+            elseif request.Receive.Direction ~= nil and door:GetAttribute("Open") then
+                return
+            end
+        elseif request.Receive.Kind == "SlideDoorServerReceive" then
+            if request.Receive.Open == door:GetAttribute("Open") then
+                return
+            elseif not request.Receive.Open and door:GetAttribute("Open") == nil then
+                return
+            end
         end
     end
 
