@@ -175,21 +175,23 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	if self.Sidebar then
 		local sb = UIManager.GetUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
 
-		local but = sb.Button:Clone()
-		but.Name = self.Name
-		but.Text = self.DisplayName
+		local entry = sb.Entry:Clone()
+		entry.Name = self.Name
 
-		but:SetAttribute("Control", self.Name)
-        but:SetAttribute("NoStyle", true)
-        but:SetAttribute("Position", UDim2.fromScale(0.5, 1))
-        but:SetAttribute("Size", UDim2.fromScale(0.45, 1))
-        but:AddTag("ControlHint")
+		entry.Button.Text = self.DisplayName
 
-		but.ZIndex = -#sb:GetChildren()
+		entry:SetAttribute("Control", self.Name)
+        entry:SetAttribute("NoStyle", true)
+        entry:SetAttribute("Size", UDim2.fromScale(0, 0.5))
+		entry:SetAttribute("TextXAlignment", "Right")
+        entry:AddTag("ControlHint")
 
-		but.Visible = true
-		but.Parent = sb
-		but.MouseButton1Click:Connect(function()
+		entry.ZIndex = -#sb:GetChildren()
+
+		entry.Visible = true
+		entry.Parent = sb
+
+		entry.Button.Activated:Connect(function()
 			self:ToggleVisible()
 		end)
 	end
