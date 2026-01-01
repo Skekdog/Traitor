@@ -1,6 +1,7 @@
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ToggleMouseVisible = require(ReplicatedStorage.Shared.Interface.Util.ToggleMouseVisible)
@@ -12,11 +13,16 @@ local UIAnimation = require(script.Parent.UIAnimation)
 local plr = Players.LocalPlayer
 local plrUi = plr.PlayerGui
 
--- Undocumented behaviour, but GetGuiInset() returns zero sometimes. But it always returns zero when (emulating) gamepad. fuck you.
-local inset = GuiService:GetGuiInset()
-while inset == Vector2.zero and not GuiService:IsTenFootInterface() do
-	inset =  GuiService:GetGuiInset()
-	task.wait()
+local inset: Vector2
+do
+	local insetGui = Instance.new("ScreenGui")
+	insetGui.ScreenInsets = Enum.ScreenInsets.None
+	insetGui.Parent = StarterGui
+
+	repeat
+		inset = -insetGui.AbsolutePosition
+		task.wait()
+	until inset.Y > 0 or GuiService:IsTenFootInterface() -- vertical inset doesn't load immediately. on consoles, there is no vertical inset.
 end
 
 --[[ Principles:
@@ -65,7 +71,7 @@ UIManager.RegisteredEvent = DynamicValue.new("")
 
 function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
-	local accountForInset = object:GetAttribute("AccountForInset") :: boolean?
+	local accountForInset = object:GetAttribute("AccountForInset") :: boolean | "X" | "Y" | "XY"?
 	local modal = object:GetAttribute("Modal") :: boolean?
 	local transitionStyle = object:GetAttribute("TransitionStyle") :: "Position" | "Size" | "Transparency"
 	local transitionTarget = object:GetAttribute("TransitionTarget") :: UDim2
@@ -210,8 +216,26 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 
 	if accountForInset and not object:GetAttribute("InsetAdjusted") then
 		object:SetAttribute("InsetAdjusted", true)
-		object.Size -= UDim2.fromOffset(inset.X, inset.Y)
-		object.Position += UDim2.fromOffset(inset.X, inset.Y)
+
+		if object.Name == "TestPlaceLabel" then print(inset) end
+
+		local thisInset: UDim2
+		if accountForInset == true or accountForInset == "XY" then
+			thisInset = UDim2.fromOffset(inset.X, inset.Y)
+		elseif accountForInset == "X" then
+			thisInset = UDim2.fromOffset(inset.X, 0)
+		elseif accountForInset == "-X" then
+			thisInset = UDim2.fromOffset(-inset.X, 0)
+		elseif accountForInset == "Y" then
+			thisInset = UDim2.fromOffset(0, inset.Y)
+		else
+			error("Unexpected type for 'AccountForInset' attribute: " .. object:GetFullName())
+		end
+
+		if object.Name == "TestPlaceLabel" then print(thisInset) end
+
+		object.Size -= thisInset
+		object.Position += thisInset
 	end
 
 	if ignoreInset and not object:GetAttribute("InsetAdjusted") then
