@@ -6,8 +6,8 @@ local boundInstances: {[string]: {Instance}} = {}
 
 type Label = TextLabel | ImageLabel
 
-local function setTextForTextLabel(text: string, label: TextLabel): ()
-    if text == "" then
+local function setTextForTextLabel(text: string, label: TextLabel, instance: Instance): ()
+    if text == "" or text == "NONE" and instance:GetAttribute("HideNone") then
         label.Text = ""
         return
     end
@@ -93,7 +93,7 @@ local function updateText(control: string, instance: Instance): ()
         end
 
         textLabel.Visible = true
-        setTextForTextLabel(text, textLabel)
+        setTextForTextLabel(text, textLabel, instance)
     end
 end
 
@@ -133,6 +133,9 @@ local function loadInstance(instance: Instance): ()
 
     local alwaysShow = instance:GetAttribute("AlwaysShow") :: boolean?
     assert(typeof(alwaysShow) == "boolean" or alwaysShow == nil, "Expected attribute 'AlwaysShow' to be a boolean or nil " .. instance:GetFullName())
+
+    local hideNone = instance:GetAttribute("HideNone") :: boolean?
+    assert(typeof(hideNone) == "boolean" or hideNone == nil, "Expected attribute 'HideNone' to be a boolean or nil " .. instance:GetFullName())
 
     createLabels(control, instance, position, size, anchorPoint, noStyle, textXAlignment)
 end

@@ -183,6 +183,7 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 		entry:SetAttribute("Control", self.Name)
         entry:SetAttribute("NoStyle", true)
         entry:SetAttribute("Size", UDim2.fromScale(0, 0.5))
+		entry:SetAttribute("HideNone", true)
 		entry:SetAttribute("TextXAlignment", "Right")
         entry:AddTag("ControlHint")
 
