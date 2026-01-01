@@ -61,6 +61,7 @@ export type ClientReceive<ClientReceiveType = HingeDoorClientReceive | SlideDoor
 export type ServerRun<ServerReceiveType = HingeDoorServerReceive | SlideDoorServerReceive> = BaseDoorRequest & {
     Kind: "ServerRun",
     Receive: ServerReceiveType,
+    Force: boolean?,
 }
 
 export type DoorRequest<ReceiveType = HingeDoorClientReceive | HingeDoorServerReceive | SlideDoorClientReceive | SlideDoorServerReceive> = ClientInteraction | ServerReceive<ReceiveType> | ClientReceive<ReceiveType> | ServerRun<ReceiveType>
@@ -278,7 +279,7 @@ local function StandardDoor(request: DoorRequest): ()
     local door = request.Door
 
     if door:GetAttribute("NoInteract") then
-        if request.Kind ~= "ClientReceive" and request.Kind ~= "ServerRun" then
+        if request.Kind ~= "ClientReceive" and (request.Kind ~= "ServerRun" or request.Force) then
             return
         end
     end
@@ -292,7 +293,7 @@ local function StandardDoor(request: DoorRequest): ()
     end
 
     if door:GetAttribute("Locked") then
-        if request.Kind ~= "ClientReceive" and request.Kind ~= "ServerRun" then
+        if request.Kind ~= "ClientReceive" and (request.Kind ~= "ServerRun" or request.Force) then
             if IS_SERVER then
                 return
             end
