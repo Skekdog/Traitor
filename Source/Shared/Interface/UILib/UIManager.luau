@@ -217,8 +217,6 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	if accountForInset and not object:GetAttribute("InsetAdjusted") then
 		object:SetAttribute("InsetAdjusted", true)
 
-		if object.Name == "TestPlaceLabel" then print(inset) end
-
 		local thisInset: UDim2
 		if accountForInset == true or accountForInset == "XY" then
 			thisInset = UDim2.fromOffset(inset.X, inset.Y)
@@ -231,8 +229,6 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 		else
 			error("Unexpected type for 'AccountForInset' attribute: " .. object:GetFullName())
 		end
-
-		if object.Name == "TestPlaceLabel" then print(thisInset) end
 
 		object.Size -= thisInset
 		object.Position += thisInset
