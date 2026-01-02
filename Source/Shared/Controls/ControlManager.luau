@@ -20,6 +20,18 @@ export type InputMethod = "Touch" | "KBM" | "Gamepad"
 
 local registered: {[string]: RegistrationInfo} = {}
 
+local KEY_NAMES = {
+	LeftControl = "LCTRL",
+	RightControl = "RCTRL",
+	LeftAlt = "LALT",
+	RightAlt = "RALT",
+	LeftShift = "LSHIFT",
+	RightShift = "RSHIFT",
+	Tab = "TAB",
+	Space = "SPACE",
+	Return = "ENTER",
+}
+
 module.PreferredInput = InstanceSignal.ListenProperty(UserInputService, "PreferredInput", (nil :: any) :: Enum.PreferredInput)
 
 function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?): string
@@ -40,24 +52,10 @@ function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?)
 			return str
 		end
 
-		if keycode == Enum.KeyCode.LeftControl then
-			return "Ctrl"
-		elseif keycode == Enum.KeyCode.LeftShift then
-			return "Shift"
-		elseif keycode == Enum.KeyCode.LeftAlt then
-			return "Alt"
-		elseif keycode == Enum.KeyCode.RightControl then
-			return "RCtrl"
-		elseif keycode == Enum.KeyCode.RightShift then
-			return "RShift"
-		elseif keycode == Enum.KeyCode.RightAlt then
-			return "RAlt"
-		elseif keycode == Enum.KeyCode.Tab then
-			return "Tab"
-		elseif keycode == Enum.KeyCode.Space then
-			return "Space"
-		elseif (keycode.Name:sub(1, 1) == "F") and (tonumber(keycode.Name:sub(2))) then
+		if keycode.Name:sub(1, 1) == "F" and tonumber(keycode.Name:sub(2)) then
 			return keycode.Name
+		elseif KEY_NAMES[keycode.Name] then
+			return KEY_NAMES[keycode.Name]
 		end
 	else
 		if keycode == Enum.UserInputType.MouseButton1 then
