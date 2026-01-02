@@ -36,6 +36,10 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 					return
 				end
 
+				if object.Input.Text == "" then
+								return
+				end
+
 				object.Output.Text = Exec.ClientExecute(object.Input.Text)
 			end)
 
