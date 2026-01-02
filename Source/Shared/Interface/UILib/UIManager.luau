@@ -76,9 +76,12 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	local transitionStyle = object:GetAttribute("TransitionStyle") :: "Position" | "Size" | "Transparency"
 	local transitionTarget = object:GetAttribute("TransitionTarget") :: UDim2
 
+	local layer = object:GetAttribute("Layer")
+	assert(layer == "Special" or layer == "Popup" or layer == "Buttons" or layer == "HUD" or layer == "ActionButtons")
+
 	local self: UI = {
 		Name = object.Name,
-		Layer = object:GetAttribute("Layer") :: Layer,
+		Layer = layer,
 		DisplayName = object:GetAttribute("DisplayName") :: string? or object.Name,
 		Visible = object.Visible,
 		NoClose = object:GetAttribute("PreventClose") :: boolean?,
