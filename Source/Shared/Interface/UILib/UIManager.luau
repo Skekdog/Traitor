@@ -233,7 +233,6 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 			error("Unexpected type for 'AccountForInset' attribute: " .. object:GetFullName())
 		end
 
-		object.Size -= thisInset
 		object.Position += thisInset
 	end
 
