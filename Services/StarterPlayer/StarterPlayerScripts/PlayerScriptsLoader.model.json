@@ -1,3 +1,6 @@
 {
-	"className": "LocalScript"
+	"className": "LocalScript",
+	"properties": {
+		"Enabled": false
+	}
 }
