@@ -15,12 +15,13 @@ else
 end
 
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local MAX_RANGE = 10000
@@ -54,21 +55,21 @@ local function clientThing(): boolean
 	return isPartValid(result.Instance)
 end
 
-local function preRenderClient(item: Types.AnyItem, dt: number): ()
-	assert(item.Kind == "Gun")
+local function preRenderClient(item: Types.Item, dt: number): ()
 	if clientThing() then
-		item.Definition.LaserColor = Color3.new(0, 1, 0)
+		item.LaserColor = Color3.new(0, 1, 0)
 	else
-		item.Definition.LaserColor = Color3.new(1, 0, 0)
+		item.LaserColor = Color3.new(1, 0, 0)
 	end
 end
 
-local function beforePrimaryFireClient(item: Types.GunWeapon, targets: {BasePart}): boolean
+local function beforePrimaryFireClient(item: Types.Item, targets: {BasePart}): boolean
 	local part = targets[1]
 	return part and isPartValid(part)
 end
 
-local function beforeHitAnything(_, round: Types.Round, hitPart: BasePart): boolean
+local function beforeHitAnything(_, params: Types.DamageParams, round: Types.Round): boolean
+	local hitPart = assert(params.HitPart)
 	return isPartValid(hitPart)
 end
 
@@ -80,7 +81,7 @@ type PoltInfo = {
 
 local poltedProps: {[Types.Prop]: PoltInfo} = {}
 
-local function beforeHitProp(_, round: Types.Round, hitProp: Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
+local function beforeHitProp(_,params: Types.DamageParams, hitProp: Types.Prop | Types.Interactable): boolean
 	assert(params.Attacker)
 
 	if hitProp.Kind ~= "Prop" then
@@ -169,7 +170,7 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 	if info.PoltPhase == #phaseAdvanceTimes then
 		local params = ExplosionParams.new({
 			Damage = 10,
-			FalloffBegin = 0,
+			FalloffStart = 0,
 			FalloffEnd = 15,
 			Pressure = 50000,
 			VisualRadius = 15,
@@ -200,41 +201,31 @@ if RunService:IsServer() then
 	RunService.Heartbeat:Connect(heartbeat)
 end
 
-local item: Types.GunWeaponDefinition = {
-	Kind = "Gun" :: "Gun",
+local Poltergeist = Gun({
 	Name = "Poltergeist",
 	Description = "Attaches thrusters to props, blasting them towards others.",
-	Icon = "rbxassetid://103677163409705",
+	IconContent = Content.fromAssetId(103677163409705),
 
 	IsEvilItem = true,
 
-	Model = ReplicatedStorage.Assets.WeaponModels.Poltergeist,
+	Model = ReplicatedStorage.Assets.ItemModels.Poltergeist,
 
 	LaserColor = Color3.new(),
 
-	HoldAnimation = "rbxassetid://10247380824",
+	HoldAnimation = Content.fromAssetId(10247380824),
 
 	ItemGroup = ItemGroups.RoleUtility,
 	MaxStock = 2,
-	CreditCost = 1,
-	CanDrop = true,
+	Cost = 1,
 
-	Damage = 0,
-
-	Spread = 0,
-
-	AttackInterval = 3,
-	ReloadTime = 0,
-	AmmoType = Ammo["Poltergeist"],
-
-	RecoilX = 0,
-	RecoilY = 0,
+	PrimaryInterval = 3,
+	AmmoDefinition = Ammo["Poltergeist"],
 
 	PreRenderClient = preRenderClient,
 	BeforePrimaryFireClient = beforePrimaryFireClient,
 
 	BeforeHitAnything = beforeHitAnything,
 	BeforeHitProp = beforeHitProp,
-}
+})
 
-return item
+return Poltergeist

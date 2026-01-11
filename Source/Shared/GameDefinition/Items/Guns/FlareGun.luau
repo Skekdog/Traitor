@@ -1,23 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fire = require(ReplicatedStorage.API.Fire)
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
-local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
+local ItemKillHighlights = require(ReplicatedStorage.API.ItemPresets.ItemKillHighlights)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
-local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
-
-local function models(name: string): BasePart
-    return ReplicatedStorage.Assets:WaitForChild("WeaponModels"):WaitForChild(name) :: BasePart
-end
-
-local function firedSounds(name: string): Sound
-    return (ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("Fired"):WaitForChild(name) :: Sound)
-end
-
-local function projectiles(name: string): BasePart
-    return ReplicatedStorage.Assets:WaitForChild("Projectiles"):WaitForChild(name) :: BasePart
-end
 
 local highlight1 = {
     Title = "To The Rescue",
@@ -33,12 +22,12 @@ local highlight2 = {
     Threshold = 4,
 }
 
-local item: Types.GunWeaponDefinition = {
-	Kind = "Gun" :: "Gun",
+local FlareGun = Gun ({
     Name = "Flare Gun",
     Description = "Will set things it hits on fire. Can be used to burn corpses, preventing others from discovering them.",
-    Icon = "rbxassetid://444145395",
-    CreditCost = 1,
+    IconContent = Content.fromAssetId(444145395),
+
+    Cost = 1,
     MaxStock = 1,
 
     ImpulseForce = 5,
@@ -46,7 +35,6 @@ local item: Types.GunWeaponDefinition = {
     IsEvilItem = true,
 
     ItemGroup = ItemGroups.RoleUtility,
-    CanDrop = true,
 
     Damage = {
         Head = 15,
@@ -54,29 +42,25 @@ local item: Types.GunWeaponDefinition = {
         Limb = 5,
     },
 
-    AmmoType = Ammo.Flare,
-
-    HasMuzzleFlash = true,
+    AmmoDefinition = Ammo.Flare,
 
     Spread = 0.015,
 
-    AttackInterval = 0.25,
-    ReloadTime = 0,
-    MagazineSize = 6,
+    PrimaryInterval = 0.25,
 
-    Model = models("Flare Gun"),
-    HoldAnimation = "rbxassetid://9253211833",
-    AimAnimation = "rbxassetid://18691552315",
-    AttackSound = firedSounds("Flare Gun"),
+    Model = ReplicatedStorage.Assets.ItemModels["Flare Gun"],
+    HoldAnimation = Content.fromAssetId(9253211833),
+    AimAnimation = Content.fromAssetId(18691552315),
+    PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired["Flare Gun"],
 
-    Projectile = projectiles("Flare"),
+    Projectile = ReplicatedStorage.Assets.Projectiles.Flare,
     ProjectileSpeed = 280,
 
     AimFOV = 60,
     AimSpreadMultiplier = 0.3,
 
-    BeforeHitParticipant = function(item, round, target: Types.Participant, params: Types.DamageParams): boolean
-        ItemKillHighlights(highlight1, highlight2)(item, round, target, params)
+    BeforeHitParticipant = function(item, params: Types.DamageParams, target: Types.Participant): boolean
+        ItemKillHighlights(highlight1, highlight2)(item, params, target)
 
         local attacker = params.Attacker
         assert(attacker)
@@ -95,7 +79,7 @@ local item: Types.GunWeaponDefinition = {
         return true
     end,
 
-    BeforeHitProp = function(_, _, target: Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
+    BeforeHitProp = function(_, params: Types.DamageParams, target: Types.Prop): boolean
         local attacker = params.Attacker
         assert(attacker)
 
@@ -122,8 +106,10 @@ local item: Types.GunWeaponDefinition = {
         return true
     end,
 
-    BeforeHitAnything = function(_, _, hitPart: BasePart, params: Types.DamageParams): boolean
-        assert(params.HitPosition)
+    BeforeHitAnything = function(_, params: Types.DamageParams, round: Types.Round): boolean
+        assert(params.HitPosition, params.HitPart)
+
+        local hitPart = params.HitPart
 
         if GetMapObject(hitPart, "Prop") or GetMapObject(hitPart, "Character") then
             return true
@@ -142,6 +128,6 @@ local item: Types.GunWeaponDefinition = {
 
     RecoilX = 0.8,
     RecoilY = 1.2,
-}
+})
 
-return item
+return FlareGun

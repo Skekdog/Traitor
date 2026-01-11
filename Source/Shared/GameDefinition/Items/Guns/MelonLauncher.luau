@@ -1,18 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Ammo = require(script.Parent.Ammo)
 local Types = require(ReplicatedStorage.API.Types)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
+local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
 
 local MelonLauncher = {}
 
-local function reduceAmount(_, _, hitParticipant: Types.Participant, params: Types.DamageParams): boolean
+local function reduceAmount(_, params: Types.DamageParams, hitParticipant: Types.Participant): boolean
 	if hitParticipant == params.Attacker then
 		params.Amount /= 5
 	end
 	return true
 end
 
-local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
+local function BeforeHitAnything(_, params: Types.DamageParams): boolean
 	local Combat = require(ReplicatedStorage.API.Combat)
 	assert(params.Attacker and params.HitPosition)
 	Combat.MakeExplosion({
@@ -20,7 +21,7 @@ local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
 		Position = params.HitPosition,
 		Damage = 50,
 		FalloffEnd = 15,
-		FalloffBegin = 5,
+		FalloffStart = 5,
 		Pressure = 100000,
 
 		BeforeHitParticipant = reduceAmount,
@@ -28,28 +29,25 @@ local function BeforeHitAnything(_, _, _, params: Types.DamageParams): boolean
 	return true
 end
 
-local item: Types.GunWeaponDefinition = {
-	Kind = "Gun" :: "Gun",
-
+MelonLauncher.Item = Gun({
 	Name = "MelonLauncher",
 	DisplayName = "Melon Launcher",
 	Description = "Launches explosive melons.",
-	Icon = "rbxassetid://4793387432",
+	IconContent = Content.fromAssetId(4793387432),
 
-	Model = ReplicatedStorage.Assets.WeaponModels.MelonLauncher,
-	HoldAnimation = "rbxassetid://10247529531",
+	Model = ReplicatedStorage.Assets.ItemModels.MelonLauncher,
+	HoldAnimation = Content.fromAssetId(10247529531),
 
-	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired["Melon Launcher"],
+	PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired["Melon Launcher"],
 
-	CanDrop = true,
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 1,
 
 	IsEvilItem = true,
 
 	ItemGroup = ItemGroups.RoleWeapon,
 
-	IsPhysicallySimulated = true,
+	IsProjectileSimulated = true,
 
 	Projectile = ReplicatedStorage.Assets.Projectiles.Watermelon,
 	ProjectileSpeed = 100,
@@ -57,18 +55,14 @@ local item: Types.GunWeaponDefinition = {
 	Damage = 50,
 	Spread = 0.01,
 
-	AmmoType = Ammo.MelonLauncher,
-	AttackInterval = 1.5,
+	AmmoDefinition = Ammo.MelonLauncher,
+	PrimaryInterval = 1.5,
 
 	RecoilX = 10,
 	RecoilY = 10,
 
-	ReloadTime = 0,
-
 	BeforeHitAnything = BeforeHitAnything,
 	BeforeHitParticipant = reduceAmount,
-}
-
-MelonLauncher.Item = item
+})
 
 return MelonLauncher

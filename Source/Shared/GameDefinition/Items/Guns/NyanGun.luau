@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
-local Ammo = require(script.Parent.Ammo)
-local Types = require(ReplicatedStorage.API.Types)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 
 local NyanGun = {}
 
@@ -23,35 +23,32 @@ local function OnUnequipClient(): ()
 	equipLoop:Stop()
 end
 
-local function OnActivateClient(): ()
+local function OnActivatedClient(): ()
 	equipLoop:Stop()
 	shootLoop:Play()
 end
 
-local function OnDeactivateClient(): ()
+local function OnDeactivatedClient(): ()
 	local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 
 	shootLoop:Stop()
 
 	local equipped = ClientInventory.EquippedItem()
-	if equipped and equipped.Definition.Name == "NyanGun" then
+	if equipped and equipped.Name == "NyanGun" then
 		equipLoop:Play()
 	end
 end
 
-local item: Types.GunWeaponDefinition = {
-	Kind = "Gun" :: "Gun",
-
+local item = Gun({
 	Name = "NyanGun",
 	DisplayName = "Nyan Gun",
 	Description = "Fast-firing and unlimited ammo cat action!",
-	Icon = "rbxassetid://83079381",
+	IconContent = Content.fromAssetId(83079381),
 
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 4,
 
 	ItemGroup = ItemGroups.RoleWeapon,
-	CanDrop = true,
 
 	Spread = 0.05,
 
@@ -61,28 +58,24 @@ local item: Types.GunWeaponDefinition = {
 		Limb = 5,
 	},
 
-	AttackInterval = 0.1,
+	PrimaryInterval = 0.1,
 
-	AmmoType = Ammo.Infinite,
-	ReloadTime = 0,
+	AmmoDefinition = Ammo.Infinite,
 
-	Model = ReplicatedStorage.Assets.WeaponModels.NyanGun,
-	HoldAnimation = "rbxassetid://12481091962",
+	Model = ReplicatedStorage.Assets.ItemModels.NyanGun,
+	HoldAnimation = Content.fromAssetId(12481091962),
 
 	Projectile = ReplicatedStorage.Assets.Projectiles.NyanBullet,
 	ProjectileSpeed = 280,
 
 	ImpulseForce = 3,
 
-	RecoilX = 0,
-	RecoilY = 0,
-
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
 
-	OnActivateClient = OnActivateClient,
-	OnDeactivateClient = OnDeactivateClient,
-}
+	OnActivateClient = OnActivatedClient,
+	OnDeactivateClient = OnDeactivatedClient,
+})
 
 NyanGun.Item = item
 

@@ -1,8 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
-local Ammo = require(script.Parent.Ammo)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local flingRemote: RemoteEvent
@@ -16,9 +17,7 @@ else
 	flingRemote = found
 end
 
-local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit: Types.Participant | Types.Prop | Types.Interactable, params: Types.DamageParams): boolean
-	assert(weapon.Kind == "Gun")
-
+local beforeHit = function(weapon: Types.Item, params: Types.DamageParams, hit: Types.Participant | Types.Prop): boolean
 	local model = if hit.Kind == "Participant" then hit:GetCharacter() else hit.Model
 	if not model then
 		return true
@@ -48,18 +47,16 @@ local beforeHit = function(weapon: Types.ItemBeforeHit, round: Types.Round, hit:
 	return true
 end
 
-local item: Types.GunWeaponDefinition = {
-	Kind = "Gun" :: "Gun",
+local NewtonLauncher = Gun({
     Name = "Newton Launcher",
     Description = "Flings anything it hits. Low inherent damage, but can be used to crush others with props or throw them off high ledges.",
-    Icon = "rbxassetid://1491877109",
+    IconContent = Content.fromAssetId(1491877109),
 
     IsEvilItem = true,
 
 	ItemGroup = ItemGroups.RoleUtility,
     MaxStock = 2,
-    CreditCost = 1,
-    CanDrop = true,
+    Cost = 1,
 
     Damage = {
         Head = 8,
@@ -67,28 +64,25 @@ local item: Types.GunWeaponDefinition = {
         Limb = 1,
     },
 
-    Spread = 0,
+    PrimaryInterval = 2,
+    AmmoDefinition = Ammo["Infinite"],
 
-    AttackInterval = 2,
-    ReloadTime = 0,
-    AmmoType = Ammo["Infinite"],
-
-    Model = ReplicatedStorage.Assets.WeaponModels["Newton Launcher"],
-    HoldAnimation = "rbxassetid://132951688645757",
-    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired["Newton Launcher"] :: Sound,
+    Model = ReplicatedStorage.Assets.ItemModels["Newton Launcher"],
+    HoldAnimation = Content.fromAssetId(132951688645757),
+    PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired["Newton Launcher"],
 
     Projectile = ReplicatedStorage.Assets.Projectiles["Newton"],
     ProjectileSpeed = 300,
 
-    RecoilX = 0,
-    RecoilY = 0,
+    RecoilX = 0.1,
+    RecoilY = 0.1,
 
 	BeforeHitParticipant = beforeHit,
 	BeforeHitProp = beforeHit,
-}
+})
 
 local module = {}
 
-module.Item = item
+module.Item = NewtonLauncher
 
 return module
