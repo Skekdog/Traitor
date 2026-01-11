@@ -62,7 +62,7 @@ RunService.Heartbeat:Connect(function(dt)
 					Attacker = Fire.Attackers[object],
 				})
 
-				PlaySound(ReplicatedStorage.Assets.WeaponSounds.FlareBurn, nil, v)
+				PlaySound(ReplicatedStorage.Assets.ItemSounds.FlareBurn, nil, v)
 			end
 		end)
 

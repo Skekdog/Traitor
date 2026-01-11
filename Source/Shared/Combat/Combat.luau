@@ -76,7 +76,7 @@ local function raycast(char: Model, spread: Vector3, range: number, checkInitial
 end
 
 local function playEmptyClipSound(): ()
-	PlaySound(ReplicatedStorage.Assets.WeaponSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
+	PlaySound(ReplicatedStorage.Assets.ItemSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
 end
 
 local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}

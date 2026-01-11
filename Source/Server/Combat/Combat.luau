@@ -440,7 +440,7 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 
 	if request.Action == "Primary" then
 		if item.PrimaryFireServer then
-			item.PrimaryFireServer(item)
+			item.PrimaryFireServer(item, by, request.Origin, request.Direction)
 		elseif not item.IsProjectileSimulated then
 			for i, raycast in ipairs(request.Raycasts) do
 				if i > (item.ProjectileCount or 1) then
@@ -520,7 +520,7 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 
 	else
 		if item.AlternateFireServer then
-			item.AlternateFireServer()
+			item.AlternateFireServer(item, by, request.Origin, request.Direction)
 		end
 	end
 
