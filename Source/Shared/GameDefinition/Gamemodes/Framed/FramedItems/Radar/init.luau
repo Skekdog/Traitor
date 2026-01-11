@@ -1,12 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Modify = require(ReplicatedStorage.API.ItemPresets.Modify)
 local Items = require(ReplicatedStorage.API.StandardGame)
 local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightCharacter)
 
 local Radar = {}
 
-local Item = Items.CopyModify(Items.GetItem("Radar"), "Radar", {
+local Item = Modify(Items.GetItem("Radar"), "Radar", {
 	Description = "Reveals the location of your target.",
-	CreditCost = 2,
+	Cost = 2,
 	MaxStock = {__nil = true},
 
 	HeartbeatClient = {__nil = true},

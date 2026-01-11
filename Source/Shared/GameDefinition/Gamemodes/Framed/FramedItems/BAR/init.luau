@@ -1,10 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Modify = require(ReplicatedStorage.API.ItemPresets.Modify)
 local Items = require(ReplicatedStorage.API.StandardGame)
 
 local BAR = {}
 
-local Item = Items.CopyModify(Items.GetItem("BAR"), "BAR", {
-	CreditCost = 2,
+local Item = Modify(Items.GetItem("BAR"), "BAR", {
+	Cost = 2,
 })
 
 BAR.Item = Item

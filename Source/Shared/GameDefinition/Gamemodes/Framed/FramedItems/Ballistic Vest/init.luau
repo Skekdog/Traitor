@@ -1,11 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Modify = require(ReplicatedStorage.API.ItemPresets.Modify)
 local Items = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 
 local BallisticVest = {}
 
-local Item = Items.CopyModify(Items.GetItem("Ballistic Vest"), "Ballistic Vest", {
-	CreditCost = 2,
+local Item = Modify(Items.GetItem("Ballistic Vest"), "Ballistic Vest", {
+	Cost = 2,
 	Description = "Increases health by 100. Visible to others.",
 	OnEquipServer = function(_, participant: Types.Participant): ()
 		local hum = participant:GetHumanoid()
