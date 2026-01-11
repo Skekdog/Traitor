@@ -4,6 +4,9 @@ local Crowbar = require(script.Parent.Crowbar)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Melee = require(ReplicatedStorage.API.ItemPresets.Melee)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 local Spoon = {}
 
@@ -11,17 +14,16 @@ local EAT_DURATION = 3
 local EAT_COOLDOWN = 30
 local HEAL = 45
 
-local clientItem: Types.MeleeWeapon?
+local clientItem: Types.Item?
 
 local remote = GetRemote("Eat", script)
 
-local function OnEquipClient(item: Types.AnyItem): ()
+local function OnEquipClient(item: Types.Item): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 	local Camera = require(ReplicatedStorage.API.Camera)
 
-	assert(item.Kind == "Melee")
 	clientItem = item
 
 	CustomActions.Register("SpoonEat", function()
@@ -29,9 +31,9 @@ local function OnEquipClient(item: Types.AnyItem): ()
 			return
 		end
 
-		item.PreventUnequip = true
-		item.PreventPrimaryFire = true
-		item.PreventAlternateFire = true
+		item.UnequipDisabled = true
+		item.PrimaryDisabled = true
+		item.AlternateDisabled = true
 
 		remote:FireServer()
 		WalkSpeed.SetModifier("EatSpoon", -math.huge)
@@ -56,19 +58,19 @@ local attackSound = PlaySound.MakeSound(329792582, {
 	RollOffMinDistance = 10,
 })
 
-local itemDefinition: Types.MeleeWeaponDefinition = {
-	Kind = "Melee" :: "Melee",
-
+local itemDefinition = Melee({
 	Name = "SpoonItem",
 	DisplayName = "Spoon",
+	Description = "",
+	IconContent = Content.none,
 
 	IsEvilItem = true,
 
-	Model = ReplicatedStorage.Assets.WeaponModels.SpoonItem,
-    HoldAnimation = "rbxassetid://98475112106018",
-    AttackAnimation = "rbxassetid://124263943524491",
+	Model = ReplicatedStorage.Assets.ItemModels.SpoonItem,
+    HoldAnimation = Content.fromAssetId(98475112106018),
+    PrimaryAnimation = Content.fromAssetId(124263943524491),
 
-	AttackSound = attackSound,
+	PrimarySound = attackSound,
 
 	Damage = 45,
 	AttackInterval = 0.75,
@@ -85,7 +87,7 @@ local itemDefinition: Types.MeleeWeaponDefinition = {
 	OnUnequipClient = OnUnequipClient,
 
 	AlternateFireServer = Crowbar.Push,
-}
+})
 
 if RunService:IsServer() then
 	remote.OnServerEvent:Connect(function(player): ()
@@ -97,10 +99,9 @@ if RunService:IsServer() then
 		end
 
 		local foundItem = participant:GetEquippedItem()
-		if not foundItem or foundItem.Definition ~= itemDefinition then
+		if not foundItem or foundItem.Base ~= itemDefinition then
 			return
 		end
-		assert(foundItem.Kind == "Melee")
 
 		if foundItem.Extras.IsEating or (foundItem.Extras.NextHealAllowedAt or 0) > workspace:GetServerTimeNow() then
 			return
@@ -132,11 +133,11 @@ if RunService:IsServer() then
 		bowl.Parent = char :: any
 
 		foundItem.Extras.IsEating = true
-		participant:TryPlayAnimation(139173308057702, "SpoonEat");
+		participant:TryPlayAnimation(Content.fromAssetId(139173308057702), "SpoonEat");
 
-		foundItem.PreventUnequip = true
-		foundItem.PreventAlternateFire = true
-		foundItem.PreventPrimaryFire = true
+		foundItem.UnequipDisabled = true
+		foundItem.AlternateDisabled = true
+		foundItem.PrimaryDisabled = true
 
 		local cooldownRequired = participant:GetHealth() < humanoid.MaxHealth
 
@@ -169,9 +170,9 @@ if RunService:IsServer() then
 
 				bowl:Destroy();
 
-				foundItem.PreventUnequip = false
-				foundItem.PreventAlternateFire = false
-				foundItem.PreventPrimaryFire = false
+				foundItem.UnequipDisabled = false
+				foundItem.AlternateDisabled = false
+				foundItem.PrimaryDisabled = false
 
 				participant:TryStopAnimation("SpoonEat")
 				participant:SetHealth(participant:GetHealth() + HEAL)
@@ -196,22 +197,20 @@ else
 		Camera.EnterFirstPerson()
 
 		if clientItem then
-			clientItem.PreventUnequip = false
-			clientItem.PreventAlternateFire = false
-			clientItem.PreventPrimaryFire = false
+			clientItem.UnequipDisabled = false
+			clientItem.AlternateDisabled = false
+			clientItem.PrimaryDisabled = false
 			clientItem.Extras.CooldownUntil = cooldownUntil
 		end
 	end)
 end
 
-local shopItem: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local shopItem = Custom({
 	Name = "Spoon",
 	Description = "Flings people at high speeds, and can be used to eat a healing bowl of soup.",
-	Icon = "rbxassetid://10974184304",
+	IconContent = Content.fromAssetId(10974184304),
 
-	CreditCost = 2,
+	Cost = 2,
 	MaxStock = 1,
 
 	OnEquipServer = function(_, participant: Types.Participant): ()
@@ -220,9 +219,9 @@ local shopItem: Types.ItemDefinition = {
 			participant:TryDropItem(occupyingItem)
 		end
 
-		participant:GiveItemFromItemDefinition(itemDefinition)
+		participant:AddItem(Item.new(itemDefinition))
 	end,
-}
+})
 
 Spoon.ShopItem = shopItem
 Spoon.Item = itemDefinition

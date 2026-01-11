@@ -1,13 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
-local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
-local DNAScanner = require(script.Parent.DNAScanner)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local ItemKillHighlights = require(ReplicatedStorage.API.ItemPresets.ItemKillHighlights)
+local Melee = require(ReplicatedStorage.API.ItemPresets.Melee)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local THROW_FORCE = 80
 local DAMAGE = 100
 
-local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
+local function throw(item: Types.Item, attacker: Types.Participant, origin: Vector3, direction: Vector3): ()
+	assert(item.Model)
 	local model = item.Model:Clone()
 
 	assert(model:IsA("BasePart"))
@@ -69,9 +70,11 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 				Priority = 6,
 				Threshold = 4,
 			}
-		)(item, attacker.Round, otherParticipant, params)
+		)(item, params, otherParticipant)
 		otherParticipant:TryTakeDamage(params)
 	end)
+
+	attacker:RemoveItem(item)
 
 	task.wait(1) -- wait, otherwise the attacker immediately picks up the knife
 
@@ -85,7 +88,7 @@ local function throw(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 	DNAScanner.AddDNATrace(newItem, attacker, nil, "rbxassetid://14930962070", model)
 end
 
-local function BeforeHitParticipant(item: Types.ItemBeforeHit, round: Types.Round, hitParticipant: Types.Participant, params: Types.DamageParams): boolean
+local function BeforeHitParticipant(item: Types.Item, params: Types.DamageParams, hitParticipant: Types.Participant): boolean
 	ItemKillHighlights(
 		{
 			Title = "Knife Knowing You",
@@ -105,9 +108,10 @@ local function BeforeHitParticipant(item: Types.ItemBeforeHit, round: Types.Roun
 			Priority = 6,
 			Threshold = 4,
 		}
-	)(item, round, hitParticipant, params)
+	)(item, params, hitParticipant)
+
 	local attacker = params.Attacker
-	assert(attacker and item.Kind == "Melee")
+	assert(attacker)
 
 	local shop = attacker:GetRole().Definition.EquipmentShop
 	local foundKnife = false
@@ -121,7 +125,7 @@ local function BeforeHitParticipant(item: Types.ItemBeforeHit, round: Types.Roun
 	end
 
 	if not foundKnife then
-		round:AddHighlight({
+		hitParticipant.Round:AddHighlight({
 			Title = "Where Did You Get That From?",
 			Description = `{attacker:GetFormattedName()} did not have connections, but still killed someone with a knife.`,
 			Priority = 5,
@@ -129,25 +133,20 @@ local function BeforeHitParticipant(item: Types.ItemBeforeHit, round: Types.Roun
 		})
 	end
 
+	attacker:RemoveItem(item)
+
 	return true
 end
 
-local model = ReplicatedStorage.Assets.WeaponModels.Knife:Clone()
-model.Name = "Knice"
-model.Parent = ReplicatedStorage.Assets.WeaponModels
-
-local item: Types.MeleeWeaponDefinition = {
-	Kind = "Melee" :: "Melee",
-	Name = "Knice",
-
+local Knife = Melee({
+	Name = "Knife",
 	Description = "A sharp knife, capable of one-hit kills when stabbing or when thrown.",
-	Icon = "rbxassetid://14930962070",
+	IconContent = Content.fromAssetId(14930962070),
 
 	ItemGroup = ItemGroups.RoleWeapon,
-	CanDrop = true,
 	IsEvilItem = true,
 
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 2,
 
 	ImpulseForce = 1,
@@ -156,17 +155,17 @@ local item: Types.MeleeWeaponDefinition = {
 	Damage = DAMAGE,
 
 	MaxDistance = 7,
-	AttackInterval = 0,
-	AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar,
+	PrimaryInterval = 0.75,
+	PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Crowbar,
 
-	Model = model,
-	HoldAnimation = "rbxassetid://96501965592565",
-    AttackAnimation = "rbxassetid://122463302312412",
+	Model = ReplicatedStorage.Assets.ItemModels.Knife,
+	HoldAnimation = Content.fromAssetId(96501965592565),
+    PrimaryAnimation = Content.fromAssetId(122463302312412),
 
 	AlternateFireServer = throw,
-	AlternateToggled = false,
+	AlternateToggled = true,
 
 	BeforeHitParticipant = BeforeHitParticipant,
-}
+})
 
-return item
+return Knife

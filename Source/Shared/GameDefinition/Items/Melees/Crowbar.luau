@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local ItemKillHighlights = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemKillHighlights)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local ItemKillHighlights = require(ReplicatedStorage.API.ItemPresets.ItemKillHighlights)
+local Melee = require(ReplicatedStorage.API.ItemPresets.Melee)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -20,8 +20,8 @@ local function raycast(head: BasePart, direction: Vector3): RaycastResult?
 	return workspace:Raycast(head.Position, direction * MAX_DISTANCE, params)
 end
 
-function module.Push(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
-	local char = attacker:GetCharacter()
+function module.Push(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): ()
+	local char = participant:GetCharacter()
 	if not char then
 		return
 	end
@@ -30,13 +30,6 @@ function module.Push(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 	if not head or not head:IsA("BasePart") then
 		return
 	end
-
-	if item.Definition.AttackSound then
-		PlaySound(item.Definition.AttackSound, nil, char.PrimaryPart)
-	end
-
-	local id = assert(tonumber((item.Definition.AttackAnimation):split("://")[2]), "Invalid attack animation: " .. tostring(item.Definition.AttackAnimation))
-	attacker:TryPlayAnimation(id, "MeleeAttack")
 
 	local raycastResult = raycast(head, direction)
 	if not raycastResult then
@@ -50,43 +43,46 @@ function module.Push(item: Types.MeleeWeapon, _, origin: Vector3, direction: Vec
 		return
 	end
 
-	local hitParticipant = attacker.Round:GetParticipant(model.Name)
+	local hitParticipant = participant.Round:GetParticipant(model.Name)
 	if not hitParticipant then
 		return
 	end
 
-	hitParticipant:SetLastDamagedBy(attacker, RESPONSIBLE_DURATION)
-	if not attacker:HasSelfDefenseAgainstParticipant(hitParticipant) then
+	hitParticipant:SetLastDamagedBy(participant, RESPONSIBLE_DURATION)
+	if not participant:HasSelfDefenseAgainstParticipant(hitParticipant) then
 		hitParticipant:AddSelfDefenseEntry({
-			Against = attacker,
+			Against = participant,
 			Duration = RESPONSIBLE_DURATION,
 		})
 	end
 
-	Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, false, nil, attacker)
+	Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, false, nil, participant)
 end
 
-local item: Types.MeleeWeaponDefinition = {
-    Kind = "Melee" :: "Melee",
+local Crowbar = Melee({
     Name = "Crowbar",
+	Description = "Hello Gordon",
+	IconContent = Content.none,
 
     ItemGroup = {
 		PreferredSlot = 1,
 	},
-    CanDrop = false,
+    DropDisabled = true,
 
     DamageKind = "Bludgeon" :: "Bludgeon",
 
 	ImpulseForce = 5,
 
-    Model = ReplicatedStorage.Assets.WeaponModels.Crowbar,
-    HoldAnimation = "rbxassetid://10247423634",
-    AttackAnimation = "rbxassetid://13269497293",
+    Model = ReplicatedStorage.Assets.ItemModels.Crowbar,
+    HoldAnimation = Content.fromAssetId(10247423634),
+    PrimaryAnimation = Content.fromAssetId(13269497293),
 
     MaxDistance = 7,
     Damage = 20,
-    AttackInterval = 0.3,
-    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Crowbar,
+    PrimaryInterval = 0.3,
+	AlternateInterval = 0.3,
+    PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Crowbar,
+	AlternateSound = ReplicatedStorage.Assets.ItemSounds.Fired.Crowbar,
 
 	BeforeHitParticipant = ItemKillHighlights({
 		Title = "Thunk Thunk Thunk",
@@ -101,10 +97,8 @@ local item: Types.MeleeWeaponDefinition = {
 	}),
 
     AlternateFireServer = module.Push,
+})
 
-    AlternateToggled = true,
-}
-
-module.Item = item
+module.Item = Crowbar
 
 return module
