@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Fire = require(ReplicatedStorage.API.Fire)
-local Types = require(ReplicatedStorage.API.Types)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Grenade = require(ReplicatedStorage.API.ItemPresets.Grenade)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 
 local IncendiaryGrenade = {}
@@ -11,28 +11,28 @@ local RAY_SPREAD = math.rad(45)
 
 local random = Random.new()
 
-local item: Types.GrenadeWeaponDefinition = {
-	Kind = "Grenade" :: "Grenade",
+local item = Grenade({
     Name = "Incendiary Grenade",
+	Description = "The fire and the flame",
+	IconContent = Content.none,
 
     ItemGroup = ItemGroups.Grenade,
-    CanDrop = true,
 
-    Projectile = ReplicatedStorage.Assets.Projectiles["Incendiary Grenade"] :: BasePart,
-    HoldAnimation = "rbxassetid://12498620263",
-    Model = ReplicatedStorage.Assets.WeaponModels["Incendiary Grenade"],
+    Projectile = ReplicatedStorage.Assets.Projectiles["Incendiary Grenade"],
+    HoldAnimation = Content.fromAssetId(12498620263),
+    Model = ReplicatedStorage.Assets.ItemModels["Incendiary Grenade"],
 
     ExplosionInfo = {
         Damage = 10,
-        FalloffBegin = 0,
+        FalloffStart = 0,
         FalloffEnd = 15,
         Pressure = 10000,
         VisualRadius = 15,
     },
 
-    OnExplode = function(weapon: Types.GrenadeWeapon, attacker: Types.Participant, projectile: BasePart)
-		local raycastResult = workspace:Raycast(projectile.Position, RAY_OFFSET)
-		local startPos = if raycastResult then raycastResult.Position else projectile.Position + RAY_OFFSET
+    OnExplode = function(params)
+		local raycastResult = workspace:Raycast(params.Position, RAY_OFFSET)
+		local startPos = if raycastResult then raycastResult.Position else params.Position + RAY_OFFSET
 
 		for _ = 1, 20 do
 			local x = random:NextNumber(-RAY_SPREAD, RAY_SPREAD)
@@ -57,8 +57,8 @@ local item: Types.GrenadeWeaponDefinition = {
 
     ProjectileForce = 60,
 
-    AttackSound = ReplicatedStorage.Assets.WeaponSounds.Fired.Grenade,
-}
+    AttackSound = ReplicatedStorage.Assets.ItemSounds.Fired.Grenade,
+})
 
 IncendiaryGrenade.Item = item
 

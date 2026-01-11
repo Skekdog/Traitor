@@ -8,6 +8,7 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 		IconContent = Content.none,
 
 		IsProjectileSimulated = true,
+		PregameDisable = true,
 		IsSingleUse = true,
 
 		DamageKind = "Explode",

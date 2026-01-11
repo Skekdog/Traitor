@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Grenade = require(ReplicatedStorage.API.ItemPresets.Grenade)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
-local Types = require(ReplicatedStorage.API.Types)
 
 local FreezeGrenade = {}
 
@@ -24,7 +24,7 @@ local function getUi()
 end
 
 local currentFreezeId: never & {}
-local function OnHitClient(item: Types.AnyItemDefinition): ()
+local function OnHitClient(): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 
@@ -79,36 +79,31 @@ local function OnHitClient(item: Types.AnyItemDefinition): ()
 	end)
 end
 
-local item: Types.GrenadeWeaponDefinition = {
-	Kind = "Grenade" :: "Grenade",
-
+local item = Grenade({
 	Name = "FreezeGrenade",
 	DisplayName = "Freeze Grenade",
 	Description = "Stops players from moving within the blast radius. Explodes on impact.",
-	Icon = "rbxassetid://102415235814315",
+	IconContent = Content.fromAssetId(102415235814315),
 
-	HoldAnimation = "rbxassetid://12498620263",
-	Model = ReplicatedStorage.Assets.WeaponModels.FreezeGrenade,
+	HoldAnimation = Content.fromAssetId(12498620263),
+	Model = ReplicatedStorage.Assets.ItemModels.FreezeGrenade,
 
 	ItemGroup = ItemGroups.Grenade,
-	CreditCost = 2,
+	Cost = 2,
 	MaxStock = 1,
 
-	CanDrop = true,
-
-	FuseTime = -1,
-	Projectile = ReplicatedStorage.Assets.WeaponModels.FreezeGrenade :: BasePart,
+	Projectile = ReplicatedStorage.Assets.ItemModels.FreezeGrenade,
 
 	OnHitClient = OnHitClient,
 
 	ExplosionInfo = {
 		Damage = 0,
-		FalloffBegin = 0,
+		FalloffStart = 0,
 		FalloffEnd = 15,
 		Pressure = 10000,
 		VisualRadius = 15,
 	},
-}
+})
 
 FreezeGrenade.Item = item
 
