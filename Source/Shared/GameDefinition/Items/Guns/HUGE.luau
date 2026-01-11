@@ -39,7 +39,7 @@ local HUGE = Gun({
     RecoilX = 1.5,
     RecoilY = 2.5,
 
-    AmmoType = Ammo.HUGE,
+    AmmoDefinition = Ammo.HUGE,
 
     BeforeHitParticipant = ItemKillHighlights(
         {

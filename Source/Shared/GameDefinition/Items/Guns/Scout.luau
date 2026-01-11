@@ -28,7 +28,7 @@ local Scout = Gun({
 
     PrimaryInterval = 1,
     ReloadDuration = 1.5,
-    AmmoType = Ammo.Rifle,
+    AmmoDefinition = Ammo.Rifle,
 
     Model = ReplicatedStorage.Assets.ItemModels.Scout,
     HoldAnimation = Content.fromAssetId(10247529531),
