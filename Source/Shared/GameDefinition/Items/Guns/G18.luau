@@ -30,7 +30,7 @@ local G18 = Gun({
     Model = ReplicatedStorage.Assets.ItemModels.G18,
     HoldAnimation = Content.fromAssetId(9253211833),
     AimAnimation = Content.fromAssetId(18691552315),
-    AttackSound = ReplicatedStorage.Assets.ItemSounds.Fired.G18,
+    PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.G18,
     ReloadSound = ReplicatedStorage.Assets.ItemSounds.Reload.G18,
 
     Projectile = ReplicatedStorage.Assets.Projectiles.Bullet,
