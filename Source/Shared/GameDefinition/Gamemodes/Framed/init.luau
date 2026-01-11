@@ -25,10 +25,8 @@ if RunService:IsClient() then
 	require(script.GameState.Mirror)
 end
 
-local RED_HANDED_ITEMS = {"Magneto Stick"}
-
-local function isItemIllegal(item: Types.AnyItem): boolean
-	return item.Kind ~= "Item" or table.find(RED_HANDED_ITEMS, item.Definition.Name) ~= nil
+local function isItemIllegal(item: Types.Item): boolean
+	return (item.PrimaryFireClient or item.PrimaryFireServer or item.AlternateFireClient or item.AlternateFireServer) ~= nil
 end
 
 local framedItems = {}
@@ -171,7 +169,7 @@ local function OnStart(round: Types.Round): ()
 		Health.InitHeal(participant)
 
 		local item = participant:GetEquippedItem()
-		if item and (item.Kind ~= "Item" or table.find(RED_HANDED_ITEMS, item.Definition.Name)) then
+		if item and isItemIllegal(item) then
 			RedHanded.Start(participant)
 		end
 	end
@@ -240,7 +238,7 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 	Targets.OnDeath(participant)
 end
 
-local function OnItemEquipped(_, participant: Types.Participant, item: Types.AnyItem, equipped: boolean): ()
+local function OnItemEquipped(_, participant: Types.Participant, item: Types.Item, equipped: boolean): ()
 	if not isItemIllegal(item) or not participant.Round:IsInProgress() or participant:GetRole().Definition ~= framedRole then
 		return
 	end

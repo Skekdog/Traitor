@@ -40,7 +40,7 @@ function module.GetPropFromInstance(instance: BasePart): Types.Prop?
 	return round:GetProp(instance) :: Types.Prop
 end
 
-function module.GetItemFromInstance(instance: BasePart): Types.AnyItem?
+function module.GetItemFromInstance(instance: BasePart): Types.Item?
 	local RoundHandler = require(ServerScriptService.RoundHandler)
 	local round = RoundHandler.GetRound()
 	return round:GetItem(instance)

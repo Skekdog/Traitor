@@ -9,14 +9,12 @@ local function OnEquipClient(): ()
 	TargetsClient.Set()
 end
 
-local Item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local Item: Types.ItemComponents = {
 	Name = "Intel",
 	Description = "Reveals your target's identity.",
-	Icon = "rbxassetid://7129850222",
+	IconContent = Content.fromAssetId(7129850222),
 
-	CreditCost = 1,
+	Cost = 1,
 
 	OnEquipClient = OnEquipClient,
 }

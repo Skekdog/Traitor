@@ -95,7 +95,7 @@ ClientInventory.EquippedItem:Connect(function(item)
     end
 
     local role = participant.Role()
-    if item.Definition.IsEvilItem and not role.Definition.IsEvil then
+    if item.IsEvilItem and not role.Definition.IsEvil then
         return showFreeKillIgnoreReason(true)
     end
 
@@ -160,27 +160,30 @@ end)
 
 function module.UpdateAmmo(): ()
     local item = ClientInventory.EquippedItem()
-    if not item or item.Kind ~= "Gun" then
+    if not item or not item.Ammo then
         roundInfo.Frame.AmmoBar.Visible = false
         return
     end
 
-    local currentAmmo: string | number = item.Ammo
+    local currentAmmo = item.Ammo
     if currentAmmo == math.huge then
         roundInfo.Frame.AmmoBar.Visible = false
         return
     end
 
-    local maxAmmo: string | number = item.Definition.AmmoType.Capacity
+    local maxAmmo: string | number = if item.AmmoDefinition then item.AmmoDefinition.Capacity else 0
     if maxAmmo == math.huge then
         maxAmmo = "∞"
     end
 
-    local reserveString = if item.Definition.AmmoType.ReserveCapacity == 0 then "" else ` + {ClientInventory.GetReserveAmmo(item.Definition.AmmoType.Name)}`
+    local reserveString = ""
+    if item.AmmoDefinition then
+        reserveString = if item.AmmoDefinition.ReserveCapacity == 0 then "" else ` + {ClientInventory.GetReserveAmmo(item.AmmoDefinition.Name)}`
+    end
 
     roundInfo.Frame.AmmoBar.Visible = true
     roundInfo.Frame.AmmoBar.AmmoLabel.Text = `{currentAmmo} / {maxAmmo}{reserveString}`
-    UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, item.Ammo, item.Definition.AmmoType.Capacity)
+    UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, item.Ammo, if typeof(maxAmmo) == "number" then maxAmmo else math.huge)
 end
 
 function module.UpdatePunchMeter(punchMeter: number?, maxPunchMeter: number): ()

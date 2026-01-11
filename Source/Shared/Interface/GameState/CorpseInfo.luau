@@ -58,23 +58,14 @@ local flavourImages: {[Types.GeneralDamageSource]: string} = {
     Other = "rbxassetid://17079244437"
 }
 
-local function getItemFromName(name: string): Types.AnyItemDefinition?
+local function getItemFromName(name: string): Types.ItemComponents?
     return GetItemDefinition(name)
 end
 
 local function getItemAttackType(name: string): Types.GeneralDamageSource
     local item = getItemFromName(name)
     if item then
-        if item.Kind == "Gun" then
-            return "Shot"
-        elseif item.Kind == "Grenade" then
-            return "Explode"
-        elseif item.Kind == "Melee" then
-            return item.DamageKind
-        elseif item.Kind == "Item" then
-            return "Other"
-        end
-        error("Unknown item kind: " .. item.Kind)
+        return item.DamageKind or "Other"
     else
         return name :: Types.GeneralDamageSource
     end

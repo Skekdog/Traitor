@@ -17,7 +17,7 @@ local module = {}
 
 local explosionInfo: Types.ExplosionInfo = {
 	Damage = 100,
-	FalloffBegin = 40,
+	FalloffStart = 40,
 	FalloffEnd = 80,
 	Pressure = 100000,
 	VisualRadius = 25,
@@ -28,7 +28,7 @@ local explosionInfo: Types.ExplosionInfo = {
 
 local reducedExplosionInfo: Types.ExplosionInfo = {
 	Damage = 100,
-	FalloffBegin = 20,
+	FalloffStart = 20,
 	FalloffEnd = 50,
 	Pressure = 500000,
 	VisualRadius = 20,
@@ -320,7 +320,7 @@ if RunService:IsClient() then
 			local colour: Color3
 			if distance > explosionInfo.FalloffEnd then
 				colour = Color3.new(0, 1, 0)
-			elseif distance > explosionInfo.FalloffBegin then
+			elseif distance > explosionInfo.FalloffStart then
 				colour = Color3.new(1, 1, 0)
 			else
 				colour = Color3.new(1, 0, 0)
@@ -367,6 +367,7 @@ if RunService:IsServer() then
 	local ServerScriptService = game:GetService("ServerScriptService")
 	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 	local Combat = require(ServerScriptService.Combat.Combat)
 
@@ -504,7 +505,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		participant:GiveItemFromItemDefinition(c4Item)
+		participant:AddItem(Item.new(c4Item))
 		destroy(c4)
 	end
 

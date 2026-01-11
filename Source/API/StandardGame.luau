@@ -10,16 +10,16 @@ local StandardGame = {}
 
 StandardGame.ItemGroups = ItemGroups
 
-function StandardGame.GetItem(name: string): Types.AnyItemDefinition
+function StandardGame.GetItem(name: string): Types.ItemComponents
 	return ItemDefinitions[name] or error("Item not found: " .. name)
 end
 
-function StandardGame.GetItems(): {[string]: Types.AnyItemDefinition}
+function StandardGame.GetItems(): {[string]: Types.ItemComponents}
 	return ItemDefinitions
 end
 
 -- todo: this function is duplicated in ItemDefinitions
-function StandardGame.CopyModify<T>(original: T & (Types.AnyItemDefinition | Types.AmmoDefinition | Types.InteractableDefinition), newName: string, edit: {[string]: any}): T
+function StandardGame.CopyModify<T>(original: T & (Types.ItemComponents | Types.AmmoDefinition | Types.InteractableDefinition), newName: string, edit: {[string]: any}): T
 	local new = table.clone(original)
     for i, v in edit do
         new[i] = if typeof(v) == "table" and v["__nil"] == true then nil else v

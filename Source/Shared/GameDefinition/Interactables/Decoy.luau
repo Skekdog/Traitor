@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -67,7 +68,7 @@ local function OnInteractServer(interactable: Decoy, participant: Types.Particip
 	end
 
 	interactable.Model:Destroy()
-	participant:GiveItemFromItemDefinition(decoyItem)
+	participant:AddItem(Item.new(decoyItem))
 end
 
 local function BeforeTakeDamage(interactable: Decoy, params: Types.DamageParams?): boolean

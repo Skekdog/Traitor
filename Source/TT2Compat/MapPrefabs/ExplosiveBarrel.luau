@@ -8,7 +8,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local function ExplosiveBarrel(prop: Types.Prop, params: Types.DamageParams?): ()
 	local explosionParams = ExplosionParams.new({
 		Damage = 200,
-		FalloffBegin = 3,
+		FalloffStart = 3,
 		FalloffEnd = 20,
 		Pressure = 50000,
 		VisualRadius = 20,

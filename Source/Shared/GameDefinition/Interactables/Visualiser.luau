@@ -4,6 +4,7 @@ local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -162,7 +163,7 @@ end
 
 local originalOnDeath = Participant.OnDeath
 local function patchedOnDeath(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
-	if params.Source ~= "Shot" and (typeof(params.Source) ~= "table" or params.Source.Kind ~= "Gun") then
+	if params.Source ~= "Shot" and (typeof(params.Source) ~= "table" or params.Source.DamageKind ~= "Shot") then
 		return
 	end
 
@@ -254,7 +255,7 @@ local function OnInteractServer(interactable: Visualiser, participant: Types.Par
 	end
 
 	interactable.Model:Destroy()
-	participant:GiveItemFromItemDefinition(visualiserItem)
+	participant:AddItem(Item.new(visualiserItem))
 end
 
 local function removeVisualiser(visualiser: Visualiser): ()

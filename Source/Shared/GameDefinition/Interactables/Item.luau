@@ -5,7 +5,7 @@ local Item = {}
 
 type ItemInteractable = Types.Interactable & {
 	Extras: {
-		Item: Types.AnyItem,
+		Item: Types.Item,
 		[any]: nil,
 	}
 }
@@ -26,7 +26,7 @@ local definition: Types.InteractableDefinition = {
 	OnInteractServer = function(interactable: ItemInteractable, participant: Types.Participant): ()
 		local foundItem = participant:GetItemOccupyingGroup(interactable.Extras.Item.Definition.ItemGroup)
 		if foundItem then
-			if (foundItem.PreventUnequip or not foundItem.Definition.CanDrop) and not interactable.Model:GetAttribute("CanReplace") then
+			if (foundItem.UnequipDisabled or foundItem.DropDisabled) and not interactable.Model:GetAttribute("CanReplace") then
 				return
 			end
 

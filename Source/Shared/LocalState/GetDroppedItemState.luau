@@ -5,7 +5,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 type ItemState = {
     Kind: "ItemState",
-    Definition: Types.AnyItemDefinition,
+    Definition: Types.ItemComponents,
     StoredAmmo: number?,
     AmmoType: string?,
 }
@@ -35,7 +35,7 @@ local function GetDroppedItemState(instance: Instance): ItemState | AmmoState
             AmmoType = ammoType,
         }
     end
-    
+
     assert(not storedAmmo or typeof(storedAmmo) == "number", "Expected attribute 'StoredAmmo' to be a number")
     assert(not ammoType or typeof(ammoType) == "string", "Expected attribute 'AmmoType' to be a string")
 

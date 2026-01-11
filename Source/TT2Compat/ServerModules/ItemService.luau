@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local AmmoRemap = require(ReplicatedStorage.Compat.AmmoRemap)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local module = {}
@@ -21,7 +22,7 @@ function module.GiveItem(self, player: Player, itemName: string, ammo: number?, 
 		return false
 	end
 
-	participant:GiveItemFromItemDefinition(itemDefinition)
+	participant:AddItem(Item.new(itemDefinition))
 	return true
 end
 

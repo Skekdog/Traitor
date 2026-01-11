@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.API.Types)
 
-local Items: {[string]: Types.ItemDefinition} = {}
+local Items: {[string]: Types.ItemComponents} = {}
 
 for _, v in script:GetChildren() do
 	if v:IsA("ModuleScript") then

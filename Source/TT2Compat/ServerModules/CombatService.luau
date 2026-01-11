@@ -39,7 +39,7 @@ function module.DamageWithinRadius(self, _, attacker: Player?, _damage: number, 
 	local round = RoundHandler.GetRound()
 	local params = ExplosionParams.new({
 		Damage = _damage,
-		FalloffBegin = _falloffBegin,
+		FalloffStart = _falloffBegin,
 		FalloffEnd = _falloffEnd,
 		Pressure = 0,
 		VisualRadius = 0,
@@ -51,7 +51,7 @@ function module.Explosion(self, position: Vector3, soundId: number?, radius: num
 	local round = RoundHandler.GetRound()
 	local params = ExplosionParams.new({
 		Damage = damage or 0,
-		FalloffBegin = 5,
+		FalloffStart = 5,
 		FalloffEnd = radius or 20,
 		Pressure = 10000,
 		VisualRadius = 20,

@@ -10,6 +10,7 @@ local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrim
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 export type BaseCommand = {
 	Name: string,
@@ -754,7 +755,7 @@ module.giveitem = {
 				continue
 			end
 
-			participant:GiveItemFromItemDefinition(item)
+			participant:AddItem(Item.new(item))
 			table.insert(affectedPlayers, player)
 		end
 

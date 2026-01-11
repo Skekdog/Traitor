@@ -14,27 +14,27 @@ local module = {}
 
 module.IsAiming = DynamicValue.new(false)
 
-function module.ToggleAim(item: Types.AnyItem?, enabled: boolean?): ()
+function module.ToggleAim(item: Types.Item?, enabled: boolean?): ()
 	local isAiming = if enabled == nil then not module.IsAiming() else enabled
 
 	JumpPower.SetModifier("Aiming", not isAiming)
 
 	local camera = workspace.CurrentCamera
 	if isAiming then
-		assert(item and item.Kind == "Gun", "Must pass a gun when enabling aiming")
+		assert(item and item.IsAimable, "Must pass an aimable item when enabling aiming")
 
-		TweenService:Create(camera, TweenInfo.new(0.1), {FieldOfView = item.Definition.AimFOV or 70}):Play()
-		
-		SetCameraSensitivity((item.Definition.AimFOV or 70) / 70)
+		TweenService:Create(camera, TweenInfo.new(0.1), {FieldOfView = item.AimFOV or 70}):Play()
 
-		if item.Definition.HasScope then
+		SetCameraSensitivity((item.AimFOV or 70) / 70)
+
+		if item.IsScopable then
 			scopeUi:ToggleVisible(true)
 		end
 
 		WalkSpeed.SetModifier("Aiming", -4)
 
-		if item.Definition.AimAnimation then
-			ViewmodelModule.PlayAnimation(item.Definition.AimAnimation, "Aim")
+		if item.AimAnimation then
+			ViewmodelModule.PlayAnimation(item.AimAnimation, "Aim")
 		end
 		ViewmodelModule.IsAiming = true
 	else

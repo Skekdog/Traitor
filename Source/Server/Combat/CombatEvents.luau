@@ -29,9 +29,9 @@ remotes.ClientServer.EquipItem.OnServerEvent:Connect(function(plr, itemName: unk
 	participant:SetEquippedItem(item)
 end)
 
-local function finishReloading(plr: Player, item: Types.GunWeapon): ()
+local function finishReloading(plr: Player, item: Types.Item): ()
 	item.IsReloading = false
-	remotes.ClientServer.ReloadWeapon:FireClient(plr, item.Definition.Name, item.Ammo)
+	remotes.ClientServer.ReloadWeapon:FireClient(plr, item.Name, item.Ammo)
 end
 
 remotes.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: unknown): ()
@@ -45,7 +45,7 @@ remotes.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: 
 	end
 
 	local item = participant:GetEquippedItem()
-	if not item or item.Definition.Name ~= itemName or item.Kind ~= "Gun" or item.Definition.Kind ~= "Gun" then
+	if not item or item.Name ~= itemName or not item.AmmoDefinition then
 		return
 	end
 
@@ -53,31 +53,35 @@ remotes.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: 
 		return
 	end
 
-	if item.Ammo >= item.Definition.AmmoType.Capacity then
+	if item.Ammo >= item.AmmoDefinition.Capacity then
 		return
 	end
 
 	-- take care: we shouldn't store the GetAmmo result, as the player may pick up more ammo whilst reloading
 
-	local ammoKind = item.Definition.AmmoType.Name
+	local ammoKind = item.AmmoDefinition.Name
 	if participant:GetAmmo(ammoKind) <= 0 then
 		return
 	end
 
 	item.IsReloading = true
 
-	local endTime = workspace:GetServerTimeNow() + item.Definition.ReloadTime
-	while workspace:GetServerTimeNow() < endTime do
-		if participant:GetEquippedItem() ~= item then
-			finishReloading(plr, item)
-			return
+	if not item.ReloadDuration or item.ReloadDuration <= 0 then
+		finishReloading(plr, item)
+	else
+		local endTime = workspace:GetServerTimeNow() + item.ReloadDuration
+		while workspace:GetServerTimeNow() < endTime do
+			if participant:GetEquippedItem() ~= item then
+				finishReloading(plr, item)
+				return
+			end
+			task.wait()
 		end
-		task.wait()
 	end
 
-	local diff = math.clamp(participant:GetAmmo(ammoKind), 0, item.Definition.AmmoType.Capacity - item.Ammo)
+	local diff = math.clamp(participant:GetAmmo(ammoKind), 0, item.AmmoDefinition.Capacity - (item.Ammo or 0))
 	participant:SetAmmo(ammoKind, participant:GetAmmo(ammoKind) - diff)
-	item.Ammo += diff
+	item.Ammo = (item.Ammo or 0) + diff
 
 	finishReloading(plr, item)
 end)
@@ -101,32 +105,12 @@ remotes.ClientServer.DropItem.OnServerEvent:Connect(function(plr, itemName: unkn
 	end
 
 	local item = participant:GetItems()[itemName]
-	if not item or not item.Definition.ItemGroup then
+	if not item or not item.ItemGroup then
 		return
 	end
 
 	participant:DropItem(item, direction)
 end)
-
-local function isPrimaryFireBaseRequest(value: any): boolean
-	if typeof(value) ~= "table" then
-		return false
-	end
-
-	if typeof(value.Origin) ~= "Vector3" then
-		return false
-	end
-
-	if typeof(value.ItemName) ~= "string" then
-		return false
-	end
-
-	return true
-end
-
-local function isAlternateFireBaseRequest(value: any): boolean
-	return isPrimaryFireBaseRequest(value)
-end
 
 local function isRaycastInfo(value: any): boolean
 	if typeof(value) ~= "table" then
@@ -156,28 +140,20 @@ local function isRaycastInfo(value: any): boolean
 	return true
 end
 
-local function isThrow(value: any): boolean
-	if typeof(value) ~= "Vector3" then
-		return false
-	end
-
-	if value.Magnitude > 1.1 then
-		return false
-	end
-
-	return true
-end
-
-local function isRaycastRequest(value: any): boolean
-	if value.Kind ~= "PrimaryFireRaycastRequest" then
-		return false
-	end
-
+local function isValidRequest(value: any): boolean
 	if typeof(value) ~= "table" then
 		return false
 	end
 
+	if value.Action ~= "Primary" and value.Action ~= "Alternate" then
+		return false
+	end
+
 	if typeof(value.Origin) ~= "Vector3" then
+		return false
+	end
+
+	if typeof(value.Direction) ~= "Vector3" then
 		return false
 	end
 
@@ -198,36 +174,8 @@ local function isRaycastRequest(value: any): boolean
 	return true
 end
 
-local function isPrimaryFireRequest(value: any): boolean
-	if not isPrimaryFireBaseRequest(value) then
-		return false
-	end
-
-	if value.Kind == "PrimaryFireRaycastRequest" then
-		return isRaycastRequest(value)
-	elseif value.Kind == "PrimaryFireThrowRequest" then
-		return isThrow(value.Direction)
-	elseif value.Kind == "PrimaryFireItemRequest" then
-		return isThrow(value.Direction)
-	else
-		return false
-	end
-end
-
-local function isAlternateFireRequest(value: any): boolean
-	if not isAlternateFireBaseRequest(value) then
-		return false
-	end
-
-	if value.Kind == "AlternateFireItemRequest" then
-		return isThrow(value.Direction)
-	else
-		return false
-	end
-end
-
-remotes.ClientServer.PrimaryFire.OnServerInvoke = function(plr, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
-	if not isPrimaryFireRequest(request) then
+remotes.ClientServer.Fire.OnServerInvoke = function(plr, request: CombatTypes.Request): CombatTypes.ValidateUsageResult
+	if not isValidRequest(request) then
 		return "OtherError"
 	end
 
@@ -236,22 +184,8 @@ remotes.ClientServer.PrimaryFire.OnServerInvoke = function(plr, request: CombatT
 		return "Dead"
 	end
 
-	local result = Combat.PrimaryFire(participant, request)
-	return result :: CombatTypes.ValidateItemUsageResult
-end
-
-remotes.ClientServer.AlternateFire.OnServerInvoke = function(plr, request: CombatTypes.AlternateFireRequest): CombatTypes.ValidateItemUsageResult
-	if not isAlternateFireRequest(request) then
-		return "OtherError"
-	end
-
-	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
-	if not participant then
-		return "Dead"
-	end
-
-	local result = Combat.AlternateFire(participant, request)
-	return result :: CombatTypes.ValidateItemUsageResult
+	local result = Combat.Fire(participant, request)
+	return result :: CombatTypes.ValidateUsageResult
 end
 
 remotes.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
@@ -279,11 +213,11 @@ remotes.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unkn
 		return
 	end
 
-	if item.Kind ~= "Gun" or not item.Definition.AmmoType.CanDrop then
+	if not item.AmmoDefinition or not item.AmmoDefinition.CanDrop then
 		return
 	end
 
-	if item.Ammo < item.Definition.AmmoType.Capacity / 4 then
+	if (item.Ammo or 0) < item.AmmoDefinition.Capacity / 4 then
 		return
 	end
 
@@ -297,15 +231,15 @@ remotes.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unkn
 		return
 	end
 
-	local amount = item.Ammo
-	local model = assert(item.Definition.AmmoType.Model):Clone()
+	local amount = item.Ammo or 0
+	local model = assert(item.AmmoDefinition.Model):Clone()
 
 	if not participant:TryThrowAssembly(model, 15, nil, nil, direction) then
 		return
 	end
 
 	item.Ammo = 0
-	remotes.ServerClient.UpdateAmmo:FireClient(plr, item.Definition.Name, 0);
+	remotes.ServerClient.UpdateAmmo:FireClient(plr, item.Name, 0);
 
 	round:LoadProp(model)
 	local ammoBox = round:GetAmmoBox(model)

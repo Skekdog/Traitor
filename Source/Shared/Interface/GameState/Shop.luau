@@ -11,9 +11,9 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local COLOUR_GOOD = Color3.fromRGB(75, 255, 62)
 local COLOUR_BAD = Color3.fromRGB(167, 0, 0)
 
-local selectedItem: Types.AnyItemDefinition?
+local selectedItem: Types.ItemComponents?
 
-local purchases: {[Types.AnyItemDefinition]: number?} = {}
+local purchases: {[Types.ItemComponents]: number?} = {}
 
 local shopPage = ReplicatedStorage.Assets.EquipmentPages.Shop
 
@@ -54,10 +54,10 @@ local function updateCredits(): boolean
 	shopPage.Data.CurrentCredits.Text = "You have " .. credits .. Plural(credits, " credit.", " credits.")
 	shopPage.Data.CurrentCredits.TextColor3 = COLOUR_GOOD
 
-	if selectedItem and selectedItem.CreditCost then
-		local canAfford = selectedItem.CreditCost <= credits
+	if selectedItem and selectedItem.Cost then
+		local canAfford = selectedItem.Cost <= credits
 
-		shopPage.Data.CreditCost.Text = "This costs " .. selectedItem.CreditCost .. Plural(selectedItem.CreditCost, " credit.", " credits.")
+		shopPage.Data.CreditCost.Text = "This costs " .. selectedItem.Cost .. Plural(selectedItem.Cost, " credit.", " credits.")
 		shopPage.Data.CreditCost.TextColor3 = if canAfford then COLOUR_GOOD else COLOUR_BAD
 
 		shopPage.Data.CurrentCredits.TextColor3 = if canAfford then COLOUR_GOOD else COLOUR_BAD
@@ -95,7 +95,7 @@ local function purchaseAllowed(): boolean
 	return allowed
 end
 
-local function selectItem(item: Types.AnyItemDefinition?): ()
+local function selectItem(item: Types.ItemComponents?): ()
 	selectedItem = item
 
 	updateName()
@@ -117,11 +117,11 @@ local function populateShop(role: Types.Role): ()
 		local gamemode = LocalRoundInfo.Gamemode() or error("Gamemode is not loaded")
 		shopPage.ScrollHolder.ScrollingFrame.Visible = true
 		for _, definition in role.Definition.EquipmentShop do
-			assert(definition.CreditCost, "missing credit cost for " .. definition.Name)
+			assert(definition.Cost, "missing credit cost for " .. definition.Name)
 
 			local button = shopPage.EquipmentEntry:Clone()
 			button.Name = "Equipment_" .. definition.Name
-			button.Image = definition.Icon or "rbxassetid://13488010851"
+			button.ImageContent = definition.IconContent or Content.fromUri("rbxassetid://13488010851")
 
 			button.ResampleMode = if definition.IsPixelIcon then Enum.ResamplerMode.Pixelated else Enum.ResamplerMode.Default
 

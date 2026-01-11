@@ -84,7 +84,7 @@ function module.ToggleCrouching(enabled: boolean?): ()
 	end
 
 	if isCrouching then
-		track = LocalAnimation.TryPlayAnimation(94335137129691, "Crouch")
+		track = LocalAnimation.TryPlayAnimation(Content.fromAssetId(94335137129691), "Crouch")
 		adjustTrackSpeed()
 	else
 		LocalAnimation.TryStopAnimation("Crouch")

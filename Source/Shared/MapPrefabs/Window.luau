@@ -7,8 +7,8 @@ local function Window(prop: Types.Prop, params: Types.DamageParams): ()
 	local force = 1
 	do
 		local source = params.Source
-		if typeof(source) == "table" and (source.Definition.Kind == "Melee" or source.Definition.Kind == "Gun") and source.Definition.ImpulseForce then
-			force = source.Definition.ImpulseForce
+		if typeof(source) == "table" and source.ImpulseForce then
+			force = source.ImpulseForce
 		end
 	end
 

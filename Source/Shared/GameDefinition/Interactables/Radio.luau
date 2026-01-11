@@ -5,6 +5,7 @@ local SoundService = game:GetService("SoundService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 local PLAY_COOLDOWN = 0.25
 
@@ -108,16 +109,16 @@ end
 
 local function addSoundsFromMap(map: Types.Map): ()
 	for _, v in map.ItemDefinitions do
-		if v.Kind == "Gun" and v.AttackSound then
-			addSound(v.AttackSound, map.Name, nil)
+		if v.PrimarySound then
+			addSound(v.PrimarySound, map.Name, nil)
 		end
 	end
 end
 
 local function addSoundsFromGamemode(gamemode: Types.GamemodeDefinition): ()
 	for _, v in gamemode.AvailableItems do
-		if v.Kind == "Gun" and v.AttackSound then
-			addSound(v.AttackSound, nil, gamemode.Name)
+		if v.PrimarySound then
+			addSound(v.PrimarySound, nil, gamemode.Name)
 		end
 	end
 end
@@ -317,7 +318,7 @@ local function OnInteractServer(interactable: Radio, participant: Types.Particip
 	end
 
 	interactable.Model:Destroy()
-	participant:GiveItemFromItemDefinition(radioItem)
+	participant:AddItem(Item.new(radioItem))
 end
 
 local interactable: Types.InteractableDefinition = {

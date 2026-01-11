@@ -12,6 +12,7 @@ local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesMan
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
@@ -21,32 +22,25 @@ local module = {}
 local sampleButton = ui.Object.Sample
 type ItemButton = typeof(sampleButton)
 
-local ourInventory: {Passive: {Types.AnyItem}, Slots: DynamicValue.DynamicValue<{[number]: Types.AnyItem}>, [number]: never} = {Passive = {}, Slots = DynamicValue.new({})}
+local ourInventory: {Passive: {Types.Item}, Slots: DynamicValue.DynamicValue<{[number]: Types.Item}>, [number]: never} = {Passive = {}, Slots = DynamicValue.new({})}
 local ourAmmo: DynamicValue.DynamicValue<{[string]: number?}> = DynamicValue.new({})
 
 module.Inventory = ourInventory
-module.EquippedItem = DynamicValue.new(nil :: Types.AnyItem?)
+module.EquippedItem = DynamicValue.new(nil :: Types.Item?)
 module.Ammo = ourAmmo
 
 local selectedSlot: number?
 
 local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "PreAnimation" | "PreRender" | "PreSimulation" | "PostSimulation"): ()
 	for _, v in ourInventory.Passive do
-		if v.Kind == "Item" and v.Definition[schedulerEvent .. "Client"] then
-			v.Definition[schedulerEvent .. "Client"](v, dt)
+		if v[schedulerEvent .. "Client"] then
+			v[schedulerEvent .. "Client"](v, dt)
 		end
 	end
 
 	for _, v in ourInventory.Slots() do
-		if v.Kind == "Item" and v.Definition[schedulerEvent .. "Client"] then
-			v.Definition[schedulerEvent .. "Client"](v, dt)
-		end
-	end
-
-	local item = module.EquippedItem()
-	if item and item.Kind == "Gun" then
-		if item.Definition[schedulerEvent .. "Client"] then
-			item.Definition[schedulerEvent .. "Client"](item, dt)
+		if v[schedulerEvent .. "Client"] then
+			v[schedulerEvent .. "Client"](v, dt)
 		end
 	end
 end
@@ -83,12 +77,12 @@ local function getNextFreeSlot(): number
 	return last + 1
 end
 
-local function tryUnequip(item: Types.AnyItem, force: boolean?): boolean
+local function tryUnequip(item: Types.Item, force: boolean?): boolean
 	if module.EquippedItem() ~= item then
 		return false
 	end
 
-	if not force and item.PreventUnequip then
+	if not force and item.UnequipDisabled then
 		return false
 	end
 
@@ -102,13 +96,13 @@ local function tryUnequip(item: Types.AnyItem, force: boolean?): boolean
 
 	ViewmodelModule.Hide()
 
-	if item.Definition.OnUnequipClient then
-		item.Definition.OnUnequipClient(item)
+	if item.OnUnequipClient then
+		item.OnUnequipClient(item)
 	end
 
 	module.EquippedItem:SetValue(nil)
 
-	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
+	local button = ui.Object.Container:FindFirstChild("Item " .. item.Name) :: ItemButton?
 	if not button then
 		return true
 	end
@@ -151,28 +145,32 @@ local function canDrop(direction: Vector3): boolean
 	return true
 end
 
-local function tryDropItem(item: Types.AnyItem, direction: Vector3): ()
+local function tryDropItem(item: Types.Item, direction: Vector3): ()
 	if not canDrop(direction) then
 		return
 	end
 
-	ReplicatedStorage.Remotes.ClientServer.DropItem:FireServer(item.Definition.Name, direction)
+	ReplicatedStorage.Remotes.ClientServer.DropItem:FireServer(item.Name, direction)
 end
 
-local function tryDropAmmo(item: Types.GunWeapon, direction: Vector3): ()
+local function tryDropAmmo(item: Types.Item, direction: Vector3): ()
 	if not canDrop(direction) then
 		return
 	end
 
-	if item.Ammo < item.Definition.AmmoType.Capacity / 4 then
+	if not item.Ammo or not item.AmmoDefinition then
+		return
+	end
+
+	if item.Ammo < item.AmmoDefinition.Capacity / 4 then
 		ShowAlert("You do not have enough ammo to drop an ammo box!")
 		return
 	end
 
-	ReplicatedStorage.Remotes.ClientServer.DropAmmo:FireServer(item.Definition.Name, direction)
+	ReplicatedStorage.Remotes.ClientServer.DropAmmo:FireServer(item.Name, direction)
 end
 
-local function tryEquip(item: Types.AnyItem): ()
+local function tryEquip(item: Types.Item): ()
 	local equippedItem = module.EquippedItem()
 	if equippedItem then
 		if equippedItem == item then
@@ -183,13 +181,11 @@ local function tryEquip(item: Types.AnyItem): ()
 		end
 	end
 
-	if item.Kind == "Item" then
-		ItemHint(item.Definition.PrimaryHint, item.Definition.AlternateHint)
-	end
+	ItemHint(item.PrimaryHint, item.AlternateHint)
 
-	ReplicatedStorage.Remotes.ClientServer.EquipItem:FireServer(item.Definition.Name)
+	ReplicatedStorage.Remotes.ClientServer.EquipItem:FireServer(item.Name)
 
-	if item.Kind == "Gun" and item.Definition.AmmoType.CanDrop then
+	if item.AmmoDefinition and item.AmmoDefinition.CanDrop then
 		ControlManager.Register("Drop Ammo", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
@@ -200,7 +196,7 @@ local function tryEquip(item: Types.AnyItem): ()
 		end)
 	end
 
-	if item.Definition.CanDrop and not item.PreventUnequip then
+	if not item.DropDisabled and not item.UnequipDisabled then
 		ControlManager.Register("Drop", function(_, state)
 			if state ~= Enum.UserInputState.End then
 				return Enum.ContextActionResult.Pass
@@ -211,17 +207,17 @@ local function tryEquip(item: Types.AnyItem): ()
 		end)
 	end
 
-	ViewmodelModule.Show(item.Definition)
+	ViewmodelModule.Show(item)
 
-	if item.Definition.OnEquipClient then
-		item.Definition.OnEquipClient(item)
+	if item.OnEquipClient then
+		item.OnEquipClient(item)
 	end
 
 	module.EquippedItem:SetValue(item)
 
 	selectedSlot = nil
 
-	local button = ui.Object.Container:FindFirstChild("Item " .. item.Definition.Name) :: ItemButton?
+	local button = ui.Object.Container:FindFirstChild("Item " .. item.Name) :: ItemButton?
 	if not button then
 		return
 	end
@@ -265,14 +261,14 @@ local function move(clone: typeof(sampleButton), order: number, middle: number):
 	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + getRelativePosition(clone, order, middle)})
 end
 
-local function tryAddButton(item: Types.AnyItem, slot: number): ()
+local function tryAddButton(item: Types.Item, slot: number): ()
 	local gamemode = LocalRoundInfo.Gamemode()
 	if not gamemode then
 		return
 	end
 
 	local clone = sampleButton:Clone()
-	clone.Text = item.Definition.DisplayName or item.Definition.Name
+	clone.Text = item.DisplayName or item.Name
 	clone.TextLabel.Text = `[{slot}]`
 	clone.LayoutOrder = slot
 
@@ -282,7 +278,7 @@ local function tryAddButton(item: Types.AnyItem, slot: number): ()
 	ThemesManager.UpdateThemeInstance(clone, nil, true)
 	ThemesManager.UpdateThemeInstance(clone.TextLabel, nil, true)
 
-	clone.Name = "Item " .. item.Definition.Name
+	clone.Name = "Item " .. item.Name
 	clone.Parent = ui.Object.Container :: any
 
 	clone.MouseButton1Click:Connect(function()
@@ -345,13 +341,13 @@ end
 
 local function removeItem(itemName: string): ()
 	local equippedItem = module.EquippedItem()
-	if equippedItem and equippedItem.Definition.Name == itemName then
+	if equippedItem and equippedItem.Name == itemName then
 		tryUnequip(equippedItem, true)
 	end
 
 	local slot: number?
 	for i, v in ourInventory.Slots() do
-		if v.Definition.Name == itemName then
+		if v.Name == itemName then
 			slot = i
 			break
 		end
@@ -359,10 +355,10 @@ local function removeItem(itemName: string): ()
 
 	if not slot then
 		for i, v in ourInventory.Passive do
-			if v.Definition.Name == itemName then
+			if v.Name == itemName then
 				table.remove(ourInventory.Passive, i)
-				if v.Definition.OnUnequipClient then
-					v.Definition.OnUnequipClient(v)
+				if v.OnUnequipClient then
+					v.OnUnequipClient(v)
 				end
 				return
 			end
@@ -375,19 +371,22 @@ local function removeItem(itemName: string): ()
 	ourInventory.Slots:Invoke()
 end
 
-function module.RemoveItem(item: Types.AnyItem): ()
-	removeItem(item.Definition.Name)
+function module.RemoveItem(item: Types.Item): ()
+	removeItem(item.Name)
 end
 
-local function addItem(item: Types.AnyItem): ()
-	(item :: {Definition: Types.AnyItemDefinition}).Definition = assert(GetItemDefinition(item.Definition.Name), "Item exists on server but not client")
+local function addItem(itemName: string, components: Types.ItemComponents): ()
+	local base = assert(GetItemDefinition(itemName), "Item exists on server but not client")
+
+	local item = Item.new(base)
+	item.Components = components
 
 	local gamemode = LocalRoundInfo.Gamemode()
 	if not gamemode then
 		return
 	end
 
-	local slot = if gamemode.IsSlotless then getNextFreeSlot() else item.Definition.ItemGroup and item.Definition.ItemGroup.PreferredSlot
+	local slot = if gamemode.IsSlotless then getNextFreeSlot() else item.ItemGroup and item.ItemGroup.PreferredSlot
 	if slot then
 		if ourInventory.Slots()[slot] then
 			slot = getNextFreeSlot()
@@ -399,8 +398,8 @@ local function addItem(item: Types.AnyItem): ()
 	end
 
 	table.insert(ourInventory.Passive, item)
-	if item.Definition.OnEquipClient then
-		item.Definition.OnEquipClient(item)
+	if item.OnEquipClient then
+		item.OnEquipClient(item)
 	end
 end
 
@@ -465,21 +464,19 @@ ControlManager.Register("Next Item", function()
 	return Enum.ContextActionResult.Pass
 end)
 
-ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.AnyItem?): ()
+ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string, components: Types.ItemComponents?): ()
 	if mode == "Add" then
-		assert(typeof(item) == "table", "Item must be a table")
-		addItem(item)
+		assert(components)
+		addItem(item, components)
 	elseif mode == "Remove" then
-		assert(typeof(item) == "string", "Item must be a string")
 		removeItem(item)
 	elseif mode == "Reset" then
-		assert(typeof(item) == "nil", "Item must be nil")
 		for _, v in ourInventory.Passive do
-			removeItem(v.Definition.Name)
+			removeItem(v.Name)
 		end
 
 		for _, v in ourInventory.Slots() do
-			removeItem(v.Definition.Name)
+			removeItem(v.Name)
 		end
 	else
 		error("Invalid mode")
@@ -503,8 +500,7 @@ end)
 
 ReplicatedStorage.Remotes.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemName: string, amount: number): ()
 	for _, v in ourInventory.Slots() do
-		if v.Definition.Name == itemName then
-			assert(v.Kind == "Gun", "Item is not a gun")
+		if v.Name == itemName then
 			v.IsReloading = false
 			v.Ammo = amount
 			module.Ammo:Invoke()
@@ -514,8 +510,7 @@ end)
 
 ReplicatedStorage.Remotes.ServerClient.UpdateAmmo.OnClientEvent:Connect(function(itemName: string, amount: number): ()
 	for _, v in ourInventory.Slots() do
-		if v.Definition.Name == itemName then
-			assert(v.Kind == "Gun", "Item is not a gun")
+		if v.Name == itemName then
 			v.Ammo = amount
 			module.Ammo:Invoke()
 		end

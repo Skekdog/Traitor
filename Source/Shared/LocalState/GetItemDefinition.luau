@@ -5,7 +5,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 assert(RunService:IsClient(), "GetItemDefinition should only be called on the client")
 
-local function GetItemDefinition(name: string): Types.AnyItemDefinition?
+local function GetItemDefinition(name: string): Types.ItemComponents?
     local map = LocalRoundInfo.Map()
     if map and map.ItemDefinitions[name] then
         return map.ItemDefinitions[name]

@@ -313,7 +313,7 @@ function module.TransitionUnderline(underline: Frame, target: TextButton)
 end
 
 function module.Slider(background: Frame, noTransition: boolean?, value: number, max: number): ()
-	local size = if value == max then 1 else value / max -- condition needed for case where value or max is infinity
+	local size = if value == max or max == 0 then 1 else value / max -- condition needed for case where value or max is infinity
 	module.Animate(background, TweenInfo.new(0.1), {Size = UDim2.new(size, 0, 1, 0)}, noTransition)
 end
 

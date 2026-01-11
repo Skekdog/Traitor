@@ -8,10 +8,12 @@ local Impulse = require(ReplicatedStorage.API.Impulse)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-local RunBeforeHit = require(ReplicatedStorage.Shared.RoundRule.RunBeforeHit)
+local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local module = {}
 
@@ -36,52 +38,43 @@ local function isOf(part: BasePart, name: string, match: boolean?): boolean?
 	return (part.Name == name) or (part:FindFirstAncestor(name) ~= nil) or (match and (part.Name:match(name) ~= nil))
 end
 
-local function getItemDamage(item: Types.AnyWeapon | Types.ExplosionParams, hitPart: BasePart): number
-	assert(item.Kind ~= "Grenade", "Cannot get damage for grenade")
+local function getItemDamage(item: Types.Item | Types.ExplosionParams, hitPart: BasePart, origin: Vector3): number
+	local data = if item.Kind == "ExplosionParams" then item.Definition :: Types.ExplosionInfo else item :: Types.Item
 
-	if item.Kind == "ExplosionParams" then
-		assert(item.Definition.FalloffEnd ~= 0, "Cannot divide by 0")
-		return ((item.Definition.FalloffEnd - math.max((hitPart.Position - item.Position).Magnitude - item.Definition.FalloffBegin, 0)) / item.Definition.FalloffEnd) * item.Definition.Damage
+	local baseDamage = data.Damage
+	if not baseDamage then
+		return 0
 	end
 
-	local dmg = item.Definition.Damage
-	if typeof(dmg) == "number" then
-		return dmg
-	end
-
-	local hitArea: "Body" | "Head" | "Limb" = "Limb"
-	if isOf(hitPart, "Head") then
-		hitArea = "Head"
-	elseif isOf(hitPart, "Torso", true) or isOf(hitPart, "HumanoidRootPart") then
-		hitArea = "Body"
+	local damage = 0
+	if typeof(baseDamage) == "table" then
+		local hitArea: "Body" | "Head" | "Limb" = "Limb"
+		if isOf(hitPart, "Head") then
+			hitArea = "Head"
+		elseif isOf(hitPart, "Torso", true) or isOf(hitPart, "HumanoidRootPart") then
+			hitArea = "Body"
+		else
+			hitArea = "Limb"
+		end
+		damage = baseDamage[hitArea]
 	else
-		hitArea = "Limb"
+		damage = baseDamage
 	end
 
-	return dmg[hitArea]
+	if data.FalloffEnd then
+		damage *= (data.FalloffEnd - math.max((hitPart.Position - origin).Magnitude - (data.FalloffStart or 0), 0)) / data.FalloffEnd
+	end
+
+	return damage
 end
 
 -- only considers static map
-local function validatePrimaryFire(item: Types.AnyItem, by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): CombatTypes.ValidatePrimaryFire
-	if item.PreventPrimaryFire then
-		return "PrimaryFireDisabled"
-	end
-
-	local char = by:GetCharacter()
-	if not char then
-		return "ShooterTooFar"
-	end
-
-	local head = char:WaitForChild("Head")
-	if not head or not head:IsA("BasePart") or (head.Position - origin).Magnitude > MAX_SHOOTER_DISTANCE then
-		return "ShooterTooFar"
-	end
-
+local function validateRaycast(item: Types.Item, by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?, targetCenterPosition: Vector3?): CombatTypes.ValidateUsageResult
 	if target and (target.Position - assert(targetCenterPosition)).Magnitude > MAX_TARGET_DISTANCE then
 		return "TargetTooFar"
 	end
 
-	if item.Kind == "Melee" and (destination - origin).Magnitude > (item.Definition.MaxDistance + 0.1) then
+	if item.MaxDistance and (destination - origin).Magnitude > (item.MaxDistance + 0.1) then
 		return "TargetTooFar"
 	end
 
@@ -107,16 +100,16 @@ local function validatePrimaryFire(item: Types.AnyItem, by: Types.Participant, o
 	return "Success"
 end
 
-local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, requestKind: string): CombatTypes.ValidateItemUsageResult
-	if (item.Kind == "Grenade") and (requestKind :: string ~= "PrimaryFireThrowRequest") then
+local function validateItemUsage(by: Types.Participant, item: Types.Item, request: CombatTypes.Request): CombatTypes.ValidateUsageResult
+	if request.Action == "Primary" and not item.PrimaryFireServer then
 		return "OtherError"
-	elseif (item.Kind == "Gun") and (requestKind :: string ~= "PrimaryFireRaycastRequest" and requestKind :: string ~= "PrimaryFireItemRequest") then
-		return "OtherError"
-	elseif (item.Kind == "Melee") and (requestKind :: string ~= "PrimaryFireRaycastRequest" and requestKind :: string ~= "AlternateFireItemRequest") then
+	elseif request.Action == "Alternate" and not item.AlternateFireServer then
 		return "OtherError"
 	end
 
-	if requestKind == "AlternateFireItemRequest" and item.PreventAlternateFire then
+	if request.Action == "Primary" and item.PrimaryDisabled then
+		return "PrimaryFireDisabled"
+	elseif request.Action == "Alternate" and item.AlternateDisabled then
 		return "AlternateFireDisabled"
 	end
 
@@ -124,35 +117,52 @@ local function validateItemUsage(by: Types.Participant, item: Types.AnyItem, req
 		return "Dead"
 	end
 
+	local char = by:GetCharacter()
+	if not char then
+		return "OriginTooFar"
+	end
+
+	local head = char:WaitForChild("Head")
+	if not head or not head:IsA("BasePart") or (head.Position - request.Origin).Magnitude > MAX_SHOOTER_DISTANCE then
+		return "OriginTooFar"
+	end
+
 	if by:GetEquippedItem() ~= item then
 		return "NotEquipped"
 	end
 
-	if item.Kind == "Gun" and item.Ammo <= 0 then
+	if request.Action == "Primary" and item.Ammo and item.Ammo <= 0 then
 		return "NotEnoughAmmo"
 	end
 
-	if item.Kind == "Gun" and item.IsReloading then
+	if item.IsReloading then
 		return "Reloading"
 	end
 
-	if item.Kind == "Grenade" and by.Round:IsPreGame() then
-		return "PreGame"
+	if item.PregameDisable and by.Round:IsPreGame() then
+		return "Pregame"
 	end
 
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, grenade: Types.GrenadeWeapon?, origin: Vector3, impulse: Vector3?): ()
+local function onParticipantHit(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, impulse: Vector3?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
 
-	local damage = getItemDamage(item, hitPart)
+	if victim.Round:IsPreGame() then
+		return
+	end
+
+	local data = if item.Kind == "ExplosionParams" then item.Definition else item
+
+	local damage = getItemDamage(item, hitPart, origin)
+
 	local params: Types.DamageParams = {
 		Amount = damage,
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
-		IsHeadshot = item.Kind == "Gun" and isOf(hitPart, "Head"),
+		IsHeadshot = item.Kind == "Item" and item.CanHeadshot and isOf(hitPart, "Head"),
 		Attacker = by,
 
 		HitPosition = hitPosition,
@@ -167,20 +177,14 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 		params.IgnoreSelfDefense = item.Definition.IgnoreSelfDefense
 	end
 
-	if not item:RunBeforeHit(round, hitPart, params) then
-		return
+	if data.BeforeHitParticipant then
+		if not (data.BeforeHitParticipant :: Types.BeforeHitParticipant)(item :: Types.Item, params, victim) then
+			return
+		end
 	end
 
-	if item.Kind ~= "ExplosionParams" then
-		item:RunOnHitClient(victim, hitPart)
-	end
-
-	if grenade then
-		grenade:RunOnHitClient(victim, hitPart)
-	end
-
-	if victim.Round:IsPreGame() then
-		return
+	if item.Kind == "Item" and item.OnHitClient then
+		Replication.RunOnHitClient(item, victim, hitPart)
 	end
 
 	local willDie = params.Amount >= victim:GetHealth()
@@ -191,12 +195,13 @@ local function onParticipantHit(item: Types.GunMeleeWeapon | Types.ExplosionPara
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
-local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, round: Types.Round, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3, origin: Vector3): ()
+local function onPropHit(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3, origin: Vector3): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
 
-	local damage = getItemDamage(item, hitPart)
+	local damage = getItemDamage(item, hitPart, origin)
+
 	local params = {
 		Amount = damage,
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
@@ -209,22 +214,27 @@ local function onPropHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, rou
 		HitPart = hitPart,
 	}
 
-	if not item:RunBeforeHit(round, hitPart, params) then
-		return
+	local data = if item.Kind == "Item" then item else item.Definition
+
+	if data.BeforeHitProp then
+		if not (data.BeforeHitProp :: Types.BeforeHitProp)(item :: Types.Item, params, prop :: Types.Prop) then
+			return
+		end
 	end
 
 	(prop :: Types.Prop):TryTakeDamage(params)
 end
 
-local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): "Part" | "Prop" | "Participant"?
+local function onPartHit(item: Types.Item | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): "Part" | "Prop" | "Participant"?
 	if not hitPart.Parent then
 		return nil -- ?? No idea how but I had an error where the hitPart was unparented. Somehow.
 	end
+
 	local round = by.Round
 
 	local impulse: Vector3?
-	if (item.Kind == "Gun" or item.Kind == "Melee") and item.Definition.ImpulseForce then
-		impulse = item.Definition.ImpulseForce * (hitPosition - origin).Unit
+	if item.Kind == "Item" and item.ImpulseForce then
+		impulse = item.ImpulseForce * (hitPosition - origin).Unit
 		Impulse.ApplyImpulse(hitPart, assert(impulse), true, hitPosition, by)
 	end
 
@@ -246,19 +256,19 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	local propLike = prop or interactable
 
 	if propLike then
-		onPropHit(item, round, by, propLike, hitPart, hitPosition, origin)
+		onPropHit(item, by, propLike, hitPart, hitPosition, origin)
 		return "Prop"
 	else
 		local char = GetMapObjectWithTag(hitPart, "Character")
 		local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
 		if victim then
-			onParticipantHit(item, round, by, victim, hitPart, hitPosition, nil, origin, impulse)
+			onParticipantHit(item, by, victim, hitPart, hitPosition, origin, impulse)
 			return "Participant"
 		end
 	end
 
 	local params: Types.DamageParams = {
-		Amount = getItemDamage(item, hitPart),
+		Amount = getItemDamage(item, hitPart, origin),
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
 
 		Attacker = by,
@@ -269,9 +279,15 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 		HitPart = hitPart,
 	}
 
-	RunBeforeHit(item, by.Round, hitPart, params)
+	local data = if item.Kind == "Item" then item else item.Definition
 
-	if normal and item.Kind == "Gun" then
+	if data.BeforeHitAnything then
+		if not (data.BeforeHitAnything :: Types.BeforeHitAnything)(item :: Types.Item, params, round) then
+			return
+		end
+	end
+
+	if normal then
 		if relativeHitCFrame and relativeHitCFrame.Position.Magnitude <= hitPart.ExtentsSize.Magnitude * 1.1 then
 			ReplicatedStorage.Remotes.ServerClient.MakeBulletHole:FireAllClients(hitPart, relativeHitCFrame, normal)
 		end
@@ -280,7 +296,7 @@ local function onPartHit(item: Types.GunMeleeWeapon | Types.ExplosionParams, by:
 	return "Part"
 end
 
-function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, grenade: Types.GrenadeWeapon?, sound: Sound?): ()
+function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, grenade: Types.Item?, sound: Sound?): ()
     local explosion = Instance.new("Explosion")
 
     local info = params.Definition
@@ -314,7 +330,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 					continue
 				end
 				table.insert(hits, prop)
-				onPropHit(params, round, params.Attacker, prop, v, v.Position, params.Position)
+				onPropHit(params, params.Attacker, prop, v, v.Position, params.Position)
 				continue
 			end
 
@@ -324,7 +340,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 					continue
 				end
 				table.insert(hits, interactable)
-				onPropHit(params, round, params.Attacker, interactable, v, v.Position, params.Position)
+				onPropHit(params, params.Attacker, interactable, v, v.Position, params.Position)
 				continue
 			end
 		end
@@ -339,7 +355,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, participant)
-			onParticipantHit(params, round, params.Attacker, participant, v, v.Position, grenade, params.Position, impulse)
+			onParticipantHit(params, params.Attacker, participant, v, v.Position, params.Position, impulse)
 		end
 
 		Impulse.ApplyImpulse(v, impulse, true, nil, params.Attacker)
@@ -384,178 +400,129 @@ local function applyNearMissSelfDefense(origin: Vector3, destination: Vector3, a
 	end
 end
 
-function module.PrimaryFire(by: Types.Participant, request: CombatTypes.PrimaryFireRequest): CombatTypes.ValidateItemUsageResult
+function module.Fire(by: Types.Participant, request: CombatTypes.Request): CombatTypes.ValidateUsageResult
 	local item = by:GetEquippedItem()
-	if not item or item.Definition.Name ~= request.ItemName then
+	if not item or item.Name ~= request.ItemName then
 		return "NotEquipped"
 	end
 
-	local validateItemUsageResult = validateItemUsage(by, item, request.Kind)
+	local validateItemUsageResult = validateItemUsage(by, item, request)
 	if validateItemUsageResult ~= "Success" then
-		return validateItemUsageResult :: CombatTypes.ValidateItemUsageResult
+		return validateItemUsageResult :: CombatTypes.ValidateUsageResult
 	end
 
-	local definition = item.Definition
-	if definition.Kind == "Gun" or definition.Kind == "Melee" or definition.Kind == "Grenade" then
-		local char = by:GetCharacter()
-		if not char then
-			return "ShooterTooFar"
-		end
+	local char = by:GetCharacter()
+	if not char then
+		return "OriginTooFar"
+	end
 
-		if definition.AttackSound then
-			for _, v in Players:GetPlayers() do
-				if v ~= by.Player then
-					PlaySound(definition.AttackSound, nil, char.PrimaryPart, nil, v)
-				end
+	local sound = if request.Action == "Primary" then item.PrimarySound else item.AlternateSound
+	if sound then
+		for _, v in Players:GetPlayers() do
+			if v ~= by.Player then
+				PlaySound(sound, nil, char.PrimaryPart, nil, v)
 			end
 		end
 	end
 
-	if item.Kind == "Gun" then
+	if request.Action == "Primary" and item.Ammo then
 		item.Ammo -= 1
 	end
 
-	if definition.Kind == "Melee" then
-		local id = assert(tonumber((definition.AttackAnimation :: string):split("://")[2]), "Invalid attack animation: " .. tostring(definition.AttackAnimation))
-		by:TryPlayAnimation(id, "MeleeAttack")
+	local animation = if request.Action == "Primary" then item.PrimaryAnimation else item.AlternateAnimation
+	if animation then
+		by:TryPlayAnimation(animation, "MeleeAttack")
 	end
 
-	if request.Kind == "PrimaryFireRaycastRequest" then
-		for i, v in ipairs(request.Raycasts) do
-			if i > (if item.Kind == "Gun" then item.Definition.BulletsPerShot or 1 else 1) then
-				break
-			end
-
-			if definition.Kind == "Gun" and definition.Projectile then
-				BulletTracer(definition.Projectile, definition.ProjectileSpeed or 100, request.Origin, v.Destination, by.Player)
-			end
-
-			local validateRaycastResult = validatePrimaryFire(item, by, request.Origin, v.Destination, v.HitPart, v.HitPartCenterPosition)
-			if validateRaycastResult ~= "Success" then
-				return validateRaycastResult :: CombatTypes.ValidatePrimaryFire
-			end
-
-			if item.Kind == "Gun" and not item.Definition.IsSilent then
-				applyNearMissSelfDefense(request.Origin, v.Destination, by)
-			end
-
-			if item.Kind ~= "Item" and item.Kind ~= "Grenade" and v.HitPart then
-				onPartHit(item, by, v.HitPart, v.Destination, v.Normal, request.Origin, v.RelativeHitCFrame)
-			end
-		end
-	elseif request.Kind == "PrimaryFireThrowRequest" then
-		if item.Kind ~= "Grenade" then
-			return "OtherError"
-		end
-
+	if item.IsSingleUse then
 		by:RemoveItem(item)
+	end
 
-		local projectile = item.Definition.Projectile:Clone()
-		projectile.Anchored = false
-		projectile.CollisionGroup = "Grenades"
+	if request.Action == "Primary" then
+		if item.PrimaryFireServer then
+			item.PrimaryFireServer(item)
+		elseif not item.IsProjectileSimulated then
+			for i, raycast in ipairs(request.Raycasts) do
+				if i > (item.ProjectileCount or 1) then
+					break
+				end
 
-		by:TryThrowAssembly(projectile, 35, workspace.Projectiles, request.Origin, request.Direction, true)
+				if item.Projectile then
+					BulletTracer(item.Projectile, item.ProjectileSpeed or 100, request.Origin, raycast.Destination, by.Player)
+				end
 
-		local function explode()
-			projectile:Destroy()
+				local validate = validateRaycast(item, by, request.Origin, raycast.Destination, raycast.HitPart, raycast.HitPartCenterPosition)
+				if validate ~= "Success" then
+					return validate :: CombatTypes.ValidateUsageResult
+				end
 
-			local explosionParams = ExplosionParams.new(item.Definition.ExplosionInfo, projectile.Position, by)
-			module.CreateExplosion(by.Round, explosionParams, item)
+				if not item.IsSilent then
+					applyNearMissSelfDefense(request.Origin, raycast.Destination, by)
+				end
 
-			if item.Definition.OnExplode then
-				item.Definition.OnExplode(item, by, projectile)
+				if raycast.HitPart then
+					onPartHit(item, by, raycast.HitPart, raycast.Destination, raycast.Normal, request.Origin, raycast.RelativeHitCFrame)
+				end
 			end
-		end
-
-		if item.Definition.FuseTime < 0 then
-			local char = by:GetCharacter()
-			local startTime = os.clock()
-
-			local maxBounces = item.Definition.MaxBounces or 1
-			local bounces = 0
-
-			projectile.Touched:Connect(function(part)
-				if (os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(projectile.CollisionGroup, part.CollisionGroup) then
-					return
-				end
-
-				bounces += 1
-				if bounces >= maxBounces then
-					explode()
-				end
-			end)
 		else
-			task.wait(item.Definition.FuseTime)
-			explode()
-		end
-	elseif request.Kind == "PrimaryFireItemRequest" then
-		if item.Kind ~= "Item" and item.Kind ~= "Gun" then
-			return "OtherError"
-		end
+			assert(item.Projectile, "Simulated items must define a projectile")
 
-		if item.Kind == "Item" then
-			if not item.Definition.PrimaryFireServer then
-				return "OtherError"
-			end
-
-			item.Definition.PrimaryFireServer(item, "Primary", request.Origin, request.Direction, by)
-		else
-			if not item.Definition.IsPhysicallySimulated or not item.Definition.Projectile or not item.Definition.ProjectileSpeed then
-				return "OtherError"
-			end
-
-			local projectile = item.Definition.Projectile:Clone()
-			projectile.CollisionGroup = "WeaponHitTargets"
-			projectile.Parent = workspace.Projectiles
-
-			projectile:SetNetworkOwner(nil)
-			by:TryThrowAssembly(projectile, item.Definition.ProjectileSpeed, nil, request.Origin, request.Direction)
-
-			local char = by:GetCharacter()
-
-			local bounces = 0
-			local maxBounces = item.Definition.MaxBounces or 1
-
-			local startTime = os.clock()
-			projectile.Touched:Connect(function(part)
-				if (os.clock() - startTime < 0.5 and char and part:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(projectile.CollisionGroup, part.CollisionGroup) then
-					return
-				end
-
-				bounces += 1
-
-				local result = onPartHit(item, by, part, projectile.Position, nil, request.Origin)
-				if result == "Participant" or bounces >= maxBounces then
-					projectile:Destroy()
-				end
+			local projectile = item.Projectile:Clone()
+			ForEachPart(projectile, function(part)
+				part.Anchored = false
+				part.CollisionGroup = "WeaponHitTargets"
 			end)
+
+			;(projectile :: Instance).Parent = workspace.Projectiles
+
+			local primaryPart = GetPrimaryPart(projectile)
+
+			primaryPart:SetNetworkOwner(nil)
+
+			if item.FuseTime and item.ExplosionInfo then
+				task.wait(item.FuseTime)
+
+				local params = ExplosionParams.new(item.ExplosionInfo, primaryPart.Position, by)
+
+				module.CreateExplosion(by.Round, params)
+
+				if item.OnExplode then
+					item.OnExplode(params)
+				end
+			else
+				local maxBounces = item.MaxBounces or 1
+				local bounces = 0
+
+				local startTime = os.clock()
+
+				ForEachPart(projectile, function(part)
+					part.Touched:Connect(function(otherPart)
+						if (os.clock() - startTime < 0.5 and char and otherPart:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(part.CollisionGroup, otherPart.CollisionGroup) then
+							return
+						end
+
+						bounces += 1
+
+						local projPosition = primaryPart.Position
+
+						local surfacePosition = otherPart:GetClosestPointOnSurface(projPosition)
+						local normal = projPosition - surfacePosition
+
+						local result = onPartHit(item, by, otherPart, surfacePosition, normal, request.Origin)
+
+						if bounces >= maxBounces or result == "Participant" then
+							projectile:Destroy()
+						end
+					end)
+				end)
+			end
+		end
+
+	else
+		if item.AlternateFireServer then
+			item.AlternateFireServer()
 		end
 	end
-
-	return "Success"
-end
-
-function module.AlternateFire(by: Types.Participant, request: CombatTypes.AlternateFireRequest): CombatTypes.ValidateItemUsageResult
-	local item = by:GetEquippedItem()
-	if not item or item.Definition.Name ~= request.ItemName then
-		return "NotEquipped"
-	end
-
-	local validateItemUsageResult = validateItemUsage(by, item, request.Kind)
-	if validateItemUsageResult ~= "Success" then
-		return validateItemUsageResult :: CombatTypes.ValidateItemUsageResult
-	end
-
-	if item.Kind ~= "Item" and item.Kind ~= "Melee" then
-		return "OtherError"
-	end
-
-	local func = (item :: Types.Item).Definition.AlternateFireServer
-	if not func then
-		return "OtherError"
-	end
-
-	func(item :: Types.Item, "Alternate", request.Origin, request.Direction, by)
 
 	return "Success"
 end

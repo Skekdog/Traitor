@@ -11,14 +11,14 @@ local function tryGetAnimator(): Animator?
     return hum:FindFirstChildOfClass("Animator")
 end
 
-function module.TryPlayAnimation(id: number, name: string): AnimationTrack?
+function module.TryPlayAnimation(content: Content, name: string): AnimationTrack?
 	local animator = tryGetAnimator()
     if not animator then
         return nil
     end
 
     local animation = Instance.new("Animation")
-    animation.AnimationId = "rbxassetid://" .. tostring(id)
+    animation.AnimationId = content.Uri or ""
 
     local track = animator:LoadAnimation(animation)
     track.Name = name

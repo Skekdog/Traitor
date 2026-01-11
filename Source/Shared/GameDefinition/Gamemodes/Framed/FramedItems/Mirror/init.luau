@@ -3,13 +3,14 @@ local Types = require(ReplicatedStorage.API.Types)
 
 local Mirror = {}
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local item: Types.ItemComponents = {
 	Name = "Mirror",
 
+	Description = "Shows your face.",
+	IconContent = Content.none,
+
 	Model = script.Mirror,
-	HoldAnimation = "rbxassetid://136425139325295",
+	HoldAnimation = Content.fromAssetId(136425139325295),
 
 	ItemGroup = {
 		PreferredSlot = 9,

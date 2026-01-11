@@ -10,17 +10,17 @@ local module = {}
 function module.MakeExplosion(params: {
 	Position: Vector3,
 	Damage: number,
-	FalloffBegin: number?,
+	FalloffStart: number?,
 	FalloffEnd: number,
 	Attacker: Types.Participant?,
 	IgnoreKarma: boolean?,
 	Pressure: number?,
 	VisualRadius: number?,
-	BeforeHitParticipant: Types.BeforeHitParticipant?,
+	BeforeHitParticipant: Types.BeforeHitParticipantExplosionInfo?,
 }, sound: Sound?): ()
 	Combat.CreateExplosion(GetRound(), ExplosionParams.new({
 		Damage = params.Damage,
-		FalloffBegin = params.FalloffBegin or 0,
+		FalloffStart = params.FalloffStart or 0,
 		FalloffEnd = params.FalloffEnd,
 		Pressure = params.Pressure or params.Damage * 50,
 		VisualRadius = params.VisualRadius or params.FalloffEnd,

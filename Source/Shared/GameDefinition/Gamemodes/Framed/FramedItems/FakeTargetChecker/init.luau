@@ -8,14 +8,15 @@ local function OnEquipClient(): ()
 	PlaySound(9118027489)
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local item: Types.ItemComponents = {
 	Name = "FakeTargetChecker",
 	DisplayName = "Fake Target Checker",
 
+	Description = "Blends in with the framed.",
+	IconContent = Content.none,
+
 	Model = script.FakeTargetChecker,
-	HoldAnimation = "rbxassetid://122493302142724",
+	HoldAnimation = Content.fromAssetId(122493302142724),
 
 	ItemGroup = {
 		PreferredSlot = 6,

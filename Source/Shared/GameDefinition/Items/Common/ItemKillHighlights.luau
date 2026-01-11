@@ -22,13 +22,13 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
 		return highlight1.Priority > highlight2.Priority --todo: i remember that something like this errored before, but i checked with lune and it didn't. see what's up, this might not work still.
 	end)
 
-	return function(item, round, victim, params)
-		assert(item.Kind ~= "ExplosionParams")
-
+	return function(item, params, victim)
 		local attacker = params.Attacker
 		if not attacker then
 			return true
 		end
+
+		local round = attacker.Round
 
 		if not round:IsInProgress() then
 			return true
@@ -39,7 +39,7 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
             return true
         end
 
-		local identifier = module.GetIdentifier(item.Definition.Name)
+		local identifier = module.GetIdentifier(item.Name)
 		attacker.Extras[identifier] = (attacker.Extras[identifier] or 0) + 1
 
 		local kills = attacker.Extras[identifier]

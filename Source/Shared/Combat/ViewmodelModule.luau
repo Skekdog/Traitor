@@ -45,21 +45,21 @@ local function clearViewmodelAppearanceConnections(): ()
 end
 
 type Viewmodel = typeof(ReplicatedStorage.Assets.Viewmodel)
-local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
-    if not gun.LaserColor then
+local function laser(viewmodel: Viewmodel, item: Types.Item): ()
+    if not item.LaserColor then
         return
     end
 
-    local item = viewmodel:FindFirstChild("Item")
-    if not item or not item:IsA("BasePart") then
+    local itemModel = viewmodel:FindFirstChild("Item")
+    if not itemModel or not itemModel:IsA("BasePart") then
         return
     end
 
-    local attachment = item:FindFirstChild("LaserAttachment", true)
+    local attachment = itemModel:FindFirstChild("LaserAttachment", true)
     assert(attachment and attachment:IsA("Attachment"), "Missing laser attachment")
 
-    local laser = item:FindFirstChild("Laser") :: typeof(ReplicatedStorage.Assets.Laser)?
-    local ball = item:FindFirstChild("Ball") :: Part?
+    local laser = itemModel:FindFirstChild("Laser") :: typeof(ReplicatedStorage.Assets.Laser)?
+    local ball = itemModel:FindFirstChild("Ball") :: Part?
 
     if not ball then
         ball = Instance.new("Part")
@@ -85,11 +85,11 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
         ball.BackSurface = Enum.SurfaceType.Smooth
 
         ball.Name = "Ball"
-        ball.Parent = item
+        ball.Parent = itemModel
     end
     assert(ball)
 
-    ball.Color = gun.LaserColor
+    ball.Color = item.LaserColor
 
     if not laser then
         laser = ReplicatedStorage.Assets.Laser:Clone()
@@ -97,12 +97,12 @@ local function laser(viewmodel: Viewmodel, gun: Types.GunWeaponDefinition): ()
 
         laser.Material = Enum.Material.Neon
 
-        laser.Parent = item
+        laser.Parent = itemModel
     end
 
     assert(laser)
 
-    laser.Color = gun.LaserColor
+    laser.Color = item.LaserColor
 
     local direction = GetCentreRay().Direction * 10000
 
@@ -159,7 +159,7 @@ local function tempShowViewmodel(): ()
     end
 end
 
-function module.Show(item: Types.AnyItemDefinition): ()
+function module.Show(item: Types.Item): ()
     clearViewmodelAppearanceConnections()
 
     if not item.HoldAnimation or not item.Model or VRService.VREnabled then
@@ -316,9 +316,7 @@ function module.Show(item: Types.AnyItemDefinition): ()
         local final = camera.CFrame:ToWorldSpace(CFrame.new(modifiers) * CFrame.new(0, -1.75, -0.75));
         (viewmodel.PrimaryPart :: BasePart).CFrame = final
 
-        if item.Kind == "Gun" then
-            laser(viewmodel, item)
-        end
+        laser(viewmodel, item)
     end)
 
     if isTempHidden then
@@ -334,14 +332,18 @@ Players.LocalPlayer:GetPropertyChangedSignal("CameraMode"):Connect(function()
     end
 end)
 
-function module.PlayAnimation(uri: string, name: string?): AnimationTrack?
+function module.PlayAnimation(content: Content, name: string?): AnimationTrack?
     local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
     if not viewmodel then
         return nil
     end
 
+    if not content.Uri then
+        return
+    end
+
     local animation = Instance.new("Animation")
-    animation.AnimationId = uri
+    animation.AnimationId = content.Uri
 
     local track = viewmodel.Humanoid.Animator:LoadAnimation(animation)
     track.Name = name or ""
@@ -379,20 +381,21 @@ function module.Hide(): ()
     end
 end
 
-function module.Recoil(definition: Types.AnyItemDefinition): ()
-    if definition.Kind == "Gun" then
-        local x = definition.RecoilX / 4
-        local y = definition.RecoilY / 4
+function module.Recoil(item: Types.Item): ()
+    local x = if item.RecoilX then item.RecoilX / 4 else 0
+    local y = if item.RecoilY then item.RecoilY / 4 else 0
 
-        if module.IsAiming then
-            x /= 2
-            y /= 2
-        end
+    if module.IsAiming then
+        x /= 2
+        y /= 2
+    end
 
+    cameraRecoilSpring.p = Vector3.new(y, x, x + y)
+
+    if item.PrimaryAnimation then
+        module.PlayAnimation(item.PrimaryAnimation)
+    else
         armRecoilSpring.p = Vector3.new(x, y, 0)
-        cameraRecoilSpring.p = Vector3.new(y, x, x + y)
-    elseif definition.Kind == "Melee" then
-        module.PlayAnimation(definition.AttackAnimation)
     end
 end
 
