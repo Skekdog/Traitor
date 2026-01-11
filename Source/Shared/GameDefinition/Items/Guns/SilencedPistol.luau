@@ -5,8 +5,14 @@ local FiveSeven = require(script.Parent.FiveSeven)
 local Modify = require(ReplicatedStorage.API.ItemPresets.Modify)
 
 local SilencedPistol = Modify(FiveSeven, "Silenced Pistol", {
+    Description = "A Five-Seven that has had a suppressor fitted to it, making it much quieter. People killed with silenced weapons will not scream.",
+    IconContent = Content.fromAssetId(299432421),
+
 	IsSilent = true,
 	IsEvilItem = true,
+
+    Cost = 1,
+    MaxStock = 2,
 
 	ItemGroup = ItemGroups.RoleWeapon,
 
