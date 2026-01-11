@@ -26,9 +26,9 @@ local XM1014 = Gun({
 
     PrimaryInterval = 0.8,
     ReloadDuration = 1.5,
-    AmmoType = Ammo.Shotgun,
+    AmmoDefinition = Ammo.Shotgun,
 
-    BulletsPerShot = 6,
+    ProjectileCount = 6,
 
     Projectile = ReplicatedStorage.Assets.Projectiles.Bullet,
     ProjectileSpeed = 220,

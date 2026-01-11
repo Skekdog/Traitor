@@ -27,7 +27,7 @@ local BAR = Gun({
 
     PrimaryInterval = 0.1,
     ReloadDuration = 2.5,
-    AmmoType = Ammo["9mm"],
+    AmmoDefinition = Ammo["9mm"],
 
     Model = ReplicatedStorage.Assets.ItemModels.BAR,
     HoldAnimation = Content.fromAssetId(10247380824),

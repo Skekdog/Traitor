@@ -9,7 +9,6 @@ local SmokeGrenade = Grenade({
 	IconContent = Content.none,
 
     ItemGroup = ItemGroups.Grenade,
-    CanDrop = true,
 
     HoldAnimation = Content.fromAssetId(12498620263),
     Model = ReplicatedStorage.Assets.ItemModels["Smoke Grenade"],

@@ -13,7 +13,6 @@ local item = Grenade({
     IsEvilItem = true,
 
     ItemGroup = ItemGroups.RoleWeapon,
-    CanDrop = true,
 
     Projectile = ReplicatedStorage.Assets.Projectiles.Grenade,
     Model = ReplicatedStorage.Assets.ItemModels.Grenade,

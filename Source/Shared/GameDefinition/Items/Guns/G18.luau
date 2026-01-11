@@ -24,7 +24,7 @@ local G18 = Gun({
     Spread = 0.01,
 
     PrimaryInterval = 0.1,
-    ReloadTime = 1,
+    ReloadDuration = 1,
     AmmoDefinition = Ammo["9mm"],
 
     Model = ReplicatedStorage.Assets.ItemModels.G18,

@@ -55,9 +55,9 @@ local item = Grenade({
 
     FuseTime = 3,
 
-    ProjectileForce = 60,
+    ProjectileSpeed = 60,
 
-    AttackSound = ReplicatedStorage.Assets.ItemSounds.Fired.Grenade,
+	PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Grenade,
 })
 
 IncendiaryGrenade.Item = item

@@ -222,7 +222,7 @@ local Poltergeist = Gun({
 	AmmoDefinition = Ammo["Poltergeist"],
 
 	PreRenderClient = preRenderClient,
-	BeforePrimaryFireClient = beforePrimaryFireClient,
+	PrimaryValidationClient = beforePrimaryFireClient,
 
 	BeforeHitAnything = beforeHitAnything,
 	BeforeHitProp = beforeHitProp,

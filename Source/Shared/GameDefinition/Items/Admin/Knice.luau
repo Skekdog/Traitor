@@ -158,12 +158,11 @@ local item = Melee({
 	Damage = DAMAGE,
 
 	MaxDistance = 7,
-	AttackInterval = 0,
-	AttackSound = ReplicatedStorage.Assets.ItemSounds.Fired.Crowbar,
+	PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Crowbar,
 
 	Model = model,
 	HoldAnimation = Content.fromAssetId(96501965592565),
-    AttackAnimation = Content.fromAssetId(122463302312412),
+    PrimaryAnimation = Content.fromAssetId(122463302312412),
 
 	AlternateFireServer = throw,
 	BeforeHitParticipant = BeforeHitParticipant,

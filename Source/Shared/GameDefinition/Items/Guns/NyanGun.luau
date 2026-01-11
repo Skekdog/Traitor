@@ -73,8 +73,8 @@ local item = Gun({
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
 
-	OnActivateClient = OnActivatedClient,
-	OnDeactivateClient = OnDeactivatedClient,
+	PrimaryActivatedClient = OnActivatedClient,
+	PrimaryDeactivatedClient = OnDeactivatedClient,
 })
 
 NyanGun.Item = item
