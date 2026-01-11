@@ -12,7 +12,7 @@ for _, module in ReplicatedStorage.Shared.GameDefinition.Items:QueryDescendants(
     if ret.Item then
         items[ret.Item.Name] = ret.Item
     else
-        items[ret.Name] = ret.Name
+        items[ret.Name] = ret
     end
 end
 
