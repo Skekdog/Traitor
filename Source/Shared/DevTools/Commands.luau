@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local Items = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
+local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
@@ -622,7 +622,7 @@ module.listitems = {
 	Arguments = {},
 	Execute = function(): string
 		local ret = ""
-		for _, v in Items do
+		for _, v in StandardGame.GetItems() do
 			ret ..= (if ret == "" then "" else "\n") .. v.Name
 		end
 		return ret

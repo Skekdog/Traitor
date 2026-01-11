@@ -2,17 +2,26 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
 local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
-local ItemDefinitions = require(ReplicatedStorage.Shared.GameDefinition.Items.Items)
 local Types = require(script.Parent.Types)
 
 local StandardGame = {}
 
+local items: {[string]: Types.ItemComponents} = {}
+for _, module in ReplicatedStorage.Shared.GameDefinition.Items:QueryDescendants("ModuleScript") do
+    local ret = (require)(module)
+    if ret.Item then
+        items[ret.Item.Name] = ret.Item
+    else
+        items[ret.Name] = ret.Name
+    end
+end
+
 function StandardGame.GetItem(name: string): Types.ItemComponents
-	return ItemDefinitions[name] or error("Item not found: " .. name)
+	return items[name] or error("Item not found: " .. name)
 end
 
 function StandardGame.GetItems(): {[string]: Types.ItemComponents}
-	return ItemDefinitions
+	return items
 end
 
 function StandardGame.GetInteractable(name: string): Types.InteractableDefinition
