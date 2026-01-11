@@ -134,7 +134,7 @@ do
 
 	addSound(footstepSound)
 
-	local burnSound = ReplicatedStorage.Assets.WeaponSounds.FlareBurn:Clone()
+	local burnSound = ReplicatedStorage.Assets.ItemSounds.FlareBurn:Clone()
 	burnSound.Name = "Burn"
 
 	addSound(burnSound)
