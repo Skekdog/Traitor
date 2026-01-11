@@ -24,8 +24,8 @@ local XM1014 = Gun({
 
     Spread = 0.03,
 
-    AttackInterval = 0.8,
-    ReloadTime = 1.5,
+    PrimaryInterval = 0.8,
+    ReloadDuration = 1.5,
     AmmoType = Ammo.Shotgun,
 
     BulletsPerShot = 6,
@@ -38,7 +38,7 @@ local XM1014 = Gun({
     Model = ReplicatedStorage.Assets.ItemModels.XM1014,
     HoldAnimation = Content.fromAssetId(11436160569),
     AimAnimation = Content.fromAssetId(18691725191),
-    AttackSound = ReplicatedStorage.Assets.ItemSounds.Fired.XM1014,
+    PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.XM1014,
     ReloadSound = ReplicatedStorage.Assets.ItemSounds.Reload.XM1014,
 
     BeforeHitParticipant = ItemKillHighlights(
