@@ -2,7 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
@@ -106,7 +107,7 @@ local function isGrounded(participant: Types.Participant): boolean
 	return not not result
 end
 
-local function PrimaryFireServer(item: Types.AnyItem | Teleporter, _, _, _, participant: Types.Participant): ()
+local function PrimaryFireServer(item: Types.Item | Teleporter, participant: Types.Participant): ()
 	local teleporter = item :: Teleporter
 
 	if teleporter.Extras.InUse or not teleporter.Extras.Target then
@@ -146,7 +147,7 @@ local function PrimaryFireServer(item: Types.AnyItem | Teleporter, _, _, _, part
 	teleporter.Extras.InUse = false
 end
 
-local function AlternateFireServer(item: Types.AnyItem | Teleporter, _, origin: Vector3, _, participant: Types.Participant): ()
+local function AlternateFireServer(item: Types.Item | Teleporter, participant: Types.Participant, origin: Vector3): ()
 	local teleporter = item :: Teleporter
 
 	if (teleporter.Extras.TimesUsed or 0) >= MAX_USES then
@@ -162,24 +163,21 @@ local function AlternateFireServer(item: Types.AnyItem | Teleporter, _, origin: 
 	teleporter.Extras.Target = origin
 end
 
-local function OnEquipServer(teleporter: Types.AnyItem | Teleporter, participant: Types.Participant): ()
+local function OnEquipServer(teleporter: Types.Item | Teleporter, participant: Types.Participant): ()
 	ShowAlert(`{100 - math.round(((teleporter.Extras.TimesUsed or 0) / MAX_USES) * 100)}% remaining.`, participant.Player)
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local item = Custom({
 	Name = "Teleporter",
 	Description = "Can be used to teleport a limited number of times, after marking a target location.",
-	Icon = "rbxassetid://8415311131",
+	IconContent = Content.fromAssetId(8415311131),
 
 	ItemGroup = ItemGroups.RoleUtility,
-	CanDrop = true,
 
-	Model = ReplicatedStorage.Assets.WeaponModels.Teleporter,
-	HoldAnimation = "rbxassetid://106602520385915",
+	Model = ReplicatedStorage.Assets.ItemModels.Teleporter,
+	HoldAnimation = Content.fromAssetId(106602520385915),
 
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 1,
 
 	PrimaryToggled = true,
@@ -191,6 +189,6 @@ local item: Types.ItemDefinition = {
 	AlternateFireServer = AlternateFireServer,
 
 	OnEquipServer = OnEquipServer,
-}
+})
 
 return item

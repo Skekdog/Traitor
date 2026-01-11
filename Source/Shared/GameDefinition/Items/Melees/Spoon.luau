@@ -73,7 +73,7 @@ local itemDefinition = Melee({
 	PrimarySound = attackSound,
 
 	Damage = 45,
-	AttackInterval = 0.75,
+	PrimaryInterval = 0.75,
 	DamageKind = "Bludgeon" :: "Bludgeon",
 	MaxDistance = 10,
 

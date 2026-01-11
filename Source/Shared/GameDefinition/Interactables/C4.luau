@@ -365,7 +365,7 @@ end
 
 if RunService:IsServer() then
 	local ServerScriptService = game:GetService("ServerScriptService")
-	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.DNAScanner)
+	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
@@ -449,7 +449,7 @@ local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 		})
 
 		DNAScanner.RemoveDNATraces(c4)
-		DNAScanner.AddDNATrace(c4, participant, nil, "rbxassetid://17229908151", c4.Model)
+		DNAScanner.AddDNATrace(c4, participant, nil, Content.fromAssetId(17229908151), c4.Model)
 
 		c4.Model:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
 	end

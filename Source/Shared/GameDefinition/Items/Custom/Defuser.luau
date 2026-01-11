@@ -1,30 +1,28 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local params = RaycastParams.new()
 params.CollisionGroup = "WeaponHitTargets"
 params.FilterDescendantsInstances = {workspace.Characters}
 params.FilterType = Enum.RaycastFilterType.Exclude
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
+local item = Custom({
 	Name = "Defuser",
 	Description = "Can be used to safely defuse any C4s.",
-	Icon = "rbxassetid://96183272088937",
+	IconContent = Content.fromAssetId(96183272088937),
 
 	ItemGroup = ItemGroups.RoleUtility,
-	CanDrop = true,
 
-	Model = ReplicatedStorage.Assets.WeaponModels.Defuser,
+	Model = ReplicatedStorage.Assets.ItemModels.Defuser,
 
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 2,
 
 	PrimaryHint = "Defuse C4",
 	PrimaryToggled = true,
-	PrimaryFireServer = function(_, _, origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+	PrimaryFireServer = function(_, participant, origin: Vector3, direction: Vector3): ()
 		local result = workspace:Raycast(origin, direction * 7.5, params)
 		if not result then
 			return
@@ -39,6 +37,6 @@ local item: Types.ItemDefinition = {
 			C4.TryDisarm(interactable :: C4.C4, participant, 1, true)
 		end
 	end
-}
+})
 
 return item

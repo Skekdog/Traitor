@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local ItemKillHighlights = require(ReplicatedStorage.API.ItemPresets.ItemKillHighlights)
 local Melee = require(ReplicatedStorage.API.ItemPresets.Melee)
+local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local THROW_FORCE = 80
@@ -85,7 +86,7 @@ local function throw(item: Types.Item, attacker: Types.Participant, origin: Vect
 	model:AddTag("Item")
 	local newItem = attacker.Round:LoadProp(model)
 
-	DNAScanner.AddDNATrace(newItem, attacker, nil, "rbxassetid://14930962070", model)
+	DNAScanner.AddDNATrace(newItem, attacker, nil, Content.fromAssetId(14930962070), model)
 end
 
 local function BeforeHitParticipant(item: Types.Item, params: Types.DamageParams, hitParticipant: Types.Participant): boolean

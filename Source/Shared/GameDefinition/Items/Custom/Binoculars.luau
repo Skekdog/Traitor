@@ -2,8 +2,9 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
+local Types = require(ReplicatedStorage.API.Types)
 
 local module = {}
 
@@ -88,19 +89,16 @@ local function OnEquipServer(_, participant: Types.Participant): ()
 	doZoomServer(participant, true)
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local item = Custom({
 	Name = "Binoculars",
 	Description = "Corpses can be searched from a long distance. Additionally, unidentified bodies will be highlighted.",
-	Icon = "rbxassetid://7677183404",
+	IconContent = Content.fromAssetId(7677183404),
 
 	ItemGroup = ItemGroups.RoleUtility,
-	CanDrop = true,
 
-	Model = ReplicatedStorage.Assets.WeaponModels.Binoculars,
+	Model = ReplicatedStorage.Assets.ItemModels.Binoculars,
 
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 2,
 
 	AlternateToggled = true,
@@ -112,7 +110,7 @@ local item: Types.ItemDefinition = {
 
 	OnEquipServer = OnEquipServer,
 	OnUnequipServer = OnUnequipServer,
-}
+})
 
 module.Item = item
 

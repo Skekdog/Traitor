@@ -2,7 +2,8 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
-local CreateRadarPoint = require(script.Parent.Common.CreateRadarPoint)
+local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -47,13 +48,13 @@ local function hasEquivalentTrace(t: {IHasTarget & IHasObject}, trace: IHasTarge
 	return false
 end
 
-function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?, icon: string, instance: Instance): ()
+function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?, icon: Content, instance: Instance): ()
 	local traces = object.Extras.DNATraces or {}
 
 	local trace: DNATrace = {
 		ExpiresAt = if duration then workspace:GetServerTimeNow() + duration else nil,
 		Target = target.Player.Name,
-		Icon = icon,
+		Icon = icon.Uri or "",
 		Object = instance,
 	}
 
@@ -119,7 +120,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local source: Types.DamageSource = params.Source
-	local isEligible = source == "Shot" or source == "Bludgeon" or source == "Stab" or if typeof(source) == "table" then source.Kind == "Gun" or source.Kind == "Melee" else false
+	local isEligible = source == "Shot" or source == "Bludgeon" or source == "Stab" or if typeof(source) == "table" then source.DamageKind == "Shot" or source.DamageKind == "Bludgeon" or source.DamageKind == "Stab" else false
 	if not isEligible then
 		return
 	end
@@ -130,7 +131,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
-	module.AddDNATrace(participant, attacker, duration, "rbxassetid://1043921089", char)
+	module.AddDNATrace(participant, attacker, duration, Content.fromAssetId(1043921089), char)
 
 	participant:AddCorpseIcon({
 		Name = "DNATrace",
@@ -141,14 +142,14 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 end
 
 local originalDropItem = Participant.DropItem
-local function patchedDropItem(participant: Types.Participant, item: Types.AnyItem, throwDirection: Vector3?): ()
-	if not item.Definition.CanDrop or not item.Model then
+local function patchedDropItem(participant: Types.Participant, item: Types.Item, throwDirection: Vector3?): ()
+	if item.DropDisabled or not item.Model then
 		return
 	end
-	module.AddDNATrace(item, participant, nil, item.Definition.Icon or "rbxassetid://4795275417", item.Model)
+	module.AddDNATrace(item, participant, nil, item.IconContent or Content.fromAssetId(4795275417), item.Model)
 end
 
-Participant.DropItem = function(participant: Types.Participant, item: Types.AnyItem, throwDirection: Vector3?): ()
+Participant.DropItem = function(participant: Types.Participant, item: Types.Item, throwDirection: Vector3?): ()
 	patchedDropItem(participant, item, throwDirection)
 	originalDropItem(participant, item, throwDirection)
 end
@@ -163,7 +164,7 @@ raycastParams.CollisionGroup = "WeaponHitTargets"
 raycastParams.FilterDescendantsInstances = {workspace.Characters}
 raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 raycastParams.IgnoreWater = true
-local function PrimaryFireServer(item: Types.Item, _, origin: Vector3, direction: Vector3, participant: Types.Participant): ()
+local function PrimaryFireServer(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): ()
 	local result = workspace:Raycast(origin, direction * MAX_SCAN_RANGE * 1.1)
 	if not result then
 		return
@@ -236,7 +237,7 @@ if RunService:IsClient() then
 
 	local function tryScan(): ()
 		local item = ClientInventory.Inventory.Slots()[ITEM_SLOT]
-		if not item or item.Definition.Name ~= "DNAScanner" then
+		if not item or item.Name ~= "DNAScanner" then
 			return
 		end
 
@@ -353,18 +354,18 @@ local function OnUnequipClient(): ()
 	ui:ToggleVisible(false)
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
+local item = Custom({
 	Name = "DNAScanner",
 	DisplayName = "DNA Scanner",
+	Description = "Collects DNA from objects of interest, revealing the location of whoever interacted with it.",
+	IconContent = Content.none,
 
 	ItemGroup = {
 		PreferredSlot = 9,
 	},
-	CanDrop = true,
 
-	Model = ReplicatedStorage.Assets.WeaponModels.DNAScanner,
-	HoldAnimation = "rbxassetid://134193046304179",
+	Model = ReplicatedStorage.Assets.ItemModels.DNAScanner,
+	HoldAnimation = Content.fromAssetId(134193046304179),
 
 	PrimaryToggled = true,
 	PrimaryHint = "Scan DNA",
@@ -372,7 +373,7 @@ local item: Types.ItemDefinition = {
 
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
-}
+})
 
 module.Item = item
 

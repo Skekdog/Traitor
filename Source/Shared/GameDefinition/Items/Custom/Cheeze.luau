@@ -1,7 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.API.Types)
-local ItemGroups = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.ItemGroups)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
+local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 local Cheeze = {}
 
@@ -23,15 +25,15 @@ local function playEatSound(participant: Types.Participant): ()
 	})
 end
 
-local function PrimaryFireServer(item: Types.Item, _, _, _, participant: Types.Participant): ()
+local function PrimaryFireServer(item: Types.Item, participant: Types.Participant): ()
 	if item.Extras.IsEating or item.Extras.IsThrowing then
 		return
 	end
 
-	item.PreventUnequip = true
+	item.UnequipDisabled = true
 	item.Extras.IsEating = true
 
-	participant:TryPlayAnimation(82123370330518, "EatCheeze")
+	participant:TryPlayAnimation(Content.fromAssetId(82123370330518), "EatCheeze")
 
 	playEatSound(participant)
 
@@ -53,10 +55,10 @@ local function PrimaryFireClient(item: Types.Item): ()
 		return
 	end
 
-	item.PreventUnequip = true
+	item.UnequipDisabled = true
 	item.Extras.IsEating = true
 
-	ViewmodelModule.PlayAnimation("rbxassetid://82123370330518")
+	ViewmodelModule.PlayAnimation(Content.fromAssetId(82123370330518))
 end
 
 local function AlternateFireClient(item: Types.Item): ()
@@ -67,10 +69,10 @@ local function AlternateFireClient(item: Types.Item): ()
 		return
 	end
 
-	item.PreventUnequip = true
+	item.UnequipDisabled = true
 	item.Extras.IsThrowing = true
 
-	local track = ViewmodelModule.PlayAnimation("rbxassetid://115786020255555")
+	local track = ViewmodelModule.PlayAnimation(Content.fromAssetId(115786020255555))
 
 	local function onFinish(): ()
 		ClientInventory.RemoveItem(item)
@@ -123,17 +125,17 @@ local function hover(cheeze: BasePart, part: BasePart): ()
 	Instance.new("Sparkles", cheeze).TimeScale = 0.5
 end
 
-local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types.Participant): ()
+local function AlternateFireServer(item: Types.Item, participant: Types.Participant): ()
 	local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 
 	if item.Extras.IsEating or item.Extras.IsThrowing then
 		return
 	end
 
-	item.PreventUnequip = true
+	item.UnequipDisabled = true
 	item.Extras.IsThrowing = true
 
-	local track = participant:TryPlayAnimation(115786020255555, "ThrowCheeze")
+	local track = participant:TryPlayAnimation(Content.fromAssetId(115786020255555), "ThrowCheeze")
 
 	local function onFinish(): ()
 		assert(item.Model and item.Model:IsA("BasePart"))
@@ -160,7 +162,7 @@ local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types
 					end
 
 					model:Destroy()
-					participant:GiveItemFromItemDefinition(item.Definition)
+					participant:AddItem(Item.new(item.Base))
 
 					return
 				end
@@ -185,17 +187,15 @@ local function AlternateFireServer(item: Types.Item, _, _, _, participant: Types
 	end
 end
 
-local definition: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local definition = Custom({
 	Name = "Cheeze",
 	Description = "Can be consumed to instantly heal, or thrown on the ground to allow others to heal.",
-	Icon = "rbxassetid://9506964263",
+	IconContent = Content.fromAssetId(9506964263),
 
-	Model = ReplicatedStorage.Assets.WeaponModels.Cheeze,
-	HoldAnimation = "rbxassetid://85447019535859",
+	Model = ReplicatedStorage.Assets.ItemModels.Cheeze,
+	HoldAnimation = Content.fromAssetId(85447019535859),
 
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 2,
 
 	ItemGroup = ItemGroups.RoleUtility,
@@ -204,7 +204,7 @@ local definition: Types.ItemDefinition = {
 	PrimaryFireClient = PrimaryFireClient,
 	AlternateFireServer = AlternateFireServer,
 	AlternateFireClient = AlternateFireClient,
-}
+})
 
 Cheeze.Item = definition
 

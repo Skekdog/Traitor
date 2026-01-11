@@ -5,12 +5,15 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local GetAssemblyMass = require(ReplicatedStorage.API.GetAssemblyMass)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
+
+module.Item = (nil :: any) :: Types.ItemComponents
 
 local INTERACT_DISTANCE = 7.5
 local MAX_DISTANCE = 15
@@ -108,8 +111,8 @@ local function clientAnimate(): ()
 	local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
 	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
 
-	LocalAnimation.TryPlayAnimation(13269497293, "Magneto")
-	ViewmodelModule.PlayAnimation("rbxassetid://13269497293", "Magneto")
+	LocalAnimation.TryPlayAnimation(Content.fromAssetId(13269497293), "Magneto")
+	ViewmodelModule.PlayAnimation(Content.fromAssetId(13269497293), "Magneto")
 end
 
 local function clientMakeAlignPosition(part: BasePart): AlignPosition
@@ -217,7 +220,7 @@ local function destroyRope(part: BasePart): ()
 	end
 end
 
-local function clientGrab(part: BasePart): ()
+local function clientGrab(item: Types.Item, part: BasePart): ()
 	local UpdateItemHint = require(ReplicatedStorage.API.UpdateItemHint)
 	local prop = clientGetProp(part)
 	if not prop or not canGrab(prop) then
@@ -225,7 +228,7 @@ local function clientGrab(part: BasePart): ()
 	end
 
 	if prop:HasTag("Corpse") then
-		UpdateItemHint(module.Item, "primary", "Pin Limb")
+		UpdateItemHint(item, "primary", "Pin Limb")
 	end
 
 	grabRemote:FireServer(part)
@@ -275,7 +278,7 @@ local function onUnequipServer(_, participant: Types.Participant): ()
 	module.ServerStopControllingProp(participant.Player)
 end
 
-local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): ()
+local function alternateFireClient(item, origin: Vector3, direction: Vector3): ()
 	local part = clientRaycast()
 
 	if part and clientControl and part == clientControl.Part and clientGetProp(part) == clientControl.Prop then
@@ -287,11 +290,11 @@ local function alternateFireClient(_, _, origin: Vector3, direction: Vector3): (
 	end
 
 	if part then
-		return clientGrab(part)
+		return clientGrab(item, part)
 	end
 end
 
-local function primaryFireClient(_, _, origin: Vector3, direction: Vector3): ()
+local function primaryFireClient(_, origin: Vector3, direction: Vector3): ()
 	local part, position = clientRaycast()
 	if not part or not position then
 		return
@@ -414,7 +417,7 @@ Players.PlayerRemoving:Connect(function(player)
 	module.ServerStopControllingProp(player)
 end)
 
-local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function(): ()
+local postSimulationClient: (item: Types.Item, dt: number) -> () = function(): ()
 	if not clientControl then
 		return
 	end
@@ -465,16 +468,18 @@ local postSimulationClient: (item: Types.AnyItem, dt: number) -> () = function()
 	clientControl.AlignPosition.Position = targetPosition
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
+local item = Custom({
 	Name = "Magneto Stick",
+	Description = "Grab stuff and push stuff",
+	IconContent = Content.none,
+
     ItemGroup = {
 		PreferredSlot = 5,
 	},
-    CanDrop = false,
+    DropDisabled = true,
 
-    Model = ReplicatedStorage.Assets.WeaponModels["Magneto Stick"],
-    HoldAnimation = "rbxassetid://10247423634",
+    Model = ReplicatedStorage.Assets.ItemModels["Magneto Stick"],
+    HoldAnimation = Content.fromAssetId(10247423634),
 
 	AlternateToggled = true,
 
@@ -488,7 +493,7 @@ local item: Types.ItemDefinition = {
 
     PrimaryHint = "Push Prop",
     AlternateHint = "Grab Prop",
-}
+})
 
 module.Item = item
 

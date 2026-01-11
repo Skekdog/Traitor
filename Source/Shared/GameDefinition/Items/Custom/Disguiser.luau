@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 
 local module = {}
 
@@ -173,7 +174,7 @@ if RunService:IsServer() then
 		local found = false
 		for _, v in participant:GetItems() do
 			assert(v)
-			if v.Definition.Name == "Disguiser" then
+			if v.Name == "Disguiser" then
 				found = true
 				break
 			end
@@ -187,7 +188,7 @@ if RunService:IsServer() then
 	end)
 end
 
-local function OnEquipClient(item: Types.AnyItem): ()
+local function OnEquipClient(item: Types.Item): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	CustomActions.Register("Disguise", function()
 		clientDisguiseActive = not clientDisguiseActive
@@ -196,17 +197,17 @@ local function OnEquipClient(item: Types.AnyItem): ()
 	end, 1)
 end
 
-local function OnEquipServer(item: Types.AnyItem, participant: Types.Participant): ()
+local function OnEquipServer(item: Types.Item, participant: Types.Participant): ()
 	serverParticipantTable[participant.Player] = participant
 end
 
-local function OnUnequipClient(item: Types.AnyItem): ()
+local function OnUnequipClient(item: Types.Item): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	clientDisguiseActive = false
 	CustomActions.Unregister("Disguise")
 end
 
-local function OnUnequipServer(item: Types.AnyItem, participant: Types.Participant): ()
+local function OnUnequipServer(item: Types.Item, participant: Types.Participant): ()
 	local data = serverParticipantTable[participant.Player]
 	if not data then
 		return
@@ -215,14 +216,12 @@ local function OnUnequipServer(item: Types.AnyItem, participant: Types.Participa
 	serverParticipantTable[participant.Player] = nil
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
+local item = Custom({
 	Name = "Disguiser",
 	Description = "When activated, conceals your identity and status from others.",
-	Icon = "rbxassetid://107291373883291",
+	IconContent = Content.fromAssetId(107291373883291),
 
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 1,
 
 	OnEquipClient = OnEquipClient,
@@ -230,7 +229,7 @@ local item: Types.ItemDefinition = {
 
 	OnUnequipClient = OnUnequipClient,
 	OnUnequipServer = OnUnequipServer,
-}
+})
 
 module.Item = item
 

@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
-local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Disguiser)
+local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.Disguiser)
 local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 local CombineTable = require(ReplicatedStorage.Shared.Util.CombineTable)
 
