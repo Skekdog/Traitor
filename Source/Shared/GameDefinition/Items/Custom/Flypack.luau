@@ -1,49 +1,35 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 
 local Jetpack = {}
 
 local VELOCITY = 20
 local WALKSPEED_BONUS = 2
 
-local MAX_FUEL = 10
-local FUEL_THRESHOLD = 1
-local FUEL_CONSUMPTION_RATE = 5
-local FUEL_RECHARGE_RATE = 0.75
-local RECHARGE_COOLDOWN = 1
+local MAX_FUEL = 100000000
+local FUEL_THRESHOLD = 2
+local FUEL_CONSUMPTION_RATE = 2
+local FUEL_RECHARGE_RATE = 0.5
 
 local fuel = MAX_FUEL
 
 local visualsRemote = GetRemote("JetpackVisuals", script)
 
-local lastUseTime = 0
-local function toggleJetpack(velocity: LinearVelocity?, enable: boolean): ()
+local function toggleJetpack(velocity: LinearVelocity): ()
 	local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 
-	if not velocity then
-		return
-	end
+	velocity.Enabled = not velocity.Enabled
+	WalkSpeed.SetModifier("UsingJetpack", if velocity.Enabled then WALKSPEED_BONUS else 0)
 
-	if enable == velocity.Enabled or enable and fuel < FUEL_THRESHOLD then
-		return
-	end
-
-	if not enable then
-		lastUseTime = os.clock()
-	end
-
-	velocity.Enabled = enable
-	WalkSpeed.SetModifier("UsingJetpack", if enable then WALKSPEED_BONUS else 0)
-
-	visualsRemote:FireServer(enable)
+	visualsRemote:FireServer(velocity.Enabled)
 end
 
 local function getUi()
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	local ui: typeof(UIManager.RegisterUI(script.JetpackFuel)) = UIManager.TryGetUI("JetpackFuel") :: typeof(UIManager.RegisterUI(script.JetpackFuel))? or UIManager.RegisterUI(script.JetpackFuel)
+	local ui: typeof(UIManager.RegisterUI(script.Parent.Jetpack.JetpackFuel)) = UIManager.TryGetUI("JetpackFuel") :: typeof(UIManager.RegisterUI(script.Parent.Jetpack.JetpackFuel))? or UIManager.RegisterUI(script.Parent.Jetpack.JetpackFuel)
 	return ui
 end
 
@@ -57,12 +43,9 @@ if RunService:IsClient() then
 		if velocity.Enabled then
 			fuel = math.max(0, fuel - FUEL_CONSUMPTION_RATE * dt)
 			if fuel <= 0 then
-				toggleJetpack(velocity, false)
+				toggleJetpack(velocity)
 			end
 		else
-			if os.clock() - lastUseTime < RECHARGE_COOLDOWN then
-				return
-			end
 			fuel = math.min(MAX_FUEL, fuel + FUEL_RECHARGE_RATE * dt)
 		end
 
@@ -70,32 +53,9 @@ if RunService:IsClient() then
 	end)
 end
 
-local function tryConnectTouchGui(): ()
-	local touchGui = Players.LocalPlayer.PlayerGui:FindFirstChild("TouchGui")
-	if not touchGui then
-		return
-	end
-
-	local touchControlFrame = touchGui:FindFirstChild("TouchControlFrame")
-	if not touchControlFrame then
-		return
-	end
-
-	local jumpButton = touchControlFrame:FindFirstChild("JumpButton")
-	if not jumpButton then
-		return
-	end
-
-	assert(jumpButton:IsA("GuiButton"), "What")
-
-	jumpButton:GetPropertyChangedSignal("GuiState"):Connect(function()
-		toggleJetpack(velocity, jumpButton.GuiState == Enum.GuiState.Press)
-	end)
-end
-
 local function OnEquipClient(): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-	local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 
 	local root = LocalCharacter.RootPart()
 	if not root then
@@ -122,23 +82,12 @@ local function OnEquipClient(): ()
 	velocity.Attachment0 = attachment
 	velocity.Parent = root
 
-	ControlManager.Register("Jetpack", function(_, state)
-		if state == Enum.UserInputState.Begin then
-			toggleJetpack(velocity, true)
-		else
-			toggleJetpack(velocity, false)
+	CustomActions.Register("Jetpack", function()
+		if not velocity or not velocity.Enabled and fuel < FUEL_THRESHOLD then
+			return
 		end
-
-		return Enum.ContextActionResult.Pass
-	end, nil, {
-		Keybind = {
-			KBMKeybind = Enum.KeyCode.Space,
-			Gamepad = Enum.KeyCode.ButtonA,
-		},
-		Toggled = false,
-	})
-
-	tryConnectTouchGui()
+		toggleJetpack(velocity)
+	end)
 
 	getUi():ToggleVisible(true)
 end
@@ -162,7 +111,7 @@ local function OnEquipServer(_, participant: Types.Participant): ()
 		return
 	end
 
-	humanoid:AddAccessory(script.JetpackModel:Clone())
+	humanoid:AddAccessory(script.Parent.Jetpack.JetpackModel:Clone())
 end
 
 local function OnUnequipServer(_, participant: Types.Participant): ()
@@ -211,15 +160,12 @@ if RunService:IsServer() then
 	end)
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
-
-	Name = "Jetpack",
+local item = Custom({
+	Name = "Flypack",
 	Description = "Fly around, while fuel lasts.",
+	IconContent = Content.fromAssetId(17576355326),
 
-	Icon = "rbxassetid://17576355326",
-
-	CreditCost = 1,
+	Cost = 1,
 	MaxStock = 1,
 
 	OnEquipClient = OnEquipClient,
@@ -227,7 +173,7 @@ local item: Types.ItemDefinition = {
 
 	OnEquipServer = OnEquipServer,
 	OnUnequipServer = OnUnequipServer,
-}
+})
 
 Jetpack.Item = item
 

@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Discombobulate = require(ReplicatedStorage.API.Discombobulate)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Grenade = require(ReplicatedStorage.API.ItemPresets.Grenade)
-local Discombobulate = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.Discombobulate)
 
 local Discombobulator = Grenade({
 	Name = "Discombobulator",

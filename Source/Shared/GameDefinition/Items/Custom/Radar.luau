@@ -1,13 +1,14 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CreateRadarPoint = require(script.Parent.Common.CreateRadarPoint)
-local Decoy = require(script.Parent.Parent.Interactables.Decoy)
+local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
+local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local GREY_COLOUR = Color3.new(0.5, 0.5, 0.5)
 local GREEN_COLOUR = Color3.fromRGB(55, 174, 37)
 
-local function HeartbeatClient(item: Types.AnyItem): ()
+local function HeartbeatClient(item: Types.Item): ()
     assert(item.Kind == "Item")
     local lastScan: number = item.Extras.LastScan or 0
 
@@ -54,15 +55,14 @@ local function HeartbeatClient(item: Types.AnyItem): ()
     end
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
+local item = Custom({
     Description = "Reveals the location of all living players every 30 seconds.",
-    CreditCost = 1,
+    Cost = 1,
     MaxStock = 1,
-    Icon = "rbxassetid://62159372",
+    IconContent = Content.fromAssetId(62159372),
     Name = "Radar",
 
     HeartbeatClient = HeartbeatClient,
-}
+})
 
 return item

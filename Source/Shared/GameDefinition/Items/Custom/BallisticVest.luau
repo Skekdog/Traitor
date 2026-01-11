@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -16,7 +17,7 @@ local function isTorso(part: BasePart): boolean
 end
 
 local function isGunSource(source: Types.DamageSource): boolean
-	return source == "Shot" or (typeof(source) == "table" and source.Kind == "Gun")
+	return source == "Shot" or (typeof(source) == "table" and source.DamageKind == "Shot")
 end
 
 local originalTryTakeDamage = Participant.TryTakeDamage
@@ -31,20 +32,19 @@ local function patchedTryTakeDamage(participant: Participant, params: Types.Dama
 	return originalTryTakeDamage(participant, params, deferDeath)
 end
 
-local item: Types.ItemDefinition = {
-	Kind = "Item" :: "Item",
+local item = Custom({
     Name = "Ballistic Vest",
     Description = "Absorbs a limited amount of damage to the torso. Not visible to others.",
-    Icon = "rbxassetid://395920626",
+    IconContent = Content.fromAssetId(395920626),
 
-    CreditCost = 1,
+    Cost = 1,
     MaxStock = 1,
 
     OnEquipServer = function(item, participant: Types.Participant)
         participant.Extras.BallisticVest = 60
 		participant.TryTakeDamage = patchedTryTakeDamage
     end,
-}
+})
 
 module.Item = item
 

@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local CreateRadarPoint = require(ReplicatedStorage.Shared.GameDefinition.Items.Common.CreateRadarPoint)
+local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
 local Crouch = require(script.Parent.Crouch)
 local CorpseInfo = require(ReplicatedStorage.Shared.Interface.GameState.CorpseInfo)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
