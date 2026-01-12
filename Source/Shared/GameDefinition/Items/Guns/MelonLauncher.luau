@@ -38,6 +38,8 @@ MelonLauncher.Item = Gun({
 	Model = ReplicatedStorage.Assets.ItemModels.MelonLauncher,
 	HoldAnimation = Content.fromAssetId(10247529531),
 
+	IsAimable = false,
+
 	PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired["Melon Launcher"],
 
 	Cost = 1,

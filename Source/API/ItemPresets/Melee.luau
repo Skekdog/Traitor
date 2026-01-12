@@ -10,6 +10,8 @@ local function Melee(components: Types.ItemComponents): Types.ItemComponents
 		MaxDistance = 7.5,
 		CheckInitialIntersection = true,
 
+		UseAttack = true,
+
 		DamageKind = "Stab",
 	}
 

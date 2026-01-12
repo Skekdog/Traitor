@@ -161,7 +161,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 	while
 		not stop and
 		not (if isPrimary then item.PrimaryDisabled else item.AlternateDisabled) and
-		item.IsShootable and
+		item.UseAttack and
 		input.UserInputState ~= Enum.UserInputState.Cancel and
 		ClientInventory.EquippedItem() == item and
 		if
@@ -180,7 +180,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		local interval = if isPrimary then item.PrimaryInterval else item.AlternateInterval
 		if interval then
 			local lastUse = if isPrimary then item.PrimaryLastUse else item.AlternateLastUse
-			if lastUse or 0 + interval > os.clock() then
+			if (lastUse or 0) + interval > os.clock() then
 				continue
 			end
 
@@ -214,9 +214,9 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		end
 
 		if isPrimary and item.PrimaryAnimation then
-			LocalAnimation.TryPlayAnimation(item.PrimaryAnimation, "MeleeAttack")
+			LocalAnimation.TryPlayAnimation(item.PrimaryAnimation, "Primary")
 		elseif not isPrimary and item.AlternateAnimation then
-			LocalAnimation.TryPlayAnimation(item.AlternateAnimation, "MeleeAttack")
+			LocalAnimation.TryPlayAnimation(item.AlternateAnimation, "Alternate")
 		end
 
 		local sound = if isPrimary then item.PrimarySound else item.AlternateSound
@@ -240,44 +240,46 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		local raycasts: {CombatTypes.RaycastInfo} = {}
 
 		if not item.IsProjectileSimulated then
-			local spread = getSpreadVector(item)
+			for i = 1, item.ProjectileCount or 1 do
+				local spread = getSpreadVector(item)
 
-			local result = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, item.MaxDistance or MAX_RANGE, item.CheckInitialIntersection or false, origin, direction, item.CheckInitialIntersection or false)
-			local raycastResult = result.RaycastResult
-			local part = if result.Parts then result.Parts[1] else nil
+				local result = raycast(assert(head:FindFirstAncestorOfClass("Model")), spread, item.MaxDistance or MAX_RANGE, item.CheckInitialIntersection or false, origin, direction, item.CheckInitialIntersection or false)
+				local raycastResult = result.RaycastResult
+				local part = if result.Parts then result.Parts[1] else nil
 
-			local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, item.MaxDistance or MAX_RANGE)
-			local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
-			local hitPartCenterPosition = if hitPart then hitPart.Position else nil
-			local normal = if raycastResult then raycastResult.Normal else nil
-			local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
+				local targetPosition = if raycastResult then raycastResult.Position else deriveTargetPosition(origin, spread, item.MaxDistance or MAX_RANGE)
+				local hitPart = if raycastResult then raycastResult.Instance :: BasePart else nil
+				local hitPartCenterPosition = if hitPart then hitPart.Position else nil
+				local normal = if raycastResult then raycastResult.Normal else nil
+				local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
 
-			if item.Projectile and result.Origin then
-				BulletTracer(item.Projectile, item.ProjectileSpeed or 100, result.Origin, targetPosition)
-			end
+				if item.Projectile and result.Origin then
+					BulletTracer(item.Projectile, item.ProjectileSpeed or 100, result.Origin, targetPosition)
+				end
 
-			if hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
-				PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, targetPosition or hitPart.Position, nil, {
-					RollOffMaxDistance = 20,
-				})
-			end
+				if hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
+					PlaySound(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, targetPosition or hitPart.Position, nil, {
+						RollOffMaxDistance = 20,
+					})
+				end
 
-			if not part then
-				table.insert(raycasts, {
-					Destination = targetPosition,
-					HitPart = hitPart,
-					HitPartCenterPosition = hitPartCenterPosition,
-					Normal = normal,
-					RelativeHitCFrame = relativeHitCFrame,
-				})
-			else
-				table.insert(raycasts, {
-					Destination = part.Position,
-					HitPart = part,
-					HitPartCenterPosition = part.Position,
-					Normal = Vector3.zero,
-					RelativeHitCFrame = CFrame.identity,
-				})
+				if not part then
+					table.insert(raycasts, {
+						Destination = targetPosition,
+						HitPart = hitPart,
+						HitPartCenterPosition = hitPartCenterPosition,
+						Normal = normal,
+						RelativeHitCFrame = relativeHitCFrame,
+					})
+				else
+					table.insert(raycasts, {
+						Destination = part.Position,
+						HitPart = part,
+						HitPartCenterPosition = part.Position,
+						Normal = Vector3.zero,
+						RelativeHitCFrame = CFrame.identity,
+					})
+				end
 			end
 		end
 
@@ -362,7 +364,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		end)
 	end
 
-	if item.PrimaryFireClient or item.PrimaryFireServer or item.IsShootable then
+	if item.PrimaryFireClient or item.PrimaryFireServer or item.UseAttack then
 		ControlManager.Register("Primary Fire", function(_, _, input)
 			action(item, true, input)
 			return Enum.ContextActionResult.Pass

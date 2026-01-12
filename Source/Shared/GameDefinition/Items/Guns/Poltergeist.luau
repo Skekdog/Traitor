@@ -208,6 +208,8 @@ local Poltergeist = Gun({
 
 	IsEvilItem = true,
 
+	IsAimable = false,
+
 	Model = ReplicatedStorage.Assets.ItemModels.Poltergeist,
 
 	LaserColor = Color3.new(),

@@ -54,6 +54,8 @@ local NewtonLauncher = Gun({
 
     IsEvilItem = true,
 
+    IsAimable = false,
+
 	ItemGroup = ItemGroups.RoleUtility,
     MaxStock = 2,
     Cost = 1,

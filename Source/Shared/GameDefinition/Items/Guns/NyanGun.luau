@@ -50,6 +50,8 @@ local item = Gun({
 
 	ItemGroup = ItemGroups.RoleWeapon,
 
+	IsAimable = false,
+
 	Spread = 0.05,
 
 	Damage = {

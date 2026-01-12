@@ -9,6 +9,8 @@ local function Gun(components: Types.ItemComponents): Types.ItemComponents
 
 		HasMuzzleFlash = true,
 		CanHeadshot = true,
+		UseAttack = true,
+		IsAimable = true,
 
 		DamageKind = "Shot",
 

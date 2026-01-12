@@ -11,6 +11,8 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 		PregameDisable = true,
 		IsSingleUse = true,
 
+		UseAttack = true,
+
 		DamageKind = "Explode",
 
 		FuseTime = 3,
