@@ -3,6 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
+local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
@@ -119,8 +120,7 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 		return
 	end
 
-	local source: Types.DamageSource = params.Source
-	local isEligible = source == "Shot" or source == "Bludgeon" or source == "Stab" or if typeof(source) == "table" then source.DamageKind == "Shot" or source.DamageKind == "Bludgeon" or source.DamageKind == "Stab" else false
+	local isEligible = DamageSource.IsFirearm(params.Source) or DamageSource.IsMelee(params.Source)
 	if not isEligible then
 		return
 	end
