@@ -161,6 +161,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 	while
 		not stop and
 		not (if isPrimary then item.PrimaryDisabled else item.AlternateDisabled) and
+		item.IsShootable and
 		input.UserInputState ~= Enum.UserInputState.Cancel and
 		ClientInventory.EquippedItem() == item and
 		if
@@ -361,7 +362,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		end)
 	end
 
-	if item.PrimaryFireClient or item.PrimaryFireServer then
+	if item.PrimaryFireClient or item.PrimaryFireServer or item.IsShootable then
 		ControlManager.Register("Primary Fire", function(_, _, input)
 			action(item, true, input)
 			return Enum.ContextActionResult.Pass
