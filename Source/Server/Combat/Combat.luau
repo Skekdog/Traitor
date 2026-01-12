@@ -101,7 +101,7 @@ local function validateRaycast(item: Types.Item, by: Types.Participant, origin: 
 end
 
 local function validateItemUsage(by: Types.Participant, item: Types.Item, request: CombatTypes.Request): CombatTypes.ValidateUsageResult
-	if request.Action == "Primary" and not item.PrimaryFireServer then
+	if request.Action == "Primary" and not item.PrimaryFireServer and not item.UseAttack then
 		return "OtherError"
 	elseif request.Action == "Alternate" and not item.AlternateFireServer then
 		return "OtherError"
