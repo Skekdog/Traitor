@@ -172,6 +172,10 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 	do
 		task.wait()
 
+		if ClientInventory.EquippedItem() ~= item then
+			return
+		end
+
 		if isPrimary and item.IsScopeRequired and not Aim.IsAiming() then
 			playEmptyClipSound()
 			return Enum.ContextActionResult.Pass -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
@@ -301,7 +305,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			end
 		end
 
-		if isPrimary and item.PrimaryFireServer or not isPrimary and item.AlternateFireServer then
+		if isPrimary and item.PrimaryFireServer or not isPrimary and item.AlternateFireServer or item.UseAttack then
 			task.spawn(function()
 				local result: CombatTypes.ValidateUsageResult = ReplicatedStorage.Remotes.ClientServer.Fire:InvokeServer(request)
 				if result ~= "Success" then
