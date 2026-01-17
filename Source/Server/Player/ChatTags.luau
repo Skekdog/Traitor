@@ -15,13 +15,25 @@ function ChatTags.GetAvailableTags(player: Player): {string}
 	tags = {}
 	assert(tags)
 
-	local groupRole = player:GetRoleInGroupAsync(game.CreatorId)
-	if groupRole ~= "Guest" and groupRole ~= "Member" then
-		table.insert(tags, groupRole)
+	local _, result = pcall(function()
+		local groupRole = player:GetRoleInGroupAsync(game.CreatorId)
+		if groupRole ~= "Guest" and groupRole ~= "Member" then
+			table.insert(tags, groupRole)
+		end
+	end)
+
+	if result then
+		warn(result)
 	end
 
-	if BadgeService:UserHasBadgeAsync(player.UserId, 2136698808) then
-		table.insert(tags, "Alpha Tester")
+	_, result = pcall(function()
+		if BadgeService:UserHasBadgeAsync(player.UserId, 2136698808) then
+			table.insert(tags, "Alpha Tester")
+		end
+	end)
+
+	if result then
+		warn(result)
 	end
 
 	tagCache[player] = tags
