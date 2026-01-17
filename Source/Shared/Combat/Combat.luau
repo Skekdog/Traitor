@@ -172,7 +172,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		task.wait()
 
 		if ClientInventory.EquippedItem() ~= item then
-			return
+			break
 		end
 
 		if isPrimary and item.IsScopeRequired and not Aim.IsAiming() then
