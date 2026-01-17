@@ -161,7 +161,7 @@ local function isValidRequest(value: any): boolean
 		return false
 	end
 
-	if typeof(value.Raycasts) ~= "table" or #value.Raycasts < 1 then
+	if typeof(value.Raycasts) ~= "table" then
 		return false
 	end
 

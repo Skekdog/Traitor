@@ -131,11 +131,11 @@ local function validateItemUsage(by: Types.Participant, item: Types.Item, reques
 		return "NotEquipped"
 	end
 
-	if request.Action == "Primary" and item.Ammo and item.Ammo <= 0 then
+	if request.Action == "Primary" and item.Ammo and item.Ammo <= 0 and item.UseAttack then
 		return "NotEnoughAmmo"
 	end
 
-	if item.IsReloading then
+	if item.IsReloading and item.UseAttack then
 		return "Reloading"
 	end
 
@@ -288,7 +288,7 @@ local function onPartHit(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	end
 
 	if normal then
-		if relativeHitCFrame and relativeHitCFrame.Position.Magnitude <= hitPart.ExtentsSize.Magnitude * 1.1 then
+		if relativeHitCFrame and relativeHitCFrame.Position.Magnitude <= hitPart.ExtentsSize.Magnitude * 1.1 and item.Kind == "Item" and item.Projectile then
 			ReplicatedStorage.Remotes.ServerClient.MakeBulletHole:FireAllClients(hitPart, relativeHitCFrame, normal)
 		end
 	end
@@ -425,7 +425,7 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 		end
 	end
 
-	if request.Action == "Primary" and item.Ammo then
+	if request.Action == "Primary" and item.Ammo and item.UseAttack then
 		item.Ammo -= 1
 	end
 
@@ -441,83 +441,85 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 	if request.Action == "Primary" then
 		if item.PrimaryFireServer then
 			item.PrimaryFireServer(item, by, request.Origin, request.Direction)
-		elseif not item.IsProjectileSimulated then
-			for i, raycast in ipairs(request.Raycasts) do
-				if i > (item.ProjectileCount or 1) then
-					break
-				end
+		elseif item.UseAttack then
+			if not item.IsProjectileSimulated then
+				for i, raycast in ipairs(request.Raycasts) do
+					if i > (item.ProjectileCount or 1) then
+						break
+					end
 
-				if item.Projectile then
-					BulletTracer(item.Projectile, item.ProjectileSpeed or 100, request.Origin, raycast.Destination, by.Player)
-				end
+					if item.Projectile then
+						BulletTracer(item.Projectile, item.ProjectileSpeed or 100, request.Origin, raycast.Destination, by.Player)
+					end
 
-				local validate = validateRaycast(item, by, request.Origin, raycast.Destination, raycast.HitPart, raycast.HitPartCenterPosition)
-				if validate ~= "Success" then
-					return validate :: CombatTypes.ValidateUsageResult
-				end
+					local validate = validateRaycast(item, by, request.Origin, raycast.Destination, raycast.HitPart, raycast.HitPartCenterPosition)
+					if validate ~= "Success" then
+						return validate :: CombatTypes.ValidateUsageResult
+					end
 
-				if not item.IsSilent then
-					applyNearMissSelfDefense(request.Origin, raycast.Destination, by)
-				end
+					if not item.IsSilent then
+						applyNearMissSelfDefense(request.Origin, raycast.Destination, by)
+					end
 
-				if raycast.HitPart then
-					onPartHit(item, by, raycast.HitPart, raycast.Destination, raycast.Normal, request.Origin, raycast.RelativeHitCFrame)
-				end
-			end
-		else
-			assert(item.Projectile, "Simulated items must define a projectile")
-
-			local projectile = item.Projectile:Clone()
-			ForEachPart(projectile, function(part)
-				part.Anchored = false
-				part.CollisionGroup = "WeaponHitTargets"
-			end)
-
-			;(projectile :: Instance).Parent = workspace.Projectiles
-
-			local primaryPart = GetPrimaryPart(projectile)
-
-			primaryPart:SetNetworkOwner(nil)
-
-			if item.FuseTime and item.ExplosionInfo then
-				task.wait(item.FuseTime)
-
-				local params = ExplosionParams.new(item.ExplosionInfo, primaryPart.Position, by)
-
-				module.CreateExplosion(by.Round, params)
-
-				if item.OnExplode then
-					item.OnExplode(params)
+					if raycast.HitPart then
+						onPartHit(item, by, raycast.HitPart, raycast.Destination, raycast.Normal, request.Origin, raycast.RelativeHitCFrame)
+					end
 				end
 			else
-				local maxBounces = item.MaxBounces or 1
-				local bounces = 0
+				assert(item.Projectile, "Simulated items must define a projectile")
 
-				local startTime = os.clock()
-
+				local projectile = item.Projectile:Clone()
 				ForEachPart(projectile, function(part)
-					part.Touched:Connect(function(otherPart)
-						if (os.clock() - startTime < 0.5 and char and otherPart:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(part.CollisionGroup, otherPart.CollisionGroup) then
-							return
-						end
-
-						bounces += 1
-
-						local projPosition = primaryPart.Position
-
-						local surfacePosition = otherPart:GetClosestPointOnSurface(projPosition)
-						local normal = projPosition - surfacePosition
-
-						local result = onPartHit(item, by, otherPart, surfacePosition, normal, request.Origin)
-
-						if bounces >= maxBounces or result == "Participant" then
-							projectile:Destroy()
-						end
-					end)
+					part.Anchored = false
+					part.CollisionGroup = "WeaponHitTargets"
 				end)
+
+				;(projectile :: Instance).Parent = workspace.Projectiles
+
+				local primaryPart = GetPrimaryPart(projectile)
+
+				primaryPart:SetNetworkOwner(nil)
+				by:TryThrowAssembly(projectile, item.ProjectileSpeed or 100, nil, request.Origin, request.Direction)
+
+				if item.FuseTime and item.ExplosionInfo then
+					task.wait(item.FuseTime)
+
+					local params = ExplosionParams.new(item.ExplosionInfo, primaryPart.Position, by)
+
+					module.CreateExplosion(by.Round, params)
+
+					if item.OnExplode then
+						item.OnExplode(params)
+					end
+				else
+					local maxBounces = item.MaxBounces or 1
+					local bounces = 0
+
+					local startTime = os.clock()
+
+					ForEachPart(projectile, function(part)
+						part.Touched:Connect(function(otherPart)
+							if (os.clock() - startTime < 0.5 and char and otherPart:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(part.CollisionGroup, otherPart.CollisionGroup) then
+								return
+							end
+
+							bounces += 1
+
+							local projPosition = primaryPart.Position
+
+							local surfacePosition = otherPart:GetClosestPointOnSurface(projPosition)
+							local normal = projPosition - surfacePosition
+
+							local result = onPartHit(item, by, otherPart, surfacePosition, normal, request.Origin)
+
+							if bounces >= maxBounces or result == "Participant" then
+								projectile:Destroy()
+							end
+						end)
+					end)
+				end
 			end
 		end
-
 	else
 		if item.AlternateFireServer then
 			item.AlternateFireServer(item, by, request.Origin, request.Direction)
