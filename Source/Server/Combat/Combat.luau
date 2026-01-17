@@ -74,7 +74,7 @@ local function validateRaycast(item: Types.Item, by: Types.Participant, origin: 
 		return "TargetTooFar"
 	end
 
-	if item.MaxDistance and (destination - origin).Magnitude > (item.MaxDistance + 0.1) then
+	if item.MaxDistance and (destination - origin).Magnitude > (item.MaxDistance + 1) then
 		return "TargetTooFar"
 	end
 
