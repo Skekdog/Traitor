@@ -146,7 +146,7 @@ local function validateItemUsage(by: Types.Participant, item: Types.Item, reques
 	return "Success"
 end
 
-local function onParticipantHit(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, impulse: Vector3?): ()
+local function onParticipantHit(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, impulse: Vector3?, originalItem: Types.Item?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -183,8 +183,8 @@ local function onParticipantHit(item: Types.Item | Types.ExplosionParams, by: Ty
 		end
 	end
 
-	if item.Kind == "Item" and item.OnHitClient then
-		Replication.RunOnHitClient(item, victim, hitPart)
+	if originalItem and originalItem.OnHitClient then
+		Replication.RunOnHitClient(originalItem, victim, hitPart)
 	end
 
 	local willDie = params.Amount >= victim:GetHealth()
@@ -225,7 +225,7 @@ local function onPropHit(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	(prop :: Types.Prop):TryTakeDamage(params)
 end
 
-local function onPartHit(item: Types.Item | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): "Part" | "Prop" | "Participant"?
+local function onPartHit(item: Types.Item | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?, originalItem: Types.Item?): "Part" | "Prop" | "Participant"?
 	if not hitPart.Parent then
 		return nil -- ?? No idea how but I had an error where the hitPart was unparented. Somehow.
 	end
@@ -262,7 +262,7 @@ local function onPartHit(item: Types.Item | Types.ExplosionParams, by: Types.Par
 		local char = GetMapObjectWithTag(hitPart, "Character")
 		local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
 		if victim then
-			onParticipantHit(item, by, victim, hitPart, hitPosition, origin, impulse)
+			onParticipantHit(item, by, victim, hitPart, hitPosition, origin, impulse, originalItem)
 			return "Participant"
 		end
 	end
@@ -296,7 +296,7 @@ local function onPartHit(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	return "Part"
 end
 
-function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, grenade: Types.Item?, sound: Sound?): ()
+function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, item: Types.Item?, sound: Sound?): ()
     local explosion = Instance.new("Explosion")
 
     local info = params.Definition
@@ -355,7 +355,7 @@ function module.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				continue
 			end
 			table.insert(hits, participant)
-			onParticipantHit(params, params.Attacker, participant, v, v.Position, params.Position, impulse)
+			onParticipantHit(params, params.Attacker, participant, v, v.Position, params.Position, impulse, item)
 		end
 
 		Impulse.ApplyImpulse(v, impulse, true, nil, params.Attacker)
@@ -462,7 +462,7 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 					end
 
 					if raycast.HitPart then
-						onPartHit(item, by, raycast.HitPart, raycast.Destination, raycast.Normal, request.Origin, raycast.RelativeHitCFrame)
+						onPartHit(item, by, raycast.HitPart, raycast.Destination, raycast.Normal, request.Origin, raycast.RelativeHitCFrame, item)
 					end
 				end
 			else
@@ -486,7 +486,7 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 
 					local params = ExplosionParams.new(item.ExplosionInfo, primaryPart.Position, by)
 
-					module.CreateExplosion(by.Round, params)
+					module.CreateExplosion(by.Round, params, item)
 
 					if item.OnExplode then
 						item.OnExplode(params)
@@ -510,7 +510,7 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 							local surfacePosition = otherPart:GetClosestPointOnSurface(projPosition)
 							local normal = projPosition - surfacePosition
 
-							local result = onPartHit(item, by, otherPart, surfacePosition, normal, request.Origin)
+							local result = onPartHit(item, by, otherPart, surfacePosition, normal, request.Origin, nil, item)
 
 							if bounces >= maxBounces or result == "Participant" then
 								projectile:Destroy()
