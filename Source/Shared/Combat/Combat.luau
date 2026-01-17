@@ -181,6 +181,13 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			return Enum.ContextActionResult.Pass -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
 		end
 
+		if item.PregameDisable then
+			local phase = LocalRoundInfo.Phase() :: Types.Phase
+			if phase == "Preparing" or phase == "Intermission" then
+				return
+			end
+		end
+
 		local interval = if isPrimary then item.PrimaryInterval else item.AlternateInterval
 		if interval then
 			local lastUse = if isPrimary then item.PrimaryLastUse else item.AlternateLastUse
@@ -295,13 +302,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			Raycasts = raycasts,
 		}
 
-		if isPrimary then
-			if item.IsSingleUse then
-				break
-			end
-		end
-
-		if isPrimary and item.PrimaryFireServer or not isPrimary and item.AlternateFireServer or item.UseAttack then
+		if (isPrimary and item.PrimaryFireServer or item.UseAttack) or (not isPrimary and item.AlternateFireServer) then
 			task.spawn(function()
 				local result: CombatTypes.ValidateUsageResult = ReplicatedStorage.Remotes.ClientServer.Fire:InvokeServer(request)
 				if result ~= "Success" then
@@ -311,6 +312,12 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 					end
 				end
 			end)
+		end
+
+		if isPrimary then
+			if item.IsSingleUse then
+				break
+			end
 		end
 	end
 end
