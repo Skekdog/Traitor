@@ -491,6 +491,8 @@ function module.Fire(by: Types.Participant, request: CombatTypes.Request): Comba
 					if item.OnExplode then
 						item.OnExplode(params)
 					end
+
+					projectile:Destroy()
 				else
 					local maxBounces = item.MaxBounces or 1
 					local bounces = 0
