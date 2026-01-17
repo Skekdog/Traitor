@@ -24,7 +24,7 @@ local definition: Types.InteractableDefinition = {
 	end,
 
 	OnInteractServer = function(interactable: ItemInteractable, participant: Types.Participant): ()
-		local foundItem = participant:GetItemOccupyingGroup(interactable.Extras.Item.Definition.ItemGroup)
+		local foundItem = participant:GetItemOccupyingGroup(interactable.Extras.Item.ItemGroup)
 		if foundItem then
 			if (foundItem.UnequipDisabled or foundItem.DropDisabled) and not interactable.Model:GetAttribute("CanReplace") then
 				return
