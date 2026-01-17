@@ -257,15 +257,12 @@ Players.PlayerAdded:Connect(function(plr)
 	end
 end)
 
-print("c")
 for _, v in Players:GetPlayers() do
 	if not findPlr(v.Name) then
 		createPlr(v)
 	end
 end
 
-print("c")
 game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
-print("c")
 
 return nil
