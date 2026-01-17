@@ -193,6 +193,11 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			if (lastUse or 0) + interval > os.clock() then
 				continue
 			end
+			if isPrimary then
+				item.PrimaryLastUse = os.clock()
+			else
+				item.AlternateLastUse = os.clock()
+			end
 		end
 
 		if isPrimary and item.UseAttack then
@@ -215,12 +220,6 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			if item.HasMuzzleFlash then
 				ViewmodelModule.MuzzleFlash()
 			end
-		end
-
-		if isPrimary then
-			item.PrimaryLastUse = os.clock()
-		else
-			item.AlternateLastUse = os.clock()
 		end
 
 		if isPrimary and item.PrimaryAnimation then
