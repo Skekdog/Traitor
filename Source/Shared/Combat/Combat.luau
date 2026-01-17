@@ -285,6 +285,11 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		elseif isPrimary and item.PrimaryFireClient then
 			item.PrimaryFireClient(item, origin, direction)
 		elseif not isPrimary and item.AlternateFireClient then
+			if item.AlternateValidationClient then
+				if not item.AlternateValidationClient(item) then
+					continue
+				end
+			end
 			item.AlternateFireClient(item, origin, direction)
 		end
 
