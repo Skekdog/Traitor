@@ -293,7 +293,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			item.AlternateFireClient(item, origin, direction)
 		end
 
-		if isPrimary and item.UseAttack and #raycasts == 0 then
+		if isPrimary and item.UseAttack and not item.IsProjectileSimulated and #raycasts == 0 then
 			continue
 		end
 
