@@ -177,13 +177,13 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 
 		if isPrimary and item.IsScopeRequired and not Aim.IsAiming() then
 			playEmptyClipSound()
-			return Enum.ContextActionResult.Pass -- note: we return here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
+			break -- note: we break here instead of continuing so that if we aren't scoped in, and later we are, we don't have to wait for the attack interval
 		end
 
 		if item.PregameDisable then
 			local phase = LocalRoundInfo.Phase() :: Types.Phase
 			if phase == "Preparing" or phase == "Intermission" then
-				return
+				break
 			end
 		end
 
@@ -210,15 +210,6 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 					playEmptyClipSound()
 				end
 				continue
-			end
-
-			if item.Ammo then
-				item.Ammo -= 1
-				RoundInfoUI.UpdateAmmo()
-			end
-
-			if item.HasMuzzleFlash then
-				ViewmodelModule.MuzzleFlash()
 			end
 		end
 
@@ -257,6 +248,12 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 				local normal = if raycastResult then raycastResult.Normal else nil
 				local relativeHitCFrame = if raycastResult then raycastResult.Instance.CFrame:ToObjectSpace(CFrame.new(targetPosition)) else nil
 
+				if item.PrimaryRayValidationClient then
+					if not item.PrimaryRayValidationClient(item, hitPart) then
+						continue
+					end
+				end
+
 				if item.Projectile and result.Origin then
 					BulletTracer(item.Projectile, item.ProjectileSpeed or 100, result.Origin, targetPosition)
 				end
@@ -291,6 +288,10 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			item.AlternateFireClient(item, origin, direction)
 		end
 
+		if isPrimary and item.UseAttack and #raycasts == 0 then
+			continue
+		end
+
 		local request: CombatTypes.Request = {
 			Action = if isPrimary then "Primary" else "Alternate",
 			ItemName = item.Name,
@@ -298,6 +299,17 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			Direction = direction,
 			Raycasts = raycasts,
 		}
+
+		if isPrimary and item.UseAttack then
+			if item.Ammo then
+				item.Ammo -= 1
+				RoundInfoUI.UpdateAmmo()
+			end
+
+			if item.HasMuzzleFlash then
+				ViewmodelModule.MuzzleFlash()
+			end
+		end
 
 		if (isPrimary and item.PrimaryFireServer or item.UseAttack) or (not isPrimary and item.AlternateFireServer) then
 			task.spawn(function()
@@ -320,6 +332,12 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		if isPrimary and item.PrimaryToggled or not isPrimary and item.AlternateToggled then
 			break
 		end
+	end
+
+	if isPrimary and item.PrimaryDeactivatedClient then
+		item.PrimaryDeactivatedClient(item)
+	elseif not isPrimary and item.AlternateDeactivatedClient then
+		item.AlternateDeactivatedClient(item)
 	end
 end
 

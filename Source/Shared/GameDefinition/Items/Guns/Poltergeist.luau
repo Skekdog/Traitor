@@ -63,9 +63,8 @@ local function preRenderClient(item: Types.Item, dt: number): ()
 	end
 end
 
-local function beforePrimaryFireClient(item: Types.Item, targets: {BasePart}): boolean
-	local part = targets[1]
-	return part and isPartValid(part)
+local function beforePrimaryFireClient(item: Types.Item, part: BasePart?): boolean
+	return if part then isPartValid(part) else false
 end
 
 local function beforeHitAnything(_, params: Types.DamageParams, round: Types.Round): boolean
@@ -224,7 +223,7 @@ local Poltergeist = Gun({
 	AmmoDefinition = Ammo["Poltergeist"],
 
 	PreRenderClient = preRenderClient,
-	PrimaryValidationClient = beforePrimaryFireClient,
+	PrimaryRayValidationClient = beforePrimaryFireClient,
 
 	BeforeHitAnything = beforeHitAnything,
 	BeforeHitProp = beforeHitProp,
