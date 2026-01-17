@@ -29,12 +29,6 @@ export type SettingValue = SettingDefinitions.SettingValue
 module.SETTINGS_VERSION = 7
 module.LOADED = false
 
-local function yieldIfNotLoaded(): ()
-	while not module.LOADED do
-		task.wait()
-	end
-end
-
 local settingValues: {[string]: SettingDefinitions.SettingValue?, SETTINGS_VERSION: number} = {SETTINGS_VERSION = module.SETTINGS_VERSION}
 
 function module.GetDefinition(name: string): SettingDefinitions.SettingDefinition?
@@ -48,7 +42,6 @@ function module.GetDefinition(name: string): SettingDefinitions.SettingDefinitio
 end
 
 function module.GetSetting(name: string): SettingDefinitions.SettingValue
-	yieldIfNotLoaded()
 	local value = if settingValues[name] ~= nil then settingValues[name] else (module.GetDefinition(name) or {Default = nil}).Default
 	assert(value ~= nil, `No value found for setting {name}`)
 	return value
