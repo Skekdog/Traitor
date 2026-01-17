@@ -13,8 +13,6 @@ local function Gun(components: Types.ItemComponents): Types.ItemComponents
 		IsAimable = true,
 
 		DamageKind = "Shot",
-
-		Projectile = ReplicatedStorage.Assets.Projectiles.Bullet,
 	}
 
 	for i, v in components do
