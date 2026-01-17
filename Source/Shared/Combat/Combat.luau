@@ -287,7 +287,6 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 				end
 			end
 		elseif isPrimary and item.PrimaryFireClient then
-			print("hi")
 			item.PrimaryFireClient(item, origin, direction)
 		elseif not isPrimary and item.AlternateFireClient then
 			item.AlternateFireClient(item, origin, direction)
