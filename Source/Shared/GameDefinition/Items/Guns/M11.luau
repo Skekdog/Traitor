@@ -21,7 +21,7 @@ local M11 = Gun({
 
 	PrimaryInterval = 0.05,
 	ReloadDuration = 1,
-	AmmoDefinition = Ammo.SMG1,
+	AmmoDefinition = Ammo["Sub-Spec"],
 
 	Model = ReplicatedStorage.Assets.ItemModels.M11,
 	HoldAnimation = Content.fromAssetId(12481091962),

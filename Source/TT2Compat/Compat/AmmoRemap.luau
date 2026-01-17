@@ -1,8 +1,6 @@
 
 local remap = {
-	["High-Cal"] = "Deagle",
-	["Mil-Spec"] = "9mm",
-	["SMG"] = "SMG1",
+	["SMG"] = "Sub-Spec",
 }
 
 local function AmmoRemap(ammo: string): string

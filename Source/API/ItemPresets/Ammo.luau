@@ -2,7 +2,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local module: {[string]: Types.AmmoDefinition} = {}
 
-local NO_PART = Instance.new("Part")
 local boxModels = ReplicatedStorage.Assets.AmmoBoxModels
 
 module["Super Gun"] = {
@@ -10,7 +9,6 @@ module["Super Gun"] = {
     Name = "Super Gun",
     Capacity = 10000,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 
@@ -19,7 +17,6 @@ module.HUGE = {
     Name = "HUGE",
     Capacity = 250,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 
@@ -28,7 +25,6 @@ module.AWP = {
     Name = "AWP",
     Capacity = 4,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 
@@ -37,7 +33,6 @@ module.MelonLauncher = {
     Name = "MelonLauncher",
     Capacity = 4,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 
@@ -46,7 +41,6 @@ module.Flare = {
     Name = "Flare",
     Capacity = 6,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 
@@ -55,17 +49,15 @@ module["Golden Bullet"] = {
     Name = "Golden Bullet",
     Capacity = 1,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 
-module["9mm"] = {
+module["Mil-Spec"] = {
     Kind = "Ammo",
-    Name = "9mm",
-    DisplayName = "Mil-Spec",
+    Name = "Mil-Spec",
     Capacity = 20,
     ReserveCapacity = 60,
-    Model = boxModels["9mm"],
+    Model = boxModels["Mil-Spec"],
     CanDrop = true,
 }
 
@@ -78,23 +70,21 @@ module.Shotgun = {
     CanDrop = true,
 }
 
-module.Deagle = {
+module["High-Cal"] = {
     Kind = "Ammo",
-    Name = "Deagle",
-    DisplayName = "High-Cal",
+    Name = "High-Cal",
     Capacity = 8,
     ReserveCapacity = 32,
-    Model = boxModels.Deagle,
+    Model = boxModels["High-Cal"],
     CanDrop = true,
 }
 
-module.SMG1 = {
+module["Sub-Spec"] = {
     Kind = "Ammo",
-    Name = "SMG1",
-    DisplayName = "Sub-Spec",
+    Name = "Sub-Spec",
     Capacity = 30,
     ReserveCapacity = 60,
-    Model = boxModels.SMG1,
+    Model = boxModels["Sub-Spec"],
     CanDrop = true,
 }
 
@@ -112,7 +102,6 @@ module.Poltergeist = {
     Name = "Poltergeist",
     Capacity = 6,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 
@@ -121,7 +110,6 @@ module.Infinite = {
     Name = "Infinite",
     Capacity = math.huge,
     ReserveCapacity = 0,
-    Model = NO_PART,
     CanDrop = false,
 }
 

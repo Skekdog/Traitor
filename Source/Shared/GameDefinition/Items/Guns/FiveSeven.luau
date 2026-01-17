@@ -23,7 +23,7 @@ local FiveSeven = Gun({
 
     PrimaryInterval = 0.5,
     ReloadDuration = 1,
-    AmmoDefinition = Ammo["9mm"],
+    AmmoDefinition = Ammo["Mil-Spec"],
 
     ImpulseForce = 5,
 

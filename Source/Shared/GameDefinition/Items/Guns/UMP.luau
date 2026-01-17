@@ -23,7 +23,7 @@ local UMP = Gun({
 
     PrimaryInterval = 0.1,
     ReloadDuration = 1.5,
-    AmmoDefinition = Ammo["SMG1"],
+    AmmoDefinition = Ammo["Sub-Spec"],
 
     Model = ReplicatedStorage.Assets.ItemModels.UMP,
     HoldAnimation = Content.fromAssetId(10247380824),

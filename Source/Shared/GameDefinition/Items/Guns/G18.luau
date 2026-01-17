@@ -25,7 +25,7 @@ local G18 = Gun({
 
     PrimaryInterval = 0.1,
     ReloadDuration = 1,
-    AmmoDefinition = Ammo["9mm"],
+    AmmoDefinition = Ammo["Mil-Spec"],
 
     Model = ReplicatedStorage.Assets.ItemModels.G18,
     HoldAnimation = Content.fromAssetId(9253211833),

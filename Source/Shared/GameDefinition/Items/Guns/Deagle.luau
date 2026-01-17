@@ -24,7 +24,7 @@ local Deagle = Gun({
 
     PrimaryInterval = 0.5,
     ReloadDuration = 1.2,
-    AmmoDefinition = Ammo.Deagle,
+    AmmoDefinition = Ammo["High-Cal"],
 
     Projectile = ReplicatedStorage.Assets.Projectiles.Bullet,
     ProjectileSpeed = 450,

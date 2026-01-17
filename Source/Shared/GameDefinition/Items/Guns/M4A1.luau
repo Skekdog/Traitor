@@ -22,7 +22,7 @@ local M4A1 = Gun({
 	PrimaryInterval = 0.15,
 
 	ReloadDuration = 1.5,
-	AmmoDefinition = Ammo["9mm"],
+	AmmoDefinition = Ammo["Mil-Spec"],
 
 	HasMuzzleFlash = true,
 	AimFOV = 50,
