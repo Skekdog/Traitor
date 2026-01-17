@@ -161,7 +161,6 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 	while
 		not stop and
 		not (if isPrimary then item.PrimaryDisabled else item.AlternateDisabled) and
-		item.UseAttack and
 		input.UserInputState ~= Enum.UserInputState.Cancel and
 		ClientInventory.EquippedItem() == item and
 		if
@@ -196,7 +195,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			end
 		end
 
-		if isPrimary then
+		if isPrimary and item.UseAttack then
 			if item.IsReloading then
 				continue
 			end
@@ -243,14 +242,9 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		local origin = head.Position
 		local direction = GetCentreRay().Direction
 
-		local func = if isPrimary then item.PrimaryFireClient else item.AlternateFireClient
-		if func then
-			func(item, origin, direction)
-		end
-
 		local raycasts: {CombatTypes.RaycastInfo} = {}
 
-		if not item.IsProjectileSimulated then
+		if isPrimary and item.UseAttack and not item.IsProjectileSimulated then
 			for i = 1, item.ProjectileCount or 1 do
 				local spread = getSpreadVector(item)
 
@@ -292,6 +286,11 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 					})
 				end
 			end
+		elseif isPrimary and item.PrimaryFireClient then
+			print("hi")
+			item.PrimaryFireClient(item, origin, direction)
+		elseif not isPrimary and item.AlternateFireClient then
+			item.AlternateFireClient(item, origin, direction)
 		end
 
 		local request: CombatTypes.Request = {
@@ -318,6 +317,10 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			if item.IsSingleUse then
 				break
 			end
+		end
+
+		if isPrimary and item.PrimaryToggled or not isPrimary and item.AlternateToggled then
+			break
 		end
 	end
 end
