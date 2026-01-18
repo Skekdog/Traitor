@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local Impulse = require(ReplicatedStorage.API.Impulse)
+local Types = require(ReplicatedStorage.API.Types)
 local DamageSourceRemap = require(ReplicatedStorage.Compat.DamageSourceRemap)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
@@ -35,15 +36,27 @@ function module.Damage(self, player: Player?, attacker: Player?, damage: number,
 end
 
 --todo: i'm not certain about these parameters, obviously the missing ones, but also the ones starting with underscore
-function module.DamageWithinRadius(self, _, attacker: Player?, _damage: number, _: boolean, position: Vector3, _falloffBegin: number, _falloffEnd: number, _: boolean, _: boolean, source: string): ()
+function module.DamageWithinRadius(self,
+	playerFilter: ((player: Player) -> boolean)?,
+	assailant: Player?,
+	damage: number,
+	damageFalloff: boolean,
+	position: Vector3,
+	radius: number,
+	impulseMagnitude: number?,
+	impulseIgnoresMass: boolean?,
+	impulseAffectsPlayers: boolean?,
+	source: Types.GeneralDamageSource?,
+	itemId: string?
+): ()
 	local round = RoundHandler.GetRound()
 	local params = ExplosionParams.new({
-		Damage = _damage,
-		FalloffStart = _falloffBegin,
-		FalloffEnd = _falloffEnd,
+		Damage = damage,
+		FalloffStart = if damageFalloff then 0 else radius - 0.001,
+		FalloffEnd = radius,
 		Pressure = 0,
 		VisualRadius = 0,
-	}, position)
+	}, position, assailant and GetParticipant(assailant))
 	Combat.CreateExplosion(round, params, nil, Instance.new("Sound"))
 end
 
