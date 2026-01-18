@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Grenade = require(ReplicatedStorage.API.ItemPresets.Grenade)
+local Grenade = require(ReplicatedStorage.API.Item.Presets.Grenade)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local FreezeGrenade = {}

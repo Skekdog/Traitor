@@ -16,8 +16,8 @@ end
 
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
-local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)

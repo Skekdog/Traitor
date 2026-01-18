@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
-local ItemKillHighlights = require(ReplicatedStorage.API.ItemPresets.ItemKillHighlights)
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
+local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 
 local M11 = Gun({
 	Name = "M11",

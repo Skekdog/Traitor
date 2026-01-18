@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
-local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local NyanGun = {}

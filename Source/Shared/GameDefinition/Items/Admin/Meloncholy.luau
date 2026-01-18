@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
-local Modify = require(ReplicatedStorage.API.ItemPresets.Modify)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local Modify = require(ReplicatedStorage.API.Modify)
 local MelonLauncher = require(ReplicatedStorage.Shared.GameDefinition.Items.Guns.MelonLauncher)
 
 local Meloncholy = Modify(MelonLauncher.Item, "Meloncholy", {

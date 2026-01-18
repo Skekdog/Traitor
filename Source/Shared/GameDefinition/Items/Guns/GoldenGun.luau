@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
+local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local MakeGolden = require(ReplicatedStorage.API.MakeGolden)
 local Types = require(ReplicatedStorage.API.Types)
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 
 local GoldenGun = Gun({
 	Name = "Golden Gun",

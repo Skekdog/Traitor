@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local ItemKillHighlights = require(ReplicatedStorage.API.ItemPresets.ItemKillHighlights)
-local Melee = require(ReplicatedStorage.API.ItemPresets.Melee)
+local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
+local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}

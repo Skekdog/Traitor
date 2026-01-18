@@ -2,8 +2,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
-local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local flingRemote: RemoteEvent

@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local ItemKillHighlights = require(ReplicatedStorage.API.ItemPresets.ItemKillHighlights)
+local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local FiveSeven = require(script.Parent.FiveSeven)
-local Modify = require(ReplicatedStorage.API.ItemPresets.Modify)
+local Modify = require(ReplicatedStorage.API.Modify)
 
 local SilencedPistol = Modify(FiveSeven, "Silenced Pistol", {
     Description = "A Five-Seven that has had a suppressor fitted to it, making it much quieter. People killed with silenced weapons will not scream.",

@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Grenade = require(ReplicatedStorage.API.ItemPresets.Grenade)
+local Grenade = require(ReplicatedStorage.API.Item.Presets.Grenade)
 
 local item = Grenade({
 	Name = "Grenade",

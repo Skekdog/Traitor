@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Discombobulate = require(ReplicatedStorage.API.Discombobulate)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Gun = require(ReplicatedStorage.API.ItemPresets.Gun)
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 
 local UMP = Gun({
 	Name = "UMP",

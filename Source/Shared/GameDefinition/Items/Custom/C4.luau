@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local InteractableItem = require(ReplicatedStorage.API.ItemPresets.InteractableItem)
+local InteractableItem = require(ReplicatedStorage.API.Item.Presets.InteractableItem)
 
 local C4 = InteractableItem({
 	Name = "C4",

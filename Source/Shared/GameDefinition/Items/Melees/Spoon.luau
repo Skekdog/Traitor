@@ -4,8 +4,8 @@ local Crowbar = require(script.Parent.Crowbar)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
-local Melee = require(ReplicatedStorage.API.ItemPresets.Melee)
-local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
+local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
+local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 local Spoon = {}

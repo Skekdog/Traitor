@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DNAScanner = require(script.Parent.DNAScanner)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local InteractableItem = require(ReplicatedStorage.API.ItemPresets.InteractableItem)
+local InteractableItem = require(ReplicatedStorage.API.Item.Presets.InteractableItem)
 
 local Decoy = InteractableItem({
 	Name = "Decoy",

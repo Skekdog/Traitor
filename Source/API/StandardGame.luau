@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StandardHighlights = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Common.StandardHighlights)
 local Interactables = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Interactables)
-local Ammo = require(ReplicatedStorage.API.ItemPresets.Ammo)
+local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Types = require(script.Parent.Types)
 
 local StandardGame = {}

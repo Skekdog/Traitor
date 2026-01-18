@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Modify = require(ReplicatedStorage.API.ItemPresets.Modify)
+local Modify = require(ReplicatedStorage.API.Modify)
 local Items = require(ReplicatedStorage.API.StandardGame)
 
 local BAR = {}

@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local Custom = require(ReplicatedStorage.API.ItemPresets.Custom)
+local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
 
 local params = RaycastParams.new()
