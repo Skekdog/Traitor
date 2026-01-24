@@ -33,9 +33,11 @@ function BehaviourTypes.IsHitscanRequest(data: any): boolean
 		return false
 	end
 
-	if typeof(data.Hit.Normal) ~= "Vector3" or data.Hit.Normal.Unit ~= data.Hit.Normal then
+	if typeof(data.Hit.Normal) ~= "Vector3" then
 		return false
 	end
+
+	data.Hit.Normal = data.Hit.Normal.Unit
 
 	if typeof(data.Hit.RelativeCFrame) ~= "CFrame" then
 		return false
