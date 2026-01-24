@@ -135,7 +135,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 	if item.FuseTime and item.ExplosionInfo then
 		task.wait(item.FuseTime)
 
-		local params = ExplosionParams.new(item.ExplosionInfo, primaryPart.Position, participant)
+		local params = ExplosionParams.new(item.ExplosionInfo, primaryPart.Position, participant, item)
 
 		Server.CreateExplosion(participant.Round, params)
 
