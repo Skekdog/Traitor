@@ -160,7 +160,7 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 		return
 	end
 
-	PlaySound(7129285090, nil, prop.Model, {
+	PlaySound(7129285090, nil, GetPrimaryPart(prop.Model), {
 		Volume = 0.5,
 		RollOffMinDistance = 10,
 		RollOffMaxDistance = 25,
@@ -205,6 +205,7 @@ local Poltergeist = Gun({
 		local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
 		local request = clientThing(origin, direction)
 		if not request then
+			item:ResetLastUse("Primary")
 			return false
 		end
 
