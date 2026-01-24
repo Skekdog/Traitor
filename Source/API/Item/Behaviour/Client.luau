@@ -139,6 +139,7 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 
 	Client.DeductAmmo(item)
 	Client.MuzzleFlash(item)
+	Client.Recoil(item)
 
 	if not item.IsProjectileSimulated then
 		local params = Client.GetDefaultRaycastParams(char)
