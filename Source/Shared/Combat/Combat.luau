@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
 local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
@@ -15,7 +15,6 @@ local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
-local Viewmodel = require(script.Parent.Viewmodel)
 
 local remote = GetRemote("ItemFire")
 
@@ -37,10 +36,6 @@ end
 
 remote.OnClientEvent:Connect(logReject)
 
-local function playEmptyClipSound(): ()
-	PlaySound(ReplicatedStorage.Assets.ItemSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
-end
-
 local crosshair = UIManager.WaitForUI("Crosshair") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Crosshair)}
 
 local crosshairFrames: {Frame} = {}
@@ -49,34 +44,6 @@ for _, v in crosshair.Object:GetChildren() do
 	if v:IsA("Frame") then
 		table.insert(crosshairFrames, v)
 	end
-end
-
-local function tryReloadWeapon(item: Types.Item): boolean
-	local ammoDefinition = item.AmmoDefinition
-	if not ammoDefinition then
-		return false
-	end
-
-	if item.Ammo >= ammoDefinition.Capacity or item.IsReloading then
-		return false
-	end
-
-	local reserve = ClientInventory.GetReserveAmmo(ammoDefinition.Name)
-	if reserve <= 0 then
-		return false
-	end
-
-	item.IsReloading = true
-
-	Viewmodel.ReloadSpring.p = Vector3.new(10, 5, 10)
-
-	if item.ReloadSound then
-		PlaySound(item.ReloadSound)
-	end
-
-	ReplicatedStorage.Remotes.ClientServer.ReloadWeapon:FireServer(item.Name)
-
-	return true
 end
 
 local lastAmmoConnection: DynamicValue.Connection<typeof(ClientInventory.Ammo:GetValue())>?
@@ -154,19 +121,6 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 				item.PrimaryLastUse = os.clock()
 			else
 				item.AlternateLastUse = os.clock()
-			end
-		end
-
-		if isPrimary and item.UseAttack then
-			if item.IsReloading then
-				continue
-			end
-
-			if item.Ammo and item.Ammo <= 0 then
-				if not tryReloadWeapon(item) then
-					playEmptyClipSound()
-				end
-				continue
 			end
 		end
 
@@ -271,7 +225,9 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 				return Enum.ContextActionResult.Pass
 			end
 
-			return if tryReloadWeapon(item) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
+			Client.TryReloadWeapon(item)
+
+			return Enum.ContextActionResult.Pass
 		end)
 	end
 

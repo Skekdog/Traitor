@@ -13,6 +13,7 @@ local Aim = require(ReplicatedStorage.Shared.Combat.Aim)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
+local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 
 local Client = {}
 
@@ -146,7 +147,14 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 		return false
 	end
 
-	if not Checks.Ammo(item) or not Checks.Scoped(item, Aim.IsAiming()) then
+	if not Checks.Ammo(item) then
+		if not Client.TryReloadWeapon(item) then
+			Client.PlayEmptyClipSound()
+		end
+		return false
+	end
+
+	if not Checks.Scoped(item, Aim.IsAiming()) then
 		Client.PlayEmptyClipSound()
 		return false
 	end
@@ -185,6 +193,34 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 
 		item:SetServerData("Primary", data)
 	end
+
+	return true
+end
+
+function Client.TryReloadWeapon(item: Types.Item): boolean
+	local ammoDefinition = item.AmmoDefinition
+	if not ammoDefinition then
+		return false
+	end
+
+	if item.Ammo >= ammoDefinition.Capacity or item.IsReloading then
+		return false
+	end
+
+	local reserve = ClientInventory.GetReserveAmmo(ammoDefinition.Name)
+	if reserve <= 0 then
+		return false
+	end
+
+	item.IsReloading = true
+
+	Viewmodel.ReloadSpring.p = Vector3.new(10, 5, 10)
+
+	if item.ReloadSound then
+		PlaySound(item.ReloadSound)
+	end
+
+	ReplicatedStorage.Remotes.ClientServer.ReloadWeapon:FireServer(item.Name)
 
 	return true
 end
