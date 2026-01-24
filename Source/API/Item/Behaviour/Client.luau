@@ -122,19 +122,19 @@ function Client.PlayEmptyClipSound(): ()
 	PlaySound(ReplicatedStorage.Assets.ItemSounds.EmptyClip)
 end
 
-function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector3): ()
+function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector3): string | {string} | boolean
 	local char = LocalCharacter.Character()
 	if not char then
-		return
+		return "NoCharacter"
 	end
 
 	if not Checks.Ammo(item) or not Checks.Scoped(item, Aim.IsAiming()) then
 		Client.PlayEmptyClipSound()
-		return
+		return false
 	end
 
 	if not Checks.Reloading(item) then
-		return
+		return false
 	end
 
 	Client.DeductAmmo(item)
@@ -171,6 +171,8 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 
 		item:SetServerData("Primary", data)
 	end
+
+	return true
 end
 
 return Client

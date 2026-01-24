@@ -19,7 +19,7 @@ local Viewmodel = require(script.Parent.Viewmodel)
 
 local remote = GetRemote("ItemFire")
 
-remote.OnClientEvent:Connect(function(message: string | {string}): ()
+local function logReject(message: string | {string}): ()
 	local result: {string}
 	if typeof(message) == "string" then
 		result = {message}
@@ -33,7 +33,9 @@ remote.OnClientEvent:Connect(function(message: string | {string}): ()
 			ScreenMessage("Hit rejected: " .. msg, "Warn")
 		end
 	end
-end)
+end
+
+remote.OnClientEvent:Connect(logReject)
 
 local function playEmptyClipSound(): ()
 	PlaySound(ReplicatedStorage.Assets.ItemSounds.EmptyClip, nil, nil, {SoundGroup = SoundService.AllSounds :: SoundGroup})
@@ -138,7 +140,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		if item.PregameDisable then
 			local phase = LocalRoundInfo.Phase() :: Types.Phase
 			if phase == "Preparing" or phase == "Intermission" then
-				break
+				continue
 			end
 		end
 
@@ -168,6 +170,42 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			end
 		end
 
+		local head = char:WaitForChild("Head")
+		assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
+
+		local origin = head.Position
+		local direction = GetCentreRay().Direction
+
+		if isPrimary then
+			if item.PrimaryFireClient then
+				local result = item.PrimaryFireClient(item, origin, direction)
+				if result ~= true then
+					if typeof(result) == "string" then
+						logReject(result)
+					end
+					continue
+				end
+			end
+
+			if item.PrimaryFireServer then
+				remote:FireServer(item.Name, "Primary", origin, direction, item:GetServerData("Primary"))
+			end
+		else
+			if item.AlternateFireClient then
+				local result = item.AlternateFireClient(item, origin, direction)
+				if result ~= true then
+					if typeof(result) == "string" then
+						logReject(result)
+					end
+					continue
+				end
+			end
+
+			if item.AlternateFireServer then
+				remote:FireServer(item.Name, "Alternate", origin, direction, item:GetServerData("Alternate"))
+			end
+		end
+
 		if isPrimary and item.PrimaryAnimation then
 			LocalAnimation.TryPlayAnimation(item.PrimaryAnimation, "Primary")
 		elseif not isPrimary and item.AlternateAnimation then
@@ -177,30 +215,6 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		local sound = if isPrimary then item.PrimarySound else item.AlternateSound
 		if sound then
 			PlaySound(sound)
-		end
-
-		local head = char:WaitForChild("Head")
-		assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
-
-		local origin = head.Position
-		local direction = GetCentreRay().Direction
-
-		if isPrimary then
-			if item.PrimaryFireClient then
-				item.PrimaryFireClient(item, origin, direction)
-			end
-
-			if item.PrimaryFireServer then
-				remote:FireServer(item.Name, "Primary", origin, direction, item:GetServerData("Primary"))
-			end
-		else
-			if item.AlternateFireClient then
-				item.AlternateFireClient(item, origin, direction)
-			end
-
-			if item.AlternateFireServer then
-				remote:FireServer(item.Name, "Alternate", origin, direction, item:GetServerData("Alternate"))
-			end
 		end
 
 		if item.IsSingleUse then
