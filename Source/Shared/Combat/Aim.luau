@@ -6,7 +6,7 @@ local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
-local ViewmodelModule = require(script.Parent.ViewmodelModule)
+local Viewmodel = require(script.Parent.Viewmodel)
 
 local scopeUi = UIManager.WaitForUI("Scope")
 
@@ -34,9 +34,9 @@ function module.ToggleAim(item: Types.Item?, enabled: boolean?): ()
 		WalkSpeed.SetModifier("Aiming", -4)
 
 		if item.AimAnimation then
-			ViewmodelModule.PlayAnimation(item.AimAnimation, "Aim")
+			Viewmodel.PlayAnimation(item.AimAnimation, "Aim")
 		end
-		ViewmodelModule.IsAiming = true
+		Viewmodel.IsAiming = true
 	else
 		TweenService:Create(camera, TweenInfo.new(0.1), {FieldOfView = 70}):Play()
 
@@ -46,8 +46,8 @@ function module.ToggleAim(item: Types.Item?, enabled: boolean?): ()
 
 		WalkSpeed.SetModifier("Aiming", 0)
 
-		ViewmodelModule.StopAnimation("Aim")
-		ViewmodelModule.IsAiming = false
+		Viewmodel.StopAnimation("Aim")
+		Viewmodel.IsAiming = false
 	end
 
 	module.IsAiming:SetValue(isAiming)

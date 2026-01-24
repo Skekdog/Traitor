@@ -1,18 +1,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ServerScriptService = game:GetService("ServerScriptService")
 local SoundService = game:GetService("SoundService")
-
-local LocalCharacter
-local GetCentreRay
-local Combat
-if RunService:IsClient() then
-	LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-	GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
-else
-	Combat = require(ServerScriptService.Combat.Combat)
-end
 
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
@@ -47,7 +36,7 @@ local function clientThing(): boolean
 		return false
 	end
 
-	local result = raycast(assert(LocalCharacter.Character()), MAX_RANGE)
+	-- local result = raycast(assert(LocalCharacter.Character()), MAX_RANGE)
 	if not result then
 		return false
 	end

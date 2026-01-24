@@ -5,7 +5,7 @@ local GetItemDefinition = require(script.Parent.GetItemDefinition)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
+local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ItemHint = require(ReplicatedStorage.Shared.Controls.ItemHint)
 local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
@@ -94,7 +94,7 @@ local function tryUnequip(item: Types.Item, force: boolean?): boolean
 
 	ReplicatedStorage.Remotes.ClientServer.EquipItem:FireServer(nil)
 
-	ViewmodelModule.Hide()
+	Viewmodel.Hide()
 
 	if item.OnUnequipClient then
 		item.OnUnequipClient(item)
@@ -207,7 +207,7 @@ local function tryEquip(item: Types.Item): ()
 		end)
 	end
 
-	ViewmodelModule.Show(item)
+	Viewmodel.Show(item)
 
 	if item.OnEquipClient then
 		item.OnEquipClient(item)

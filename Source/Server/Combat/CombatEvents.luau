@@ -1,9 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local CombatTypes = require(ReplicatedStorage.Shared.Combat.CombatTypes)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
-local Combat = require(script.Parent.Combat)
 
 local remotes = ReplicatedStorage.Remotes
 
@@ -111,82 +109,6 @@ remotes.ClientServer.DropItem.OnServerEvent:Connect(function(plr, itemName: unkn
 
 	participant:DropItem(item, direction)
 end)
-
-local function isRaycastInfo(value: any): boolean
-	if typeof(value) ~= "table" then
-		return false
-	end
-
-	if typeof(value.Destination) ~= "Vector3" then
-		return false
-	end
-
-	if value.HitPart ~= nil and typeof(value.HitPart) ~= "Instance" then
-		return false
-	end
-
-	if value.HitPartCenterPosition ~= nil and typeof(value.HitPartCenterPosition) ~= "Vector3" then
-		return false
-	end
-
-	if value.Normal ~= nil and typeof(value.Normal) ~= "Vector3" then
-		return false
-	end
-
-	if value.RelativeHitCFrame ~= nil and typeof(value.RelativeHitCFrame) ~= "CFrame" then
-		return false
-	end
-
-	return true
-end
-
-local function isValidRequest(value: any): boolean
-	if typeof(value) ~= "table" then
-		return false
-	end
-
-	if value.Action ~= "Primary" and value.Action ~= "Alternate" then
-		return false
-	end
-
-	if typeof(value.Origin) ~= "Vector3" then
-		return false
-	end
-
-	if typeof(value.Direction) ~= "Vector3" then
-		return false
-	end
-
-	if typeof(value.ItemName) ~= "string" then
-		return false
-	end
-
-	if typeof(value.Raycasts) ~= "table" then
-		return false
-	end
-
-	for i, v in ipairs(value.Raycasts) do
-		if not isRaycastInfo(v) then
-			return false
-		end
-	end
-
-	return true
-end
-
-remotes.ClientServer.Fire.OnServerInvoke = function(plr, request: CombatTypes.Request): CombatTypes.ValidateUsageResult
-	if not isValidRequest(request) then
-		return "OtherError"
-	end
-
-	local participant = RoundHandler.GetRound():GetParticipant(plr.Name)
-	if not participant then
-		return "Dead"
-	end
-
-	local result = Combat.Fire(participant, request)
-	return result :: CombatTypes.ValidateUsageResult
-end
 
 remotes.ClientServer.DropAmmo.OnServerEvent:Connect(function(plr, itemName: unknown, direction: unknown): ()
 	if typeof(itemName) ~= "string" then

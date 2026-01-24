@@ -9,7 +9,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local THROW_FORCE = 80
 local DAMAGE = 100
 
-local function throw(item: Types.Item, attacker: Types.Participant, origin: Vector3, direction: Vector3): ()
+local function throw(item: Types.Item, origin: Vector3, direction: Vector3, attacker: Types.Participant): ()
 	assert(item.Model)
 	local model = item.Model:Clone()
 

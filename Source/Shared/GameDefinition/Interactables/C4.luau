@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
@@ -364,12 +365,10 @@ local function highlightText(text: string): string
 end
 
 if RunService:IsServer() then
-	local ServerScriptService = game:GetService("ServerScriptService")
 	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
+	local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
-	local Combat = require(ServerScriptService.Combat.Combat)
 
 	local function pickAndRemove<T>(list: {T}): T
 		assert(#list > 0, "List is empty")
@@ -414,7 +413,7 @@ local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 		sound.RollOffMaxDistance = if reducedPower then 70 else 240
 
 		destroy(c4)
-		Combat.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Model.Position, armedBy), nil, sound)
+		Server.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Model.Position, armedBy), sound)
 	end
 
 	local function tryArm(c4: C4, participant: Types.Participant, duration: number?): ()

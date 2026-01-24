@@ -1,9 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ServerScriptService = game:GetService("ServerScriptService")
+local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetRound = require(script.Parent.GetRound)
-local Combat = require(ServerScriptService.Combat.Combat)
 
 local module = {}
 
@@ -18,7 +17,7 @@ function module.MakeExplosion(params: {
 	VisualRadius: number?,
 	BeforeHitParticipant: Types.BeforeHitParticipantExplosionInfo?,
 }, sound: Sound?): ()
-	Combat.CreateExplosion(GetRound(), ExplosionParams.new({
+	Server.CreateExplosion(GetRound(), ExplosionParams.new({
 		Damage = params.Damage,
 		FalloffStart = params.FalloffStart or 0,
 		FalloffEnd = params.FalloffEnd,
@@ -28,7 +27,7 @@ function module.MakeExplosion(params: {
 		IgnoreScore = params.IgnoreKarma,
 		IgnoreSelfDefense = params.IgnoreKarma,
 		BeforeHitParticipant = params.BeforeHitParticipant,
-	}, params.Position, params.Attacker), nil, sound)
+	}, params.Position, params.Attacker), sound)
 end
 
 return module

@@ -63,14 +63,14 @@ local function Custom(components: Types.ItemComponents, allowThrow: boolean, all
 		Description = "",
 		IconContent = Content.none,
 
-		PrimaryFireServer = function(item, participant, origin, direction)
+		PrimaryFireServer = function(item, origin, direction, participant)
 			local interactable = throwInteractable(item, participant, origin, direction)
 			if interactable and onThrow then
 				onThrow(interactable, participant)
 			end
 		end,
 
-		AlternateFireServer = function(item, participant, origin, direction)
+		AlternateFireServer = function(item, origin, direction, participant)
 			local interactable, raycastResult, weldConstraint = plantInteractable(item, participant, origin, direction)
 			if interactable and raycastResult and weldConstraint and onPlant then
 				onPlant(interactable, raycastResult, weldConstraint, participant)

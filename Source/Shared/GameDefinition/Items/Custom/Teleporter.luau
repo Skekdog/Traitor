@@ -107,7 +107,7 @@ local function isGrounded(participant: Types.Participant): boolean
 	return not not result
 end
 
-local function PrimaryFireServer(item: Types.Item | Teleporter, participant: Types.Participant): ()
+local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, participant: Types.Participant): ()
 	local teleporter = item :: Teleporter
 
 	if teleporter.Extras.InUse or not teleporter.Extras.Target then
@@ -147,7 +147,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, participant: Typ
 	teleporter.Extras.InUse = false
 end
 
-local function AlternateFireServer(item: Types.Item | Teleporter, participant: Types.Participant, origin: Vector3): ()
+local function AlternateFireServer(item: Types.Item | Teleporter, origin: Vector3, _, participant: Types.Participant): ()
 	local teleporter = item :: Teleporter
 
 	if (teleporter.Extras.TimesUsed or 0) >= MAX_USES then

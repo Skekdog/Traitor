@@ -109,10 +109,10 @@ end
 
 local function clientAnimate(): ()
 	local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
-	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
+	local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 
 	LocalAnimation.TryPlayAnimation(Content.fromAssetId(13269497293), "Magneto")
-	ViewmodelModule.PlayAnimation(Content.fromAssetId(13269497293), "Magneto")
+	Viewmodel.PlayAnimation(Content.fromAssetId(13269497293), "Magneto")
 end
 
 local function clientMakeAlignPosition(part: BasePart): AlignPosition

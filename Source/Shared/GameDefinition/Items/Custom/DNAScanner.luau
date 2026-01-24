@@ -164,7 +164,7 @@ raycastParams.CollisionGroup = "WeaponHitTargets"
 raycastParams.FilterDescendantsInstances = {workspace.Characters}
 raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 raycastParams.IgnoreWater = true
-local function PrimaryFireServer(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): ()
+local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant): ()
 	local result = workspace:Raycast(origin, direction * MAX_SCAN_RANGE * 1.1)
 	if not result then
 		return

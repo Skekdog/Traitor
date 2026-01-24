@@ -6,7 +6,6 @@ local Types = require(ReplicatedStorage.API.Types)
 local DamageSourceRemap = require(ReplicatedStorage.Compat.DamageSourceRemap)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-local Combat = require(ServerScriptService.Combat.Combat)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local module = {}

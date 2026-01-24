@@ -22,7 +22,7 @@ local item = Custom({
 
 	PrimaryHint = "Defuse C4",
 	PrimaryToggled = true,
-	PrimaryFireServer = function(_, participant, origin: Vector3, direction: Vector3): ()
+	PrimaryFireServer = function(_, origin: Vector3, direction: Vector3, participant): ()
 		local result = workspace:Raycast(origin, direction * 7.5, params)
 		if not result then
 			return

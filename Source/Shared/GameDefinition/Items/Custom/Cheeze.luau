@@ -25,7 +25,7 @@ local function playEatSound(participant: Types.Participant): ()
 	})
 end
 
-local function PrimaryFireServer(item: Types.Item, participant: Types.Participant): ()
+local function PrimaryFireServer(item: Types.Item, _, _, participant: Types.Participant): ()
 	if item.Extras.IsEating or item.Extras.IsThrowing then
 		return
 	end
@@ -49,7 +49,7 @@ local function PrimaryFireServer(item: Types.Item, participant: Types.Participan
 end
 
 local function PrimaryFireClient(item: Types.Item): ()
-	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
+	local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 
 	if item.Extras.IsEating or item.Extras.IsThrowing then
 		return
@@ -58,11 +58,11 @@ local function PrimaryFireClient(item: Types.Item): ()
 	item.UnequipDisabled = true
 	item.Extras.IsEating = true
 
-	ViewmodelModule.PlayAnimation(Content.fromAssetId(82123370330518))
+	Viewmodel.PlayAnimation(Content.fromAssetId(82123370330518))
 end
 
 local function AlternateFireClient(item: Types.Item): ()
-	local ViewmodelModule = require(ReplicatedStorage.Shared.Combat.ViewmodelModule)
+	local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 	local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 
 	if item.Extras.IsEating or item.Extras.IsThrowing then
@@ -72,7 +72,7 @@ local function AlternateFireClient(item: Types.Item): ()
 	item.UnequipDisabled = true
 	item.Extras.IsThrowing = true
 
-	local track = ViewmodelModule.PlayAnimation(Content.fromAssetId(115786020255555))
+	local track = Viewmodel.PlayAnimation(Content.fromAssetId(115786020255555))
 
 	local function onFinish(): ()
 		ClientInventory.RemoveItem(item)
@@ -125,7 +125,7 @@ local function hover(cheeze: BasePart, part: BasePart): ()
 	Instance.new("Sparkles", cheeze).TimeScale = 0.5
 end
 
-local function AlternateFireServer(item: Types.Item, participant: Types.Participant): ()
+local function AlternateFireServer(item: Types.Item, _, _, participant: Types.Participant): ()
 	local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 
 	if item.Extras.IsEating or item.Extras.IsThrowing then
