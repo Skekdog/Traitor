@@ -7,6 +7,7 @@ local Types = require(ReplicatedStorage.API.Types)
 local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local Aim = require(ReplicatedStorage.Shared.Combat.Aim)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
@@ -50,6 +51,19 @@ function Client.GetDefaultRaycastParams(char: Instance): RaycastParams
 	params.CollisionGroup = "WeaponHitTargets"
 
 	return params
+end
+
+function Client.GetOrigin(): Vector3
+	local head = LocalCharacter.Head()
+	if not head then
+		return Vector3.zero
+	end
+
+	return head.Position
+end
+
+function Client.GetDirection(): Vector3
+	return GetCentreRay().Direction
 end
 
 function Client.Hitscan(

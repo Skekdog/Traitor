@@ -1,59 +1,45 @@
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
-
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local BehaviourTypes = require(ReplicatedStorage.API.Item.Behaviour.BehaviourTypes)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local MAX_RANGE = 10000
-
-local function raycast(char: Model, range: number): RaycastResult?
-	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {char}
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.IgnoreWater = true
-	params.CollisionGroup = "WeaponHitTargets"
-
-	return workspace:Raycast(workspace.CurrentCamera.CFrame.Position, GetCentreRay().Direction.Unit * range, params)
-end
 
 local function isPartValid(part: BasePart): boolean
 	local prop = GetMapObjectWithTag(part, "Prop")
 	return if prop then Impulse.CanImpulse(part) and not prop:HasTag("Interactable") else false
 end
 
-local function clientThing(): boolean
+local function clientThing(origin: Vector3, direction: Vector3): BehaviourTypes.HitscanResult?
+	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
 	local map = workspace:FindFirstChild("Map")
 	if not map then
-		return false
+		return nil
 	end
 
-	-- local result = raycast(assert(LocalCharacter.Character()), MAX_RANGE)
-	if not result then
-		return false
+	local result = Client.Hitscan(Client.GetDefaultRaycastParams(assert(LocalCharacter.Character())), origin, direction, MAX_RANGE)
+	if not result.Hit or not isPartValid(result.Hit.Part) then
+		return nil
 	end
 
-	return isPartValid(result.Instance)
+	return result
 end
 
 local function preRenderClient(item: Types.Item, dt: number): ()
-	if clientThing() then
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+	if clientThing(Client.GetOrigin(), Client.GetDirection()) then
 		item.LaserColor = Color3.new(0, 1, 0)
 	else
 		item.LaserColor = Color3.new(1, 0, 0)
 	end
-end
-
-local function beforePrimaryFireClient(item: Types.Item, part: BasePart?): boolean
-	return if part then isPartValid(part) else false
 end
 
 local function beforeHitAnything(_, params: Types.DamageParams, round: Types.Round): boolean
@@ -156,23 +142,25 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 	Impulse.ApplyImpulse(propRoot, -direction * 50, true, nil, info.Attacker)
 
 	if info.PoltPhase == #phaseAdvanceTimes then
-		local params = ExplosionParams.new({
+		local params = {
 			Damage = 10,
 			FalloffStart = 0,
 			FalloffEnd = 15,
 			Pressure = 50000,
 			VisualRadius = 15,
+			Position = propRoot.Position,
+			Attacker = info.Attacker,
 
 			BeforeHitParticipant = function(_, _, hitParticipant: Types.Participant): boolean
 				return hitParticipant ~= info.Attacker
 			end,
-		}, propRoot.Position, info.Attacker)
-		Combat.CreateExplosion(prop.Round, params)
+		}
+		local Combat = require(ReplicatedStorage.API.Combat)
+		Combat.MakeExplosion(params)
 		return
 	end
 
 	PlaySound(7129285090, nil, prop.Model, {
-		SoundGroup = SoundService.AllSounds :: SoundGroup,
 		Volume = 0.5,
 		RollOffMinDistance = 10,
 		RollOffMaxDistance = 25,
@@ -212,7 +200,23 @@ local Poltergeist = Gun({
 	AmmoDefinition = Ammo["Poltergeist"],
 
 	PreRenderClient = preRenderClient,
-	PrimaryRayValidationClient = beforePrimaryFireClient,
+
+	PrimaryFireClient = function(item, origin, direction)
+		local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+		local request = clientThing(origin, direction)
+		if not request then
+			return false
+		end
+
+		return Client.PrimaryFire(item, origin, direction)
+	end,
+
+	PrimaryFireServer =
+		if RunService:IsServer() then
+			require(ReplicatedStorage.API.Item.Behaviour.Server).PrimaryFire
+		else
+			function() return nil
+		end,
 
 	BeforeHitAnything = beforeHitAnything,
 	BeforeHitProp = beforeHitProp,
