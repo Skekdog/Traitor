@@ -29,7 +29,7 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 			if RunService:IsClient() then
 				require(ReplicatedStorage.API.Item.Behaviour.Client).PrimaryFire
 			else
-				function() return nil
+				function() return true
 			end,
 
 		PrimaryFireServer =

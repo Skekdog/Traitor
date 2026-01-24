@@ -48,25 +48,26 @@ local function PrimaryFireServer(item: Types.Item, _, _, participant: Types.Part
 	end)
 end
 
-local function PrimaryFireClient(item: Types.Item): ()
+local function PrimaryFireClient(item: Types.Item): true
 	local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 
 	if item.Extras.IsEating or item.Extras.IsThrowing then
-		return
+		return true
 	end
 
 	item.UnequipDisabled = true
 	item.Extras.IsEating = true
 
 	Viewmodel.PlayAnimation(Content.fromAssetId(82123370330518))
+	return true
 end
 
-local function AlternateFireClient(item: Types.Item): ()
+local function AlternateFireClient(item: Types.Item): true
 	local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 	local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 
 	if item.Extras.IsEating or item.Extras.IsThrowing then
-		return
+		return true
 	end
 
 	item.UnequipDisabled = true
@@ -83,6 +84,8 @@ local function AlternateFireClient(item: Types.Item): ()
 	else
 		onFinish()
 	end
+
+	return true
 end
 
 local function hover(cheeze: BasePart, part: BasePart): ()

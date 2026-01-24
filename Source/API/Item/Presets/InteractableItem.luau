@@ -68,6 +68,7 @@ local function Custom(components: Types.ItemComponents, allowThrow: boolean, all
 			if interactable and onThrow then
 				onThrow(interactable, participant)
 			end
+            return nil
 		end,
 
 		AlternateFireServer = function(item, origin, direction, participant)
@@ -75,6 +76,7 @@ local function Custom(components: Types.ItemComponents, allowThrow: boolean, all
 			if interactable and raycastResult and weldConstraint and onPlant then
 				onPlant(interactable, raycastResult, weldConstraint, participant)
 			end
+            return nil
 		end
 	}
 

@@ -278,11 +278,12 @@ local function onUnequipServer(_, participant: Types.Participant): ()
 	module.ServerStopControllingProp(participant.Player)
 end
 
-local function alternateFireClient(item, origin: Vector3, direction: Vector3): ()
+local function alternateFireClient(item, origin: Vector3, direction: Vector3): true
 	local part = clientRaycast()
 
 	if part and clientControl and part == clientControl.Part and clientGetProp(part) == clientControl.Prop then
-		return clientRelease(clientControl.Part)
+		clientRelease(clientControl.Part)
+		return true
 	end
 
 	if clientControl then
@@ -290,24 +291,28 @@ local function alternateFireClient(item, origin: Vector3, direction: Vector3): (
 	end
 
 	if part then
-		return clientGrab(item, part)
+		clientGrab(item, part)
+		return true
 	end
+
+	return true
 end
 
-local function primaryFireClient(_, origin: Vector3, direction: Vector3): ()
+local function primaryFireClient(_, origin: Vector3, direction: Vector3): true
 	local part, position = clientRaycast()
 	if not part or not position then
-		return
+		return true
 	end
 
 	if clientControl then
 		if clientControl.Prop:HasTag("Corpse") then
 			clientHang()
 		end
-		return
+		return true
 	end
 
 	clientPush(part, position, origin)
+	return true
 end
 
 local function serverGetPropFromPart(part: unknown): Types.Prop?

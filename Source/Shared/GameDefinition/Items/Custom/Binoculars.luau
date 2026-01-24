@@ -31,9 +31,10 @@ local function doZoomServer(participant: Types.Participant, isZoomed: boolean): 
 	participant.CorpseSearchDistance = if isZoomed then 200 else 10
 end
 
-local function AlternateFireClient(): ()
+local function AlternateFireClient(): true
 	module.IsZoomedIn = not module.IsZoomedIn
 	doZoomClient()
+	return true
 end
 
 local bodies: {[Types.MapObject]: Highlight} = {}

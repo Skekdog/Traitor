@@ -1,11 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Combat = require(ReplicatedStorage.API.Combat)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local Types = require(ReplicatedStorage.API.Types)
 local DamageSourceRemap = require(ReplicatedStorage.Compat.DamageSourceRemap)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local module = {}
@@ -48,33 +48,33 @@ function module.DamageWithinRadius(self,
 	source: Types.GeneralDamageSource?,
 	itemId: string?
 ): ()
-	local round = RoundHandler.GetRound()
-	local params = ExplosionParams.new({
+	Combat.MakeExplosion({
 		Damage = damage,
 		FalloffStart = if damageFalloff then 0 else radius - 0.001,
 		FalloffEnd = radius,
 		Pressure = 0,
 		VisualRadius = 0,
-	}, position, assailant and GetParticipant(assailant))
-	Combat.CreateExplosion(round, params, nil, Instance.new("Sound"))
+		Position = position,
+		Attacker = assailant and GetParticipant(assailant)
+	}, Instance.new("Sound"))
 end
 
 function module.Explosion(self, position: Vector3, soundId: number?, radius: number?, damage: number?): ()
-	local round = RoundHandler.GetRound()
-	local params = ExplosionParams.new({
+	local params = {
 		Damage = damage or 0,
 		FalloffStart = 5,
 		FalloffEnd = radius or 20,
 		Pressure = 10000,
 		VisualRadius = 20,
-	}, position)
+		Position = position,
+	}
 
 	local sound = Instance.new("Sound")
 	if soundId then
 		sound.SoundId = "rbxassetid://" .. soundId
 	end
 
-	Combat.CreateExplosion(round, params, nil, soundId and sound)
+	Combat.MakeExplosion(params, soundId and sound)
 end
 
 function module.Impulse(self, target: Model | BasePart, attacker: Player?, origin: Vector3, directionalForce: Vector3, _: boolean, _: boolean, itemName: string): ()
