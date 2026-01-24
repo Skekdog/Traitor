@@ -186,17 +186,13 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 		local direction = GetCentreRay().Direction
 
 		if isPrimary then
-			print("pre client")
 			if item.PrimaryFireClient then
-				print("in client")
 				item.PrimaryFireClient(item, origin, direction)
 			end
-			print("post client")
+
 			if item.PrimaryFireServer then
-				print("in server")
 				remote:FireServer(item.Name, "Primary", origin, direction, item:GetServerData("Primary"))
 			end
-			print("post server")
 		else
 			if item.AlternateFireClient then
 				item.AlternateFireClient(item, origin, direction)
