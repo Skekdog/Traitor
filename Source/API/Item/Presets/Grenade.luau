@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.API.Types)
 
 local function Grenade(components: Types.ItemComponents): Types.ItemComponents
@@ -22,7 +23,21 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 			FalloffEnd = 1,
 			Pressure = 1,
 			VisualRadius = 10,
-		}
+		},
+
+		PrimaryFireClient =
+			if RunService:IsClient() then
+				require(ReplicatedStorage.API.Item.Behaviour.Client).PrimaryFire
+			else
+				function() return nil
+			end,
+
+		PrimaryFireServer =
+			if RunService:IsServer() then
+				require(ReplicatedStorage.API.Item.Behaviour.Server).PrimaryFire
+			else
+				function() return nil
+			end,
 	}
 
 	for i, v in components do

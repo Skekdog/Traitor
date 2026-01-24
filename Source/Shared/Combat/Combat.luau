@@ -23,6 +23,8 @@ remote.OnClientEvent:Connect(function(message: string | {string}): ()
 	local result: {string}
 	if typeof(message) == "string" then
 		result = {message}
+	else
+		result = message
 	end
 
 	for _, msg in result do
