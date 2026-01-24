@@ -142,12 +142,12 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 		return "NoCharacter"
 	end
 
-	if not Checks.Ammo(item) or not Checks.Scoped(item, Aim.IsAiming()) then
-		Client.PlayEmptyClipSound()
+	if not Checks.Reloading(item) then
 		return false
 	end
 
-	if not Checks.Reloading(item) then
+	if not Checks.Ammo(item) or not Checks.Scoped(item, Aim.IsAiming()) then
+		Client.PlayEmptyClipSound()
 		return false
 	end
 
