@@ -28,7 +28,7 @@ remote.OnClientEvent:Connect(function(message: string | {string}): ()
 	end
 
 	for _, msg in result do
-		warn("Hit rejected:", message)
+		warn("Hit rejected:", msg)
 		if Settings.GetSetting("Show Hit Rejects") then
 			ScreenMessage("Hit rejected: " .. msg, "Warn")
 		end
