@@ -22,7 +22,7 @@ function Client.GetRaycastDirection(direction: Vector3, spread: number): Vector3
 end
 
 function Client.DeriveTargetPosition(origin: Vector3, direction: Vector3, range: number): Vector3
-	return (origin + direction).Unit * range
+	return origin + (direction.Unit * range)
 end
 
 function Client.DeductAmmo(item: Types.Item): ()
@@ -147,7 +147,7 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 		local hits = {}
 		for i = 1, item.ProjectileCount or 1 do
 			local spreadDirection = Client.GetRaycastDirection(direction, item.Spread or 0)
-			local result = Client.Hitscan(params, origin, spreadDirection, item.MaxDistance or 10000, false, false)
+			local result = Client.Hitscan(params, origin, spreadDirection, item.MaxDistance or 10000, item.CheckInitialIntersection, item.CheckInitialIntersection)
 
 			local targetPosition = result and result.Position or Client.DeriveTargetPosition(origin, direction, item.MaxDistance or 10000)
 			if item.Projectile then

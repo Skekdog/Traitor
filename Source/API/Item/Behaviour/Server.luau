@@ -98,12 +98,10 @@ function Server.ProcessHitscan(item: Types.Item, origin: Vector3, participant: T
 	end
 
 	if not Checks.TargetDistance(item, origin, hitscan.Position) then
-		warn("target too far")
 		return "TargetTooFar"
 	end
 
 	if not Checks.RaycastStatic(item, participant, origin, hitscan.Position, hitscan.Hit and hitscan.Hit.Part) then
-		warn("static obscured")
 		return "StaticObscured"
 	end
 
