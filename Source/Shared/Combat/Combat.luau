@@ -143,6 +143,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 
 			if item.PrimaryFireServer then
 				remote:FireServer(item.Name, "Primary", origin, direction, item:GetServerData("Primary"))
+				item:SetServerData("Primary", nil)
 			end
 		else
 			if item.AlternateFireClient then
@@ -157,6 +158,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 
 			if item.AlternateFireServer then
 				remote:FireServer(item.Name, "Alternate", origin, direction, item:GetServerData("Alternate"))
+				item:SetServerData("Alternate", nil)
 			end
 		end
 
