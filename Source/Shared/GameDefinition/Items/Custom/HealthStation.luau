@@ -11,7 +11,7 @@ local HealthStation = InteractableItem({
     IconContent = Content.fromAssetId(93284379186217),
     IsPixelIcon = true,
 
-    CreditCost = 1,
+    Cost = 1,
     MaxStock = 1,
 
     PrimaryToggled = true,
