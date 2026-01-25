@@ -188,7 +188,7 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 			end
 
 			if not GetMapObject(result.Hit.Part, "Character") then
-				PlaySound(HitSounds[GetMaterial(result.Hit.Part)] or HitSounds.Default, targetPosition, nil, {
+				PlaySound(item.HitSound or HitSounds[GetMaterial(result.Hit.Part)] or HitSounds.Default, targetPosition, nil, {
 					RollOffMaxDistance = 20,
 				})
 			end
