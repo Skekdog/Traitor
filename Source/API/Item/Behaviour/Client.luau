@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local BehaviourTypes = require(script.Parent.BehaviourTypes)
 local Checks = require(script.Parent.Checks)
 local Types = require(ReplicatedStorage.API.Types)
@@ -16,6 +17,8 @@ local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 
 local Client = {}
+
+local remote = GetRemote("ItemFire")
 
 local random = Random.new(workspace:GetServerTimeNow())
 function Client.GetRaycastDirection(direction: Vector3, spread: number): Vector3
@@ -230,6 +233,11 @@ function Client.TryReloadWeapon(item: Types.Item): boolean
 	ReplicatedStorage.Remotes.ClientServer.ReloadWeapon:FireServer(item.Name)
 
 	return true
+end
+
+function Client.ServerFire(action: "Primary" | "Alternate", item: Types.Item, origin: Vector3, direction: Vector3): ()
+	remote:FireServer(item.Name, action, origin, direction, item:GetServerData(action))
+	item:SetServerData(action, nil)
 end
 
 return Client

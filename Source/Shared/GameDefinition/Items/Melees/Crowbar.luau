@@ -1,51 +1,60 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Impulse = require(ReplicatedStorage.API.Impulse)
+local BehaviourTypes = require(ReplicatedStorage.API.Item.Behaviour.BehaviourTypes)
 local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-local MAX_DISTANCE = 7
-local PUSH_FORCE = 75
+local PUSH_FORCE = 10
 local RESPONSIBLE_DURATION = 5
 
-local function raycast(head: BasePart, direction: Vector3): RaycastResult?
-	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {head.Parent :: Model}
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.IgnoreWater = true
-	params.CollisionGroup = "WeaponHitTargets"
+function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction: Vector3): boolean
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+	Client.PrimaryFire(item, origin, direction)
 
-	return workspace:Raycast(head.Position, direction * MAX_DISTANCE, params)
+	local data = item:GetServerData("Primary") :: BehaviourTypes.Request
+	if not data then
+		return false
+	end
+
+	item:SetServerData("Primary", nil)
+
+	if not data[1] or not data[1].Hit then
+		return false
+	end
+
+	item:SetServerData("Alternate", data)
+
+	return true
 end
 
-function module.Push(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): ()
-	local char = participant:GetCharacter()
-	if not char then
-		return
+function module.AlternateFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, data: unknown): string?
+	local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+	local Impulse = require(ReplicatedStorage.API.Impulse)
+
+	if not BehaviourTypes.IsRequest(data) then
+		return "InvalidRequest"
 	end
 
-	local head = char:FindFirstChild("Head")
-	if not head or not head:IsA("BasePart") then
-		return
+	local request = data :: BehaviourTypes.Request
+	if not request then
+		return "InvalidRequest"
 	end
 
-	local raycastResult = raycast(head, direction)
-	if not raycastResult then
-		return
+	local hitscan = request[1]
+	if not hitscan or not hitscan.Hit then
+		return "InvalidRequest"
 	end
 
-	local hitPart = raycastResult.Instance :: BasePart
-	local model = hitPart:FindFirstAncestorOfClass("Model")
-
-	if not model then
-		return
+	local part = hitscan.Hit.Part
+	if Impulse.CanImpulse(part) then
+		Impulse.ApplyImpulse(part, direction * PUSH_FORCE, true)
 	end
 
-	local hitParticipant = participant.Round:GetParticipant(model.Name)
+	local hitParticipant = GetParticipant(part)
 	if not hitParticipant then
-		return
+		return nil
 	end
 
 	hitParticipant:SetLastDamagedBy(participant, RESPONSIBLE_DURATION)
@@ -56,7 +65,7 @@ function module.Push(item: Types.Item, participant: Types.Participant, origin: V
 		})
 	end
 
-	Impulse.ApplyImpulse(hitPart, direction * PUSH_FORCE * hitPart.AssemblyMass, false, nil, participant)
+	return nil
 end
 
 local Crowbar = Melee({
@@ -96,7 +105,8 @@ local Crowbar = Melee({
 		Threshold = 4,
 	}),
 
-    AlternateFireServer = module.Push,
+    AlternateFireServer = module.AlternateFireServer,
+	AlternateFireClient = module.AlternateFireClient,
 })
 
 module.Item = Crowbar
