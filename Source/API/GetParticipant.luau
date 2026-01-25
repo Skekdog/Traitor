@@ -10,6 +10,10 @@ local function GetParticipant(identifier: Instance | string): Types.Participant?
 	elseif identifier:IsA("Player") then
 		finalIdentifier = identifier.Name
 	else
+		if not identifier:IsDescendantOf(workspace) then
+			return nil
+		end
+
 		local char = GetMapObjectWithTag(identifier, "Character")
 		if char then
 			finalIdentifier = char.Name
