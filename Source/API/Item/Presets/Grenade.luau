@@ -38,6 +38,8 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 			else
 				function() return nil
 			end,
+
+		ProjectileSpeed = 35,
 	}
 
 	for i, v in components do

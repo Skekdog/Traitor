@@ -135,7 +135,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 	local primaryPart = GetPrimaryPart(projectile)
 
 	primaryPart:SetNetworkOwner(nil)
-	participant:TryThrowAssembly(projectile, item.ProjectileSpeed or 100, nil, origin, direction)
+	participant:TryThrowAssembly(projectile, item.ProjectileSpeed or 35, nil, origin, direction)
 
 	if item.FuseTime and item.ExplosionInfo then
 		task.wait(item.FuseTime)
