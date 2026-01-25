@@ -14,6 +14,10 @@ for _, module in ReplicatedStorage.Shared.GameDefinition.Items:QueryDescendants(
     else
         items[ret.Name] = ret
     end
+
+    if ret.ShopItem then
+        items[ret.ShopItem.Name] = ret.ShopItem
+    end
 end
 
 function StandardGame.GetItem(name: string): Types.ItemComponents
