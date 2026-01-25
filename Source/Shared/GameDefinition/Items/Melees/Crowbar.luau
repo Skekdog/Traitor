@@ -93,7 +93,7 @@ local Crowbar = Melee({
     Model = ReplicatedStorage.Assets.ItemModels.Crowbar,
     HoldAnimation = Content.fromAssetId(10247423634),
     PrimaryAnimation = Content.fromAssetId(13269497293),
-	AlternateAnimation = Content.fromAssetId(1326949723),
+	AlternateAnimation = Content.fromAssetId(13269497293),
 
     MaxDistance = 7,
     Damage = 20,
