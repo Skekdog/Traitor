@@ -3,7 +3,6 @@ local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 local Cheeze = {}
 
@@ -165,7 +164,7 @@ local function AlternateFireServer(item: Types.Item, _, _, participant: Types.Pa
 					end
 
 					model:Destroy()
-					participant:AddItem(Item.new(item.Base))
+					participant:AddItem(participant.Round:LoadItem(item.Base))
 
 					return
 				end

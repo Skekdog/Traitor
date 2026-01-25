@@ -5,7 +5,6 @@ local SoundService = game:GetService("SoundService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
-local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 local PLAY_COOLDOWN = 0.25
 
@@ -318,7 +317,7 @@ local function OnInteractServer(interactable: Radio, participant: Types.Particip
 	end
 
 	interactable.Model:Destroy()
-	participant:AddItem(Item.new(radioItem))
+	participant:AddItem(participant.Round:LoadItem(radioItem))
 end
 
 local interactable: Types.InteractableDefinition = {

@@ -6,7 +6,6 @@ local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 
 local Spoon = {}
 
@@ -221,7 +220,7 @@ local shopItem = Custom({
 			participant:TryDropItem(occupyingItem)
 		end
 
-		participant:AddItem(Item.new(itemDefinition))
+		participant:AddItem(participant.Round:LoadItem(itemDefinition))
 	end,
 })
 

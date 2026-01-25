@@ -4,7 +4,6 @@ local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -255,7 +254,7 @@ local function OnInteractServer(interactable: Visualiser, participant: Types.Par
 	end
 
 	interactable.Model:Destroy()
-	participant:AddItem(Item.new(visualiserItem))
+	participant:AddItem(participant.Round:LoadItem(visualiserItem))
 end
 
 local function removeVisualiser(visualiser: Visualiser): ()

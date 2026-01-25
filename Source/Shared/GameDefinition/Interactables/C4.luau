@@ -367,7 +367,6 @@ end
 if RunService:IsServer() then
 	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-	local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
 	local function pickAndRemove<T>(list: {T}): T
@@ -504,7 +503,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		participant:AddItem(Item.new(c4Item))
+		participant:AddItem(participant.Round:LoadItem(c4Item))
 		destroy(c4)
 	end
 
