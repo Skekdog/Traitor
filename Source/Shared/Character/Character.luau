@@ -66,7 +66,7 @@ local function initRemoveDeathSound(root: BasePart): ()
     end
 end
 
-local function initHeadTilt(char: Model): ()
+local function initHeadTiltAsync(char: Model): ()
     local neck = char:WaitForChild("Head"):WaitForChild("Neck")
     assert(neck:IsA("Motor6D"), "Neck is not a Motor6D")
 
@@ -110,7 +110,9 @@ LocalCharacter.Humanoid:Connect(function(hum)
 
     initSnapToLadder(root)
     initRemoveDeathSound(root)
-    initHeadTilt(char)
+    task.spawn(initHeadTiltAsync, char)
+
+    workspace.CurrentCamera.CameraSubject = hum
 end)
 
 return nil
