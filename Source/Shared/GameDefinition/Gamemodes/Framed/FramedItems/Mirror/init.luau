@@ -15,6 +15,8 @@ local item: Types.ItemComponents = {
 	ItemGroup = {
 		PreferredSlot = 9,
 	},
+
+	DropDisabled = true,
 }
 
 Mirror.Item = item

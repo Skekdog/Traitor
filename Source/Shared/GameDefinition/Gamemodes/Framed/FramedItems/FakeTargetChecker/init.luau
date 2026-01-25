@@ -23,6 +23,8 @@ local item: Types.ItemComponents = {
 	},
 
 	OnEquipClient = OnEquipClient,
+
+	DropDisabled = true,
 }
 
 TargetChecker.Item = item

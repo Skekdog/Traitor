@@ -16,6 +16,8 @@ local item: Types.ItemComponents = {
 	ItemGroup = {
 		PreferredSlot = 6,
 	},
+
+	DropDisabled = true,
 }
 
 PoliceBadge.Item = item

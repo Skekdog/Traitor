@@ -22,6 +22,8 @@ local item: Types.ItemComponents = {
 		PreferredSlot = 6,
 	},
 
+	DropDisabled = true,
+
 	OnEquipClient = OnEquipClient,
 }
 
