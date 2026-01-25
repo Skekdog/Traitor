@@ -130,7 +130,7 @@ table.insert(availableSettings, {
 	Tab = "Display",
 	Category = "Debug",
 	Kind = "Boolean" :: "Boolean",
-	Default = false,
+	Default = RunService:IsStudio(),
 	Tooltip = "Display an on-screen warning when a hit is rejected.",
 })
 
