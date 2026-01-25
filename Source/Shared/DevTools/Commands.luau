@@ -763,6 +763,54 @@ module.giveitem = {
 	end
 }
 
+module.removeitem = {
+	Name = "removeitem",
+	Description = "Removes an item from players.",
+	HasRelaxedPermissions = true,
+	Environment = "Server" :: "Server",
+	Arguments = {"item name", "players"},
+	Execute = function(executor: Player, round: Round, args: {string?}): string
+		local players = processPlayerArgument(executor, args[2])
+		if not players then
+			return `Player {args[2]} not found.`
+		end
+
+		local itemName = processStringArgument(args[1])
+		if not itemName then
+			return "Missing argument 1 item name."
+		end
+
+		if not round:GetItemDefinition(itemName) then
+			return `Item {itemName} not found.`
+		end
+
+		local affectedPlayers: {Player} = {}
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local item: Types.Item?
+
+			for _, found in participant:GetItems() do
+				assert(found)
+				if found.Name == itemName then
+					item = found
+					break
+				end
+			end
+
+			if item then
+				participant:RemoveItem(item)
+				table.insert(affectedPlayers, player)
+			end
+		end
+
+		return `Removed {itemName} from {getPlayersString(affectedPlayers)}.`
+	end
+}
+
 module.givecredits = {
 	Name = "givecredits",
 	Description = "Gives credits to players",
