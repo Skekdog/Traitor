@@ -219,6 +219,8 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 		return
 	end
 
+	RedHanded.StopImmediately(participant)
+
 	local framedAlive: {Types.Participant} = {}
 	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
 		if v:IsAlive() and v ~= participant then
