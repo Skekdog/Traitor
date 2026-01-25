@@ -9,9 +9,13 @@ local module = {}
 local PUSH_FORCE = 10
 local RESPONSIBLE_DURATION = 5
 
-function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction: Vector3): boolean
+function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction: Vector3): boolean | string | {string}
 	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
-	Client.PrimaryFire(item, origin, direction, true)
+
+	local result = Client.PrimaryFire(item, origin, direction, true)
+	if result ~= true then
+		return result
+	end
 
 	local data = item:GetServerData("Primary") :: BehaviourTypes.Request
 	if not data then
