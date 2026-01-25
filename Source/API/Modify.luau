@@ -9,7 +9,7 @@ local function Modify<T>(original: T & (Types.ItemComponents | Types.AmmoDefinit
 
     new.Name = newName
 
-    if original.Model then
+    if original.Model and not edit.Model then
         new.Model = original.Model:Clone();
         (new.Model :: PVInstance).Name = newName;
         (new.Model :: PVInstance).Parent = original.Model.Parent
