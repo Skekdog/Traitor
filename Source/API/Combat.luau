@@ -16,6 +16,7 @@ function module.MakeExplosion(params: {
 	Pressure: number?,
 	VisualRadius: number?,
 	BeforeHitParticipant: Types.BeforeHitParticipantExplosionInfo?,
+	FilterImpulse: ((Types.ExplosionInfo, participant: Types.Participant) -> boolean?)?
 }, sound: Sound?): ()
 	Server.CreateExplosion(GetRound(), ExplosionParams.new({
 		Damage = params.Damage,
@@ -27,6 +28,7 @@ function module.MakeExplosion(params: {
 		IgnoreScore = params.IgnoreKarma,
 		IgnoreSelfDefense = params.IgnoreKarma,
 		BeforeHitParticipant = params.BeforeHitParticipant,
+		FilterImpulse = params.FilterImpulse,
 	}, params.Position, params.Attacker), sound)
 end
 

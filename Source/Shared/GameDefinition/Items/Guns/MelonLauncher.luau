@@ -3,10 +3,14 @@ local Types = require(ReplicatedStorage.API.Types)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local BehaviourTypes = require(ReplicatedStorage.API.Item.Behaviour.BehaviourTypes)
 
 local MelonLauncher = {}
 
-local function reduceAmount(_, params: Types.DamageParams, hitParticipant: Types.Participant): boolean
+local PRESSURE = 100000
+local RADIUS = 15
+
+local function reduceAmount(info: Types.ExplosionInfo | Types.Item, params: Types.DamageParams, hitParticipant: Types.Participant): boolean
 	if hitParticipant == params.Attacker then
 		params.Amount /= 5
 	end
@@ -20,13 +24,63 @@ local function BeforeHitAnything(_, params: Types.DamageParams): boolean
 		Attacker = params.Attacker,
 		Position = params.HitPosition,
 		Damage = 50,
-		FalloffEnd = 15,
+		FalloffEnd = RADIUS,
 		FalloffStart = 5,
-		Pressure = 100000,
+		Pressure = PRESSURE,
 
 		BeforeHitParticipant = reduceAmount,
+		FilterImpulse = function(_: Types.ExplosionInfo, participant: Types.Participant): boolean?
+			if participant == params.Attacker then
+				return false
+			end
+			return true
+		end,
 	})
 	return true
+end
+
+local function PrimaryFireClient(item: Types.Item, origin: Vector3, direction: Vector3): boolean | string | {string}
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+	local Impulse = require(ReplicatedStorage.API.Impulse)
+
+	item.IsProjectileSimulated = false
+	local result = Client.PrimaryFire(item, origin, direction, true)
+	item.IsProjectileSimulated = true
+
+	(function(): boolean | string | {string}
+		if result ~= true then
+			return result
+		end
+
+		local request = item:GetServerData("Primary") :: BehaviourTypes.Request
+		if not request then
+			return true
+		end
+
+		local hitscan = request[1]
+		if not hitscan then
+			return true
+		end
+
+		local root = LocalCharacter.RootPart()
+		if not root then
+			return true
+		end
+
+		if (root.Position - hitscan.Position).Magnitude > RADIUS then
+			return true
+		end
+
+		local impulse = (root.Position - hitscan.Position).Unit * PRESSURE / 1000
+		Impulse.ApplyImpulse(root, impulse, true, nil)
+
+		return true
+	end)()
+
+	item:SetServerData("Primary", nil)
+
+	return Client.PrimaryFire(item, origin, direction)
 end
 
 MelonLauncher.Item = Gun({
@@ -65,6 +119,8 @@ MelonLauncher.Item = Gun({
 
 	BeforeHitAnything = BeforeHitAnything,
 	BeforeHitParticipant = reduceAmount,
+
+	PrimaryFireClient = PrimaryFireClient,
 })
 
 return MelonLauncher

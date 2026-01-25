@@ -80,6 +80,11 @@ function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 			if table.find(hits, participant) then
 				continue
 			end
+
+			if info.FilterImpulse and info.FilterImpulse(info, participant) == false then
+				impulse = Vector3.zero
+			end
+
 			table.insert(hits, participant)
 			ProcessHit.Participant(params, params.Attacker, participant, v, v.Position, params.Position, impulse)
 		end
