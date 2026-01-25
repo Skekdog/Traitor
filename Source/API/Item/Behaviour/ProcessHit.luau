@@ -76,7 +76,16 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	if hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
 		for _, v in Players:GetPlayers() do
 			if v ~= by.Player then
-				PlaySound(if item.Kind == "Item" then item.HitSound else HitSounds[GetMaterial(hitPart)] or HitSounds.Default, hitPosition, nil, {
+				local sound: PlaySound.SoundId | {PlaySound.SoundId}
+				if item.Kind == "Item" and item.HitSound then
+					sound = item.HitSound
+				end
+
+				if not sound then
+					sound = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
+				end
+
+				PlaySound(sound, hitPosition, nil, {
 					RollOffMinDistance = 0,
 					RollOffMaxDistance = 20,
 				}, v)
