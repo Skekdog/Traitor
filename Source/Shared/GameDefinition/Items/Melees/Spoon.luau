@@ -86,7 +86,8 @@ local itemDefinition = Melee({
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
 
-	AlternateFireServer = Crowbar.Push,
+	AlternateFireServer = Crowbar.AlternateFireServer,
+	AlternateFireClient = Crowbar.AlternateFireClient,
 })
 
 if RunService:IsServer() then
