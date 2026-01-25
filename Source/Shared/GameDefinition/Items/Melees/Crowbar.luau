@@ -11,7 +11,7 @@ local RESPONSIBLE_DURATION = 5
 
 function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction: Vector3): boolean
 	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
-	Client.PrimaryFire(item, origin, direction)
+	Client.PrimaryFire(item, origin, direction, true)
 
 	local data = item:GetServerData("Primary") :: BehaviourTypes.Request
 	if not data then
@@ -23,6 +23,8 @@ function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction
 	if not data[1] or not data[1].Hit then
 		return false
 	end
+
+	Client.Recoil(item)
 
 	item:SetServerData("Alternate", data)
 

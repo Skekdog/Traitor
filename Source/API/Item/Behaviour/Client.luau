@@ -140,7 +140,7 @@ function Client.PlayEmptyClipSound(): ()
 	PlaySound(ReplicatedStorage.Assets.ItemSounds.EmptyClip)
 end
 
-function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector3): string | {string} | boolean
+function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector3, noEffects: boolean?): string | {string} | boolean
 	local char = LocalCharacter.Character()
 	if not char then
 		return "NoCharacter"
@@ -162,9 +162,11 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 		return false
 	end
 
-	Client.DeductAmmo(item)
-	Client.MuzzleFlash(item)
-	Client.Recoil(item)
+	if not noEffects then
+		Client.DeductAmmo(item)
+		Client.MuzzleFlash(item)
+		Client.Recoil(item)
+	end
 
 	if not item.IsProjectileSimulated then
 		local params = Client.GetDefaultRaycastParams(char)
