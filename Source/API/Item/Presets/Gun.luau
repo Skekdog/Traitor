@@ -27,6 +27,14 @@ local function Gun(components: Types.ItemComponents): Types.ItemComponents
 			else
 				function() return nil
 			end,
+
+		AlternateToggled = true,
+		AlternateFireClient =
+			if RunService:IsClient() then
+				require(ReplicatedStorage.API.Item.Behaviour.Client).Aim
+			else
+				function() return true
+			end,
 	}
 
 	for i, v in components do

@@ -197,6 +197,13 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 	return true
 end
 
+function Client.Aim(item: Types.Item): boolean
+	if item.IsAimable then
+		Aim.ToggleAim(item)
+	end
+	return true
+end
+
 function Client.TryReloadWeapon(item: Types.Item): boolean
 	local ammoDefinition = item.AmmoDefinition
 	if not ammoDefinition then

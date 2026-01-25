@@ -208,17 +208,6 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 	lastAmmoConnection = ClientInventory.Ammo:Connect(RoundInfoUI.UpdateAmmo)
 
-	if item.IsAimable and not item.AlternateFireClient and not item.AlternateFireServer then
-		ControlManager.Register("Alternate Fire", function(_, state)
-			if state ~= Enum.UserInputState.End then
-				return Enum.ContextActionResult.Pass
-			end
-
-			Aim.ToggleAim(item)
-			return Enum.ContextActionResult.Pass
-		end)
-	end
-
 	if item.AmmoDefinition and item.AmmoDefinition.Capacity ~= math.huge and item.AmmoDefinition.ReserveCapacity ~= 0 then
 		ControlManager.Register("Reload Weapon", function(_, state)
 			if state ~= Enum.UserInputState.End then
@@ -231,7 +220,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		end)
 	end
 
-	if not item.IsAimable and item.AlternateFireClient or item.AlternateFireServer then
+	if item.AlternateFireClient or item.AlternateFireServer then
 		ControlManager.Register("Alternate Fire", function(_, _, input)
 			action(item, false, input)
 			return Enum.ContextActionResult.Pass
