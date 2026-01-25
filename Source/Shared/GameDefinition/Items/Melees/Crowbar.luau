@@ -48,11 +48,17 @@ function module.AlternateFireServer(item: Types.Item, origin: Vector3, direction
 	end
 
 	local part = hitscan.Hit.Part
-	if Impulse.CanImpulse(part) then
-		Impulse.ApplyImpulse(part, direction * PUSH_FORCE, true)
-	end
+	local force = direction * PUSH_FORCE
 
 	local hitParticipant = GetParticipant(part)
+	if hitParticipant then
+		force *= 10
+	end
+
+	if Impulse.CanImpulse(part) then
+		Impulse.ApplyImpulse(part, force, true, hitscan.Position, participant)
+	end
+
 	if not hitParticipant then
 		return nil
 	end
