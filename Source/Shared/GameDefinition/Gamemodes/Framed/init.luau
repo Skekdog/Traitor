@@ -145,6 +145,24 @@ local function AssignRoles(_, participants: {Types.Participant}): ()
 	end
 end
 
+local function nextPhase(round: Types.Round, deadParticipant: Types.Participant?): ()
+	local framedAlive: {Types.Participant} = {}
+	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
+		if v:IsAlive() and v ~= deadParticipant then
+			table.insert(framedAlive, v)
+		end
+	end
+
+	if #framedAlive == 0 then
+		round:Finish(round:GetRoleFromRoleName("Police"))
+		return
+	elseif #framedAlive == 1 then
+		Epilogue.Begin(framedAlive[1])
+	elseif #framedAlive <= 3 then
+		HasteMode.Start(round)
+	end
+end
+
 local function OnStart(round: Types.Round): ()
 	local framed = round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed"))
 
@@ -179,6 +197,8 @@ local function OnStart(round: Types.Round): ()
 	for _, participant in round:GetParticipants() do
 		loadMarkingRemote:FireClient(participant.Player, true)
 	end
+
+	nextPhase(round)
 end
 
 local function OnFinish(round: Types.Round): ()
@@ -221,21 +241,7 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 
 	RedHanded.StopImmediately(participant)
 
-	local framedAlive: {Types.Participant} = {}
-	for _, v in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Framed")) do
-		if v:IsAlive() and v ~= participant then
-			table.insert(framedAlive, v)
-		end
-	end
-
-	if #framedAlive == 0 then
-		round:Finish(round:GetRoleFromRoleName("Police"))
-		return
-	elseif #framedAlive == 1 then
-		Epilogue.Begin(framedAlive[1])
-	elseif #framedAlive <= 3 then
-		HasteMode.Start(round)
-	end
+	nextPhase(round, participant)
 
 	Targets.OnDeath(participant)
 end
