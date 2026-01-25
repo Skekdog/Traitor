@@ -314,6 +314,10 @@ function module.Show(item: Types.Item): ()
         camera.CFrame *= CFrame.Angles(math.rad(r.X), math.rad(r.Y), math.rad(r.Z))
 
         local final = camera.CFrame:ToWorldSpace(CFrame.new(modifiers) * CFrame.new(0, -1.75, -0.75));
+
+        if not viewmodel.PrimaryPart then
+            return
+        end
         (viewmodel.PrimaryPart :: BasePart).CFrame = final
 
         laser(viewmodel, item)
