@@ -44,11 +44,16 @@ local function PrimaryFireClient(item: Types.Item, origin: Vector3, direction: V
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local Impulse = require(ReplicatedStorage.API.Impulse)
 
+	local originalProj = item.Projectile
+	item.Projectile = nil
+
 	item.IsProjectileSimulated = false
 	local result = Client.PrimaryFire(item, origin, direction, true)
 	item.IsProjectileSimulated = true
 
-	(function(): boolean | string | {string}
+	item.Projectile = originalProj
+
+	;(function(): boolean | string | {string}
 		if result ~= true then
 			return result
 		end
