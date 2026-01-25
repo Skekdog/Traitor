@@ -55,11 +55,6 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 		end
 	end
 
-	local animation = if action == "Primary" then item.PrimaryAnimation else item.AlternateAnimation
-	if animation then
-		participant:TryPlayAnimation(animation, action .. "Fire")
-	end
-
 	if item.IsSingleUse then
 		participant:RemoveItem(item)
 	end
