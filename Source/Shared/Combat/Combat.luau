@@ -124,11 +124,9 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			end
 		end
 
-		local head = char:WaitForChild("Head")
-		assert(head and head:IsA("BasePart"), "HumanoidRootPart is not a BasePart")
-
-		local origin = head.Position
-		local direction = GetCentreRay().Direction
+		local centre = GetCentreRay()
+		local origin = centre.Origin
+		local direction = centre.Direction
 
 		if isPrimary then
 			if item.PrimaryFireClient then
