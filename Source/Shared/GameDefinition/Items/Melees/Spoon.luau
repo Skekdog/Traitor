@@ -57,6 +57,10 @@ local attackSound = PlaySound.MakeSound(329792582, {
 	RollOffMinDistance = 10,
 })
 
+if RunService:IsServer() then
+	attackSound.Parent = script
+end
+
 local itemDefinition = Melee({
 	Name = "SpoonItem",
 	DisplayName = "Spoon",
