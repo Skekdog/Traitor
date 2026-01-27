@@ -9,6 +9,8 @@ local MelonLauncher = {}
 
 local PRESSURE = 100000
 local RADIUS = 15
+local PROJECTILE_FORCE = 100
+local PROJECTILE = ReplicatedStorage.Assets.Projectiles.Watermelon
 
 local function reduceAmount(info: Types.ExplosionInfo | Types.Item, params: Types.DamageParams, hitParticipant: Types.Participant): boolean
 	if hitParticipant == params.Attacker then
@@ -44,14 +46,11 @@ local function PrimaryFireClient(item: Types.Item, origin: Vector3, direction: V
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 	local Impulse = require(ReplicatedStorage.API.Impulse)
 
-	local originalProj = item.Projectile
 	item.Projectile = nil
-
 	item.IsProjectileSimulated = false
 	local result = Client.PrimaryFire(item, origin, direction, true)
 	item.IsProjectileSimulated = true
-
-	item.Projectile = originalProj
+	item.Projectile = PROJECTILE
 
 	;(function(): boolean | string | {string}
 		if result ~= true then
@@ -68,17 +67,24 @@ local function PrimaryFireClient(item: Types.Item, origin: Vector3, direction: V
 			return true
 		end
 
-		local root = LocalCharacter.RootPart()
-		if not root then
-			return true
-		end
+		local distance = (origin - hitscan.Position).Magnitude
+		local speed = PROJECTILE_FORCE
 
-		if (root.Position - hitscan.Position).Magnitude > RADIUS then
-			return true
-		end
+		local duration = distance / speed
 
-		local impulse = (root.Position - hitscan.Position).Unit * PRESSURE / 1000
-		Impulse.ApplyImpulse(root, impulse, true, nil)
+		task.delay(duration, function()
+			local root = LocalCharacter.RootPart()
+			if not root then
+				return
+			end
+
+			if (root.Position - hitscan.Position).Magnitude > RADIUS then
+				return
+			end
+
+			local impulse = (root.Position - hitscan.Position).Unit * PRESSURE / 1000
+			Impulse.ApplyImpulse(root, impulse, true, nil)
+		end)
 
 		return true
 	end)()
@@ -110,8 +116,8 @@ MelonLauncher.Item = Gun({
 
 	IsProjectileSimulated = true,
 
-	Projectile = ReplicatedStorage.Assets.Projectiles.Watermelon,
-	ProjectileSpeed = 100,
+	Projectile = PROJECTILE,
+	ProjectileSpeed = PROJECTILE_FORCE,
 
 	Damage = 50,
 	Spread = 0.01,
