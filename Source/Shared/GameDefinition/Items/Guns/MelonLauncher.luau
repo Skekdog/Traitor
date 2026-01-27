@@ -7,7 +7,7 @@ local BehaviourTypes = require(ReplicatedStorage.API.Item.Behaviour.BehaviourTyp
 
 local MelonLauncher = {}
 
-local PRESSURE = 100000
+local PRESSURE = 75000
 local RADIUS = 15
 local PROJECTILE_FORCE = 100
 local PROJECTILE = ReplicatedStorage.Assets.Projectiles.Watermelon
@@ -83,7 +83,7 @@ local function PrimaryFireClient(item: Types.Item, origin: Vector3, direction: V
 			end
 
 			local impulse = (root.Position - hitscan.Position).Unit * PRESSURE / 1000
-			Impulse.ApplyImpulse(root, impulse, true, nil)
+			Impulse.ApplyImpulse(root, impulse, true, root:GetClosestPointOnSurface(hitscan.Position))
 		end)
 
 		return true
