@@ -555,8 +555,8 @@ module.restart = {
 	end
 }
 
-module.loadgamemode = {
-	Name = "loadgamemode",
+module.gamemode = {
+	Name = "gamemode",
 	Description = "Changes the gamemode",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -583,7 +583,7 @@ module.loadgamemode = {
 	end
 }
 
-module.loadboss = {
+module.boss = {
 	Name = "boss",
 	Description = "Loads a boss from the current map or from an asset id",
 	Environment = "Server" :: "Server",
