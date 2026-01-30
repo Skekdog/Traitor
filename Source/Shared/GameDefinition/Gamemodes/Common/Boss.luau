@@ -58,6 +58,12 @@ local gamemode: Types.GamemodeDefinition = {
 		StandardGame.GetItem("Magneto Stick"),
 	},
 
+	AssignRoles = function(round, participants)
+		for _, participant in participants do
+			participant:SetRole(survivorRole)
+		end
+	end,
+
 	Duration = function(round, numParticipants)
 		return 120 + numParticipants * 10
 	end,

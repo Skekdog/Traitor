@@ -555,9 +555,9 @@ module.restart = {
 	end
 }
 
-module.forcegamemode = {
-	Name = "forcegamemode",
-	Description = "Forces the next round to use the specified gamemode",
+module.loadgamemode = {
+	Name = "loadgamemode",
+	Description = "Changes the gamemode",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
 	Arguments = {"gamemode name"},
@@ -568,19 +568,46 @@ module.forcegamemode = {
 		local RoundHandler = require(ServerScriptService.RoundHandler)
 
 		if not gamemodeName then
-			RoundHandler.TrySetForcedGamemode()
-			return "Unset forced gamemode."
+			return "Missing argument 1 gamemode name / asset id."
 		end
 
 		local assetId = processNumberArgument(gamemodeName)
 		if assetId then
 			CustomGamemode.LoadGamemode(assetId)
-			return `Set forced gamemode to asset ID {assetId}. Note: gamemodes will not load until the next round.`
+			return `Gamemode changed to asset ID {assetId}.`
 		end
 
 		local result = RoundHandler.TrySetForcedGamemode(gamemodeName)
 
-		return if result then `Set forced gamemode to {gamemodeName}. Note: gamemodes will not load until the next round.` else `Gamemode {gamemodeName} not found.`
+		return if result then `Map changed to {gamemodeName}.` else `Gamemode {gamemodeName} not found.`
+	end
+}
+
+module.loadboss = {
+	Name = "boss",
+	Description = "Loads a boss from the current map or from an asset id",
+	Environment = "Server" :: "Server",
+	HasRelaxedPermissions = true,
+	Arguments = {"boss name / asset id"},
+	Execute = function(_, round: Round, args: Args): string
+		local bossName = processStringArgument(args[1])
+		if not bossName then
+			return "Missing argument 1 boss name / asset id."
+		end
+
+		local assetId = processNumberArgument(bossName)
+		if assetId then
+			return "not implemented"
+		end
+
+		local boss = round:GetMap().Bosses[bossName]
+		if not boss then
+			return `Boss {bossName} not found.`
+		end
+
+		round:LoadBoss(boss)
+
+		return `Loaded boss {bossName}`
 	end
 }
 

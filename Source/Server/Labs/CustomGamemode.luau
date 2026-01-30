@@ -36,7 +36,7 @@ function module.LoadGamemode(assetId: number): ()
 	end
 
 	RoundHandler.UpdateLoadedGamemodes()
-	RoundHandler.TrySetForcedGamemode(gamemodeScript.Name)
+	RoundHandler.Round():LoadGamemode(result)
 end
 
 return module

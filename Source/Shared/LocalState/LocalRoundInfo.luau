@@ -20,6 +20,8 @@ type Event = {
     WasCorrectKill: boolean?,
 }
 
+module.Map = DynamicValue.new(nil :: Types.Map?)
+
 module.Gamemode = DynamicValue.new(nil :: Types.GamemodeDefinition?)
 InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connect(function(name: string?)
     if not name then
@@ -27,9 +29,24 @@ InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connec
         return
     end
 
+    local isSucky = false
+
     local object = ReplicatedStorage.Shared.GameDefinition.Gamemodes:FindFirstChild(name)
+    if not object then
+        local map = module.Map()
+        if map and map.Structure:FindFirstChild("Bosses") then
+            object = (map.Structure.Bosses :: Instance):FindFirstChild(name)
+            isSucky = true
+        end
+    end
+
     if object then
-        module.Gamemode:SetValue((require)(object))
+        local ret = (require)(object)
+        if isSucky then
+            module.Gamemode:SetValue(ret.Gamemode)
+        else
+            module.Gamemode:SetValue(ret)
+        end
     else
         module.Gamemode:SetValue()
     end
@@ -127,15 +144,12 @@ function module.GetPlayerScores(): {[string]: Types.ScoreTable}
     return playerScores
 end
 
-do
-    local map: Types.Map?
+task.defer(function()
     local mapScript = workspace:FindFirstChild("Map")
     if mapScript then
-        map = Map.new(Map.ValidateStructure(mapScript))
+        module.Map:SetValue(Map.new(Map.ValidateStructure(mapScript)))
     end
-
-    module.Map = DynamicValue.new(map)
-end
+end)
 
 module.Interactables = DynamicValue.new({} :: {[Instance]: Types.Interactable?})
 

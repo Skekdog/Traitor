@@ -95,7 +95,7 @@ local function getMap(name: string): Types.MapStructure
     return Map.ValidateStructure((maps :: any)[name]:Clone())
 end
 
-local currentMap = "International"
+local currentMap = "Asylum"
 
 type ClientMapInfo = {
     Name: string,
