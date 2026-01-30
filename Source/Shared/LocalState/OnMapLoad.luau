@@ -14,8 +14,8 @@ LocalRoundInfo.Map:Connect(function(map)
 	alertUI.Object.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
 	alertUI:ToggleVisible(true)
 
-	playerlistUI.Object.Info.RoundInfo.Creators.Map.Text = map.Authors
-	playerlistUI.Object.Info.RoundInfo.Info.Map.Text = `Map: {GetDisplayName(map)}`
+	playerlistUI.Object.Info.RoundInfo.Map.MapAuthors.Text = map.Authors
+	playerlistUI.Object.Info.RoundInfo.Map.MapName.Text = `Map: {GetDisplayName(map)}`
 
 	task.wait(5)
 	alertUI:ToggleVisible(false)

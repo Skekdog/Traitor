@@ -247,8 +247,8 @@ LocalRoundInfo.Gamemode:Connect(function(gamemode)
 		return
 	end
 
-	info.RoundInfo.Info.Gamemode.Text = "Gamemode: " .. GetDisplayName(gamemode)
-	info.RoundInfo.Creators.Gamemode.Text = gamemode.Authors
+	info.RoundInfo.Gamemode.GamemodeName.Text = "Gamemode: " .. GetDisplayName(gamemode)
+	info.RoundInfo.Gamemode.GamemodeAuthors.Text = gamemode.Authors
 end, true)
 
 Players.PlayerAdded:Connect(function(plr)
