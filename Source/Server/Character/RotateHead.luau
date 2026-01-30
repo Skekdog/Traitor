@@ -3,7 +3,7 @@ local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
 ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)
 	local char = plr.Character
-	if not char then
+	if not char or char:GetAttribute("IsRagdolled") then
 		return
 	end
 
@@ -11,13 +11,20 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 		return
 	end
 
-	local neck = char:FindFirstChild("Neck", true)
-	if not neck or not neck:IsA("Motor6D") then
+	local neckBallSocket = char:FindFirstChild("NeckBallSocket", true)
+	if not neckBallSocket or not neckBallSocket:IsA("BallSocketConstraint") then
 		return
 	end
 
-	y = math.clamp(y, -1.4, 1.4)
-	neck.C0 = CFrame.new(neck.C0.Position) * CFrame.Angles(y, 0, 0)
+	local neck = char:FindFirstChild("Neck", true)
+	if not neck or not neck:IsA("AnimationConstraint") then
+		return
+	end
+	neck.IsKinematic = false
+
+	y = math.deg(math.clamp(y, -1.4, 1.4))
+	neckBallSocket.TwistLowerAngle = y
+	neckBallSocket.TwistUpperAngle = y
 end)
 
 return nil

@@ -67,8 +67,8 @@ local function initRemoveDeathSound(root: BasePart): ()
 end
 
 local function initHeadTiltAsync(char: Model): ()
-    local neck = char:WaitForChild("Head"):WaitForChild("Neck")
-    assert(neck:IsA("Motor6D"), "Neck is not a Motor6D")
+    local neck = char:WaitForChild("Head"):WaitForChild("NeckBallSocket")
+    assert(neck:IsA("BallSocketConstraint"), "Neck is not a BallSocketConstraint")
 
     local camera = workspace.CurrentCamera
 

@@ -403,7 +403,11 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 	local hum = model:FindFirstChildOfClass("Humanoid")
 
-	local partData: {[BasePart]: {Rope: {Constraint: RopeConstraint, Attachment0: Attachment}?, CFrame: CFrame}} = {}
+	local partData: {[BasePart]: {
+		Rope: {Constraint: RopeConstraint, Attachment0: Attachment}?,
+		CFrame: CFrame,
+		Joint: {Name: string, AttachmentPath: {string}}?,
+	}} = {}
 	for _, part in model:GetChildren() do
 		if not part:IsA("BasePart") then
 			continue
@@ -418,11 +422,28 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 				Attachment0 = rope.Attachment0:Clone(),
 			}
 		end
+
+		local joint = part:FindFirstChildWhichIsA("BallSocketConstraint")
+		if joint and joint.Attachment0 then
+			local path: {string} = {}
+
+			local ancestor: Instance? = joint.Attachment0
+			while ancestor and ancestor ~= model :: any do
+				table.insert(path, ancestor.Name)
+				ancestor = ancestor.Parent
+			end
+
+			partData[part].Joint = {
+				Name = joint.Name,
+				AttachmentPath = path
+			}
+		end
 	end
 
 	Disguiser.DisguiseServer("Corpse", participant, enable, model, hum, true)
 
-	model = Ragdoll(model, true)
+	Ragdoll.Ragdoll(model)
+
 	corpse.Model = model
 
 	for part, data in partData do
@@ -437,6 +458,27 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 			data.Rope.Constraint.Attachment0 = data.Rope.Attachment0
 			data.Rope.Constraint.Parent = newPart
 			data.Rope.Attachment0.Parent = newPart
+		end
+
+		if data.Joint then
+			local attachment: Instance? = model
+			for i = #data.Joint.AttachmentPath, 1, -1 do
+				if not attachment then
+					break
+				end
+				attachment = attachment:FindFirstChild(data.Joint.AttachmentPath[i])
+			end
+
+			if not attachment or not attachment:IsA("Attachment") then
+				continue
+			end
+
+			local joint = newPart:FindFirstChild(data.Joint.Name)
+			if not joint or not joint:IsA("BallSocketConstraint") then
+				continue
+			end
+
+			joint.Attachment0 = attachment
 		end
 	end
 

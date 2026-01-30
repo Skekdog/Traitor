@@ -8,6 +8,7 @@
 		"CharacterJumpPower": 18,
 		"HealthDisplayDistance": 0,
 		"NameDisplayDistance": 0,
-		"CameraMaxZoomDistance": 128
+		"CameraMaxZoomDistance": 128,
+		"AvatarJointUpgrade": "Enabled"
 	}
 }
