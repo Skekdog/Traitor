@@ -565,8 +565,6 @@ module.gamemode = {
 		local CustomGamemode = require(ServerScriptService.Labs.CustomGamemode)
 		local gamemodeName = processStringArgument(args[1])
 
-		local RoundHandler = require(ServerScriptService.RoundHandler)
-
 		if not gamemodeName then
 			return "Missing argument 1 gamemode name / asset id."
 		end
@@ -577,9 +575,20 @@ module.gamemode = {
 			return `Gamemode changed to asset ID {assetId}.`
 		end
 
-		local result = RoundHandler.TrySetForcedGamemode(gamemodeName)
+		local gamemodeModule = ReplicatedStorage.Shared.GameDefinition.Gamemodes:FindFirstChild(gamemodeName)
+		if not gamemodeModule then
+			return `Gamemode {gamemodeName} not found.`
+		end
 
-		return if result then `Map changed to {gamemodeName}.` else `Gamemode {gamemodeName} not found.`
+		local success, result = pcall(function()
+			round:LoadGamemode((require)(gamemodeModule))
+		end)
+
+		if not success then
+			return result
+		end
+
+		return `Gamemode changed to {gamemodeName}.`
 	end
 }
 
@@ -607,7 +616,7 @@ module.boss = {
 
 		round:LoadBoss(boss)
 
-		return `Loaded boss {bossName}`
+		return `Loaded boss {bossName}.`
 	end
 }
 
