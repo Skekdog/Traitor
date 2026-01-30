@@ -442,7 +442,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 	Disguiser.DisguiseServer("Corpse", participant, enable, model, hum, true)
 
-	Ragdoll.Ragdoll(model)
+	Ragdoll.Ragdoll(participant, model)
 
 	corpse.Model = model
 

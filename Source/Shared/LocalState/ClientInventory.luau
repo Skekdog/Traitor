@@ -171,6 +171,11 @@ local function tryDropAmmo(item: Types.Item, direction: Vector3): ()
 end
 
 local function tryEquip(item: Types.Item): ()
+	local char = LocalCharacter.Character()
+	if char and char:GetAttribute("IsRagdolled") then
+		return
+	end
+
 	local equippedItem = module.EquippedItem()
 	if equippedItem then
 		if equippedItem == item then
@@ -225,7 +230,6 @@ local function tryEquip(item: Types.Item): ()
 	selectedSlot = button.LayoutOrder
 	button.BackgroundTransparency = 0.25
 end
-
 
 local INV_BUTTON_PADDING = 25
 local function getRelativePosition(clone: typeof(sampleButton), order: number, middle: number): UDim2
