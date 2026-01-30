@@ -19,7 +19,7 @@ local function respond(response: boolean, callback: (response: boolean) -> ())
 	callback(response)
 end
 
-local function ConfirmationPrompt(text: string, callback: (response: boolean) -> ())
+local function ConfirmationPrompt(text: string, callback: (response: boolean) -> (), yesText: string?, noText: string?)
 	prompt:ToggleVisible(false)
 	prompt.Object.TextLabel.Text = text
 
@@ -31,13 +31,25 @@ local function ConfirmationPrompt(text: string, callback: (response: boolean) ->
 		noCon:Disconnect()
 	end
 
-	yesCon = prompt.Object.Yes.Activated:Once(function()
-		respond(true, callback)
-	end)
+	if yesText ~= "" then
+		prompt.Object.Yes.Text = yesText or "Yes"
+		prompt.Object.Yes.Visible = true
+		yesCon = prompt.Object.Yes.Activated:Once(function()
+			respond(true, callback)
+		end)
+	else
+		prompt.Object.Yes.Visible = false
+	end
 
-	noCon = prompt.Object.No.Activated:Once(function()
-		respond(false, callback)
-	end)
+	if noText ~= "" then
+		prompt.Object.No.Text = noText or "No"
+		prompt.Object.No.Visible = true
+		noCon = prompt.Object.No.Activated:Once(function()
+			respond(false, callback)
+		end)
+	else
+		prompt.Object.No.Visible = false
+	end
 
 	prompt:ToggleVisible(true)
 end

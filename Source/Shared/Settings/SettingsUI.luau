@@ -499,6 +499,34 @@ function module.AddButton(definition: SettingDefinitions.SettingDefinition, valu
 	setupForDefinition(definition, value)
 end
 
+function module.RemoveTab(tab: string): ()
+	local page = getPage(tab)
+	if not page then
+		return
+	end
+
+	if currentPage == page then
+		local nextPage: string?
+		for _, v in page.Parent:GetChildren() do
+			if v:IsA("GuiObject") and v ~= page then
+				nextPage = v.Name:sub(#("Page_") + 1)
+				break
+			end
+		end
+
+		if nextPage then
+			switchToPage(nextPage)
+		end
+	end
+
+	local button = ui.Main.TabHolder.Tabs:FindFirstChild("Tab_" .. tab)
+	if button then
+		button:Destroy()
+	end
+
+	page:Destroy()
+end
+
 function module.RemoveButton(definition: SettingDefinitions.SettingDefinition): ()
 	local page = getPage(definition.Tab)
 	if not page then
