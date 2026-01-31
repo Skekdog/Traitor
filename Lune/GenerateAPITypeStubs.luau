@@ -63,37 +63,41 @@ local function moduleStub(declStat: poke_ast.Stat_LocalVariable, stats: {poke_as
 	local decl = declStat.bindings[1]
 	local declName = getText(source, decl.name.span)
 
-	local properties = ""
+	if decl.type then
+		return baseStub(stats, getText(source, decl.type.span), source)
+	else
+		local properties = ""
 
-	for _, stat in stats do
-		if stat.kind == "assign" or stat.kind == "function" then
-			local left = if stat.kind == "assign" then stat.left[1].root else stat.names[1]
-			local right = if stat.kind == "assign" then stat.right[1] else nil
-			if getText(source, left.span) == declName then
-				local name do
-					local span = if stat.kind == "assign" then stat.left[1].suffixes[#stat.left[1].suffixes].span else stat.names[#stat.names].span
-					name = getText(source, span)
-					if stat.kind == "assign" then
-						name = name:sub(2)
+		for _, stat in stats do
+			if stat.kind == "assign" or stat.kind == "function" then
+				local left = if stat.kind == "assign" then stat.left[1].root else stat.names[1]
+				local right = if stat.kind == "assign" then stat.right[1] else nil
+				if getText(source, left.span) == declName then
+					local name do
+						local span = if stat.kind == "assign" then stat.left[1].suffixes[#stat.left[1].suffixes].span else stat.names[#stat.names].span
+						name = getText(source, span)
+						if stat.kind == "assign" then
+							name = name:sub(2)
+						end
 					end
-				end
-				if stat.kind == "assign" and right then
-					local typeCast = if right.kind == "assertion" then getText(source, right.type.span) else "any"
-					properties ..= "\n\t" .. name .. ": " .. typeCast .. ","
-				elseif stat.kind == "function" then
-					properties ..= "\n\t" .. name .. ": " .. getFunctionType(stat, source) .. ","
+					if stat.kind == "assign" and right then
+						local typeCast = if right.kind == "assertion" then getText(source, right.type.span) else "any"
+						properties ..= "\n\t" .. name .. ": " .. typeCast .. ","
+					elseif stat.kind == "function" then
+						properties ..= "\n\t" .. name .. ": " .. getFunctionType(stat, source) .. ","
+					end
 				end
 			end
 		end
+
+		if properties == "" then
+			print("No properties found for " .. declName)
+		end
+
+		properties ..= "\n"
+
+		return baseStub(stats, `\{{properties}}`, source)
 	end
-
-	if properties == "" then
-		print("No properties found for " .. declName)
-	end
-
-	properties ..= "\n"
-
-	return baseStub(stats, `\{{properties}}`, source)
 end
 
 local function functionStub(stat: poke_ast.Stat_LocalFunction, stats: {poke_ast.Stat}, source: string): string
