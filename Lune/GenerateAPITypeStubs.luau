@@ -100,20 +100,20 @@ local function functionStub(stat: poke_ast.Stat_LocalFunction, stats: {poke_ast.
 	return baseStub(stats, getFunctionType(stat, source), source)
 end
 
-local function generateStub(script: string): string
+local function generateStub(script: string, file: string): string
 	local source = poke.source.create(script)
 	poke.parser.load(source)
 
 	local block = poke.parser.parse_block()
 
 	local retStat = block.last_stat
-	assert(retStat and retStat.kind == "return", "Expected return statement")
+	assert(retStat and retStat.kind == "return", "Expected return statement: " .. file)
 
 	local ret = retStat.exprs[1]
 	assert(ret, "Expected return value")
 
-	assert(ret.kind == "var", "Only variables are supported for return")
-	assert(ret.var.root.kind == "name", "Only direct variables are supported for return")
+	assert(ret.kind == "var", "Only variables are supported for return: " .. file)
+	assert(ret.var.root.kind == "name", "Only direct variables are supported for return: " .. file)
 
 	local name do
 		local span = ret.var.root.span
@@ -132,7 +132,7 @@ local function generateStub(script: string): string
 		end
 	end
 
-	assert(declarationStat, "Could not find declaration")
+	assert(declarationStat, "Could not find declaration: " .. file)
 
 	local stub: string
 	if declarationStat.kind == "localvariable" then
@@ -165,7 +165,7 @@ local function generateFile(path: string): ()
 
 	local name = file:sub(1, -6)
 
-	local stub = generateStub(fs.readFile(path))
+	local stub = generateStub(fs.readFile(path), path)
 	createScript(name, outputFolder, stub)
 end
 
