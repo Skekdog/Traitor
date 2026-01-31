@@ -225,7 +225,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		end)
 	end
 
-	if item.PrimaryFireClient or item.PrimaryFireServer or item.UseAttack then
+	if item.PrimaryFireClient or item.PrimaryFireServer then
 		ControlManager.Register("Primary Fire", function(_, _, input)
 			action(item, true, input)
 			return Enum.ContextActionResult.Pass
