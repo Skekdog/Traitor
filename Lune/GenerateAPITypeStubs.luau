@@ -167,8 +167,10 @@ end
 local outputFolder = roblox.Instance.new("Folder")
 outputFolder.Name = "API"
 
-local function generateFile(path: string): ()
-	local split = path:split("/")
+local function generateFile(basePath: string, path: string): ()
+	local relPath = path:split(basePath)[2]:sub(2)
+
+	local split = relPath:split("/")
 	local file = split[#split]
 
 	if file:sub(-5) ~= ".luau" then
@@ -178,12 +180,38 @@ local function generateFile(path: string): ()
 	local name = file:sub(1, -6)
 
 	local stub = generateStub(fs.readFile(path), path)
-	createScript(name, outputFolder, stub)
+
+	local parent = outputFolder
+	for _, folder in split do
+		if folder == file then
+			break
+		end
+
+		-- note: lune seems to have a bug with Instance.new(..., parent) constructor
+		local newParent = parent:FindFirstChild(folder) or roblox.Instance.new("Folder")
+		newParent.Parent = parent
+		newParent.Name = folder
+		parent = newParent
+	end
+
+	createScript(name, parent, stub)
 end
 
-for _, path in fs.readDir("Source/API") do
-	generateFile("Source/API/" .. path)
+local function generateDirectory(basePath: string, dir: string?): ()
+	dir = dir or basePath
+	assert(dir)
+
+	for _, path in fs.readDir(dir) do
+		path = dir .. "/" .. path
+		if fs.isFile(path) then
+			generateFile(basePath, path)
+		else
+			generateDirectory(basePath, path)
+		end
+	end
 end
+
+generateDirectory("Source/API")
 
 createScript("Types", outputFolder, fs.readFile("Source/Shared/RoundRule/src/Types.luau"))
 
