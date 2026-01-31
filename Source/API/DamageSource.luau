@@ -16,4 +16,4 @@ function DamageSource.IsMelee(source: Types.DamageSource): boolean
 	return _DamageSource.IsMelee(source)
 end
 
-return _DamageSource
+return DamageSource
