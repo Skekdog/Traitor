@@ -104,6 +104,10 @@ local function functionStub(stat: poke_ast.Stat_LocalFunction, stats: {poke_ast.
 	return baseStub(stats, getFunctionType(stat, source), source)
 end
 
+local function assertionStub(expr: poke_ast.Expr_Assertion, stats: {poke_ast.Stat}, source: string): string
+	return baseStub(stats, getText(source, expr.type.span), source)
+end
+
 local function generateStub(script: string, file: string): string
 	local source = poke.source.create(script)
 	poke.parser.load(source)
@@ -115,6 +119,10 @@ local function generateStub(script: string, file: string): string
 
 	local ret = retStat.exprs[1]
 	assert(ret, "Expected return value")
+
+	if ret.kind == "assertion" then
+		return assertionStub(ret, block.stats, script)
+	end
 
 	assert(ret.kind == "var", "Only variables are supported for return: " .. file)
 	assert(ret.var.root.kind == "name", "Only direct variables are supported for return: " .. file)
