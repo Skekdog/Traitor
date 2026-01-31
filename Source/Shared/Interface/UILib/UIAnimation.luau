@@ -1,11 +1,10 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
 local TweenService = game:GetService("TweenService")
-local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local module = {}
 
 function module.Animate(object: Instance, tweenInfo: TweenInfo, properties: {[string]: any}, noAnimate: boolean?): Tween?
-	local animate = Settings.GetSetting("Animate UI Transitions") :: Settings.BooleanValue
+	local animate = not GuiService.ReducedMotionEnabled
 
 	if not animate or noAnimate then
 		for i, v in properties do

@@ -135,15 +135,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Animate UI Transitions",
-	Tab = "Display",
-	Category = "User Interface",
-	Tooltip = "Controls animation for most UI.",
-	Kind = "Boolean" :: "Boolean",
-	Default = true,
-})
-
-table.insert(availableSettings, {
 	Name = "Snap To Ladders",
 	Tab = "Gameplay",
 	Category = "Gameplay",

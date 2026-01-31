@@ -1,7 +1,6 @@
+local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
-local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local screenMessageFormats = {
 	Standard = {
@@ -90,7 +89,7 @@ return function(format: string, text: string, formatOverrides: {LabelProperties:
 
 	label.Parent = gui
 
-	local animate = Settings.GetSetting("Animate UI Transitions")
+	local animate = not GuiService.ReducedMotionEnabled
 	if not animate then
 		task.delay(4, function()
 			label:Destroy()
