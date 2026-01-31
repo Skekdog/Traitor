@@ -9,6 +9,7 @@
 		"HealthDisplayDistance": 0,
 		"NameDisplayDistance": 0,
 		"CameraMaxZoomDistance": 128,
-		"AvatarJointUpgrade": "Enabled"
+		"AvatarJointUpgrade_SerializedRollout": "Enabled",
+		"CharacterBreakJointsOnDeath": {"Bool": false}
 	}
 }
