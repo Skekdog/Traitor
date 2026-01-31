@@ -33,8 +33,8 @@ local function baseStub(stats: {poke_ast.Stat}, cast: string, source: string): s
 	return STUB_BASE .. types .. "return (nil :: any) :: " .. cast
 end
 
-local function getFunctionType(stat: poke_ast.Stat_LocalFunction | poke_ast.Stat_Function, source: string): string
-	local body = stat.body
+local function getFunctionType(func: poke_ast.Stat_LocalFunction | poke_ast.Stat_Function | poke_ast.Expr_Function, source: string): string
+	local body = func.body
 
 	local generics = ""
 	if body.generics then
@@ -59,7 +59,11 @@ local function getFunctionType(stat: poke_ast.Stat_LocalFunction | poke_ast.Stat
 	return `{generics}({parameters}) -> ({ret})`
 end
 
-local function moduleStub(declStat: poke_ast.Stat_LocalVariable, stats: {poke_ast.Stat}, source: string): string
+local function metatableType(tbl: string, callMetamethod: poke_ast.Expr_Function, source: string)
+	return `typeof(setmetatable(\{} :: \{{tbl}}, \{} :: \{__call: {getFunctionType(callMetamethod, source)}}))`
+end
+
+local function moduleStub(declStat: poke_ast.Stat_LocalVariable, stats: {poke_ast.Stat}, source: string, callMetamethod: poke_ast.Expr_Function?): string
 	local decl = declStat.bindings[1]
 	local declName = getText(source, decl.name.span)
 
@@ -96,7 +100,13 @@ local function moduleStub(declStat: poke_ast.Stat_LocalVariable, stats: {poke_as
 
 		properties ..= "\n"
 
-		return baseStub(stats, `\{{properties}}`, source)
+		if callMetamethod then
+			properties = metatableType(properties, callMetamethod, source)
+		else
+			properties = "{" .. "}"
+		end
+
+		return baseStub(stats, properties, source)
 	end
 end
 
@@ -106,6 +116,58 @@ end
 
 local function assertionStub(expr: poke_ast.Expr_Assertion, stats: {poke_ast.Stat}, source: string): string
 	return baseStub(stats, getText(source, expr.type.span), source)
+end
+
+local function getCallMetamethod(metaStat: poke_ast.Stat_Call, source: string): poke_ast.Expr_Function?
+	local suffix = metaStat.call.suffixes[1]
+	assert(suffix.kind == "call", "Invalid suffix for setmetatable")
+
+	local args = suffix.args
+	local metatable = args[2]
+	assert(metatable and metatable.kind == "table")
+
+	for _, field in metatable.table.fields do
+		if field.kind == "namekey" then
+			if getText(source, field.name.span) == "__call" then
+				assert(field.value.kind == "function", "Invalid __call assignment")
+				return field.value
+			end
+		end
+	end
+
+	return nil
+end
+
+local function findSetMetatable(declStat: poke_ast.Stat_LocalVariable, stats: {poke_ast.Stat}, source: string): poke_ast.Stat_Call?
+	local decl = declStat.bindings[1]
+	local declName = getText(source, decl.name.span)
+
+	-- Reverse iteration because currently most API modules use setmetatable towards the end of the script
+	for i = #stats, 1, -1 do
+		local stat = stats[i]
+		if stat.kind ~= "call" then
+			continue
+		end
+
+		local root = stat.call.root
+		if root.kind ~= "name" or getText(source, root.name.span) ~= "setmetatable" then
+			continue
+		end
+
+		local suffix = stat.call.suffixes[1]
+		if suffix.kind ~= "call" then
+			continue
+		end
+
+		local args = suffix.args
+		if getText(source, args[1].span) ~= declName then
+			continue
+		end
+
+		return stat
+	end
+
+	return nil
 end
 
 local function generateStub(script: string, file: string): string
@@ -148,7 +210,8 @@ local function generateStub(script: string, file: string): string
 
 	local stub: string
 	if declarationStat.kind == "localvariable" then
-		stub = moduleStub(declarationStat, block.stats, script)
+		local metatable = findSetMetatable(declarationStat, block.stats, script)
+		stub = moduleStub(declarationStat, block.stats, script, metatable and getCallMetamethod(metatable, script))
 	else
 		stub = functionStub(declarationStat, block.stats, script)
 	end
