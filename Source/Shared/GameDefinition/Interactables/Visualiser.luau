@@ -22,6 +22,7 @@ local VISUALISE_COLOUR = Color3.fromRGB(0, 110, 255)
 local TRACER_TRANSPARENCY = 0.5
 
 local VISUALISE_ITEM_COLOUR = Color3.fromRGB(255, 255, 255)
+local VISUALISE_TRACE_COLOUR = Color3.fromRGB(200, 80, 80)
 
 local VISUALISATION_RADIUS = 7.5
 
@@ -198,7 +199,7 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 	mesh.Scale = Vector3.new(0.1, 0.1, tracerVector.Magnitude / 2)
 
 	tracer.Material = VISUALISE_MATERIAL
-	tracer.Color = VISUALISE_COLOUR
+	tracer.Color = VISUALISE_TRACE_COLOUR
 	tracer.Anchored = true
 	tracer.CanCollide = false
 	tracer.CanTouch = false
@@ -210,7 +211,7 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 		task.wait()
 		local corpse = participant.Corpse
 		if not corpse or not corpse.Model then
-			return
+			return print("hoooooooooooooooooooooooooo")
 		end
 
 		deathData[corpse.Model] = {
