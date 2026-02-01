@@ -66,21 +66,21 @@ local function Custom(components: Types.ItemComponents, allowThrow: boolean, all
 		Description = "",
 		IconContent = Content.none,
 
-		PrimaryFireServer = function(item, origin, direction, participant)
+		PrimaryFireServer = if allowThrow then function(item, origin, direction, participant)
 			local interactable = throwInteractable(item, participant, origin, direction)
 			if interactable and onThrow then
 				onThrow(interactable, participant)
 			end
             return nil
-		end,
+		end else nil,
 
-		AlternateFireServer = function(item, origin, direction, participant)
+		AlternateFireServer = if allowPlant then function(item, origin, direction, participant)
 			local interactable, raycastResult, weldConstraint = plantInteractable(item, participant, origin, direction)
 			if interactable and raycastResult and weldConstraint and onPlant then
 				onPlant(interactable, raycastResult, weldConstraint, participant)
 			end
             return nil
-		end
+		end else nil,
 	}
 
 	for i, v in components do
