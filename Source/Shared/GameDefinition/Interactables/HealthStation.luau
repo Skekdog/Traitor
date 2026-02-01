@@ -10,7 +10,8 @@ module.HEAL_AMOUNT = 1
 module.RECHARGE_INTERVAL = 2.5
 module.RECHARGE_AMOUNT = 1
 
-type HealthStationServer = Types.Interactable & {
+type HealthStationServer = Types.Prop & {
+	Interactable: Types.InteractableDefinition,
 	Extras: {
 		Charge: number?,
 		HealQueue: {Types.Participant}?,
@@ -27,27 +28,31 @@ local function setCharge(interactable: HealthStationServer, charge: number): ()
 	interactable.Model:SetAttribute("Charge", interactable.Extras.Charge)
 end
 
-local function OnInteractServer(interactable: HealthStationServer, participant: Types.Participant): ()
-	local charge = interactable.Extras.Charge or module.MAX_CHARGE
+local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
+	local station = interactable :: HealthStationServer
+
+	local charge = station.Extras.Charge or module.MAX_CHARGE
 	local humanoid = participant:GetHumanoid()
 	if not humanoid or participant:GetHealth() >= humanoid.MaxHealth then
 		return
 	end
 
 	if charge < module.HEAL_AMOUNT then
-		if not interactable.Extras.NoChargeSound.IsPlaying then
-			interactable.Extras.NoChargeSound:Play()
+		if not station.Extras.NoChargeSound.IsPlaying then
+			station.Extras.NoChargeSound:Play()
 		end
 		return
 	end
 
-	table.insert(interactable.Extras.HealQueue, participant)
+	table.insert(station.Extras.HealQueue, participant)
 end
 
-local function OnLoadServer(interactable: HealthStationServer): ()
-	setCharge(interactable, module.MAX_CHARGE)
-	interactable.Extras.HealQueue = {}
-	table.insert(stations, interactable)
+local function OnLoadServer(interactable: Types.Prop): ()
+	local station = interactable :: HealthStationServer
+
+	setCharge(station, module.MAX_CHARGE)
+	station.Extras.HealQueue = {}
+	table.insert(stations, station)
 
 	local healSound = Instance.new("Sound")
 	healSound.SoundId = "rbxassetid://4720447470"
@@ -55,20 +60,22 @@ local function OnLoadServer(interactable: HealthStationServer): ()
 	healSound.RollOffMaxDistance = 15
 	healSound.PlaybackRegionsEnabled = true
 	healSound.PlaybackRegion = NumberRange.new(0.2, 1.19)
-	healSound.Parent = interactable.Model
+	healSound.Parent = station.Model
 
-	interactable.Extras.HealSound = healSound
+	station.Extras.HealSound = healSound
 
 	local noChargeSound = Instance.new("Sound")
 	noChargeSound.SoundId = "rbxassetid://72729349003330"
 	noChargeSound.RollOffMinDistance = 5
 	noChargeSound.RollOffMaxDistance = 15
-	noChargeSound.Parent = interactable.Model
+	noChargeSound.Parent = station.Model
 
-	interactable.Extras.NoChargeSound = noChargeSound
+	station.Extras.NoChargeSound = noChargeSound
 end
 
-local function heal(station: HealthStationServer, participant: Types.Participant): ()
+local function heal(interactable: Types.Prop, participant: Types.Participant): ()
+	local station = interactable :: HealthStationServer
+
 	participant.Extras.HealthStationLastHealedAt = tick()
 	participant:SetHealth(participant:GetHealth() + module.HEAL_AMOUNT)
 	setCharge(station, station.Extras.Charge - module.HEAL_AMOUNT)
@@ -129,19 +136,19 @@ RunService.Heartbeat:Connect(function()
 	end
 end)
 
-local function updateCharge(interactable: Types.Interactable): ()
+local function updateCharge(interactable: Types.Prop): ()
 	local charge = interactable.Model:GetAttribute("Charge") :: number?
 	interactable.HintTextClient = `Charge: {charge} / {module.MAX_CHARGE}`
 end
 
-local function OnLoadClient(interactable: Types.Interactable): ()
+local function OnLoadClient(interactable: Types.Prop): ()
 	interactable.Model:GetAttributeChangedSignal("Charge"):Connect(function()
 		updateCharge(interactable)
 	end)
 	updateCharge(interactable)
 end
 
-local function BeforeTakeDamage(interactable: HealthStationServer, params: Types.DamageParams?): boolean
+local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
 	if not params then
 		return false
 	end

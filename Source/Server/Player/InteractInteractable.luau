@@ -31,23 +31,24 @@ local function InteractInteractable(player: Player, interactablePart: unknown): 
 		return
 	end
 
-	local interactable = round:GetInteractable(MapObject) or DynamicInteractable.TryCreateNewInteractable(MapObject)
-	if not interactable then
+	local prop = round:GetProp(MapObject) or DynamicInteractable.TryCreateNewInteractable(MapObject)
+	local interactable = prop and prop.Interactable
+	if not interactable or not prop then
 		return
 	end
 
-	if not interactable.Definition.OnInteractServer then
+	if not interactable.OnInteractServer then
 		return
 	end
 
 	local size = if MapObject:IsA("BasePart") then MapObject.Size else MapObject:GetExtentsSize()
 	local origin = GetPrimaryPart(MapObject).Position
 
-	if distanceFromBox(origin, size, player.Character:GetPivot().Position) > interactable.Definition.InteractionRange * 1.1 then
+	if distanceFromBox(origin, size, player.Character:GetPivot().Position) > interactable.InteractionRange * 1.1 then
 		return
 	end
 
-	interactable.Definition.OnInteractServer(interactable, participant)
+	interactable.OnInteractServer(prop, participant)
 end
 
 ReplicatedStorage.Remotes.ClientServer.InteractInteractable.OnServerEvent:Connect(InteractInteractable)

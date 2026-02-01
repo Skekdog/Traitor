@@ -55,7 +55,7 @@ type PoltInfo = {
 
 local poltedProps: {[Types.Prop]: PoltInfo} = {}
 
-local function beforeHitProp(_,params: Types.DamageParams, hitProp: Types.Prop | Types.Interactable): boolean
+local function beforeHitProp(_,params: Types.DamageParams, hitProp: Types.Prop): boolean
 	assert(params.Attacker)
 
 	if hitProp.Kind ~= "Prop" then
@@ -92,6 +92,8 @@ local phaseAdvanceTimes = {
 }
 
 local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
+	assert(prop.Round)
+
 	if not prop.Model:IsDescendantOf(workspace) then
 		poltedProps[prop] = nil
 		return

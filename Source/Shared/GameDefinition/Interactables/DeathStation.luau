@@ -2,27 +2,31 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local HealthStation = require(script.Parent.HealthStation)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-type DeathStationServer = Types.Interactable & {
+type DeathStationServer = Types.Prop & {
+	Interactable: Types.InteractableDefinition,
 	Extras: {
 		DeniedSound: Sound?,
 		Owner: Types.Participant?,
 	}
 }
 
-local function OnLoadServer(interactable: DeathStationServer): ()
+local function OnLoadServer(interactable: Types.Prop): ()
+	local deathStation = interactable :: DeathStationServer
+
 	local deniedSound = Instance.new("Sound")
 	deniedSound.SoundId = "rbxassetid://72729349003330"
 	deniedSound.RollOffMinDistance = 5
 	deniedSound.RollOffMaxDistance = 15
 	deniedSound.Parent = interactable.Model
 
-	interactable.Extras.DeniedSound = deniedSound
+	deathStation.Extras.DeniedSound = deniedSound
 end
 
-local function OnInteractServer(interactable: DeathStationServer, participant: Types.Participant): ()
+local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
+	local deathStation = interactable :: DeathStationServer
 	if participant:GetRole().Definition.IsEvil then
-		if not interactable.Extras.DeniedSound.IsPlaying then
-			interactable.Extras.DeniedSound:Play()
+		if not deathStation.Extras.DeniedSound.IsPlaying then
+			deathStation.Extras.DeniedSound:Play()
 		end
 		return
 	end
@@ -30,16 +34,16 @@ local function OnInteractServer(interactable: DeathStationServer, participant: T
 	participant:TryTakeDamage({
 		Amount = math.huge,
 		Source = "Poison",
-		Attacker = interactable.Extras.Owner,
+		Attacker = deathStation.Extras.Owner,
 		IgnoreKarma = true,
 	})
 end
 
-local function OnLoadClient(interactable: Types.Interactable): ()
+local function OnLoadClient(interactable: Types.Prop): ()
 	interactable.HintTextClient = `Charge: {HealthStation.MAX_CHARGE} / {HealthStation.MAX_CHARGE}`
 end
 
-local function BeforeTakeDamage(interactable: DeathStationServer, params: Types.DamageParams?): boolean
+local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
 	if not params then
 		return false
 	end

@@ -4,7 +4,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-local function setLockedHint(interactable: Types.Interactable): ()
+local function setLockedHint(interactable: Types.Prop): ()
 	local locked = interactable.Model:GetAttribute("Locked")
 	interactable.HintTextClient = if locked then "This door is locked" else nil
 end
@@ -14,14 +14,14 @@ local definition: Types.InteractableDefinition = {
 	InteractionRange = 7.5,
 	IsContinuousInteraction = false,
 
-	OnLoadClient = function(interactable: Types.Interactable): ()
+	OnLoadClient = function(interactable: Types.Prop): ()
 		setLockedHint(interactable)
 		interactable.Model:GetAttributeChangedSignal("Locked"):Connect(function()
 			setLockedHint(interactable)
 		end)
 	end,
 
-	OnInteractClient = function(interactable: Types.Interactable): ()
+	OnInteractClient = function(interactable: Types.Prop): ()
 		local request: StandardDoor.ClientInteraction = {
 			Kind = "ClientInteraction" :: "ClientInteraction",
 			Door = interactable.Model,

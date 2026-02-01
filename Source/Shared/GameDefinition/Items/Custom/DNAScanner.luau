@@ -191,7 +191,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 			object = mapItem
 		end
 	elseif hitPart:HasTag("Interactable") then
-		local interactable = round:GetInteractable(hitPart)
+		local interactable = round:GetProp(hitPart)
 		if interactable then
 			object = interactable
 		end

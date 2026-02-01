@@ -28,13 +28,13 @@ local item = Custom({
 			return
 		end
 
-		local interactable = participant.Round:GetInteractable(result.Instance :: BasePart)
-		if not interactable then
+		local prop = participant.Round:GetProp(result.Instance)
+		if not prop then
 			return
 		end
 
-		if interactable.Definition == C4.Interactable then
-			C4.TryDisarm(interactable :: C4.C4, participant, 1, true)
+		if prop.Interactable == C4.Interactable then
+			C4.TryDisarm(prop :: C4.C4, participant, 1, true)
 		end
 	end
 })

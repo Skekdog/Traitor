@@ -19,6 +19,7 @@ function PropDamage.GetController(prop: Types.MapObject): Player?
 end
 
 local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
+	assert(prop.Round)
 	if not otherPart:IsDescendantOf(workspace) then
 		return -- somehow happened, idk
 	end

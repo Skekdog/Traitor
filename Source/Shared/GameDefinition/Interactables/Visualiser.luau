@@ -27,7 +27,8 @@ local VISUALISATION_RADIUS = 7.5
 
 local activeVisualisers: {Visualiser} = {}
 
-type Visualiser = Types.Interactable & {
+type Visualiser = Types.Prop & {
+	Interactable: Types.InteractableDefinition,
 	Extras: {
 		Removed: boolean?,
 		Player: Player?,
@@ -226,7 +227,7 @@ Participant.OnDeath = function(participant: Types.Participant, params: Types.Dam
 	originalOnDeath(participant, params, deferVictoryCheck)
 end
 
-local function BeforeTakeDamage(interactable: Visualiser, params: Types.DamageParams?): boolean
+local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
 	if not params then
 		return false
 	end
@@ -239,12 +240,14 @@ local function BeforeTakeDamage(interactable: Visualiser, params: Types.DamagePa
 	return attacker:GetRole().Definition.IsEvil or false
 end
 
-local function OnInteractServer(interactable: Visualiser, participant: Types.Participant): ()
-	if participant.Player ~= interactable.Extras.Player :: Player? then
+local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
+	local visualiser = interactable :: Visualiser
+
+	if participant.Player ~= visualiser.Extras.Player :: Player? then
 		return
 	end
 
-	local visualiserItem = participant.Round:GetItemDefinition(interactable.Definition.Name)
+	local visualiserItem = participant.Round:GetItemDefinition(visualiser.Interactable.Name)
 	if not visualiserItem then
 		return warn("Could not find Decoy item")
 	end
@@ -253,24 +256,28 @@ local function OnInteractServer(interactable: Visualiser, participant: Types.Par
 		return
 	end
 
-	interactable.Model:Destroy()
+	visualiser.Model:Destroy()
 	participant:AddItem(participant.Round:LoadItem(visualiserItem))
 end
 
-local function removeVisualiser(visualiser: Visualiser): ()
+local function removeVisualiser(interactable: Types.Prop): ()
+	local visualiser = interactable :: Visualiser
+
 	visualiser.Extras.Removed = true
 	table.remove(activeVisualisers, table.find(activeVisualisers, visualiser) or error("Visualiser not found"))
 	stopVisualising(visualiser)
 end
 
-local function OnLoadServer(interactable: Visualiser): ()
-	interactable.Extras.LastVisualisedAt = tick() - (VISUALISE_INTERVAL - INITIAL_VISUALISE_DELAY)
+local function OnLoadServer(interactable: Types.Prop): ()
+	local visualiser = interactable :: Visualiser
 
-	interactable.Model.Destroying:Connect(function()
-		removeVisualiser(interactable)
+	visualiser.Extras.LastVisualisedAt = tick() - (VISUALISE_INTERVAL - INITIAL_VISUALISE_DELAY)
+
+	visualiser.Model.Destroying:Connect(function()
+		removeVisualiser(visualiser)
 	end)
 
-	table.insert(activeVisualisers, interactable)
+	table.insert(activeVisualisers, visualiser)
 end
 
 local function forEachVisualiser(visualiser: Visualiser): ()

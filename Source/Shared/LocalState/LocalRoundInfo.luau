@@ -2,8 +2,8 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 local GetInteractableDefinition = require(script.Parent.GetInteractableDefinition)
-local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
+local Prop = require(ReplicatedStorage.Shared.RoundRule.Prop)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local InstanceSignal = require(ReplicatedStorage.Shared.Util.InstanceSignal)
@@ -151,7 +151,7 @@ task.defer(function()
     end
 end)
 
-module.Interactables = DynamicValue.new({} :: {[Instance]: Types.Interactable?})
+module.Interactables = DynamicValue.new({} :: {[Instance]: Types.Prop?})
 
 local function loadInteractable(instance: Instance): ()
     assert(instance:IsA("BasePart") or instance:IsA("Model"), "Interactable must be a BasePart or Model")
@@ -184,7 +184,7 @@ local function loadInteractable(instance: Instance): ()
         return
     end
 
-    local interactable = Interactable.new(definition, instance)
+    local interactable = Prop.new(instance, nil, definition)
     module.Interactables()[instance] = interactable
 
     if definition.OnLoadClient then

@@ -3,7 +3,7 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local Item = {}
 
-type ItemInteractable = Types.Interactable & {
+type ItemInteractable = Types.Prop & {
 	Extras: {
 		Item: Types.Item,
 		[any]: nil,

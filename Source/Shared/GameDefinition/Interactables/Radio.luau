@@ -10,7 +10,8 @@ local PLAY_COOLDOWN = 0.25
 
 local serverRound: Types.Round?
 
-type Radio = Types.Interactable & {
+type Radio = Types.Prop & {
+	Interactable: Types.InteractableDefinition,
 	Extras: {
 		Player: Player?,
 		LastPlayedAt: number?,
@@ -274,7 +275,7 @@ if RunService:IsServer() then
 	end)
 end
 
-local function BeforeTakeDamage(interactable: Radio, params: Types.DamageParams?): boolean
+local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
 	if not params then
 		return false
 	end
@@ -287,27 +288,31 @@ local function BeforeTakeDamage(interactable: Radio, params: Types.DamageParams?
 	return not attacker:GetRole().Definition.IsEvil
 end
 
-local function OnLoadServer(interactable: Radio): ()
-	serverRound = interactable.Round
-	interactable.Model.Destroying:Connect(function()
-		if interactable.Extras.Player then
-			addMenuRemote:FireClient(interactable.Extras.Player, false)
+local function OnLoadServer(interactable: Types.Prop): ()
+	local radio = interactable :: Radio
+
+	serverRound = radio.Round
+	radio.Model.Destroying:Connect(function()
+		if radio.Extras.Player then
+			addMenuRemote:FireClient(radio.Extras.Player, false)
 		end
-		table.remove(activeRadios, table.find(activeRadios, interactable) or error("Radio not found"))
+		table.remove(activeRadios, table.find(activeRadios, radio) or error("Radio not found"))
 	end)
 
-	if interactable.Extras.Player then
-		addMenuRemote:FireClient(interactable.Extras.Player, true)
+	if radio.Extras.Player then
+		addMenuRemote:FireClient(radio.Extras.Player, true)
 	end
-	table.insert(activeRadios, interactable)
+	table.insert(activeRadios, radio)
 end
 
-local function OnInteractServer(interactable: Radio, participant: Types.Participant): ()
-	if participant.Player ~= interactable.Extras.Player :: Player? then
+local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
+	local radio = interactable :: Radio
+
+	if participant.Player ~= radio.Extras.Player :: Player? then
 		return
 	end
 
-	local radioItem = participant.Round:GetItemDefinition(interactable.Definition.Name)
+	local radioItem = participant.Round:GetItemDefinition(radio.Interactable.Name)
 	if not radioItem then
 		return warn("Could not find Radio item")
 	end
@@ -316,7 +321,7 @@ local function OnInteractServer(interactable: Radio, participant: Types.Particip
 		return
 	end
 
-	interactable.Model:Destroy()
+	radio.Model:Destroy()
 	participant:AddItem(participant.Round:LoadItem(radioItem))
 end
 

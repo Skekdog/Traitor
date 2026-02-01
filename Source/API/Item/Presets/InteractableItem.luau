@@ -2,23 +2,26 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
-local function createInteractableForItem(item: Types.Item, round: Types.Round): Types.Interactable
+local function createInteractableForItem(item: Types.Item, round: Types.Round): Types.Prop
     local interactableDefinition = round:GetInteractableDefinition(item.Name)
     assert(interactableDefinition, "Could not find interactable definition for " .. item.Name)
-    return round:AddInteractable(interactableDefinition, nil, true)
+    assert(interactableDefinition.Model, "Interactable must have a model")
+    local model = interactableDefinition.Model:Clone()
+    model:AddTag("Interactable")
+    model:RemoveTag("Item")
+    return round:LoadProp(model)
 end
 
-local function throwInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): Types.Interactable?
+local function throwInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): Types.Prop?
     local round = participant.Round
 
     local interactable = createInteractableForItem(item, round)
-    interactable.Model:RemoveTag("Item")
     interactable.Extras.PlantedBy = participant
     interactable.Extras.Player = participant.Player
     local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Structure.Dynamic, nil, direction)
 
     if not success then
-        round._interactables[interactable.Model] = nil
+        round._props[interactable.Model] = nil
         interactable.Model:Destroy()
         return nil
     end
@@ -28,7 +31,7 @@ local function throwInteractable(item: Types.Item, participant: Types.Participan
     return interactable
 end
 
-local function plantInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): (Types.Interactable?, RaycastResult?, WeldConstraint?)
+local function plantInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): (Types.Prop?, RaycastResult?, WeldConstraint?)
     local params = RaycastParams.new()
     params.CollisionGroup = "WeaponHitTargets"
     params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles}
@@ -57,7 +60,7 @@ local function plantInteractable(item: Types.Item, participant: Types.Participan
     return interactable, result, weld
 end
 
-local function Custom(components: Types.ItemComponents, allowThrow: boolean, allowPlant: boolean, onThrow: (interactable: Types.Interactable, participant: Types.Participant) -> ()?, onPlant: (interactable: Types.Interactable, raycastResult: RaycastResult, weldConstraint: WeldConstraint, participant: Types.Participant) -> ()?): Types.ItemComponents
+local function Custom(components: Types.ItemComponents, allowThrow: boolean, allowPlant: boolean, onThrow: (interactable: Types.Prop, participant: Types.Participant) -> ()?, onPlant: (interactable: Types.Prop, raycastResult: RaycastResult, weldConstraint: WeldConstraint, participant: Types.Participant) -> ()?): Types.ItemComponents
 	local base: Types.ItemComponents = {
 		Name = "",
 		Description = "",

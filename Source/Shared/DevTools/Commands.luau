@@ -681,6 +681,10 @@ module.spawninteractable = {
 			return `Interactable {interactableName} not found.`
 		end
 
+		if not definition.Model then
+			return `Interactable {interactableName} does not have a model.`
+		end
+
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
@@ -698,7 +702,7 @@ module.spawninteractable = {
 				continue
 			end
 
-			local interactable = round:AddInteractable(definition)
+			local interactable = round:LoadProp(definition.Model:Clone())
 			interactable.Model:RemoveTag("Item")
 			GetPrimaryPart(interactable.Model).CFrame = char:GetPivot();
 			(interactable.Model :: Instance).Parent = round:GetMap().Structure.Dynamic

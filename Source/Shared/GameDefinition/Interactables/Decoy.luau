@@ -4,7 +4,8 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
 
-type Decoy = Types.Interactable & {
+type Decoy = Types.Prop & {
+	Interactable: Types.InteractableDefinition,
 	Extras: {
 		Player: Player?,
 		[any]: nil,
@@ -28,36 +29,40 @@ local function setAssociatedPlayerClient(interactable: Decoy, player: Player?): 
 	interactable.Extras.Player = player
 end
 
-local function OnLoadClient(interactable: Decoy): ()
-	local object = interactable.Model
+local function OnLoadClient(interactable: Types.Prop): ()
+	local decoy = interactable :: Decoy
+
+	local object = decoy.Model
 	if not object:IsDescendantOf(workspace) then
 		return
 	end
 
-	table.insert(activeDecoysClient, interactable)
+	table.insert(activeDecoysClient, decoy)
 
 	object.Destroying:Connect(function()
-		table.remove(activeDecoysClient, table.find(activeDecoysClient, interactable) or error("Could not find"))
+		table.remove(activeDecoysClient, table.find(activeDecoysClient, decoy) or error("Could not find"))
 	end)
 
-	local player = getPlayerFromAttribute(interactable)
+	local player = getPlayerFromAttribute(decoy)
 	if not player then
 		object:GetAttributeChangedSignal("Player"):Connect(function()
-			setAssociatedPlayerClient(interactable, getPlayerFromAttribute(interactable))
+			setAssociatedPlayerClient(decoy, getPlayerFromAttribute(decoy))
 		end)
 		return
 	end
 
-	setAssociatedPlayerClient(interactable, player)
+	setAssociatedPlayerClient(decoy, player)
 end
 
-local function OnInteractServer(interactable: Decoy, participant: Types.Participant): ()
-	local player = getPlayerFromAttribute(interactable)
+local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
+	local decoy = interactable :: Decoy
+
+	local player = getPlayerFromAttribute(decoy)
 	if participant.Player ~= player then
 		return
 	end
 
-	local decoyItem = participant.Round:GetItemDefinition(interactable.Definition.Name)
+	local decoyItem = participant.Round:GetItemDefinition(decoy.Interactable.Name)
 	if not decoyItem then
 		return warn("Could not find Decoy item")
 	end
@@ -70,7 +75,7 @@ local function OnInteractServer(interactable: Decoy, participant: Types.Particip
 	participant:AddItem(participant.Round:LoadItem(decoyItem))
 end
 
-local function BeforeTakeDamage(interactable: Decoy, params: Types.DamageParams?): boolean
+local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
 	if not params then
 		return false
 	end

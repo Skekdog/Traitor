@@ -120,17 +120,18 @@ function module.ShowCorpseHint(char: Model)
 	interactableFrame.Visible = true
 end
 
-function module.ShowInteractableHint(prop: Types.MapObject, part: BasePart): ()
+function module.ShowInteractableHint(mapObject: Types.MapObject, part: BasePart): ()
 	local plr = Players.LocalPlayer
 
 	local hintText: string?
 	local displayName: string
 
-	local interactable = LocalRoundInfo.Interactables()[prop]
+	local prop = LocalRoundInfo.Interactables()[mapObject]
+	local interactable = prop and prop.Interactable
 
 	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 
-	if not prop:HasTag("Interactable") and not interactable then
+	if not mapObject:HasTag("Interactable") and not interactable then
 		if status ~= "Alive" and PossessProp.CanPossess(part) then
 			hintText = "Possess"
 			displayName = "Prop"
@@ -138,31 +139,31 @@ function module.ShowInteractableHint(prop: Types.MapObject, part: BasePart): ()
 			return
 		end
 	else
+		assert(prop)
 		if status ~= "Alive" or not interactable then
 			return
 		end
 
-		if interactable.Definition.NoActionHint then
+		if interactable.NoActionHint then
 			return
 		end
 
-		local definition = interactable.Definition
-		if not definition or plr:DistanceFromCharacter(part.Position) > definition.InteractionRange then
+		if not interactable or plr:DistanceFromCharacter(part.Position) > interactable.InteractionRange then
 			return
 		end
 
-		if definition.HideName then
+		if interactable.HideName then
 			displayName = ""
 		else
-			local attr = prop:GetAttribute("DisplayName")
+			local attr = mapObject:GetAttribute("DisplayName")
 			if typeof(attr) == "string" then
 				displayName = attr
 			else
-				displayName = GetDisplayName(definition)
+				displayName = GetDisplayName(interactable)
 			end
 		end
 
-		hintText = interactable.HintTextClient
+		hintText = prop.HintTextClient
 	end
 
 	corpseHint.Text = displayName

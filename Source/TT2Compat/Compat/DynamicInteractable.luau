@@ -1,26 +1,26 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local Interactable = require(ReplicatedStorage.Shared.RoundRule.Interactable)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Prop = require(ReplicatedStorage.Shared.RoundRule.Prop)
 
 local module = {}
 
-local function OnInteract(interactable: Types.Interactable, participant: Types.Participant?): ()
+local function OnInteract(prop: Types.Prop, participant: Types.Participant?): ()
 	local name = if participant then "ButtonServer" else "ButtonClient"
-	local Button = interactable.Model:FindFirstChild(name)
+	local Button = prop.Model:FindFirstChild(name)
 	if not Button or not Button:IsA("ModuleScript") then
 		return
 	end
 	(require)(Button).Began(if participant then participant.Player else nil)
 end
 
-local function OnBreak(interactable: Types.Interactable, params: Types.DamageParams): ()
-	local Break = interactable.Model:FindFirstChild("OnBreak")
+local function OnBreak(prop: Types.Prop, params: Types.DamageParams): ()
+	local Break = prop.Model:FindFirstChild("OnBreak")
 	if not Break or not Break:IsA("ModuleScript") then
 		return
 	end
-	(require)(Break)(interactable, params)
+	(require)(Break)(prop, params)
 end
 
 local function getUseText(MapObject: Types.MapObject): string?
@@ -31,7 +31,7 @@ local function getUseText(MapObject: Types.MapObject): string?
 	return useText :: string?
 end
 
-local function createNewInteractable(MapObject: Types.MapObject): Types.Interactable
+local function createNewInteractable(MapObject: Types.MapObject): Types.Prop
 	local useText = getUseText(MapObject)
 
 	local definition: Types.InteractableDefinition = {
@@ -51,7 +51,7 @@ local function createNewInteractable(MapObject: Types.MapObject): Types.Interact
 		DefaultHintText = useText,
 	}
 
-	local interactable = Interactable.new(definition, MapObject)
+	local interactable = Prop.new(MapObject, nil, definition)
 
 	MapObject:GetAttributeChangedSignal("UseText"):Connect(function()
 		interactable.HintTextClient = getUseText(MapObject)
@@ -73,7 +73,7 @@ if RunService:IsClient() then
 			return
 		end
 
-		local interactable: Types.Interactable?
+		local interactable: Types.Prop?
 		if descendant:GetAttribute("Button") then
 			interactable = createNewInteractable(descendant)
 			LocalRoundInfo.Interactables()[descendant] = interactable
@@ -111,7 +111,7 @@ if RunService:IsClient() then
 end
 
 local RoundHandler = require(ServerScriptService.RoundHandler)
-function module.TryCreateNewInteractable(MapObject: Types.MapObject): Types.Interactable?
+function module.TryCreateNewInteractable(MapObject: Types.MapObject): Types.Prop?
 	local round = RoundHandler.Round()
 
 	if not MapObject:GetAttribute("Button") or not MapObject:IsDescendantOf(round:GetMap().Structure.Dynamic) then

@@ -43,7 +43,7 @@ function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 
     explosion.Parent = folder
 
-	local hits: {Types.Participant | Types.Prop | Types.Interactable} = {}
+	local hits: {Types.Participant | Types.Prop} = {}
     for _, v in workspace:GetPartBoundsInRadius(params.Position, info.FalloffEnd) do
 		if not v:IsDescendantOf(workspace) then
 			continue -- stupid bullshit
@@ -57,16 +57,6 @@ function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 				end
 				table.insert(hits, prop)
 				ProcessHit.Prop(params, params.Attacker, prop, v, v.Position, params.Position)
-				continue
-			end
-
-			local interactable = round:GetInteractable(propObject)
-			if interactable then
-				if table.find(hits, interactable) then
-					continue
-				end
-				table.insert(hits, interactable)
-				ProcessHit.Prop(params, params.Attacker, interactable, v, v.Position, params.Position)
 				continue
 			end
 		end

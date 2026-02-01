@@ -95,12 +95,9 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 
 	local MapObject = GetMapObject(hitPart, "Prop")
 	local prop = round:GetProp(MapObject or hitPart)
-	local interactable = round:GetInteractable(MapObject or hitPart)
 
-	local propLike = prop or interactable
-
-	if propLike then
-		ProcessHit.Prop(item, by, propLike, hitPart, hitPosition, origin)
+	if prop then
+		ProcessHit.Prop(item, by, prop, hitPart, hitPosition, origin)
 		return "Prop"
 	else
 		local char = GetMapObject(hitPart, "Character")
@@ -190,7 +187,7 @@ function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Ty
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
-function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop | Types.Interactable, hitPart: BasePart, hitPosition: Vector3, origin: Vector3): ()
+function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3, origin: Vector3): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -217,7 +214,7 @@ function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Par
 		end
 	end
 
-	(prop :: Types.Prop):TryTakeDamage(params)
+	prop:TryTakeDamage(params)
 end
 
 return ProcessHit

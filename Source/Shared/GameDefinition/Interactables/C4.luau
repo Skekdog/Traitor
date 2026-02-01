@@ -38,7 +38,8 @@ local reducedExplosionInfo: Types.ExplosionInfo = {
 	IgnoreSelfDefense = true,
 }
 
-export type C4 = Types.Interactable & {
+export type C4 = Types.Prop & {
+	Interactable: Types.InteractableDefinition,
 	Model: BasePart,
 	Extras: {
 		ArmedBy: Types.Participant?,
@@ -263,7 +264,7 @@ if RunService:IsClient() then
 		local ui = getC4Menu()
 		if currentC4 == c4 and ui.Visible then
 			local distance = Players.LocalPlayer:DistanceFromCharacter(c4.Model.Position)
-			if distance == 0 or distance > c4.Definition.InteractionRange then
+			if distance == 0 or distance > c4.Interactable.InteractionRange then
 				showC4Menu(c4, false)
 			end
 		end
@@ -494,7 +495,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		local c4Item = participant.Round:GetItemDefinition(c4.Definition.Name)
+		local c4Item = participant.Round:GetItemDefinition(c4.Interactable.Name)
 		if not c4Item then
 			return warn("Could not find C4 item")
 		end
@@ -532,7 +533,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		if player:DistanceFromCharacter(c4.Model.Position) > c4.Definition.InteractionRange * 1.1 then
+		if player:DistanceFromCharacter(c4.Model.Position) > c4.Interactable.InteractionRange * 1.1 then
 			return
 		end
 
@@ -564,16 +565,16 @@ local interactable: Types.InteractableDefinition = {
 	IsContinuousInteraction = false,
 	InteractionRange = 7.5,
 
-	OnInteractClient = function(object: Types.Interactable): ()
+	OnInteractClient = function(object: Types.Prop): ()
 		showC4Menu(object :: C4, true)
 	end,
 
-	OnLoadClient = function(object: Types.Interactable): ()
+	OnLoadClient = function(object: Types.Prop): ()
 		c4s()[object.Model] = object :: C4
 		c4s:Invoke()
 	end,
 
-	OnLoadServer = function(object: Types.Interactable): ()
+	OnLoadServer = function(object: Types.Prop): ()
 		c4s()[object.Model] = object :: C4
 		c4s:Invoke()
 

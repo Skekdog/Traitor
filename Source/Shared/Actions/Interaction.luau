@@ -50,33 +50,34 @@ local function interactCorpse(corpse: Model): boolean
 	return true
 end
 
-local function interactInteractable(interactable: Types.Interactable): ()
-	if interactable.Definition.OnInteractClient then
-		interactable.Definition.OnInteractClient(interactable)
+local function interactInteractable(prop: Types.Prop): ()
+	local interactable = prop.Interactable
+	if interactable and interactable.OnInteractClient then
+		interactable.OnInteractClient(prop)
 	end
-	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(interactable.Model)
+	ReplicatedStorage.Remotes.ClientServer.InteractInteractable:FireServer(prop.Model)
 end
 
-local function tryInteractInteractable(prop: Types.MapObject, part: BasePart, input: InputObject?): boolean
-	local interactable = LocalRoundInfo.Interactables()[prop]
-	if not interactable then
+local function tryInteractInteractable(mapObject: Types.MapObject, part: BasePart, input: InputObject?): boolean
+	local prop = LocalRoundInfo.Interactables()[mapObject]
+	if not prop or not prop.Interactable then
 		return false
 	end
 
-	local definition = interactable.Definition
+	local definition = prop.Interactable
 
 	if not distanceCheck(part.Position, definition.InteractionRange) then
 		return false
 	end
 
 	if definition.IsContinuousInteraction then
-		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(part.Position, definition.InteractionRange) and module.InteractProp == prop do
-			interactInteractable(interactable)
+		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(part.Position, definition.InteractionRange) and module.InteractProp == mapObject do
+			interactInteractable(prop)
 			task.wait()
 		end
 	else
 		if not input or input.UserInputState == Enum.UserInputState.End then
-			interactInteractable(interactable)
+			interactInteractable(prop)
 		end
 	end
 
