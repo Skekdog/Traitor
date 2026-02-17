@@ -162,7 +162,8 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 
 				local result = ProcessHit.Part(item, participant, otherPart, surfacePosition, normal, origin)
 
-				if bounces >= maxBounces or result == "Participant" then
+				local shouldPlayersStopBounces = if item.ShouldPlayersStopBounces ~= nil then item.ShouldPlayersStopBounces else true
+				if bounces >= maxBounces or result == "Participant" and shouldPlayersStopBounces then
 					projectile:Destroy()
 				end
 			end)
