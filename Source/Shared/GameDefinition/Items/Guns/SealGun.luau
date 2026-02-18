@@ -1,10 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 
 local SealGun = {}
 
@@ -12,6 +14,27 @@ local function onHitClient(): ()
 	local Camera = require(ReplicatedStorage.API.Camera)
 	Camera.EnterAnimationView()
 	task.delay(3, Camera.EnterFirstPerson)
+end
+
+local function beforeHitAnything(_, params: Types.DamageParams): boolean
+	local projectile = params.Projectile
+	assert(projectile)
+
+	if projectile:GetAttribute("DidHit") then
+		return true
+	end
+
+	projectile:SetAttribute("DidHit", true)
+	task.delay(5, ForEachPart, projectile, function(part: BasePart)
+		part.Anchored = true
+		TweenService:Create(part, TweenInfo.new(1), {
+			Transparency = 1,
+		}):Play()
+	end)
+
+	task.delay(6, projectile.Destroy, projectile)
+
+	return true
 end
 
 local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams, participant: Types.Participant): boolean
@@ -73,6 +96,7 @@ local item = Gun({
 	RecoilY = 10,
 
 	BeforeHitParticipant = beforeHitParticipant,
+	BeforeHitAnything = beforeHitAnything,
 
 	BeforeHitProp = function() return false end, -- Otherwise it keeps hitting props and destroys them
 
