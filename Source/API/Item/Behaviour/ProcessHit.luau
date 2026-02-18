@@ -60,7 +60,7 @@ function ProcessHit.GetItemDamage(item: Types.Item | Types.ExplosionParams, hitP
 	return damage
 end
 
-function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?): "Part" | "Prop" | "Participant"?
+function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?, projectile: Types.MapObject?): "Part" | "Prop" | "Participant"?
 	if not hitPart.Parent then
 		return nil -- ?? No idea how but I had an error where the hitPart was unparented. Somehow.
 	end
@@ -118,6 +118,8 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 		Direction = (hitPosition - origin).Unit,
 		Origin = origin,
 		HitPart = hitPart,
+
+		Projectile = projectile,
 	}
 
 	local data = if item.Kind == "Item" then item else item.Definition

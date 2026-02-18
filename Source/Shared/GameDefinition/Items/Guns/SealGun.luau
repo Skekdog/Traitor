@@ -1,27 +1,41 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 
 local SealGun = {}
 
-local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams, participant: Types.Participant): boolean
-	if not item.Extras.SealGunHits then
-		item.Extras.SealGunHits = {
-			Params = params,
-			Hits = {},
-		}
+local function beforeHitAnything(item: Types.Item, params: Types.DamageParams): boolean
+	local projectile = params.Projectile
+	assert(projectile)
+
+	if not projectile:GetAttribute("DidHit") then
+		projectile:SetAttribute("DidHit", true)
+		task.delay(3, ForEachPart, projectile, function(part)
+			TweenService:Create(part, TweenInfo.new(1), {
+				Transparency = 1,
+			})
+		end)
 	end
 
+	return true
+end
+
+local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams, participant: Types.Participant): boolean
+	local projectile = params.Projectile
+	assert(projectile)
+
 	local char = participant:GetCharacter()
-	if not char or table.find(item.Extras.SealGunHits.Hits, char) then
+	if not char or projectile:GetAttribute("Hit_" .. char.Name) then
 		return false
 	end
 
-	table.insert(item.Extras.SealGunHits.Hits, char)
+	projectile:SetAttribute("Hit_" .. char.Name, true)
 
 	PlaySound(129432532096499, nil, char.PrimaryPart, {
 		RollOffMinDistance = 10,
@@ -69,6 +83,7 @@ local item = Gun({
 	RecoilY = 10,
 
 	BeforeHitParticipant = beforeHitParticipant,
+	BeforeHitAnything = beforeHitAnything,
 
 	PregameDisable = true,
 })

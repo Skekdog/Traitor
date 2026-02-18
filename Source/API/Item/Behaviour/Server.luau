@@ -105,7 +105,7 @@ function Server.ProcessHitscan(item: Types.Item, origin: Vector3, participant: T
 	end
 
 	if hitscan.Hit then
-		ProcessHit.Part(item, participant, hitscan.Hit.Part, hitscan.Position, hitscan.Hit.Normal, origin, hitscan.Hit.RelativeCFrame)
+		ProcessHit.Part(item, participant, hitscan.Hit.Part, hitscan.Position, hitscan.Hit.Normal, origin, hitscan.Hit.RelativeCFrame, item.Projectile)
 	end
 
 	return nil
@@ -160,7 +160,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 				local surfacePosition = otherPart:GetClosestPointOnSurface(projPosition)
 				local normal = projPosition - surfacePosition
 
-				local result = ProcessHit.Part(item, participant, otherPart, surfacePosition, normal, origin)
+				local result = ProcessHit.Part(item, participant, otherPart, surfacePosition, normal, origin, nil, projectile)
 
 				local shouldPlayersStopBounces = if item.ShouldPlayersStopBounces ~= nil then item.ShouldPlayersStopBounces else true
 				if bounces >= maxBounces or result == "Participant" and shouldPlayersStopBounces then

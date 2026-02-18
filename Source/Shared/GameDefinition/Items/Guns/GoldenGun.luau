@@ -51,6 +51,8 @@ local GoldenGun = Gun({
                 Origin = params.Origin,
                 HitPosition = params.HitPosition,
                 HitPart = params.HitPart,
+
+                Projectile = params.Projectile,
             })
         else
             MakeGolden(attacker)
