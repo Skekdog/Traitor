@@ -15,7 +15,7 @@ local function makeGolden(victim: Types.Participant)
             deathSound:Destroy()
         end
 
-        local sound = ReplicatedStorage.Assets:WaitForChild("WeaponSounds"):WaitForChild("GoldenGunHit"):Clone()
+        local sound = ReplicatedStorage.Assets:WaitForChild("ItemSounds"):WaitForChild("GoldenGunHit"):Clone()
         sound.Name = "DeathSound"
         sound.Parent = root :: any
     end
