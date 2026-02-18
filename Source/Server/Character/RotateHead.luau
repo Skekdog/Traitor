@@ -11,20 +11,13 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 		return
 	end
 
-	local neckBallSocket = char:FindFirstChild("NeckBallSocket", true)
-	if not neckBallSocket or not neckBallSocket:IsA("BallSocketConstraint") then
-		return
-	end
-
 	local neck = char:FindFirstChild("Neck", true)
-	if not neck or not neck:IsA("AnimationConstraint") then
+	if not neck or not neck:IsA("AnimationConstraint") or not neck.Attachment1 then
 		return
 	end
-	neck.IsKinematic = false
 
-	y = math.deg(math.clamp(y, -1.4, 1.4))
-	neckBallSocket.TwistLowerAngle = y
-	neckBallSocket.TwistUpperAngle = y
+	y = math.clamp(y, -1.4, 1.4)
+	neck.Attachment1.CFrame = CFrame.new(neck.Attachment1.Position) * CFrame.Angles(y, 0, 0)
 end)
 
 return nil
