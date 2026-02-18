@@ -8,6 +8,12 @@ local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 
 local SealGun = {}
 
+local function onHitClient(): ()
+	local Camera = require(ReplicatedStorage.API.Camera)
+	Camera.EnterAnimationView()
+	task.delay(3, Camera.EnterFirstPerson)
+end
+
 local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams, participant: Types.Participant): boolean
 	local projectile = params.Projectile
 	assert(projectile)
@@ -67,6 +73,8 @@ local item = Gun({
 	RecoilY = 10,
 
 	BeforeHitParticipant = beforeHitParticipant,
+
+	OnHitClient = onHitClient,
 
 	PregameDisable = true,
 })
