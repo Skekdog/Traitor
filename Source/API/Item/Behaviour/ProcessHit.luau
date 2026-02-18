@@ -93,21 +93,6 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 		end
 	end
 
-	local MapObject = GetMapObject(hitPart, "Prop")
-	local prop = round:GetProp(MapObject or hitPart)
-
-	if prop then
-		ProcessHit.Prop(item, by, prop, hitPart, hitPosition, origin)
-		return "Prop"
-	else
-		local char = GetMapObject(hitPart, "Character")
-		local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
-		if victim then
-			ProcessHit.Participant(item, by, victim, hitPart, hitPosition, origin, impulse)
-			return "Participant"
-		end
-	end
-
 	local params: Types.DamageParams = {
 		Amount = ProcessHit.GetItemDamage(item, hitPart, origin),
 		Source = (if item.Kind == "ExplosionParams" then "Explode" else item) :: Types.DamageSource,
@@ -130,6 +115,21 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 		end
 	end
 
+	local MapObject = GetMapObject(hitPart, "Prop")
+	local prop = round:GetProp(MapObject or hitPart)
+
+	if prop then
+		ProcessHit.Prop(item, by, prop, hitPart, hitPosition, origin, projectile)
+		return "Prop"
+	else
+		local char = GetMapObject(hitPart, "Character")
+		local victim = if char and char:IsA("Model") then round:GetParticipant(char) else nil
+		if victim then
+			ProcessHit.Participant(item, by, victim, hitPart, hitPosition, origin, impulse, projectile)
+			return "Participant"
+		end
+	end
+
 	if normal then
 		if relativeHitCFrame and relativeHitCFrame.Position.Magnitude <= hitPart.ExtentsSize.Magnitude * 1.1 and item.Kind == "Item" and item.Projectile then
 			ReplicatedStorage.Remotes.ServerClient.MakeBulletHole:FireAllClients(hitPart, relativeHitCFrame, normal)
@@ -139,7 +139,7 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	return "Part"
 end
 
-function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, impulse: Vector3?): ()
+function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, impulse: Vector3?, projectile: Types.MapObject?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -162,6 +162,8 @@ function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Ty
 		Origin = origin,
 		Direction = (hitPosition - origin).Unit,
 		HitPart = hitPart,
+
+		Projectile = projectile,
 	}
 
 	if item.Kind == "ExplosionParams" then
@@ -189,7 +191,7 @@ function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Ty
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
-function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3, origin: Vector3): ()
+function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, projectile: Types.MapObject?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end

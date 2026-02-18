@@ -1,30 +1,12 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
-local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 
 local SealGun = {}
-
-local function beforeHitAnything(item: Types.Item, params: Types.DamageParams): boolean
-	local projectile = params.Projectile
-	assert(projectile)
-
-	if not projectile:GetAttribute("DidHit") then
-		projectile:SetAttribute("DidHit", true)
-		task.delay(3, ForEachPart, projectile, function(part)
-			TweenService:Create(part, TweenInfo.new(1), {
-				Transparency = 1,
-			})
-		end)
-	end
-
-	return true
-end
 
 local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams, participant: Types.Participant): boolean
 	local projectile = params.Projectile
@@ -43,6 +25,8 @@ local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams
 	})
 
 	Ragdoll.Ragdoll(participant, char)
+
+	task.delay(3, Ragdoll.Unragdoll, char)
 
 	return true
 end
@@ -83,7 +67,6 @@ local item = Gun({
 	RecoilY = 10,
 
 	BeforeHitParticipant = beforeHitParticipant,
-	BeforeHitAnything = beforeHitAnything,
 
 	PregameDisable = true,
 })
