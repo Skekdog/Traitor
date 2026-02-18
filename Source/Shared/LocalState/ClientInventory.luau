@@ -502,6 +502,28 @@ ReplicatedStorage.Shared.RoundRule.Remotes.UpdateReserveAmmo.OnClientEvent:Conne
 	end
 end)
 
+ReplicatedStorage.Shared.RoundRule.Remotes.SetEquippedItem.OnClientEvent:Connect(function(itemName: string?): ()
+	if not itemName then
+		local equippedItem = module.EquippedItem()
+		if equippedItem then
+			return tryUnequip(equippedItem)
+		end
+		return
+	end
+
+	local item: Types.Item?
+	for _, v in ourInventory.Slots() do
+		if v.Name == itemName then
+			item = v
+			break
+		end
+	end
+
+	if item and item ~= module.EquippedItem() then
+		tryEquip(item)
+	end
+end)
+
 ReplicatedStorage.Remotes.ClientServer.ReloadWeapon.OnClientEvent:Connect(function(itemName: string, amount: number): ()
 	for _, v in ourInventory.Slots() do
 		if v.Name == itemName then
