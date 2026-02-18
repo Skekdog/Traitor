@@ -16,7 +16,6 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 
 		DamageKind = "Explode",
 
-		FuseTime = 3,
 		ExplosionInfo = {
 			Damage = 0,
 			FalloffStart = 0,

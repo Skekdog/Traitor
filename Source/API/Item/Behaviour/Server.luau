@@ -111,6 +111,22 @@ function Server.ProcessHitscan(item: Types.Item, origin: Vector3, participant: T
 	return nil
 end
 
+local function explode(item: Types.Item, participant: Types.Participant, projectile: Types.MapObject): ()
+	if not item.ExplosionInfo then
+		return
+	end
+
+	local params = ExplosionParams.new(item.ExplosionInfo, GetPrimaryPart(projectile).Position, participant, item)
+
+	Server.CreateExplosion(participant.Round, params)
+
+	if item.OnExplode then
+		item.OnExplode(params)
+	end
+
+	projectile:Destroy()
+end
+
 function Server.SimulateProjectile(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): ()
 	assert(item.Projectile, "Simulated items must define a projectile")
 
@@ -129,16 +145,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 
 	if item.FuseTime and item.ExplosionInfo then
 		task.wait(item.FuseTime)
-
-		local params = ExplosionParams.new(item.ExplosionInfo, primaryPart.Position, participant, item)
-
-		Server.CreateExplosion(participant.Round, params)
-
-		if item.OnExplode then
-			item.OnExplode(params)
-		end
-
-		projectile:Destroy()
+		explode(item, participant, projectile)
 	else
 		local maxBounces = item.MaxBounces or 1
 		local bounces = 0
@@ -164,7 +171,11 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 
 				local shouldPlayersStopBounces = if item.ShouldPlayersStopBounces ~= nil then item.ShouldPlayersStopBounces else true
 				if bounces >= maxBounces or result == "Participant" and shouldPlayersStopBounces then
-					projectile:Destroy()
+					if item.ExplosionInfo then
+						explode(item, participant, projectile)
+					else
+						projectile:Destroy()
+					end
 				end
 			end)
 		end)
