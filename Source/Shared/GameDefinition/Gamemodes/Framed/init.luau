@@ -50,7 +50,7 @@ local framedRole: Types.RoleDefinition = {
 
 	Allegiance = {Kind = "Solo"},
 
-	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"], Items.Radar, Items.Intel, Items.NyanGun},
+	EquipmentShop = {Items.Flashbang, Items.Knife, Items.AWP, Items["Newton Launcher"], Items.BAR, Items["Silenced Pistol"], Items.Radar, Items.Intel, Items.NyanGun, Items["Seal Gun"]},
 	StartingItems = {Items.TargetChecker, Items.Mirror, Items.Crowbar},
 
 	WalkSpeed = 18,
