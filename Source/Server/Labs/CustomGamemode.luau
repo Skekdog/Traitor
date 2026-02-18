@@ -1,5 +1,6 @@
 local AssetService = game:GetService("AssetService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CheckAssetPermission = require(script.Parent.CheckAssetPermission)
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 local GamemodeValidation = require(ReplicatedStorage.Shared.RoundRule.GamemodeValidation)
 local RoundHandler = require(script.Parent.Parent.RoundHandler)
@@ -10,6 +11,8 @@ function module.LoadGamemode(assetId: number): ()
 	if not IsLabs then
 		error("Custom gamemodes are only available in Labs.")
 	end
+
+	CheckAssetPermission(assetId)
 
 	local gamemodeScript = AssetService:LoadAssetAsync(assetId):FindFirstChildWhichIsA("Instance")
 	assert(gamemodeScript, "No asset was uploaded.")

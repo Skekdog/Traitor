@@ -1,5 +1,6 @@
 local AssetService = game:GetService("AssetService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CheckAssetPermission = require(script.Parent.CheckAssetPermission)
 local RoundHandler = require(script.Parent.Parent.RoundHandler)
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
@@ -9,6 +10,8 @@ function module.LoadBoss(assetId: number): ()
 	if not IsLabs then
 		error("Custom bosses are only available in Labs.")
 	end
+
+	CheckAssetPermission(assetId)
 
 	local bossScript = AssetService:LoadAssetAsync(assetId):FindFirstChildWhichIsA("Instance")
 	if not bossScript then
