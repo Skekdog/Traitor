@@ -103,6 +103,12 @@ LocalCharacter.Humanoid:Connect(function(hum)
     local char = hum.Parent
     assert(char and char:IsA("Model"), "Humanoid has no Character")
 
+    char:GetAttributeChangedSignal("IsRagolled"):Connect(function()
+        if char:GetAttribute("IsRagdolled") then
+            ClimbLadder.StopClimbing()
+        end
+    end)
+
     local root = char:WaitForChild("HumanoidRootPart")
     assert(root:IsA("BasePart"), "HumanoidRootPart is not a Part")
 

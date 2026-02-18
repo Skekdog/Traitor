@@ -38,10 +38,9 @@ end
 
 function module.Climb(ladder: BasePart): ()
     module.StopClimbing()
-    Crouch.SetCrouchDisabled("Climbing", true)
 
     local char = LocalCharacter.Character()
-    if not char then
+    if not char or char:GetAttribute("IsRagdolled") then
         return
     end
 
@@ -54,6 +53,8 @@ function module.Climb(ladder: BasePart): ()
     if not hum then
         return
     end
+
+    Crouch.SetCrouchDisabled("Climbing", true)
 
     currentClimbSoundIndex = 1
 
