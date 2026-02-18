@@ -39,6 +39,7 @@ local keyboard = {
 	S = 0,
 	D = 0,
 	E = 0,
+	Space = 0,
 	Q = 0,
 	LeftShift = 0,
 	RightShift = 0,
@@ -93,7 +94,7 @@ function module.GetVelocity(dt: number): Vector3
 
 	local kKeyboard = Vector3.new(
 		keyboard.D - keyboard.A,
-		keyboard.E - keyboard.Q,
+		(keyboard.E + keyboard.Space) - keyboard.Q,
 		keyboard.S - keyboard.W
 	) * NAV_KEYBOARD_SPEED
 
@@ -249,6 +250,7 @@ function module.StartCapture(): ()
 		Enum.KeyCode.S,
 		Enum.KeyCode.D,
 		Enum.KeyCode.E,
+		Enum.KeyCode.Space,
 		Enum.KeyCode.Q
 	)
 
