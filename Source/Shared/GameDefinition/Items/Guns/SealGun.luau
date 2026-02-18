@@ -54,7 +54,7 @@ local item = Gun({
 
 	HoldAnimation = Content.fromAssetId(10247529531),
 
-	ProjectileSpeed = 50,
+	ProjectileSpeed = 30,
 	Spread = 0.01,
 
 	CanHeadshot = false,
