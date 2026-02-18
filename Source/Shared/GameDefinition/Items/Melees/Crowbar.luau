@@ -24,11 +24,11 @@ function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction
 
 	item:SetServerData("Primary", nil)
 
+	Client.Recoil(item)
+
 	if not data[1] or not data[1].Hit then
 		return false
 	end
-
-	Client.Recoil(item)
 
 	item:SetServerData("Alternate", data)
 
