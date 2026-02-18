@@ -31,7 +31,7 @@ local function validateItemUsage(participant: Types.Participant, item: Types.Ite
 		return "OriginTooFar"
 	end
 
-	local head = char:WaitForChild("Head")
+	local head = char:FindFirstChild("Head")
 	if not head or not head:IsA("BasePart") or (head.Position - origin).Magnitude > MAX_SHOOTER_DISTANCE then
 		return "OriginTooFar"
 	end
