@@ -215,7 +215,7 @@ local shopItem = Custom({
 	Description = "Flings people at high speeds, and can be used to eat a healing bowl of soup.",
 	IconContent = Content.fromAssetId(10974184304),
 
-	Cost = 2,
+	Cost = 1,
 	MaxStock = 1,
 
 	OnEquipServer = function(_, participant: Types.Participant): ()
