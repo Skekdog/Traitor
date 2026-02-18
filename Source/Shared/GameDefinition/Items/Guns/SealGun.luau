@@ -74,6 +74,8 @@ local item = Gun({
 
 	BeforeHitParticipant = beforeHitParticipant,
 
+	BeforeHitProp = function() return false end, -- Otherwise it keeps hitting props and destroys them
+
 	OnHitClient = onHitClient,
 
 	PregameDisable = true,
