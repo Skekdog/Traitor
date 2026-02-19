@@ -8,6 +8,10 @@ local MirrorUI = script.Parent.MirrorUI
 MirrorUI.Parent = Players.LocalPlayer.PlayerGui :: any
 
 local function set(face: Face.FaceInstance, head: BasePart): ()
+	if face:IsA("ImageLabel") then
+		face.ImageTransparency = 1
+	end
+
 	MirrorUI.ImageLabel.Image = Face.GetInstance(head).Image
 	if MirrorUI.Adornee then
 		assert(MirrorUI.Adornee:IsA("BasePart"))
