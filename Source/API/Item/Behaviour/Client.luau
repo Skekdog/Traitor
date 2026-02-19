@@ -177,7 +177,7 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 			local result = Client.Hitscan(params, origin, spreadDirection, item.MaxDistance or 10000, item.CheckInitialIntersection, item.CheckInitialIntersection)
 
 			local targetPosition = result and result.Position or Client.DeriveTargetPosition(origin, direction, item.MaxDistance or 10000)
-			if item.Projectile then
+			if item.Projectile and not noEffects then
 				BulletTracer(item.Projectile, item.ProjectileSpeed or 100, origin, targetPosition)
 			end
 
@@ -187,7 +187,7 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 				continue
 			end
 
-			if not GetMapObject(result.Hit.Part, "Character") then
+			if not GetMapObject(result.Hit.Part, "Character") and not noEffects then
 				PlaySound(item.HitSound or HitSounds[GetMaterial(result.Hit.Part)] or HitSounds.Default, targetPosition, nil, {
 					RollOffMaxDistance = 20,
 				})
