@@ -141,6 +141,10 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 	local primaryPart = GetPrimaryPart(projectile)
 
 	primaryPart:SetNetworkOwner(nil)
+
+	local char = participant:GetCharacter()
+	primaryPart.AssemblyLinearVelocity = if char and char.PrimaryPart then char.PrimaryPart.AssemblyLinearVelocity else Vector3.zero
+
 	participant:TryThrowAssembly(projectile, item.ProjectileSpeed or 35, nil, origin, direction)
 
 	if item.FuseTime and item.ExplosionInfo then
@@ -151,8 +155,6 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 		local bounces = 0
 
 		local startTime = os.clock()
-
-		local char = participant:GetCharacter()
 
 		ForEachPart(projectile, function(part)
 			part.Touched:Connect(function(otherPart)
