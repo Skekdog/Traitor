@@ -1,4 +1,6 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FilterDead = require(script.Parent.FilterDead)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Notification = require(ReplicatedStorage.API.Notification)
 local QuickChat = require(ReplicatedStorage.Shared.Interface.Chat.QuickChat.QuickChat)
@@ -27,7 +29,11 @@ remote.OnServerEvent:Connect(function(player: Player, messageId: unknown, id: un
 
 	rateLimits[player] = os.clock()
 
-	Notification(QuickChat.FormatMessage(baseMessage, id), "QuickChat", nil, player)
+	for _, v in Players:GetPlayers() do
+		if FilterDead.ShouldSend(player, v) then
+			Notification(QuickChat.FormatMessage(baseMessage, id), "QuickChat", v, player)
+		end
+	end
 end)
 
 return nil

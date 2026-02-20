@@ -8,7 +8,7 @@ local FilterDead = {}
 
 FilterDead.Disabled = false
 
-HookOnMessage(function(message, source)
+function FilterDead.ShouldSend(sender: Player?, receiver: Player?): boolean
 	if FilterDead.Disabled then
 		return true
 	end
@@ -18,10 +18,6 @@ HookOnMessage(function(message, source)
 		return true
 	end
 
-	-- note: TextSource.Name is set to DisplayName, so we can't use that
-	local sender = Players:GetPlayerByUserId(message.TextSource.UserId)
-	local receiver = Players:GetPlayerByUserId(source.UserId)
-
 	local senderParticipant = if sender then GetParticipant(sender.Name) else nil
 	local receiverParticipant = if receiver then GetParticipant(receiver.Name) else nil
 
@@ -30,6 +26,13 @@ HookOnMessage(function(message, source)
 	end
 
 	return true
+end
+
+HookOnMessage(function(message, source)
+	local sender = Players:GetPlayerByUserId(message.TextSource.UserId)
+	local receiver = Players:GetPlayerByUserId(source.UserId)
+
+	return FilterDead.ShouldSend(sender, receiver)
 end)
 
 return FilterDead
