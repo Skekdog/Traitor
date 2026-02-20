@@ -40,7 +40,7 @@ end
 local playerChatted = Instance.new("BindableEvent")
 module.PlayerChatted = playerChatted.Event
 
-HookOnMessage(function(message)
+HookOnMessage.Hook(function(message)
 	playerChatted:Fire(Players:GetPlayerByUserId(message.TextSource.UserId), message.Text)
 	return true
 end)

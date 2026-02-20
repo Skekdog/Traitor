@@ -28,7 +28,7 @@ function FilterDead.ShouldSend(sender: Player?, receiver: Player?): boolean
 	return true
 end
 
-HookOnMessage(function(message, source)
+HookOnMessage.Hook(function(message, source)
 	local sender = Players:GetPlayerByUserId(message.TextSource.UserId)
 	local receiver = Players:GetPlayerByUserId(source.UserId)
 

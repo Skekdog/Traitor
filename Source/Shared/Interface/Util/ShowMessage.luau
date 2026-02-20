@@ -60,13 +60,17 @@ end
 
 local chatChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
 
-return function(msg: string, kind: Types.MessageKind | "QuickChat", from: Player?)
+return function(msg: string, kind: Types.MessageKind | "QuickChat" | "Relay", from: Player?)
 	msg = FullParse(msg)
 	if kind == "Chat" then
 		chatChannel:DisplaySystemMessage(msg)
 	elseif kind == "QuickChat" then
 		if from then
 			HookClientMessage.ExecuteOn(chatChannel:DisplaySystemMessage(msg, "QuickChat Player_" .. from.UserId))
+		end
+	elseif kind == "Relay" then
+		if from then
+			HookClientMessage.ExecuteOn(chatChannel:DisplaySystemMessage(msg, "Relay Player_" .. from.UserId))
 		end
 	else
 		makeLabel(kind == "Team", msg)

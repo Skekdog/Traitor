@@ -42,7 +42,9 @@ HookClientMessage.Hook(function(message)
 		message.PrefixText ..= `<font color='#{color:ToHex()}'>{tag}</font> `
 	end
 
-	message.PrefixText ..= `<font color='#{UsernameColor(participant.Name):ToHex()}'>{participant.Name}</font>:`
+	local padlocked = if message.Metadata:find("Relay") then " 🔒" else ""
+
+	message.PrefixText ..= `<font color='#{UsernameColor(participant.Name):ToHex()}'>{participant.Name}{padlocked}</font>:`
 
 	message.PrefixText ..= "</b>"
 end)
