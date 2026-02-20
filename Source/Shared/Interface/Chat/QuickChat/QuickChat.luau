@@ -1,9 +1,7 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
 
 local QuickChat = {}
 
-QuickChat.AvailableMessages = {
+QuickChat.Messages = {
 	[1] = "Yes.",
 	[2] = "No.",
 	[3] = "Help!",
@@ -35,10 +33,6 @@ end
 
 function QuickChat.FormatMessage(message: string, id: Model?): string
 	return message:gsub("{ID}", QuickChat.GetIdString(id))
-end
-
-function QuickChat.Chat(message: string): ()
-	GetChatChannel("RBXGeneral"):SendAsync(message)
 end
 
 return QuickChat

@@ -11,10 +11,19 @@ local DEAD_ASTERISK_COLOR = Color3.fromRGB(255, 0, 0)
 local DEAD_STRING = `<font color='#{DEAD_ASTERISK_COLOR:ToHex()}'>*<font color='#{DEAD_COLOR:ToHex()}'>DEAD</font>*</font> `
 
 HookClientMessage.Hook(function(message)
-	if not message.TextSource then
-		return -- Sometimes this is nil 🤷‍♂️
+	local sender: Player?
+	if message.TextSource then
+		sender = Players:GetPlayerByUserId(message.TextSource.UserId)
+	else
+		local tags = message.Metadata:split(" ")
+		for _, tag in tags do
+			if tag:find("Player_") then
+				local id = tonumber(tag:split("Player_")[2]) or 0
+				sender = Players:GetPlayerByUserId(id)
+			end
+		end
 	end
-	local sender = Players:GetPlayerByUserId(message.TextSource.UserId)
+
 	if not sender then
 		return
 	end

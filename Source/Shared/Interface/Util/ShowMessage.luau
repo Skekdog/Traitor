@@ -2,6 +2,7 @@ local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local TextChatService = game:GetService("TextChatService")
+local HookClientMessage = require(ReplicatedStorage.Shared.Interface.Chat.HookClientMessage)
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local UIAnimation = require(script.Parent.Parent.UILib.UIAnimation)
 local UIManager = require(script.Parent.Parent.UILib.UIManager)
@@ -59,10 +60,14 @@ end
 
 local chatChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
 
-return function(msg: string, kind: Types.MessageKind)
+return function(msg: string, kind: Types.MessageKind | "QuickChat", from: Player?)
 	msg = FullParse(msg)
 	if kind == "Chat" then
 		chatChannel:DisplaySystemMessage(msg)
+	elseif kind == "QuickChat" then
+		if from then
+			HookClientMessage.ExecuteOn(chatChannel:DisplaySystemMessage(msg, "QuickChat Player_" .. from.UserId))
+		end
 	else
 		makeLabel(kind == "Team", msg)
 	end

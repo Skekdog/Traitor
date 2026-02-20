@@ -64,11 +64,23 @@ local function toggleMarksVisible(clone: PlayerElement, visible: boolean): ()
 end
 
 HookClientMessage.Hook(function(message)
-	if not message.TextSource then
+	if not message.TextSource and not message.Metadata:find("Player_") then
 		return
 	end
 
-	local plr = Players:GetPlayerByUserId(message.TextSource.UserId)
+	local plr: Player?
+	if message.TextSource then
+		plr = Players:GetPlayerByUserId(message.TextSource.UserId)
+	else
+		local tags = message.Metadata:split(" ")
+		for _, tag in tags do
+			if tag:find("Player_") then
+				local id = tonumber(tag:split("Player_")[2]) or 0
+				plr = Players:GetPlayerByUserId(id)
+			end
+		end
+	end
+
 	if plr and plr:GetAttribute("Muted") then
 		message.Metadata ..= " MUTED"
 	end

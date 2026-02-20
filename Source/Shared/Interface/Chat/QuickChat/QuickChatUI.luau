@@ -1,27 +1,24 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local TextChatService = game:GetService("TextChatService")
+local QuickChat = require(script.Parent.QuickChat)
 local Interaction = require(ReplicatedStorage.Shared.Actions.Interaction)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ChatWindow = require(ReplicatedStorage.Shared.Interface.Chat.ChatWindow)
-local QuickChat = require(script.Parent.QuickChat)
+local QuickChatClient = require(script.Parent.QuickChatClient)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local ID_DURATION = 5
 local AUTO_HIDE_AFTER = 5
 
-if not TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
-	return nil
-end
-
 local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs["Quick Chat"])
 
 type ChatButton = typeof(ui.Object.ChatTemplate)
 
+local id: Model?
+
 local function chat(button: ChatButton): ()
 	ui:ToggleVisible(false)
-	QuickChat.Chat(button.TextLabel.Text)
+	QuickChatClient.Chat(button.LayoutOrder, id)
 end
 
 local lastShow
@@ -48,7 +45,7 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	end
 
 	for i = 1, 9 do
-		if QuickChat.AvailableMessages[i] then
+		if QuickChat.Messages[i] then
 			ControlManager.Register("Quick Chat " .. i, function()
 				local button = ui.Object:FindFirstChild(tostring(i))
 				if not button or not button:IsA("TextButton") then
@@ -60,7 +57,7 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 		end
 	end
 
-	for i, v in QuickChat.AvailableMessages do
+	for i, v in QuickChat.Messages do
 		local button = ui.Object.ChatTemplate:Clone()
 		button.LayoutOrder = i
 		button.Name = tostring(i)
@@ -75,6 +72,7 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 end)
 
 ChatWindow.QuickChatButton.Activated:Connect(function()
+	print("yay")
 	ui:ToggleVisible()
 end)
 
@@ -83,13 +81,13 @@ RunService.Heartbeat:Connect(function()
 		return
 	end
 
-	local id = if Interaction.LastId.At + ID_DURATION < os.clock() then nil else Interaction.LastId.Id
+	id = if Interaction.LastId.At + ID_DURATION < os.clock() then nil else Interaction.LastId.Id
 	for _, v in ui.Object:GetChildren() do
 		if v:IsA("TextButton") and v.Name ~= "ChatTemplate" then
 			local button = v :: ChatButton
 			button.Visible = true
 
-			local baseMessage = QuickChat.AvailableMessages[tonumber(button.Name) or error("not a number")]
+			local baseMessage = QuickChat.Messages[tonumber(button.Name) or error("not a number")]
 			button.TextLabel.Text = QuickChat.FormatMessage(baseMessage, id)
 		end
 	end

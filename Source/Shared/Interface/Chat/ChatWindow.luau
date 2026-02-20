@@ -133,10 +133,17 @@ ChatWindow.InputBox:GetPropertyChangedSignal("Text"):Connect(function()
 	ChatWindow.InputBox.Text = text:sub(1, MAX_LENGTH)
 end)
 
-if not TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
-	ChatWindow.InputBox.TextEditable = false
-	ChatWindow.InputBox.PlaceholderText = "Your Roblox settings prevent you from chatting."
-end
+local defaultText = ChatWindow.InputBox.PlaceholderText
+
+ChatWindow.InputBox.TextEditable = false
+ChatWindow.InputBox.PlaceholderText = "Your Roblox settings prevent you from chatting."
+
+task.spawn(function()
+	if not TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
+		ChatWindow.InputBox.TextEditable = true
+		ChatWindow.InputBox.PlaceholderText = defaultText
+	end
+end)
 
 sendButton.Activated:Connect(function()
 	sendChat()

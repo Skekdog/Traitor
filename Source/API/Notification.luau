@@ -2,12 +2,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Types = require(script.Parent.Types)
 
-local function ShowMessage(message: string, kind: Types.MessageKind, to: Player?): ()
+local function ShowMessage(message: string, kind: Types.MessageKind | "QuickChat", to: Player?, from: Player?): ()
 	if RunService:IsServer() then
 		if to then
-			ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireClient(to, message, kind)
+			ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireClient(to, message, kind, from)
 		else
-			ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireAllClients(message, kind)
+			ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireAllClients(message, kind, from)
 		end
 		return
 	end
