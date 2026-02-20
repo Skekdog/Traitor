@@ -139,6 +139,15 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Animate UI",
+	Tab = "Display",
+	Category = "User Interface",
+	Tooltip = "If 'Reduce Motion' is enabled in Roblox settings, this setting is ignored. Otherwise, this will disable most UI animation.",
+	Kind = "Boolean" :: "Boolean",
+	Default = true,
+})
+
+table.insert(availableSettings, {
 	Name = "Show Hit Rejects",
 	Tab = "Display",
 	Category = "Debug",
