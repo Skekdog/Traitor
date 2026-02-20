@@ -11,7 +11,7 @@ local poke = {
 -- So I thought that we could get away with simple string patterns
 -- But actually its less complex to just use a full parser
 
-local ASSET_ID = 116031459660559
+local ASSET_ID = "117390899198330"
 
 local function getText(source: string, span: poke_ast.Span): string
 	return string.sub(source, span.x + 1, span.y)
@@ -281,5 +281,5 @@ createScript("Types", outputFolder, fs.readFile("Source/Shared/RoundRule/src/Typ
 local output = roblox.serializeModel({outputFolder})
 fs.writeFile("API.rbxm", output)
 
-pcall(PublishAsset, ASSET_ID, "Traitor! API", "API.rbxm")
+PublishAsset(ASSET_ID, "API", "API.rbxm")
 fs.removeFile("API.rbxm")

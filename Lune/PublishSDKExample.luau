@@ -10,12 +10,12 @@ local ITEMS_PATH = "Source/Shared/GameDefinition/Items"
 local MAPS_PATH = "Assets/Maps"
 
 local ASSET_IDS = {
-	["TestMap"] = 125557102994928,
-	["Facility"] = 122192823669641,
-	["ThoseYouTrust"] = 117084689582342,
-	["Framed"] = 85240118809989,
-	["Elimination"] = 73629714476044,
-	["Items"] = 71521398249549,
+	["TestMap"] = "109123324659232",
+	["Facility"] = "126472909699829",
+	["ThoseYouTrust"] = "119447016204491",
+	["Framed"] = "139092719483295",
+	["Elimination"] = "81237358985439",
+	["Items"] = "81535955487145",
 }
 
 local function GetAssetPath(assetName: string, kind: "map" | "gamemode" | "items"): string
@@ -44,15 +44,8 @@ local function GetAssetPath(assetName: string, kind: "map" | "gamemode" | "items
 	error("Invalid asset kind")
 end
 
-local function GetIgnoreGlobs(assetName: string, kind: "map" | "gamemode" | "items"): {string}?
-	if kind == "items" then
-		return {"Source/Shared/GameDefinition/Items/Items.luau"}
-	end
-	return nil
-end
-
 local function publish(assetName: string, kind: "map" | "gamemode" | "items"): ()
-	PublishAsset(ASSET_IDS[assetName], assetName, GetAssetPath(assetName, kind), GetIgnoreGlobs(assetName, kind))
+	PublishAsset(ASSET_IDS[assetName], assetName, GetAssetPath(assetName, kind))
 end
 
 local kind = process.args[1]
