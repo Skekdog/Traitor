@@ -113,6 +113,19 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Always Show Sidebar",
+	Tab = "Display",
+	Category = "User Interface",
+	Tooltip = "The sidebar is always visible when using touchscreen, or if you very intelligently decide to unbind the settings menu.",
+	Kind = "Boolean" :: "Boolean",
+	Default = true,
+
+	Callback = function(name, value)
+		(require)(callbacks.AlwaysShowSidebar).Callback(name, value)
+	end
+})
+
+table.insert(availableSettings, {
 	Name = "Sidebar Alignment",
 	Tab = "Display",
 	Category = "User Interface",
