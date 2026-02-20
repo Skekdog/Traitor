@@ -72,7 +72,6 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 end)
 
 ChatWindow.QuickChatButton.Activated:Connect(function()
-	print("yay")
 	ui:ToggleVisible()
 end)
 
