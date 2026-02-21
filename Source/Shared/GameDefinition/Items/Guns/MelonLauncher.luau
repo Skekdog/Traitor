@@ -9,7 +9,7 @@ local MelonLauncher = {}
 
 local PRESSURE = 75000
 local RADIUS = 15
-local PROJECTILE_FORCE = 100
+local PROJECTILE_FORCE = 75
 local PROJECTILE = ReplicatedStorage.Assets.Projectiles.Watermelon
 
 local function reduceAmount(info: Types.ExplosionInfo | Types.Item, params: Types.DamageParams, hitParticipant: Types.Participant): boolean
