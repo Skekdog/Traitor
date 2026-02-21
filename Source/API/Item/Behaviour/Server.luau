@@ -148,7 +148,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 	local char = participant:GetCharacter()
 	primaryPart.AssemblyLinearVelocity = if char and char.PrimaryPart then char.PrimaryPart.AssemblyLinearVelocity else Vector3.zero
 
-	participant:TryThrowAssembly(projectile, item.ProjectileSpeed or 35, nil, origin, direction)
+	participant:TryThrowAssembly(projectile, item.ProjectileSpeed or 35, nil, origin, direction, nil, true)
 
 	if item.OnProjectileSpawn then
 		item.OnProjectileSpawn(item, projectile, participant)
