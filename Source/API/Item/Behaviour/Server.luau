@@ -105,7 +105,7 @@ function Server.ProcessHitscan(item: Types.Item, origin: Vector3, participant: T
 	end
 
 	if hitscan.Hit then
-		ProcessHit.Part(item, participant, hitscan.Hit.Part, hitscan.Position, hitscan.Hit.Normal, origin, hitscan.Hit.RelativeCFrame, item.Projectile)
+		ProcessHit.Part(item, participant, hitscan.Hit.Part, hitscan.Position, hitscan.Hit.Normal, origin, hitscan.Hit.RelativeCFrame, item.Projectile, os.clock())
 	end
 
 	return nil
@@ -147,6 +147,10 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 
 	participant:TryThrowAssembly(projectile, item.ProjectileSpeed or 35, nil, origin, direction)
 
+	if item.OnProjectileSpawn then
+		item.OnProjectileSpawn(item, projectile)
+	end
+
 	if item.FuseTime and item.ExplosionInfo then
 		task.wait(item.FuseTime)
 		explode(item, participant, projectile)
@@ -169,7 +173,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 				local surfacePosition = otherPart:GetClosestPointOnSurface(projPosition)
 				local normal = projPosition - surfacePosition
 
-				local result = ProcessHit.Part(item, participant, otherPart, surfacePosition, normal, origin, nil, projectile)
+				local result = ProcessHit.Part(item, participant, otherPart, surfacePosition, normal, origin, nil, projectile, startTime)
 
 				local shouldPlayersStopBounces = if item.ShouldPlayersStopBounces ~= nil then item.ShouldPlayersStopBounces else true
 				if bounces >= maxBounces or result == "Participant" and shouldPlayersStopBounces then

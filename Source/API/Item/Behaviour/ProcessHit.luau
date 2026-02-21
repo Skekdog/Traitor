@@ -60,7 +60,7 @@ function ProcessHit.GetItemDamage(item: Types.Item | Types.ExplosionParams, hitP
 	return damage
 end
 
-function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?, projectile: Types.MapObject?): "Part" | "Prop" | "Participant"?
+function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Participant, hitPart: BasePart, hitPosition: Vector3, normal: Vector3?, origin: Vector3, relativeHitCFrame: CFrame?, projectile: Types.MapObject?, timeOrigin: number?): "Part" | "Prop" | "Participant"?
 	if not hitPart.Parent then
 		return nil -- ?? No idea how but I had an error where the hitPart was unparented. Somehow.
 	end
@@ -99,6 +99,7 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 
 		Attacker = by,
 
+		TimeOrigin = timeOrigin,
 		HitPosition = hitPosition,
 		Direction = (hitPosition - origin).Unit,
 		Origin = origin,
@@ -139,7 +140,7 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	return "Part"
 end
 
-function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, impulse: Vector3?, projectile: Types.MapObject?): ()
+function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, victim: Types.Participant, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, impulse: Vector3?, projectile: Types.MapObject?, timeOrigin: number?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -158,6 +159,7 @@ function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Ty
 		IsHeadshot = item.Kind == "Item" and item.CanHeadshot and isOf(hitPart, "Head"),
 		Attacker = by,
 
+		TimeOrigin = timeOrigin,
 		HitPosition = hitPosition,
 		Origin = origin,
 		Direction = (hitPosition - origin).Unit,
@@ -191,7 +193,7 @@ function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Ty
 	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
 end
 
-function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, projectile: Types.MapObject?): ()
+function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, projectile: Types.MapObject?, timeOrigin: number?): ()
 	if item.Kind ~= "ExplosionParams" then
 		assert(by, "by must not be nil")
 	end
@@ -204,6 +206,7 @@ function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Par
 
 		Attacker = by,
 
+		TimeOrigin = timeOrigin,
 		HitPosition = hitPosition,
 		Direction = (hitPosition - origin).Unit,
 		Origin = origin,
