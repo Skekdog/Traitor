@@ -2,9 +2,10 @@ local CollectionService = game:GetService("CollectionService")
 
 local function fix(corpse: Instance)
     for _, part in corpse:GetChildren() do
-        if part:IsA("BasePart") then
-            part.CanCollide = part.Name ~= "HumanoidRootPart"
+        if not part:IsA("BasePart") or part:FindFirstAncestorWhichIsA("Accessory") or part:FindFirstAncestor("Item") or part.Name == "Item" then
+            continue
         end
+        part.CanCollide = part.Name ~= "HumanoidRootPart"
     end
 end
 
