@@ -124,6 +124,9 @@ local function explode(item: Types.Item, participant: Types.Participant, project
 		item.OnExplode(params)
 	end
 
+	if item.OnProjectileDespawn then
+		item.OnProjectileDespawn(item, projectile, participant)
+	end
 	projectile:Destroy()
 end
 
@@ -148,7 +151,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 	participant:TryThrowAssembly(projectile, item.ProjectileSpeed or 35, nil, origin, direction)
 
 	if item.OnProjectileSpawn then
-		item.OnProjectileSpawn(item, projectile)
+		item.OnProjectileSpawn(item, projectile, participant)
 	end
 
 	if item.FuseTime and item.ExplosionInfo then
@@ -180,6 +183,9 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 					if item.ExplosionInfo then
 						explode(item, participant, projectile)
 					else
+						if item.OnProjectileDespawn then
+							item.OnProjectileDespawn(item, projectile, participant)
+						end
 						projectile:Destroy()
 					end
 				end

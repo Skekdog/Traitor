@@ -48,24 +48,23 @@ local Grow = Gun({
     PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired["Five-Seven"],
     ReloadSound = ReplicatedStorage.Assets.ItemSounds.Reload["Five-Seven"],
 
-    BeforeHitAnything = function(_, params, round): boolean
-        local projectile = assert(params.Projectile)
+    OnProjectileDespawn = function(_, projectile, participant): ()
         local power = projectile:GetAttribute("Power") :: number? or 0
 
         if power < 0.25 then
-            return true
+            return
         end
 
-        Server.CreateExplosion(round, ExplosionParams.new({
+        Server.CreateExplosion(participant.Round, ExplosionParams.new({
             Pressure = power * BASE_PRESSURE,
-            Attacker = params.Attacker,
+            Attacker = participant,
             Damage = power * BASE_DAMAGE,
             FalloffEnd = power * BASE_RADIUS,
             FalloffStart = 0,
             VisualRadius = power * BASE_RADIUS,
         }, GetPrimaryPart(projectile).Position))
 
-        return true
+        return
     end,
 
     OnProjectileSpawn = function(_, projectile): ()
@@ -92,7 +91,6 @@ RunService.PostSimulation:Connect(function(dt)
         projectile:SetAttribute("Power", power)
 
         projectile.Size += PROJECTILE_SIZE_BASE.Unit * PROJECTILE_SIZE_SCALE * dt
-        print(projectile.Size)
     end
 end)
 
