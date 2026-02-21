@@ -211,7 +211,7 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 		task.wait()
 		local corpse = participant.Corpse
 		if not corpse or not corpse.Model then
-			return print("hoooooooooooooooooooooooooo")
+			return
 		end
 
 		deathData[corpse.Model] = {
