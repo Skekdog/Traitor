@@ -67,6 +67,8 @@ local itemDefinition = Melee({
 	Description = "",
 	IconContent = Content.none,
 
+	DropDisabled = true,
+
 	IsEvilItem = true,
 
 	Model = ReplicatedStorage.Assets.ItemModels.SpoonItem,
