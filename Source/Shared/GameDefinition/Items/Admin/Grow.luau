@@ -14,7 +14,6 @@ local BASE_PRESSURE = 10000
 local POWER_SCALE_RATE = 2 -- 1 power every half second
 
 local PROJECTILE = ReplicatedStorage.Assets.Projectiles.SimulatedBullet
-local PROJECTILE_SIZE_SCALE = 1.5
 local PROJECTILE_SIZE_BASE = PROJECTILE.Size
 
 local projectiles: {BasePart} = {}
@@ -48,6 +47,9 @@ local Grow = Gun({
     PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired["Five-Seven"],
     ReloadSound = ReplicatedStorage.Assets.ItemSounds.Reload["Five-Seven"],
 
+    MaxBounces = 3,
+    ShouldPlayersStopBounces = true,
+
     OnProjectileDespawn = function(_, projectile, participant): ()
         local power = projectile:GetAttribute("Power") :: number? or 0
 
@@ -79,7 +81,7 @@ local Grow = Gun({
 
     Projectile = PROJECTILE,
     IsProjectileSimulated = true,
-    ProjectileSpeed = 50,
+    ProjectileSpeed = 75,
 
     RecoilX = 0.2,
     RecoilY = 1.0,
@@ -90,7 +92,7 @@ RunService.PostSimulation:Connect(function(dt)
         local power = (projectile:GetAttribute("Power") :: number? or 0) + POWER_SCALE_RATE * dt
         projectile:SetAttribute("Power", power)
 
-        projectile.Size += PROJECTILE_SIZE_BASE.Unit * PROJECTILE_SIZE_SCALE * dt
+        projectile.Size += PROJECTILE_SIZE_BASE.Unit * POWER_SCALE_RATE * dt
     end
 end)
 
