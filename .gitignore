@@ -2,6 +2,6 @@
 *.rbxl.lock
 sourcemap.json
 *.env
-*.rbxm
-*.rbxmx
+/*.rbxm
+/*.rbxmx
 Ignore/
