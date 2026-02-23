@@ -12,9 +12,11 @@ local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
 	ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
 end
 
+local BADGE_ID = 2136698808
+
 local function tryAwardTesterBadge(plr: Player): ()
 	local _, hasBadge = pcall(function()
-		return BadgeService:UserHasBadgeAsync(plr.UserId, 2136698808)
+		return BadgeService:UserHasBadgeAsync(plr.UserId, BADGE_ID)
 	end)
 
 	if hasBadge then
@@ -25,7 +27,7 @@ local function tryAwardTesterBadge(plr: Player): ()
 	local suc = false
 	repeat
 		suc = pcall(function()
-			BadgeService:AwardBadgeAsync(plr.UserId, 2136698808)
+			BadgeService:AwardBadgeAsync(plr.UserId, BADGE_ID)
 		end)
 		task.wait(1)
 	until suc or tries > 3
