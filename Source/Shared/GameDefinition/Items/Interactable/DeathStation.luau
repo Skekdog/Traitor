@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local DNAScanner = require(script.Parent.DNAScanner)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local InteractableItem = require(ReplicatedStorage.API.Item.Presets.InteractableItem)
+local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 
 local DeathStation = InteractableItem({
 	Name = "DeathStation",
