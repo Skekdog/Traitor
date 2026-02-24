@@ -21,7 +21,7 @@ local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local module = {}
 
-local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.ThoseYouTrust)
+local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.PropHunt)
 
 local EXCLUDED_GAMEMODES: {Instance} = {}
 
