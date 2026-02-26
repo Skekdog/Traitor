@@ -513,7 +513,7 @@ local function onDeath(round: Types.Round, victim: Types.Participant, deferVicto
 end
 
 local gamemode: Types.GamemodeDefinition = {
-	Name = "ThoseYouTrust",
+	Name = "Traitor",
 	DisplayName = "Traitor!",
 	Description = "Spy HQ has been infilitrated by Traitors. Can you separate those you trust, from those you shouldn't?",
 	Authors = "@Skekdogs",
