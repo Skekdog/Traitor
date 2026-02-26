@@ -58,6 +58,8 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
 				Description = highlightParams.Description:format(attacker:GetFormattedName(), kills),
 				Priority = highlightParams.Priority,
 				Group = identifier,
+				ScoreBonus = math.floor(highlightParams.Threshold / 2),
+				Participants = {attacker},
 			}
 			round:AddHighlight(highlight)
 		end
