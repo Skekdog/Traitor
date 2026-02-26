@@ -5,7 +5,7 @@ local Modify = require(ReplicatedStorage.API.Modify)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
+local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 
 local Propper = {}
 
@@ -23,28 +23,38 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	local participant = params.Attacker
 	assert(participant)
 
+	local morph = Instance.new("Model")
+
+	local humanoid = Instance.new("Humanoid")
+	humanoid.RequiresNeck = false
+	humanoid.RigType = Enum.HumanoidRigType.R6
+	humanoid.Parent = morph
+
+	local model = prop.Model:Clone()
+	local root = GetPrimaryPart(model)
+
+	for _, part in model:GetChildren() do
+		part.Parent = morph
+	end
+
+	local head = CreateEmptyPart(root.CFrame)
+	head.Name = "Head"
+	head.Parent = morph
+
+	root.Name = "HumanoidRootPart"
+	morph.PrimaryPart = root
+
 	local character = participant:GetCharacter()
 	assert(character)
 
-	local root = character.PrimaryPart
-	assert(root)
+	local charHead = character:FindFirstChild("Head")
+	if not charHead or not charHead:IsA("BasePart") then
+		return false
+	end
 
-	character:ScaleTo(0.0001)
-	ForEachPart(character, function(part)
-		part.Transparency = 1
-	end)
+	morph:PivotTo(charHead:GetPivot())
 
-	local model = prop.Model:Clone()
-
-	local part = GetPrimaryPart(model)
-	part.CFrame = root.CFrame
-
-	local weld = Instance.new("WeldConstraint")
-	weld.Part0 = root
-	weld.Part1 = part
-	weld.Parent = model
-
-	;(model :: Instance).Parent = character
+	participant:SpawnCharacter(morph)
 
 	remote:FireClient(participant.Player, true)
 

@@ -67,16 +67,13 @@ local function initRemoveDeathSound(root: BasePart): ()
 end
 
 local function initHeadTiltAsync(char: Model): ()
-    local neck = char:WaitForChild("Head"):WaitForChild("NeckBallSocket")
-    assert(neck:IsA("BallSocketConstraint"), "Neck is not a BallSocketConstraint")
-
     local camera = workspace.CurrentCamera
 
     local y = camera.CFrame:ToOrientation()
-    while neck:IsDescendantOf(char) do
+    while char:IsDescendantOf(workspace) do
         task.wait(1 / 20)
 
-        if not neck:IsDescendantOf(char) then
+        if not char:IsDescendantOf(workspace) then
             break
         end
 
