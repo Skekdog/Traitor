@@ -8,7 +8,9 @@ function module.AddHighlight(round: Types.Round, highlightParams: Types.Highligh
 		Title = highlightParams.Title,
 		Description = highlightParams.Description:format(participant:GetFormattedName(), ...),
 		Priority = highlightParams.Priority,
-		Group = highlightParams.Group
+		Group = highlightParams.Group,
+		ScoreBonus = highlightParams.ScoreBonus,
+		Participants = {participant},
 	}
 	round:AddHighlight(highlight)
 end
@@ -18,6 +20,7 @@ local suicideHighlight = {
 	Description = "%s was the only one who killed themselves.",
 	Priority = 1,
 	Group = "Suicide",
+	ScoreBonus = -1,
 }
 
 local suicideCultHighlight = {
@@ -25,6 +28,7 @@ local suicideCultHighlight = {
 	Description = "%s showed the other suiciders how to do it by being the first to go.",
 	Priority = 2,
 	Group = "Suicide",
+	ScoreBonus = 2,
 }
 
 local fieldResearchHighlight = {
@@ -32,6 +36,7 @@ local fieldResearchHighlight = {
 	Description = "%s tested their own resistance to explosions. It was not high enough.",
 	Priority = 1,
 	Group = "Explosives",
+	ScoreBonus = 1,
 }
 
 local explosivesResearchGrantHighlight = {
@@ -39,6 +44,7 @@ local explosivesResearchGrantHighlight = {
 	Description = "%s was recognized for their research on explosions. %d test subjects helped out.",
 	Priority = 2,
 	Group = "Explosives",
+	ScoreBonus = 1,
 }
 
 local pushKillHighlight = {
@@ -60,6 +66,7 @@ local headshots1 = {
 	Description = "%s discovered the joy of headshots and made %d.",
 	Priority = 1,
 	Group = "Headshots",
+	ScoreBonus = 2,
 }
 
 local headshots2 = {
@@ -67,6 +74,7 @@ local headshots2 = {
 	Description = "%s removed the brains from %d heads for a closer examination.",
 	Priority = 3,
 	Group = "Headshots",
+	ScoreBonus = 3,
 }
 
 local headshots3 = {
@@ -74,6 +82,7 @@ local headshots3 = {
 	Description = "%s applied their murder simulation training and headshotted %d foes.",
 	Priority = 5,
 	Group = "Headshots",
+	ScoreBonus = 4,
 }
 
 local iHateThisGame = {
@@ -81,6 +90,7 @@ local iHateThisGame = {
 	Description = "%s died right after the start of the round.",
 	Priority = 1,
 	Group = "Death Time",
+	ScoreBonus = -1,
 }
 
 local pyrrhicVictory = {
@@ -88,6 +98,7 @@ local pyrrhicVictory = {
 	Description = "%s died only seconds before their team won the round.",
 	Priority = 1,
 	Group = "Death Time",
+	ScoreBonus = 1,
 }
 
 local burn1 = {
@@ -102,6 +113,7 @@ local burn2 = {
 	Description = "%s was heard cackling loudly after burning one of their many victims.",
 	Priority = 4,
 	Group = "Burning",
+	ScoreBonus = 1,
 }
 
 local burn3 = {
@@ -109,6 +121,7 @@ local burn3 = {
 	Description = "%s burned them all, but is now all out of incendiary grenades! How will they cope!?",
 	Priority = 5,
 	Group = "Burning",
+	ScoreBonus = 2,
 }
 
 local crush1 = {
@@ -123,6 +136,7 @@ local crush2 = {
 	Description = "%s dedicated their time to the science of bone-breaking. %d test subjects did not live to see the outcome.",
 	Priority = 4,
 	Group = "Propkills",
+	ScoreBonus = 1,
 }
 
 local drown = {
@@ -137,6 +151,7 @@ local bodies1 = {
 	Description = "%s found %d bodies lying around.",
 	Priority = 1,
 	Group = "Bodies Found",
+	ScoreBonus = 1,
 }
 
 local bodies2 = {
@@ -144,6 +159,7 @@ local bodies2 = {
 	Description = "%s found %d corpses for their collection.",
 	Priority = 2,
 	Group = "Bodies Found",
+	ScoreBonus = 2,
 }
 
 local bodies3 = {
@@ -151,6 +167,7 @@ local bodies3 = {
 	Description = "%s keeps stumbling on random corpses, %d times this round.",
 	Priority = 3,
 	Group = "Bodies Found",
+	ScoreBonus = 3,
 }
 
 local moron = {
