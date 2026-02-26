@@ -4,6 +4,15 @@ local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local MakeGolden = require(ReplicatedStorage.API.MakeGolden)
 local Types = require(ReplicatedStorage.API.Types)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
+
+local killHighlight = {
+    Title = "I'm The Guy With The Gun",
+    Description = "%s swiftly brought down justice on their target.",
+    Priority = 4,
+    Threshold = 1,
+    ScoreBonus = 2,
+}
 
 local GoldenGun = Gun({
 	Name = "Golden Gun",
@@ -41,7 +50,10 @@ local GoldenGun = Gun({
         assert(attacker)
 
         if attacker:IsDamageJustifiedAgainstParticipant(target) then
+            KillHighlights(killHighlight)(item, params, target)
+
             MakeGolden(target)
+
             target:TryTakeDamage({
                 Amount = math.huge,
                 Attacker = attacker,

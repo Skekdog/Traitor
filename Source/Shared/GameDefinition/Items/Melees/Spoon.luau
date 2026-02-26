@@ -6,6 +6,7 @@ local Types = require(ReplicatedStorage.API.Types)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 
 local Spoon = {}
 
@@ -94,6 +95,18 @@ local itemDefinition = Melee({
 	AlternateFireServer = Crowbar.AlternateFireServer,
 	AlternateFireClient = Crowbar.AlternateFireClient,
 	AlternateInterval = 0.75,
+
+	BeforeHitParticipant = KillHighlights({
+		Title = "Chopsticks Are Better",
+		Description = "%s made messy work of 1 person with a spoon.",
+		Priority = 2,
+		Threshold = 1,
+	}, {
+		Title = "Chopsticks Are Better",
+		Description = "%s made messy work of %d people with a spoon.",
+		Priority = 3,
+		Threshold = 2,
+	})
 })
 
 if RunService:IsServer() then

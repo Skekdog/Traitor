@@ -3,6 +3,7 @@ local Discombobulate = require(ReplicatedStorage.API.Discombobulate)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 
 local UMP = Gun({
 	Name = "UMP",
@@ -40,6 +41,18 @@ local UMP = Gun({
 
     RecoilX = 0.75,
     RecoilY = 1.75,
+
+    BeforeHitParticipant = KillHighlights({
+        Title = "Disorientating",
+        Description = "%d people spent their last moments utterly confused by %s.",
+        Priority = 2,
+        Threshold = 2,
+    }, {
+        Title = "Help I'm Lost",
+        Description = "%s made the world spin for %d victims.",
+        Priority = 2,
+        Threshold = 4,
+    })
 })
 
 return UMP
