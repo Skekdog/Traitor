@@ -57,6 +57,8 @@ function Highlights.OnDeath(round: Types.Round, participant: Types.Participant):
 			Description = corpse.Killer:GetFormattedName() .. " was responsible for the first death of the round.",
 			Priority = 1,
 			Group = "First Blood",
+			ScoreBonus = 2,
+			Participants = {corpse.Killer},
 		})
 	end
 
@@ -68,6 +70,8 @@ function Highlights.OnDeath(round: Types.Round, participant: Types.Participant):
 				Description = participant:GetFormattedName() .. ` ended {participant.Extras.PoliceKills} lives of espionage today.`,
 				Group = "PoliceKills",
 				Priority = 2,
+				ScoreBonus = 2,
+				Participants = {participant},
 			})
 		end
 	elseif participant:GetRole().Definition.Name == "Undercover" then
@@ -78,6 +82,8 @@ function Highlights.OnDeath(round: Types.Round, participant: Types.Participant):
 				Description = participant:GetFormattedName() .. ` executed {participant.Extras.UndercoverKills} spies. All whilst pretending to be one themselves.`,
 				Group = "UndercoverKills",
 				Priority = 2,
+				ScoreBonus = 2,
+				Participants = {participant},
 			})
 		end
 	end
@@ -90,6 +96,8 @@ function Highlights.OnDeath(round: Types.Round, participant: Types.Participant):
 				Description = participant:GetFormattedName() .. ` was merely framed for {participant.Extras.FramedKills} crimes.`,
 				Group = "FramedKills",
 				Priority = 2,
+				ScoreBonus = 2,
+				Participants = {participant},
 			})
 		end
 	end

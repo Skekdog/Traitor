@@ -171,6 +171,8 @@ local gamemode: Types.GamemodeDefinition = {
                         Description = attacker:GetFormattedName() .. " drew the first blood of the round.",
                         Priority = 2,
                         Group = "First Blood",
+                        ScoreBonus = 2,
+                        Participants = {attacker},
                     })
                 end
             end
@@ -206,6 +208,8 @@ local gamemode: Types.GamemodeDefinition = {
                 Description = mostKillsParticipant:GetFormattedName() .. " scored the most kills this round.",
                 Group = "Most Kills",
                 Priority = 2,
+                ScoreBonus = 2,
+                Participants = {mostKillsParticipant},
             })
         end
     end,

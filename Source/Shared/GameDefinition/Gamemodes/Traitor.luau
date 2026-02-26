@@ -305,6 +305,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 						Description = attacker:GetFormattedName() .. " showed the first one was not a lucky shot by killing another.",
 						Group = "Traitor Correct Kills",
 						Priority = 2,
+						ScoreBonus = 1,
+						Participants = {attacker},
 					})
 				elseif kills == 3 then
 					round:AddHighlight({
@@ -312,6 +314,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 						Description = attacker:GetFormattedName() .. " ended three innocent lives of espionage today.",
 						Group = "Traitor Correct Kills",
 						Priority = 3,
+						ScoreBonus = 2,
+						Participants = {attacker},
 					})
 				elseif kills > 3 and kills < 7 then
 					round:AddHighlight({
@@ -319,6 +323,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 						Description = attacker:GetFormattedName() .. ` eats innocent spies for dinner. A dinner of {kills} courses.`,
 						Group = "Traitor Correct Kills",
 						Priority = 4,
+						ScoreBonus = 3,
+						Participants = {attacker},
 					})
 				else
 					round:AddHighlight({
@@ -326,6 +332,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 						Description = attacker:GetFormattedName() .. " gets paid per kill. Can now buy another luxury yacht.",
 						Group = "Traitor Correct Kills",
 						Priority = 5,
+						ScoreBonus = 4,
+						Participants = {attacker},
 					})
 				end
 			end
@@ -335,6 +343,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 				Description = attacker:GetFormattedName() .. " scored the first kill by shooting a fellow traitor. Good job.",
 				Priority = 5,
 				Group = "Teamkilling",
+				ScoreBonus = -2,
+				Participants = {attacker}
 			})
 		end
 	else
@@ -345,6 +355,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 					Description = attacker:GetFormattedName() .. " was the first to kill. Too bad it was an innocent comrade.",
 					Priority = 1,
 					Group = "Teamkilling",
+					ScoreBonus = -1,
+					Participants = {attacker},
 				})
 			else
 				round:AddHighlight({
@@ -352,6 +364,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 					Description = attacker:GetFormattedName() .. " struck the first blow for the innocent spies by making the first death a traitor's.",
 					Priority = 1,
 					Group = "Correct kills",
+					ScoreBonus = 2,
+					Participants = {attacker},
 				})
 				attacker.Extras.CorrectTraitorKills = 1
 			end
@@ -365,6 +379,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 					Description = attacker:GetFormattedName() .. " found a traitor. Shot a traitor. Easy.",
 					Priority = 2,
 					Group = "Innocent Correct Kills",
+					ScoreBonus = 1,
+					Participants = {attacker},
 				})
 			elseif kills == 2 then
 				round:AddHighlight({
@@ -372,6 +388,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 					Description = attacker:GetFormattedName() .. " escorted two traitors to the great beyond.",
 					Priority = 3,
 					Group = "Innocent Correct Kills",
+					ScoreBonus = 3,
+					Participants = {attacker},
 				})
 			elseif kills == 3 then
 				round:AddHighlight({
@@ -379,6 +397,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 					Description = attacker:GetFormattedName() .. " put three traitors to rest.",
 					Priority = 4,
 					Group = "Innocent Correct Kills",
+					ScoreBonus = 4,
+					Participants = {attacker}
 				})
 			else
 				round:AddHighlight({
@@ -386,6 +406,8 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
 					Description = attacker:GetFormattedName() .. " gets paid per kill. Can now order their fifth swimming pool.",
 					Priority = 5,
 					Group = "Innocent Correct Kills",
+					ScoreBonus = 5,
+					Participants = {attacker},
 				})
 			end
 		end
@@ -612,6 +634,8 @@ local gamemode: Types.GamemodeDefinition = {
 				Description = awardDeadliestAmongEquals:GetFormattedName() .. " was responsible for every traitor death made by the innocents this round.",
 				Priority = 2,
 				Group = "Innocent Correct Kills",
+				ScoreBonus = 2,
+				Participants = {awardDeadliestAmongEquals},
 			})
 		end
 
@@ -621,6 +645,8 @@ local gamemode: Types.GamemodeDefinition = {
 				Description = awardLoneWolf:GetFormattedName() .. " was responsible for every innocent death made by a traitor this round.",
 				Priority = 2,
 				Group = "Traitor Correct Kills",
+				ScoreBonus = 2,
+				Participants = {awardLoneWolf},
 			})
 		end
 	end,
