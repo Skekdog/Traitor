@@ -16,14 +16,14 @@ function Camera.EnterAnimationView(): ()
 end
 
 function Camera.EnterFirstPerson(): ()
-	player.CameraMinZoomDistance = THIRD_PERSON_MAX_ZOOM
-	player.CameraMaxZoomDistance = THIRD_PERSON_MIN_ZOOM
+	player.CameraMinZoomDistance = THIRD_PERSON_MIN_ZOOM
+	player.CameraMaxZoomDistance = THIRD_PERSON_MAX_ZOOM
 	player.CameraMode = Enum.CameraMode.LockFirstPerson
 end
 
-function Camera.EnterThirdPerson(): ()
-	player.CameraMinZoomDistance = THIRD_PERSON_MAX_ZOOM
-	player.CameraMaxZoomDistance = THIRD_PERSON_MIN_ZOOM
+function Camera.EnterThirdPerson(maxZoom: number?): ()
+	player.CameraMinZoomDistance = THIRD_PERSON_MIN_ZOOM
+	player.CameraMaxZoomDistance = maxZoom or THIRD_PERSON_MAX_ZOOM
 	player.CameraMode = Enum.CameraMode.Classic
 end
 

@@ -81,6 +81,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	humanoid.Health = math.min(health, participant:GetHealth())
 	humanoid.MaxHealth = health
 
+	morph.Parent = workspace.Characters
 	root:SetNetworkOwner(participant.Player)
 
 	remote:FireClient(participant.Player, true)
@@ -91,7 +92,7 @@ end
 if RunService:IsClient() then
 	local Camera = require(ReplicatedStorage.API.Camera)
 	remote.OnClientEvent:Connect(function(doThirdPerson: boolean): ()
-		Camera.EnterAnimationView()
+		Camera.EnterThirdPerson(10)
 	end)
 end
 

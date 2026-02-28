@@ -37,7 +37,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         IsEvil = true,
 
-        StartingItems = {},
+        StartingItems = {Items["Crowbar"]},
         StartingCredits = 1,
 
         EquipmentShop = {
@@ -49,6 +49,10 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         CanSeeMissingInAction = true,
         CanStealCreditsFromCorpses = true,
+
+        AwardCreditsToRolesOnDeath = {
+            Prop = 1,
+        },
 
         RevealedRoles = {"Hunter", "Prop"},
     },
@@ -105,6 +109,7 @@ local function onStart(round: Types.Round): ()
         round:SetPhase("Playing", ROUND_DURATION - HIDE_TIME)
         for _, hunter in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Hunter")) do
             hunter:MoveToSpawn()
+            hunter:AddItem(round:LoadItem(Items["Radar"]))
         end
     end)
 end
@@ -324,6 +329,11 @@ local gamemode: Types.GamemodeDefinition = {
         if attacker then
             awardScoreForKill(attacker, participant)
             killHighlights(attacker, participant)
+
+            if attacker:GetRole().Definition == roles.Hunter and participant:GetRole().Definition == roles.Prop then
+                attacker:AddCredits(1)
+                round:SendMessage(attacker.Player, attacker:GetRole():GetFormattedName() .. ", you have been awarded 1 credit for your work.")
+            end
         end
 
         if deferVictoryCheck then
