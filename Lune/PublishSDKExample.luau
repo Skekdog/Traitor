@@ -77,6 +77,24 @@ local name =
 	elseif kind == "assets" then "Assets"
 	else process.args[2]
 
-assert(name, "Invalid name. Expected usage: PublishSDKExample map|gamemode|items|assets|all mapName|gamemodeName")
+assert(name, "Invalid name. Expected usage: PublishSDKExample map|gamemode|items|assets|all mapName|gamemodeName|all")
+
+if name == "all" then
+	if kind == "gamemode" then
+		for _, gamemode in EXAMPLE_GAMEMODES do
+			print("Publishing gamemode: " .. gamemode)
+			publish(gamemode, kind)
+		end
+	elseif kind == "map" then
+		for _, map in EXAMPLE_MAPS do
+			print("Publishing map: " .. map)
+			publish(map, kind)
+		end
+	else
+		error("Invalid kind. Expected usage: PublishSDKExample map|gamemode|items|assets|all mapName|gamemodeName|all")
+	end
+
+	return
+end
 
 publish(name, kind)
