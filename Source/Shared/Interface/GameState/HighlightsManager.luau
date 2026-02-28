@@ -98,7 +98,7 @@ local function populateScores(): ()
 		for reason, value in v do
 			assert(value)
 			local reasonFrame = scoreList.Template:Clone()
-			reasonFrame.Text = reason:gsub("_", " ") .. (if value > 0 then " +" else " -") .. math.abs(value)
+			reasonFrame.Text = reason .. (if value > 0 then " +" else " -") .. math.abs(value)
 			reasonFrame.Name = reason
 			reasonFrame.Visible = true
 			reasonFrame.Parent = scoreList

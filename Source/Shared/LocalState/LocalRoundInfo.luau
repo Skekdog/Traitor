@@ -135,8 +135,9 @@ function module.GetPlayerScores(): {[string]: Types.ScoreTable}
         if v:IsA("StringValue") then
             local name = v.Name
             playerScores[name] = {}
-            for reason, value in v:GetAttributes() do
-                playerScores[name][reason] = value :: number
+            for _, scoreValue in v:GetChildren() do
+                assert(scoreValue:IsA("IntValue"))
+                playerScores[name][scoreValue.Name] = scoreValue.Value
             end
         end
     end
