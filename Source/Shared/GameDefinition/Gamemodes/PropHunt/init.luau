@@ -254,7 +254,7 @@ local gamemode: Types.GamemodeDefinition = {
 
     AssignRoles = function(i, participants: {Types.Participant})
         for i, v in participants do
-            if i % 2 == 0 then
+            if i % 2 == 1 then
                 v:SetRole(roles.Hunter)
             else
                 v:SetRole(roles.Prop)
@@ -340,6 +340,15 @@ local gamemode: Types.GamemodeDefinition = {
 
     BeforeDamageParticipant = beforeDamageParticipant,
     BeforeDamageProp = beforeDamageProp,
+
+    UnloadGamemode = function(round): ()
+        local map = round:GetMap()
+        local platform = map.Structure.Dynamic:FindFirstChild("_PropHunt_Platform")
+
+        if platform then
+            platform:Destroy()
+        end
+    end
 }
 
 return gamemode
