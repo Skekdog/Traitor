@@ -56,7 +56,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	head.Anchored = false
 	head.Name = "Head"
 
-	local weld = Instance.new("WeldConstraint")
+	local weld = Instance.new("Weld")
 	weld.Part0 = root
 	weld.Part1 = head
 	weld.Parent = head
