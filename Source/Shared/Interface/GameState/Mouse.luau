@@ -25,7 +25,10 @@ function module.ShowPlayerInfo(char: Model)
         return
     end
 
-	if char:GetAttribute("IsDisguised") then
+	local theirRole = LocalParticipantInfo.GetParticipant(plr.Name).Role()
+	local ourRole = LocalParticipantInfo.GetParticipant().Role()
+
+	if char:GetAttribute("IsDisguised") and not ourRole:IsAlliedWith(theirRole) then
 		return
 	end
 
@@ -39,7 +42,6 @@ function module.ShowPlayerInfo(char: Model)
         return
     end
 
-	local role = LocalParticipantInfo.GetParticipant(plr.Name).Role()
 	playerInfo:FindFirstChild("Name").Text = plr.Name
 
 	local healthPercent = health / hum.MaxHealth * 100
@@ -77,8 +79,8 @@ function module.ShowPlayerInfo(char: Model)
 	playerInfo.Karma.Text = karmaText
 	playerInfo.Karma.TextColor3 = Color3.new(1, 0.4, 0):Lerp(Color3.new(1, 1, 1), (karma - 600) / 400)
 
-	if role then
-		playerInfo.Role.Text = role:GetFormattedName()
+	if theirRole then
+		playerInfo.Role.Text = theirRole:GetFormattedName()
 		playerInfo.Role.Visible = true
 	else
 		playerInfo.Role.Visible = false
