@@ -252,9 +252,15 @@ local gamemode: Types.GamemodeDefinition = {
 
     GetRoundEndMusic = getVictoryMusic,
 
-    AssignRoles = function(i, participants: {Types.Participant})
+    AssignRoles = function(i, participants: {Types.Participant}): ()
+        if #participants == 1 then
+            participants[1]:SetRole(roles.Prop)
+            return
+        end
+
+        local numHunters = math.max(#participants // 4, 1)
         for i, v in participants do
-            if i % 2 == 1 then
+            if i <= numHunters then
                 v:SetRole(roles.Hunter)
             else
                 v:SetRole(roles.Prop)
