@@ -102,7 +102,7 @@ local function onStart(round: Types.Round): ()
     for _, hunter in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Hunter")) do
         local char = hunter:GetCharacter()
         if char then
-            char:PivotTo(platform.CFrame)
+            char:PivotTo(platform.CFrame * CFrame.new(0, 5, 0))
         end
     end
 
