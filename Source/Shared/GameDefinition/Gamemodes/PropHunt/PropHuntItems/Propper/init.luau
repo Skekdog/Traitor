@@ -9,6 +9,8 @@ local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.Create
 
 local Propper = {}
 
+local DEFAULT_HEALTH = 50
+
 local remote = GetRemote("ThirdPerson", script)
 
 local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop: Types.Prop): boolean
@@ -62,6 +64,10 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	morph:PivotTo(charHead:GetPivot())
 
 	participant:SpawnCharacter(morph, true)
+
+	local health = prop:GetHealth() or DEFAULT_HEALTH
+	humanoid.Health = math.min(health, participant:GetHealth())
+	humanoid.MaxHealth = health
 
 	root:SetNetworkOwner(participant.Player)
 
