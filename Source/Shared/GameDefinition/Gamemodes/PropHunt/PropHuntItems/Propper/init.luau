@@ -61,7 +61,8 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 		return false
 	end
 
-	morph:PivotTo(charHead:GetPivot())
+	local propSize = if model:IsA("Model") then model:GetExtentsSize() else model.Size
+	morph:PivotTo(charHead:GetPivot() * CFrame.new(Vector3.new(0, propSize.Y, 0)))
 
 	participant:SpawnCharacter(morph, true)
 
