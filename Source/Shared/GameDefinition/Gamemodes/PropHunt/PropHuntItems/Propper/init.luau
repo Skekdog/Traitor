@@ -38,7 +38,14 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	end
 
 	local head = CreateEmptyPart(root.CFrame)
+	head.Anchored = false
 	head.Name = "Head"
+
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = root
+	weld.Part1 = head
+	weld.Parent = head
+
 	head.Parent = morph
 
 	root.Name = "HumanoidRootPart"
@@ -55,6 +62,8 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	morph:PivotTo(charHead:GetPivot())
 
 	participant:SpawnCharacter(morph)
+
+	root:SetNetworkOwner(participant.Player)
 
 	remote:FireClient(participant.Player, true)
 
