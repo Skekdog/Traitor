@@ -42,6 +42,9 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         EquipmentShop = {
             Items["Jetpack"],
+			Items["Teleporter"],
+			Items["Golden Gun"],
+			Items["UMP"],
         },
 
         CanSeeMissingInAction = true,
@@ -63,7 +66,13 @@ local roles: {[string]: Types.RoleDefinition} = {
         StartingCredits = 1,
 
         EquipmentShop = {
-            Items["Radar"]
+            Items["Radar"],
+			Items["Decoy"],
+			Items["Newton Launcher"],
+			Items["Radio"],
+			Items["Flashbang"],
+			Items["FreezeGrenade"],
+			Items["Cheeze"],
         },
 
         CanSeeMissingInAction = true,
