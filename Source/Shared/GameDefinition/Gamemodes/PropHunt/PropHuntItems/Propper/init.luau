@@ -61,7 +61,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	morph:PivotTo(charHead:GetPivot())
 
-	participant:SpawnCharacter(morph)
+	participant:SpawnCharacter(morph, true)
 
 	root:SetNetworkOwner(participant.Player)
 
