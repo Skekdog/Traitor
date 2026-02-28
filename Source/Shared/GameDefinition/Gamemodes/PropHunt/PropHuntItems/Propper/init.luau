@@ -25,6 +25,18 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	local participant = params.Attacker
 	assert(participant)
 
+	local character = participant:GetCharacter()
+	assert(character)
+
+	local charRoot = character.PrimaryPart
+	if not charRoot then
+		return false
+	end
+
+	if charRoot:GetAttribute("PropName") == prop.Model.Name then
+		return false
+	end
+
 	local morph = Instance.new("Model")
 
 	local humanoid = Instance.new("Humanoid")
@@ -50,11 +62,9 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	head.Parent = morph
 
+	root:SetAttribute("PropName", model.Name)
 	root.Name = "HumanoidRootPart"
 	morph.PrimaryPart = root
-
-	local character = participant:GetCharacter()
-	assert(character)
 
 	local charHead = character:FindFirstChild("Head")
 	if not charHead or not charHead:IsA("BasePart") then
