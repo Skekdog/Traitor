@@ -314,6 +314,24 @@ local gamemode: Types.GamemodeDefinition = {
 
     AddFinishHighlights = function(round)
         StandardGame.Highlights.FinishHighlights(round)
+
+        local victor = assert(round.VictoryData).Victor
+        assert(victor.Kind == "Role")
+
+        if victor.Definition == roles.Prop then
+            local props = round:GetParticipantsWithRole(victor)
+
+            local survivingProps = 0
+            for _, prop in props do
+                if prop:IsAlive() then
+                    survivingProps += 1
+                end
+            end
+
+            for _, prop in props do
+                prop:AddScore("Surviving Props", 0.25 * survivingProps)
+            end
+        end
     end,
 
     OnStart = onStart,

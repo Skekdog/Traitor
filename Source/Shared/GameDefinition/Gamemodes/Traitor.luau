@@ -649,6 +649,38 @@ local gamemode: Types.GamemodeDefinition = {
 				Participants = {awardLoneWolf},
 			})
 		end
+
+		assert(round.VictoryData and round.VictoryData.Victor.Kind == "Role")
+		local victorRole = round.VictoryData.Victor
+
+		if victorRole.Definition == roles.Traitor then
+			local traitors = round:GetParticipantsWithRole(victorRole)
+
+			local survivingTraitors = 0
+			for _, participant in traitors do
+				if participant:IsAlive() then
+					survivingTraitors += 1
+				end
+			end
+
+			for _, traitor in traitors do
+				traitor:AddScore("Surviving Traitors", 2 * #traitors)
+			end
+		else
+			local innocents: {Types.Participant} = {}
+
+			local survivingInnocents = 0
+			for _, participant in round:GetParticipants() do
+				if participant:IsAlive() and participant:GetRole():IsAlliedWith(round:GetRoleFromRoleName("Innocent")) then
+					survivingInnocents += 1
+					table.insert(innocents, participant)
+				end
+			end
+
+			for _, innocent in innocents do
+				innocent:AddScore("Surviving Innocents", 0.25 * survivingInnocents)
+			end
+		end
 	end,
 }
 

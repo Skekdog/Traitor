@@ -202,6 +202,11 @@ local gamemode: Types.GamemodeDefinition = {
             end
         end
 
+        local winner = assert(round.VictoryData).Victor
+        assert(winner.Kind == "Participant")
+
+        winner:AddScore("Winner", 3)
+
         if mostKillsParticipant then
             round:AddHighlight({
                 Title = "Most Kills",

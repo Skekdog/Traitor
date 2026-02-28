@@ -347,6 +347,26 @@ local gamemode: Types.GamemodeDefinition = {
 
 	AddFinishHighlights = function(round)
 		Highlights.AddQuote(round)
+
+		local victor = assert(round.VictoryData).Victor
+
+		if victor.Kind == "Participant" then
+			victor:AddScore("Winner", 3)
+		else
+			local police: {Types.Participant} = {}
+
+			local survivingPolice = 0
+			for _, participant in round:GetParticipants() do
+				if participant:IsAlive() and participant:GetRole():IsAlliedWith(round:GetRoleFromRoleName("Police")) then
+					survivingPolice += 1
+					table.insert(police, participant)
+				end
+			end
+
+			for _, innocent in police do
+				innocent:AddScore("Surviving Police", survivingPolice)
+			end
+		end
 	end,
 
 	OnDeath = OnDeath,
