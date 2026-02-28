@@ -35,7 +35,7 @@ local shouldPublish = process.args[2] == "publish"
 local universeId = if placeId == LABS_PLACE_ID then LABS_UNIVERSE_ID else STANDARD_UNIVERSE_ID
 local API_KEY = Env.APIKEY or error("Missing APIKEY in .env")
 
-local PROJECT_FILE_PATH = "default.project.json"
+local PROJECT_FILE_PATH = "build.project.json"
 
 local game = BuildLib(NAME, PROJECT_FILE_PATH)
 

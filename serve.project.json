@@ -1,0 +1,98 @@
+{
+  "name": "Traitor!",
+
+  "emitLegacyScripts": false,
+
+  "globIgnorePaths": ["**/*.rbxm", "**/*.rbxmx"],
+
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "$path": "Source/Server"
+    },
+
+    "ReplicatedStorage": {
+      "Shared": {
+        "$className": "Folder",
+        "$path": "Source/Shared"
+      },
+
+      "API": {
+        "$path": "Source/API",
+
+        "Types": {
+          "$path": "Source/Shared/RoundRule/src/Types.luau"
+        }
+      },
+
+      "SharedModules": {
+        "$className": "Folder",
+        "$path": "Source/TT2Compat/SharedModules"
+      },
+
+      "Compat": {
+        "$className": "Folder",
+        "$path": "Source/TT2Compat/Compat"
+      },
+
+      "Assets": {
+        "$className": "Folder",
+        "$ignoreUnknownInstances": true,
+        "MapPrefabs": {
+          "$className": "Folder",
+          "$path": "Source/TT2Compat/MapPrefabs"
+        }
+      },
+
+      "Remotes": {
+        "$className": "Folder",
+        "$path": "Remotes"
+      }
+    },
+
+    "ServerStorage": {
+      "ServerModules": {
+        "$className": "Folder",
+        "$path": "Source/TT2Compat/ServerModules"
+      }
+    },
+
+    "Workspace": {
+      "$ignoreUnknownInstances": true,
+      "$path": "Services/Workspace"
+    },
+
+    "SoundService": {
+      "$path": "Services/SoundService"
+    },
+
+    "TextChatService": {
+      "$path": "Services/TextChatService"
+    },
+
+    "Players": {
+      "$path": "Services/Players"
+    },
+
+    "StarterGui": {
+      "$path": "Services/StarterGui"
+    },
+
+    "StarterPlayer": {
+      "$path": "Services/StarterPlayer"
+    },
+
+    "Lighting": {
+      "$path": "Services/Lighting"
+    },
+
+    "VoiceChatService": {
+      "$path": "Services/VoiceChatService"
+    },
+
+    "VRService": {
+      "$path": "Services/VRService"
+    }
+  }
+}
