@@ -75,7 +75,7 @@ end
 
 if RunService:IsClient() then
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	local ui = UIManager.RegisterUI(script.Parent.Parent.Interface.FramedRedHandedUI) :: UIManager.UI & {Object: typeof(script.Parent.Parent.Interface.FramedRedHandedUI)}
+	local ui = UIManager.RegisterUI(ReplicatedStorage.Assets.Gamemode.Framed.UI.FramedRedHandedUI) :: UIManager.UI & {Object: typeof(ReplicatedStorage.Assets.Gamemode.Framed.UI.FramedRedHandedUI)}
 
 	local currentTween: Tween?
 	remote.OnClientEvent:Connect(function(stop: true?)

@@ -15,7 +15,7 @@ local item: Types.ItemComponents = {
 	Description = "Blends in with the framed.",
 	IconContent = Content.none,
 
-	Model = script.FakeTargetChecker,
+	Model = ReplicatedStorage.Assets.Gamemode.Framed.Items.FakeTargetChecker,
 	HoldAnimation = Content.fromAssetId(122493302142724),
 
 	ItemGroup = {

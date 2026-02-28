@@ -1,9 +1,10 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Face = require(script.Parent.Face)
 
 local TargetsClient = {}
 
-TargetsClient.UI = script.Parent.TargetChecker
+TargetsClient.UI = ReplicatedStorage.Assets.Gamemode.Framed.UI.TargetChecker
 TargetsClient.UI.Parent = Players.LocalPlayer.PlayerGui :: any
 
 TargetsClient.Target = nil :: string?

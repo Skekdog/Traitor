@@ -20,7 +20,7 @@ function Targets.AssignTarget(participant: Types.Participant, target: Types.Part
 
 	local targetChecker = participant:GetItems()["TargetChecker"]
 	if targetChecker then
-		local model = targetChecker.Model :: typeof(script.Parent.Parent.FramedItems.TargetChecker.TargetChecker)
+		local model = targetChecker.Model :: typeof(ReplicatedStorage.Assets.Gamemode.Framed.Items.TargetChecker)
 
 		local targetChar = target:GetCharacter()
 		if not targetChar then

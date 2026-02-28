@@ -9,7 +9,7 @@ local item: Types.ItemComponents = {
 	Description = "Shows your face.",
 	IconContent = Content.none,
 
-	Model = script.Mirror,
+	Model = ReplicatedStorage.Assets.Gamemode.Framed.Items.Mirror,
 	HoldAnimation = Content.fromAssetId(136425139325295),
 
 	ItemGroup = {

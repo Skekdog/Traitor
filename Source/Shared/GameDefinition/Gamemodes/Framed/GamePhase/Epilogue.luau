@@ -7,6 +7,8 @@ local HighlightCharacter = require(script.Parent.Parent.GameState.HighlightChara
 local Types = require(ReplicatedStorage.API.Types)
 local RedHanded = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Framed.GameState.RedHanded)
 
+local escape = ReplicatedStorage.Assets.Gamemode.Framed.Escape
+
 local EPILOGUE_DURATION = 45
 
 local Epilogue = {}
@@ -43,7 +45,7 @@ function Epilogue.Begin(framed: Types.Participant): ()
 	local result = workspace:Raycast(exitCFrame.Position, Vector3.new(0, -10, 0), params)
 
 	if result then
-		exitCFrame = CFrame.new(result.Position) * CFrame.new(0, script.Parent.Escape.Part.Size.X / 2, 0) * CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))
+		exitCFrame = CFrame.new(result.Position) * CFrame.new(0, escape.Part.Size.X / 2, 0) * CFrame.fromEulerAnglesXYZ(0, 0, math.rad(90))
 	end
 
 	RedHanded.SetPermanent(framed)
@@ -67,7 +69,7 @@ function Epilogue.Finish(): ()
 end
 
 if RunService:IsClient() then
-	local exit: typeof(script.Parent.Escape)?
+	local exit: typeof(escape)?
 	local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
 	local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 	remote.OnClientEvent:Connect(function(escapeCFrame: CFrame?): ()
@@ -85,7 +87,7 @@ if RunService:IsClient() then
 			return
 		end
 
-		exit = script.Parent.Escape:Clone()
+		exit = escape:Clone()
 		assert(exit)
 
 		exit.Name = "FramedEpilogueExit"

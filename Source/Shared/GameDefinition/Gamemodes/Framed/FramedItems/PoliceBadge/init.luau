@@ -10,7 +10,7 @@ local item: Types.ItemComponents = {
 	Description = '"This badge... it proves that I am a police officer."',
 	IconContent = Content.none,
 
-	Model = script.PoliceBadge,
+	Model = ReplicatedStorage.Assets.Gamemode.Framed.Items.PoliceBadge,
 	HoldAnimation = Content.fromAssetId(76200494560650),
 
 	ItemGroup = {

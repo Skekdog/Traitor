@@ -15,7 +15,7 @@ local item: Types.ItemComponents = {
 	Description = "Used to identify your target.",
 	IconContent = Content.none,
 
-	Model = script.TargetChecker,
+	Model = ReplicatedStorage.Assets.Gamemode.Framed.Items.TargetChecker,
 	HoldAnimation = Content.fromAssetId(122493302142724),
 
 	ItemGroup = {

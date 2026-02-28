@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Face = require(script.Parent.Face)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
-local MirrorUI = script.Parent.MirrorUI
+local MirrorUI = ReplicatedStorage.Assets.Gamemode.Framed.UI.MirrorUI
 
 MirrorUI.Parent = Players.LocalPlayer.PlayerGui :: any
 

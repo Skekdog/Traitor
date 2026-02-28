@@ -16,7 +16,7 @@ local Item = Modify(Items.GetItem("Ballistic Vest"), "Ballistic Vest", {
 
 		hum.MaxHealth += 100
 		hum.Health = math.min(hum.Health + 100, hum.MaxHealth)
-		hum:AddAccessory(script["Ballistic Vest"]:Clone())
+		hum:AddAccessory(ReplicatedStorage.Assets.Gamemode.Framed.Items["Ballistic Vest"]:Clone())
 	end
 })
 
