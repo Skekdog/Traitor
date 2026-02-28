@@ -17,7 +17,8 @@ local ASSET_IDS = {
 	["Framed"] = "139092719483295",
 	["Elimination"] = "81237358985439",
 	["Items"] = "81535955487145",
-	["Assets"] = "104086335415869"
+	["Assets"] = "104086335415869",
+	["PropHunt"] = "108921425683278",
 }
 
 local function GetAssetPath(assetName: string, kind: "map" | "gamemode" | "items" | "assets"): string
