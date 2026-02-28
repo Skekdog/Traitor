@@ -46,6 +46,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	humanoid.Parent = morph
 
 	local model = prop.Model:Clone()
+	model:RemoveTag("Prop")
 	local root = GetPrimaryPart(model)
 
 	for _, part in model:GetChildren() do
