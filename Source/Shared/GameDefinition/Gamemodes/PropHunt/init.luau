@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local PropHuntItems = require(script.Items)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
@@ -242,12 +243,15 @@ local function beforeDamageProp(_, prop: Types.Prop, params: Types.DamageParams)
     end
 
     if attacker:GetRole().Definition == roles.Hunter then
-        attacker:TryTakeDamage({
-            Amount = INCORRECT_DAMAGE_AMOUNT,
-            Source = params.Source,
-            Attacker = attacker,
-        })
-        return false
+        if DamageSource.IsFirearm(params.Source) or DamageSource.IsMelee(params.Source) then
+            attacker:TryTakeDamage({
+                Amount = INCORRECT_DAMAGE_AMOUNT,
+                Source = params.Source,
+                Attacker = attacker,
+            })
+            return true -- allow, but harm, intentional damage to props
+        end
+        return false -- disallow unintentional damage
     end
 
     if params.Amount > 0 then
