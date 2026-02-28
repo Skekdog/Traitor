@@ -15,6 +15,9 @@ for i, v in PropHuntItems do
 	items[i] = v
 end
 
+local ROUND_DURATION = 300
+local HIDE_TIME = 30
+
 local Items = items
 
 local roles: {[string]: Types.RoleDefinition} = {
@@ -32,7 +35,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         EquipmentShop = {
             Items["Jetpack"],
-            Items["Radar"]
         },
 
         CanSeeMissingInAction = true,
@@ -44,7 +46,7 @@ local roles: {[string]: Types.RoleDefinition} = {
     Prop = {
         Kind = "RoleDefinition",
         Name = "Prop",
-        Description = "Hide from the Hunters!",
+        Description = "Hide from the Hunters! They have Radars.",
         Sound = "rbxassetid://9042088276",
         Color = Color3.fromRGB(13, 197, 229),
 
@@ -64,6 +66,33 @@ local roles: {[string]: Types.RoleDefinition} = {
     }
 }
 
+local function onStart(round: Types.Round): ()
+    local map = round:GetMap()
+    local platform = map.Structure.Dynamic:FindFirstChild("_PropHunt_Platform") :: typeof(ReplicatedStorage.Assets.Gamemode.PropHunt._PropHunt_Platform)?
+
+    if not platform then
+        local new = ReplicatedStorage.Assets.Gamemode.PropHunt._PropHunt_Platform:Clone()
+        new:PivotTo(CFrame.new(-10000, 10000, 10000))
+        new.Parent = map.Structure.Dynamic :: any
+        platform = new
+    end
+    assert(platform)
+
+    for _, hunter in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Hunter")) do
+        local char = hunter:GetCharacter()
+        if char then
+            char:PivotTo(platform.CFrame)
+        end
+    end
+
+    round:SetPhase("Playing", HIDE_TIME, function()
+        round:SetPhase("Playing", ROUND_DURATION - HIDE_TIME)
+        for _, hunter in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Hunter")) do
+            hunter:MoveToSpawn()
+        end
+    end)
+end
+
 local gamemode: Types.GamemodeDefinition = {
     Name = "PropHunt",
     DisplayName = "Prop Hunt",
@@ -78,7 +107,7 @@ local gamemode: Types.GamemodeDefinition = {
 
     AssignRoles = function(i, participants: {Types.Participant})
         for i, v in participants do
-            if i%2 == 0 then
+            if i % 2 == 1 then
                 v:SetRole(roles.Hunter)
             else
                 v:SetRole(roles.Prop)
@@ -104,7 +133,7 @@ local gamemode: Types.GamemodeDefinition = {
     StartingItems = {},
 
     Duration = function(_, numParticipants: number)
-		return 120 + 10 * numParticipants
+		return 0
 	end,
 
     Roles = roles,
@@ -141,6 +170,8 @@ local gamemode: Types.GamemodeDefinition = {
     AddFinishHighlights = function(round)
         StandardGame.Highlights.FinishHighlights(round)
     end,
+
+    OnStart = onStart,
 }
 
 return gamemode
