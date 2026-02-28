@@ -38,6 +38,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	end
 
 	local morph = Instance.new("Model")
+	morph:SetAttribute("IsDisguised", true)
 
 	local humanoid = Instance.new("Humanoid")
 	humanoid.RequiresNeck = false
