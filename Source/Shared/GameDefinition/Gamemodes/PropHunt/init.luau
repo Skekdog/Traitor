@@ -19,6 +19,8 @@ end
 local ROUND_DURATION = 300
 local HIDE_TIME = 30
 
+local INCORRECT_DAMAGE_AMOUNT = 10
+
 local PROP_THRESHOLD_FOR_MAPS = 20
 
 local Items = items
@@ -200,6 +202,41 @@ local function killHighlights(attacker: Types.Participant, victim: Types.Partici
     })
 end
 
+local function beforeDamageParticipant(_, participant: Types.Participant, params: Types.DamageParams): boolean
+    local attacker = params.Attacker
+    if not attacker then
+        return true
+    end
+
+    if participant:GetRole().Definition == roles.Hunter and attacker:GetRole().Definition == roles.Prop then
+        return false
+    end
+
+    return true
+end
+
+local function beforeDamageProp(_, prop: Types.Prop, params: Types.DamageParams): boolean
+    local attacker = params.Attacker
+    if not attacker then
+        return true
+    end
+
+    if attacker:GetRole().Definition == roles.Hunter then
+        attacker:TryTakeDamage({
+            Amount = INCORRECT_DAMAGE_AMOUNT,
+            Source = params.Source,
+            Attacker = attacker,
+        })
+        return false
+    end
+
+    if params.Amount > 0 then
+        return false
+    end
+
+    return true
+end
+
 local gamemode: Types.GamemodeDefinition = {
     Name = "PropHunt",
     DisplayName = "Prop Hunt",
@@ -282,6 +319,9 @@ local gamemode: Types.GamemodeDefinition = {
     OnStart = onStart,
 
     IsValidOnMap = isValidOnMap,
+
+    BeforeDamageParticipant = beforeDamageParticipant,
+    BeforeDamageProp = beforeDamageProp,
 }
 
 return gamemode
