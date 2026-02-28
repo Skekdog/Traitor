@@ -16,6 +16,8 @@ local FUEL_CONSUMPTION_RATE = 5
 local FUEL_RECHARGE_RATE = 0.75
 local RECHARGE_COOLDOWN = 1
 
+local jetpackFuelUi = ReplicatedStorage.Assets.ItemAssets.JetpackFuel
+
 local fuel = MAX_FUEL
 
 local visualsRemote = GetRemote("JetpackVisuals", script)
@@ -44,7 +46,7 @@ end
 
 local function getUi()
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	local ui: typeof(UIManager.RegisterUI(script.Parent.Parent.Custom.Jetpack.JetpackFuel)) = UIManager.TryGetUI("JetpackFuel") :: typeof(UIManager.RegisterUI(script.Parent.Parent.Custom.Jetpack.JetpackFuel))? or UIManager.RegisterUI(script.Parent.Parent.Custom.Jetpack.JetpackFuel)
+	local ui: typeof(UIManager.RegisterUI(jetpackFuelUi)) = UIManager.TryGetUI("JetpackFuel") :: typeof(UIManager.RegisterUI(jetpackFuelUi))? or UIManager.RegisterUI(jetpackFuelUi)
 	return ui
 end
 
@@ -163,7 +165,7 @@ local function OnEquipServer(_, participant: Types.Participant): ()
 		return
 	end
 
-	humanoid:AddAccessory(script.Parent.Parent.Custom.Jetpack.JetpackModel:Clone())
+	humanoid:AddAccessory(ReplicatedStorage.Assets.ItemModels.JetpackModel:Clone())
 end
 
 local function OnUnequipServer(_, participant: Types.Participant): ()
@@ -213,7 +215,7 @@ if RunService:IsServer() then
 end
 
 local item = Custom({
-	Name = "Flypack",
+	Name = "Jetpack",
 	Description = "Fly around, forever.",
 	IconContent = Content.fromAssetId(17576355326),
 
