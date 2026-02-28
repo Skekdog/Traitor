@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PropHuntItems = require(script.PropHuntItems)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
 local Ammo = StandardGame.GetAllAmmo()
 local Interactables = StandardGame.GetInteractables()
@@ -17,6 +18,8 @@ end
 
 local ROUND_DURATION = 300
 local HIDE_TIME = 30
+
+local PROP_THRESHOLD_FOR_MAPS = 20
 
 local Items = items
 
@@ -91,6 +94,20 @@ local function onStart(round: Types.Round): ()
             hunter:MoveToSpawn()
         end
     end)
+end
+
+local function isValidOnMap(map: Types.MapStructure): boolean
+    local props = map.Dynamic:QueryDescendants("Model .Prop:not(.Item):not(.Ammo), BasePart .Prop:not(.Item):not(.Ammo)")
+
+    local validProps = 0
+    for _, prop in props do
+        local part = GetPrimaryPart(prop)
+        if not part.Anchored then
+            validProps += 1
+        end
+    end
+
+    return validProps >= PROP_THRESHOLD_FOR_MAPS
 end
 
 local gamemode: Types.GamemodeDefinition = {
@@ -172,6 +189,8 @@ local gamemode: Types.GamemodeDefinition = {
     end,
 
     OnStart = onStart,
+
+    IsValidOnMap = isValidOnMap,
 }
 
 return gamemode

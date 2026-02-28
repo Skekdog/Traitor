@@ -21,7 +21,7 @@ local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local module = {}
 
-local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.PropHunt)
+local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Traitor)
 
 local EXCLUDED_GAMEMODES: {Instance} = {}
 
@@ -172,15 +172,25 @@ function module.TrySetForcedGamemode(gamemode: string?): boolean
     return true
 end
 
-local function pickNextGamemode(): Types.GamemodeDefinition
+local function pickNextGamemode(map: Types.MapStructure): Types.GamemodeDefinition
     if forcedGamemode then
         return forcedGamemode
     end
 
-    if roundCount ~= 0 and roundCount % MAP_VOTE_INTERVAL == 0 then
-        return varietyGamemodes[math.random(#varietyGamemodes)]
+    if roundCount == 0 or roundCount % MAP_VOTE_INTERVAL ~= 0 then
+        return defaultGamemode
     end
-    return defaultGamemode
+
+    local validGamemodes: {Types.GamemodeDefinition} = {}
+    for _, gamemode in varietyGamemodes do
+        if not gamemode.IsValidOnMap or gamemode.IsValidOnMap(map) then
+            table.insert(validGamemodes, gamemode)
+        end
+    end
+
+    assert(#validGamemodes > 0, "No valid gamemodes found for this map")
+
+    return validGamemodes[math.random(#validGamemodes)]
 end
 
 module.Round = DynamicValue.new((nil :: any) :: Types.Round)
@@ -192,9 +202,11 @@ local function newRound(): Types.Round
 
     TeamChat.Clear()
 
-    local gamemode = pickNextGamemode()
+    local map = getMap(currentMap)
+
+    local gamemode = pickNextGamemode(map)
     module.Round:SetValue(Round.new(gamemode))
-    task.defer(module.Round().LoadMap, module.Round(), getMap(currentMap)) -- somefuckinghow loading normally will cause recursive require errors on SERVER scripts, not even module scripts. WTF.
+    task.defer(module.Round().LoadMap, module.Round(), map) -- somefuckinghow loading normally will cause recursive require errors on SERVER scripts, not even module scripts. WTF.
 
     return module.Round()
 end
