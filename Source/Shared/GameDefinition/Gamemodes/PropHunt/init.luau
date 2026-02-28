@@ -50,7 +50,7 @@ local roles: {[string]: Types.RoleDefinition} = {
         Kind = "RoleDefinition",
         Name = "Prop",
         Description = "Hide from the Hunters! They have Radars.",
-        Sound = "rbxassetid://9042088276",
+        Sound = "rbxassetid://9042819926",
         Color = Color3.fromRGB(13, 197, 229),
 
         Allegiance = {Kind = "Role", Role = "Prop"},
@@ -96,6 +96,40 @@ local function onStart(round: Types.Round): ()
     end)
 end
 
+local traitorMusic: {Sound} = {}
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Traitor:GetChildren() do
+	if v:IsA("Sound") then
+		table.insert(traitorMusic, v)
+	end
+end
+
+local innocentMusic: {Sound} = {}
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Innocent:GetChildren() do
+	if v:IsA("Sound") then
+		table.insert(innocentMusic, v)
+	end
+end
+
+local timeoutMusic: {Sound} = {}
+for _, v in ReplicatedStorage.Assets.VictoryMusic.Timeout:GetChildren() do
+	if v:IsA("Sound") then
+		table.insert(timeoutMusic, v)
+	end
+end
+
+local function getVictoryMusic(round: Types.Round, victor: Types.Victor, isTimeout: boolean): Sound
+	if isTimeout then
+		return timeoutMusic[math.random(#timeoutMusic)]
+	end
+
+	assert(victor.Kind == "Role")
+
+	if victor.Definition.Name == "Hunter" then
+		return traitorMusic[math.random(#traitorMusic)]
+	end
+	return innocentMusic[math.random(#innocentMusic)]
+end
+
 local function isValidOnMap(map: Types.MapStructure): boolean
     local props = map.Dynamic:QueryDescendants("Model .Prop:not(.Item):not(.Ammo), BasePart .Prop:not(.Item):not(.Ammo)")
 
@@ -110,6 +144,62 @@ local function isValidOnMap(map: Types.MapStructure): boolean
     return validProps >= PROP_THRESHOLD_FOR_MAPS
 end
 
+local function awardScoreForKill(attacker: Types.Participant, victim: Types.Participant): ()
+    local attackerRole = attacker:GetRole().Definition
+    local victimRole = victim:GetRole().Definition
+
+    if attacker == victim then
+        attacker:AddScore("Suicide", -2)
+    elseif attackerRole == roles.Hunter and victimRole == roles.Prop then
+        attacker:AddScore("Caught Prop", 1)
+    end
+end
+
+local function getWinner(round: Types.Round): Types.Role?
+    local huntersAlive, propsAlive = 0, 0
+
+    for _, participant in round:GetParticipants() do
+        if not participant:IsAlive() then
+            continue
+        end
+
+        if participant:GetRole().Definition == roles.Hunter then
+            huntersAlive += 1
+        else
+            propsAlive += 1
+        end
+    end
+
+    if propsAlive == 0 then
+        return round:GetRoleFromRoleName("Hunter")
+    elseif huntersAlive == 0 then
+        return round:GetRoleFromRoleName("Prop")
+    end
+
+    return nil
+end
+
+local function tryFinishRound(round: Types.Round): ()
+    local winner = getWinner(round)
+    if winner then
+        round:Finish(winner)
+    end
+end
+
+local function killHighlights(attacker: Types.Participant, victim: Types.Participant): ()
+    if attacker.Round.Extras.AnyKillsHappened or attacker == victim then
+        return
+    end
+
+    attacker.Round.Extras.AnyKillsHappened = true
+    attacker.Round:AddHighlight({
+        Title = "First Blood",
+        Description = attacker:GetFormattedName() .. " drew the first blood of the round.",
+        Priority = 2,
+        Group = "First Blood",
+    })
+end
+
 local gamemode: Types.GamemodeDefinition = {
     Name = "PropHunt",
     DisplayName = "Prop Hunt",
@@ -119,12 +209,15 @@ local gamemode: Types.GamemodeDefinition = {
 
     MinimumPlayers = 1,
 
-    TimeoutVictor = function(round) return round:GetRoleFromRoleName("Prop") end,
-    GetRoundEndMusic = function() return nil end,
+    TimeoutVictor = function(round)
+        return round:GetRoleFromRoleName("Prop")
+    end,
+
+    GetRoundEndMusic = getVictoryMusic,
 
     AssignRoles = function(i, participants: {Types.Participant})
         for i, v in participants do
-            if i % 2 == 1 then
+            if i % 2 == 0 then
                 v:SetRole(roles.Hunter)
             else
                 v:SetRole(roles.Prop)
@@ -133,10 +226,20 @@ local gamemode: Types.GamemodeDefinition = {
     end,
 
     GetVictoryEventText = function(round: Types.Round, victor: Types.Victor, isTimeout: boolean): string?
+        local propRole = round:GetRoleFromRoleName("Prop")
+        local hunterRole = round:GetRoleFromRoleName("Hunter")
+
         if isTimeout then
-            return "The time has run out and the player with the highest score has won."
+            return `The time has run out and the {propRole:FormatString("Props")} have won!`
         end
-        return if victor.Kind == "Participant" then victor:GetFormattedName() .. " has won the round!" else nil
+
+        assert(victor.Kind == "Role")
+
+        if victor == propRole then
+            return `The sneaky {propRole:FormatString("Props")} have survived!`
+        end
+
+        return `The evil {hunterRole:FormatString("Hunters")} have won!`
     end,
 
     EnableFriendlyFire = false,
@@ -149,7 +252,7 @@ local gamemode: Types.GamemodeDefinition = {
 
     StartingItems = {},
 
-    Duration = function(_, numParticipants: number)
+    Duration = function()
 		return 0
 	end,
 
@@ -161,26 +264,14 @@ local gamemode: Types.GamemodeDefinition = {
         local corpse = participant.Corpse
         local attacker = if corpse then corpse.Killer else nil
         if attacker then
-            if attacker == participant then
-                attacker:AddScore("Suicide", -2)
-            else
-                attacker:AddScore("Killed Player", 1)
-                if not participant.Round.Extras.AnyKillsHappened then
-                    participant.Round.Extras.AnyKillsHappened = true
-                    participant.Round:AddHighlight({
-                        Title = "First Blood",
-                        Description = attacker:GetFormattedName() .. " drew the first blood of the round.",
-                        Priority = 2,
-                        Group = "First Blood",
-                    })
-                end
-            end
+            awardScoreForKill(attacker, participant)
+            killHighlights(attacker, participant)
         end
 
         if deferVictoryCheck then
-            task.defer(function(_) end, participant.Round)
+            task.defer(tryFinishRound, participant.Round)
         else
-            (function(_) end)(participant.Round)
+            tryFinishRound(participant.Round)
         end
     end,
 
