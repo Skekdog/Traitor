@@ -35,6 +35,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         Allegiance = {Kind = "Role", Role = "Hunter"},
 
+        IsEvil = true,
+
         StartingItems = {},
         StartingCredits = 1,
 
