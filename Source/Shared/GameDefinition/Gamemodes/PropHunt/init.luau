@@ -20,6 +20,9 @@ end
 local ROUND_DURATION = 300
 local HIDE_TIME = 30
 
+local AWARD_SCORE_INTERVAL = 60
+local AWARD_CREDITS_INTERVAL = 150
+
 local INCORRECT_DAMAGE_AMOUNT = 10
 
 local PROP_THRESHOLD_FOR_MAPS = 20
@@ -112,6 +115,7 @@ local function onStart(round: Types.Round): ()
         for _, hunter in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Hunter")) do
             hunter:MoveToSpawn()
         end
+        platform:Destroy()
     end)
 end
 
@@ -265,6 +269,36 @@ local function beforeDamageProp(_, prop: Types.Prop, params: Types.DamageParams)
     return true
 end
 
+local function heartbeat(round: Types.Round, dt: number): ()
+    if not round:IsInProgress() then
+        return
+    end
+
+    local timeCount = (round.Extras.TimeCount or 0) + dt
+    round.Extras.TimeCount = timeCount
+
+    local propRole = round:GetRoleFromRoleName("Prop")
+
+    if timeCount > AWARD_SCORE_INTERVAL and (round.Extras.LastScoreAward or 0) < timeCount - AWARD_SCORE_INTERVAL then
+        round.Extras.LastScoreAward = timeCount
+        for _, prop in round:GetParticipantsWithRole(propRole) do
+            if prop:IsAlive() then
+                prop:AddScore("Survival Duration", 1)
+            end
+        end
+    end
+
+    if timeCount > AWARD_CREDITS_INTERVAL and (round.Extras.LastCreditsAward or 0) < timeCount - AWARD_CREDITS_INTERVAL  then
+        round.Extras.LastCreditsAward = timeCount
+        for _, prop in round:GetParticipantsWithRole(propRole) do
+            if prop:IsAlive() then
+                prop:AddCredits(1)
+                round:SendMessage(prop.Player, prop:GetFormattedName() .. ", you have received 1 credit for surviving this long.", "Team")
+            end
+        end
+    end
+end
+
 local gamemode: Types.GamemodeDefinition = {
     Name = "PropHunt",
     DisplayName = "Prop Hunt",
@@ -387,7 +421,9 @@ local gamemode: Types.GamemodeDefinition = {
         if platform then
             platform:Destroy()
         end
-    end
+    end,
+
+    Heartbeat = heartbeat,
 }
 
 return gamemode
