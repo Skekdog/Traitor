@@ -51,7 +51,6 @@ local function createNewInteractable(MapObject: Types.MapObject): Types.Prop
 		DefaultHintText = useText,
 	}
 
-
 	MapObject:AddTag("Prop")
 	MapObject:AddTag("Interactable")
 	local interactable = Prop.new(MapObject, nil, definition)
