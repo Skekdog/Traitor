@@ -49,6 +49,8 @@ local function selectMark(marks: Frame & any, button: (TextButton & any)?, plr: 
 	if not button then
 		return
 	end
+	button.UIStroke.Color = Color3.new(1, 1, 1)
+	button.UIStroke.Transparency = 0.4
 	button.UIStroke.Enabled = true
 	plr:SetAttribute("Mark", button.Name)
 	plr:SetAttribute("MarkColour", button.TextColor3)
