@@ -242,6 +242,10 @@ local function beforeDamageProp(_, prop: Types.Prop, params: Types.DamageParams)
     end
 
     if attacker:GetRole().Definition == roles.Hunter then
+        if not IsValidProp(prop.Model) then
+            return true -- allow windows and decoys to be damaged
+        end
+
         if DamageSource.IsFirearm(params.Source) or DamageSource.IsMelee(params.Source) then
             attacker:TryTakeDamage({
                 Amount = INCORRECT_DAMAGE_AMOUNT,
@@ -250,6 +254,7 @@ local function beforeDamageProp(_, prop: Types.Prop, params: Types.DamageParams)
             })
             return true -- allow, but harm, intentional damage to props
         end
+
         return false -- disallow unintentional damage
     end
 
