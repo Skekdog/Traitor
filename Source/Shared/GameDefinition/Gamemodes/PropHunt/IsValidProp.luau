@@ -15,7 +15,7 @@ local function IsValidProp(prop: Types.MapObject): boolean
 	end
 
 	local size = if prop:IsA("Model") then prop:GetExtentsSize() else prop.ExtentsSize
-	return size.X >= MIN_SIZE and size.Y >= MIN_SIZE and size.Z >= MIN_SIZE
+	return size.X >= MIN_SIZE or size.Y >= MIN_SIZE or size.Z >= MIN_SIZE
 end
 
 return IsValidProp
