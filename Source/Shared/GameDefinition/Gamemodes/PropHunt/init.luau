@@ -33,7 +33,7 @@ local roles: {[string]: Types.RoleDefinition} = {
     Hunter = {
         Kind = "RoleDefinition",
         Name = "Hunter",
-        Description = "Eliminate the Props!",
+        Description = "Use your Scanner to find and eliminate the Props!",
         Sound = "rbxassetid://9042088276",
         Color = Color3.fromRGB(229, 53, 13),
 
@@ -65,7 +65,7 @@ local roles: {[string]: Types.RoleDefinition} = {
     Prop = {
         Kind = "RoleDefinition",
         Name = "Prop",
-        Description = "Hide from the Hunters! They have Radars.",
+        Description = "Hide from the Hunters! They have Scanners.",
         Sound = "rbxassetid://9042819926",
         Color = Color3.fromRGB(13, 197, 229),
 
