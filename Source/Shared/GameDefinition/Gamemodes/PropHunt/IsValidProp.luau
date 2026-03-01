@@ -5,7 +5,7 @@ local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrim
 local MIN_SIZE = 1
 
 local function IsValidProp(prop: Types.MapObject): boolean
-	if prop:HasTag("Ammo") or prop:HasTag("Item") or prop:HasTag("Interactable") then
+	if prop:HasTag("AmmoBox") or prop:HasTag("Item") or prop:HasTag("Interactable") then
 		return false
 	end
 
