@@ -89,7 +89,7 @@ local item = Grenade({
 	Model = ReplicatedStorage.Assets.ItemModels.FreezeGrenade,
 
 	ItemGroup = ItemGroups.Grenade,
-	Cost = 2,
+	Cost = 1,
 	MaxStock = 1,
 
 	Projectile = ReplicatedStorage.Assets.ItemModels.FreezeGrenade,
