@@ -17,7 +17,7 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 	end
 
 	y = math.clamp(y, -1.4, 1.4)
-	neck.Attachment1.CFrame = CFrame.new(neck.Attachment1.Position) * CFrame.Angles(y, 0, 0)
+	neck.Attachment1.CFrame = CFrame.new(neck.Attachment1.Position) * CFrame.Angles(-y, 0, 0)
 end)
 
 return nil
