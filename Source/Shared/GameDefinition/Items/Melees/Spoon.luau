@@ -58,6 +58,8 @@ local attackSound = PlaySound.MakeSound(329792582, {
 	RollOffMinDistance = 10,
 })
 
+attackSound.Name = "Spoon"
+
 if RunService:IsServer() then
 	attackSound.Parent = script
 end
