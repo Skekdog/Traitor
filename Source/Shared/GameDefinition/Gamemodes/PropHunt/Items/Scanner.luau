@@ -7,7 +7,7 @@ local Types = require(ReplicatedStorage.API.Types)
 
 local Scanner = {}
 
-local scannerUi = ReplicatedStorage.Assets.ItemAssets.Scanner
+local scannerUi = ReplicatedStorage.Assets.Gamemode.PropHunt.Scanner
 
 local function getUi()
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
