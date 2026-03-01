@@ -38,10 +38,9 @@ local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "
 		end
 	end
 
-	for _, v in ourInventory.Slots() do
-		if v[schedulerEvent .. "Client"] then
-			v[schedulerEvent .. "Client"](v, dt)
-		end
+	local equippedItem = module.EquippedItem()
+	if equippedItem and equippedItem[schedulerEvent .. "Client"] then
+		equippedItem[schedulerEvent .. "Client"](equippedItem, dt)
 	end
 end
 
