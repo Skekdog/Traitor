@@ -1,4 +1,6 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ZoomController = require(ReplicatedStorage.Shared.PlayerModule.CameraModule.ZoomController)
 
 local Camera = {}
 
@@ -25,6 +27,9 @@ function Camera.EnterThirdPerson(maxZoom: number?): ()
 	player.CameraMinZoomDistance = THIRD_PERSON_MIN_ZOOM
 	player.CameraMaxZoomDistance = maxZoom or THIRD_PERSON_MAX_ZOOM
 	player.CameraMode = Enum.CameraMode.Classic
+
+	local targetZoom = math.min(2, maxZoom or THIRD_PERSON_MAX_ZOOM)
+	ZoomController.SetZoomParameters(targetZoom, if ZoomController.GetZoomRadius() > targetZoom then -1 else 1)
 end
 
 return Camera
