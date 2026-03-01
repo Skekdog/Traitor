@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local IsValidProp = require(script.IsValidProp)
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local PropHuntItems = require(script.Items)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
-local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
 local Ammo = StandardGame.GetAllAmmo()
 local Interactables = StandardGame.GetInteractables()
@@ -150,12 +150,11 @@ local function getVictoryMusic(round: Types.Round, victor: Types.Victor, isTimeo
 end
 
 local function isValidOnMap(map: Types.MapStructure): boolean
-    local props = map.Dynamic:QueryDescendants("Model .Prop:not(.Item):not(.Ammo), BasePart .Prop:not(.Item):not(.Ammo)")
+    local props = map.Dynamic:QueryDescendants("Model .Prop, BasePart .Prop")
 
     local validProps = 0
     for _, prop in props do
-        local part = GetPrimaryPart(prop)
-        if not part.Anchored then
+        if IsValidProp(prop) then
             validProps += 1
         end
     end

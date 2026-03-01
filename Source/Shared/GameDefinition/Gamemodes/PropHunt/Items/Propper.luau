@@ -6,6 +6,7 @@ local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
+local IsValidProp = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.PropHunt.IsValidProp)
 
 local Propper = {}
 
@@ -18,7 +19,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 		return false
 	end
 
-	if GetPrimaryPart(prop.Model):IsGrounded() then
+	if not IsValidProp(prop.Model) then
 		return false
 	end
 
