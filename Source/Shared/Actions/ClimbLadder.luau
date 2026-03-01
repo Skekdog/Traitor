@@ -70,7 +70,18 @@ function module.Climb(ladder: BasePart): ()
 
     if not alignPos.Parent then
         alignPos.RigidityEnabled = true
-        alignPos.Attachment0 = root:FindFirstChild("RootAttachment") :: Attachment?
+
+        local rootAttachment = root:FindFirstChild("RootAttachment")
+        if not rootAttachment then
+            local new = Instance.new("Attachment")
+            new.Name = "RootAttachment"
+            new.Parent = root
+
+            rootAttachment = new
+        end
+
+        assert(rootAttachment and rootAttachment:IsA("Attachment"))
+        alignPos.Attachment0 = rootAttachment
 
         alignPos.Name = "LadderPositionAlignment"
         alignPos.Parent = root
