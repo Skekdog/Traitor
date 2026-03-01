@@ -38,10 +38,11 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         IsEvil = false, -- traitor nodes are cool but decoy relies on IsEvil
 
-        StartingItems = {Items["Crowbar"]},
+        StartingItems = {Items["Crowbar"], Items["Scanner"]},
         StartingCredits = 1,
 
         EquipmentShop = {
+            Items["Radar"],
             Items["Jetpack"],
 			Items["Teleporter"],
 			Items["Golden Gun"],
@@ -110,7 +111,6 @@ local function onStart(round: Types.Round): ()
         round:SetPhase("Playing", ROUND_DURATION - HIDE_TIME)
         for _, hunter in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Hunter")) do
             hunter:MoveToSpawn()
-            hunter:AddItem(round:LoadItem(Items["Radar"]))
         end
     end)
 end
