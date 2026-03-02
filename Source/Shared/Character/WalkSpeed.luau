@@ -16,7 +16,7 @@ local function updateWalkSpeed(): ()
 
 	local role = participant.Role()
 	local speed = role.Definition.WalkSpeed or Defaults.WalkSpeed
-	
+
 	for _, v in modifiers do
 		speed += v
 	end
@@ -32,6 +32,10 @@ end
 function module.SetModifier(modifier: string, value: number): ()
 	modifiers[modifier] = value
 	updateWalkSpeed()
+end
+
+function module.GetModifier(modifier: string): number
+	return modifiers[modifier] or 0
 end
 
 return module
