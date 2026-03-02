@@ -62,7 +62,10 @@ local function HeartbeatClient(item: Types.Item, dt: number): ()
 	local closestDistance = math.huge
 	for _, player in Players:GetPlayers() do
 		if player.Character and LocalParticipantInfo.GetParticipant(player.Name).Role().Definition.Name == "Prop" then
-			closestDistance = player:DistanceFromCharacter(position)
+			local distance = player:DistanceFromCharacter(position)
+			if distance < closestDistance then
+				closestDistance = player:DistanceFromCharacter(position)
+			end
 		end
 	end
 
