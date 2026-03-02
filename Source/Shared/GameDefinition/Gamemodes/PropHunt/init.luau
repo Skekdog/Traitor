@@ -232,7 +232,7 @@ local function beforeDamageParticipant(_, participant: Types.Participant, params
         return true
     end
 
-    if participant:GetRole().Definition == roles.Hunter and attacker:GetRole().Definition == roles.Prop then
+    if attacker:GetRole().Definition == roles.Prop then
         return false
     end
 
