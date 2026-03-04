@@ -166,6 +166,19 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Auto-Jump",
+	Tab = "Gameplay",
+	Category = "Gameplay",
+	Tooltip = "Only has an effect on mobile devices.",
+	Kind = "Boolean" :: "Boolean",
+	Default = false,
+
+	Callback = function(name: string, value: boolean): ()
+		(require)(callbacks.AutoJump)(name, value)
+	end
+})
+
+table.insert(availableSettings, {
 	Name = "Crouch",
 	Tab = "Keybinds",
 	Category = "Movement",
