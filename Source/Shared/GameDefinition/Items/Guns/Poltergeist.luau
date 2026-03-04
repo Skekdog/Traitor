@@ -19,13 +19,14 @@ end
 
 local function clientThing(origin: Vector3, direction: Vector3): BehaviourTypes.HitscanResult?
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+	local Raycasts = require(ReplicatedStorage.API.Item.Behaviour.Raycasts)
+
 	local map = workspace:FindFirstChild("Map")
 	if not map then
 		return nil
 	end
 
-	local result = Client.Hitscan(Client.GetDefaultRaycastParams(assert(LocalCharacter.Character())), origin, direction, MAX_RANGE)
+	local result = Raycasts.Hitscan(Raycasts.GetDefaultRaycastParams(assert(LocalCharacter.Character())), origin, direction, MAX_RANGE)
 	if not result.Hit or not isPartValid(result.Hit.Part) then
 		return nil
 	end
@@ -34,8 +35,9 @@ local function clientThing(origin: Vector3, direction: Vector3): BehaviourTypes.
 end
 
 local function preRenderClient(item: Types.Item, dt: number): ()
-	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
-	if clientThing(Client.GetOrigin(), Client.GetDirection()) then
+	local Raycasts = require(ReplicatedStorage.API.Item.Behaviour.Raycasts)
+
+	if clientThing(Raycasts.GetOrigin(), Raycasts.GetDirection()) then
 		item.LaserColor = Color3.new(0, 1, 0)
 	else
 		item.LaserColor = Color3.new(1, 0, 0)

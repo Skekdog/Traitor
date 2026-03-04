@@ -4,11 +4,10 @@ local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local BehaviourTypes = require(script.Parent.BehaviourTypes)
 local Checks = require(script.Parent.Checks)
+local Raycasts = require(script.Parent.Raycasts)
 local Types = require(ReplicatedStorage.API.Types)
 local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
-local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
-local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local Aim = require(ReplicatedStorage.Shared.Combat.Aim)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
@@ -19,16 +18,6 @@ local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInvent
 local Client = {}
 
 local remote = GetRemote("ItemFire")
-
-local random = Random.new(workspace:GetServerTimeNow())
-function Client.GetRaycastDirection(direction: Vector3, spread: number): Vector3
-	local spreadVector = Vector3.new(random:NextNumber(-spread, spread), random:NextNumber(-spread, spread), random:NextNumber(-spread, spread))
-	return (direction + spreadVector).Unit
-end
-
-function Client.DeriveTargetPosition(origin: Vector3, direction: Vector3, range: number): Vector3
-	return origin + (direction.Unit * range)
-end
 
 function Client.DeductAmmo(item: Types.Item): ()
 	if not item.Ammo then
@@ -45,85 +34,6 @@ function Client.ApplyInterval(item: Types.Item, action: "Primary" | "Alternate")
 	elseif action == "Alternate" and item.AlternateInterval then
 		item.AlternateLastUse = os.clock()
 	end
-end
-
-function Client.GetDefaultRaycastParams(char: Instance): RaycastParams
-	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {char}
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.IgnoreWater = true
-	params.CollisionGroup = "WeaponHitTargets"
-
-	return params
-end
-
-function Client.GetOrigin(): Vector3
-	local head = LocalCharacter.Head()
-	if not head then
-		return Vector3.zero
-	end
-
-	return head.Position
-end
-
-function Client.GetDirection(): Vector3
-	return GetCentreRay().Direction
-end
-
-function Client.Hitscan(
-	params: RaycastParams,
-	origin: Vector3,
-	direction: Vector3,
-	range: number,
-	checkInitialOverlap: boolean?,
-	fallbackToBlockcast: boolean?
-): BehaviourTypes.HitscanResult
-	local parts: {BasePart}?
-	if checkInitialOverlap then
-		local overlapParams = OverlapParams.new()
-		overlapParams.FilterDescendantsInstances = params.FilterDescendantsInstances
-		overlapParams.FilterType = params.FilterType
-		overlapParams.CollisionGroup = params.CollisionGroup
-
-		local boundPart = CreateEmptyPart(workspace.CurrentCamera.CFrame)
-		boundPart.Size = Vector3.new(0.1, 0.1, 0.1)
-		parts = workspace:GetPartsInPart(boundPart, overlapParams)
-	end
-
-	direction *= range
-	local result = workspace:Raycast(origin, direction, params)
-
-	if not result and fallbackToBlockcast then
-		result = workspace:Blockcast(CFrame.new(origin), Vector3.one * 1.5, direction, params)
-	end
-
-	local part = if result then result.Instance else if parts and parts[1] then parts[1] else nil
-
-	local position =
-		if result then
-			result.Position
-		elseif part then
-			part:GetClosestPointOnSurface(origin)
-		else
-			Client.DeriveTargetPosition(origin, direction, range)
-
-	local normal = if result then result.Normal else (origin - position).Unit
-	local relativeCFrame = if part then part.CFrame:ToObjectSpace(CFrame.new(position)) else nil
-
-	if part and relativeCFrame then
-		return {
-			Hit = {
-				Part = part,
-				Normal = normal,
-				RelativeCFrame = relativeCFrame,
-			},
-			Position = position,
-		}
-	end
-
-	return {
-		Position = position,
-	}
 end
 
 function Client.MuzzleFlash(item: Types.Item): ()
@@ -169,14 +79,14 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 	end
 
 	if not item.IsProjectileSimulated then
-		local params = Client.GetDefaultRaycastParams(char)
+		local params = Raycasts.GetDefaultRaycastParams(char)
 
 		local hits = {}
 		for i = 1, item.ProjectileCount or 1 do
-			local spreadDirection = Client.GetRaycastDirection(direction, item.Spread or 0)
-			local result = Client.Hitscan(params, origin, spreadDirection, item.MaxDistance or 10000, item.CheckInitialIntersection, item.CheckInitialIntersection)
+			local spreadDirection = Raycasts.GetRaycastDirection(direction, item.Spread or 0)
+			local result = Raycasts.Hitscan(params, origin, spreadDirection, item.MaxDistance or 10000, item.CheckInitialIntersection, item.CheckInitialIntersection)
 
-			local targetPosition = result and result.Position or Client.DeriveTargetPosition(origin, direction, item.MaxDistance or 10000)
+			local targetPosition = result and result.Position or Raycasts.DeriveTargetPosition(origin, direction, item.MaxDistance or 10000)
 			if item.Projectile and not noEffects then
 				BulletTracer(item.Projectile, item.ProjectileSpeed or 100, origin, targetPosition)
 			end
