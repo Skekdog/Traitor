@@ -2,7 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
-local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
+local Raycasts = require(ReplicatedStorage.API.Item.Behaviour.Raycasts)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
@@ -47,6 +47,11 @@ end
 type Viewmodel = typeof(ReplicatedStorage.Assets.Viewmodel)
 local function laser(viewmodel: Viewmodel, item: Types.Item): ()
     if not item.LaserColor then
+        return
+    end
+
+    local char = LocalCharacter.Character()
+    if not char then
         return
     end
 
@@ -104,25 +109,18 @@ local function laser(viewmodel: Viewmodel, item: Types.Item): ()
 
     laser.Color = item.LaserColor
 
-    local direction = GetCentreRay().Direction * 10000
+    local position = Raycasts.Hitscan(Raycasts.GetDefaultRaycastParams(char), workspace.CurrentCamera.CFrame.Position, Raycasts.GetDirection(), item.MaxDistance or 10000).Position
 
-    local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {viewmodel, LocalCharacter.Character() :: Model}
-    rayParams.FilterType = Enum.RaycastFilterType.Exclude
-
-    local result = workspace:Raycast(workspace.CurrentCamera.CFrame.Position, direction, rayParams)
     CreateEmptyPart(attachment.CFrame).Color = Color3.fromRGB(255,255,255)
 
-    local distance = if result then (attachment.WorldPosition - result.Position).Magnitude else 10000
+    local distance = (attachment.WorldPosition - position).Magnitude
     local half = distance / 2
-
-    local destination = if result then result.Position else attachment.WorldPosition + direction
 
     laser.Mesh.Scale = Vector3.new(0.05, half, 0.05)
 
-    laser.CFrame = CFrame.lookAt((attachment.WorldPosition + destination) / 2, destination) * CFrame.Angles(math.rad(-90), 0, 0)
+    laser.CFrame = CFrame.lookAt((attachment.WorldPosition + position) / 2, position) * CFrame.Angles(math.rad(-90), 0, 0)
 
-    ball.Position = destination
+    ball.Position = position
 end
 
 local function tempHideViewmodel(): ()
