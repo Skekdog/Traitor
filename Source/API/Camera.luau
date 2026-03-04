@@ -11,6 +11,10 @@ local ANIMATION_VIEW_ZOOM = 10
 
 local player = Players.LocalPlayer
 
+function Camera.IsFirstPerson(): boolean
+	return player.CameraMode == Enum.CameraMode.LockFirstPerson
+end
+
 function Camera.EnterAnimationView(): ()
 	player.CameraMinZoomDistance = ANIMATION_VIEW_ZOOM
 	player.CameraMaxZoomDistance = ANIMATION_VIEW_ZOOM
