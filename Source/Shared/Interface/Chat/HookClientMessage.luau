@@ -2,20 +2,20 @@ local TextChatService = game:GetService("TextChatService")
 
 type Callback = (message: TextChatMessage) -> ()
 
-local hooks: {[Callback]: true} = {}
+local hooks: {Callback} = {}
 
 local HookClientMessage = {}
 
 function HookClientMessage.Hook(callback: Callback): ()
-	hooks[callback] = true
+	table.insert(hooks, callback)
 end
 
 function HookClientMessage.RemoveHook(callback: Callback): ()
-	hooks[callback] = nil
+	table.remove(hooks, table.find(hooks, callback) or error("aaaa"))
 end
 
 function HookClientMessage.ExecuteOn(message: TextChatMessage): ()
-	for callback in hooks do
+	for _, callback in hooks do
 		callback(message)
 	end
 end
