@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
@@ -26,16 +27,7 @@ teleportFX.Color = Color3.new(0.52549, 0.858824, 0.372549)
 teleportFX.Transparency = 0.5
 teleportFX.Material = Enum.Material.Neon
 
-local remote: RemoteEvent
-if RunService:IsServer() then
-	remote = Instance.new("RemoteEvent")
-	remote.Name = "TeleporterFX"
-	remote.Parent = script
-else
-	local found = script:WaitForChild("TeleporterFX")
-	assert(found:IsA("RemoteEvent"), "TeleporterFX must be a RemoteEvent")
-	remote = found
-end
+local remote = GetRemote("TeleporterFX", script)
 
 type Teleporter = Types.Item & {
 	Extras: {
