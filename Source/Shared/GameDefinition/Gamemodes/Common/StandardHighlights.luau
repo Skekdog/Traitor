@@ -61,6 +61,13 @@ local fellHighlight = {
 	Group = "Falling",
 }
 
+local stompHighlight = {
+	Title = "Squished",
+	Description = "%s helped someone become a part of the floor.",
+	Priority = 1,
+	Group = "Stomping"
+}
+
 local headshots1 = {
 	Title = "Efficiency",
 	Description = "%s discovered the joy of headshots and made %d.",
@@ -281,6 +288,12 @@ function module.OnDeath(round: Types.Round, victim: Types.Participant): ()
 			module.AddHighlight(round, pushKillHighlight, attacker)
 		elseif not attacker then
 			module.AddHighlight(round, fellHighlight, victim)
+		end
+	end
+
+	if corpse.CorpseView.DamageSource == "Stomp" then
+		if attacker and attacker ~= victim then
+			module.AddHighlight(round, stompHighlight, attacker)
 		end
 	end
 

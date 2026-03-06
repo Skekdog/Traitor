@@ -10,7 +10,7 @@ local remap = {
 	Drown = "Drown",
 	Crush = "Crush",
 	Fall = "Fall",
-	Stomp = "Crush",
+	Stomp = "Stomp",
 }
 
 local function DamageSourceRemap(source: string): Types.GeneralDamageSource

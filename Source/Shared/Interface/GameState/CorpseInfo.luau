@@ -35,6 +35,7 @@ local flavourTexts: {[Types.GeneralDamageSource]: string} = {
     Shot = `It is obvious that they were {highlightedText("shot")} to death.`,
     Bludgeon = `The body is {highlightedText("bruised and battered")}. Evidently some {highlightedText("blunt-force trauma")} was at hand.`,
     Crush = `Many of their bones are broken. It seems the impact of a {highlightedText("heavy object")} killed them.`,
+    Stomp = `Their body looks flattened and miserable. It looks like they were {highlightedText("stomped")}.`,
 	Magic = `{highlightedText("Otherworldly forces")} brought about this spy's death.`,
     Poison = `A strong chemical odor suggests that {highlightedText("poison")} was the cause of this spy's demise.`,
     Other = `It is unclear how this spy met their fate.`,
@@ -55,7 +56,8 @@ local flavourImages: {[Types.GeneralDamageSource]: string} = {
     Crush = "rbxassetid://953809995",
     Magic = "rbxassetid://15244435410",
     Poison = "rbxassetid://79725625736870",
-    Other = "rbxassetid://17079244437"
+    Other = "rbxassetid://17079244437",
+    Stomp = "rbxassetid://78517882762574",
 }
 
 local function getItemFromName(name: string): Types.ItemComponents?
