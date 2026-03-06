@@ -466,8 +466,8 @@ local postSimulationClient: (item: Types.Item, dt: number) -> () = function(): (
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
 
-	local centreRay = GetCentreRay(ALIGNMENT_DEPTH)
-	local result = workspace:Raycast(GetCentreRay(0).Origin, centreRay.Direction * ALIGNMENT_DEPTH, params)
+	local centreRay = GetCentreRay(ALIGNMENT_DEPTH, true)
+	local result = workspace:Raycast(GetCentreRay(0, true).Origin, centreRay.Direction * ALIGNMENT_DEPTH, params)
 
 	local targetPosition = if result then result.Position else centreRay.Origin
 	clientControl.AlignPosition.Position = targetPosition
