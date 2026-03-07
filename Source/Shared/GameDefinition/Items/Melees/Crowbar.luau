@@ -11,6 +11,11 @@ local RESPONSIBLE_DURATION = 5
 
 function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction: Vector3): boolean | string | {string}
 	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+	local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
+
+	if not Checks.Interval(item, "Alternate") then
+		return false
+	end
 
 	local result = Client.PrimaryFire(item, origin, direction, true)
 	if result ~= true then
@@ -24,7 +29,7 @@ function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction
 
 	item:SetServerData("Primary", nil)
 
-	Client.Recoil(item)
+	Client.RunAllEffects(item, "Alternate")
 
 	if not data[1] or not data[1].Hit then
 		return false

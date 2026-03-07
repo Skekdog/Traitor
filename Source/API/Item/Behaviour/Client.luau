@@ -8,6 +8,7 @@ local Raycasts = require(script.Parent.Raycasts)
 local Types = require(ReplicatedStorage.API.Types)
 local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local Aim = require(ReplicatedStorage.Shared.Combat.Aim)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
@@ -50,10 +51,25 @@ function Client.PlayEmptyClipSound(): ()
 	PlaySound(ReplicatedStorage.Assets.ItemSounds.EmptyClip)
 end
 
-function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector3, noEffects: boolean?): string | {string} | boolean
-	local char = LocalCharacter.Character()
-	if not char then
-		return "NoCharacter"
+function Client.PlaySound(item: Types.Item, action: "Primary" | "Alternate"): ()
+	if action == "Primary" and item.PrimarySound then
+		PlaySound(item.PrimarySound)
+	elseif action == "Alternate" and item.AlternateSound then
+		PlaySound(item.AlternateSound)
+	end
+end
+
+function Client.PlayAnimation(item: Types.Item, action: "Primary" | "Alternate"): ()
+	if action == "Primary" and item.PrimaryAnimation then
+		LocalAnimation.TryPlayAnimation(item.PrimaryAnimation, action .. "Fire")
+	elseif action == "Alternate" and item.AlternateAnimation then
+		LocalAnimation.TryPlayAnimation(item.AlternateAnimation, action .. "Fire")
+	end
+end
+
+function Client.RunAllChecks(item: Types.Item, action: "Primary" | "Alternate", noEffects: boolean?): boolean
+	if not Checks.Interval(item, "Primary") then
+		return false
 	end
 
 	if not Checks.Reloading(item) then
@@ -61,7 +77,7 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 	end
 
 	if not Checks.Ammo(item) then
-		if not Client.TryReloadWeapon(item) then
+		if not noEffects and not Client.TryReloadWeapon(item) then
 			Client.PlayEmptyClipSound()
 		end
 		return false
@@ -72,10 +88,30 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 		return false
 	end
 
+	return true
+end
+
+function Client.RunAllEffects(item: Types.Item, action: "Primary" | "Alternate"): ()
+	Client.DeductAmmo(item)
+	Client.MuzzleFlash(item)
+	Client.Recoil(item)
+	Client.PlaySound(item, action)
+	Client.PlayAnimation(item, action)
+	Client.ApplyInterval(item, action)
+end
+
+function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector3, noEffects: boolean?): string | {string} | boolean
+	local char = LocalCharacter.Character()
+	if not char then
+		return "NoCharacter"
+	end
+
+	if not Client.RunAllChecks(item, "Primary", noEffects) then
+		return false
+	end
+
 	if not noEffects then
-		Client.DeductAmmo(item)
-		Client.MuzzleFlash(item)
-		Client.Recoil(item)
+		Client.RunAllEffects(item, "Primary")
 	end
 
 	if not item.IsProjectileSimulated then
