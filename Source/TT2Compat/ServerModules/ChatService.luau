@@ -41,7 +41,13 @@ local playerChatted = Instance.new("BindableEvent")
 module.PlayerChatted = playerChatted.Event
 
 HookOnMessage.Hook(function(message)
+	if message:GetAttribute("ChatServiceProcessed") then
+		return true
+	end
+
+	message:SetAttribute("ChatServiceProcessed", true)
 	playerChatted:Fire(Players:GetPlayerByUserId(message.TextSource.UserId), message.Text)
+
 	return true
 end)
 
