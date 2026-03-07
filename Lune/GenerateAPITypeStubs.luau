@@ -60,7 +60,7 @@ local function getFunctionType(func: poke_ast.Stat_LocalFunction | poke_ast.Stat
 end
 
 local function metatableType(tbl: string, callMetamethod: poke_ast.Expr_Function, source: string)
-	return `typeof(setmetatable(\{} :: \{{tbl}}, \{} :: \{__call: {getFunctionType(callMetamethod, source)}}))`
+	return `typeof(setmetatable(\{} :: {tbl}, \{} :: \{__call: {getFunctionType(callMetamethod, source)}}))`
 end
 
 local function moduleStub(declStat: poke_ast.Stat_LocalVariable, stats: {poke_ast.Stat}, source: string, callMetamethod: poke_ast.Expr_Function?): string
@@ -99,11 +99,10 @@ local function moduleStub(declStat: poke_ast.Stat_LocalVariable, stats: {poke_as
 		end
 
 		properties ..= "\n"
+		properties = "{" .. properties .. "}"
 
 		if callMetamethod then
 			properties = metatableType(properties, callMetamethod, source)
-		else
-			properties = "{" .. "}"
 		end
 
 		return baseStub(stats, properties, source)
