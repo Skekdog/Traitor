@@ -161,7 +161,7 @@ end
 
 local function OnEquipServer(_, participant: Types.Participant): ()
 	local humanoid = participant:GetHumanoid()
-	if not humanoid then
+	if not humanoid or not participant:IsAlive() then
 		return
 	end
 
