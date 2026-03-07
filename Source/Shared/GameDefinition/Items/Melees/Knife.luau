@@ -19,7 +19,7 @@ local function throw(item: Types.Item, origin: Vector3, direction: Vector3, atta
 	model:RemoveTag("Item")
 	model:RemoveTag("Prop")
 
-	local didThrow = attacker:TryThrowAssembly(model, THROW_FORCE, attacker.Round:GetMap().Structure.Dynamic, origin, direction, true)
+	local didThrow = attacker:TryThrowAssembly(model, THROW_FORCE, attacker.Round:GetMap().Structure.Dynamic, origin, direction, true, true)
 	if not didThrow then
 		return
 	end
