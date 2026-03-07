@@ -7,7 +7,7 @@
 		"Services/**",
 	],
 	"luau-lsp.ignoreGlobs": [
-		"Lune/Lib/poke/**"
+		"Lune/Lib/Stubuau/poke/**"
 	],
 	"luau-lsp.types.robloxSecurityLevel": "None",
 	"luau-lsp.sourcemap.rojoProjectFile": "build.project.json",

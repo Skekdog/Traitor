@@ -2,6 +2,6 @@
 [submodule "src/ReplicatedStorage/RoundRule"]
 	path = Source/Shared/RoundRule
 	url = ../RoundRule
-[submodule "Lune/Lib/poke"]
-	path = Lune/Lib/poke
-	url = https://github.com/jackdotink/poke.git
+[submodule "Lune/Lib/Stubuau"]
+	path = Lune/Lib/Stubuau
+	url = https://github.com/Skekdog/Stubuau.git
