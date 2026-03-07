@@ -19,7 +19,7 @@ image:SetAttribute("Layer", "HUD")
 
 local function getUi()
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-	local ui: typeof(UIManager.RegisterUI(image)) = UIManager.TryGetUI("JetpackFuel") :: typeof(UIManager.RegisterUI(image))? or UIManager.RegisterUI(image)
+	local ui: typeof(UIManager.RegisterUI(image)) = UIManager.TryGetUI("FreezeOverlay") :: typeof(UIManager.RegisterUI(image))? or UIManager.RegisterUI(image)
 	return ui
 end
 
