@@ -1,4 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+require(script.Parent.Util.KickOnVR)
+
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 if IsLabs then
