@@ -89,6 +89,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["MelonLauncher"],
 			Items["Spoon"],
 			Items["Seal Gun"],
+			Items["Pigeon"],
 		},
 
 		CanTeamChat = true,
