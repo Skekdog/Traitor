@@ -6,14 +6,18 @@ local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 
 local Pigeon = {}
+
+local recallRemote = GetRemote("Recall", script)
 
 local MODEL = ReplicatedStorage.Assets.ItemModels.Pigeon
 
 local ORBIT_SPEED = 0.5 * math.pi -- rad/s
 local ORBIT_RADIUS = 10 -- well, studs
 
+local RECALL_SPEED = 20
 local FOLLOW_SPEED = 20
 local CHARGE_SPEED = 50
 local CLIMB_SPEED = 2
@@ -33,9 +37,26 @@ type PigeonData = {
 	LaunchRole: Types.Role,
 	Launcher: Types.Participant,
 	DeployHeight: number,
+	IsRecalling: boolean,
 }
 
 local pigeons: {PigeonData} = {}
+
+local function updateRecall(data: PigeonData): ()
+	local char = data.Launcher:GetCharacter()
+	if not char then
+		data.IsRecalling = false
+		return
+	end
+
+	local root = char.PrimaryPart
+	if not root then
+		data.IsRecalling = false
+		return
+	end
+
+	data.Velocity.VectorVelocity = (root.Position - GetPrimaryPart(data.Pigeon).Position).Unit * RECALL_SPEED
+end
 
 local function updateOrbit(data: PigeonData, dt: number): ()
 	local newAngle = (data.CurrentAngle + (dt * ORBIT_SPEED)) % (2 * math.pi)
@@ -118,11 +139,42 @@ end
 
 RunService.PreSimulation:Connect(function(dt)
 	for _, data in pigeons do
-		if not scanForPlayers(data, dt) then
-			updateOrbit(data, dt)
+		if data.IsRecalling then
+			updateRecall(data)
+		end
+
+		if not data.IsRecalling then -- updateRecall() might disable recalling
+			if not scanForPlayers(data, dt) then
+				updateOrbit(data, dt)
+			end
 		end
 	end
 end)
+
+if RunService:IsClient() then
+	local CustomActions = require(ReplicatedStorage.API.CustomActions)
+	recallRemote.OnClientEvent:Connect(function(active: boolean): ()
+		if not active then
+			CustomActions.Unregister("Recall Pigeon")
+			return
+		end
+
+		CustomActions.Register("Recall Pigeon", function()
+			recallRemote:FireServer()
+		end, 2)
+	end)
+else
+	recallRemote.OnServerEvent:Connect(function(player)
+		local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+		local participant: Types.Participant? = GetParticipant(player)
+
+		for _, pigeon in pigeons do
+			if pigeon.Launcher == participant then
+				pigeon.IsRecalling = true
+			end
+		end
+	end)
+end
 
 local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, _): {string} | string?
 	local Combat = require(ReplicatedStorage.API.Combat)
@@ -171,12 +223,23 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		LaunchRole = launchRole,
 		Launcher = participant,
 		DeployHeight = origin.Y,
+		IsRecalling = false,
 	})
 
 	ForEachPart(model, function(part)
 		part.Touched:Connect(function(otherPart)
-			local target = GetParticipant(otherPart)
-			if not target or target:GetRole():IsAlliedWith(launchRole) then
+			local target: Types.Participant? = GetParticipant(otherPart)
+			if not target then
+				return
+			end
+
+			if target == participant then
+				model:Destroy()
+				participant:AddItem(item)
+				return
+			end
+
+			if target:GetRole():IsAlliedWith(launchRole) then
 				return
 			end
 
@@ -189,6 +252,12 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 				Position = GetPrimaryPart(model).Position,
 			})
 		end)
+	end)
+
+	recallRemote:FireClient(participant.Player, true)
+
+	model.Destroying:Connect(function()
+		recallRemote:FireClient(participant.Player, false)
 	end)
 
 	return nil
