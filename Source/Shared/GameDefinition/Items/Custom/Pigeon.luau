@@ -7,6 +7,7 @@ local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local Pigeon = {}
 
@@ -30,6 +31,16 @@ local CHARGE_DISTANCE = 10
 
 local TARGET_HEIGHT = 7.5
 
+local SOUND_INTERVAL = 2.5
+local SOUND_INTERVAL_FOLLOW = 2
+local SOUND_INTERVAL_CHARGE = 0.5
+
+local sound = PlaySound.MakeSound(88048142187812, {
+	RollOffMaxDistance = 40,
+	RollOffMinDistance = 20,
+	Volume = 4,
+})
+
 type PigeonData = {
 	Velocity: LinearVelocity,
 	CurrentAngle: number,
@@ -40,9 +51,15 @@ type PigeonData = {
 	Launcher: Types.Participant,
 	DeployHeight: number,
 	IsRecalling: boolean,
+	LastSound: number,
 }
 
 local pigeons: {PigeonData} = {}
+
+local function play(data: PigeonData): ()
+	data.LastSound = os.clock()
+	PlaySound(sound, nil, GetPrimaryPart(data.Pigeon))
+end
 
 local function updateRecall(data: PigeonData): ()
 	local char = data.Launcher:GetCharacter()
@@ -61,6 +78,10 @@ local function updateRecall(data: PigeonData): ()
 
 	data.Velocity.VectorVelocity = (root.Position - part.Position).Unit * RECALL_SPEED
 	data.Orientation.CFrame = CFrame.lookAt(part.Position, root.Position)
+
+	if data.LastSound < os.clock() - SOUND_INTERVAL then
+		play(data)
+	end
 end
 
 local function updateOrbit(data: PigeonData, dt: number): ()
@@ -82,6 +103,10 @@ local function updateOrbit(data: PigeonData, dt: number): ()
 	data.Orientation.CFrame = CFrame.lookAt(part.Position, part.Position + velocity.Unit)
 
 	data.CurrentAngle = newAngle
+
+	if data.LastSound < os.clock() - SOUND_INTERVAL then
+		play(data)
+	end
 end
 
 local function scanForPlayers(data: PigeonData, dt: number): boolean
@@ -138,6 +163,10 @@ local function scanForPlayers(data: PigeonData, dt: number): boolean
 
 	data.Velocity.VectorVelocity = direction * if isCharge then CHARGE_SPEED else FOLLOW_SPEED
 	data.Orientation.CFrame = CFrame.lookAlong(origin, direction)
+
+	if data.LastSound < os.clock() - (if isCharge then SOUND_INTERVAL_CHARGE else SOUND_INTERVAL_FOLLOW) then
+		play(data)
+	end
 
 	return true
 end
@@ -241,6 +270,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		Launcher = participant,
 		DeployHeight = origin.Y,
 		IsRecalling = false,
+		LastSound = 0,
 	})
 
 	ForEachPart(model, function(part)
