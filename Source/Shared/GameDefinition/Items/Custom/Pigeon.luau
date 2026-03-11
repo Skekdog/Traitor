@@ -14,6 +14,8 @@ local recallRemote = GetRemote("Recall", script)
 
 local MODEL = ReplicatedStorage.Assets.ItemModels.Pigeon
 
+local PIGEON_HEALTH = 50
+
 local ORBIT_SPEED = 0.5 * math.pi -- rad/s
 local ORBIT_RADIUS = 10 -- well, studs
 
@@ -194,7 +196,9 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	model.Attachment.SecondaryAxis = Vector3.new(0, 1, 0)
 
 	model:RemoveTag("Item")
-	model:RemoveTag("Prop")
+
+	model:AddTag("Prop")
+	model:SetAttribute("Health", PIGEON_HEALTH)
 
 	if not participant:TryThrowAssembly(model, 0, participant.Round:GetMap().Structure.Dynamic, origin, direction, nil, true) then
 		return
