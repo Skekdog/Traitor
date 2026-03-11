@@ -15,9 +15,15 @@ local MODEL = ReplicatedStorage.Assets.ItemModels.Pigeon
 local ORBIT_SPEED = 0.5 * math.pi -- rad/s
 local ORBIT_RADIUS = 10 -- well, studs
 
-local SEARCH_RADIUS = 20
+local FOLLOW_SPEED = 20
+local CHARGE_SPEED = 50
+local CLIMB_SPEED = 2
 
-local ATTACK_SPEED = 20
+local SEARCH_RADIUS = 40
+
+local CHARGE_DISTANCE = 10
+
+local TARGET_HEIGHT = 7.5
 
 type PigeonData = {
 	Velocity: LinearVelocity,
@@ -27,6 +33,7 @@ type PigeonData = {
 	Orientation: AlignOrientation,
 	LaunchRole: Types.Role,
 	Launcher: Types.Participant,
+	DeployHeight: number,
 }
 
 local pigeons: {PigeonData} = {}
@@ -34,18 +41,20 @@ local pigeons: {PigeonData} = {}
 local function updateOrbit(data: PigeonData, dt: number): ()
 	local newAngle = (data.CurrentAngle + (dt * ORBIT_SPEED)) % (2 * math.pi)
 
+	local part = GetPrimaryPart(data.Pigeon)
+
 	local speed = (ORBIT_SPEED ^ 2) * ORBIT_RADIUS
 
-	local mass = GetPrimaryPart(data.Pigeon).AssemblyMass -- this can't be a constant because it is incorrect due to the weld not being loaded
+	local mass = part.AssemblyMass -- this can't be a constant because it is incorrect due to the weld not being loaded
 	local magnitude = mass * speed
 
 	local speed_x = magnitude * math.sin(newAngle)
 	local speed_z = magnitude * math.cos(newAngle)
 
-	local velocity = Vector3.new(speed_x, 0, speed_z)
+	local velocity = Vector3.new(speed_x, if (data.DeployHeight + TARGET_HEIGHT) > part.Position.Y then CLIMB_SPEED else 0, speed_z)
 	data.Velocity.VectorVelocity = velocity
 
-	data.Orientation.LookAtPosition = (GetPrimaryPart(data.Pigeon).Position + velocity).Unit
+	data.Orientation.LookAtPosition = (part.Position + velocity).Unit
 
 	data.CurrentAngle = newAngle
 end
@@ -96,7 +105,13 @@ local function scanForPlayers(data: PigeonData, dt: number): boolean
 		return false
 	end
 
-	data.Velocity.VectorVelocity = (closestPart.Position - origin).Unit * ATTACK_SPEED
+	local isCharge = (closestPart.Position * Vector3.new(1, 0, 1) - origin * Vector3.new(1, 0, 1)).Magnitude < CHARGE_DISTANCE
+
+	local direction = (closestPart.Position - origin).Unit
+
+	local velocity = if isCharge then direction else direction * Vector3.new(1, 0, 1)
+
+	data.Velocity.VectorVelocity = velocity * if isCharge then CHARGE_SPEED else FOLLOW_SPEED
 	data.Orientation.LookAtPosition = closestPart.Position
 
 	return true
@@ -141,8 +156,11 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	orientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
 	orientation.MaxTorque = 2000
 	orientation.MaxAngularVelocity = 10
+	orientation.Parent = model
 
 	GetPrimaryPart(model):SetNetworkOwner(nil)
+
+	task.wait(5)
 
 	table.insert(pigeons, {
 		Velocity = velocity,
@@ -152,6 +170,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		Orientation = orientation,
 		LaunchRole = participant:GetRole(),
 		Launcher = participant,
+		DeployHeight = origin.Y,
 	})
 
 	ForEachPart(model, function(part)
