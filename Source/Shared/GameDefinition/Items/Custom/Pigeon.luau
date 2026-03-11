@@ -312,7 +312,7 @@ end
 
 local item = Custom({
 	Name = "Pigeon",
-	Description = "An unmanned aerial bombing pigeon, detonating nearby enemies.",
+	Description = "An unmanned aerial bombing pigeon, that detonates nearby enemies.",
 	IconContent = Content.fromAssetId(13935182127),
 
 	Cost = 1,
