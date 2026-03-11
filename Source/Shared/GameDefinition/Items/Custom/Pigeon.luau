@@ -171,9 +171,14 @@ else
 		local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 		local participant: Types.Participant? = GetParticipant(player)
 
+		if not participant or not participant:IsAlive() then
+			return
+		end
+
 		for _, pigeon in pigeons do
 			if pigeon.Launcher == participant then
 				pigeon.IsRecalling = true
+				break
 			end
 		end
 	end)
