@@ -221,7 +221,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	local model = (assert(item.Model) :: typeof(MODEL)):Clone()
 
-	model.Attachment.Axis = Vector3.new(0, 0, -1)
+	model.Attachment.Axis = Vector3.new(0, 0, 1)
 	model.Attachment.SecondaryAxis = Vector3.new(0, 1, 0)
 
 	model:RemoveTag("Item")
