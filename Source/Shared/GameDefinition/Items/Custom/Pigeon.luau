@@ -160,8 +160,6 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	GetPrimaryPart(model):SetNetworkOwner(nil)
 
-	task.wait(5)
-
 	table.insert(pigeons, {
 		Velocity = velocity,
 		Pigeon = model :: BasePart,
