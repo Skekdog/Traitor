@@ -196,7 +196,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	model:RemoveTag("Item")
 	model:RemoveTag("Prop")
 
-	if not participant:TryThrowAssembly(model, 0, workspace.Projectiles, origin, direction, nil, true) then
+	if not participant:TryThrowAssembly(model, 0, participant.Round:GetMap().Structure.Dynamic, origin, direction, nil, true) then
 		return
 	end
 
