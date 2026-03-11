@@ -96,7 +96,7 @@ function Server.ProcessHitscan(item: Types.Item, origin: Vector3, participant: T
 		return "TargetTooFar"
 	end
 
-	if not Checks.RaycastStatic(item, participant, origin, hitscan.Position, hitscan.Hit and hitscan.Hit.Part) then
+	if not Checks.RaycastStatic(participant.Round:GetMap(), origin, hitscan.Position, hitscan.Hit and hitscan.Hit.Part) then
 		return "StaticObscured"
 	end
 

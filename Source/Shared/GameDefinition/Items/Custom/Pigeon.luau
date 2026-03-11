@@ -1,8 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
+local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Types = require(ReplicatedStorage.API.Types)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
 local Pigeon = {}
@@ -12,30 +15,109 @@ local MODEL = ReplicatedStorage.Assets.ItemModels.Pigeon
 local ORBIT_SPEED = 0.5 * math.pi -- rad/s
 local ORBIT_RADIUS = 10 -- well, studs
 
-local velocities: {[LinearVelocity]: {
+local SEARCH_RADIUS = 20
+
+local ATTACK_SPEED = 20
+
+type PigeonData = {
+	Velocity: LinearVelocity,
 	CurrentAngle: number,
-}} = {}
+	Pigeon: Types.MapObject,
+	Round: Types.Round,
+	Orientation: AlignOrientation,
+	LaunchRole: Types.Role,
+	Launcher: Types.Participant,
+}
+
+local pigeons: {PigeonData} = {}
+
+local function updateOrbit(data: PigeonData, dt: number): ()
+	local newAngle = (data.CurrentAngle + (dt * ORBIT_SPEED)) % (2 * math.pi)
+
+	local speed = (ORBIT_SPEED ^ 2) * ORBIT_RADIUS
+
+	local mass = GetPrimaryPart(data.Pigeon).AssemblyMass -- this can't be a constant because it is incorrect due to the weld not being loaded
+	local magnitude = mass * speed
+
+	local speed_x = magnitude * math.sin(newAngle)
+	local speed_z = magnitude * math.cos(newAngle)
+
+	local velocity = Vector3.new(speed_x, 0, speed_z)
+	data.Velocity.VectorVelocity = velocity
+
+	data.Orientation.LookAtPosition = (GetPrimaryPart(data.Pigeon).Position + velocity).Unit
+
+	data.CurrentAngle = newAngle
+end
+
+local function scanForPlayers(data: PigeonData, dt: number): boolean
+	local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+
+	local origin = GetPrimaryPart(data.Pigeon).Position
+
+	local params = OverlapParams.new()
+	params.FilterDescendantsInstances = {workspace.Characters}
+	params.FilterType = Enum.RaycastFilterType.Include
+
+	local closestPart: BasePart?, closestDistance = nil, math.huge
+
+	local foundParticipants: {Types.Participant} = {}
+	for _, part in workspace:GetPartBoundsInRadius(origin, SEARCH_RADIUS, params) do
+		if part.Name ~= "Head" then
+			continue
+		end
+
+		local distance = (part.Position - origin).Magnitude
+		if distance >= closestDistance then
+			continue
+		end
+
+		local participant: Types.Participant? = GetParticipant(part) -- annotation needed because type-checker otherwise calls it too complex
+		if not participant or table.find(foundParticipants, participant) then
+			continue
+		end
+
+		if participant == data.Launcher or participant:GetRole():IsAlliedWith(data.LaunchRole) then
+			continue
+		end
+
+		local canReach = Checks.RaycastStatic(data.Round:GetMap(), origin, part.Position, part)
+		if not canReach then
+			continue
+		end
+
+		closestDistance = distance
+		closestPart = part
+
+		table.insert(foundParticipants, participant)
+	end
+
+	if not closestPart then
+		return false
+	end
+
+	data.Velocity.VectorVelocity = (closestPart.Position - origin).Unit * ATTACK_SPEED
+	data.Orientation.LookAtPosition = closestPart.Position
+
+	return true
+end
 
 RunService.PreSimulation:Connect(function(dt)
-	for velocity, data in velocities do
-		local newAngle = (data.CurrentAngle + (dt * ORBIT_SPEED)) % (2 * math.pi)
-
-		local speed = (ORBIT_SPEED ^ 2) * ORBIT_RADIUS
-
-		local mass = GetPrimaryPart(velocity.Parent :: Types.MapObject).AssemblyMass -- this can't be a constant because it is incorrect due to the weld not being loaded
-		local magnitude = mass * speed
-
-		local speed_x = magnitude * math.sin(newAngle)
-		local speed_z = magnitude * math.cos(newAngle)
-
-		velocity.VectorVelocity = Vector3.new(speed_x, 0, speed_z)
-
-		data.CurrentAngle = newAngle
+	for _, data in pigeons do
+		if not scanForPlayers(data, dt) then
+			updateOrbit(data, dt)
+		end
 	end
 end)
 
 local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, _): {string} | string?
-	local model = assert(item.Model) :: typeof(MODEL)
+	local Combat = require(ReplicatedStorage.API.Combat)
+
+	local model = (assert(item.Model) :: typeof(MODEL)):Clone()
+
+	model:RemoveTag("Item")
+	model:RemoveTag("Prop")
+
 	if not participant:TryThrowAssembly(model, 0, workspace.Projectiles, origin, direction, nil, true) then
 		return
 	end
@@ -53,9 +135,39 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	velocity.VectorVelocity = Vector3.zero
 	velocity.Parent = model
 
-	velocities[velocity] = {
+	local orientation = Instance.new("AlignOrientation")
+	orientation.Attachment0 = model.Attachment
+	orientation.AlignType = Enum.AlignType.PrimaryAxisLookAt
+	orientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
+	orientation.MaxTorque = 2000
+	orientation.MaxAngularVelocity = 10
+
+	GetPrimaryPart(model):SetNetworkOwner(nil)
+
+	table.insert(pigeons, {
+		Velocity = velocity,
+		Pigeon = model :: BasePart,
 		CurrentAngle = 0,
-	}
+		Round = participant.Round,
+		Orientation = orientation,
+		LaunchRole = participant:GetRole(),
+		Launcher = participant,
+	})
+
+	ForEachPart(model, function(part)
+		part.Touched:Connect(function(otherPart)
+			if GetMapObject(otherPart, "Character") then
+				model:Destroy()
+				Combat.MakeExplosion({
+					Attacker = participant,
+					Damage = 100,
+					FalloffStart = 10,
+					FalloffEnd = 15,
+					Position = GetPrimaryPart(model).Position,
+				})
+			end
+		end)
+	end)
 
 	return nil
 end

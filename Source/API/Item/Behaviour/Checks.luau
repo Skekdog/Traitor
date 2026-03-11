@@ -46,13 +46,13 @@ function Checks.TargetDistance(item: Types.Item, origin: Vector3, destination: V
 	return true
 end
 
-function Checks.RaycastStatic(item: Types.Item, by: Types.Participant, origin: Vector3, destination: Vector3, target: BasePart?): boolean
+function Checks.RaycastStatic(map: Types.Map, origin: Vector3, destination: Vector3, target: BasePart?): boolean
 	if not target then
 		return true
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {by.Round:GetMap().Structure.Static}
+	params.FilterDescendantsInstances = {map.Structure.Static}
 	params.CollisionGroup = "WeaponHitTargets"
 	params.FilterType = Enum.RaycastFilterType.Include
 	params.IgnoreWater = true
