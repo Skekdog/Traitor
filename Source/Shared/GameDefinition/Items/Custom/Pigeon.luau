@@ -260,7 +260,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	local launchRole = participant:GetRole()
 
-	table.insert(pigeons, {
+	local data: PigeonData = {
 		Velocity = velocity,
 		Pigeon = model :: BasePart,
 		CurrentAngle = 0,
@@ -271,7 +271,9 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		DeployHeight = origin.Y,
 		IsRecalling = false,
 		LastSound = 0,
-	})
+	}
+
+	table.insert(pigeons, data)
 
 	ForEachPart(model, function(part)
 		part.Touched:Connect(function(otherPart)
@@ -305,6 +307,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	model.Destroying:Connect(function()
 		recallRemote:FireClient(participant.Player, false)
+		table.remove(pigeons, assert(table.find(pigeons, data)))
 	end)
 
 	return nil
