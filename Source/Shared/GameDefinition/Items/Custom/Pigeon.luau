@@ -1,6 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
@@ -127,6 +126,7 @@ end)
 
 local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, _): {string} | string?
 	local Combat = require(ReplicatedStorage.API.Combat)
+	local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 
 	local model = (assert(item.Model) :: typeof(MODEL)):Clone()
 
@@ -160,29 +160,34 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	GetPrimaryPart(model):SetNetworkOwner(nil)
 
+	local launchRole = participant:GetRole()
+
 	table.insert(pigeons, {
 		Velocity = velocity,
 		Pigeon = model :: BasePart,
 		CurrentAngle = 0,
 		Round = participant.Round,
 		Orientation = orientation,
-		LaunchRole = participant:GetRole(),
+		LaunchRole = launchRole,
 		Launcher = participant,
 		DeployHeight = origin.Y,
 	})
 
 	ForEachPart(model, function(part)
 		part.Touched:Connect(function(otherPart)
-			if GetMapObject(otherPart, "Character") then
-				model:Destroy()
-				Combat.MakeExplosion({
-					Attacker = participant,
-					Damage = 100,
-					FalloffStart = 10,
-					FalloffEnd = 15,
-					Position = GetPrimaryPart(model).Position,
-				})
+			local target = GetParticipant(otherPart)
+			if not target or target:GetRole():IsAlliedWith(launchRole) then
+				return
 			end
+
+			model:Destroy()
+			Combat.MakeExplosion({
+				Attacker = participant,
+				Damage = 100,
+				FalloffStart = 10,
+				FalloffEnd = 15,
+				Position = GetPrimaryPart(model).Position,
+			})
 		end)
 	end)
 
