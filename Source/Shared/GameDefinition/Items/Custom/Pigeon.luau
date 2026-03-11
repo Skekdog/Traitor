@@ -55,7 +55,10 @@ local function updateRecall(data: PigeonData): ()
 		return
 	end
 
-	data.Velocity.VectorVelocity = (root.Position - GetPrimaryPart(data.Pigeon).Position).Unit * RECALL_SPEED
+	local part = GetPrimaryPart(data.Pigeon)
+
+	data.Velocity.VectorVelocity = (root.Position - part.Position).Unit * RECALL_SPEED
+	data.Orientation.CFrame = CFrame.lookAt(part.Position, root.Position)
 end
 
 local function updateOrbit(data: PigeonData, dt: number): ()
@@ -74,7 +77,7 @@ local function updateOrbit(data: PigeonData, dt: number): ()
 	local velocity = Vector3.new(speed_x, if (data.DeployHeight + TARGET_HEIGHT) > part.Position.Y then CLIMB_SPEED else 0, speed_z)
 	data.Velocity.VectorVelocity = velocity
 
-	data.Orientation.LookAtPosition = (part.Position + velocity).Unit
+	data.Orientation.CFrame = CFrame.lookAt(part.Position, part.Position + velocity.Unit)
 
 	data.CurrentAngle = newAngle
 end
@@ -125,14 +128,14 @@ local function scanForPlayers(data: PigeonData, dt: number): boolean
 		return false
 	end
 
-	local isCharge = (closestPart.Position * Vector3.new(1, 0, 1) - origin * Vector3.new(1, 0, 1)).Magnitude < CHARGE_DISTANCE
+	local heightAlignedTarget = Vector3.new(closestPart.Position.X, origin.Y, closestPart.Position.Z)
 
-	local direction = (closestPart.Position - origin).Unit
+	local isCharge = (heightAlignedTarget - origin).Magnitude < CHARGE_DISTANCE
 
-	local velocity = if isCharge then direction else direction * Vector3.new(1, 0, 1)
+	local direction = if isCharge then (heightAlignedTarget - origin).Unit else (closestPart.Position - origin).Unit
 
-	data.Velocity.VectorVelocity = velocity * if isCharge then CHARGE_SPEED else FOLLOW_SPEED
-	data.Orientation.LookAtPosition = closestPart.Position
+	data.Velocity.VectorVelocity = direction * if isCharge then CHARGE_SPEED else FOLLOW_SPEED
+	data.Orientation.CFrame = CFrame.lookAlong(origin, direction)
 
 	return true
 end
@@ -182,6 +185,9 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	local model = (assert(item.Model) :: typeof(MODEL)):Clone()
 
+	model.Attachment.Axis = Vector3.new(0, 0, -1)
+	model.Attachment.SecondaryAxis = Vector3.new(0, 1, 0)
+
 	model:RemoveTag("Item")
 	model:RemoveTag("Prop")
 
@@ -197,17 +203,19 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	velocity.RelativeTo = Enum.ActuatorRelativeTo.World
 	velocity.ForceLimitsEnabled = true
 	velocity.ForceLimitMode = Enum.ForceLimitMode.PerAxis
-	velocity.MaxAxesForce = Vector3.new(mass * 30, mass * workspace.Gravity * 1.5, mass * 30)
+	velocity.MaxAxesForce = Vector3.new(mass * 20, mass * workspace.Gravity * 1.25, mass * 20)
 	velocity.Attachment0 = model.Attachment
 	velocity.VectorVelocity = Vector3.zero
 	velocity.Parent = model
 
 	local orientation = Instance.new("AlignOrientation")
 	orientation.Attachment0 = model.Attachment
-	orientation.AlignType = Enum.AlignType.PrimaryAxisLookAt
+	orientation.AlignType = Enum.AlignType.AllAxes
 	orientation.Mode = Enum.OrientationAlignmentMode.OneAttachment
-	orientation.MaxTorque = 2000
-	orientation.MaxAngularVelocity = 10
+	orientation.MaxTorque = 7.5
+	orientation.MaxAngularVelocity = 2.5
+	orientation.Responsiveness = 50
+	orientation.SecondaryAxis = Vector3.xAxis
 	orientation.Parent = model
 
 	GetPrimaryPart(model):SetNetworkOwner(nil)
