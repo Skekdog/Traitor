@@ -47,7 +47,6 @@ type PigeonData = {
 	Pigeon: Types.MapObject,
 	Round: Types.Round,
 	Orientation: AlignOrientation,
-	LaunchRole: Types.Role,
 	Launcher: Types.Participant,
 	DeployHeight: number,
 	IsRecalling: boolean,
@@ -136,7 +135,7 @@ local function scanForPlayers(data: PigeonData, dt: number): boolean
 			continue
 		end
 
-		if participant == data.Launcher or participant:GetRole():IsAlliedWith(data.LaunchRole) then
+		if participant == data.Launcher or participant:GetRole():IsAlliedWith(data.Launcher:GetRole()) then
 			continue
 		end
 
@@ -266,7 +265,6 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		CurrentAngle = 0,
 		Round = participant.Round,
 		Orientation = orientation,
-		LaunchRole = launchRole,
 		Launcher = participant,
 		DeployHeight = origin.Y,
 		IsRecalling = false,
