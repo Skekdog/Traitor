@@ -4,7 +4,6 @@ local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local Camera = require(ReplicatedStorage.API.Camera)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
@@ -241,6 +240,7 @@ module.thirdperson = {
 	Environment = "Client" :: "Client",
 	Arguments = {},
 	Execute = function(player: Player, args: Args)
+		local Camera = require(ReplicatedStorage.API.Camera)
 		if Camera.IsFirstPerson() then
 			Camera.EnterThirdPerson()
 		else
