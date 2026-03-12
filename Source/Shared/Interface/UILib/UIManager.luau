@@ -47,6 +47,7 @@ export type UI = {
 	Visible: boolean,
 	Sidebar: boolean?,
 	Object: GuiObject,
+	NoCursor: boolean?,
 
 	ToggleVisible: (self: UI, force: boolean?, ignoreOtherUIs: boolean?, callback: (() -> ())?) -> (),
 	Unregister: (self: UI) -> (),
@@ -59,7 +60,7 @@ UIManager.GuiInset = inset
 
 local function tryMakeCursorVisible(): ()
 	for _, v in registeredUIs do
-		if v.Visible and (v.Layer == "Popup" or v.KeepCursorVisible) then
+		if v.Visible and (v.Layer == "Popup" or v.KeepCursorVisible) and not v.NoCursor then
 			return ToggleMouseVisible(true)
 		end
 	end
@@ -87,6 +88,7 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 		NoClose = object:GetAttribute("PreventClose") :: boolean?,
 		Sidebar = object:GetAttribute("Sidebar") :: boolean?,
 		Object = object,
+		NoCursor = object:GetAttribute("NoCursor") :: boolean?,
 
 		KeepCursorVisible = object:GetAttribute("KeepCursorVisible") :: boolean?,
 
