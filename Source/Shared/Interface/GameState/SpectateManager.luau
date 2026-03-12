@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local plr = Players.LocalPlayer
 
+local Camera = require(ReplicatedStorage.API.Camera)
 local PossessProp = require(ReplicatedStorage.Shared.Actions.PossessProp)
 local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
@@ -36,7 +37,7 @@ local function spectateFunc(action, state)
 	end
 
 	camera.CameraType = Enum.CameraType.Track
-	plr.CameraMode = Enum.CameraMode.Classic
+	Camera.EnterThirdPerson()
 
 	local index: number
 	if action == "Spectate Next" then
@@ -104,13 +105,13 @@ participant.Status:Connect(function(status)
 
 		ui:ToggleVisible(true)
 		camera.CameraType = Enum.CameraType.Track
-		plr.CameraMode = Enum.CameraMode.Classic
+		Camera.EnterThirdPerson()
 		isCurrentlySpectatingPleaseRefactorThisScript = true
 	else
 		Freecam.StopFreecam()
 		ui:ToggleVisible(false)
 		camera.CameraType = Enum.CameraType.Custom
-		plr.CameraMode = Enum.CameraMode.LockFirstPerson
+		Camera.EnterFirstPerson()
 		isCurrentlySpectatingPleaseRefactorThisScript = false
 	end
 end, true)
