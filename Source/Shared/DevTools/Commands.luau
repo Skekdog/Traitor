@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local Camera = require(ReplicatedStorage.API.Camera)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
@@ -240,8 +241,13 @@ module.thirdperson = {
 	Environment = "Client" :: "Client",
 	Arguments = {},
 	Execute = function(player: Player, args: Args)
-		player.CameraMode = if player.CameraMode == Enum.CameraMode.Classic then Enum.CameraMode.LockFirstPerson else Enum.CameraMode.Classic
-		return `Third person {if player.CameraMode == Enum.CameraMode.Classic then "enabled" else "disabled"}.`
+		if Camera.IsFirstPerson() then
+			Camera.EnterThirdPerson()
+		else
+			Camera.EnterFirstPerson()
+		end
+
+		return `Third person {if Camera.IsFirstPerson() then "disabled" else "enabled"}.`
 	end
 }
 
