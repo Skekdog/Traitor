@@ -5,6 +5,7 @@ local TeamChat = require(ServerScriptService.Chat.TeamChat)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWithDeterminer)
@@ -27,26 +28,59 @@ local EXCLUDED_GAMEMODES: {Instance} = {}
 
 Round.Config.DeathSounds = DeathSounds
 
-function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
-    if participant.Extras.CombatImpulse and participant.Corpse and participant.Corpse.Model and participant.Corpse.Model.PrimaryPart then
-        Impulse.ApplyImpulse(participant.Corpse.Model.PrimaryPart, participant.Extras.CombatImpulse, true)
+local function impulseCorpse(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+    if not participant.Extras.CombatImpulse or not participant.Corpse or not participant.Corpse.Model or not participant.Corpse.Model.PrimaryPart then
+        return
     end
 
-    TeamChat.TryRemove(participant.Player.UserId)
+    Impulse.ApplyImpulse(participant.Corpse.Model.PrimaryPart, participant.Extras.CombatImpulse, true)
+end
 
-    if participant.Corpse then
-        local attacker = participant.Corpse.Killer
-        if attacker and attacker ~= participant then
-            assert(participant.Corpse)
-            local roleName = GetDisplayName(attacker:GetRole().Definition)
-            local formattedRoleName = attacker:GetRole():GetFormattedName()
-            local determiner = StringWithDeterminer(roleName):split(" ")[1]
-            if participant:IsAlliedWithParticipant(attacker) then
-                ShowAlert(`You were killed by {attacker:GetFormattedName()}{if participant.Corpse.CorpseView.WasSelfDefense then " in self-defense" else ""}. They were {determiner} {formattedRoleName}.`, participant.Player)
-            else
-                ShowAlert(`You were killed by {determiner} {formattedRoleName}!`, participant.Player)
-            end
-        end
+local function removeTeamChat(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+    TeamChat.TryRemove(participant.Player.UserId)
+end
+
+local function youWereKilledBy(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+    if not participant.Corpse then
+        return
+    end
+
+    local attacker = participant.Corpse.Killer
+    if not attacker or attacker == participant then
+        return
+    end
+
+    local roleName = GetDisplayName(attacker:GetRole().Definition)
+    local formattedRoleName = attacker:GetRole():GetFormattedName()
+    local determiner = StringWithDeterminer(roleName):split(" ")[1]
+    if participant:IsAlliedWithParticipant(attacker) then
+        ShowAlert(`You were killed by {attacker:GetFormattedName()}{if participant.Corpse.CorpseView.WasSelfDefense then " in self-defense" else ""}. They were {determiner} {formattedRoleName}.`, participant.Player)
+    else
+        ShowAlert(`You were killed by {determiner} {formattedRoleName}!`, participant.Player)
+    end
+end
+
+RoundHooks.OnDeath["ImpulseCorpse"] = impulseCorpse
+RoundHooks.OnDeath["RemoveTeamChat"] = removeTeamChat
+RoundHooks.OnDeath["YouWereKilledBy"] = youWereKilledBy
+
+function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+    for _, hook in RoundHooks.OnDeath do
+        hook(round, participant, defer)
+    end
+end
+
+function Round.Config.BeforeDamageParticipant(round: Types.Round, participant: Types.Participant, params: Types.DamageParams): boolean
+    for _, hook in RoundHooks.BeforeDamageParticipant do
+        hook(round, participant, params)
+    end
+
+    return true
+end
+
+function Round.Config.OnItemDropped(round: Types.Round, participant: Types.Participant, item: Types.Item): ()
+    for _, hook in RoundHooks.OnItemDropped do
+        hook(round, participant, item)
     end
 end
 

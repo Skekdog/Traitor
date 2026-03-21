@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
-local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 
@@ -92,7 +91,7 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 		end
 
 		for _, v in char:GetDescendants() do
-			Participant.OnCharacterPartAdded(v)
+			participant:OnCharacterPartAdded(v)
 		end
 	end)
 

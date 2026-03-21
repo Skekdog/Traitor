@@ -2,9 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local DamageSource = require(ReplicatedStorage.API.DamageSource)
+local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local SPHERE_TWEEN_INFO = TweenInfo.new(
@@ -162,18 +163,24 @@ local function copyCharacter(char: Model): Model
 	return char
 end
 
-local originalOnDeath = Participant.OnDeath
-local function patchedOnDeath(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
-	if params.Source ~= "Shot" and (typeof(params.Source) ~= "table" or params.Source.DamageKind ~= "Shot") then
+RoundHooks.OnDeath["Visualiser"] = function(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+	local corpse = participant.Corpse
+	if not corpse then
 		return
 	end
 
-	local attacker = params.Attacker
+	if not DamageSource.IsFirearm(corpse.CorpseView.DamageSource) then
+		return
+	end
+
+	local params = corpse.DamageParams
+
+	local attacker = corpse.Killer
 	if not attacker then
 		return
 	end
 
-	local char = participant:GetCharacter()
+	local char = corpse.Model
 	if not char then
 		return
 	end
@@ -221,11 +228,6 @@ local function patchedOnDeath(participant: Types.Participant, params: Types.Dama
 			Tracer = tracer,
 		}
 	end)
-end
-
-Participant.OnDeath = function(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
-	patchedOnDeath(participant, params, deferVictoryCheck)
-	originalOnDeath(participant, params, deferVictoryCheck)
 end
 
 local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean

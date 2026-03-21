@@ -1,6 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DamageSource = require(ReplicatedStorage.API.DamageSource)
+local ProcessHit = require(ReplicatedStorage.API.Item.Behaviour.ProcessHit)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
+local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -12,24 +14,14 @@ type Participant = Types.Participant & {
 	}
 }
 
-local function isTorso(part: BasePart): boolean
-	return part.Name == "HumanoidRootPart" or part.Name:match("Torso") ~= nil
-end
-
-local function isGunSource(source: Types.DamageSource): boolean
-	return source == "Shot" or (typeof(source) == "table" and source.DamageKind == "Shot")
-end
-
-local originalTryTakeDamage = Participant.TryTakeDamage
-
-local function patchedTryTakeDamage(participant: Participant, params: Types.DamageParams, deferDeath: boolean?): boolean
-	if isGunSource(params.Source) and ((participant.Extras.BallisticVest or 0) > 0) and params.HitPart and isTorso(params.HitPart) then
-		local reduction = math.clamp(params.Amount, 0, participant.Extras.BallisticVest)
-		participant.Extras.BallisticVest -= reduction
-		params.Amount -= reduction
+RoundHooks.BeforeDamageParticipant["BallisticVest"] = function(round: Types.Round, participant: Participant, params: Types.DamageParams)
+	if not params.HitPart or not DamageSource.IsFirearm(params.Source) or ((participant.Extras.BallisticVest or 0) <= 0) or ProcessHit.GetBodyPart(params.HitPart) ~= "Body" then
+		return
 	end
 
-	return originalTryTakeDamage(participant, params, deferDeath)
+	local reduction = math.clamp(params.Amount, 0, participant.Extras.BallisticVest)
+	participant.Extras.BallisticVest -= reduction
+	params.Amount -= reduction
 end
 
 local item = Custom({
@@ -42,7 +34,6 @@ local item = Custom({
 
     OnEquipServer = function(item, participant: Types.Participant)
         participant.Extras.BallisticVest = 60
-		participant.TryTakeDamage = patchedTryTakeDamage
     end,
 })
 

@@ -7,7 +7,6 @@ local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWith
 local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
-local GetItemDefinition = require(ReplicatedStorage.Shared.LocalState.GetItemDefinition)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
@@ -60,28 +59,22 @@ local flavourImages: {[Types.GeneralDamageSource]: string} = {
     Stomp = "rbxassetid://78517882762574",
 }
 
-local function getItemFromName(name: string): Types.ItemComponents?
-    return GetItemDefinition(name)
-end
-
-local function getItemAttackType(name: string): Types.GeneralDamageSource
-    local item = getItemFromName(name)
-    if item then
-        return item.DamageKind or "Other"
+local function getItemAttackType(item: Types.DamageSource): Types.GeneralDamageSource
+    if typeof(item) == "table" then
+        return item.Base.DamageKind or "Other"
     else
-        return name :: Types.GeneralDamageSource
+        return item
     end
 end
 
-local function getFlavourText(deathType: Types.NamedDamageSource): string?
-    local attackType: Types.GeneralDamageSource = getItemAttackType(deathType)
-    if attackType ~= deathType then
-        local item = getItemFromName(deathType)
-        local weaponName = if item then GetDisplayName(item) else deathType
+local function getFlavourText(source: Types.DamageSource): string?
+    local attackType: Types.GeneralDamageSource = getItemAttackType(source)
+    if typeof(source) == "table" then
+        local weaponName = GetDisplayName(source.Base)
         return if flavourTextsWithWeapon[attackType] then flavourTextsWithWeapon[attackType]:format(StringWithDeterminer(weaponName)) else flavourTexts[attackType]
     end
 
-    return flavourTexts[attackType] or error("Unknown death type: " .. deathType)
+    return flavourTexts[attackType] or error("Unknown death type: " .. source)
 end
 
 local information = corpseUi.Object.Information
@@ -162,8 +155,7 @@ return function(corpseInfo: Types.CorpseView?)
 
     information.Text = "Click on an icon to reveal detailed information."
 
-    local item = getItemFromName(corpseInfo.DamageSource)
-    local weaponName = if item then GetDisplayName(item) else corpseInfo.DamageSource
+    local weaponName = if typeof(corpseInfo.DamageSource) == "table" then GetDisplayName(corpseInfo.DamageSource.Base) else corpseInfo.DamageSource
     object.MurderWeapon.TextLabel.Text = weaponName
 
     local flavourText = getFlavourText(corpseInfo.DamageSource)

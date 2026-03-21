@@ -5,8 +5,8 @@ local SoundService = game:GetService("SoundService")
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
+local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Participant = require(ReplicatedStorage.Shared.RoundRule.Participant)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 
@@ -102,11 +102,15 @@ type DNATrace = IHasTarget & IHasObject & {
 
 type Participant = Types.Participant & IHasDNATraces
 
-local originalOnDeath = Participant.OnDeath
-local function patchedOnDeath(participant: Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
+RoundHooks.OnDeath["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, deferVictoryCheck: boolean): ()
 	remote:FireClient(participant.Player)
 
-	local attacker = params.Attacker
+	local corpse = participant.Corpse
+	if not corpse then
+		return
+	end
+
+	local attacker = corpse.Killer
 	if not attacker then
 		return
 	end
@@ -115,19 +119,19 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 		return
 	end
 
-	local char = participant:GetCharacter()
+	local char = corpse.Model
 	if not char then
 		return
 	end
 
-	local isEligible = DamageSource.IsFirearm(params.Source) or DamageSource.IsMelee(params.Source)
+	local isEligible = DamageSource.IsFirearm(corpse.CorpseView.DamageSource) or DamageSource.IsMelee(corpse.CorpseView.DamageSource)
 	if not isEligible then
-		return
+		return print("it was made up by writers")
 	end
 
 	local distance = attacker.Player:DistanceFromCharacter(char:GetPivot().Position)
 	if distance == 0 then
-		return
+		return print("its a total fabrication")
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
@@ -141,22 +145,11 @@ local function patchedOnDeath(participant: Participant, params: Types.DamagePara
 	})
 end
 
-local originalDropItem = Participant.DropItem
-local function patchedDropItem(participant: Types.Participant, item: Types.Item, throwDirection: Vector3?): ()
-	if item.DropDisabled or not item.Model then
+RoundHooks.OnItemDropped["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, item: Types.Item)
+	if not item.Model then
 		return
 	end
 	module.AddDNATrace(item, participant, nil, item.IconContent or Content.fromAssetId(4795275417), item.Model)
-end
-
-Participant.DropItem = function(participant: Types.Participant, item: Types.Item, throwDirection: Vector3?): ()
-	patchedDropItem(participant, item, throwDirection)
-	originalDropItem(participant, item, throwDirection)
-end
-
-Participant.OnDeath = function(participant: Types.Participant, params: Types.DamageParams, deferVictoryCheck: boolean): ()
-	patchedOnDeath(participant, params, deferVictoryCheck)
-	originalOnDeath(participant, params, deferVictoryCheck)
 end
 
 local raycastParams = RaycastParams.new()
