@@ -197,6 +197,8 @@ if RunService:IsClient() then
 		end, 2)
 	end)
 else
+	local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
+
 	recallRemote.OnServerEvent:Connect(function(player)
 		local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 		local participant: Types.Participant? = GetParticipant(player)
@@ -212,6 +214,15 @@ else
 			end
 		end
 	end)
+
+	RoundHooks.OnDeath["Pigeon"] = function(round: Types.Round, participant: Types.Participant): ()
+		for _, pigeon in pigeons do
+			if pigeon.Launcher == participant then
+				recallRemote:FireClient(participant.Player, false)
+				break
+			end
+		end
+	end
 end
 
 local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, _): {string} | string?
