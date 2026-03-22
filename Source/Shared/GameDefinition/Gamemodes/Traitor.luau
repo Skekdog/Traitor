@@ -665,7 +665,7 @@ local gamemode: Types.GamemodeDefinition = {
 			end
 
 			for _, traitor in traitors do
-				traitor:AddScore("Surviving Traitors", 2 * #traitors)
+				traitor:AddScore("Surviving Traitors", 2 * survivingTraitors)
 			end
 		else
 			local innocents: {Types.Participant} = {}
