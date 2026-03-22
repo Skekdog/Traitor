@@ -5,11 +5,13 @@ local TweenService = game:GetService("TweenService")
 local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
+local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 
 local IS_SERVER = RunService:IsServer()
 
 local function BulletTracer(projectile: Types.MapObject, projectileSpeed: number, start: Vector3, target: Vector3, except: Player?, tempHide: boolean?): ()
 	if IS_SERVER then
+		assert(Replication.CanInstanceReplicate(projectile))
 		for _, player in Players:GetPlayers() do
 			if player ~= except then
 				ReplicatedStorage.Remotes.ServerClient.BulletTracer:FireClient(player, projectile, projectileSpeed, start, target)
