@@ -159,9 +159,6 @@ return function(corpseInfo: Types.ClientCorpseView?)
 
     local source: Types.DamageSource = if typeof(corpseInfo.DamageSource) == "table" then ClientInventory.CreateReplicatedItem(corpseInfo.DamageSource) else corpseInfo.DamageSource
 
-    local weaponName = if typeof(source) == "table" then GetDisplayName(source) else source
-    object.MurderWeapon.TextLabel.Text = weaponName
-
     local flavourText = getFlavourText(source)
     object.MurderWeapon:SetAttribute("Description", flavourText)
 
@@ -208,7 +205,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     end
 
     for _, v in corpseInfo.AdditionalIcons do
-        local icon = object.MurderWeapon:Clone()
+        local icon = object.DeathTime:Clone()
         icon.ImageContent = v.Icon
         icon:SetAttribute("Description", FullParse(v.Description))
         icon.Name = "AdditionalIcon_" .. v.Name

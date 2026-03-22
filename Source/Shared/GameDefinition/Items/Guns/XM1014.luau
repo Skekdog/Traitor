@@ -7,7 +7,7 @@ local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local XM1014 = Gun({
     Name = "XM1014",
 	Description = "Haha boomstick",
-	IconContent = Content.none,
+	IconContent = Content.fromAssetId(91158225550994),
 
     ItemGroup = ItemGroups.Primary,
 

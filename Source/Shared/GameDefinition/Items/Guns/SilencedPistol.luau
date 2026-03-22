@@ -6,7 +6,7 @@ local Modify = require(ReplicatedStorage.API.Modify)
 
 local SilencedPistol = Modify(FiveSeven, "Silenced Pistol", {
     Description = "A Five-Seven that has had a suppressor fitted to it, making it much quieter. People killed with silenced weapons will not scream.",
-    IconContent = Content.fromAssetId(299432421),
+    IconContent = Content.fromAssetId(114595796341288),
 
 	IsSilent = true,
 	IsEvilItem = true,

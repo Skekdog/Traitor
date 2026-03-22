@@ -7,7 +7,7 @@ local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local M4A1 = Gun({
 	Name = "M4A1",
 	Description = "Powerful mid-range assault rifle.",
-	IconContent = Content.none,
+	IconContent = Content.fromAssetId(97287553447708),
 
 	ItemGroup = ItemGroups.Primary,
 

@@ -7,7 +7,7 @@ local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local FiveSeven = Gun({
 	Name = "Five-Seven",
     Description = "Sadder version of the Deagle.",
-    IconContent = Content.none,
+    IconContent = Content.fromAssetId(137172954346374),
 
     ItemGroup = ItemGroups.Secondary,
 
