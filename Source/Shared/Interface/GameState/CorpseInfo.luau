@@ -73,7 +73,7 @@ local function getFlavourText(source: Types.DamageSource): string?
     local attackType: Types.GeneralDamageSource = getItemAttackType(source)
     if typeof(source) == "table" then
         local weaponName = GetDisplayName(source.Base)
-        return if flavourTextsWithWeapon[attackType] then flavourTextsWithWeapon[attackType]:format(StringWithDeterminer(weaponName)) else flavourTexts[attackType]
+        return if flavourTextsWithWeapon[attackType] then flavourTextsWithWeapon[attackType]:format(GetDeterminer(weaponName) .. " " .. highlightedText(weaponName)) else flavourTexts[attackType]
     end
 
     return flavourTexts[attackType] or error("Unknown death type: " .. source)
