@@ -315,6 +315,24 @@ local function getVictoryMusic(round: Types.Round, victor: Types.Victor, isTimeo
 	return innocentMusic[math.random(#innocentMusic)]
 end
 
+local function OnCharacterAdded(round: Types.Round, participant: Types.Participant, char: Model): ()
+	for _, accessory in char:QueryDescendants("Accessory") do
+		if accessory.AccessoryType == Enum.AccessoryType.Face then
+			accessory:Destroy()
+		elseif accessory.AccessoryType == Enum.AccessoryType.Hat then
+			local handle = accessory:FindFirstChild("Handle")
+			if not handle or not handle:IsA("BasePart") then
+				accessory:Destroy()
+				return
+			end
+
+			if handle.Size.X > 0.9 and handle.Size.Y > 0.9 and handle.Size.Z > 0.9 then
+				accessory:Destroy()
+			end
+		end
+	end
+end
+
 local gamemode: Types.GamemodeDefinition = {
 	Name = "Framed",
 	Description = "Find and kill your targets. Don't get caught red-handed.",
@@ -381,6 +399,8 @@ local gamemode: Types.GamemodeDefinition = {
 	OnItemEquipped = OnItemEquipped,
 
 	BeforeDamageParticipant = BeforeHitParticipant,
+
+	OnCharacterAdded = OnCharacterAdded,
 }
 
 return table.freeze(gamemode)
