@@ -378,11 +378,17 @@ function module.RemoveItem(item: Types.Item): ()
 	removeItem(item.Name)
 end
 
-local function addItem(itemName: string, components: Types.ItemComponents): ()
-	local base = assert(GetItemDefinition(itemName), "Item exists on server but not client")
+function module.CreateReplicatedItem(replicate: Types.ItemReplication): Types.Item
+	local base = assert(GetItemDefinition(replicate.Name), "Item exists on server but not client")
 
-	local item = Item.new(base)
-	item.Components = components
+	local item = Item.new(base, replicate.Model)
+	item.Components = replicate.Components
+
+	return item
+end
+
+local function addItem(replicate: Types.ItemReplication): ()
+	local item = module.CreateReplicatedItem(replicate)
 
 	local gamemode = LocalRoundInfo.Gamemode()
 	if not gamemode then
@@ -467,11 +473,12 @@ ControlManager.Register("Next Item", function()
 	return Enum.ContextActionResult.Pass
 end)
 
-ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string, components: Types.ItemComponents?): ()
+ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.ItemReplication?): ()
 	if mode == "Add" then
-		assert(components)
-		addItem(item, components)
+		assert(typeof(item) == "table")
+		addItem(item)
 	elseif mode == "Remove" then
+		assert(typeof(item) == "string")
 		removeItem(item)
 	elseif mode == "Reset" then
 		for _, v in ourInventory.Passive do

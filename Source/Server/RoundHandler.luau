@@ -16,6 +16,7 @@ local GamemodeValidation = require(ReplicatedStorage.Shared.RoundRule.GamemodeVa
 local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 local ScoreManager = require(ServerScriptService.Player.ScoreManager)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
+local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
@@ -407,7 +408,7 @@ ReplicatedStorage.Shared.RoundRule.Remotes.SlayVote.OnServerEvent:Connect(functi
     againstParticipant:TryAddSlayVote(participant)
 end)
 
-remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown, covert: unknown): Types.CorpseView?
+remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown, covert: unknown): Types.ClientCorpseView?
     if typeof(body) ~= "Instance" or (not body:IsA("Model") and not body:IsA("Player")) then
         return nil
     end
@@ -434,7 +435,12 @@ remotes.ClientServer.GetCorpseInfo.OnServerInvoke = function(plr, body: unknown,
 
     local success = corpse:Search(participant, covert, if not participant then plr else nil)
     if success then
-        return corpse.CorpseView
+        if typeof(corpse.CorpseView.DamageSource) == "table" then
+            local view: Types.ClientCorpseView = table.clone(corpse.CorpseView) :: any
+            view.DamageSource = Replication.GetItemReplicate(corpse.CorpseView.DamageSource, false, {"IconContent"})
+            return view
+        end
+        return (corpse.CorpseView :: Types.BaseCorpseView) :: Types.ClientCorpseView
     end
 
     return nil

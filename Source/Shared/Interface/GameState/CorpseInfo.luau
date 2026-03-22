@@ -7,6 +7,7 @@ local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWith
 local ToRoundTime = require(ReplicatedStorage.Shared.Grammar.ToRoundTime)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
+local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
@@ -122,7 +123,7 @@ callRoleButton.Activated:Connect(function()
     ReplicatedStorage.Remotes.ClientServer.CallRole:FireServer(corpseName)
 end)
 
-return function(corpseInfo: Types.CorpseView?)
+return function(corpseInfo: Types.ClientCorpseView?)
     if not corpseInfo then
         return
     end
@@ -155,13 +156,15 @@ return function(corpseInfo: Types.CorpseView?)
 
     information.Text = "Click on an icon to reveal detailed information."
 
-    local weaponName = if typeof(corpseInfo.DamageSource) == "table" then GetDisplayName(corpseInfo.DamageSource.Base) else corpseInfo.DamageSource
+    local source: Types.DamageSource = if typeof(corpseInfo.DamageSource) == "table" then ClientInventory.CreateReplicatedItem(corpseInfo.DamageSource) else corpseInfo.DamageSource
+
+    local weaponName = if typeof(source) == "table" then GetDisplayName(source) else source
     object.MurderWeapon.TextLabel.Text = weaponName
 
-    local flavourText = getFlavourText(corpseInfo.DamageSource)
+    local flavourText = getFlavourText(source)
     object.MurderWeapon:SetAttribute("Description", flavourText)
 
-    object.MurderWeapon.Image = flavourImages[getItemAttackType(corpseInfo.DamageSource)]
+    object.MurderWeapon.Image = flavourImages[getItemAttackType(source)]
 
     local timeNow = workspace:GetServerTimeNow()
     object.DeathTime.TextLabel.Text = ToRoundTime(corpseInfo.DeathTime, timeNow)

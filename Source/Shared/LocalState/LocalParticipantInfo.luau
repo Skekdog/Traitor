@@ -16,7 +16,7 @@ export type LocalParticipant = {
     Name: string,
     Role: DynamicValue.DynamicValue<Types.Role>,
     Status: DynamicValue.DynamicValue<Types.ParticipantStatus | "Spectating">,
-    Corpse: DynamicValue.DynamicValue<Types.CorpseView?>,
+    Corpse: DynamicValue.DynamicValue<Types.ClientCorpseView?>,
 }
 
 local function getRoleFromName(name: string?): Types.Role
@@ -38,7 +38,7 @@ local function getOrCreateParticipantValue(name: string): LocalParticipant
 			Name = name,
 			Role = DynamicValue.new(Defaults.Role),
 			Status = DynamicValue.new("Spectating" :: any),
-			Corpse = DynamicValue.new(nil :: Types.CorpseView?),
+			Corpse = DynamicValue.new(nil :: Types.ClientCorpseView?),
 		}
 
 		module.Participants()[name] = value
@@ -68,7 +68,7 @@ remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: 
 	participant.Role:SetValue(getRoleFromName(roleName))
 end)
 
-remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.CorpseView, covert: boolean)
+remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.ClientCorpseView, covert: boolean)
     if covert then
         return
     end
