@@ -40,6 +40,38 @@ end
 
 local Items = framedItems
 
+local function clearObstructiveAccessories(participant: Types.Participant): ()
+	local char = participant:GetCharacter()
+	if not char then
+		return
+	end
+
+	local role = participant:GetRole().Definition.Name
+	if role ~= "Framed" and role ~= "Undercover" then
+		return
+	end
+
+	for _, accessory in char:QueryDescendants("Accessory") do
+		if accessory.AccessoryType == Enum.AccessoryType.Face then
+			accessory:Destroy()
+		elseif accessory.AccessoryType == Enum.AccessoryType.Hat then
+			local handle = accessory:FindFirstChild("Handle")
+			if not handle or not handle:IsA("BasePart") then
+				accessory:Destroy()
+				return
+			end
+
+			if handle.Size.X > 0.9 and handle.Size.Y > 0.9 and handle.Size.Z > 0.9 then
+				accessory:Destroy()
+			end
+		end
+	end
+end
+
+local function OnRoleAssignedServer(role: Types.RoleDefinition, participant: Types.Participant): ()
+	clearObstructiveAccessories(participant)
+end
+
 local framedRole: Types.RoleDefinition = {
 	Kind = "RoleDefinition",
 
@@ -59,6 +91,8 @@ local framedRole: Types.RoleDefinition = {
 	HighlightedRoles = {"Police"},
 
 	CanSeeMissingInAction = true,
+
+	OnRoleAssignedServer = OnRoleAssignedServer,
 }
 
 local policeRole: Types.RoleDefinition = {
@@ -104,6 +138,8 @@ local undercoverRole: Types.RoleDefinition = {
 	HighlightedRoles = {"Police", "Undercover"},
 
 	CanSeeMissingInAction = true,
+
+	OnRoleAssignedServer = OnRoleAssignedServer,
 }
 
 local threshold1 = 5
@@ -316,21 +352,7 @@ local function getVictoryMusic(round: Types.Round, victor: Types.Victor, isTimeo
 end
 
 local function OnCharacterAdded(round: Types.Round, participant: Types.Participant, char: Model): ()
-	for _, accessory in char:QueryDescendants("Accessory") do
-		if accessory.AccessoryType == Enum.AccessoryType.Face then
-			accessory:Destroy()
-		elseif accessory.AccessoryType == Enum.AccessoryType.Hat then
-			local handle = accessory:FindFirstChild("Handle")
-			if not handle or not handle:IsA("BasePart") then
-				accessory:Destroy()
-				return
-			end
-
-			if handle.Size.X > 0.9 and handle.Size.Y > 0.9 and handle.Size.Z > 0.9 then
-				accessory:Destroy()
-			end
-		end
-	end
+	clearObstructiveAccessories(participant)
 end
 
 local gamemode: Types.GamemodeDefinition = {
