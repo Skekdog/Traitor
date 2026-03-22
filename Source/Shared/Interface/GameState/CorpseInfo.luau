@@ -47,17 +47,17 @@ local flavourTextsWithWeapon: {[Types.GeneralDamageSource]: string} = {
 }
 
 local flavourImages: {[Types.GeneralDamageSource]: string} = {
-    Fall = "rbxassetid://27225585",
-    Drown = "rbxassetid://1094356207",
-    Explode = "rbxassetid://1789477853",
-    Burn = "rbxassetid://5664716195",
-    Stab = "rbxassetid://949752421",
-    Shot = "rbxassetid://700497561",
-    Bludgeon = "rbxassetid://15819411457",
-    Crush = "rbxassetid://953809995",
-    Magic = "rbxassetid://15244435410",
-    Poison = "rbxassetid://79725625736870",
-    Other = "rbxassetid://17079244437",
+    Fall = "rbxassetid://9657499712",
+    Drown = "rbxassetid://14384005789",
+    Explode = "rbxassetid://17581822935",
+    Burn = "rbxassetid://112209743118737",
+    Stab = "rbxassetid://882840238",
+    Shot = "rbxassetid://11702759774",
+    Bludgeon = "rbxassetid://127797187414874",
+    Crush = "rbxassetid://12712802208",
+    Magic = "rbxassetid://755925534",
+    Poison = "rbxassetid://484395923",
+    Other = "rbxassetid://96175403983245",
     Stomp = "rbxassetid://78517882762574",
 }
 
