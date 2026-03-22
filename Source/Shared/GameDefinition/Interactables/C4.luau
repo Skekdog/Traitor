@@ -443,7 +443,7 @@ if RunService:IsServer() then
 
 		participant:AddCorpseIcon({
 			Name = "C4Defusal",
-			Icon = "rbxassetid://17229908151",
+			Icon = Content.fromAssetId(17229908151),
 			Description = `You find a note on their corpse saying that {highlightText("wire " .. safeWire)} will defuse a C4.`,
 		})
 

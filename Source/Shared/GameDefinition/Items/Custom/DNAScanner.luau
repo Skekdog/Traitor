@@ -139,7 +139,7 @@ RoundHooks.OnDeath["DNAScanner"] = function(round: Types.Round, participant: Typ
 
 	participant:AddCorpseIcon({
 		Name = "DNATrace",
-		Icon = "rbxassetid://135886260297010",
+		Icon = Content.fromAssetId(135886260297010),
 		Description = "Traces of the killer's DNA are on the body. Use a DNA Scanner to track them.",
 		DisplayText = `[TIMEUNTIL-{tostring(workspace:GetServerTimeNow() + duration)}]`,
 	})

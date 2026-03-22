@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+local GetDeterminer = require(ReplicatedStorage.Shared.Grammar.GetDeterminer)
 local PossessiveApostrophe = require(ReplicatedStorage.Shared.Grammar.PossessiveApostrophe)
 local Mouse = require(script.Parent.Mouse)
 local StringWithDeterminer = require(ReplicatedStorage.Shared.Grammar.StringWithDeterminer)
@@ -176,24 +177,14 @@ return function(corpseInfo: Types.ClientCorpseView?)
     object.Headshot.Visible = corpseInfo.WasHeadshot or false
     object.SD.Visible = corpseInfo.WasSelfDefense or false
 
-    local equipment = corpseInfo.EquipmentList
-    local equipmentText = "You find"
-    if #equipment > 0 then
-        for i, v in equipment do
-            v = highlightedText(v)
-            if i == 1 then
-                equipmentText ..= ` {StringWithDeterminer(v)}`
-            elseif i == #equipment then
-                equipmentText ..= ` and {StringWithDeterminer(v)}`
-            else
-                equipmentText ..= `, {StringWithDeterminer(v)}`
-            end
-        end
-        equipmentText ..= " on their corpse."
-        object.EquipmentList:SetAttribute("Description", equipmentText)
-        object.EquipmentList.Visible = true
-    else
-        object.EquipmentList.Visible = false
+    for _, replicate in corpseInfo.EquipmentList do
+        local item = ClientInventory.CreateReplicatedItem(replicate)
+        local formattedItemName = GetDeterminer(GetDisplayName(item)) .. " " ..  highlightedText(GetDisplayName(item))
+        table.insert(corpseInfo.AdditionalIcons, {
+            Name = item.Name,
+            Description = string.format(item.CorpseIconDescription or "They had %s.", formattedItemName),
+            Icon = item.IconContent,
+        })
     end
 
     local kills = corpseInfo.KillList
@@ -218,7 +209,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
 
     for _, v in corpseInfo.AdditionalIcons do
         local icon = object.MurderWeapon:Clone()
-        icon.Image = v.Icon
+        icon.ImageContent = v.Icon
         icon:SetAttribute("Description", FullParse(v.Description))
         icon.Name = "AdditionalIcon_" .. v.Name
         icon.ScaleType = Enum.ScaleType.Fit
