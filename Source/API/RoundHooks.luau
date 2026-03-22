@@ -11,5 +11,3 @@ RoundHooks.OnItemDropped = {} :: Hooks<(round: Types.Round, participant: Types.P
 RoundHooks.BeforeDamageParticipant = {} :: Hooks<(round: Types.Round, participant: Types.Participant, params: Types.DamageParams) -> ()>
 
 return RoundHooks
-
--- local hooks: {[string]: (round: Types.Round)}
