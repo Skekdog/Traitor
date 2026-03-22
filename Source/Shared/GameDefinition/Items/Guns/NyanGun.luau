@@ -81,4 +81,4 @@ local item = Gun({
 
 NyanGun.Item = item
 
-return NyanGun
+return table.freeze(NyanGun)

@@ -46,4 +46,4 @@ end
 
 StandardGame.Highlights = StandardHighlights
 
-return StandardGame
+return table.freeze(StandardGame)

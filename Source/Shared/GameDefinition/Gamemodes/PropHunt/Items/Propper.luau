@@ -109,4 +109,4 @@ local Item = Modify(StandardGame.GetItem("Crowbar"), "Propper", {
 
 Propper.Item = Item
 
-return Propper
+return table.freeze(Propper)

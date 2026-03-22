@@ -58,4 +58,4 @@ function module.GetAlivePlayers(): {Player}
 	return players
 end
 
-return module
+return table.freeze(module)

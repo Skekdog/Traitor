@@ -57,4 +57,4 @@ local HUGE = Gun({
     )
 })
 
-return HUGE
+return table.freeze(HUGE)

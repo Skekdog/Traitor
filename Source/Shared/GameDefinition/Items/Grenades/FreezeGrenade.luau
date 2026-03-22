@@ -107,4 +107,4 @@ local item = Grenade({
 
 FreezeGrenade.Item = item
 
-return FreezeGrenade
+return table.freeze(FreezeGrenade)

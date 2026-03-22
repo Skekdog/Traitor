@@ -520,4 +520,4 @@ remotes.ClientServer.CallRole.OnServerEvent:Connect(function(player: Player, cor
     corpse:CallRole(participant)
 end)
 
-return module
+return table.freeze(module)

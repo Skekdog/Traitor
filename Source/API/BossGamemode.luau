@@ -69,4 +69,4 @@ local BossGamemode: Types.GamemodeDefinition = {
 	end,
 }
 
-return BossGamemode
+return table.freeze(BossGamemode)

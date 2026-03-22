@@ -231,4 +231,4 @@ local item = Custom({
 
 Jetpack.Item = item
 
-return Jetpack
+return table.freeze(Jetpack)

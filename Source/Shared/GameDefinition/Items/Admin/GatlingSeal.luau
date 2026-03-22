@@ -10,4 +10,4 @@ local GatlingSeal = Modify(SealGun.Item, "Gatling Seal", {
     AmmoDefinition = Ammo["Super Gun"],
 })
 
-return GatlingSeal
+return table.freeze(GatlingSeal)

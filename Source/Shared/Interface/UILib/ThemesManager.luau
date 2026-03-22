@@ -91,4 +91,4 @@ CollectionService:GetInstanceAddedSignal("StyledUI"):Connect(function(instance)
 	module.UpdateThemeInstance(instance)
 end)
 
-return module
+return table.freeze(module)

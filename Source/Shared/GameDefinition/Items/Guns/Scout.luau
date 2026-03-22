@@ -55,4 +55,4 @@ local Scout = Gun({
     RecoilY = 1.5,
 })
 
-return Scout
+return table.freeze(Scout)

@@ -117,4 +117,4 @@ function module.new<T>(initialValue: T): DynamicValue<T>
 	})
 end
 
-return module
+return table.freeze(module)

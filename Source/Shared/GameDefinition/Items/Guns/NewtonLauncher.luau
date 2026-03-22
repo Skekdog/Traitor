@@ -75,4 +75,4 @@ local module = {}
 
 module.Item = NewtonLauncher
 
-return module
+return table.freeze(module)

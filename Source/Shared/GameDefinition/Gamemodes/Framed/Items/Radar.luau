@@ -29,4 +29,4 @@ local Item = Modify(Items.GetItem("Radar"), "Radar", {
 
 Radar.Item = Item
 
-return Radar
+return table.freeze(Radar)

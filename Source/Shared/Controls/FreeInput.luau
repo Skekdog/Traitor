@@ -305,4 +305,4 @@ function module.StopCapture(): ()
 	RunService:UnbindFromRenderStep("FreeInputResetTouchCameraPan")
 end
 
-return module
+return table.freeze(module)

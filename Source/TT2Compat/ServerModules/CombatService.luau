@@ -93,4 +93,4 @@ function module.SpawnFire(): ()
 
 end
 
-return module
+return table.freeze(module)

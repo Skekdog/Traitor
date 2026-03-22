@@ -132,4 +132,4 @@ MelonLauncher.Item = Gun({
 	PrimaryFireClient = PrimaryFireClient,
 })
 
-return MelonLauncher
+return table.freeze(MelonLauncher)

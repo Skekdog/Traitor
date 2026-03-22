@@ -22,4 +22,4 @@ local item: Types.ItemComponents = {
 
 PoliceBadge.Item = item
 
-return PoliceBadge
+return table.freeze(PoliceBadge)

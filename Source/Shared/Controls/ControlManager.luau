@@ -210,4 +210,4 @@ function module.IsActionActive(actionName: string): boolean
 	return false
 end
 
-return module
+return table.freeze(module)

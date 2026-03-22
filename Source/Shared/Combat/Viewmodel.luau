@@ -415,4 +415,4 @@ function module.MuzzleFlash(): ()
     MuzzleFlash(item)
 end
 
-return module
+return table.freeze(module)

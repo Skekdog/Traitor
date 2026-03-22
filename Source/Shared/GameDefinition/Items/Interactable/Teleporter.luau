@@ -183,4 +183,4 @@ local item = Custom({
 	OnEquipServer = OnEquipServer,
 })
 
-return item
+return table.freeze(item)

@@ -84,4 +84,4 @@ workspace.CurrentCamera.DescendantAdded:Connect(function(descendant)
 	end
 end)
 
-return TargetsClient
+return table.freeze(TargetsClient)

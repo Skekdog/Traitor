@@ -21,4 +21,4 @@ local Item: Types.ItemComponents = {
 
 Intel.Item = Item
 
-return Intel
+return table.freeze(Intel)

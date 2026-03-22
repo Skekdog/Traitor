@@ -38,4 +38,4 @@ function module.GetModifier(modifier: string): number
 	return modifiers[modifier] or 0
 end
 
-return module
+return table.freeze(module)

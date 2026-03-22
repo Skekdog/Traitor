@@ -587,4 +587,4 @@ local interactable: Types.InteractableDefinition = {
 
 module.Interactable = interactable
 
-return module
+return table.freeze(module)

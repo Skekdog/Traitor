@@ -31,4 +31,4 @@ local item = Grenade({
     PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Grenade,
 })
 
-return item
+return table.freeze(item)

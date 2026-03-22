@@ -39,4 +39,4 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 	module.Head:SetValue(head)
 end)
 
-return module
+return table.freeze(module)

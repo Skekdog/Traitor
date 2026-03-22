@@ -29,4 +29,4 @@ local Discombobulator = Grenade({
     PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Grenade,
 })
 
-return Discombobulator
+return table.freeze(Discombobulator)

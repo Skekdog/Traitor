@@ -55,4 +55,4 @@ local UMP = Gun({
     })
 })
 
-return UMP
+return table.freeze(UMP)

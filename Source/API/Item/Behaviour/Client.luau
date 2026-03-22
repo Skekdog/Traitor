@@ -188,4 +188,4 @@ function Client.ServerFire(action: "Primary" | "Alternate", item: Types.Item, or
 	item:SetServerData(action, nil)
 end
 
-return Client
+return table.freeze(Client)

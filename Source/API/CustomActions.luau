@@ -54,4 +54,4 @@ function CustomActions.Unregister(name: string): ()
 	end
 end
 
-return CustomActions
+return table.freeze(CustomActions)

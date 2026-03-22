@@ -228,4 +228,4 @@ local item = Custom({
 
 Flypack.Item = item
 
-return Flypack
+return table.freeze(Flypack)

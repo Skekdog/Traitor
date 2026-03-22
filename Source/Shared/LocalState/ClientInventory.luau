@@ -551,4 +551,4 @@ end)
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 
-return module
+return table.freeze(module)

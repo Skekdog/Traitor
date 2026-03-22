@@ -224,4 +224,4 @@ function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	prop:TryTakeDamage(params)
 end
 
-return ProcessHit
+return table.freeze(ProcessHit)

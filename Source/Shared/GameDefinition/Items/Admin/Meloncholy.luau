@@ -9,4 +9,4 @@ local Meloncholy = Modify(MelonLauncher.Item, "Meloncholy", {
     AttackInterval = 0.5,
 })
 
-return Meloncholy
+return table.freeze(Meloncholy)

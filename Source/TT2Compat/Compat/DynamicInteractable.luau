@@ -123,4 +123,4 @@ function module.TryCreateNewInteractable(MapObject: Types.MapObject): Types.Prop
 	return createNewInteractable(MapObject)
 end
 
-return module
+return table.freeze(module)

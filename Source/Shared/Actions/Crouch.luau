@@ -106,4 +106,4 @@ LocalCharacter.Humanoid:Connect(function(hum)
 	end)
 end)
 
-return module
+return table.freeze(module)

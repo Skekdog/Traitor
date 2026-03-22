@@ -375,4 +375,4 @@ ControlManager.Register("Close UI", function()
 	return Enum.ContextActionResult.Pass
 end)
 
-return UIManager
+return table.freeze(UIManager)

@@ -428,4 +428,4 @@ local gamemode: Types.GamemodeDefinition = {
     Heartbeat = heartbeat,
 }
 
-return gamemode
+return table.freeze(gamemode)

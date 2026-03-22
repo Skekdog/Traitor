@@ -9,4 +9,4 @@ function QuickChatClient.Chat(messageId: number, id: Model?): ()
 	remote:FireServer(messageId, id)
 end
 
-return QuickChatClient
+return table.freeze(QuickChatClient)

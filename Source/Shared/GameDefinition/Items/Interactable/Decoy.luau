@@ -28,4 +28,4 @@ local Decoy = InteractableItem({
 	DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(96906503847712), interactable.Model)
 end)
 
-return Decoy
+return table.freeze(Decoy)

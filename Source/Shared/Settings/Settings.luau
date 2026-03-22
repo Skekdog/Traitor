@@ -133,4 +133,4 @@ function module.SaveSettings(): ()
 	ReplicatedStorage.Remotes.ClientServer.SaveSettings:FireServer(module.JSONEncode())
 end
 
-return module
+return table.freeze(module)

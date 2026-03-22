@@ -92,4 +92,4 @@ remotes.Reset.OnClientEvent:Connect(function()
 	module.Participants:Invoke()
 end)
 
-return module
+return table.freeze(module)

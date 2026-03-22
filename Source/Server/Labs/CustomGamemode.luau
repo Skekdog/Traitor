@@ -42,4 +42,4 @@ function module.LoadGamemode(assetId: number): ()
 	RoundHandler.Round():LoadGamemode(result)
 end
 
-return module
+return table.freeze(module)

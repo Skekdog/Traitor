@@ -21,4 +21,4 @@ local Radio = InteractableItem({
     DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(128627317841330), interactable.Model)
 end)
 
-return Radio
+return table.freeze(Radio)

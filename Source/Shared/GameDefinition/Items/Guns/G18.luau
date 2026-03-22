@@ -42,4 +42,4 @@ local G18 = Gun({
     RecoilY = 0.8,
 })
 
-return G18
+return table.freeze(G18)

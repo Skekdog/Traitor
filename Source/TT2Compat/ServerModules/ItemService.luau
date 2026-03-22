@@ -50,4 +50,4 @@ function module.GiveAmmoReserve(self, player: Player, ammoName: string, amount: 
 	participant:SetAmmo(ammoName, currentAmmo + amount)
 end
 
-return module
+return table.freeze(module)

@@ -51,4 +51,4 @@ HookOnMessage.Hook(function(message)
 	return true
 end)
 
-return module
+return table.freeze(module)

@@ -37,4 +37,4 @@ function module.LoadBoss(assetId: number): ()
 	RoundHandler.Round():LoadBoss((require)(bossScript))
 end
 
-return module
+return table.freeze(module)

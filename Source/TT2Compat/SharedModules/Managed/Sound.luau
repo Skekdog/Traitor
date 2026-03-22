@@ -17,4 +17,4 @@ function module.PlayAt(sound: Sound, position: Vector3): ()
 	PlaySound(sound, position)
 end
 
-return module
+return table.freeze(module)

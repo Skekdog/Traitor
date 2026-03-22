@@ -129,4 +129,4 @@ local Crowbar = Melee({
 
 module.Item = Crowbar
 
-return module
+return table.freeze(module)

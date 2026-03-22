@@ -60,4 +60,4 @@ local M4A1 = Gun({
     ),
 })
 
-return M4A1
+return table.freeze(M4A1)

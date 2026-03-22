@@ -267,4 +267,4 @@ function Server.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 	return rejects
 end
 
-return Server
+return table.freeze(Server)

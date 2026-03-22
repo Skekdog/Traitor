@@ -113,4 +113,4 @@ module.Infinite = {
     CanDrop = false,
 }
 
-return module
+return table.freeze(module)

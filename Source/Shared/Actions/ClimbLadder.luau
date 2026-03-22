@@ -171,4 +171,4 @@ function module.StopClimbing(): ()
     end
 end
 
-return module
+return table.freeze(module)

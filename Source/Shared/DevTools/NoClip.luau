@@ -76,4 +76,4 @@ Players.LocalPlayer.CharacterRemoving:Connect(function()
 	module.Enable(false)
 end)
 
-return module
+return table.freeze(module)

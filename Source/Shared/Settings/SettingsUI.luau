@@ -573,4 +573,4 @@ ui:GetPropertyChangedSignal("Visible"):Connect(function()
 	end
 end)
 
-return module
+return table.freeze(module)

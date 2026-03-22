@@ -6,4 +6,4 @@ local IsaacNewton = Modify(NewtonLauncher.Item, "Isaac Newton", {
 	PrimaryInterval = 0,
 })
 
-return IsaacNewton
+return table.freeze(IsaacNewton)

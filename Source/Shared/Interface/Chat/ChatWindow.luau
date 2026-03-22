@@ -176,4 +176,4 @@ ControlManager.Register("Team Chat", function()
 	return Enum.ContextActionResult.Pass
 end)
 
-return ChatWindow
+return table.freeze(ChatWindow)

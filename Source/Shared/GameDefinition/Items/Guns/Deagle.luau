@@ -56,4 +56,4 @@ local Deagle = Gun({
     ),
 })
 
-return Deagle
+return table.freeze(Deagle)

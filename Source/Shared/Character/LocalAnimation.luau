@@ -42,4 +42,4 @@ function module.TryStopAnimation(name: string): ()
 end
 
 
-return module
+return table.freeze(module)

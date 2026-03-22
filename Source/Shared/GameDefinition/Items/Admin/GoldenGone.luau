@@ -8,4 +8,4 @@ local GoldenGone = Modify(GoldenGun, "Golden Gone", {
     AmmoDefinition = Ammo["Super Gun"],
 })
 
-return GoldenGone
+return table.freeze(GoldenGone)

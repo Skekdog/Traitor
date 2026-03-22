@@ -55,4 +55,4 @@ local FiveSeven = Gun({
     RecoilY = 1.0,
 })
 
-return FiveSeven
+return table.freeze(FiveSeven)

@@ -29,4 +29,4 @@ function HookOnMessage.Hook(callback: Callback): ()
 	table.insert(hooks, callback)
 end
 
-return HookOnMessage
+return table.freeze(HookOnMessage)

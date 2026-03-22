@@ -66,4 +66,4 @@ local AWP = Gun({
 	)
 })
 
-return AWP
+return table.freeze(AWP)

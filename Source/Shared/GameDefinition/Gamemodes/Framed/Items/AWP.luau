@@ -17,4 +17,4 @@ local Item = Modify(StandardGame.GetItem("AWP"), "AWP", {
 
 AWP.Item = Item
 
-return AWP
+return table.freeze(AWP)

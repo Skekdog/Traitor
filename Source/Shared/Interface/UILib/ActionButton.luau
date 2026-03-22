@@ -74,4 +74,4 @@ function module.TryHideActionButton(actionName: string): ()
 	end
 end
 
-return module
+return table.freeze(module)

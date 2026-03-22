@@ -38,4 +38,4 @@ function module.HasRelaxedPermissions(user: number | Player): boolean
 	return module.TemporaryPermissions()[id] or false
 end
 
-return module
+return table.freeze(module)

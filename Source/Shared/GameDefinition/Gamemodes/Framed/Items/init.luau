@@ -12,4 +12,4 @@ for _, v in script:GetChildren() do
 	end
 end
 
-return Items
+return table.freeze(Items)

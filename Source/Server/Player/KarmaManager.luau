@@ -23,4 +23,4 @@ function module.SetKarma(plr: Player, karma: number): ()
 	plr:SetAttribute("Karma", karma)
 end
 
-return module
+return table.freeze(module)

@@ -11,4 +11,4 @@ function module.Create(self, soundData: {Ids: {number}?, Volume: number?, Looped
 	})
 end
 
-return module
+return table.freeze(module)

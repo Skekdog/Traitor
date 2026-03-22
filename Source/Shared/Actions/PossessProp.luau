@@ -156,4 +156,4 @@ LocalParticipantInfo.GetParticipant().Status:Connect(function(status)
 	end
 end)
 
-return PossessProp
+return table.freeze(PossessProp)

@@ -232,4 +232,4 @@ local item = Custom({
 
 module.Item = item
 
-return module
+return table.freeze(module)

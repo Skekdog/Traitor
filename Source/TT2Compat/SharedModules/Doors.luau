@@ -21,4 +21,4 @@ function module.Use(self, door: Types.MapObject, counterClockwise: boolean): ()
 	StandardDoor({Kind = "ClientInteraction" :: "ClientInteraction", Door = door})
 end
 
-return module
+return table.freeze(module)

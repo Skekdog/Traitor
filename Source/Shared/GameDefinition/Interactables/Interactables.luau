@@ -13,4 +13,4 @@ for _, v in script.Parent:GetChildren() do
 	end
 end
 
-return interactables
+return table.freeze(interactables)

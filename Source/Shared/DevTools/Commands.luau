@@ -992,4 +992,4 @@ module.seance = {
 	end
 }
 
-return module
+return table.freeze(module)

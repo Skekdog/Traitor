@@ -383,4 +383,4 @@ local gamemode: Types.GamemodeDefinition = {
 	BeforeDamageParticipant = BeforeHitParticipant,
 }
 
-return gamemode
+return table.freeze(gamemode)

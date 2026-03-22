@@ -19,4 +19,4 @@ local item = Custom({
 
 Speed.Item = item
 
-return Speed
+return table.freeze(Speed)

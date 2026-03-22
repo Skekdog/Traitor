@@ -74,4 +74,4 @@ function module.ReleaseAllProfiles(): ()
 	end
 end
 
-return module
+return table.freeze(module)

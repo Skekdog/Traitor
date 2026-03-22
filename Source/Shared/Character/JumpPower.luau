@@ -35,4 +35,4 @@ function module.Reset()
 	setJumpPower()
 end
 
-return module
+return table.freeze(module)

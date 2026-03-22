@@ -43,4 +43,4 @@ function Camera.EnterThirdPerson(maxZoom: number?): ()
 	ZoomController.SetZoomParameters(targetZoom, if ZoomController.GetZoomRadius() > targetZoom then -1 else 1)
 end
 
-return Camera
+return table.freeze(Camera)

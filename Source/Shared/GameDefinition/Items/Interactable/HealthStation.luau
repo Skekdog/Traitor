@@ -18,4 +18,4 @@ local HealthStation = InteractableItem({
     PrimaryHint = "Deploy Health Station",
 }, true, false)
 
-return HealthStation
+return table.freeze(HealthStation)

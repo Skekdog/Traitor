@@ -85,4 +85,4 @@ function module.DeserialiseJSON(json: string): {[string]: any}
 	return decoded
 end
 
-return module
+return table.freeze(module)

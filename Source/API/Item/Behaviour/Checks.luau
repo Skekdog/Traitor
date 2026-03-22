@@ -71,4 +71,4 @@ function Checks.RaycastStatic(map: Types.Map, origin: Vector3, destination: Vect
 	return true
 end
 
-return Checks
+return table.freeze(Checks)

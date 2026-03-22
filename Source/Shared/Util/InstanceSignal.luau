@@ -22,4 +22,4 @@ function module.ListenAttribute<T>(instance: Instance, attribute: string, _: T):
 	return value
 end
 
-return module
+return table.freeze(module)

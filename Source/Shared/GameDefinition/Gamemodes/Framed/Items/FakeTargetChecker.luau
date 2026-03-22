@@ -29,4 +29,4 @@ local item: Types.ItemComponents = {
 
 TargetChecker.Item = item
 
-return TargetChecker
+return table.freeze(TargetChecker)

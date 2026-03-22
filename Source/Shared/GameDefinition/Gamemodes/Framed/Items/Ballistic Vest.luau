@@ -22,4 +22,4 @@ local Item = Modify(Items.GetItem("Ballistic Vest"), "Ballistic Vest", {
 
 BallisticVest.Item = Item
 
-return BallisticVest
+return table.freeze(BallisticVest)

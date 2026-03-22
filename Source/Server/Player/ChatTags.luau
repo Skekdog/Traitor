@@ -67,4 +67,4 @@ ReplicatedStorage.Remotes.ClientServer.SetChatTag.OnServerEvent:Connect(function
 	end
 end)
 
-return ChatTags
+return table.freeze(ChatTags)

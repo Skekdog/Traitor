@@ -40,4 +40,4 @@ local definition: Types.InteractableDefinition = {
 
 Item.Interactable = definition
 
-return Item
+return table.freeze(Item)

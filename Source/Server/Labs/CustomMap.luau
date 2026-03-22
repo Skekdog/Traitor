@@ -31,4 +31,4 @@ function module.LoadMap(assetId: number): ()
 	RoundHandler.Round():LoadMap(Map.ValidateStructure(mapScript))
 end
 
-return module
+return table.freeze(module)

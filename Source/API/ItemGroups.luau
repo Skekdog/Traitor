@@ -23,4 +23,4 @@ ItemGroups.RoleUtility = {
 	PreferredSlot = 8,
 } :: Types.ItemGroup
 
-return ItemGroups
+return table.freeze(ItemGroups)

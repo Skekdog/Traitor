@@ -139,4 +139,4 @@ function Face.SetFace(round: Types.Round, head: BasePart): ()
 	face.Image = popRandomFace(faces)
 end
 
-return Face
+return table.freeze(Face)

@@ -21,4 +21,4 @@ local item: Types.ItemComponents = {
 
 Mirror.Item = item
 
-return Mirror
+return table.freeze(Mirror)

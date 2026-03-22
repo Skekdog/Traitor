@@ -60,4 +60,4 @@ local XM1014 = Gun({
     RecoilY = 2.0,
 })
 
-return XM1014
+return table.freeze(XM1014)

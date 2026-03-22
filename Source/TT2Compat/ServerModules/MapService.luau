@@ -12,4 +12,4 @@ function module.SpawnPlayer(self, player: Player, cframe: CFrame): ()
 	participant:MoveToSpawn(cframe)
 end
 
-return module
+return table.freeze(module)

@@ -96,4 +96,4 @@ RunService.PostSimulation:Connect(function(dt)
     end
 end)
 
-return Grow
+return table.freeze(Grow)

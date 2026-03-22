@@ -8,4 +8,4 @@ local SuperShotgun = Modify(XM1014, "Super Shotgun", {
     AmmoDefinition = Ammo["Super Gun"],
 })
 
-return SuperShotgun
+return table.freeze(SuperShotgun)

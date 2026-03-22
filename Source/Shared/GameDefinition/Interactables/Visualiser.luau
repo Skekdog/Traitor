@@ -331,4 +331,4 @@ local interactable: Types.InteractableDefinition = {
 	OnInteractServer = OnInteractServer,
 }
 
-return interactable
+return table.freeze(interactable)

@@ -59,4 +59,4 @@ if RunService:IsClient() then
 	remote.OnClientEvent:Connect(Impulse.ApplyImpulse)
 end
 
-return Impulse
+return table.freeze(Impulse)

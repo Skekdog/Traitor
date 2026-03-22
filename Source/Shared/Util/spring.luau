@@ -23,14 +23,14 @@ end
 function spring.update(self: typeof(spring.new(0, 0)), dt: number)
 	local aF = self.angularFrequency;
 	local dR =  self.dampingRatio;
-	
+
 	if (aF < EPSILON) then return; end;
 	if (dR < 0) then dR = 0; end;
-	
+
 	local epos = self.target;
 	local dpos = self.p - epos;
 	local dvel = self.v;
-	
+
 	if (dR > 1 + EPSILON) then
 		local za = -aF * dR;
 		local zb = aF * sqrt(dR*dR - 1);
@@ -38,18 +38,18 @@ function spring.update(self: typeof(spring.new(0, 0)), dt: number)
 		local z2 = za + zb;
 		local expTerm1 = exp(z1 * dt);
 		local expTerm2 = exp(z2 * dt);
-		
+
 		local c1 = (dvel - dpos*z2)/(-2*zb);
 		local c2 = dpos - c1;
 		self.p = epos + c1*expTerm1 + c2*expTerm2;
 		self.v = c1*z1*expTerm1 + c2*z2*expTerm2;
 	elseif (dR > 1 - EPSILON) then
 		local expTerm = exp(-aF * dt);
-		
+
 		local c1 = dvel + aF*dpos;
 		local c2 = dpos;
 		local c3 = (c1*dt + c2)*expTerm;
-		
+
 		self.p = epos + c3;
 		self.v = (c1*expTerm) - (c3*aF);
 	else
@@ -58,7 +58,7 @@ function spring.update(self: typeof(spring.new(0, 0)), dt: number)
 		local expTerm = exp(-omegaZeta*dt);
 		local cosTerm = cos(alpha*dt);
 		local sinTerm = sin(alpha*dt);
-		
+
 		local c1 = dpos;
 		local c2 = (dvel + omegaZeta*dpos) / alpha;
 		self.p = epos + expTerm*(c1*cosTerm + c2*sinTerm);
@@ -66,4 +66,4 @@ function spring.update(self: typeof(spring.new(0, 0)), dt: number)
 	end
 end
 
-return spring;
+return table.freeze(spring)

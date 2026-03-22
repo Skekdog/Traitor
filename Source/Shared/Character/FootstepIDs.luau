@@ -50,4 +50,4 @@ local IDList: {[string]: FootstepData} = {
 	Default = {id = "rbxassetid://277067660", volume = 0.60, speed = 1.00},
 }
 
-return IDList
+return table.freeze(IDList)

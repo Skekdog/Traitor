@@ -107,4 +107,4 @@ local item = Gun({
 
 SealGun.Item = item
 
-return SealGun
+return table.freeze(SealGun)

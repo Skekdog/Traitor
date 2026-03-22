@@ -65,4 +65,4 @@ local item = Custom({
     HeartbeatClient = HeartbeatClient,
 })
 
-return item
+return table.freeze(item)

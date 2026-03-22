@@ -41,4 +41,4 @@ function Fire.IsBurning(object: Types.MapObject): boolean
 	return object:HasTag("Burning")
 end
 
-return Fire
+return table.freeze(Fire)

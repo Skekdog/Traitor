@@ -39,4 +39,4 @@ local item = Custom({
 	end
 })
 
-return item
+return table.freeze(item)

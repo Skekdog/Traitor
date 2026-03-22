@@ -40,4 +40,4 @@ function AlwaysShowSidebar.OnSettingsKeybindChanged(value: Settings.ControlValue
     determineVisibility(alwaysShowSidebar)
 end
 
-return AlwaysShowSidebar
+return table.freeze(AlwaysShowSidebar)

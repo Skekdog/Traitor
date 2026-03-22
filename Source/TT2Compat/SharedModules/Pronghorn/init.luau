@@ -6,4 +6,4 @@ module.DeferredComplete = {
 	Wait = function() return true end,
 }
 
-return module
+return table.freeze(module)

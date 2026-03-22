@@ -41,4 +41,4 @@ function Mistakes.TrySlayForMistakes(participant: Types.Participant): boolean
 	return false
 end
 
-return Mistakes
+return table.freeze(Mistakes)

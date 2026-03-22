@@ -408,4 +408,4 @@ module.FinishHighlights = function(round: Types.Round): ()
 	end
 end
 
-return module
+return table.freeze(module)

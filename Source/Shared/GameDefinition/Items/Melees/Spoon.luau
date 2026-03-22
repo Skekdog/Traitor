@@ -248,4 +248,4 @@ local shopItem = Custom({
 Spoon.ShopItem = shopItem
 Spoon.Item = itemDefinition
 
-return Spoon
+return table.freeze(Spoon)

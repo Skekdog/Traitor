@@ -210,4 +210,4 @@ local definition = Custom({
 
 Cheeze.Item = definition
 
-return Cheeze
+return table.freeze(Cheeze)

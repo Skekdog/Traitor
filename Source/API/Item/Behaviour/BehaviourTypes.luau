@@ -71,4 +71,4 @@ function BehaviourTypes.IsRequest(data: any): boolean
 	return true
 end
 
-return BehaviourTypes
+return table.freeze(BehaviourTypes)

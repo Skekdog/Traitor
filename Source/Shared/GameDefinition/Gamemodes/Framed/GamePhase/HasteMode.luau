@@ -34,4 +34,4 @@ function HasteMode.Start(round: Types.Round): ()
 	end
 end
 
-return HasteMode
+return table.freeze(HasteMode)

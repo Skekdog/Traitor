@@ -42,4 +42,4 @@ local SmokeGrenade = Grenade({
     PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Grenade,
 })
 
-return SmokeGrenade
+return table.freeze(SmokeGrenade)

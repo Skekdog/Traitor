@@ -169,4 +169,4 @@ local Knife = Melee({
 	BeforeHitParticipant = BeforeHitParticipant,
 })
 
-return Knife
+return table.freeze(Knife)

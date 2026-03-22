@@ -85,4 +85,4 @@ function PropDamage.SetLastHolder(prop: Types.Prop, participant: Types.Participa
 	end)
 end
 
-return PropDamage
+return table.freeze(PropDamage)

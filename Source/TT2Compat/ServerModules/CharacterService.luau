@@ -8,4 +8,4 @@ function module.Teleport(self, player: Player, cframe: CFrame | Vector3): ()
 	end
 end
 
-return module
+return table.freeze(module)

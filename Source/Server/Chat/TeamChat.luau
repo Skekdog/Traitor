@@ -52,4 +52,4 @@ function TeamChat.Clear(): ()
 	channels = {}
 end
 
-return TeamChat
+return table.freeze(TeamChat)

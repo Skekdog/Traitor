@@ -18,4 +18,4 @@ local Visualiser = InteractableItem({
 	interactable.Extras.Player = participant.Player
 end)
 
-return Visualiser
+return table.freeze(Visualiser)

@@ -41,4 +41,4 @@ function module.AddScore(plr: Player, score: number): ()
 	module.SetScore(plr, newScore, false)
 end
 
-return module
+return table.freeze(module)

@@ -32,4 +32,4 @@ function module.MakeExplosion(params: {
 	}, params.Position, params.Attacker), sound)
 end
 
-return module
+return table.freeze(module)

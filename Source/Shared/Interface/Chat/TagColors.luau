@@ -5,4 +5,4 @@ local TagColors = {
 	["Alpha Tester"] = Color3.fromRGB(210, 230, 33),
 }
 
-return TagColors
+return table.freeze(TagColors)

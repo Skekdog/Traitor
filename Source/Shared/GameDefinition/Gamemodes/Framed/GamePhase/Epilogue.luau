@@ -135,4 +135,4 @@ else
 	end)
 end
 
-return Epilogue
+return table.freeze(Epilogue)

@@ -223,4 +223,4 @@ function module.Reset(): ()
 	interactableFrame.Visible = false
 end
 
-return module
+return table.freeze(module)

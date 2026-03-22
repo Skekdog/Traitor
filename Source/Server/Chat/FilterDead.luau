@@ -35,4 +35,4 @@ HookOnMessage.Hook(function(message, source)
 	return FilterDead.ShouldSend(sender, receiver)
 end)
 
-return FilterDead
+return table.freeze(FilterDead)

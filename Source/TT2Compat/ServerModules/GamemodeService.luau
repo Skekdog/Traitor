@@ -32,4 +32,4 @@ setmetatable(GamemodeService, {
 	end
 })
 
-return GamemodeService
+return table.freeze(GamemodeService)

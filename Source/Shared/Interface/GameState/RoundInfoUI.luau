@@ -199,4 +199,4 @@ function module.UpdatePunchMeter(punchMeter: number?, maxPunchMeter: number): ()
     UIAnimation.Slider(roundInfo.Frame.AmmoBar.Background, false, punchMeter, maxPunchMeter)
 end
 
-return module
+return table.freeze(module)

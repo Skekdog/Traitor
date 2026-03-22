@@ -685,4 +685,4 @@ local gamemode: Types.GamemodeDefinition = {
 	end,
 }
 
-return gamemode
+return table.freeze(gamemode)

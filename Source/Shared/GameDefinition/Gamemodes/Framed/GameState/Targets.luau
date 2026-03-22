@@ -80,4 +80,4 @@ if RunService:IsClient() then
 	end)
 end
 
-return Targets
+return table.freeze(Targets)

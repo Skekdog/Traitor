@@ -114,4 +114,4 @@ local item = Custom({
 
 Scanner.Item = item
 
-return Scanner
+return table.freeze(Scanner)

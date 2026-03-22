@@ -71,4 +71,4 @@ function EquipmentMenu.RemovePage(page: GuiObject): ()
 	page.Parent = nil
 end
 
-return EquipmentMenu
+return table.freeze(EquipmentMenu)

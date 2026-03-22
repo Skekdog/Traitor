@@ -35,4 +35,4 @@ function QuickChat.FormatMessage(message: string, id: Model?): string
 	return message:gsub("{ID}", QuickChat.GetIdString(id))
 end
 
-return QuickChat
+return table.freeze(QuickChat)

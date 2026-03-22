@@ -32,4 +32,4 @@ local C4 = InteractableItem({
     weld.Enabled = true
 end)
 
-return C4
+return table.freeze(C4)

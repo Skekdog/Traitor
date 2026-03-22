@@ -103,4 +103,4 @@ function Highlights.OnDeath(round: Types.Round, participant: Types.Participant):
 	end
 end
 
-return Highlights
+return table.freeze(Highlights)

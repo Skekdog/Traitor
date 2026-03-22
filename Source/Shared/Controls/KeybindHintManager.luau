@@ -175,4 +175,4 @@ ControlManager.PreferredInput:Connect(function()
     end
 end)
 
-return module
+return table.freeze(module)

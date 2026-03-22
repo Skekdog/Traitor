@@ -22,4 +22,4 @@ local DeathStation = InteractableItem({
     DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(93284379186217), interactable.Model)
 end)
 
-return DeathStation
+return table.freeze(DeathStation)

@@ -10,4 +10,4 @@ local Item = Modify(Items.GetItem("BAR"), "BAR", {
 
 BAR.Item = Item
 
-return BAR
+return table.freeze(BAR)

@@ -318,4 +318,4 @@ function module.Slider(background: Frame, noTransition: boolean?, value: number,
 	module.Animate(background, TweenInfo.new(0.1), {Size = UDim2.new(size, 0, 1, 0)}, noTransition)
 end
 
-return module
+return table.freeze(module)

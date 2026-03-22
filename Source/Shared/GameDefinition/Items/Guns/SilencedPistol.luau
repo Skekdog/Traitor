@@ -40,4 +40,4 @@ local SilencedPistol = Modify(FiveSeven, "Silenced Pistol", {
     ),
 })
 
-return SilencedPistol
+return table.freeze(SilencedPistol)

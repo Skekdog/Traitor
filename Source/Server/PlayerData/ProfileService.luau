@@ -2421,4 +2421,4 @@ task.spawn(function()
 	)
 end)
 
-return ProfileService
+return table.freeze(ProfileService)

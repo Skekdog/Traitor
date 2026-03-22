@@ -5,4 +5,4 @@ local module = {}
 
 module.Combine = CombineTable
 
-return module
+return table.freeze(module)

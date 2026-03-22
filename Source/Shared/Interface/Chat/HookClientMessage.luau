@@ -24,4 +24,4 @@ TextChatService.OnIncomingMessage = function(message): ()
 	HookClientMessage.ExecuteOn(message)
 end
 
-return HookClientMessage
+return table.freeze(HookClientMessage)

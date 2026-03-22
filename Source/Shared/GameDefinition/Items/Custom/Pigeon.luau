@@ -342,4 +342,4 @@ local item = Custom({
 
 Pigeon.Item = item
 
-return Pigeon
+return table.freeze(Pigeon)

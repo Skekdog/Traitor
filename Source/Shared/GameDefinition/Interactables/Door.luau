@@ -32,4 +32,4 @@ local definition: Types.InteractableDefinition = {
 
 module.Interactable = definition
 
-return module
+return table.freeze(module)

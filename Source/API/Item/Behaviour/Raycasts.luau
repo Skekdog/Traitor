@@ -95,4 +95,4 @@ function Raycasts.Hitscan(
 	}
 end
 
-return Raycasts
+return table.freeze(Raycasts)

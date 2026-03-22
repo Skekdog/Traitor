@@ -18,4 +18,4 @@ setmetatable(Teams, {
 	end
 })
 
-return Teams
+return table.freeze(Teams)

@@ -76,4 +76,4 @@ local Flashbang = Grenade({
     PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Grenade,
 })
 
-return Flashbang
+return table.freeze(Flashbang)

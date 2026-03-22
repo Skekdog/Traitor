@@ -53,4 +53,4 @@ function module.ToggleAim(item: Types.Item?, enabled: boolean?): ()
 	module.IsAiming:SetValue(isAiming)
 end
 
-return module
+return table.freeze(module)

@@ -53,4 +53,4 @@ function textInput.Create(text: string, inputType: "Number", range: string, cont
 	return if val.Value == -math.huge then nil else val.Value
 end
 
-return textInput
+return table.freeze(textInput)

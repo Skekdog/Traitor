@@ -102,4 +102,4 @@ if RunService:IsClient() then
 	end)
 end
 
-return RedHanded
+return table.freeze(RedHanded)

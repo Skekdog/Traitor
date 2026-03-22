@@ -227,4 +227,4 @@ local Poltergeist = Gun({
 	BeforeHitProp = beforeHitProp,
 })
 
-return Poltergeist
+return table.freeze(Poltergeist)

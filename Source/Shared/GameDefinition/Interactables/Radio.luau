@@ -338,4 +338,4 @@ local interactable: Types.InteractableDefinition = {
 	BeforeTakeDamage = BeforeTakeDamage,
 }
 
-return interactable
+return table.freeze(interactable)

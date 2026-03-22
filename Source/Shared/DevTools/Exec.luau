@@ -69,4 +69,4 @@ function module.ServerExecute(player: Player, round: Types.Round, command: strin
 	return result
 end
 
-return module
+return table.freeze(module)

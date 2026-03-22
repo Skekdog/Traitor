@@ -82,4 +82,4 @@ local GoldenGun = Gun({
     end,
 })
 
-return GoldenGun
+return table.freeze(GoldenGun)

@@ -57,4 +57,4 @@ local M11 = Gun({
     ),
 })
 
-return M11
+return table.freeze(M11)

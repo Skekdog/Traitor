@@ -65,4 +65,4 @@ function Health.InitHeal(participant: Types.Participant): ()
 	end)
 end
 
-return Health
+return table.freeze(Health)

@@ -130,4 +130,4 @@ local FlareGun = Gun ({
     RecoilY = 1.2,
 })
 
-return FlareGun
+return table.freeze(FlareGun)
