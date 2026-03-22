@@ -165,7 +165,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     local flavourText = getFlavourText(source)
     object.MurderWeapon:SetAttribute("Description", flavourText)
 
-    object.MurderWeapon.Image = flavourImages[getItemAttackType(source)]
+    object.MurderWeapon.ImageContent = if typeof(source) == "table" and source.IconContent ~= Content.none then source.IconContent else Content.fromUri(flavourImages[getItemAttackType(source)])
 
     local timeNow = workspace:GetServerTimeNow()
     object.DeathTime.TextLabel.Text = ToRoundTime(corpseInfo.DeathTime, timeNow)
