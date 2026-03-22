@@ -68,13 +68,19 @@ remotes.UpdatePlayerRole.OnClientEvent:Connect(function(name: string, roleName: 
 	participant.Role:SetValue(getRoleFromName(roleName))
 end)
 
-remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.ClientCorpseView, covert: boolean)
+remotes.UpdatePlayerCorpse.OnClientEvent:Connect(function(corpse: Types.ClientCorpseView | string, covert: boolean)
     if covert then
         return
     end
 
-	local participant = module.GetParticipant(corpse.Name)
-	participant.Corpse:SetValue(corpse)
+	if typeof(corpse) == "table" then
+		local participant = module.GetParticipant(corpse.Name)
+		participant.Corpse:SetValue(corpse)
+		return
+	end
+
+	local participant = module.GetParticipant(corpse)
+	participant.Corpse:SetValue()
 end)
 
 remotes.Reset.OnClientEvent:Connect(function()
