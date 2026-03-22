@@ -18,6 +18,15 @@ local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInvent
 
 local Client = {}
 
+local lastEmptyClipSound = 0
+local function tryPlayEmptyClipSound(item: Types.Item, action: "Primary" | "Alternate"): ()
+	local interval = (if action == "Primary" then item.PrimaryInterval else item.AlternateInterval) or 1
+	if lastEmptyClipSound < (os.clock() - interval) then
+		Client.PlayEmptyClipSound()
+		lastEmptyClipSound = os.clock()
+	end
+end
+
 local remote = GetRemote("ItemFire")
 
 function Client.DeductAmmo(item: Types.Item): ()
@@ -78,13 +87,13 @@ function Client.RunAllChecks(item: Types.Item, action: "Primary" | "Alternate", 
 
 	if not Checks.Ammo(item) then
 		if not noEffects and not Client.TryReloadWeapon(item) then
-			Client.PlayEmptyClipSound()
+			tryPlayEmptyClipSound(item, action)
 		end
 		return false
 	end
 
 	if not Checks.Scoped(item, Aim.IsAiming()) then
-		Client.PlayEmptyClipSound()
+		tryPlayEmptyClipSound(item, action)
 		return false
 	end
 
