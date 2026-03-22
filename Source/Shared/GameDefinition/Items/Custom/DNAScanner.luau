@@ -126,12 +126,12 @@ RoundHooks.OnDeath["DNAScanner"] = function(round: Types.Round, participant: Typ
 
 	local isEligible = DamageSource.IsFirearm(corpse.CorpseView.DamageSource) or DamageSource.IsMelee(corpse.CorpseView.DamageSource)
 	if not isEligible then
-		return print("it was made up by writers")
+		return
 	end
 
 	local distance = attacker.Player:DistanceFromCharacter(char:GetPivot().Position)
 	if distance == 0 then
-		return print("its a total fabrication")
+		return
 	end
 
 	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
