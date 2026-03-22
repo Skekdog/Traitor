@@ -4,7 +4,7 @@ local TextChatService = game:GetService("TextChatService")
 local Notification = require(ReplicatedStorage.API.Notification)
 local HookOnMessage = require(script.Parent.HookOnMessage)
 
-HookOnMessage.FinalHook = function(message, source)
+HookOnMessage.SetFinalHook(function(message, source)
 	if not message.TextSource then
 		return true
 	end
@@ -21,6 +21,6 @@ HookOnMessage.FinalHook = function(message, source)
 	end
 
 	return true
-end
+end)
 
 return nil

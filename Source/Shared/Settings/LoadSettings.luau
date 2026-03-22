@@ -15,8 +15,6 @@ local function setSetting(name: string, value: SettingDefinitions.SettingValue):
 	Settings.SetSetting(name, value)
 end
 
-Settings.LOADED = true
-
 ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings.OnClientEvent:Connect(function(toLoad: string): ()
 	local loadedVersion: number?
 

@@ -8,7 +8,10 @@ type Callback = (message: TextChatMessage, source: TextSource) -> boolean
 
 local hooks: {Callback} = {}
 
-HookOnMessage.FinalHook = nil :: Callback?
+local finalHook: Callback?
+function HookOnMessage.SetFinalHook(callback: Callback): ()
+	finalHook = callback
+end
 
 RBXGeneral.ShouldDeliverCallback = function(message, source)
 	local doNotDeliver = false
@@ -18,7 +21,7 @@ RBXGeneral.ShouldDeliverCallback = function(message, source)
 		end
 	end
 
-	if HookOnMessage.FinalHook and not HookOnMessage.FinalHook(message, source) then
+	if finalHook and not finalHook(message, source) then
 		doNotDeliver = true
 	end
 

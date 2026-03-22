@@ -221,4 +221,4 @@ RunService.PostSimulation:Connect(function()
 	end
 end)
 
-return table.freeze(module)
+return module

@@ -27,7 +27,6 @@ export type ControlValue = SettingDefinitions.ControlValue
 export type SettingValue = SettingDefinitions.SettingValue
 
 module.SETTINGS_VERSION = 7
-module.LOADED = false
 
 local settingValues: {[string]: SettingDefinitions.SettingValue?, SETTINGS_VERSION: number} = {SETTINGS_VERSION = module.SETTINGS_VERSION}
 

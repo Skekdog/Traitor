@@ -18,7 +18,7 @@ StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.Chat)
 ui:ToggleVisible(true)
 
-ChatWindow.TargetChannel = GetChatChannel("RBXGeneral")
+local targetChannel = GetChatChannel("RBXGeneral")
 
 local frame = ui.Object
 ChatWindow.MessagesFrame = frame.Messages.ScrollingFrame
@@ -36,10 +36,10 @@ local teamChannel: TextChannel?
 local function activateTeamChat(): ()
 	if selectedTeamChat then
 		assert(teamChannel, "Team channel not found")
-		ChatWindow.TargetChannel = teamChannel
+		targetChannel = teamChannel
 		ChatWindow.TeamChatButton.Icon.ImageTransparency = 0
 	else
-		ChatWindow.TargetChannel = GetChatChannel("RBXGeneral")
+		targetChannel = GetChatChannel("RBXGeneral")
 		ChatWindow.TeamChatButton.Icon.ImageTransparency = 0.75
 	end
 end
@@ -122,7 +122,7 @@ local function sendChat(): ()
 	if ChatWindow.InputBox.Text == "" then
 		return
 	end
-	ChatWindow.TargetChannel:SendAsync(ChatWindow.InputBox.Text)
+	targetChannel:SendAsync(ChatWindow.InputBox.Text)
 	ChatWindow.InputBox.Text = ""
 end
 

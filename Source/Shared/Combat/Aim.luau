@@ -36,7 +36,7 @@ function module.ToggleAim(item: Types.Item?, enabled: boolean?): ()
 		if item.AimAnimation then
 			Viewmodel.PlayAnimation(item.AimAnimation, "Aim")
 		end
-		Viewmodel.IsAiming = true
+		Viewmodel.SetIsAiming(true)
 	else
 		TweenService:Create(camera, TweenInfo.new(0.1), {FieldOfView = 70}):Play()
 
@@ -47,7 +47,7 @@ function module.ToggleAim(item: Types.Item?, enabled: boolean?): ()
 		WalkSpeed.SetModifier("Aiming", 0)
 
 		Viewmodel.StopAnimation("Aim")
-		Viewmodel.IsAiming = false
+		Viewmodel.SetIsAiming(false)
 	end
 
 	module.IsAiming:SetValue(isAiming)

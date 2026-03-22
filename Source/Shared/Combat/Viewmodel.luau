@@ -21,7 +21,11 @@ local breathingSpring = spring.new(1, 10)
 local bobbingSpring = spring.new(10, 1)
 
 module.ReloadSpring = spring.new(7, 0.8)
-module.IsAiming = false
+
+local isAiming = false
+function module.SetIsAiming(is: boolean): ()
+    isAiming = is
+end
 
 local shirtCon: RBXScriptConnection?
 local coloursCon: RBXScriptConnection?
@@ -387,7 +391,7 @@ function module.Recoil(item: Types.Item): ()
     local x = if item.RecoilX then item.RecoilX / 4 else 0
     local y = if item.RecoilY then item.RecoilY / 4 else 0
 
-    if module.IsAiming then
+    if isAiming then
         x /= 2
         y /= 2
     end
