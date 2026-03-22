@@ -220,6 +220,8 @@ local item = Custom({
 	Description = "When activated, conceals your identity and status from others.",
 	IconContent = Content.fromAssetId(107291373883291),
 
+	CorpseIconDescription = "They were using %s.",
+
 	Cost = 1,
 	MaxStock = 1,
 

@@ -62,6 +62,8 @@ local item = Custom({
     IconContent = Content.fromAssetId(62159372),
     Name = "Radar",
 
+    CorpseIconDescription = "They were using %s. Unfortunately, it is now broken.",
+
     HeartbeatClient = HeartbeatClient,
 })
 

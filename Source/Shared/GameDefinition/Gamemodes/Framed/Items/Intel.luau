@@ -14,6 +14,8 @@ local Item: Types.ItemComponents = {
 	Description = "Reveals your target's identity.",
 	IconContent = Content.fromAssetId(7129850222),
 
+	DoNotShowInEquipmentList = true,
+
 	Cost = 1,
 
 	OnEquipClient = OnEquipClient,

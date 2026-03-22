@@ -29,6 +29,8 @@ local item = Custom({
     Description = "Absorbs a limited amount of damage to the torso. Not visible to others.",
     IconContent = Content.fromAssetId(395920626),
 
+	CorpseIconDescription = "They were wearing %s.",
+
     Cost = 1,
     MaxStock = 1,
 

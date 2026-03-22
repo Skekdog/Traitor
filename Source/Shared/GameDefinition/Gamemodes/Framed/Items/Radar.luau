@@ -10,6 +10,8 @@ local Item = Modify(Items.GetItem("Radar"), "Radar", {
 	Cost = 2,
 	MaxStock = {__nil = true},
 
+	DoNotShowInEquipmentList = true,
+
 	HeartbeatClient = {__nil = true},
 
 	OnEquipClient = function()

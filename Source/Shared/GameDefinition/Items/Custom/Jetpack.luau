@@ -219,6 +219,8 @@ local item = Custom({
 	Description = "Fly around, while fuel lasts.",
 	IconContent = Content.fromAssetId(17576355326),
 
+	CorpseIconDescription = "They were wearing %s.",
+
 	Cost = 1,
 	MaxStock = 1,
 
