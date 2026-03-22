@@ -166,8 +166,9 @@ RunService.PostSimulation:Connect(function()
 	module.InteractProp = nil
 	module.InteractPart = nil
 
-	if ActionNodeClient.ActiveNode then
-		module.ActionNode = ActionNodeClient.ActiveNode
+	local activeNode = ActionNodeClient.GetActiveNode()
+	if activeNode then
+		module.ActionNode = activeNode
 		return
 	end
 

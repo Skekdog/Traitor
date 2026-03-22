@@ -11,13 +11,17 @@ export type ClientNodeData = {
 }
 
 local module = {}
-module.ActiveNode = nil :: ClientNodeData?
+
+local activeNode: ClientNodeData?
+function module.GetActiveNode(): ClientNodeData?
+	return activeNode
+end
 
 local nodes: {[BillboardGui]: ActionNodeType.ActionNodeParams?} = {}
 
 local function deselect(nodeData: ClientNodeData): ()
-	if module.ActiveNode == nodeData then
-		module.ActiveNode = nil
+	if activeNode == nodeData then
+		activeNode = nil
 	end
 	nodeData.ClickIcon.ImageTransparency = 0.5
 	nodeData.Info.Visible = false
@@ -90,7 +94,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	end
 
 	clickIcon.MouseEnter:Connect(function()
-		module.ActiveNode = nodeData
+		activeNode = nodeData
 		clickIcon.ImageTransparency = 0
 		info.Visible = true
 		clickIcon:AddTag("ControlHint")
@@ -108,8 +112,8 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 		nodeGui:Destroy()
 		nodes[nodeGui] = nil
 
-		if module.ActiveNode == nodeData then
-			module.ActiveNode = nil
+		if activeNode == nodeData then
+			activeNode = nil
 		end
 	end)
 
@@ -137,8 +141,8 @@ RunService.PreRender:Connect(function()
 		assert(params)
 		gui.Enabled = (role.Definition.IsEvil or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and not gui.Adornee:GetAttribute("IsDisabled")
 
-		if not gui.Enabled and module.ActiveNode and module.ActiveNode.Params == params then
-			module.ActiveNode = nil
+		if not gui.Enabled and activeNode and activeNode.Params == params then
+			activeNode = nil
 		end
 	end
 end)
