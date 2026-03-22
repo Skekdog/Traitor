@@ -7,15 +7,31 @@ local TargetsClient = {}
 TargetsClient.UI = ReplicatedStorage.Assets.Gamemode.Framed.UI.TargetChecker
 TargetsClient.UI.Parent = Players.LocalPlayer.PlayerGui :: any
 
-TargetsClient.Target = nil :: string?
-TargetsClient.HasIntel = false
+local currentTarget: string?
+local hasIntel = false
+
+function TargetsClient.SetCurrentTarget(target: string): ()
+	currentTarget = target
+end
+
+function TargetsClient.SetIntel(has: boolean): ()
+	hasIntel = has
+end
+
+function TargetsClient.GetCurrentTarget(): string?
+	return currentTarget
+end
+
+function TargetsClient.GetIntel(): boolean
+	return hasIntel
+end
 
 function TargetsClient.Set(): ()
-	if not TargetsClient.Target then
+	if not currentTarget then
 		return
 	end
 
-	local char = workspace.Characters:FindFirstChild(TargetsClient.Target)
+	local char = workspace.Characters:FindFirstChild(currentTarget)
 	if not char or not char:IsA("Model") then
 		return
 	end
@@ -26,7 +42,7 @@ function TargetsClient.Set(): ()
 	local vp = TargetsClient.UI.Viewport
 	vp.Visible = false
 
-	if TargetsClient.HasIntel then
+	if hasIntel then
 		local model = vp.WorldModel:FindFirstChildOfClass("Model")
 		if model then
 			model:Destroy()

@@ -14,11 +14,13 @@ local Item = Modify(Items.GetItem("Radar"), "Radar", {
 
 	OnEquipClient = function()
 		local TargetsClient = require(script.Parent.Parent.GameState.TargetsClient)
-		if not TargetsClient.Target then
+
+		local target = TargetsClient.GetCurrentTarget()
+		if not target then
 			return
 		end
 
-		local char = workspace.Characters:FindFirstChild(TargetsClient.Target)
+		local char = workspace.Characters:FindFirstChild(target)
 		if not char or not char:IsA("Model") then
 			return
 		end

@@ -5,7 +5,7 @@ local Intel = {}
 
 local function OnEquipClient(): ()
 	local TargetsClient = require(script.Parent.Parent.GameState.TargetsClient)
-	TargetsClient.HasIntel = true
+	TargetsClient.SetIntel(true)
 	TargetsClient.Set()
 end
 

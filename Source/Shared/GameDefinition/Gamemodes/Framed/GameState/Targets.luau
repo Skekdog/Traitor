@@ -74,8 +74,8 @@ end
 if RunService:IsClient() then
 	local TargetsClient = require(script.Parent.TargetsClient)
 	remote.OnClientEvent:Connect(function(newName: string)
-		TargetsClient.Target = newName
-		TargetsClient.HasIntel = false
+		TargetsClient.SetCurrentTarget(newName)
+		TargetsClient.SetIntel(false)
 		TargetsClient.Set()
 	end)
 end
