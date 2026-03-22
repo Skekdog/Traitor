@@ -69,7 +69,7 @@ local function doFootstep(state: PlayerState): ()
 		return stopSound(currentSound)
 	end
 
-	if state.Player == Players.LocalPlayer and NoClip.IsEnabled then
+	if state.Player == Players.LocalPlayer and NoClip.IsEnabled() then
 		return stopSound(currentSound)
 	end
 
