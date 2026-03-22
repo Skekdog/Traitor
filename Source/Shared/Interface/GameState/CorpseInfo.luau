@@ -28,21 +28,21 @@ end
 
 local flavourTexts: {[Types.GeneralDamageSource]: string} = {
     Fall = `Their injuries indicate a {highlightedText("fatal fall")}.`,
-    Drown = `Their drenched clothes and lack of struggle indicate a {highlightedText("watery fate")}.`,
-    Explode = `Their wounds and singed clothes indicate that an {highlightedText("explosion")} brought about their demise.`,
-	Burn = `Smells of {highlightedText("burnt spy")} around here...`,
+    Drown = `Their clothes are drenched and there are no signs of struggle. They probably {highlightedText("drowned.")}.`,
+    Explode = `Their singed clothes and wounds indicate a terrible {highlightedText("explosion")}.`,
+	Burn = `Smells like {highlightedText("burnt flesh")} around here...`,
     Stab = `They were {highlightedText("stabbed and cut")} before quickly {highlightedText("bleeding")} to death.`,
     Shot = `It is obvious that they were {highlightedText("shot")} to death.`,
     Bludgeon = `The body is {highlightedText("bruised and battered")}. Evidently some {highlightedText("blunt-force trauma")} was at hand.`,
-    Crush = `Many of their bones are broken. It seems the impact of a {highlightedText("heavy object")} killed them.`,
+    Crush = `Many of their bones are broken. The impact of a {highlightedText("heavy object")} likely killed them.`,
     Stomp = `Their body looks flattened and miserable. It looks like they were {highlightedText("stomped")}.`,
-	Magic = `{highlightedText("Otherworldly forces")} brought about this spy's death.`,
-    Poison = `A strong chemical odor suggests that {highlightedText("poison")} was the cause of this spy's demise.`,
-    Other = `It is unclear how this spy met their fate.`,
+	Magic = `{highlightedText("Otherworldly forces")} brought about this death.`,
+    Poison = `A strong chemical scent indicates that {highlightedText("poison")} was their downfall.`,
+    Other = `The lead-up to their fate is unclear.`,
 }
 
 local flavourTextsWithWeapon: {[Types.GeneralDamageSource]: string} = {
-    Shot = "It is obvious that they were shot to death. Moreover, it appears %s was used.",
+    Shot = "It is obvious that they were shot to death. It looks like %s.",
 }
 
 local flavourImages: {[Types.GeneralDamageSource]: string} = {
@@ -170,7 +170,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     object.DeathTime.TextLabel.Text = ToRoundTime(corpseInfo.DeathTime, timeNow)
 
     local timeSinceDeath = tostring(math.round(timeNow - corpseInfo.DeathTime))
-    object.DeathTime:SetAttribute("Description", `Their watch stopped, indicating that they died {highlightedText(timeSinceDeath)} {if timeSinceDeath == "1" then "second" else "seconds"} ago.`)
+    object.DeathTime:SetAttribute("Description", `From their now-stopped watch, you can tell that they died {highlightedText(timeSinceDeath)} {if timeSinceDeath == "1" then "second" else "seconds"} ago.`)
 
     object.FreeKill.Visible = corpseInfo.WasFreeKill or false
     object.Headshot.Visible = corpseInfo.WasHeadshot or false
@@ -197,7 +197,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     end
 
     local kills = corpseInfo.KillList
-    local killText = `They had a list of kills, confirming the death{if #kills == 1 then "" else "s"} of: `
+    local killText = `They kept a list of victims, confirming the death{if #kills == 1 then "" else "s"} of: `
 
     if #kills > 0 then
         for i, v in kills do
