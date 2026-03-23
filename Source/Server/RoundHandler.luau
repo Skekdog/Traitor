@@ -134,7 +134,7 @@ local currentMap = "International"
 
 type ClientMapInfo = {
     Name: string,
-    Icon: string?,
+    Icon: Content
 }
 
 local function getMapsForVote(): {ClientMapInfo}

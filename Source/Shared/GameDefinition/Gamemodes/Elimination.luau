@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 
@@ -54,7 +55,7 @@ local roles: {[string]: Types.RoleDefinition} = {
         Kind = "RoleDefinition",
         Name = "Competitor",
         Description = "Free for all! Kill everyone.",
-        Sound = "rbxassetid://9042088276",
+        Sound = PlaySound.MakeSound(9042088276),
         Color = Color3.fromRGB(255, 176, 7),
 
         IsEvil = false,

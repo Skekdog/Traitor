@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Impulse = require(ReplicatedStorage.API.Impulse)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local Disguiser = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.Disguiser)
@@ -52,7 +53,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Name = "Traitor",
 		Description = `Work with the other <font color="#{TRAITOR_COLOUR:ToHex()}">Traitors</font> to kill the <font color="#{INNOCENT_COLOUR:ToHex()}">Innocents</font>. Keep your role secret.`,
 		Color = TRAITOR_COLOUR,
-		Sound = "rbxassetid://9042088276",
+		Sound = PlaySound.MakeSound(9042088276),
 
 		IsEvil = true,
 
@@ -107,7 +108,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Name = "Innocent",
 		Description = `Spy HQ has been infilitrated by <font color="#{TRAITOR_COLOUR:ToHex()}">Traitors</font>. Work with the <font color="#{DETECTIVE_COLOUR:ToHex()}">Detectives</font> to survive.`,
 		Color = INNOCENT_COLOUR,
-		Sound = "rbxassetid://9042819926",
+		Sound = PlaySound.MakeSound(9042819926),
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
 
@@ -122,7 +123,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Name = "Detective",
 		Description = `Spy HQ has been infilitrated by <font color='#{TRAITOR_COLOUR:ToHex()}'>Traitors</font>. Use your <font color="#{DETECTIVE_COLOUR:ToHex()}">Equipment</font> to defeat the <font color="#{TRAITOR_COLOUR:ToHex()}">Traitors</font>.`,
 		Color = DETECTIVE_COLOUR,
-		Sound = "rbxassetid://9042823666",
+		Sound = PlaySound.MakeSound(9042823666),
 
 		Allegiance = {Kind = "Role", Role = "Innocent"},
 

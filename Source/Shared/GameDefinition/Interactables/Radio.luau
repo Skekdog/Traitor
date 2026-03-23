@@ -157,11 +157,8 @@ do
 
 	local deathSounds: {Sound} = {}
 	for _, v in DeathSounds do
-		local sound = Instance.new("Sound")
+		local sound = v:Clone()
 		sound.Name = "Death"
-		sound.SoundId = v
-		sound.RollOffMinDistance = 20
-		sound.RollOffMaxDistance = 50
 		table.insert(deathSounds, sound)
 	end
 
