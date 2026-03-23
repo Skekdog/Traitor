@@ -29,7 +29,7 @@ end
 
 local flavourTexts: {[Types.GeneralDamageSource]: string} = {
     Fall = `Their injuries indicate a {highlightedText("fatal fall")}.`,
-    Drown = `Their clothes are drenched and there are no signs of struggle. They probably {highlightedText("drowned.")}.`,
+    Drown = `Their clothes are drenched and there are no signs of struggle. They probably {highlightedText("drowned")}.`,
     Explode = `Their singed clothes and wounds indicate a terrible {highlightedText("explosion")}.`,
 	Burn = `Smells like {highlightedText("burnt flesh")} around here...`,
     Stab = `They were {highlightedText("stabbed and cut")} before quickly {highlightedText("bleeding")} to death.`,
