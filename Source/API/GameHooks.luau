@@ -6,7 +6,7 @@ local GameHooks = {}
 
 GameHooks.OnDeath = {} :: Hooks<(round: Types.Round, participant: Types.Participant, defer: boolean) -> ()>
 
-GameHooks.OnItemDropped = {} :: Hooks<(round: Types.Round, participant: Types.Participant, defer: Types.Item) -> ()>
+GameHooks.OnItemDropped = {} :: Hooks<(round: Types.Round, participant: Types.Participant, item: Types.Item) -> ()>
 
 GameHooks.BeforeDamageParticipant = {} :: Hooks<(round: Types.Round, participant: Types.Participant, params: Types.DamageParams) -> ()>
 
