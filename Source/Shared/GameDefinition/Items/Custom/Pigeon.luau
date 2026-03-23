@@ -197,7 +197,7 @@ if RunService:IsClient() then
 		end, 2)
 	end)
 else
-	local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
+	local GameHooks = require(ReplicatedStorage.API.GameHooks)
 
 	recallRemote.OnServerEvent:Connect(function(player)
 		local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
@@ -215,7 +215,7 @@ else
 		end
 	end)
 
-	RoundHooks.OnDeath["Pigeon"] = function(round: Types.Round, participant: Types.Participant): ()
+	GameHooks.OnDeath["Pigeon"] = function(round: Types.Round, participant: Types.Participant): ()
 		for _, pigeon in pigeons do
 			if pigeon.Launcher == participant then
 				recallRemote:FireClient(participant.Player, false)

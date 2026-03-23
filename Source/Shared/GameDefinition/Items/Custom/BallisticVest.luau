@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local ProcessHit = require(ReplicatedStorage.API.Item.Behaviour.ProcessHit)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
+local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -14,7 +14,7 @@ type Participant = Types.Participant & {
 	}
 }
 
-RoundHooks.BeforeDamageParticipant["BallisticVest"] = function(round: Types.Round, participant: Participant, params: Types.DamageParams)
+GameHooks.BeforeDamageParticipant["BallisticVest"] = function(round: Types.Round, participant: Participant, params: Types.DamageParams)
 	if not params.HitPart or not DamageSource.IsFirearm(params.Source) or ((participant.Extras.BallisticVest or 0) <= 0) or ProcessHit.GetBodyPart(params.HitPart) ~= "Body" then
 		return
 	end

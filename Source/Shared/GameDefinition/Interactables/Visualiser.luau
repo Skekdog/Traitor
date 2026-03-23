@@ -3,7 +3,7 @@ local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
-local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
+local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -163,7 +163,7 @@ local function copyCharacter(char: Model): Model
 	return char
 end
 
-RoundHooks.OnDeath["Visualiser"] = function(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+GameHooks.OnDeath["Visualiser"] = function(round: Types.Round, participant: Types.Participant, defer: boolean): ()
 	local corpse = participant.Corpse
 	if not corpse then
 		return

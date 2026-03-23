@@ -5,7 +5,7 @@ local SoundService = game:GetService("SoundService")
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local RoundHooks = require(ReplicatedStorage.API.RoundHooks)
+local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
@@ -102,7 +102,7 @@ type DNATrace = IHasTarget & IHasObject & {
 
 type Participant = Types.Participant & IHasDNATraces
 
-RoundHooks.OnDeath["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, deferVictoryCheck: boolean): ()
+GameHooks.OnDeath["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, deferVictoryCheck: boolean): ()
 	remote:FireClient(participant.Player)
 
 	local corpse = participant.Corpse
@@ -145,7 +145,7 @@ RoundHooks.OnDeath["DNAScanner"] = function(round: Types.Round, participant: Typ
 	})
 end
 
-RoundHooks.OnItemDropped["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, item: Types.Item)
+GameHooks.OnItemDropped["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, item: Types.Item)
 	if not item.Model then
 		return
 	end
