@@ -4,7 +4,7 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 type ClientMapInfo = {
 	Name: string,
-	Icon: string?,
+	Icon: Content,
 }
 
 type Votes = {
@@ -53,7 +53,7 @@ ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(func
 
     for _, v: ClientMapInfo in votableMaps do
         local clone = screen.Object.Sample:Clone()
-        clone.Image = v.Icon or "rbxassetid://116876920061584"
+        clone.ImageContent = if v.Icon ~= Content.none then v.Icon else Content.fromAssetId(116876920061584)
         clone.MapName.Text = v.Name
         clone.Name = v.Name
         clone.Visible = true
