@@ -75,7 +75,7 @@ end
 function Gamepad:GetHighestPriorityGamepad()
 	local connectedGamepads = UserInputService:GetConnectedGamepads()
 	local bestGamepad = NONE -- Note that this value is higher than all valid gamepad values
-	for _, gamepad in pairs(connectedGamepads) do
+	for _, gamepad in connectedGamepads do
 		if gamepad.Value < bestGamepad.Value then
 			bestGamepad = gamepad
 		end

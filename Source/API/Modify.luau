@@ -1,7 +1,7 @@
 
 local function Modify<T>(original: T & {[any]: any}, newName: string, edit: {[any]: any}): T
 	local new = table.clone(original)
-    for i, v in pairs(edit) do
+    for i, v in edit do
         new[i] = if typeof(v) == "table" and v["__nil"] == true then nil else v
     end
 

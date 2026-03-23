@@ -78,14 +78,14 @@ function TransparencyController:CachePartsRecursive(object)
 			self.cachedParts[object] = true
 			self.transparencyDirty = true
 		end
-		for _, child in pairs(object:GetChildren()) do
+		for _, child in object:GetChildren() do
 			self:CachePartsRecursive(child)
 		end
 	end
 end
 
 function TransparencyController:TeardownTransparency()
-	for child, _ in pairs(self.cachedParts) do
+	for child, _ in self.cachedParts do
 		child.LocalTransparencyModifier = 0
 	end
 	self.cachedParts = {}
@@ -100,11 +100,11 @@ function TransparencyController:TeardownTransparency()
 		self.descendantRemovingConn:disconnect()
 		self.descendantRemovingConn = nil
 	end
-	for object, conn in pairs(self.toolDescendantAddedConns) do
+	for object, conn in self.toolDescendantAddedConns do
 		conn:Disconnect()
 		self.toolDescendantAddedConns[object] = nil
 	end
-	for object, conn in pairs(self.toolDescendantRemovingConns) do
+	for object, conn in self.toolDescendantRemovingConns do
 		conn:Disconnect()
 		self.toolDescendantRemovingConns[object] = nil
 	end
@@ -199,7 +199,7 @@ function TransparencyController:Update(dt)
 
 		-- update transparencies
 		if self.transparencyDirty or self.lastTransparency ~= transparency then
-			for child, _ in pairs(self.cachedParts) do
+			for child, _ in self.cachedParts do
 				if VRService.VREnabled and VRService.AvatarGestures then
 					-- keep the arms visible in VR
 					local hiddenAccessories = {

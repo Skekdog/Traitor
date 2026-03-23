@@ -103,7 +103,7 @@ function DynamicThumbstick:Enable(enable: boolean?, uiParentFrame): boolean?
 	if enable == nil then return false end			-- If nil, return false (invalid argument)
 	enable = enable and true or false				-- Force anything non-nil to boolean before comparison
 	if self.enabled == enable then return true end	-- If no state change, return true indicating already in requested state
-	
+
 	if not enable then return true end
 
 	if enable then
@@ -182,7 +182,7 @@ end
 function DynamicThumbstick:FadeThumbstickFrame(fadeDuration: number, fadeRatio: number)
 	self.fadeInAndOutHalfDuration = fadeDuration * 0.5
 	self.fadeInAndOutBalance = fadeRatio
-	self.tweenInAlphaStart = tick()
+	self.tweenInAlphaStart = os.clock()
 end
 
 function DynamicThumbstick:InputInFrame(inputObject: InputObject)
@@ -216,7 +216,7 @@ function DynamicThumbstick:DoFadeInBackground()
 	if not hasFadedBackgroundInOrientation then
 		self.fadeInAndOutHalfDuration = FADE_IN_OUT_HALF_DURATION_DEFAULT
 		self.fadeInAndOutBalance = FADE_IN_OUT_BALANCE_DEFAULT
-		self.tweenInAlphaStart = tick()
+		self.tweenInAlphaStart = os.clock()
 	end
 end
 
@@ -533,15 +533,15 @@ function DynamicThumbstick:Create(parentFrame: GuiBase2d)
 
 	self.onRenderSteppedConn = RunService.RenderStepped:Connect(function()
 		if self.tweenInAlphaStart ~= nil then
-			local delta = tick() - self.tweenInAlphaStart
+			local delta = os.clock() - self.tweenInAlphaStart
 			local fadeInTime = (self.fadeInAndOutHalfDuration * 2 * self.fadeInAndOutBalance)
 			self.thumbstickFrame.BackgroundTransparency = 1 - FADE_IN_OUT_MAX_ALPHA*math.min(delta/fadeInTime, 1)
 			if delta > fadeInTime then
-				self.tweenOutAlphaStart = tick()
+				self.tweenOutAlphaStart = os.clock()
 				self.tweenInAlphaStart = nil
 			end
 		elseif self.tweenOutAlphaStart ~= nil then
-			local delta = tick() - self.tweenOutAlphaStart
+			local delta = os.clock() - self.tweenOutAlphaStart
 			local fadeOutTime = (self.fadeInAndOutHalfDuration * 2) - (self.fadeInAndOutHalfDuration * 2 * self.fadeInAndOutBalance)
 			self.thumbstickFrame.BackgroundTransparency = 1 - FADE_IN_OUT_MAX_ALPHA + FADE_IN_OUT_MAX_ALPHA*math.min(delta/fadeOutTime, 1)
 			if delta > fadeOutTime  then
@@ -575,7 +575,7 @@ function DynamicThumbstick:Create(parentFrame: GuiBase2d)
 	local function longShowBackground()
 		self.fadeInAndOutHalfDuration = 2.5
 		self.fadeInAndOutBalance = 0.05
-		self.tweenInAlphaStart = tick()
+		self.tweenInAlphaStart = os.clock()
 	end
 
 	playerGuiChangedConn = playerGui:GetPropertyChangedSignal("CurrentScreenOrientation"):Connect(function()

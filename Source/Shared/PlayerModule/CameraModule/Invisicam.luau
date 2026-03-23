@@ -72,7 +72,7 @@ includeParams.FilterType = Enum.RaycastFilterType.Include
 local function AssertTypes(param, ...)
 	local allowedTypes = {}
 	local typeString = ''
-	for _, typeName in pairs({...}) do
+	for _, typeName in {...} do
 		allowedTypes[typeName] = true
 		typeString = typeString .. (typeString == '' and '' or ' or ') .. typeName
 	end
@@ -169,7 +169,7 @@ end
 
 --[[ Module functions ]]--
 function Invisicam:LimbBehavior(castPoints)
-	for limb, _ in pairs(self.trackedLimbs) do
+	for limb, _ in self.trackedLimbs do
 		castPoints[#castPoints + 1] = limb.Position
 	end
 end
@@ -456,14 +456,14 @@ function Invisicam:CharacterAdded(char: Model, player: Player)
 
 	self.childAddedConn = char.ChildAdded:Connect(childAdded)
 	self.childRemovedConn = char.ChildRemoved:Connect(childRemoved)
-	for _, child in pairs(self.char:GetChildren()) do
+	for _, child in self.char:GetChildren() do
 		childAdded(child)
 	end
 end
 
 function Invisicam:SetMode(newMode: number)
 	AssertTypes(newMode, 'number')
-	for _, modeNum in pairs(MODE) do
+	for _, modeNum in MODE do
 		if modeNum == newMode then
 			self.mode = newMode
 			self.behaviorFunction = self.behaviors[self.mode]
@@ -479,7 +479,7 @@ end
 
 -- Want to turn off Invisicam? Be sure to call this after.
 function Invisicam:Cleanup()
-	for hit, originalFade in pairs(self.savedHits) do
+	for hit, originalFade in self.savedHits do
 		hit.LocalTransparencyModifier = originalFade
 	end
 end
@@ -568,7 +568,7 @@ function Invisicam:Update(dt: number, desiredCameraCFrame: CFrame, desiredCamera
 			local hitPart = hitParts[i]
 			hitPartCount = hitPartCount + 1 -- count the part itself
 			headTorsoRayHitParts[hitPart] = true
-			for _, child in pairs(hitPart:GetChildren()) do
+			for _, child in hitPart:GetChildren() do
 				if child:IsA('Decal') or child:IsA('Texture') then
 					hitPartCount = hitPartCount + 1 -- count first decal hit, then break
 					break
@@ -600,7 +600,7 @@ function Invisicam:Update(dt: number, desiredCameraCFrame: CFrame, desiredCamera
 		end
 
 		-- Check all decals and textures on the part
-		for _, child in pairs(hitPart:GetChildren()) do
+		for _, child in hitPart:GetChildren() do
 			if child:IsA('Decal') or child:IsA('Texture') then
 				if (child.Transparency < partTargetTransparency[hitPart]) then
 					partTargetTransparency[child] = partTargetTransparency[hitPart]
@@ -611,7 +611,7 @@ function Invisicam:Update(dt: number, desiredCameraCFrame: CFrame, desiredCamera
 	end
 
 	-- Invisibilize objects that are in the way, restore those that aren't anymore
-	for hitPart, originalLTM in pairs(self.savedHits) do
+	for hitPart, originalLTM in self.savedHits do
 		if currentHits[hitPart] then
 			-- LocalTransparencyModifier gets whatever value is required to print the part's total transparency to equal perPartTransparency
 			hitPart.LocalTransparencyModifier = (hitPart.Transparency < 1) and ((partTargetTransparency[hitPart] - hitPart.Transparency) / (1.0 - hitPart.Transparency)) or 0

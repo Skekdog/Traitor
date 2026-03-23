@@ -42,7 +42,7 @@ function ClassicCamera.new()
 
 	self.isFollowCamera = false
 	self.isCameraToggle = false
-	self.lastUpdate = tick()
+	self.lastUpdate = os.clock()
 	self.cameraToggleSpring = Util.Spring.new(5, 0)
 
 	return self
@@ -74,7 +74,7 @@ function ClassicCamera:SetCameraMovementMode(cameraMovementMode: Enum.ComputerCa
 end
 
 function ClassicCamera:Update(dt)
-	local now = tick()
+	local now = os.clock()
 	local timeDelta = now - self.lastUpdate -- replace with dt if FFlagUserCameraInputDt
 	if FFlagUserCameraInputDt then
 		timeDelta = dt
@@ -116,7 +116,7 @@ function ClassicCamera:Update(dt)
 	-- Reset tween speed if user is panning
 	if rotateInput ~= Vector2.new() then
 		tweenSpeed = 0
-		self.lastUserPanCamera = tick()
+		self.lastUserPanCamera = os.clock()
 	end
 
 	local userRecentlyPannedCamera = now - self.lastUserPanCamera < TIME_BEFORE_AUTO_ROTATE
@@ -199,7 +199,7 @@ function ClassicCamera:Update(dt)
 
 			local cameraFocusP = newCameraFocus.p
 			local newLookVector = self:CalculateNewLookVectorFromArg(overrideCameraLookVector, rotateInput)
-			
+
 			if FFlagUserFixCameraFPError then
 				newCameraCFrame = CFrame.lookAlong(cameraFocusP - (zoom * newLookVector), newLookVector)
 			else

@@ -76,7 +76,7 @@ end
 local function heal(interactable: Types.Prop, participant: Types.Participant): ()
 	local station = interactable :: HealthStationServer
 
-	participant.Extras.HealthStationLastHealedAt = tick()
+	participant.Extras.HealthStationLastHealedAt = os.clock()
 	participant:SetHealth(participant:GetHealth() + module.HEAL_AMOUNT)
 	setCharge(station, station.Extras.Charge - module.HEAL_AMOUNT)
 
@@ -90,8 +90,8 @@ end
 local lastRecharge = 0
 local lastHeal = 0
 RunService.Heartbeat:Connect(function()
-	local shouldRecharge = tick() - lastRecharge > module.RECHARGE_INTERVAL
-	local shouldHeal = tick() - lastHeal > module.HEAL_INTERVAL
+	local shouldRecharge = os.clock() - lastRecharge > module.RECHARGE_INTERVAL
+	local shouldHeal = os.clock() - lastHeal > module.HEAL_INTERVAL
 
 	local toRemove: {HealthStationServer} = {}
 
@@ -128,11 +128,11 @@ RunService.Heartbeat:Connect(function()
 	end
 
 	if shouldRecharge then
-		lastRecharge = tick()
+		lastRecharge = os.clock()
 	end
 
 	if shouldHeal then
-		lastHeal = tick()
+		lastHeal = os.clock()
 	end
 end)
 

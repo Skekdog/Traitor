@@ -306,11 +306,11 @@ local function StandardDoor(request: DoorRequest): ()
                 return
             end
 
-            if tick() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
+            if os.clock() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
                 return
             end
             PlaySound(134969396, nil, door)
-            door:SetAttribute("LastPlayedLockedSound", tick())
+            door:SetAttribute("LastPlayedLockedSound", os.clock())
             return
         end
     end

@@ -66,7 +66,7 @@ end
 -- Ritter's loose bounding sphere algorithm
 function CameraUtils.getLooseBoundingSphere(parts: {BasePart})
 	local points = table.create(#parts)
-	for idx, part in pairs(parts) do
+	for idx, part in parts do
 		points[idx] = part.Position
 	end
 

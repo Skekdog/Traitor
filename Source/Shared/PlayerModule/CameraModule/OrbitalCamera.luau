@@ -42,7 +42,7 @@ OrbitalCamera.__index = OrbitalCamera
 function OrbitalCamera.new()
 	local self = setmetatable(BaseCamera.new(), OrbitalCamera)
 
-	self.lastUpdate = tick()
+	self.lastUpdate = os.clock()
 
 	-- OrbitalCamera-specific members
 	self.changedSignalConnections = {}
@@ -60,7 +60,7 @@ function OrbitalCamera.new()
 
 	self.gamepadDollySpeedMultiplier = 1
 
-	self.lastUserPanCamera = tick()
+	self.lastUserPanCamera = os.clock()
 
 	self.externalProperties = {}
 	self.externalProperties["InitialDistance"] 	= 25
@@ -215,7 +215,7 @@ end
 
 -- [[ Update ]]--
 function OrbitalCamera:Update(dt: number): (CFrame, CFrame)
-	local now = tick()
+	local now = os.clock()
 	local timeDelta = (now - self.lastUpdate)
 	local userPanningTheCamera = CameraInput.getRotation(dt) ~= Vector2.new()
 	local camera = 	workspace.CurrentCamera
@@ -232,7 +232,7 @@ function OrbitalCamera:Update(dt: number): (CFrame, CFrame)
 
 	-- Reset tween speed if user is panning
 	if userPanningTheCamera then
-		self.lastUserPanCamera = tick()
+		self.lastUserPanCamera = os.clock()
 	end
 
 	local subjectPosition = self:GetSubjectPosition()

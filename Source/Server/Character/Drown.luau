@@ -65,7 +65,7 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 		return
 	end
 
-	if tick() - (participant.Extras.LastDrownAt or 0) < DROWN_INTERVAL then
+	if os.clock() - (participant.Extras.LastDrownAt or 0) < DROWN_INTERVAL then
 		return
 	end
 
@@ -87,7 +87,7 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 		Source = "Drown",
 	})
 
-	participant.Extras.LastDrownAt = tick()
+	participant.Extras.LastDrownAt = os.clock()
 end
 
 RunService.Heartbeat:Connect(function(dt)

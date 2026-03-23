@@ -183,7 +183,7 @@ local function getCollidableExtentsSize(character: Model?)
 	local toLocalCFrame = character.PrimaryPart.CFrame:Inverse()
 	local min = Vector3.new(math.huge, math.huge, math.huge)
 	local max = Vector3.new(-math.huge, -math.huge, -math.huge)
-	for _,descendant in pairs(character:GetDescendants()) do
+	for _,descendant in character:GetDescendants() do
 		if descendant:IsA('BasePart') and descendant.CanCollide then
 			local localCFrame = toLocalCFrame * descendant.CFrame
 			local size = Vector3.new(descendant.Size.X / 2, descendant.Size.Y / 2, descendant.Size.Z / 2)
@@ -668,7 +668,7 @@ end
 
 local function GetEquippedTool(character: Model?)
 	if character ~= nil then
-		for _, child in pairs(character:GetChildren()) do
+		for _, child in character:GetChildren() do
 			if child:IsA('Tool') then
 				return child
 			end
@@ -864,11 +864,11 @@ function ClickToMove.new(CONTROL_ACTION_PRIORITY)
 	self.fingerTouches = {}
 	self.numUnsunkTouches = 0
 	-- PC simulation
-	self.mouse1Down = tick()
+	self.mouse1Down = os.clock()
 	self.mouse1DownPos = Vector2.new()
-	self.mouse2DownTime = tick()
+	self.mouse2DownTime = os.clock()
 	self.mouse2DownPos = Vector2.new()
-	self.mouse2UpTime = tick()
+	self.mouse2UpTime = os.clock()
 
 	self.keyboardMoveVector = ZERO_VECTOR3
 
@@ -942,11 +942,11 @@ function ClickToMove:OnCharacterAdded(character)
 			ClickToMoveDisplay.CancelFailureAnimation()
 		end
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			self.mouse1DownTime = tick()
+			self.mouse1DownTime = os.clock()
 			self.mouse1DownPos = input.Position
 		end
 		if input.UserInputType == Enum.UserInputType.MouseButton2 then
-			self.mouse2DownTime = tick()
+			self.mouse2DownTime = os.clock()
 			self.mouse2DownPos = input.Position
 		end
 	end)
@@ -963,7 +963,7 @@ function ClickToMove:OnCharacterAdded(character)
 		end
 
 		if input.UserInputType == Enum.UserInputType.MouseButton2 then
-			self.mouse2UpTime = tick()
+			self.mouse2UpTime = os.clock()
 			local currPos: Vector3 = input.Position
 			-- We allow click to move during path following or if there is no keyboard movement
 			local allowed = ExistingPather or self.keyboardMoveVector.Magnitude <= 0
@@ -1010,7 +1010,7 @@ function ClickToMove:OnCharacterAdded(character)
 			end
 		end
 	end)
-	for _, child in pairs(character:GetChildren()) do
+	for _, child in character:GetChildren() do
 		OnCharacterChildAdded(child)
 	end
 end
@@ -1050,7 +1050,7 @@ function ClickToMove:Enable(enable: boolean, enableWASD: boolean, touchJumpContr
 			if UserInputService.TouchEnabled then
 				local character = Player.Character
 				if character then
-					for _, child in pairs(character:GetChildren()) do
+					for _, child in character:GetChildren() do
 						if child:IsA('Tool') then
 							child.ManualActivationOnly = false
 						end

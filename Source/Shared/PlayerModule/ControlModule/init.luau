@@ -388,7 +388,7 @@ end
 
 local function getGamepadRightThumbstickPosition(): Vector3
 	local state = UserInputService:GetGamepadState(Enum.UserInputType.Gamepad1)
-	for _, input in pairs(state) do
+	for _, input in state do
 		if input.KeyCode == Enum.KeyCode.Thumbstick2 then
 			return input.Position
 		end

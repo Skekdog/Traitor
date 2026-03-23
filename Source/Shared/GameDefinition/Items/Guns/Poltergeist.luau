@@ -101,7 +101,7 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 		return
 	end
 
-	local now = tick()
+	local now = os.clock()
 	if now - info.LastTime < phaseAdvanceTimes[info.PoltPhase] then
 		return
 	end

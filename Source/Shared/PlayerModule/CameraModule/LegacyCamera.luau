@@ -22,7 +22,7 @@ function LegacyCamera.new()
 	local self = setmetatable(BaseCamera.new(), LegacyCamera)
 
 	self.cameraType = Enum.CameraType.Fixed
-	self.lastUpdate = tick()
+	self.lastUpdate = os.clock()
 	self.lastDistanceToSubject = nil
 
 	return self
@@ -44,7 +44,7 @@ function LegacyCamera:Update(dt: number): (CFrame?, CFrame?)
 		return nil, nil
 	end
 
-	local now = tick()
+	local now = os.clock()
 	local timeDelta = (now - self.lastUpdate)
 	local camera = 	workspace.CurrentCamera
 	local newCameraCFrame = camera.CFrame

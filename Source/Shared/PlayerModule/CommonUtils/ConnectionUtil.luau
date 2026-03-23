@@ -53,7 +53,7 @@ function ConnectionUtil:disconnect(key)
 end
 
 function ConnectionUtil:disconnectAll()
-	for _, disconnectFunc in pairs(self._connections) do
+	for _, disconnectFunc in self._connections do
 		disconnectFunc()
 	end
 	self._connections = {} -- Clear all connections

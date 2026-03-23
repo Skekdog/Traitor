@@ -79,7 +79,7 @@ function VRNavigation.new(CONTROL_ACTION_PRIORITY)
 	self.currentPointIdx = 0
 
 	self.expectedTimeToNextPoint = 0
-	self.timeReachedLastPoint = tick()
+	self.timeReachedLastPoint = os.clock()
 	self.moving = false
 
 	self.isJumpBound = false
@@ -102,7 +102,7 @@ function VRNavigation:GetLocalHumanoid()
 		return
 	end
 
-	for _, child in pairs(character:GetChildren()) do
+	for _, child in character:GetChildren() do
 		if child:IsA("Humanoid") then
 			return child
 		end
@@ -154,7 +154,7 @@ function VRNavigation:StartFollowingPath(newPath)
 	currentPointIdx = 1
 	moving = true
 
-	timeReachedLastPoint = tick()
+	timeReachedLastPoint = os.clock()
 
 	local humanoid = self:GetLocalHumanoid()
 	if humanoid and humanoid.Torso and #currentPoints >= 1 then
@@ -175,7 +175,7 @@ function VRNavigation:GoToPoint(point)
 	local distance = (humanoid.Torso.Position - point).magnitude
 	local estimatedTimeRemaining = distance / humanoid.WalkSpeed
 
-	timeReachedLastPoint = tick()
+	timeReachedLastPoint = os.clock()
 	expectedTimeToNextPoint = estimatedTimeRemaining
 
 	movementUpdateEvent:Fire("targetPoint", point)
@@ -343,7 +343,7 @@ function VRNavigation:OnHeartbeat(dt)
 		if moveDist < POINT_REACHED_THRESHOLD then
 			local estimatedTimeRemaining = 0
 			local prevPoint = currentPoints[1]
-			for i, point in pairs(currentPoints) do
+			for i, point in currentPoints do
 				if i ~= 1 then
 					local dist = (point - prevPoint).magnitude
 					prevPoint = point
@@ -369,7 +369,7 @@ function VRNavigation:OnHeartbeat(dt)
 				local newGoal = currentPoints[1]
 				local distanceToGoal = (newGoal - currentPosition).magnitude
 				expectedTimeToNextPoint = distanceToGoal / humanoid.WalkSpeed
-				timeReachedLastPoint = tick()
+				timeReachedLastPoint = os.clock()
 			end
 		else
 			if FFlagUserRaycastUpdateAPI then
@@ -404,7 +404,7 @@ function VRNavigation:OnHeartbeat(dt)
 				end
 			end
 
-			local timeSinceLastPoint = tick() - timeReachedLastPoint
+			local timeSinceLastPoint = os.clock() - timeReachedLastPoint
 			if timeSinceLastPoint > expectedTimeToNextPoint + OFFTRACK_TIME_THRESHOLD then
 				self:StopFollowingPath()
 				if PathDisplay then

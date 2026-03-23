@@ -227,7 +227,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		if radio.Extras.LastPlayedAt and tick() - radio.Extras.LastPlayedAt < PLAY_COOLDOWN then
+		if radio.Extras.LastPlayedAt and os.clock() - radio.Extras.LastPlayedAt < PLAY_COOLDOWN then
 			return
 		end
 
@@ -264,7 +264,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		radio.Extras.LastPlayedAt = tick()
+		radio.Extras.LastPlayedAt = os.clock()
 
 		PlaySound(sound, nil, radio.Model, {
 			SoundGroup = SoundService.AllSounds :: SoundGroup,

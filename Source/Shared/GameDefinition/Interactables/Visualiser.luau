@@ -274,7 +274,7 @@ end
 local function OnLoadServer(interactable: Types.Prop): ()
 	local visualiser = interactable :: Visualiser
 
-	visualiser.Extras.LastVisualisedAt = tick() - (VISUALISE_INTERVAL - INITIAL_VISUALISE_DELAY)
+	visualiser.Extras.LastVisualisedAt = os.clock() - (VISUALISE_INTERVAL - INITIAL_VISUALISE_DELAY)
 
 	visualiser.Model.Destroying:Connect(function()
 		removeVisualiser(visualiser)
@@ -284,13 +284,13 @@ local function OnLoadServer(interactable: Types.Prop): ()
 end
 
 local function forEachVisualiser(visualiser: Visualiser): ()
-	if (visualiser.Extras.LastVisualisedAt or 0) + VISUALISE_INTERVAL > tick() then
+	if (visualiser.Extras.LastVisualisedAt or 0) + VISUALISE_INTERVAL > os.clock() then
 		return
 	end
 
 	assert(visualiser.Model:IsA("BasePart"))
 
-	visualiser.Extras.LastVisualisedAt = tick()
+	visualiser.Extras.LastVisualisedAt = os.clock()
 
 	local corpsesInRange: {[Model]: DeathData} = {}
 

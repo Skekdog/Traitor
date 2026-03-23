@@ -493,7 +493,7 @@ local CustomWriteQueue = {
 
 local function DeepCopyTable(t)
 	local copy = {}
-	for key, value in pairs(t) do
+	for key, value in t do
 		if type(value) == "table" then
 			copy[key] = DeepCopyTable(value)
 		else
@@ -504,7 +504,7 @@ local function DeepCopyTable(t)
 end
 
 local function ReconcileTable(target, template)
-	for k, v in pairs(template) do
+	for k, v in template do
 		if type(k) == "string" then -- Only string keys will be reconciled
 			if target[k] == nil then
 				if type(v) == "table" then
@@ -1066,7 +1066,7 @@ local function SaveProfileAsync(profile, release_from_session, is_overwriting)
 			-- Setting MetaData:
 			local session_meta_data = profile.MetaData
 			local latest_meta_data = loaded_data.MetaData
-			for key in pairs(SETTINGS.MetaTagsUpdatedValues) do
+			for key in SETTINGS.MetaTagsUpdatedValues do
 				session_meta_data[key] = latest_meta_data[key]
 			end
 			session_meta_data.MetaTagsLatest = latest_meta_data.MetaTags

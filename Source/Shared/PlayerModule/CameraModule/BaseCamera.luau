@@ -89,7 +89,7 @@ function BaseCamera.new()
 	self.cameraMovementMode = nil
 
 	self.lastCameraTransform = nil
-	self.lastUserPanCamera = tick()
+	self.lastUserPanCamera = os.clock()
 
 	self.humanoidRootPart = nil
 	self.humanoidCache = {}

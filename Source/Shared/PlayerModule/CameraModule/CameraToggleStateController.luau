@@ -7,7 +7,7 @@ local CameraUI = require(script.Parent:WaitForChild("CameraUI"))
 local CameraUtils = require(script.Parent:WaitForChild("CameraUtils"))
 
 local lastTogglePan = false
-local lastTogglePanChange = tick()
+local lastTogglePanChange = os.clock()
 
 local CROSS_MOUSE_ICON = "rbxasset://textures/Cursors/CrossMouseIcon.png"
 
@@ -25,15 +25,15 @@ return function(isFirstPerson: boolean)
 		lockStateDirty = true
 	end
 
-	if lastTogglePan ~= togglePan or tick() - lastTogglePanChange > toastTimeout then
-		local doShow = togglePan and tick() - lastTogglePanChange < toastTimeout
+	if lastTogglePan ~= togglePan or os.clock() - lastTogglePanChange > toastTimeout then
+		local doShow = togglePan and os.clock() - lastTogglePanChange < toastTimeout
 
 		CameraUI.setCameraModeToastOpen(doShow)
 
 		if togglePan then
 			lockStateDirty = false
 		end
-		lastTogglePanChange = tick()
+		lastTogglePanChange = os.clock()
 		lastTogglePan = togglePan
 	end
 

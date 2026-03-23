@@ -12,7 +12,7 @@ local DEFAULT_MOUSE_LOCK_CURSOR = "rbxasset://textures/MouseLockedCursor.png"
 
 local CONTEXT_ACTION_NAME = "MouseLockSwitchAction"
 local MOUSELOCK_ACTION_PRIORITY = Enum.ContextActionPriority.Medium.Value
-local CAMERA_OFFSET_DEFAULT = Vector3.new(1.75,0,0)  
+local CAMERA_OFFSET_DEFAULT = Vector3.new(1.75,0,0)
 
 --[[ Services ]]--
 local PlayersService = game:GetService("Players")
@@ -108,7 +108,7 @@ end
 function MouseLockController:OnBoundKeysObjectChanged(newValue: string)
 	self.boundKeys = {} -- Overriding defaults, note: possibly with nothing at all if boundKeysObj.Value is "" or contains invalid values
 	for token in string.gmatch(newValue,"[^%s,]+") do
-		for _, keyEnum in pairs(Enum.KeyCode:GetEnumItems()) do
+		for _, keyEnum in Enum.KeyCode:GetEnumItems() do
 			if token == keyEnum.Name then
 				self.boundKeys[#self.boundKeys+1] = keyEnum :: Enum.KeyCode
 				break

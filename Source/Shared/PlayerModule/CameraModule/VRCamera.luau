@@ -29,7 +29,7 @@ VRCamera.__index = VRCamera
 function VRCamera.new()
 	local self = setmetatable(VRBaseCamera.new(), VRCamera)
 
-	self.lastUpdate = tick()
+	self.lastUpdate = os.clock()
 	self.focusOffset = CFrame.new()
 	self:Reset()
 
@@ -105,7 +105,7 @@ function VRCamera:Update(timeDelta)
 		self.lastCameraFocus = newCameraFocus
 	end
 
-	self.lastUpdate = tick()
+	self.lastUpdate = os.clock()
 	return newCameraCFrame, newCameraFocus
 end
 

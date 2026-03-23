@@ -102,7 +102,7 @@ local excludeList = {} do
 	local function refreshIgnoreList()
 		local n = 1
 		excludeList = {}
-		for _, character in pairs(charMap) do
+		for _, character in charMap do
 			excludeList[n] = character
 			n = n + 1
 		end
