@@ -18,10 +18,14 @@ local participant = LocalParticipantInfo.GetParticipant()
 
 local module = {}
 
-module.LastId = {
+local lastId = {
 	Id = nil :: Model?,
 	At = 0,
 }
+
+function module.GetLastId()
+	return lastId
+end
 
 local interactProp: Types.MapObject?
 local interactPart: BasePart?
@@ -205,16 +209,14 @@ RunService.PostSimulation:Connect(function()
 		return
 	end
 
-	module.InteractTarget = char
-
 	if char:HasTag("Corpse") then
-		module.LastId = {
+		lastId = {
 			Id = char,
 			At = os.clock(),
 		}
 		return Mouse.ShowCorpseHint(char)
 	elseif char:IsDescendantOf(workspace.Characters) then
-		module.LastId = {
+		lastId = {
 			Id = char,
 			At = os.clock(),
 		}

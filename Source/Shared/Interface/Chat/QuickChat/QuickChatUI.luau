@@ -80,7 +80,8 @@ RunService.Heartbeat:Connect(function()
 		return
 	end
 
-	id = if Interaction.LastId.At + ID_DURATION < os.clock() then nil else Interaction.LastId.Id
+	local lastId = Interaction.GetLastId()
+	id = if lastId.At + ID_DURATION < os.clock() then nil else lastId.Id
 	for _, v in ui.Object:GetChildren() do
 		if v:IsA("TextButton") and v.Name ~= "ChatTemplate" then
 			local button = v :: ChatButton
