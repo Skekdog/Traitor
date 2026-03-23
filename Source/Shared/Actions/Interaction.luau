@@ -23,9 +23,9 @@ module.LastId = {
 	At = 0,
 }
 
-module.InteractProp = nil :: Types.MapObject?
-module.InteractPart = nil :: BasePart?
-module.ActionNode = nil :: ActionNodeClient.ClientNodeData?
+local interactProp: Types.MapObject?
+local interactPart: BasePart?
+local actionNode: ActionNodeClient.ClientNodeData?
 
 local function distanceCheck(target: Vector3, maxDistance: number): boolean
 	local distance = Players.LocalPlayer:DistanceFromCharacter(target)
@@ -71,7 +71,7 @@ local function tryInteractInteractable(mapObject: Types.MapObject, part: BasePar
 	end
 
 	if definition.IsContinuousInteraction then
-		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(part.Position, definition.InteractionRange) and module.InteractProp == mapObject do
+		while input and input.UserInputState ~= Enum.UserInputState.End and distanceCheck(part.Position, definition.InteractionRange) and interactProp == mapObject do
 			interactInteractable(prop)
 			task.wait()
 		end
@@ -141,7 +141,7 @@ function module.TryInteract(prop: Types.MapObject?, part: BasePart?, input: Inpu
 end
 
 local function interactAction(action: string, state: Enum.UserInputState, input: InputObject?): Enum.ContextActionResult
-	return if module.TryInteract(module.InteractProp, module.InteractPart, input, module.ActionNode) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
+	return if module.TryInteract(interactProp, interactPart, input, actionNode) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
 end
 
 ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.High.Value + 1)
@@ -162,13 +162,13 @@ RunService.PostSimulation:Connect(function()
 
 	Mouse.Reset()
 
-	module.ActionNode = nil
-	module.InteractProp = nil
-	module.InteractPart = nil
+	actionNode = nil
+	interactProp = nil
+	interactPart = nil
 
 	local activeNode = ActionNodeClient.GetActiveNode()
 	if activeNode then
-		module.ActionNode = activeNode
+		actionNode = activeNode
 		return
 	end
 
@@ -184,8 +184,8 @@ RunService.PostSimulation:Connect(function()
 	local prop = GetMapObjectWithTag(target, {"Prop", "Door"})
 
 	if prop then
-		module.InteractPart = target
-		module.InteractProp = prop
+		interactPart = target
+		interactProp = prop
 		local ret = false
 		if prop:HasTag("Item") or prop:HasTag("AmmoBox") then
 			Mouse.ShowItemHint(prop)
@@ -222,4 +222,4 @@ RunService.PostSimulation:Connect(function()
 	end
 end)
 
-return module
+return table.freeze(module)
