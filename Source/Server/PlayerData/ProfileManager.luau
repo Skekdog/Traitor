@@ -27,7 +27,7 @@ function module.LoadProfile(plr: Player): Profile?
 		profile:ListenToRelease(function()
 			profiles[plr] = nil
 		end)
-		
+
 		if plr:IsDescendantOf(Players) then
 			profiles[plr] = profile
 			return profile
@@ -60,8 +60,23 @@ type UpdateProfile =
 	((Player, "Settings", string) -> ()) &
 	((Player, "TotalPoints", number) -> ())
 
+local function checkInteger(value: number): boolean
+	return math.isfinite(value) and value ~= value // 1
+end
+
+local function checkValue(plr: Player, key: string, value: unknown): boolean
+	if key == "Karma" then
+		return typeof(value) == "number" and checkInteger(value) and value >= 1 and value <= 1000
+	elseif key == "TotalPoints" then
+		return typeof(value) == "number" and checkInteger(value)
+	else
+		return true
+	end
+end
+
 module.UpdateProfile = function(plr: Player, key, value): ()
-	if not profiles[plr] then
+	if not profiles[plr] or not checkValue(plr, key :: string, value) then
+		warn(`Attempted to update profile {plr.UserId} with invalid value {value} for key {key}`)
 		return
 	end
 	profiles[plr].Data[key] = value
