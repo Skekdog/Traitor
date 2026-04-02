@@ -57,7 +57,7 @@ ReplicatedStorage.Remotes.ClientServer.ActionNode.OnServerEvent:Connect(function
 
 	local round = RoundHandler.GetRound()
 	local participant = round:GetParticipant(player.Name)
-	if not participant or not participant:IsEvil() or participant:GetCredits() < node.Cost or not participant:IsAlive() then
+	if not participant or not participant:GetRole().Definition.CanUseActionNodes or participant:GetCredits() < node.Cost or not participant:IsAlive() then
 		return
 	end
 

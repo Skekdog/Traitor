@@ -139,7 +139,7 @@ RunService.PreRender:Connect(function()
 
 	for gui, params in nodes do
 		assert(params)
-		gui.Enabled = (role.Definition.IsEvil or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and not gui.Adornee:GetAttribute("IsDisabled")
+		gui.Enabled = (role.Definition.CanUseActionNodes or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and not gui.Adornee:GetAttribute("IsDisabled")
 
 		if not gui.Enabled and activeNode and activeNode.Params == params then
 			activeNode = nil
