@@ -373,7 +373,11 @@ module.setfreekill = {
 				continue
 			end
 
-			participant:SetFreeKill(if reason == "nil" then nil else reason)
+			if not reason or reason == "nil" then
+				participant:ClearFreeKillReasons()
+			else
+				participant:SetFreeKill(reason, true)
+			end
 
 			table.insert(affectedPlayers, player)
 		end

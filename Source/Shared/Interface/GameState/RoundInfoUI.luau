@@ -75,32 +75,13 @@ local function updateFreeKillStatus(): ()
 end
 
 LocalRoundInfo.FreeKill:Connect(function(reason)
-    if reason and not roundInfo.FreeKill.Visible then
+    if reason and not roundInfo.FreeKill.Visible and not LocalRoundInfo.IsFreeKillReasonHidden() then
         ShowMessage(`Because you {reason}, you are now a free kill!`, "Chat")
     end
     updateFreeKillStatus()
 end)
 
 LocalCharacter.Character:Connect(updateFreeKillStatus)
-
-local function showFreeKillIgnoreReason(show: boolean): ()
-    local hasReason = not not LocalRoundInfo.FreeKill()
-    local hasCharacter = not not LocalCharacter.Character()
-    roundInfo.FreeKill.Visible = hasCharacter and (show or hasReason)
-end
-
-ClientInventory.EquippedItem:Connect(function(item)
-    if not item then
-        return showFreeKillIgnoreReason(false)
-    end
-
-    local role = participant.Role()
-    if item.IsEvilItem and not role.Definition.IsEvil then
-        return showFreeKillIgnoreReason(true)
-    end
-
-    showFreeKillIgnoreReason(false)
-end)
 
 local function showHealth(show: boolean): ()
     roundInfo.Frame.HealthBar.Visible = show

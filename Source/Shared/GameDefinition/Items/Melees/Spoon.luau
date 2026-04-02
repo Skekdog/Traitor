@@ -72,8 +72,6 @@ local itemDefinition = Melee({
 
 	DropDisabled = true,
 
-	IsEvilItem = true,
-
 	Model = ReplicatedStorage.Assets.ItemModels.SpoonItem,
     HoldAnimation = Content.fromAssetId(98475112106018),
     PrimaryAnimation = Content.fromAssetId(124263943524491),

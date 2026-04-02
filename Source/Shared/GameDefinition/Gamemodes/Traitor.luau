@@ -536,6 +536,27 @@ local function onDeath(round: Types.Round, victim: Types.Participant, deferVicto
 	end
 end
 
+local function onItemEquipped(round: Types.Round, participant: Types.Participant, item: Types.Item, equipped: boolean): ()
+	if not equipped then
+		participant:SetFreeKill("equipped a traitor item", false)
+		return
+	end
+
+	if not item.Model then
+		return
+	end
+
+	if not table.find(assert(roles.Traitor.EquipmentShop), item.Base) or table.find(assert(roles.Detective.EquipmentShop), item.Base) then
+		return
+	end
+
+	if not participant:GetRole():IsAlliedWith(round:GetRoleFromRoleName("Innocent")) then
+		return
+	end
+
+	participant:SetFreeKill("equipped a traitor item", true, true)
+end
+
 local gamemode: Types.GamemodeDefinition = {
 	Name = "Traitor",
 	DisplayName = "Traitor!",
@@ -684,6 +705,8 @@ local gamemode: Types.GamemodeDefinition = {
 			end
 		end
 	end,
+
+	OnItemEquipped = onItemEquipped,
 }
 
 return table.freeze(gamemode)
