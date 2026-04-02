@@ -60,6 +60,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         IsEvil = false,
         CanUseActionNodes = true,
+        CanDoSuspiciousActions = true,
 
         Allegiance = {Kind = "Solo"},
 

@@ -57,6 +57,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		IsEvil = true,
 		CanUseActionNodes = true,
+		CanDoSuspiciousActions = true,
 
 		IsExclamatory = true,
 		Allegiance = {Kind = "Role", Role = "Traitor"},
@@ -133,6 +134,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["DNAScanner"],
 			Items["Ballistic Vest"],
 		},
+
+		CanDoSuspiciousActions = true,
 
 		EquipmentShop = {
 			Items["Radar"],

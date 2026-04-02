@@ -42,6 +42,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         IsEvil = false,
         CanUseActionNodes = true,
+        CanDoSuspiciousActions = true,
 
         StartingItems = {Items["Crowbar"], Items["Scanner"]},
         StartingCredits = 1,

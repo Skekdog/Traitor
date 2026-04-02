@@ -93,6 +93,7 @@ local framedRole: Types.RoleDefinition = {
 
 	CanSeeMissingInAction = true,
 	CanUseActionNodes = true,
+	CanDoSuspiciousActions = true,
 
 	OnRoleAssignedServer = OnRoleAssignedServer,
 }
@@ -118,6 +119,8 @@ local policeRole: Types.RoleDefinition = {
 	HighlightedRoles = {"Police", "Undercover"},
 
 	CanSeeMissingInAction = true,
+
+	CanDoSuspiciousActions = true,
 }
 
 local undercoverRole: Types.RoleDefinition = {
@@ -141,6 +144,7 @@ local undercoverRole: Types.RoleDefinition = {
 
 	CanSeeMissingInAction = true,
 	CanUseActionNodes = true,
+	CanDoSuspiciousActions = true,
 
 	OnRoleAssignedServer = OnRoleAssignedServer,
 }
