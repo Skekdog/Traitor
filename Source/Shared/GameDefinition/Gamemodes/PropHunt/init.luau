@@ -79,6 +79,8 @@ local roles: {[string]: Types.RoleDefinition} = {
         StartingItems = {Items.Propper},
         StartingCredits = 1,
 
+        CanDoSuspiciousActions = true,
+
         EquipmentShop = {
             Items["Radar"],
 			Items["Decoy"],
