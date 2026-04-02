@@ -40,7 +40,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         Allegiance = {Kind = "Role", Role = "Hunter"},
 
-        IsEvil = false, -- traitor nodes are cool but decoy relies on IsEvil
+        IsEvil = false,
+        CanUseActionNodes = true,
 
         StartingItems = {Items["Crowbar"], Items["Scanner"]},
         StartingCredits = 1,

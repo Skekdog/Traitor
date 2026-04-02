@@ -59,6 +59,7 @@ local roles: {[string]: Types.RoleDefinition} = {
         Color = Color3.fromRGB(255, 176, 7),
 
         IsEvil = false,
+        CanUseActionNodes = true,
 
         Allegiance = {Kind = "Solo"},
 

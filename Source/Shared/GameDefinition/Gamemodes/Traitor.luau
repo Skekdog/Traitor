@@ -56,6 +56,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 		Sound = PlaySound.MakeSound(9042088276),
 
 		IsEvil = true,
+		CanUseActionNodes = true,
 
 		IsExclamatory = true,
 		Allegiance = {Kind = "Role", Role = "Traitor"},
