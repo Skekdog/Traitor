@@ -62,6 +62,8 @@ local roles: {[string]: Types.RoleDefinition} = {
         CanUseActionNodes = true,
         CanDoSuspiciousActions = true,
 
+        ShouldAnnounceRoleCount = true,
+
         Allegiance = {Kind = "Solo"},
 
         StartingItems = {Items.Radar},

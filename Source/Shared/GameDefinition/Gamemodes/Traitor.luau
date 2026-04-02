@@ -60,6 +60,9 @@ local roles: {[string]: Types.RoleDefinition} = {
 		CanDoSuspiciousActions = true,
 
 		IsExclamatory = true,
+		ShouldAnnounceRoleCount = true,
+		ShouldRevealComradeList = true,
+
 		Allegiance = {Kind = "Role", Role = "Traitor"},
 
 		ShouldAnnounceDisconnect = true,

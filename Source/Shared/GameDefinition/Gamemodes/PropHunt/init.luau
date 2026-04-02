@@ -44,6 +44,9 @@ local roles: {[string]: Types.RoleDefinition} = {
         CanUseActionNodes = true,
         CanDoSuspiciousActions = true,
 
+        ShouldAnnounceRoleCount = true,
+        ShouldRevealComradeList = true,
+
         StartingItems = {Items["Crowbar"], Items["Scanner"]},
         StartingCredits = 1,
 
