@@ -145,7 +145,7 @@ local Knife = Melee({
 	IconContent = Content.fromAssetId(14930962070),
 
 	ItemGroup = ItemGroups.RoleWeapon,
-	IsEvilItem = true,
+	IsSuspicious = true,
 
 	Cost = 1,
 	MaxStock = 2,

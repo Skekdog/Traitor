@@ -11,7 +11,7 @@ local AWP = Gun({
 
     MaxStock = 1,
 
-    IsEvilItem = true,
+    IsSuspicious = true,
 
     ItemGroup = ItemGroups.RoleWeapon,
     Cost = 1,

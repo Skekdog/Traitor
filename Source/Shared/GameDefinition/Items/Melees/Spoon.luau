@@ -72,7 +72,7 @@ local itemDefinition = Melee({
 
 	DropDisabled = true,
 
-	IsEvilItem = true,
+	IsSuspicious = true,
 
 	Model = ReplicatedStorage.Assets.ItemModels.SpoonItem,
     HoldAnimation = Content.fromAssetId(98475112106018),

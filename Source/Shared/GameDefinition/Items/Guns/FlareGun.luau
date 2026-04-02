@@ -32,7 +32,7 @@ local FlareGun = Gun ({
 
     ImpulseForce = 5,
 
-    IsEvilItem = true,
+    IsSuspicious = true,
 
     ItemGroup = ItemGroups.RoleUtility,
 

@@ -40,7 +40,7 @@ local NewtonLauncher = Gun({
     Description = "Flings anything it hits. Low inherent damage, but can be used to crush others with props or throw them off high ledges.",
     IconContent = Content.fromAssetId(1491877109),
 
-    IsEvilItem = true,
+    IsSuspicious = true,
 
     IsAimable = false,
 

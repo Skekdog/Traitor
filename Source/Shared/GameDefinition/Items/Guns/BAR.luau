@@ -10,7 +10,7 @@ local BAR = Gun({
 
     MaxStock = 3,
 
-    IsEvilItem = true,
+    IsSuspicious = true,
 
     ItemGroup = ItemGroups.Primary,
     Cost = 1,

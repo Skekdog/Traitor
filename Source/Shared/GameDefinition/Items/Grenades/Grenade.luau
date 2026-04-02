@@ -10,7 +10,7 @@ local item = Grenade({
     Cost = 2,
     MaxStock = 2,
 
-    IsEvilItem = true,
+    IsSuspicious = true,
 
     ItemGroup = ItemGroups.RoleWeapon,
 
