@@ -428,7 +428,7 @@ if RunService:IsServer() then
 		end
 
 		local role = participant:GetRole()
-		if not role.Definition.IsEvil then
+		if not role.Definition.CanDoSuspiciousActions then
 			participant:SetFreeKill("armed a C4")
 		end
 

@@ -90,7 +90,7 @@ local FlareGun = Gun ({
         Fire.Ignite(target.Model)
 
         if target.Model:HasTag("Corpse") then
-            if not attacker:IsEvil() then
+            if not attacker:GetRole().Definition.CanDoSuspiciousActions then
                 attacker:SetFreeKill("flared a corpse")
             end
         end
