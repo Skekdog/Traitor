@@ -3,6 +3,7 @@ local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local BehaviourTypes = require(script.Parent.BehaviourTypes)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
+local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 
 local Raycasts = {}
 
@@ -38,6 +39,17 @@ function Raycasts.GetDirection(): Vector3
 	return GetCentreRay().Direction
 end
 
+local function sortParts(part1: BasePart, part2: BasePart): boolean
+	if GetMapObjectWithTag(part1, "Character") and not GetMapObjectWithTag(part2, "Character") then
+		return true
+	elseif GetMapObjectWithTag(part1, "Interactable") and not GetMapObjectWithTag(part2, "Interactable") then
+		return true
+	elseif GetMapObjectWithTag(part1, "Prop") and not GetMapObjectWithTag(part2, "Prop") then
+		return true
+	else
+		return false
+	end
+end
 
 function Raycasts.Hitscan(
 	params: RaycastParams,
@@ -56,7 +68,11 @@ function Raycasts.Hitscan(
 
 		local boundPart = CreateEmptyPart(workspace.CurrentCamera.CFrame)
 		boundPart.Size = Vector3.new(0.1, 0.1, 0.1)
-		parts = workspace:GetPartsInPart(boundPart, overlapParams)
+
+		local foundParts = workspace:GetPartsInPart(boundPart, overlapParams)
+		parts = foundParts
+
+		table.sort(foundParts, sortParts)
 	end
 
 	direction *= range
