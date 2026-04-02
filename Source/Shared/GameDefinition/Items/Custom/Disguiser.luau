@@ -6,21 +6,7 @@ local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 
 local module = {}
 
-local DISGUISED_SKIN_TONE = Color3.new(1, 1, 1)
-local DISGUISED_SHIRT = 855773572
-local DISGUISED_PANTS = 867838635
-
-local DISGUISED_DESCRIPTION = Instance.new("HumanoidDescription")
-
-DISGUISED_DESCRIPTION.HeadColor = DISGUISED_SKIN_TONE
-DISGUISED_DESCRIPTION.LeftArmColor = DISGUISED_SKIN_TONE
-DISGUISED_DESCRIPTION.RightArmColor = DISGUISED_SKIN_TONE
-DISGUISED_DESCRIPTION.LeftLegColor = DISGUISED_SKIN_TONE
-DISGUISED_DESCRIPTION.RightLegColor = DISGUISED_SKIN_TONE
-DISGUISED_DESCRIPTION.TorsoColor = DISGUISED_SKIN_TONE
-
-DISGUISED_DESCRIPTION.Shirt = DISGUISED_SHIRT
-DISGUISED_DESCRIPTION.Pants = DISGUISED_PANTS
+local DISGUISED_DESCRIPTION = ReplicatedStorage.Shared.RoundRule.Assets.TestDummy.Humanoid.HumanoidDescription
 
 local serverParticipantTable: {[Player]: Types.Participant?} = {}
 
