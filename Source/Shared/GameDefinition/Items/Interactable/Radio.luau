@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local InteractableItem = require(ReplicatedStorage.API.Item.Presets.InteractableItem)
-local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 
 local Radio = InteractableItem({
 	Name = "Radio",
@@ -16,9 +15,6 @@ local Radio = InteractableItem({
 
     PrimaryToggled = true,
     PrimaryHint = "Deploy Radio",
-}, true, false, function(interactable, participant)
-	interactable.Extras.Player = participant.Player
-    DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(128627317841330), interactable.Model)
-end)
+}, true, false)
 
 return table.freeze(Radio)

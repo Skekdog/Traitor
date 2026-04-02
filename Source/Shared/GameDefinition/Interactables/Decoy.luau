@@ -1,5 +1,7 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
+local ReplicateAssociatedPlayer = require(ReplicatedStorage.API.Prop.ReplicateAssociatedPlayer)
+local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -8,26 +10,13 @@ type Decoy = Types.Prop & {
 	Interactable: Types.InteractableDefinition,
 	Extras: {
 		Player: Player?,
+		Participant: Types.Participant?,
 		[any]: nil,
 	},
 }
 
 local activeDecoysClient: {Decoy} = {}
 module.ActiveDecoysClient = activeDecoysClient
-
-local function getPlayerFromAttribute(interactable: Decoy): Player?
-	local name = interactable.Model:GetAttribute("Player") :: string?
-	if not name then
-		return nil
-	end
-	local player = Players:FindFirstChild(name)
-	assert(not player or player:IsA("Player"), "Player is not a Player")
-	return player
-end
-
-local function setAssociatedPlayerClient(interactable: Decoy, player: Player?): ()
-	interactable.Extras.Player = player
-end
 
 local function OnLoadClient(interactable: Types.Prop): ()
 	local decoy = interactable :: Decoy
@@ -43,22 +32,13 @@ local function OnLoadClient(interactable: Types.Prop): ()
 		table.remove(activeDecoysClient, table.find(activeDecoysClient, decoy) or error("Could not find"))
 	end)
 
-	local player = getPlayerFromAttribute(decoy)
-	if not player then
-		object:GetAttributeChangedSignal("Player"):Connect(function()
-			setAssociatedPlayerClient(decoy, getPlayerFromAttribute(decoy))
-		end)
-		return
-	end
-
-	setAssociatedPlayerClient(decoy, player)
+	ReplicateAssociatedPlayer(interactable)
 end
 
 local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
 	local decoy = interactable :: Decoy
 
-	local player = getPlayerFromAttribute(decoy)
-	if participant.Player ~= player then
+	if participant ~= decoy.Extras.Participant then
 		return
 	end
 
@@ -75,17 +55,15 @@ local function OnInteractServer(interactable: Types.Prop, participant: Types.Par
 	participant:AddItem(participant.Round:LoadItem(decoyItem))
 end
 
-local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
-	if not params then
-		return false
+local function OnLoadServer(prop: Types.Prop): ()
+	ReplicateAssociatedPlayer(prop)
+
+	local participant: Types.Participant = prop.Extras.Participant
+	if not participant then
+		return
 	end
 
-	local attacker = params.Attacker
-	if not attacker then
-		return false
-	end
-
-	return not attacker:GetRole().Definition.IsEvil
+	DNAScanner.AddDNATrace(prop, participant, nil, Content.fromAssetId(96906503847712), prop.Model)
 end
 
 local interactable: Types.InteractableDefinition = {
@@ -99,7 +77,9 @@ local interactable: Types.InteractableDefinition = {
 	OnLoadClient = OnLoadClient,
 	OnInteractServer = OnInteractServer,
 
-	BeforeTakeDamage = BeforeTakeDamage,
+	BeforeTakeDamage = BlockFriendlyDamage,
+
+	OnLoadServer = OnLoadServer,
 }
 
 module.Interactable = interactable

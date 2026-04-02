@@ -1,4 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
+local IsHostileParticipant = require(ReplicatedStorage.API.Prop.IsHostileParticipant)
+local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local HealthStation = require(script.Parent.HealthStation)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -6,7 +9,7 @@ type DeathStationServer = Types.Prop & {
 	Interactable: Types.InteractableDefinition,
 	Extras: {
 		DeniedSound: Sound?,
-		Owner: Types.Participant?,
+		Participant: Types.Participant?,
 	}
 }
 
@@ -20,11 +23,16 @@ local function OnLoadServer(interactable: Types.Prop): ()
 	deniedSound.Parent = interactable.Model
 
 	deathStation.Extras.DeniedSound = deniedSound
+
+	local participant: Types.Participant? = interactable.Extras.Participant
+	if participant then
+		DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(93284379186217), interactable.Model)
+	end
 end
 
 local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
 	local deathStation = interactable :: DeathStationServer
-	if participant:GetRole().Definition.IsEvil then
+	if not IsHostileParticipant(interactable, participant) then
 		if not deathStation.Extras.DeniedSound.IsPlaying then
 			deathStation.Extras.DeniedSound:Play()
 		end
@@ -34,26 +42,13 @@ local function OnInteractServer(interactable: Types.Prop, participant: Types.Par
 	participant:TryTakeDamage({
 		Amount = math.huge,
 		Source = "Poison",
-		Attacker = deathStation.Extras.Owner,
+		Attacker = deathStation.Extras.Participant,
 		IgnoreKarma = true,
 	})
 end
 
 local function OnLoadClient(interactable: Types.Prop): ()
 	interactable.HintTextClient = `Charge: {HealthStation.MAX_CHARGE} / {HealthStation.MAX_CHARGE}`
-end
-
-local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
-	if not params then
-		return false
-	end
-
-	local attacker = params.Attacker
-	if not attacker then
-		return false
-	end
-
-	return not attacker:GetRole().Definition.IsEvil
 end
 
 local model = ReplicatedStorage.Assets.InteractableModels.HealthStation:Clone()
@@ -74,7 +69,7 @@ local interactable: Types.InteractableDefinition = {
 
 	OnLoadClient = OnLoadClient,
 
-	BeforeTakeDamage = BeforeTakeDamage,
+	BeforeTakeDamage = BlockFriendlyDamage,
 }
 
 return table.freeze(interactable)

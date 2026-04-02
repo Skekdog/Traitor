@@ -1,7 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local InteractableItem = require(ReplicatedStorage.API.Item.Presets.InteractableItem)
-local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 
 local Decoy = InteractableItem({
 	Name = "Decoy",
@@ -23,9 +22,6 @@ local Decoy = InteractableItem({
 	weld.Enabled = false
 	object.CFrame *= CFrame.new(0, 0, -object.Size.Z / 2)
 	weld.Enabled = true
-
-	interactable.Model:SetAttribute("Player", participant.Player.Name)
-	DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(96906503847712), interactable.Model)
 end)
 
 return table.freeze(Decoy)

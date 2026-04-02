@@ -3,7 +3,9 @@ local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
+local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local PLAY_COOLDOWN = 0.25
@@ -14,6 +16,7 @@ type Radio = Types.Prop & {
 	Interactable: Types.InteractableDefinition,
 	Extras: {
 		Player: Player?,
+		Participant: Types.Participant?,
 		LastPlayedAt: number?,
 		[any]: never,
 	}
@@ -272,19 +275,6 @@ if RunService:IsServer() then
 	end)
 end
 
-local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
-	if not params then
-		return false
-	end
-
-	local attacker = params.Attacker
-	if not attacker then
-		return false
-	end
-
-	return not attacker:GetRole().Definition.IsEvil
-end
-
 local function OnLoadServer(interactable: Types.Prop): ()
 	local radio = interactable :: Radio
 
@@ -300,6 +290,11 @@ local function OnLoadServer(interactable: Types.Prop): ()
 		addMenuRemote:FireClient(radio.Extras.Player, true)
 	end
 	table.insert(activeRadios, radio)
+
+	local participant: Types.Participant? = interactable.Extras.Participant
+	if participant then
+		DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(128627317841330), interactable.Model)
+	end
 end
 
 local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
@@ -332,7 +327,7 @@ local interactable: Types.InteractableDefinition = {
 
 	OnInteractServer = OnInteractServer,
 	OnLoadServer = OnLoadServer,
-	BeforeTakeDamage = BeforeTakeDamage,
+	BeforeTakeDamage = BlockFriendlyDamage,
 }
 
 return table.freeze(interactable)

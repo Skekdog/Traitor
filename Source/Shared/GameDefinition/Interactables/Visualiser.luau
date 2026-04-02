@@ -4,6 +4,7 @@ local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
+local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
@@ -230,19 +231,6 @@ GameHooks.OnDeath["Visualiser"] = function(round: Types.Round, participant: Type
 	end)
 end
 
-local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
-	if not params then
-		return false
-	end
-
-	local attacker = params.Attacker
-	if not attacker then
-		return false
-	end
-
-	return attacker:GetRole().Definition.IsEvil or false
-end
-
 local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
 	local visualiser = interactable :: Visualiser
 
@@ -325,7 +313,7 @@ local interactable: Types.InteractableDefinition = {
 	InteractionRange = 7.5,
 	IsContinuousInteraction = false,
 
-	BeforeTakeDamage = BeforeTakeDamage,
+	BeforeTakeDamage = BlockFriendlyDamage,
 
 	OnLoadServer = OnLoadServer,
 	OnInteractServer = OnInteractServer,

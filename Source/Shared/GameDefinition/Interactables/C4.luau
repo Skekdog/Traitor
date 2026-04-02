@@ -7,6 +7,8 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
+-- NOTE: C4 should not be based on alliance with planter role! Evil roles should always see it, friendly roles should never.
+
 local MIN_ARM_DURATION = 45
 local MAX_ARM_DURATION = 360
 

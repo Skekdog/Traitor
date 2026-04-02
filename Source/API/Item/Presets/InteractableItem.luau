@@ -2,22 +2,25 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
-local function createInteractableForItem(item: Types.Item, round: Types.Round): Types.Prop
+local function createInteractableForItem(item: Types.Item, round: Types.Round, participant: Types.Participant): Types.Prop
     local interactableDefinition = round:GetInteractableDefinition(item.Name)
     assert(interactableDefinition, "Could not find interactable definition for " .. item.Name)
     assert(interactableDefinition.Model, "Interactable must have a model")
     local model = interactableDefinition.Model:Clone()
     model:AddTag("Interactable")
     model:RemoveTag("Item")
-    return round:LoadProp(model)
+
+    local prop = round:LoadProp(model)
+    prop.Extras.Participant = participant
+    prop.Extras.Player = participant.Player
+
+    return prop
 end
 
 local function throwInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): Types.Prop?
     local round = participant.Round
 
-    local interactable = createInteractableForItem(item, round)
-    interactable.Extras.PlantedBy = participant
-    interactable.Extras.Player = participant.Player
+    local interactable = createInteractableForItem(item, round, participant)
     local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Structure.Dynamic, nil, direction)
 
     if not success then
@@ -42,8 +45,7 @@ local function plantInteractable(item: Types.Item, participant: Types.Participan
         return nil
     end
 
-    local interactable = createInteractableForItem(item, participant.Round)
-    interactable.Extras.PlantedBy = participant
+    local interactable = createInteractableForItem(item, participant.Round, participant)
     local object = interactable.Model
     object:RemoveTag("Item");
     (object :: Instance).Parent = participant.Round:GetMap().Structure.Dynamic

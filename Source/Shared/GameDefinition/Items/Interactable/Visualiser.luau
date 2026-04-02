@@ -14,8 +14,6 @@ local Visualiser = InteractableItem({
 
     PrimaryToggled = true,
     PrimaryHint = "Deploy Visualiser",
-}, true, false, function(interactable, participant)
-	interactable.Extras.Player = participant.Player
-end)
+}, true, false)
 
 return table.freeze(Visualiser)

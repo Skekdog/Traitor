@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -148,19 +149,6 @@ local function OnLoadClient(interactable: Types.Prop): ()
 	updateCharge(interactable)
 end
 
-local function BeforeTakeDamage(interactable: Types.Prop, params: Types.DamageParams?): boolean
-	if not params then
-		return false
-	end
-
-	local attacker = params.Attacker
-	if not attacker then
-		return false
-	end
-
-	return attacker:GetRole().Definition.IsEvil or false
-end
-
 local interactable: Types.InteractableDefinition = {
 	Name = "HealthStation",
 	DisplayName = "Health Station",
@@ -175,7 +163,7 @@ local interactable: Types.InteractableDefinition = {
 
 	OnLoadClient = OnLoadClient,
 
-	BeforeTakeDamage = BeforeTakeDamage,
+	BeforeTakeDamage = BlockFriendlyDamage,
 }
 
 module.Interactable = interactable
