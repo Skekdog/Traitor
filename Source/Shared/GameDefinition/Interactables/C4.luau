@@ -427,7 +427,7 @@ if RunService:IsServer() then
 
 		local role = participant:GetRole()
 		if not role.Definition.IsEvil then
-			participant:SetFreeKill("armed a C4", true)
+			participant:SetFreeKill("armed a C4")
 		end
 
 		c4.Extras.ArmId = newproxy()

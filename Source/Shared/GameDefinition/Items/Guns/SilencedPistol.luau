@@ -9,6 +9,7 @@ local SilencedPistol = Modify(FiveSeven, "Silenced Pistol", {
     IconContent = Content.fromAssetId(114595796341288),
 
 	IsSilent = true,
+	IsEvilItem = true,
 
     Cost = 1,
     MaxStock = 2,

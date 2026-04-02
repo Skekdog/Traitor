@@ -32,6 +32,8 @@ local FlareGun = Gun ({
 
     ImpulseForce = 5,
 
+    IsEvilItem = true,
+
     ItemGroup = ItemGroups.RoleUtility,
 
     Damage = {
@@ -89,7 +91,7 @@ local FlareGun = Gun ({
 
         if target.Model:HasTag("Corpse") then
             if not attacker:IsEvil() then
-                attacker:SetFreeKill("flared a corpse", true)
+                attacker:SetFreeKill("flared a corpse")
             end
         end
 

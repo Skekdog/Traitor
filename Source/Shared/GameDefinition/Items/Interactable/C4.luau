@@ -6,6 +6,8 @@ local C4 = InteractableItem({
 	Name = "C4",
     ItemGroup = ItemGroups.RoleWeapon,
 
+    IsEvilItem = true,
+
     Description = "Explodes in a massive radius after a set timer.",
     IconContent = Content.fromAssetId(17229908151),
 

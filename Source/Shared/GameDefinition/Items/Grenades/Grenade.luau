@@ -10,6 +10,8 @@ local item = Grenade({
     Cost = 2,
     MaxStock = 2,
 
+    IsEvilItem = true,
+
     ItemGroup = ItemGroups.RoleWeapon,
 
     Projectile = ReplicatedStorage.Assets.Projectiles.Grenade,

@@ -108,6 +108,8 @@ MelonLauncher.Item = Gun({
 	Cost = 1,
 	MaxStock = 1,
 
+	IsEvilItem = true,
+
 	ItemGroup = ItemGroups.RoleWeapon,
 
 	IsProjectileSimulated = true,

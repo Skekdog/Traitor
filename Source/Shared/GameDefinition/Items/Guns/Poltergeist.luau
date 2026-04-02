@@ -186,6 +186,8 @@ local Poltergeist = Gun({
 	Description = "Attaches thrusters to props, blasting them towards others.",
 	IconContent = Content.fromAssetId(103677163409705),
 
+	IsEvilItem = true,
+
 	IsAimable = false,
 
 	Model = ReplicatedStorage.Assets.ItemModels.Poltergeist,

@@ -58,14 +58,7 @@ remotes.UpdateCredits.OnClientEvent:Connect(function(value: number?)
 end)
 
 module.FreeKill = DynamicValue.new(nil :: string?)
-
-local isFreeKillReasonHidden = false
-function module.IsFreeKillReasonHidden(): boolean
-    return isFreeKillReasonHidden
-end
-
-remotes.FreeKill.OnClientEvent:Connect(function(reason: string?, hideReason: boolean?)
-    isFreeKillReasonHidden = hideReason or false
+remotes.FreeKill.OnClientEvent:Connect(function(reason: string?)
     module.FreeKill:SetValue(reason)
 end)
 
