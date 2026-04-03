@@ -306,7 +306,7 @@ if RunService:IsClient() then
 				distance = (workspace.CurrentCamera.CFrame.Position - c4.Model.Position).Magnitude
 			end
 
-			-- Instances fucking suck and somehow these instances might not exist
+			-- Instances flipping suck and somehow these instances might not exist
 			local border = marker:FindFirstChild("Border")
 			if not border then
 				return

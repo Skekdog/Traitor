@@ -62,7 +62,7 @@ if RunService:IsClient() then
 	end)
 end
 
--- jesus fucking christ this is horrible
+-- gosh this is horrible
 
 local function addSound(sound: Sound | {Sound}, map: string?, gamemode: string?): ()
 	for _, v in sounds do
