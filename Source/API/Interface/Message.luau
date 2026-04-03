@@ -25,7 +25,7 @@ if not IS_SERVER then
 	notication.OnClientEvent:Connect(Message.Notification)
 end
 
-local popup = GetRemote("Notification", script)
+local popup = GetRemote("Popup", script)
 function Message.Popup(message: string, target: ReplicationTarget?): ()
 	if IS_SERVER then
 		assert(target, "Using Message on the server must specify a target")
