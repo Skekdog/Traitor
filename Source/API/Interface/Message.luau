@@ -5,7 +5,7 @@ local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 
 local Message = {}
 
-export type ReplicationTarget = Replication.ReplicationTarget
+export type ReplicationTarget = Player | {[any]: Player} | "All"
 
 local IS_SERVER = RunService:IsServer()
 
