@@ -58,11 +58,17 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	if hitPart:IsDescendantOf(workspace.Characters) then
 		local model = hitPart:FindFirstAncestorOfClass("Model")
 		if model then
-			if model:GetAttribute("Unidentified") or not model:HasTag("Corpse") then
+			if not model:HasTag("Corpse") then
 				return
 			end
 
-			object = round:GetParticipant(model.Name)
+			local foundParticipant = round:GetParticipant(model)
+			if foundParticipant and foundParticipant.Corpse and model:GetAttribute("Unidentified") then
+				foundParticipant.Corpse:SearchAsAlive(participant, false)
+			end
+
+			object = foundParticipant
+
 		end
 	elseif hitPart:HasTag("Item") then
 		local mapItem = round:GetItem(hitPart)
