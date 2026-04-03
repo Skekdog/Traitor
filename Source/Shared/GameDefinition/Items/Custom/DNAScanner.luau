@@ -3,9 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
-local DamageSource = require(ReplicatedStorage.API.DamageSource)
-local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
+local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
+local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
+local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
@@ -13,9 +14,6 @@ local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation
 local module = {}
 
 local ITEM_SLOT = 9
-
-local MAX_KILL_DISTANCE = 60
-local MAX_KILL_TRACE_DURATION = 120
 
 local MAX_SCAN_RANGE = 7.5
 
@@ -40,118 +38,6 @@ else
 	remote = found
 end
 
-local function hasEquivalentTrace(t: {IHasTarget & IHasObject}, trace: IHasTarget & IHasObject): boolean
-	for _, existingTrace in t do
-		if existingTrace.Target == trace.Target and existingTrace.Object == trace.Object then
-			return true
-		end
-	end
-	return false
-end
-
-function module.AddDNATrace(object: IHasDNATraces, target: Types.Participant, duration: number?, icon: Content, instance: Instance): ()
-	local traces = object.Extras.DNATraces or {}
-
-	local trace: DNATrace = {
-		ExpiresAt = if duration then workspace:GetServerTimeNow() + duration else nil,
-		Target = target.Player.Name,
-		Icon = icon.Uri or "",
-		Object = instance,
-	}
-
-	if hasEquivalentTrace(traces, trace) then
-		return
-	end
-
-	table.insert(traces, trace)
-
-	object.Extras.DNATraces = traces
-end
-
-function module.RemoveDNATraces(object: IHasDNATraces): ()
-	object.Extras.DNATraces = nil
-end
-
-function module.GetDNATraces(object: IHasDNATraces): {DNATrace}
-	return object.Extras.DNATraces or {}
-end
-
-export type IHasDNATraces = {
-	Extras: {
-		DNATraces: {DNATrace}?,
-		[any]: never,
-	},
-}
-
-type IHasObject = {
-	Object: Instance,
-}
-
-type IHasTarget = {
-	Target: string
-}
-
-type SampledTrace = IHasTarget & IHasObject & {
-	Icon: string,
-}
-
-type DNATrace = IHasTarget & IHasObject & {
-	ExpiresAt: number?,
-	Icon: string,
-}
-
-type Participant = Types.Participant & IHasDNATraces
-
-GameHooks.OnDeath["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, deferVictoryCheck: boolean): ()
-	remote:FireClient(participant.Player)
-
-	local corpse = participant.Corpse
-	if not corpse then
-		return
-	end
-
-	local attacker = corpse.Killer
-	if not attacker then
-		return
-	end
-
-	if (attacker:HasSelfDefenseAgainstParticipant(participant) and not participant:GetRole().Definition.CorpseHidesSelfDefense) or participant:IsFreeKill(attacker) then
-		return
-	end
-
-	local char = corpse.Model
-	if not char then
-		return
-	end
-
-	local isEligible = DamageSource.IsFirearm(corpse.CorpseView.DamageSource) or DamageSource.IsMelee(corpse.CorpseView.DamageSource)
-	if not isEligible then
-		return
-	end
-
-	local distance = attacker.Player:DistanceFromCharacter(char:GetPivot().Position)
-	if distance == 0 then
-		return
-	end
-
-	local duration = math.lerp(MAX_KILL_TRACE_DURATION, 0, distance / MAX_KILL_DISTANCE)
-	module.AddDNATrace(participant, attacker, duration, Content.fromAssetId(1043921089), char)
-
-	participant:AddCorpseIcon({
-		Name = "DNATrace",
-		Icon = Content.fromAssetId(135886260297010),
-		Description = "Traces of the killer's DNA are on the body. Use a DNA Scanner to track them.",
-		DisplayText = `[TIMEUNTIL-{tostring(workspace:GetServerTimeNow() + duration)}]`,
-	})
-end
-
-GameHooks.OnItemDropped["DNAScanner"] = function(round: Types.Round, participant: Types.Participant, item: Types.Item)
-	if not item.Model then
-		return
-	end
-	module.AddDNATrace(item, participant, nil, item.IconContent or Content.fromAssetId(4795275417), item.Model)
-end
-
 local raycastParams = RaycastParams.new()
 raycastParams.CollisionGroup = "WeaponHitTargets"
 raycastParams.FilterDescendantsInstances = {workspace.Characters}
@@ -165,7 +51,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	local round = participant.Round
 
-	local object: IHasDNATraces?
+	local object: DNATraces.IHasDNATraces?
 
 	local hitPart = result.Instance :: BasePart
 
@@ -206,6 +92,10 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	remote:FireClient(participant.Player, samples)
 end
 
+type SampledTrace = DNATraces.IHasTarget & DNATraces.IHasObject & {
+	Icon: string,
+}
+
 local function getUI()
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 	local ui = UIManager.WaitForUI("DNAScanner") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.DNAScanner)}
@@ -238,12 +128,21 @@ if RunService:IsClient() then
 			return
 		end
 
-		local targetCharacter = workspace.Characters:FindFirstChild(clientCurrentTrace.Target)
-		if not targetCharacter or not targetCharacter:IsA("Model") then
+		local targetPlayer = Players:FindFirstChild(clientCurrentTrace.Target)
+		if not targetPlayer or not targetPlayer:IsA("Player") then
 			return
 		end
 
-		local cframe = targetCharacter:GetPivot()
+		local cframe = Decoy.GetPlayerPosition(targetPlayer)
+		if not cframe then
+			local targetCharacter = workspace.Characters:FindFirstChild(clientCurrentTrace.Target)
+			if not targetCharacter or not targetCharacter:IsA("Model") then
+				return
+			end
+			cframe = targetCharacter:GetPivot()
+		end
+		assert(cframe)
+
 		local distance = Players.LocalPlayer:DistanceFromCharacter(cframe.Position)
 		if distance == 0 then
 			return
@@ -271,7 +170,7 @@ if RunService:IsClient() then
 		end
 
 		for i, trace in traces do
-			if hasEquivalentTrace(clientAvailableTraces, trace) then
+			if DNATraces.HasEquivalentTrace(clientAvailableTraces, trace) then
 				continue
 			end
 			table.insert(clientAvailableTraces, trace)
@@ -347,6 +246,10 @@ local function OnUnequipClient(): ()
 	ui:ToggleVisible(false)
 end
 
+GameHooks.OnDeath["DNAScanner"] = function(round, participant): ()
+	remote:FireClient(participant.Player)
+end
+
 local item = Custom({
 	Name = "DNAScanner",
 	DisplayName = "DNA Scanner",
@@ -354,7 +257,7 @@ local item = Custom({
 	IconContent = Content.none,
 
 	ItemGroup = {
-		PreferredSlot = 9,
+		PreferredSlot = ITEM_SLOT,
 	},
 
 	Model = ReplicatedStorage.Assets.ItemModels.DNAScanner,

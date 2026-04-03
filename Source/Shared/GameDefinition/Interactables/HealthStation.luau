@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
-local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -85,7 +85,7 @@ local function heal(interactable: Types.Prop, participant: Types.Participant): (
 		station.Extras.HealSound:Play()
 	end
 
-	DNAScanner.AddDNATrace(station, participant, nil, Content.fromAssetId(93284379186217), station.Model)
+	DNATraces.Add(station, participant, nil, Content.fromAssetId(93284379186217), station.Model)
 end
 
 local lastRecharge = 0

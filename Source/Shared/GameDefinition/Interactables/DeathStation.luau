@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local IsHostileParticipant = require(ReplicatedStorage.API.Prop.IsHostileParticipant)
-local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local HealthStation = require(script.Parent.HealthStation)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -26,7 +26,7 @@ local function OnLoadServer(interactable: Types.Prop): ()
 
 	local participant: Types.Participant? = interactable.Extras.Participant
 	if participant then
-		DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(93284379186217), interactable.Model)
+		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(93284379186217), interactable.Model)
 	end
 end
 

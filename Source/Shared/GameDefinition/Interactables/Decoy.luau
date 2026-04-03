@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local ReplicateAssociatedPlayer = require(ReplicatedStorage.API.Prop.ReplicateAssociatedPlayer)
-local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local module = {}
@@ -16,7 +16,6 @@ type Decoy = Types.Prop & {
 }
 
 local activeDecoysClient: {Decoy} = {}
-module.ActiveDecoysClient = activeDecoysClient
 
 local function OnLoadClient(interactable: Types.Prop): ()
 	local decoy = interactable :: Decoy
@@ -63,7 +62,7 @@ local function OnLoadServer(prop: Types.Prop): ()
 		return
 	end
 
-	DNAScanner.AddDNATrace(prop, participant, nil, Content.fromAssetId(96906503847712), prop.Model)
+	DNATraces.Add(prop, participant, nil, Content.fromAssetId(96906503847712), prop.Model)
 end
 
 local interactable: Types.InteractableDefinition = {
@@ -81,6 +80,27 @@ local interactable: Types.InteractableDefinition = {
 
 	OnLoadServer = OnLoadServer,
 }
+
+function module.GetPlayerPosition(player: Player): (CFrame?, boolean)
+	for _, decoy in activeDecoysClient do
+		if decoy.Extras.Player :: Player? == player then
+			return decoy.Model:GetPivot(), true
+		end
+	end
+
+	local char = player.Character
+	if not char then
+		return nil, false
+	end
+
+	local root = char.PrimaryPart
+	local humanoid = char:FindFirstAncestorOfClass("Humanoid")
+	if not root or not humanoid or humanoid.Health <= 0 then
+		return nil, false
+	end
+
+	return root.CFrame, false
+end
 
 module.Interactable = interactable
 

@@ -2,10 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local SoundService = game:GetService("SoundService")
+local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
-local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local PLAY_COOLDOWN = 0.25
@@ -293,7 +293,7 @@ local function OnLoadServer(interactable: Types.Prop): ()
 
 	local participant: Types.Participant? = interactable.Extras.Participant
 	if participant then
-		DNAScanner.AddDNATrace(interactable, participant, nil, Content.fromAssetId(128627317841330), interactable.Model)
+		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(128627317841330), interactable.Model)
 	end
 end
 

@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
@@ -368,7 +369,6 @@ local function highlightText(text: string): string
 end
 
 if RunService:IsServer() then
-	local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
@@ -449,8 +449,8 @@ if RunService:IsServer() then
 			Description = `You find a note on their corpse saying that {highlightText("wire " .. safeWire)} will defuse a C4.`,
 		})
 
-		DNAScanner.RemoveDNATraces(c4)
-		DNAScanner.AddDNATrace(c4, participant, nil, Content.fromAssetId(17229908151), c4.Model)
+		DNATraces.Remove(c4)
+		DNATraces.Add(c4, participant, nil, Content.fromAssetId(17229908151), c4.Model)
 
 		c4.Model:SetAttribute("ExplodesAt", workspace:GetServerTimeNow() + duration)
 	end

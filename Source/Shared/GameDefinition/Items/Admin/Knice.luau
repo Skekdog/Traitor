@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
-local DNAScanner = require(ReplicatedStorage.Shared.GameDefinition.Items.Custom.DNAScanner)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -88,7 +88,7 @@ local function throw(item: Types.Item, origin: Vector3, direction: Vector3, atta
 	model:AddTag("Item")
 	local newItem = attacker.Round:LoadProp(model)
 
-	DNAScanner.AddDNATrace(newItem, attacker, nil, Content.fromAssetId(14930962070), model)
+	DNATraces.Add(newItem, attacker, nil, Content.fromAssetId(14930962070), model)
 end
 
 local function BeforeHitParticipant(item: Types.Item, params: Types.DamageParams, hitParticipant: Types.Participant): boolean

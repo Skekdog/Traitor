@@ -9,7 +9,8 @@ local GREY_COLOUR = Color3.new(0.5, 0.5, 0.5)
 local GREEN_COLOUR = Color3.fromRGB(55, 174, 37)
 
 local function HeartbeatClient(item: Types.Item): ()
-    assert(item.Kind == "Item")
+    local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
+
     local lastScan: number = item.Extras.LastScan or 0
 
     local timeNow = workspace:GetServerTimeNow()
@@ -25,39 +26,19 @@ local function HeartbeatClient(item: Types.Item): ()
         end
     end
 
-    local decoyPlayers: {Player} = {}
-    for _, v in Decoy.ActiveDecoysClient do
-        local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
-
-        local player: Player? = v.Extras.Player
-        if not player then
+    for _, player in Players:GetPlayers() do
+        local cframe, isDecoy = Decoy.GetPlayerPosition(player)
+        if not cframe then
             continue
         end
 
-        table.insert(decoyPlayers, player)
+        local colour = if isDecoy and player == Players.LocalPlayer or
+            LocalParticipantInfo.GetParticipant().Role():IsAlliedWith(LocalParticipantInfo.GetParticipant(player.Name).Role()) then
+                GREY_COLOUR
+            else
+                GREEN_COLOUR
 
-        assert(v.Model:IsA("BasePart"))
-        CreateRadarPoint(v.Model.CFrame, if player == Players.LocalPlayer or LocalParticipantInfo.GetParticipant().Role():IsAlliedWith(LocalParticipantInfo.GetParticipant(player.Name).Role()) then GREY_COLOUR else GREEN_COLOUR, "RadarScan")
-    end
-
-    for _, v in Players:GetPlayers() do
-        if table.find(decoyPlayers, v) then
-            continue
-        end
-
-        local char = v.Character
-        if not char or v == Players.LocalPlayer then
-            continue
-        end
-
-        local root = char.PrimaryPart
-        local hum = char:FindFirstChildOfClass("Humanoid")
-
-        if not root or not hum or hum.Health <= 0 then
-            continue
-        end
-
-        CreateRadarPoint(root.CFrame, GREEN_COLOUR, "RadarScan")
+        CreateRadarPoint(cframe, colour, "RadarScan")
     end
 end
 
