@@ -1,10 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
-local MAX_DAMAGE = 60
-local MIN_DAMAGE = 1
+local MAX_DAMAGE_SCALE = 0.6
+local MIN_DAMAGE_SCALE = 0.01
 
 local MIN_TRANSPARENCY = 0.5
 local TRANSITION_INFO = TweenInfo.new(0.75, Enum.EasingStyle.Linear)
@@ -22,13 +23,19 @@ frame:SetAttribute("IgnoreInset", true)
 UIManager.RegisterUI(frame):ToggleVisible(true)
 
 ReplicatedStorage.Shared.RoundRule.Remotes.DamageTaken.OnClientEvent:Connect(function(amount: number, kind: Types.GeneralDamageSource | string)
-	if amount < MIN_DAMAGE then
+	local humanoid = LocalCharacter.Humanoid()
+	if not humanoid then
+		return
+	end
+
+	local maxHealth = humanoid.MaxHealth
+	if amount / maxHealth < MIN_DAMAGE_SCALE then
 		return
 	end
 
 	frame.BackgroundColor3 = if kind == "Drown" then DROWN_DAMAGE_COLOUR else DAMAGE_COLOUR
 
-	local factor = math.min(amount / MAX_DAMAGE, 1)
+	local factor = math.min(amount / maxHealth / MAX_DAMAGE_SCALE, 1)
 	frame.BackgroundTransparency = math.max(MIN_TRANSPARENCY, 1 - factor)
 
 	TweenService:Create(frame, TRANSITION_INFO, {BackgroundTransparency = 1}):Play()
