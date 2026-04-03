@@ -87,6 +87,13 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	morph.Parent = workspace.Characters
 	root:SetNetworkOwner(participant.Player)
 
+	if not participant.Extras.PropperCharacterChangedSignal then
+		participant.Extras.PropperCharacterChangedSignal = participant.Player:GetPropertyChangedSignal("Character"):Once(function()
+			remote:FireClient(participant.Player, false)
+			participant.Extras.PropperCharacterChangedSignal = nil
+		end)
+	end
+
 	remote:FireClient(participant.Player, true)
 
 	return false
@@ -94,8 +101,13 @@ end
 
 if RunService:IsClient() then
 	local Camera = require(ReplicatedStorage.API.Camera)
+	local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
+
 	remote.OnClientEvent:Connect(function(doThirdPerson: boolean): ()
-		Camera.EnterThirdPerson(10)
+		Crouch.SetCrouchDisabled("PropMorph", doThirdPerson)
+		if doThirdPerson then
+			Camera.EnterThirdPerson(10)
+		end
 	end)
 end
 
