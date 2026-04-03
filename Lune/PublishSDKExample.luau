@@ -9,6 +9,7 @@ local GAMEMODES_PATH = "Source/Shared/GameDefinition/Gamemodes"
 local ITEMS_PATH = "Source/Shared/GameDefinition/Items"
 local MAPS_PATH = "Assets/Maps"
 local ASSETS_PATH = "Assets/Shared"
+local INTERACTABLES_PATH = "Source/Shared/GameDefinition/Interactables"
 
 local ASSET_IDS = {
 	["TestMap"] = "109123324659232",
@@ -19,9 +20,10 @@ local ASSET_IDS = {
 	["Items"] = "81535955487145",
 	["Assets"] = "104086335415869",
 	["PropHunt"] = "108921425683278",
+	["Interactables"] = "114739037638623",
 }
 
-local function GetAssetPath(assetName: string, kind: "map" | "gamemode" | "items" | "assets"): string
+local function GetAssetPath(assetName: string, kind: "map" | "gamemode" | "items" | "assets" | "interactables"): string
 	if kind == "map" then
 		assert(table.find(EXAMPLE_MAPS, assetName), `Map {assetName} is not valid for publishing.`)
 		local mapPath = MAPS_PATH .. "/" .. assetName .. ".rbxm"
@@ -44,12 +46,14 @@ local function GetAssetPath(assetName: string, kind: "map" | "gamemode" | "items
 		return ITEMS_PATH
 	elseif kind == "assets" then
 		return ASSETS_PATH
+	elseif kind == "interactables" then
+		return INTERACTABLES_PATH
 	end
 
 	error("Invalid asset kind")
 end
 
-local function publish(assetName: string, kind: "map" | "gamemode" | "items" | "assets"): ()
+local function publish(assetName: string, kind: "map" | "gamemode" | "items" | "assets" | "interactables"): ()
 	PublishAsset(ASSET_IDS[assetName], assetName, GetAssetPath(assetName, kind))
 end
 
@@ -68,6 +72,7 @@ if kind == "all" then
 	end
 
 	publish("Items", "items")
+	publish("Interactables", "interactables")
 
 	return
 end
