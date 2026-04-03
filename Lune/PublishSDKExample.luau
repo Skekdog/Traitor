@@ -82,7 +82,7 @@ local name =
 	elseif kind == "assets" then "Assets"
 	else process.args[2]
 
-assert(name, "Invalid name. Expected usage: PublishSDKExample map|gamemode|items|assets|all mapName|gamemodeName|all")
+assert(name, "Invalid name. Expected usage: PublishSDKExample map|gamemode|items|assets|interactables|all mapName|gamemodeName|all")
 
 if name == "all" then
 	if kind == "gamemode" then
