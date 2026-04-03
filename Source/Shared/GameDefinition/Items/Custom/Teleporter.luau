@@ -3,11 +3,11 @@ local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
-local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 
 local MAX_USES = 6
 
@@ -107,7 +107,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, participan
 	end
 
 	if (teleporter.Extras.TimesUsed or 0) >= MAX_USES then
-		return ShowAlert("This teleporter is out of charge!", participant.Player)
+		return Message.Popup("This teleporter is out of charge!", participant.Player)
 	end
 
 	local char = participant:GetCharacter()
@@ -116,7 +116,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, participan
 	end
 
 	if not isGrounded(participant) then
-		return ShowAlert("Can't teleport right now!", participant.Player)
+		return Message.Popup("Can't teleport right now!", participant.Player)
 	end
 
 	local root = char.PrimaryPart
@@ -130,7 +130,7 @@ local function PrimaryFireServer(item: Types.Item | Teleporter, _, _, participan
 
 	makeFXServer(participant.Player, teleporter.Extras.Target)
 
-	ShowAlert(`Teleporting! {100 - math.round((teleporter.Extras.TimesUsed / MAX_USES) * 100)}% remaining.`, participant.Player)
+	Message.Popup(`Teleporting! {100 - math.round((teleporter.Extras.TimesUsed / MAX_USES) * 100)}% remaining.`, participant.Player)
 
 	task.wait(FX_DURATION)
 
@@ -143,20 +143,20 @@ local function AlternateFireServer(item: Types.Item | Teleporter, origin: Vector
 	local teleporter = item :: Teleporter
 
 	if (teleporter.Extras.TimesUsed or 0) >= MAX_USES then
-		return ShowAlert("This teleporter is out of charge!", participant.Player)
+		return Message.Popup("This teleporter is out of charge!", participant.Player)
 	end
 
 	if not isGrounded(participant) then
-		return ShowAlert("Failed to mark location.", participant.Player)
+		return Message.Popup("Failed to mark location.", participant.Player)
 	end
 
-	ShowAlert("Location marked!", participant.Player)
+	Message.Popup("Location marked!", participant.Player)
 
 	teleporter.Extras.Target = origin
 end
 
 local function OnEquipServer(teleporter: Types.Item | Teleporter, participant: Types.Participant): ()
-	ShowAlert(`{100 - math.round(((teleporter.Extras.TimesUsed or 0) / MAX_USES) * 100)}% remaining.`, participant.Player)
+	Message.Popup(`{100 - math.round(((teleporter.Extras.TimesUsed or 0) / MAX_USES) * 100)}% remaining.`, participant.Player)
 end
 
 local item = Custom({

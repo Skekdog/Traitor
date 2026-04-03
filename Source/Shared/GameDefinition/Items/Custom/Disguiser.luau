@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Types = require(ReplicatedStorage.API.Types)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 
@@ -177,7 +177,7 @@ local function OnEquipClient(item: Types.Item): ()
 	local CustomActions = require(ReplicatedStorage.API.CustomActions)
 	CustomActions.Register("Disguise", function()
 		clientDisguiseActive = not clientDisguiseActive
-		ShowAlert("Disguise: " .. if clientDisguiseActive then "ON" else "OFF")
+		Message.Popup("Disguise: " .. if clientDisguiseActive then "ON" else "OFF")
 		remote:FireServer(clientDisguiseActive)
 	end, 1)
 end
