@@ -5,6 +5,7 @@ local SoundService = game:GetService("SoundService")
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
@@ -82,17 +83,29 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		end
 	end
 
-	if not object or not object.Extras.DNATraces then
+	if not object then
+		return
+	end
+
+	if not object.Extras.DNATraces then
+		Message.Popup("No DNA traces found.", participant.Player)
 		return
 	end
 
 	local samples: {DNATraces.DNATrace} = {}
 	for _, trace in object.Extras.DNATraces do
-		table.insert(samples, {
-			Target = trace.Target,
-			Icon = trace.Icon,
-			Object = trace.Object,
-		})
+		if (trace.ExpiresAt or math.huge) > workspace:GetServerTimeNow() then
+			table.insert(samples, {
+				Target = trace.Target,
+				Icon = trace.Icon,
+				Object = trace.Object,
+			})
+		end
+	end
+
+	if #samples == 0 and #object.Extras.DNATraces > 0 then
+		Message.Popup("The DNA traces have decayed.")
+		return
 	end
 
 	remote:FireClient(participant.Player, samples)
