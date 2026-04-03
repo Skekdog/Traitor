@@ -159,7 +159,7 @@ local function setWinnerText(): ()
 	assert(winner and winnerKind, "No winner")
 
 	local gamemode = assert(LocalRoundInfo.Gamemode(), "No gamemode")
-	local winnerRole = if winnerKind == "Participant" then LocalParticipantInfo.GetParticipant(winner).Role() else Role.fromDefinition(gamemode.Roles[winner])
+	local winnerRole: Types.Role = if winnerKind == "Participant" then LocalParticipantInfo.GetParticipant(winner).Role() else Role.fromDefinition(gamemode.Roles[winner])
 
 	if winnerKind == "Participant" then
 		highlightsPage.Winners.Text = winnerRole:FormatString(winner) .. " wins!"
