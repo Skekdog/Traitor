@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 local EquipmentMenu = require(ReplicatedStorage.Shared.Interface.EquipmentMenu)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
@@ -52,11 +52,11 @@ local function tryAddPlayerButton(participant: LocalParticipantInfo.LocalPartici
 		end
 
 		if amount > LocalRoundInfo.Credits() then
-			return ScreenMessage("You don't have enough credits.", "Error")
+			return Message.Screen("You don't have enough credits.", "Error")
 		end
 
 		if ownParticipant.Status() ~= "Alive" then
-			return ScreenMessage("You are dead.", "Error")
+			return Message.Screen("You are dead.", "Error")
 		end
 
 		ReplicatedStorage.Remotes.ClientServer.TransferCredits:FireServer(participant.Name, amount)

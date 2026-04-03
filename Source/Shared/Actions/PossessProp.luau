@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetAssemblyMass = require(ReplicatedStorage.API.GetAssemblyMass)
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
-local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Types = require(ReplicatedStorage.API.Types)
 local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 local FreeInput = require(ReplicatedStorage.Shared.Controls.FreeInput)
@@ -29,7 +29,7 @@ local punchConnection: RBXScriptConnection?
 local camera = workspace.CurrentCamera
 
 local function possess(prop: Types.MapObject): ()
-	ScreenMessage("Change spectate mode to stop possession.", "Success")
+	Message.Screen("Change spectate mode to stop possession.", "Success")
 	currentPossess = prop
 	punchMeter = 0
 	ReplicatedStorage.Remotes.ClientServer.PossessProp:FireServer(prop)

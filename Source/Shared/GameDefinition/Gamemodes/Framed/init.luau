@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Epilogue = require(script.GamePhase.Epilogue)
-local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Face = require(script.GameState.Face)
 local FramedItems = require(script.Items)
@@ -313,7 +313,7 @@ local function BeforeHitParticipant(_, participant: Types.Participant, params: T
 			return true
 		end
 
-		ScreenMessage("⚠️ Police cannot be hurt yet!", "Warn", nil, attacker.Player)
+		Message.Screen("⚠️ Police cannot be hurt yet!", "Warn", nil, attacker.Player)
 		return false
 	elseif participant:GetRole().Definition == framedRole then
 		if attacker:GetRole().Definition == policeRole or attacker:GetRole().Definition == undercoverRole then
@@ -321,7 +321,7 @@ local function BeforeHitParticipant(_, participant: Types.Participant, params: T
 				return true
 			end
 
-			ScreenMessage("⚠️ Don't hurt innocents!", "Warn", nil, attacker.Player)
+			Message.Screen("⚠️ Don't hurt innocents!", "Warn", nil, attacker.Player)
 			return false
 		end
 		return true

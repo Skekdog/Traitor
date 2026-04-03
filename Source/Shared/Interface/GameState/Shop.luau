@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 local EquipmentMenu = require(ReplicatedStorage.Shared.Interface.EquipmentMenu)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
@@ -156,7 +156,7 @@ LocalRoundInfo.Credits:Connect(purchaseAllowed)
 ClientInventory.Inventory.Slots:Connect(purchaseAllowed)
 
 local function errorMessage(message: string): ()
-    ScreenMessage(message, "Error")
+    Message.Screen(message, "Error")
 end
 
 shopPage.Purchase.Activated:Connect(function()

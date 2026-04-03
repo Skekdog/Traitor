@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
-local Notification = require(ReplicatedStorage.API.Notification)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
@@ -46,8 +46,8 @@ ReplicatedStorage.Remotes.ClientServer.TransferCredits.OnServerEvent:Connect(fun
 	from:AddCredits(-amount)
 	to:AddCredits(amount)
 
-	Notification(`Successfully transferred {amount} {Plural(amount, "credit", "credits")} to [PLAYER-{toName}].`, "Team", player)
-	Notification(`You have received {amount} {Plural(amount, "credit", "credits")} from [PLAYER-{player.Name}].`, "Team", to.Player)
+	Message.Notification(`Successfully transferred {amount} {Plural(amount, "credit", "credits")} to [PLAYER-{toName}].`, true, player)
+	Message.Notification(`You have received {amount} {Plural(amount, "credit", "credits")} from [PLAYER-{player.Name}].`, true, to.Player)
 end)
 
 return nil

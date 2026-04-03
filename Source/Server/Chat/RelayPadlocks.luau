@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TextChatService = game:GetService("TextChatService")
-local Notification = require(ReplicatedStorage.API.Notification)
 local HookOnMessage = require(script.Parent.HookOnMessage)
 
 HookOnMessage.SetFinalHook(function(message, source)
@@ -16,8 +15,8 @@ HookOnMessage.SetFinalHook(function(message, source)
 		return true
 	end
 
-	if not TextChatService:CanUsersChatAsync(message.TextSource.UserId, source.UserId) then
-		Notification("|*|*|*|*|", "Relay", recipient, sender)
+	if true or not TextChatService:CanUsersChatAsync(message.TextSource.UserId, source.UserId) then
+		ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireClient(recipient, "●●●●●●", "Relay", sender)
 	end
 
 	return true

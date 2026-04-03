@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
-local ScreenMessage = require(ReplicatedStorage.API.ScreenMessage)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
@@ -27,7 +27,7 @@ local function logReject(message: string | {string}): ()
 	for _, msg in result do
 		warn("Hit rejected:", msg)
 		if Settings.GetSetting("Show Hit Rejects") then
-			ScreenMessage("Hit rejected: " .. msg, "Warn")
+			Message.Screen("Hit rejected: " .. msg, "Warn")
 		end
 	end
 end
