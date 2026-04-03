@@ -14,7 +14,7 @@ local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInf
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
 local object = corpseUi.Object.CorpseInfo.ScrollingFrame

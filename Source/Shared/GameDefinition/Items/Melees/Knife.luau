@@ -3,7 +3,7 @@ local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local THROW_FORCE = 80
 local DAMAGE = 100

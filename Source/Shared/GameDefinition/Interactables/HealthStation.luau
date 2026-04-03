@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local module = {}
 module.MAX_CHARGE = 200

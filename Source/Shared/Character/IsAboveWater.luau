@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): (boolean, BasePart?)
 	local params = RaycastParams.new()

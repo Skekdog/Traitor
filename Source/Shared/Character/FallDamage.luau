@@ -3,7 +3,7 @@ local SoundService = game:GetService("SoundService")
 local CalculateFallDamage = require(script.Parent.CalculateFallDamage)
 local IsAboveWater = require(script.Parent.IsAboveWater)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 
 local function checkForWater(root: BasePart): boolean

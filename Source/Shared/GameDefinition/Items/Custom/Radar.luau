@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local GREY_COLOUR = Color3.new(0.5, 0.5, 0.5)
 local GREEN_COLOUR = Color3.fromRGB(55, 174, 37)

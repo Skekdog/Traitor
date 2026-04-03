@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ActionNode = require(ReplicatedStorage.Shared.MapPrefabs.ActionNode)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local function TraitorNode(object: Script, tip: string, cost: number, interval: number, radius: number, callback: (Player) -> ()): ()
 	local MapObject: Types.MapObject? = object:FindFirstAncestorWhichIsA("BasePart")

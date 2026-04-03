@@ -9,7 +9,7 @@ local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local module = {}
 

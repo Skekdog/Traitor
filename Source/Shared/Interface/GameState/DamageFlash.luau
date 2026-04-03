@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local MAX_DAMAGE_SCALE = 0.6
 local MIN_DAMAGE_SCALE = 0.01

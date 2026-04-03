@@ -4,7 +4,7 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local participant = LocalParticipantInfo.GetParticipant()
 

@@ -7,7 +7,7 @@ local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local spring = require(ReplicatedStorage.Shared.Util.spring)
 local MuzzleFlash = require(script.Parent.MuzzleFlash)
 

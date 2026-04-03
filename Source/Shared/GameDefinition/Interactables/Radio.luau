@@ -6,7 +6,7 @@ local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local PLAY_COOLDOWN = 0.25
 
@@ -200,7 +200,7 @@ end
 local activeRadios: {Radio} = {}
 
 if RunService:IsServer() then
-	local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+	local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 	local lastGamemode: Types.GamemodeDefinition?
 	local lastMap: Types.Map?

@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local module = {}
 

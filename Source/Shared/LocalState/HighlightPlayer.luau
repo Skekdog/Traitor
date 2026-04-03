@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local LocalParticipantInfo = require(script.Parent.LocalParticipantInfo)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local function makeIcon(player: Player, role: Types.Role): BillboardGui?
     local gui = Instance.new("BillboardGui")

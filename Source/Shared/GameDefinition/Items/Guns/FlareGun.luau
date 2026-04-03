@@ -6,7 +6,7 @@ local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local highlight1 = {
     Title = "To The Rescue",

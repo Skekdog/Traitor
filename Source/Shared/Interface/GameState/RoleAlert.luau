@@ -4,7 +4,7 @@ local GetDeterminer = require(ReplicatedStorage.Shared.Grammar.GetDeterminer)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 
 local ui = UIManager.WaitForUI("RoleAlert")

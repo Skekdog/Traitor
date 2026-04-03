@@ -4,7 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local ActionNodeType = require(ReplicatedStorage.Shared.Actions.ActionNodeType)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local nodes: {[Types.MapObject]: ActionNodeType.ActionNodeParams?} = {}
 

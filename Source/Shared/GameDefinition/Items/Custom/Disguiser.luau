@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 
 local module = {}

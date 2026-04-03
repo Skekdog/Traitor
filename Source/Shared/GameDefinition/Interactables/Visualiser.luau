@@ -6,8 +6,8 @@ local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Types = require(ReplicatedStorage.API.Types)
 
 local SPHERE_TWEEN_INFO = TweenInfo.new(
 	0.25,

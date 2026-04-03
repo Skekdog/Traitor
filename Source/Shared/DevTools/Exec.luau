@@ -1,6 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local Commands = require(script.Parent.Commands)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local IsAdmin = require(script.Parent.IsAdmin)

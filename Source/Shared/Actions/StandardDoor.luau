@@ -3,8 +3,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Types = require(ReplicatedStorage.API.Types)
 
 local remotes = ReplicatedStorage.Remotes
 

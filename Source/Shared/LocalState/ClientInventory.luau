@@ -13,7 +13,7 @@ local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
 

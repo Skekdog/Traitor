@@ -6,7 +6,7 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local UI = UIManager.WaitForUI("Highlights") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Highlights)}
 local page = UI.Object.Page

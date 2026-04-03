@@ -6,7 +6,7 @@ local HookClientMessage = require(ReplicatedStorage.Shared.Interface.Chat.HookCl
 local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local UIAnimation = require(script.Parent.Parent.UILib.UIAnimation)
 local UIManager = require(script.Parent.Parent.UILib.UIManager)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 

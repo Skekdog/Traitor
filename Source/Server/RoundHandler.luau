@@ -18,7 +18,7 @@ local ScoreManager = require(ServerScriptService.Player.ScoreManager)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 local Round = require(ReplicatedStorage.Shared.RoundRule.Round)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local module = {}

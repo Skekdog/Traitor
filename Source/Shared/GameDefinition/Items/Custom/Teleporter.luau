@@ -5,8 +5,8 @@ local TweenService = game:GetService("TweenService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Types = require(ReplicatedStorage.API.Types)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 
 local MAX_USES = 6

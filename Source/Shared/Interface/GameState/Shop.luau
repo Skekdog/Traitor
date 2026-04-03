@@ -6,7 +6,7 @@ local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInvent
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local COLOUR_GOOD = Color3.fromRGB(75, 255, 62)
 local COLOUR_BAD = Color3.fromRGB(167, 0, 0)

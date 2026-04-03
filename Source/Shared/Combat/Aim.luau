@@ -4,7 +4,7 @@ local SetCameraSensitivity = require(ReplicatedStorage.Shared.Camera.SetCameraSe
 local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 local WalkSpeed = require(ReplicatedStorage.Shared.Character.WalkSpeed)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local Viewmodel = require(script.Parent.Viewmodel)
 

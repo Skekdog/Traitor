@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local GetRound = require(script.Parent.GetRound)
 
 local module = {}

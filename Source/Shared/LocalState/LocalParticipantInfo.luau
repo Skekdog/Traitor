@@ -3,7 +3,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Role = require(ReplicatedStorage.Shared.RoundRule.Role)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local localPlayerName = Players.LocalPlayer.Name

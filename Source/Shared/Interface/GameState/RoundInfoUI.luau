@@ -10,7 +10,7 @@ local ShowMessage = require(ReplicatedStorage.Shared.Interface.Util.ShowMessage)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local participant = LocalParticipantInfo.GetParticipant()
 

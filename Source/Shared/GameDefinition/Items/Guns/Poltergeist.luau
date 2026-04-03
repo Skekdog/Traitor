@@ -7,8 +7,8 @@ local BehaviourTypes = require(ReplicatedStorage.API.Item.Behaviour.BehaviourTyp
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Types = require(ReplicatedStorage.API.Types)
 
 local MAX_RANGE = 10000
 

@@ -3,7 +3,7 @@ local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local beforeHit = function(weapon: Types.Item, params: Types.DamageParams, hit: Types.Participant | Types.Prop): boolean
 	local model = if hit.Kind == "Participant" then hit:GetCharacter() else hit.Model

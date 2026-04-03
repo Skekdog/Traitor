@@ -3,7 +3,7 @@ local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local IsHostileParticipant = require(ReplicatedStorage.API.Prop.IsHostileParticipant)
 local HealthStation = require(script.Parent.HealthStation)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 type DeathStationServer = Types.Prop & {
 	Interactable: Types.InteractableDefinition,

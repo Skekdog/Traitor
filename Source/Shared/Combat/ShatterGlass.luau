@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local IS_SERVER = game:GetService("RunService"):IsServer()
@@ -12,7 +12,7 @@ local function createWedgeFragment(properties: GlassProperties, size: Vector3, c
 
     for i, v in properties do
         if i ~= "Size" and i ~= "CFrame" then
-            (wedge :: any)[i] = v 
+            (wedge :: any)[i] = v
         end
     end
 
@@ -22,10 +22,10 @@ local function createWedgeFragment(properties: GlassProperties, size: Vector3, c
     wedge.Anchored = false
     wedge.CanTouch = false
     wedge.CanQuery = false
-    
+
     wedge.CollisionGroup = "ShatteredGlass"
     wedge.BottomSurface = Enum.SurfaceType.Smooth
-    
+
     wedge.Name = "GlassFragment"
     wedge.Parent = workspace.Projectiles
 

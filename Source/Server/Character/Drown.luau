@@ -3,9 +3,9 @@ local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local SoundService = game:GetService("SoundService")
 local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local RoundHandler = require(ServerScriptService.RoundHandler)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local DROWN_THRESHOLD = 10
 local DROWN_DAMAGE = 10

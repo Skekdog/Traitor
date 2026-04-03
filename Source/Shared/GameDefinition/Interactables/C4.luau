@@ -4,8 +4,8 @@ local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Types = require(ReplicatedStorage.API.Types)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 -- NOTE: C4 should not be based on alliance with planter role! Evil roles should always see it, friendly roles should never.

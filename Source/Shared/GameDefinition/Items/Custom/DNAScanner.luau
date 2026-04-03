@@ -7,8 +7,8 @@ local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Types = require(ReplicatedStorage.API.Types)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 
 local module = {}

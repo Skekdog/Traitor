@@ -3,7 +3,7 @@ local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local ProcessHit = require(ReplicatedStorage.API.Item.Behaviour.ProcessHit)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
-local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
+local Types = require(ReplicatedStorage.API.Types)
 
 local module = {}
 
