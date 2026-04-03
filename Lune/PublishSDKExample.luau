@@ -58,7 +58,7 @@ local function publish(assetName: string, kind: "map" | "gamemode" | "items" | "
 end
 
 local kind = process.args[1]
-assert(kind == "map" or kind == "gamemode" or kind == "items" or kind == "assets" or kind == "all", "Invalid kind. Expected usage: PublishSDKExample map|gamemode|items|all mapName|gamemodeName")
+assert(kind == "map" or kind == "gamemode" or kind == "items" or kind == "interactables" or kind == "assets" or kind == "all", "Invalid kind. Expected usage: PublishSDKExample map|gamemode|items|assets|interactables|all mapName|gamemodeName")
 
 if kind == "all" then
 	for _, map in EXAMPLE_MAPS do
@@ -79,6 +79,7 @@ end
 
 local name =
 	if kind == "items" then "Items"
+	elseif kind == "interactables" then "Interactables"
 	elseif kind == "assets" then "Assets"
 	else process.args[2]
 
@@ -96,7 +97,7 @@ if name == "all" then
 			publish(map, kind)
 		end
 	else
-		error("Invalid kind. Expected usage: PublishSDKExample map|gamemode|items|assets|all mapName|gamemodeName|all")
+		error("Invalid kind. Expected usage: PublishSDKExample map|gamemode|items|assets|interactables|all mapName|gamemodeName|all")
 	end
 
 	return
