@@ -41,8 +41,11 @@ local function getOrCreateParticipantValue(name: string): LocalParticipant
 			Corpse = DynamicValue.new(nil :: Types.ClientCorpseView?),
 		}
 
-		module.Participants()[name] = value
-		module.Participants:Invoke()
+		local player = Players:FindFirstChild(name)
+		if player then
+			module.Participants()[name] = value
+			module.Participants:Invoke()
+		end
 	end
 
 	return value
