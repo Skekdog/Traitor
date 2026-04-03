@@ -2,30 +2,24 @@ local Types = require(script.Parent.Types)
 
 local DNATraces = {}
 
-export type IHasDNATraces = {
+export type HasDNATraces = {
 	Extras: {
 		DNATraces: {DNATrace}?,
 		[any]: never,
 	},
 }
 
-export type IHasObject = {
+export type DNATrace = {
 	Object: Instance,
-}
-
-export type IHasTarget = {
-	Target: string
-}
-
-export type DNATrace = IHasTarget & IHasObject & {
+	Target: string,
 	ExpiresAt: number?,
-	Icon: string,
+	Icon: Content,
 }
 
-type Participant = Types.Participant & IHasDNATraces
+type Participant = Types.Participant & HasDNATraces
 
-function DNATraces.HasEquivalentTrace(t: {IHasTarget & IHasObject}, trace: IHasTarget & IHasObject): boolean
-	for _, existingTrace in t do
+function DNATraces.HasEquivalentTrace(traces: {DNATrace}, trace: DNATrace): boolean
+	for _, existingTrace in traces do
 		if existingTrace.Target == trace.Target and existingTrace.Object == trace.Object then
 			return true
 		end
@@ -33,13 +27,13 @@ function DNATraces.HasEquivalentTrace(t: {IHasTarget & IHasObject}, trace: IHasT
 	return false
 end
 
-function DNATraces.Add(object: IHasDNATraces, target: Types.Participant, duration: number?, icon: Content, instance: Instance): ()
+function DNATraces.Add(object: HasDNATraces, target: Types.Participant, duration: number?, icon: Content, instance: Instance): ()
 	local traces = object.Extras.DNATraces or {}
 
 	local trace: DNATrace = {
 		ExpiresAt = if duration then workspace:GetServerTimeNow() + duration else nil,
 		Target = target.Player.Name,
-		Icon = icon.Uri or "",
+		Icon = icon,
 		Object = instance,
 	}
 
@@ -52,11 +46,11 @@ function DNATraces.Add(object: IHasDNATraces, target: Types.Participant, duratio
 	object.Extras.DNATraces = traces
 end
 
-function DNATraces.Remove(object: IHasDNATraces): ()
+function DNATraces.Remove(object: HasDNATraces): ()
 	object.Extras.DNATraces = nil
 end
 
-function DNATraces.Get(object: IHasDNATraces): {DNATrace}
+function DNATraces.Get(object: HasDNATraces): {DNATrace}
 	return object.Extras.DNATraces or {}
 end
 

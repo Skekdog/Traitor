@@ -23,8 +23,8 @@ local MIN_CHARGE_DEPLETION = 5
 local RECHARGE_RATE = 5
 local currentCharge = 100
 
-local clientAvailableTraces: {SampledTrace} = {}
-local clientCurrentTrace: SampledTrace?
+local clientAvailableTraces: {DNATraces.DNATrace} = {}
+local clientCurrentTrace: DNATraces.DNATrace?
 local clientAutoScan = true
 
 local remote: RemoteEvent
@@ -51,7 +51,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	local round = participant.Round
 
-	local object: DNATraces.IHasDNATraces?
+	local object: DNATraces.HasDNATraces?
 
 	local hitPart = result.Instance :: BasePart
 
@@ -80,7 +80,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		return
 	end
 
-	local samples: {SampledTrace} = {}
+	local samples: {DNATraces.DNATrace} = {}
 	for _, trace in object.Extras.DNATraces do
 		table.insert(samples, {
 			Target = trace.Target,
@@ -91,10 +91,6 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	remote:FireClient(participant.Player, samples)
 end
-
-type SampledTrace = DNATraces.IHasTarget & DNATraces.IHasObject & {
-	Icon: string,
-}
 
 local function getUI()
 	local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
@@ -164,7 +160,7 @@ if RunService:IsClient() then
 
 	local ui = getUI()
 
-	remote.OnClientEvent:Connect(function(traces: {SampledTrace}?)
+	remote.OnClientEvent:Connect(function(traces: {DNATraces.DNATrace}?)
 		if not traces then
 			return resetClient()
 		end
@@ -176,7 +172,7 @@ if RunService:IsClient() then
 			table.insert(clientAvailableTraces, trace)
 
 			local newTrace = ui.Object.DefaultSample:Clone()
-			newTrace.Image = trace.Icon
+			newTrace.ImageContent = trace.Icon
 			newTrace.Visible = true
 			newTrace.UIStroke.Enabled = false
 			newTrace.Name = tostring(trace)
