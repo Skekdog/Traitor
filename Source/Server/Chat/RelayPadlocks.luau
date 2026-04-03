@@ -15,7 +15,7 @@ HookOnMessage.SetFinalHook(function(message, source)
 		return true
 	end
 
-	if true or not TextChatService:CanUsersChatAsync(message.TextSource.UserId, source.UserId) then
+	if not TextChatService:CanUsersChatAsync(message.TextSource.UserId, source.UserId) then
 		ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireClient(recipient, "●●●●●●", "Relay", sender)
 	end
 
