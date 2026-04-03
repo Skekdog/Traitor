@@ -59,8 +59,15 @@ function Raycasts.Hitscan(
 	checkInitialOverlap: boolean?,
 	fallbackToBlockcast: boolean?
 ): BehaviourTypes.HitscanResult
+	direction *= range
+	local result = workspace:Raycast(origin, direction, params)
+
+	if not result and fallbackToBlockcast then
+		result = workspace:Blockcast(CFrame.new(origin), Vector3.one * 1.5, direction, params)
+	end
+
 	local parts: {BasePart}?
-	if checkInitialOverlap then
+	if not result and checkInitialOverlap then
 		local overlapParams = OverlapParams.new()
 		overlapParams.FilterDescendantsInstances = params.FilterDescendantsInstances
 		overlapParams.FilterType = params.FilterType
@@ -73,13 +80,6 @@ function Raycasts.Hitscan(
 		parts = foundParts
 
 		table.sort(foundParts, sortParts)
-	end
-
-	direction *= range
-	local result = workspace:Raycast(origin, direction, params)
-
-	if not result and fallbackToBlockcast then
-		result = workspace:Blockcast(CFrame.new(origin), Vector3.one * 1.5, direction, params)
 	end
 
 	local part = if result then result.Instance else if parts and parts[1] then parts[1] else nil
