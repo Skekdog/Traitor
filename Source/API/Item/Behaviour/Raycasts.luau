@@ -51,19 +51,58 @@ local function sortParts(part1: BasePart, part2: BasePart): boolean
 	end
 end
 
+local function createVisualiser(cframe: CFrame, size: Vector3, colour: Color3): ()
+	local part = CreateEmptyPart(cframe)
+	part.Size = size
+
+	local highlight = Instance.new("Highlight")
+
+	highlight.FillColor = colour
+	highlight.FillTransparency = 0
+
+	highlight.OutlineColor = Color3.new(1, 1, 1)
+	highlight.OutlineTransparency = 0
+
+	highlight.Parent = part
+
+	part.Transparency = 0
+	part.Parent = workspace.Projectiles
+
+	task.delay(5, part.Destroy, part)
+end
+
+local function visualiseRay(origin: Vector3, destination: Vector3): ()
+	local cframe = CFrame.lookAt((origin + destination) / 2, destination)
+
+	local distance = (origin - destination).Magnitude
+    local half = distance / 2
+
+	local size = Vector3.new(0.05, 0.05, half)
+
+	createVisualiser(cframe, size, Color3.new(0, 0, 1))
+end
+
 function Raycasts.Hitscan(
 	params: RaycastParams,
 	origin: Vector3,
 	direction: Vector3,
 	range: number,
 	checkInitialOverlap: boolean?,
-	fallbackToBlockcast: boolean?
+	fallbackToBlockcast: boolean?,
+	visualiseCasts: boolean?
 ): BehaviourTypes.HitscanResult
 	direction *= range
 	local result = workspace:Raycast(origin, direction, params)
 
+	if visualiseCasts then
+		visualiseRay(origin, if result then result.Position else Raycasts.DeriveTargetPosition(origin, direction, 1))
+	end
+
 	if not result and fallbackToBlockcast then
-		result = workspace:Blockcast(CFrame.new(origin), Vector3.one * 1.5, direction, params)
+		local cframe = CFrame.new(origin)
+		local size = Vector3.one * 1.5
+
+		result = workspace:Blockcast(cframe, size, direction, params)
 	end
 
 	local parts: {BasePart}?
@@ -73,13 +112,20 @@ function Raycasts.Hitscan(
 		overlapParams.FilterType = params.FilterType
 		overlapParams.CollisionGroup = params.CollisionGroup
 
-		local boundPart = CreateEmptyPart(workspace.CurrentCamera.CFrame)
-		boundPart.Size = Vector3.new(0.1, 0.1, 0.1)
+		local cframe = workspace.CurrentCamera.CFrame
+		local size = Vector3.new(0.1, 0.1, 0.1)
+
+		local boundPart = CreateEmptyPart(cframe)
+		boundPart.Size = size
 
 		local foundParts = workspace:GetPartsInPart(boundPart, overlapParams)
 		parts = foundParts
 
 		table.sort(foundParts, sortParts)
+
+		if visualiseCasts then
+			createVisualiser(cframe, size, Color3.new(1, 0, 0))
+		end
 	end
 
 	local part = if result then result.Instance else if parts and parts[1] then parts[1] else nil
@@ -90,7 +136,7 @@ function Raycasts.Hitscan(
 		elseif part then
 			part:GetClosestPointOnSurface(origin)
 		else
-			Raycasts.DeriveTargetPosition(origin, direction, range)
+			Raycasts.DeriveTargetPosition(origin, direction, 1)
 
 	local normal = if result then result.Normal else (origin - position).Unit
 	local relativeCFrame = if part then part.CFrame:ToObjectSpace(CFrame.new(position)) else nil
