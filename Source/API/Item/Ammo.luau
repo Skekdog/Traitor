@@ -91,8 +91,8 @@ module["Sub-Spec"] = {
 module.Rifle = {
     Kind = "Ammo",
     Name = "Rifle",
-    Capacity = 5,
-    ReserveCapacity = 10,
+    Capacity = 10,
+    ReserveCapacity = 20,
     Model = boxModels.Rifle,
     CanDrop = true,
 }

@@ -13,7 +13,7 @@ local FiveSeven = Gun({
 
     Damage = {
         Head = 60,
-        Body = 30,
+        Body = 25,
         Limb = 20,
     },
 
@@ -21,7 +21,7 @@ local FiveSeven = Gun({
 
     AimSpreadMultiplier = 0.1,
 
-    PrimaryInterval = 0.5,
+    PrimaryInterval = 0.38,
     ReloadDuration = 1,
     AmmoDefinition = Ammo["Mil-Spec"],
 

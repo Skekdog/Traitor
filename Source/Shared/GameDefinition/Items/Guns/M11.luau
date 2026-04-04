@@ -12,14 +12,14 @@ local M11 = Gun({
 	ItemGroup = ItemGroups.Primary,
 
 	Damage = {
-		Head = 25,
-		Body = 20,
-		Limb = 15,
+		Head = 20,
+		Body = 10,
+		Limb = 5,
 	},
 
 	Spread = 0.02,
 
-	PrimaryInterval = 0.05,
+	PrimaryInterval = 0.065,
 	ReloadDuration = 1,
 	AmmoDefinition = Ammo["Sub-Spec"],
 

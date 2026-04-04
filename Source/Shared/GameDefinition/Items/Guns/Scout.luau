@@ -26,7 +26,7 @@ local Scout = Gun({
 
     ImpulseForce = 20,
 
-    PrimaryInterval = 1,
+    PrimaryInterval = 1.5,
     ReloadDuration = 1.5,
     AmmoDefinition = Ammo.Rifle,
 

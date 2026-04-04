@@ -22,7 +22,7 @@ local Deagle = Gun({
     AimFOV = 50,
     AimSpreadMultiplier = 0.1,
 
-    PrimaryInterval = 0.5,
+    PrimaryInterval = 0.6,
     ReloadDuration = 1.2,
     AmmoDefinition = Ammo["High-Cal"],
 

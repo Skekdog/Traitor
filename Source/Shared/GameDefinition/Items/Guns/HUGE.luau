@@ -23,7 +23,7 @@ local HUGE = Gun({
     AimFOV = 60,
     AimSpreadMultiplier = 0.9,
 
-    PrimaryInterval = 0.01,
+    PrimaryInterval = 0.06,
 
     Projectile = ReplicatedStorage.Assets.Projectiles.Bullet,
     ProjectileSpeed = 280,

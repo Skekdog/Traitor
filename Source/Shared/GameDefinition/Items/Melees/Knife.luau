@@ -156,7 +156,7 @@ local Knife = Melee({
 	Damage = DAMAGE,
 
 	MaxDistance = 7,
-	PrimaryInterval = 0.75,
+	PrimaryInterval = 1.1,
 	PrimarySound = ReplicatedStorage.Assets.ItemSounds.Fired.Crowbar,
 
 	Model = ReplicatedStorage.Assets.ItemModels.Knife,

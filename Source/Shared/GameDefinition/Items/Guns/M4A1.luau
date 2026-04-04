@@ -19,7 +19,7 @@ local M4A1 = Gun({
 		Limb = 20,
 	},
 
-	PrimaryInterval = 0.15,
+	PrimaryInterval = 0.19,
 
 	ReloadDuration = 1.5,
 	AmmoDefinition = Ammo["Mil-Spec"],

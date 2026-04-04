@@ -12,9 +12,9 @@ local XM1014 = Gun({
     ItemGroup = ItemGroups.Primary,
 
     Damage = {
-        Head = 30,
-        Body = 18,
-        Limb = 10,
+        Head = 15,
+        Body = 10,
+        Limb = 5,
     },
 
     HasMuzzleFlash = true,
@@ -28,7 +28,7 @@ local XM1014 = Gun({
     ReloadDuration = 1.5,
     AmmoDefinition = Ammo.Shotgun,
 
-    ProjectileCount = 6,
+    ProjectileCount = 8,
 
     Projectile = ReplicatedStorage.Assets.Projectiles.Bullet,
     ProjectileSpeed = 220,

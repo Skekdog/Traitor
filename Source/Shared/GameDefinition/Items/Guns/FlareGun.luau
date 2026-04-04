@@ -46,7 +46,7 @@ local FlareGun = Gun ({
 
     Spread = 0.015,
 
-    PrimaryInterval = 0.25,
+    PrimaryInterval = 1,
 
     Model = ReplicatedStorage.Assets.ItemModels["Flare Gun"],
     HoldAnimation = Content.fromAssetId(9253211833),

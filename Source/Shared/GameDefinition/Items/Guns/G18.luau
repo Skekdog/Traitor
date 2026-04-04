@@ -11,7 +11,7 @@ local G18 = Gun({
     ItemGroup = ItemGroups.Secondary,
 
     Damage = {
-        Head = 20,
+        Head = 25,
         Body = 15,
         Limb = 10,
     },
