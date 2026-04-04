@@ -14,7 +14,7 @@ local function GetParticipant(identifier: Instance | string): Types.Participant?
 			return nil
 		end
 
-		local char = GetMapObjectWithTag(identifier, "Character")
+		local char = GetMapObjectWithTag(identifier, {"Character", "Corpse"})
 		if char then
 			finalIdentifier = char.Name
 		end

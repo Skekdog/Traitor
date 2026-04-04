@@ -5,12 +5,15 @@ local SoundService = game:GetService("SoundService")
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
+local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local Message = require(ReplicatedStorage.API.Interface.Message)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
+local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 
 local module = {}
 
@@ -28,63 +31,88 @@ local clientAvailableTraces: {DNATraces.DNATrace} = {}
 local clientCurrentTrace: DNATraces.DNATrace?
 local clientAutoScan = true
 
-local remote: RemoteEvent
-if RunService:IsServer() then
-	remote = Instance.new("RemoteEvent")
-	remote.Name = "DNARemote"
-	remote.Parent = script
-else
-	local found = script:WaitForChild("DNARemote")
-	assert(found:IsA("RemoteEvent"), "DNARemote must be a RemoteEvent")
-	remote = found
+local remote = GetRemote("DNA", script)
+
+local function PrimaryFireClient(item: Types.Item, origin: Vector3, direction: Vector3)
+	local Raycasts = require(ReplicatedStorage.API.Item.Behaviour.Raycasts)
+	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+
+	local char = LocalCharacter.Character()
+	if not char then
+		return false
+	end
+
+	local result = Raycasts.Hitscan(Raycasts.GetDefaultRaycastParams(char), origin, direction, MAX_SCAN_RANGE)
+	if not result.Hit then
+		return false
+	end
+
+	local mapObject = GetMapObject(result.Hit.Part, {"Corpse", "Item", "Interactable"})
+	if not mapObject then
+		return false
+	end
+
+	item:SetServerData("Primary", {Part = result.Hit.Part, Position = result.Position})
+
+	return true
 end
 
-local raycastParams = RaycastParams.new()
-raycastParams.CollisionGroup = "WeaponHitTargets"
-raycastParams.FilterDescendantsInstances = {workspace.Characters}
-raycastParams.FilterType = Enum.RaycastFilterType.Exclude
-raycastParams.IgnoreWater = true
-local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant): ()
-	local result = workspace:Raycast(origin, direction * MAX_SCAN_RANGE * 1.1)
-	if not result then
-		return
+local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, data: any): ()
+	local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+	local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
+
+	if typeof(data) ~= "table" then
+		return "InvalidRequest"
+	end
+
+	local position = data.Position
+	if typeof(position) ~= "Vector3" then
+		return "InvalidRequest"
+	end
+
+	local part = data.Part
+	if typeof(part) ~= "Instance" or not part:IsA("BasePart") then
+		return "InvalidRequest"
+	end
+
+	if not Checks.TargetDistance(item, origin, position, part) then
+		return "TargetTooFar"
 	end
 
 	local round = participant.Round
 
+	if not Checks.RaycastStatic(round:GetMap(), origin, position, part) then
+		return "StaticObscured"
+	end
+
 	local object: DNATraces.HasDNATraces?
 
-	local hitPart = result.Instance :: BasePart
+	local model = GetMapObject(part, {"Corpse", "Item", "Interactable"})
+	if not model then
+		return "InvalidObject"
+	end
 
-	if hitPart:IsDescendantOf(workspace.Characters) then
-		local model = hitPart:FindFirstAncestorOfClass("Model")
-		if model then
-			if not model:HasTag("Corpse") then
-				return
-			end
+	if model:HasTag("Corpse") then
+		local foundParticipant = GetParticipant(model)
+		object = foundParticipant
 
-			local foundParticipant = round:GetParticipant(model)
-			if foundParticipant and foundParticipant.Corpse and model:GetAttribute("Unidentified") then
-				foundParticipant.Corpse:SearchAsAlive(participant, false)
-			end
-
-			object = foundParticipant
-
+		if foundParticipant and foundParticipant.Corpse then
+			foundParticipant.Corpse:SearchAsAlive(participant, false)
 		end
-	elseif hitPart:HasTag("Item") then
-		local mapItem = round:GetItem(hitPart)
+	elseif model:HasTag("Item") then
+		local mapItem = round:GetItem(model)
 		if mapItem then
 			object = mapItem
 		end
-	elseif hitPart:HasTag("Interactable") then
-		local interactable = round:GetProp(hitPart)
+	elseif model:HasTag("Interactable") then
+		local interactable = round:GetProp(model)
 		if interactable then
 			object = interactable
 		end
 	end
 
 	if not object then
-		return
+		return "NoObject"
 	end
 
 	PlaySound(ReplicatedStorage.Assets.ItemSounds.DNAScanner, nil, nil, nil, participant.Player)
@@ -186,6 +214,8 @@ if RunService:IsClient() then
 			return resetClient()
 		end
 
+		Message.Popup(Plural(#traces, "Trace", "Traces") .. " acquired.")
+
 		for i, trace in traces do
 			if DNATraces.HasEquivalentTrace(clientAvailableTraces, trace) then
 				continue
@@ -283,6 +313,9 @@ local item = Custom({
 	PrimaryToggled = true,
 	PrimaryHint = "Scan DNA",
 	PrimaryFireServer = PrimaryFireServer,
+	PrimaryFireClient = PrimaryFireClient,
+
+	MaxDistance = MAX_SCAN_RANGE,
 
 	OnEquipClient = OnEquipClient,
 	OnUnequipClient = OnUnequipClient,
