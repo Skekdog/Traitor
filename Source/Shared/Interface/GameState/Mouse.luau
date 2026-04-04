@@ -42,7 +42,7 @@ function module.ShowPlayerInfo(char: Model)
         return
     end
 
-	playerInfo:FindFirstChild("Name").Text = plr.Name
+	playerInfo:FindFirstChild("Name").Text = plr.Name .. if char:GetAttribute("IsDisguised") then " (DISGUISED)" else ""
 
 	local healthPercent = health / hum.MaxHealth * 100
 	local healthText = ""
