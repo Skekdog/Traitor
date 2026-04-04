@@ -2,11 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 return {
-	PlaySound.MakeSound(9125652432, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
-	PlaySound.MakeSound(9125651099, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
-	PlaySound.MakeSound(9125651607, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
-	PlaySound.MakeSound(9125652452, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
-	PlaySound.MakeSound(9125651373, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
-	PlaySound.MakeSound(9125652147, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
-	PlaySound.MakeSound(9125652675, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
+	PlaySound.MakeSound(77825123688975, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
+	PlaySound.MakeSound(90810570393244, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
+	PlaySound.MakeSound(112769182475221, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
+	PlaySound.MakeSound(122713299649326, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
+	PlaySound.MakeSound(80965191101874, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
+	PlaySound.MakeSound(104406691271280, {RollOffMinDistance = 20, RollOffMaxDistance = 50}),
 }
