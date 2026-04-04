@@ -87,6 +87,8 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		return
 	end
 
+	PlaySound(ReplicatedStorage.Assets.ItemSounds.DNAScanner, nil, nil, nil, participant.Player)
+
 	if not object.Extras.DNATraces then
 		Message.Popup("No DNA traces found.", participant.Player)
 		return
