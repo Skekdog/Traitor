@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
@@ -31,6 +32,8 @@ local function throwInteractable(item: Types.Item, participant: Types.Participan
 
     participant:RemoveItem(item)
 
+    PlaySound(137090564514029, nil, GetPrimaryPart(interactable.Model))
+
     return interactable
 end
 
@@ -58,6 +61,8 @@ local function plantInteractable(item: Types.Item, participant: Types.Participan
     weld.Parent = object
 
     participant:RemoveItem(item)
+
+    PlaySound(95346310800820, nil, GetPrimaryPart(interactable.Model))
 
     return interactable, result, weld
 end
