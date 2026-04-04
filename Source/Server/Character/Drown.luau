@@ -78,8 +78,8 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 
 	PlaySound(220194561, nil, head, {
 		SoundGroup = SoundService.AllSounds :: SoundGroup,
-		RollOffMinDistance = 5,
-		RollOffMaxDistance = 10,
+		RollOffMinDistance = 15,
+		RollOffMaxDistance = 20,
 	})
 
 	participant:TryTakeDamage({

@@ -19,8 +19,8 @@ local function playEatSound(participant: Types.Participant): ()
 	local root = if char then char.PrimaryPart else nil
 
 	PlaySound(3043029786, nil, root, {
-		RollOffMaxDistance = 20,
-		RollOffMinDistance = 5,
+		RollOffMaxDistance = 30,
+		RollOffMinDistance = 15,
 	})
 end
 

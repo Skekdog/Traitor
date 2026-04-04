@@ -21,14 +21,14 @@ local module = {}
 
 local fullSound = PlaySound.MakeSound(252142019, {
 	Volume = 1,
-	RollOffMinDistance = 70,
+	RollOffMinDistance = 80,
 	RollOffMaxDistance = 240,
 })
 
 local reducedSound = PlaySound.MakeSound(252142019, {
 	Volume = 1,
-	RollOffMinDistance = 35,
-	RollOffMaxDistance = 70,
+	RollOffMinDistance = 50,
+	RollOffMaxDistance = 100,
 })
 
 local explosionInfo: Types.ExplosionInfo = {

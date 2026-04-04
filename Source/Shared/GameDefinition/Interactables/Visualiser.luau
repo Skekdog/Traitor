@@ -110,8 +110,8 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 
 	PlaySound(5114177371, nil, visualiser.Model, {
 		Volume = 0.5,
-		RollOffMinDistance = 5,
-		RollOffMaxDistance = 15,
+		RollOffMinDistance = 15,
+		RollOffMaxDistance = 20,
 		SoundGroup = SoundService.AllSounds :: SoundGroup,
 	})
 

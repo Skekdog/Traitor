@@ -166,8 +166,8 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 
 	PlaySound(7129285090, nil, GetPrimaryPart(prop.Model), {
 		Volume = 0.5,
-		RollOffMinDistance = 10,
-		RollOffMaxDistance = 25,
+		RollOffMinDistance = 20,
+		RollOffMaxDistance = 30,
 	})
 end
 

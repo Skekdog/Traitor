@@ -36,8 +36,8 @@ local SOUND_INTERVAL_FOLLOW = 2
 local SOUND_INTERVAL_CHARGE = 0.5
 
 local sound = PlaySound.MakeSound(88048142187812, {
-	RollOffMaxDistance = 40,
-	RollOffMinDistance = 20,
+	RollOffMaxDistance = 60,
+	RollOffMinDistance = 40,
 	Volume = 4,
 })
 

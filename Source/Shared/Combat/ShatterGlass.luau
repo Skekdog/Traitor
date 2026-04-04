@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
@@ -108,9 +107,7 @@ local function shatterClient(glassProperties: BasePart | GlassProperties, direct
 
     PlaySound(sounds, glassCFrame.Position, nil, {
         RollOffMaxDistance = 50,
-        RollOffMinDistance = 10,
-        RollOffMode = Enum.RollOffMode.Linear,
-        SoundGroup = SoundService.AllSounds :: SoundGroup,
+        RollOffMinDistance = 15,
     })
 
     if Settings.GetSetting("Keep Shattered Glass") then

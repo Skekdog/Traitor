@@ -55,7 +55,7 @@ end
 
 local attackSound = PlaySound.MakeSound(329792582, {
 	RollOffMaxDistance = 40,
-	RollOffMinDistance = 10,
+	RollOffMinDistance = 30,
 })
 
 attackSound.Name = "Spoon"
@@ -170,8 +170,8 @@ if RunService:IsServer() then
 				end
 
 				PlaySound(3043029786, nil, root, {
-					RollOffMaxDistance = 20,
-					RollOffMinDistance = 5,
+					RollOffMaxDistance = 25,
+					RollOffMinDistance = 15,
 				})
 
 				participant:SetHealth(participant:GetHealth() + HEAL / EAT_DURATION)

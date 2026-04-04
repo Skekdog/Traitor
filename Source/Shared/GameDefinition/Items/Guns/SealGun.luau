@@ -49,8 +49,8 @@ local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams
 	projectile:SetAttribute("Hit_" .. char.Name, true)
 
 	PlaySound(129432532096499, nil, char.PrimaryPart, {
-		RollOffMinDistance = 10,
-		RollOffMaxDistance = 20,
+		RollOffMinDistance = 20,
+		RollOffMaxDistance = 30,
 	})
 
 	Ragdoll.Ragdoll(participant, char)

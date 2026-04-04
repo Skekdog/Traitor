@@ -86,7 +86,7 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 				end
 
 				PlaySound(sound, hitPosition, nil, {
-					RollOffMinDistance = 0,
+					RollOffMinDistance = 10,
 					RollOffMaxDistance = 20,
 				}, v)
 			end

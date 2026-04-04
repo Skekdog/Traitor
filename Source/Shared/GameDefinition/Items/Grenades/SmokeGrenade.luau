@@ -23,7 +23,7 @@ local SmokeGrenade = Grenade({
 
         Sound = PlaySound.MakeSound(104605904869658, {
             Volume = 0.75,
-            RollOffMinDistance = 10,
+            RollOffMinDistance = 40,
             RollOffMaxDistance = 60,
         })
     },

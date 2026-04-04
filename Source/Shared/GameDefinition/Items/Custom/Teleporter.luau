@@ -60,8 +60,8 @@ if RunService:IsClient() then
 
 		PlaySound(5518430240, at, nil, {
 			SoundGroup = SoundService.AllSounds :: SoundGroup,
-			RollOffMinDistance = 5,
-			RollOffMaxDistance = 12,
+			RollOffMinDistance = 15,
+			RollOffMaxDistance = 25,
 		})
 
 		tween:Play()

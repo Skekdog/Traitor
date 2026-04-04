@@ -109,7 +109,7 @@ function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, par
     local hitPart = params.HitPart or GetPrimaryPart(prop.Model)
 
     GameHooks(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, params.HitPosition or hitPart.Position, nil, {
-        RollOffMinDistance = 5,
+        RollOffMinDistance = 10,
         RollOffMaxDistance = 15,
     })
 

@@ -58,8 +58,8 @@ local function OnLoadServer(interactable: Types.Prop): ()
 
 	local healSound = Instance.new("Sound")
 	healSound.SoundId = "rbxassetid://4720447470"
-	healSound.RollOffMinDistance = 5
-	healSound.RollOffMaxDistance = 15
+	healSound.RollOffMinDistance = 15
+	healSound.RollOffMaxDistance = 20
 	healSound.PlaybackRegionsEnabled = true
 	healSound.PlaybackRegion = NumberRange.new(0.2, 1.19)
 	healSound.Parent = station.Model

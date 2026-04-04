@@ -39,7 +39,7 @@ local Flashbang = Grenade({
 
         Sound = PlaySound.MakeSound(70709185462455, {
             Volume = 0.75,
-            RollOffMinDistance = 10,
+            RollOffMinDistance = 40,
             RollOffMaxDistance = 60,
         })
     },

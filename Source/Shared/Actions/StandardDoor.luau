@@ -358,8 +358,8 @@ local function StandardDoor(request: DoorRequest): ()
         if #sounds == 0 then
             local id = if shouldOpen then if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_OPEN_SOUND else DEFAULT_HINGE_OPEN_SOUND else if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_CLOSE_SOUND else DEFAULT_HINGE_CLOSE_SOUND
             sounds = {PlaySound.MakeSound(id, {
-                RollOffMinDistance = 6,
-                RollOffMaxDistance = 18,
+                RollOffMinDistance = 15,
+                RollOffMaxDistance = 20,
             })}
         end
         PlaySound(sounds, nil, GetPrimaryPart(door))

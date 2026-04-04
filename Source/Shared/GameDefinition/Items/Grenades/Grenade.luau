@@ -28,7 +28,7 @@ local item = Grenade({
 
         Sound = PlaySound.MakeSound(110846649787027, {
             Volume = 0.75,
-            RollOffMinDistance = 10,
+            RollOffMinDistance = 40,
             RollOffMaxDistance = 75,
         })
     },
