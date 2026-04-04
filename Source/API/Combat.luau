@@ -29,7 +29,8 @@ function module.MakeExplosion(params: {
 		IgnoreSelfDefense = params.IgnoreKarma,
 		BeforeHitParticipant = params.BeforeHitParticipant,
 		FilterImpulse = params.FilterImpulse,
-	}, params.Position, params.Attacker), sound)
+		Sound = sound,
+	}, params.Position, params.Attacker))
 end
 
 return table.freeze(module)

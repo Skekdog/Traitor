@@ -36,6 +36,12 @@ local Flashbang = Grenade({
         FalloffEnd = 15,
         Pressure = 10000,
         VisualRadius = 15,
+
+        Sound = PlaySound.MakeSound(70709185462455, {
+            Volume = 0.75,
+            RollOffMinDistance = 10,
+            RollOffMaxDistance = 60,
+        })
     },
 
     OnHitClient = function()

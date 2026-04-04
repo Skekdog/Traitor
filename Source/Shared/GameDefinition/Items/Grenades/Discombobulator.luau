@@ -20,6 +20,8 @@ local Discombobulator = Grenade({
         FalloffEnd = 15,
         Pressure = 75000,
         VisualRadius = 15,
+
+        Sound = ReplicatedStorage.Assets.InteractableSounds.Broken :: Sound?,
     },
 
     OnHitClient = Discombobulate,

@@ -22,7 +22,7 @@ local nearMissSound = Instance.new("Sound")
 nearMissSound.SoundId = "rbxassetid://98905989782853"
 nearMissSound.Parent = ReplicatedStorage.Assets
 
-function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParams, sound: Sound?): ()
+function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParams): ()
     local explosion = Instance.new("Explosion")
 
     local info = params.Definition
@@ -39,7 +39,7 @@ function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
     folder.Name = "Explosions"
     folder.Parent = workspace
 
-	PlaySound(sound or ServerStorage.Assets.Explosion, params.Position)
+	PlaySound(info.Sound or ServerStorage.Assets.Explosion, params.Position)
 
     explosion.Parent = folder
 

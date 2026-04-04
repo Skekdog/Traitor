@@ -19,6 +19,18 @@ local TEXT_HIGHLIGHT_COLOUR = Color3.fromRGB(66, 135, 245)
 
 local module = {}
 
+local fullSound = PlaySound.MakeSound(252142019, {
+	Volume = 1,
+	RollOffMinDistance = 70,
+	RollOffMaxDistance = 240,
+})
+
+local reducedSound = PlaySound.MakeSound(252142019, {
+	Volume = 1,
+	RollOffMinDistance = 35,
+	RollOffMaxDistance = 70,
+})
+
 local explosionInfo: Types.ExplosionInfo = {
 	Damage = 100,
 	FalloffStart = 40,
@@ -28,6 +40,8 @@ local explosionInfo: Types.ExplosionInfo = {
 
 	IgnoreKarma = true,
 	IgnoreSelfDefense = true,
+
+	Sound = fullSound,
 }
 
 local reducedExplosionInfo: Types.ExplosionInfo = {
@@ -39,6 +53,8 @@ local reducedExplosionInfo: Types.ExplosionInfo = {
 
 	IgnoreKarma = true,
 	IgnoreSelfDefense = true,
+
+	Sound = reducedSound,
 }
 
 export type C4 = Types.Prop & {
@@ -408,14 +424,8 @@ if RunService:IsServer() then
 			return
 		end
 
-		local sound = Instance.new("Sound")
-		sound.SoundId = "rbxassetid://252142019"
-		sound.Volume = 1
-		sound.RollOffMinDistance = if reducedPower then 35 else 70
-		sound.RollOffMaxDistance = if reducedPower then 70 else 240
-
 		destroy(c4)
-		Server.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Model.Position, armedBy), sound)
+		Server.CreateExplosion(armedBy.Round, ExplosionParams.new(if reducedPower then reducedExplosionInfo else explosionInfo, c4.Model.Position, armedBy))
 	end
 
 	local function tryArm(c4: C4, participant: Types.Participant, duration: number?): ()
