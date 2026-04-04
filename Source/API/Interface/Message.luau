@@ -15,7 +15,7 @@ function Message.Notification(message: string, isTeamMessage: boolean?, target: 
 		assert(target, "Using Message on the server must specify a target")
 		return Replication.FireToTargets(notication, target, message, isTeamMessage)
 	end
-	assert(target, "Using Message on the client must not specify a target")
+	assert(not target, "Using Message on the client must not specify a target")
 
 	local ShowMessage = require(ReplicatedStorage.Shared.Interface.Util.ShowMessage)
 	ShowMessage(message, if isTeamMessage then "Team" else "All")
@@ -31,6 +31,7 @@ function Message.Popup(message: string, target: ReplicationTarget?): ()
 		assert(target, "Using Message on the server must specify a target")
 		return Replication.FireToTargets(popup, target, message)
 	end
+	assert(not target, "Using Message on the client must not specify a target")
 
 	local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 	ShowAlert(message)
@@ -46,7 +47,7 @@ function Message.Chat(message: string, target: ReplicationTarget?): ()
 		assert(target, "Using Message on the server must specify a target")
 		return Replication.FireToTargets(chat, target, message)
 	end
-	assert(target, "Using Message on the client must not specify a target")
+	assert(not target, "Using Message on the client must not specify a target")
 
 	local ShowMessage = require(ReplicatedStorage.Shared.Interface.Util.ShowMessage)
 	ShowMessage(message, "Chat")
@@ -64,7 +65,7 @@ function Message.Screen(message: string, format: ScreenMessageFormat, overrides:
 		assert(target, "Using Message on the server must specify a target")
 		return Replication.FireToTargets(screen, target, message, format, overrides)
 	end
-	assert(target, "Using Message on the client must not specify a target")
+	assert(not target, "Using Message on the client must not specify a target")
 
 	local ScreenMessage = require(ReplicatedStorage.Shared.Interface.Util.ScreenMessage)
 	ScreenMessage(format, message, overrides)
