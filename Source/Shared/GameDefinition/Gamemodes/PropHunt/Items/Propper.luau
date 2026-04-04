@@ -91,6 +91,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 		humanoid.Health = math.min(health, participant:GetHealth())
 	end
 
+	humanoid.CameraOffset = Vector3.new(0, -1.5, 0)
 	humanoid.MaxHealth = health
 
 	morph.Parent = workspace.Characters
