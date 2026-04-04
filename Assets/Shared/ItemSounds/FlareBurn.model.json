@@ -1,17 +1,10 @@
 {
   "Properties": {
-    "PlaybackRegion": {
-      "NumberRange": [
-        0.10000000149011612,
-        60000
-      ]
-    },
-    "PlaybackRegionsEnabled": true,
     "RollOffMaxDistance": 40,
     "RollOffMinDistance": 10,
-    "RollOffMode": "Inverse",
-    "SoundId": "rbxassetid://298181829",
-    "Volume": 0.25
+    "RollOffMode": "InverseTapered",
+    "SoundId": "rbxassetid://89387010456423",
+    "Volume": 0.5
   },
   "className": "Sound"
 }
