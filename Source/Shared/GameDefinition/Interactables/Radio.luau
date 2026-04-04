@@ -7,6 +7,7 @@ local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local Types = require(ReplicatedStorage.API.Types)
+local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
 
 local PLAY_COOLDOWN = 0.25
 
@@ -328,6 +329,8 @@ local interactable: Types.InteractableDefinition = {
 	OnInteractServer = OnInteractServer,
 	OnLoadServer = OnLoadServer,
 	BeforeTakeDamage = BlockFriendlyDamage,
+
+	OnBreakServer = BreakSound(),
 }
 
 return table.freeze(interactable)

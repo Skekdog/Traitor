@@ -7,6 +7,7 @@ local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local SPHERE_TWEEN_INFO = TweenInfo.new(
@@ -317,6 +318,8 @@ local interactable: Types.InteractableDefinition = {
 
 	OnLoadServer = OnLoadServer,
 	OnInteractServer = OnInteractServer,
+
+	OnBreakServer = BreakSound(),
 }
 
 return table.freeze(interactable)

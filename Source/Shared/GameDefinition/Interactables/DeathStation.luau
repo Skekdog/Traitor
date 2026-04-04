@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
+local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
 local IsHostileParticipant = require(ReplicatedStorage.API.Prop.IsHostileParticipant)
 local HealthStation = require(script.Parent.HealthStation)
 local Types = require(ReplicatedStorage.API.Types)
@@ -16,13 +17,7 @@ type DeathStationServer = Types.Prop & {
 local function OnLoadServer(interactable: Types.Prop): ()
 	local deathStation = interactable :: DeathStationServer
 
-	local deniedSound = Instance.new("Sound")
-	deniedSound.SoundId = "rbxassetid://72729349003330"
-	deniedSound.RollOffMinDistance = 5
-	deniedSound.RollOffMaxDistance = 15
-	deniedSound.Parent = interactable.Model
-
-	deathStation.Extras.DeniedSound = deniedSound
+	deathStation.Extras.DeniedSound = ReplicatedStorage.Assets.InteractableSounds.Deny:Clone()
 
 	local participant: Types.Participant? = interactable.Extras.Participant
 	if participant then
@@ -70,6 +65,8 @@ local interactable: Types.InteractableDefinition = {
 	OnLoadClient = OnLoadClient,
 
 	BeforeTakeDamage = BlockFriendlyDamage,
+
+	OnBreakServer = BreakSound(),
 }
 
 return table.freeze(interactable)

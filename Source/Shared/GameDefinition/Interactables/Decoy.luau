@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
+local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
 local ReplicateAssociatedPlayer = require(ReplicatedStorage.API.Prop.ReplicateAssociatedPlayer)
 local Types = require(ReplicatedStorage.API.Types)
 
@@ -79,6 +80,8 @@ local interactable: Types.InteractableDefinition = {
 	BeforeTakeDamage = BlockFriendlyDamage,
 
 	OnLoadServer = OnLoadServer,
+
+	OnBreakServer = BreakSound(),
 }
 
 function module.GetPlayerPosition(player: Player): (CFrame?, boolean)

@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
+local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local module = {}
@@ -65,13 +66,7 @@ local function OnLoadServer(interactable: Types.Prop): ()
 
 	station.Extras.HealSound = healSound
 
-	local noChargeSound = Instance.new("Sound")
-	noChargeSound.SoundId = "rbxassetid://72729349003330"
-	noChargeSound.RollOffMinDistance = 5
-	noChargeSound.RollOffMaxDistance = 15
-	noChargeSound.Parent = station.Model
-
-	station.Extras.NoChargeSound = noChargeSound
+	station.Extras.NoChargeSound = ReplicatedStorage.Assets.InteractableSounds.Deny:Clone()
 end
 
 local function heal(interactable: Types.Prop, participant: Types.Participant): ()
@@ -164,6 +159,8 @@ local interactable: Types.InteractableDefinition = {
 	OnLoadClient = OnLoadClient,
 
 	BeforeTakeDamage = BlockFriendlyDamage,
+
+	OnBreakServer = BreakSound(),
 }
 
 module.Interactable = interactable
