@@ -41,6 +41,8 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	local morph = Instance.new("Model")
 	morph:SetAttribute("IsDisguised", true)
 
+	local oldHumanoid = participant:GetHumanoid()
+
 	local humanoid = Instance.new("Humanoid")
 	humanoid.RequiresNeck = false
 	humanoid.RigType = Enum.HumanoidRigType.R6
@@ -81,7 +83,14 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	participant:SpawnCharacter(morph, true)
 
 	local health = prop:GetHealth() or DEFAULT_HEALTH
-	humanoid.Health = math.min(health, participant:GetHealth())
+
+	if oldHumanoid then
+		local percent = oldHumanoid.Health / oldHumanoid.MaxHealth
+		humanoid.Health = health * percent
+	else
+		humanoid.Health = math.min(health, participant:GetHealth())
+	end
+
 	humanoid.MaxHealth = health
 
 	morph.Parent = workspace.Characters
