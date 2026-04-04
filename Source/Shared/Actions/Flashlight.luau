@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 
@@ -52,6 +53,8 @@ local function enableFlashlight(doEnable: boolean?): Enum.ContextActionResult
 
 	local light = getOrCreateFlashlight(workspace.CurrentCamera)
 	light.Enabled = enabled
+
+	PlaySound(120344853558767)
 
 	return Enum.ContextActionResult.Pass
 end
