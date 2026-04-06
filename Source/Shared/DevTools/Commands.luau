@@ -6,7 +6,6 @@ local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
-local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
@@ -708,10 +707,15 @@ module.spawninteractable = {
 				continue
 			end
 
-			local interactable = round:LoadProp(definition.Model:Clone())
-			interactable.Model:RemoveTag("Item")
-			GetPrimaryPart(interactable.Model).CFrame = char:GetPivot();
-			(interactable.Model :: Instance).Parent = round:GetMap().Structure.Dynamic
+			local model = definition.Model:Clone()
+			model:AddTag("Interactable")
+			model:AddTag("Prop")
+			model:RemoveTag("Item")
+
+			local interactable = round:LoadProp(model)
+			interactable.Model:PivotTo(char:GetPivot())
+
+			;(interactable.Model :: Instance).Parent = round:GetMap().Structure.Dynamic
 
 			table.insert(affectedPlayers, player)
 		end
