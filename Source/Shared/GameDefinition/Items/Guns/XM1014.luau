@@ -25,7 +25,7 @@ local XM1014 = Gun({
     Spread = 0.03,
 
     PrimaryInterval = 0.8,
-    ReloadDuration = 0.5,
+    ReloadDuration = 0.45,
     AmmoDefinition = Ammo.Shotgun,
     UseShells = true,
 
