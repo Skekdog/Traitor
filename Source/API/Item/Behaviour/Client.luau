@@ -192,11 +192,13 @@ function Client.TryReloadWeapon(item: Types.Item): boolean
 
 		local lastAmmo = item.Ammo
 		while ClientInventory.EquippedItem() == item do
-			if item.Ammo ~= lastAmmo then
+			if item.Ammo > lastAmmo then
 				lastAmmo = item.Ammo
 				if item.ReloadSound then
 					PlaySound(item.ReloadSound)
 				end
+			elseif item.Ammo ~= lastAmmo then
+				lastAmmo = item.Ammo
 			end
 
 			-- not in the loop condition because we still want to play reload sound when inserting the final shell
