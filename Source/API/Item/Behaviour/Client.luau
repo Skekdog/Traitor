@@ -181,13 +181,43 @@ function Client.TryReloadWeapon(item: Types.Item): boolean
 
 	item.IsReloading = true
 
-	Viewmodel.ReloadSpring.p = Vector3.new(10, 5, 10)
-
-	if item.ReloadSound then
-		PlaySound(item.ReloadSound)
-	end
-
 	ReplicatedStorage.Remotes.ClientServer.ReloadWeapon:FireServer(item.Name)
+
+	if item.UseShells then
+		local oldFreq = Viewmodel.ReloadSpring.angularFrequency
+		if oldFreq ~= 0 then
+			Viewmodel.ReloadSpring.angularFrequency = 0
+			Viewmodel.ReloadSpring.p = Vector3.new(10000, 100000, 10000)
+		end
+
+		local lastAmmo = item.Ammo
+		while ClientInventory.EquippedItem() == item do
+			if item.Ammo ~= lastAmmo then
+				lastAmmo = item.Ammo
+				if item.ReloadSound then
+					PlaySound(item.ReloadSound)
+				end
+			end
+
+			-- not in the loop condition because we still want to play reload sound when inserting the final shell
+			if not item.IsReloading then
+				break
+			end
+
+			task.wait()
+		end
+
+		if oldFreq ~= 0 then
+			Viewmodel.ReloadSpring.angularFrequency = oldFreq
+			Viewmodel.ReloadSpring.p = Vector3.new(10, 5, 10)
+		end
+	else
+		Viewmodel.ReloadSpring.p = Vector3.new(10, 5, 10)
+
+		if item.ReloadSound then
+			PlaySound(item.ReloadSound)
+		end
+	end
 
 	return true
 end

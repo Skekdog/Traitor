@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.API.Types)
@@ -30,6 +31,10 @@ end)
 local function finishReloading(plr: Player, item: Types.Item): ()
 	item.IsReloading = false
 	remotes.ClientServer.ReloadWeapon:FireClient(plr, item.Name, item.Ammo)
+end
+
+local function updateAmmo(plr: Player, item: Types.Item): ()
+	remotes.ServerClient.UpdateAmmo:FireClient(plr, item.Name, item.Ammo)
 end
 
 remotes.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: unknown): ()
@@ -67,13 +72,34 @@ remotes.ClientServer.ReloadWeapon.OnServerEvent:Connect(function(plr, itemName: 
 	if not item.ReloadDuration or item.ReloadDuration <= 0 then
 		finishReloading(plr, item)
 	else
-		local endTime = workspace:GetServerTimeNow() + item.ReloadDuration
-		while workspace:GetServerTimeNow() < endTime do
-			if participant:GetEquippedItem() ~= item then
-				finishReloading(plr, item)
-				return
+		if item.UseShells then
+			local elapsed = 0
+			while (item.Ammo or 0) < item.AmmoDefinition.Capacity and participant:GetAmmo(ammoKind) > 0 do
+				if participant:GetEquippedItem() ~= item then
+					finishReloading(plr, item)
+					return
+				end
+
+				if elapsed > item.ReloadDuration :: number then
+					elapsed = 0
+					item.Ammo = (item.Ammo or 0) + 1
+					participant:SetAmmo(ammoKind, participant:GetAmmo(ammoKind) - 1)
+					updateAmmo(plr, item)
+				end
+
+				elapsed += RunService.Heartbeat:Wait()
 			end
-			task.wait()
+			finishReloading(plr, item)
+			return
+		else
+			local endTime = workspace:GetServerTimeNow() + item.ReloadDuration
+			while workspace:GetServerTimeNow() < endTime do
+				if participant:GetEquippedItem() ~= item then
+					finishReloading(plr, item)
+					return
+				end
+				task.wait()
+			end
 		end
 	end
 
