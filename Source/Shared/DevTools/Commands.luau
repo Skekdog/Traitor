@@ -488,7 +488,9 @@ module.skipphase = {
 	Execute = function(_, round: Round): string
 		local currentPhase: Types.Phase = round:GetPhase()
 
+		round:Pause(false)
 		round.ElapsedPhaseTime = math.huge
+
 		RunService.Heartbeat:Wait()
 		RunService.Heartbeat:Wait()
 
