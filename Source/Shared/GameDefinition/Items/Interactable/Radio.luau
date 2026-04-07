@@ -7,7 +7,7 @@ local Radio = InteractableItem({
     ItemGroup = ItemGroups.RoleUtility,
     DropDisabled = true,
 
-    Description = "Remotely plays a sound to confuse nearby spies.",
+    Description = "Remotely plays a sound to confuse nearby players.",
     IconContent = Content.fromAssetId(128627317841330),
 
     Cost = 1,
