@@ -14,7 +14,14 @@ local texts = {
 
 local TEXT_INTERVAL = 0.5
 
+local heyOverHere = PlaySound.MakeSound(1454256125, {
+	RollOffMinDistance = 40,
+	RollOffMaxDistance = 50,
+	Volume = 1,
+})
+
 local function disable(item: Types.Item): ()
+	item.AlternateDisabled = true
 	item.PrimaryDisabled = true
 	item.UnequipDisabled = true
 	item.DropDisabled = true
@@ -85,6 +92,20 @@ local function PrimaryFireServer(item: Types.Item, _, _, participant: Types.Part
 	end)
 end
 
+local function AlternateFireClient(item: Types.Item): boolean
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+	local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
+
+	if not Checks.Interval(item, "Alternate") then
+		return false
+	end
+
+	Client.ApplyInterval(item, "Alternate")
+	Client.PlaySound(item, "Alternate")
+
+	return true
+end
+
 local item = Custom({
 	Name = "JBomb",
 	DisplayName = "J-Bomb",
@@ -100,9 +121,18 @@ local item = Custom({
 	Model = ReplicatedStorage.Assets.ItemModels.JBomb,
 	HoldAnimation = Content.fromAssetId(109945925204096),
 
+	PregameDisable = true,
+
 	PrimaryToggled = true,
 	PrimarySound = ReplicatedStorage.Assets.ItemSounds.JBomb,
 	PrimaryAnimation = Content.fromAssetId(80011723264524),
+
+	AlternateInterval = 1,
+	AlternateToggled = true,
+	AlternateSound = heyOverHere,
+
+	AlternateFireServer = function() return nil end,
+	AlternateFireClient = AlternateFireClient,
 
 	PrimaryFireClient = PrimaryFireClient,
 	PrimaryFireServer = PrimaryFireServer,
