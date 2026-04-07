@@ -1,9 +1,10 @@
 local fs = require("@lune/fs")
 local roblox = require("@lune/roblox")
-local PublishAsset = require("./Lib/PublishAsset")
-local Stubuau = require("./Lib/Stubuau/Stubuau")
+local Stubuau = require("@lib/Stubuau/Stubuau")
 
-local ASSET_ID = "117390899198330"
+local GenerateAPITypeStubs = {}
+
+local PATH = "API.rbxm"
 
 local STUB_BASE = [[
 --!strict
@@ -66,12 +67,19 @@ local function generateDirectory(basePath: string, dir: string?): ()
 	end
 end
 
-generateDirectory("Source/API")
+function GenerateAPITypeStubs.CreateFile(): string
+	generateDirectory("Source/API")
 
-createScript("Types", outputFolder, fs.readFile("Source/Shared/RoundRule/src/Types.luau"))
+	createScript("Types", outputFolder, fs.readFile("Source/Shared/RoundRule/src/Types.luau"))
 
-local output = roblox.serializeModel({outputFolder})
-fs.writeFile("API.rbxm", output)
+	local output = roblox.serializeModel({outputFolder})
 
-PublishAsset(ASSET_ID, "API", "API.rbxm")
-fs.removeFile("API.rbxm")
+	fs.writeFile(PATH, output)
+	return PATH
+end
+
+function GenerateAPITypeStubs.RemoveFile(): ()
+	fs.removeFile(PATH)
+end
+
+return GenerateAPITypeStubs

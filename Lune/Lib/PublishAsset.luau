@@ -1,7 +1,7 @@
 local fs = require("@lune/fs")
 local net = require("@lune/net")
 local process = require("@lune/process")
-local Env = require("./Env")
+local Env = require("@lib/Env")
 
 local ASSET_PROJECT = [[
 {
