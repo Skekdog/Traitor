@@ -4,10 +4,6 @@ local Types = require(script.Parent.Types)
 local function makeGolden(victim: Types.Participant)
     local char = assert(victim:GetCharacter(), "Participant has no character")
     local root = char:FindFirstChild("HumanoidRootPart")
-    local bodyColors = char:FindFirstChildOfClass("BodyColors")
-    if bodyColors then
-        bodyColors:Destroy()
-    end
 
     if root then
         local deathSound = root:FindFirstChild("DeathSound") :: Sound?
@@ -19,10 +15,22 @@ local function makeGolden(victim: Types.Participant)
         sound.Name = "DeathSound"
         sound.Parent = root :: any
     end
+
+    local bodyColours = char:FindFirstChildWhichIsA("BodyColors")
+    if bodyColours then
+        local gold = BrickColor.new("Gold")
+
+        bodyColours.HeadColor = gold
+        bodyColours.LeftLegColor = gold
+        bodyColours.RightLegColor = gold
+        bodyColours.LeftArmColor = gold
+        bodyColours.RightArmColor = gold
+        bodyColours.TorsoColor = gold
+    end
+
     for _, v in char:GetChildren() do
         if v:IsA("BasePart") then
             v.Material = Enum.Material.Metal
-            v.BrickColor = BrickColor.new("Gold")
         end
     end
 
