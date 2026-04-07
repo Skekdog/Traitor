@@ -97,7 +97,7 @@ function module.GetPlayerPosition(player: Player): (CFrame?, boolean)
 	end
 
 	local root = char.PrimaryPart
-	local humanoid = char:FindFirstAncestorOfClass("Humanoid")
+	local humanoid = char:FindFirstChildWhichIsA("Humanoid")
 	if not root or not humanoid or humanoid.Health <= 0 then
 		return nil, false
 	end

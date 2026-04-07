@@ -32,8 +32,8 @@ local function HeartbeatClient(item: Types.Item): ()
             continue
         end
 
-        local colour = if isDecoy and player == Players.LocalPlayer or
-            LocalParticipantInfo.GetParticipant().Role():IsAlliedWith(LocalParticipantInfo.GetParticipant(player.Name).Role()) then
+        local colour = if isDecoy and (player == Players.LocalPlayer or
+            LocalParticipantInfo.GetParticipant().Role():IsAlliedWith(LocalParticipantInfo.GetParticipant(player.Name).Role())) then
                 GREY_COLOUR
             else
                 GREEN_COLOUR
