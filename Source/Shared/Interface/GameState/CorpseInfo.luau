@@ -174,10 +174,12 @@ return function(corpseInfo: Types.ClientCorpseView?)
     object.Headshot.Visible = corpseInfo.WasHeadshot or false
     object.SD.Visible = corpseInfo.WasSelfDefense or false
 
+    local additionalIcons = table.clone(corpseInfo.AdditionalIcons)
+
     for _, replicate in corpseInfo.EquipmentList do
         local item = ClientInventory.CreateReplicatedItem(replicate)
         local formattedItemName = GetDeterminer(GetDisplayName(item)) .. " " ..  highlightedText(GetDisplayName(item))
-        table.insert(corpseInfo.AdditionalIcons, {
+        table.insert(additionalIcons, {
             Name = item.Name,
             Description = string.format(item.CorpseIconDescription or "They had %s.", formattedItemName),
             Icon = item.IconContent,
@@ -204,7 +206,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
         object.KillList.Visible = false
     end
 
-    for _, v in corpseInfo.AdditionalIcons do
+    for _, v in additionalIcons do
         local icon = object.DeathTime:Clone()
         icon.ImageContent = v.Icon
         icon:SetAttribute("Description", FullParse(v.Description))
