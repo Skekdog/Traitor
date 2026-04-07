@@ -183,18 +183,22 @@ function module.Show(item: Types.Item): ()
     local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Assets.Viewmodel:Clone()) :: Viewmodel
 
     if not viewmodel.Parent then
-        local function updateShirt(shirt: Shirt): ()
+        local function updateShirt(shirt: Shirt?): ()
             local oldShirt = viewmodel:FindFirstChildOfClass("Shirt")
             if oldShirt then
                 oldShirt:Destroy()
             end
 
-            local newShirt = shirt:Clone()
-            newShirt.Parent = viewmodel
-
             if shirtCon then
                 shirtCon:Disconnect()
             end
+
+            if not shirt then
+                return
+            end
+
+            local newShirt = shirt:Clone()
+            newShirt.Parent = viewmodel
 
             shirtCon = shirt.Changed:Connect(function(prop)
                 if prop == "Parent" then
@@ -202,20 +206,26 @@ function module.Show(item: Types.Item): ()
                 end
                 (newShirt :: any)[prop] = (shirt :: any)[prop]
             end)
+
+            shirt.Destroying:Once(updateShirt)
         end
 
-        local function updateColours(colours: BodyColors): ()
+        local function updateColours(colours: BodyColors?): ()
             local oldColours = viewmodel:FindFirstChildOfClass("BodyColors")
             if oldColours then
                 oldColours:Destroy()
             end
 
-            local newColours = colours:Clone()
-            newColours.Parent = viewmodel
-
             if coloursCon then
                 coloursCon:Disconnect()
             end
+
+            if not colours then
+                return
+            end
+
+            local newColours = colours:Clone()
+            newColours.Parent = viewmodel
 
             coloursCon = colours.Changed:Connect(function(prop)
                 if prop == "Parent" then
@@ -223,6 +233,8 @@ function module.Show(item: Types.Item): ()
                 end
                 (newColours :: any)[prop] = (colours :: any)[prop]
             end)
+
+            colours.Destroying:Once(updateColours)
         end
 
         local shirt = char:FindFirstChildOfClass("Shirt")
