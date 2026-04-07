@@ -10,4 +10,6 @@ GameHooks.OnItemDropped = {} :: Hooks<(round: Types.Round, participant: Types.Pa
 
 GameHooks.BeforeDamageParticipant = {} :: Hooks<(round: Types.Round, participant: Types.Participant, params: Types.DamageParams) -> ()>
 
+GameHooks.OnCrouch = {} :: Hooks<(isCrouching: boolean) -> ()>
+
 return GameHooks

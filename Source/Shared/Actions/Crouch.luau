@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local JumpPower = require(ReplicatedStorage.Shared.Character.JumpPower)
 local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
@@ -89,6 +90,10 @@ function module.ToggleCrouching(enabled: boolean?): ()
 	else
 		LocalAnimation.TryStopAnimation("Crouch")
 		track = nil
+	end
+
+	for _, hook in GameHooks.OnCrouch do
+		hook(isCrouching)
 	end
 end
 
