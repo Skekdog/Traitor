@@ -14,7 +14,7 @@ local MAX_RANGE = 10000
 
 local function isPartValid(part: BasePart): boolean
 	local prop = GetMapObjectWithTag(part, "Prop")
-	return if prop then Impulse.CanImpulse(part) and not prop:HasTag("Interactable") else false
+	return if prop then Impulse.CanImpulse(part) and not prop:HasTag("Interactable") and not prop:HasTag("Corpse") else false
 end
 
 local function clientThing(origin: Vector3, direction: Vector3): BehaviourTypes.HitscanResult?
