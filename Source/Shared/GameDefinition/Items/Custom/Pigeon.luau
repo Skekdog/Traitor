@@ -130,12 +130,12 @@ local function scanForPlayers(data: PigeonData, dt: number): boolean
 			continue
 		end
 
-		local participant: Types.Participant? = GetParticipant(part) -- annotation needed because type-checker otherwise calls it too complex
+		local participant = GetParticipant(part)
 		if not participant or table.find(foundParticipants, participant) then
 			continue
 		end
 
-		if participant == data.Launcher or participant:GetRole():IsAlliedWith(data.Launcher:GetRole()) then
+		if participant == data.Launcher or not participant:IsAlive() or participant:GetRole():IsAlliedWith(data.Launcher:GetRole()) then
 			continue
 		end
 
