@@ -113,7 +113,7 @@ local function laser(viewmodel: Viewmodel, item: Types.Item): ()
 
     laser.Color = item.LaserColor
 
-    local position = Raycasts.Hitscan(Raycasts.GetDefaultRaycastParams(char), workspace.CurrentCamera.CFrame.Position, Raycasts.GetDirection(), item.MaxDistance or 10000).Position
+    local position = Raycasts.Hitscan(Raycasts.GetDefaultRaycastParams(char, workspace.CurrentCamera), workspace.CurrentCamera.CFrame.Position, Raycasts.GetDirection(), item.MaxDistance or 10000).Position
 
     CreateEmptyPart(attachment.CFrame).Color = Color3.fromRGB(255,255,255)
 

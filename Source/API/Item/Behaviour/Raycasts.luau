@@ -16,9 +16,10 @@ end
 function Raycasts.DeriveTargetPosition(origin: Vector3, direction: Vector3, range: number): Vector3
 	return origin + (direction.Unit * range)
 end
-function Raycasts.GetDefaultRaycastParams(char: Instance): RaycastParams
+
+function Raycasts.GetDefaultRaycastParams(...: Instance): RaycastParams
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {char}
+	params.FilterDescendantsInstances = {...}
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
