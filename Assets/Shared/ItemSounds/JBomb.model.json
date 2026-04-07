@@ -1,0 +1,9 @@
+{
+  "Properties": {
+    "RollOffMaxDistance": 50,
+    "RollOffMinDistance": 20,
+    "SoundId": "rbxassetid://94110016771720",
+    "Volume": 0.5
+  },
+  "className": "Sound"
+}
