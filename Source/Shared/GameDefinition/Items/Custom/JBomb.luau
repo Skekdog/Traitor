@@ -87,7 +87,7 @@ local item = Custom({
 	Name = "JBomb",
 	DisplayName = "J-Bomb",
 	Description = "Triggers an explosion, killing everyone in range. No refunds.",
-	IconContent = Content.none,
+	IconContent = Content.fromAssetId(120985266025944),
 
 	Cost = 1,
 	MaxStock = 2, -- Give it to an innocent, you know you want to
