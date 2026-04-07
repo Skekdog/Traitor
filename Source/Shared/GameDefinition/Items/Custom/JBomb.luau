@@ -29,13 +29,15 @@ local function PrimaryFireClient(item: Types.Item): boolean
 	Client.PlayAnimation(item, "Primary")
 
 	local model = Client.GetViewmodelItem() :: typeof(ReplicatedStorage.Assets.ItemModels.JBomb)?
-	if model then
-		model.DisplayUI.Label.Text = texts[1]
-		model.DisplayUI.Enabled = true
+	local displayUI = if model then model:FindFirstChild("DisplayUI") else nil
+	local label = if displayUI then displayUI:FindFirstChild("Label") else nil
+	if label and displayUI then
+		label.Text = texts[1]
+		displayUI.Enabled = true
 
 		task.spawn(function()
 			for _, text in texts do
-				model.DisplayUI.Label.Text = text
+				label.Text = text
 				task.wait(TEXT_INTERVAL)
 			end
 		end)
