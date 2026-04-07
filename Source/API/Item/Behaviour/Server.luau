@@ -41,8 +41,6 @@ function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 
 	PlaySound(info.Sound or ServerStorage.Assets.Explosion, params.Position)
 
-    explosion.Parent = folder
-
 	local hits: {Types.Participant | Types.Prop} = {}
     for _, v in workspace:GetPartBoundsInRadius(params.Position, info.FalloffEnd) do
 		if not v:IsDescendantOf(workspace) then
@@ -81,6 +79,8 @@ function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
 
 		Impulse.ApplyImpulse(v, impulse, true, nil, params.Attacker)
     end
+
+    explosion.Parent = folder
 end
 
 function Server.ProcessHitscan(item: Types.Item, origin: Vector3, participant: Types.Participant, i: number, hitscan: BehaviourTypes.HitscanResult): string?
