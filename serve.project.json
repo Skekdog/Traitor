@@ -42,6 +42,18 @@
         "MapPrefabs": {
           "$className": "Folder",
           "$path": "Source/TT2Compat/MapPrefabs"
+        },
+
+        "ItemSounds": {
+          "$path": "Assets/Shared/ItemSounds"
+        },
+
+        "InteractableSounds": {
+          "$path": "Assets/Shared/InteractableSounds"
+        },
+
+        "VictoryMusic": {
+          "$path": "Assets/Shared/VictoryMusic"
         }
       },
 
