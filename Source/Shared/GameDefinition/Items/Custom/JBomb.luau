@@ -2,9 +2,17 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Types = require(ReplicatedStorage.API.Types)
-	local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local JBomb = {}
+
+local texts = {
+	"STAP!!!",
+	"PLIZZZ )):",
+	"NOOOO!!! DD:"
+}
+
+local TEXT_INTERVAL = 0.5
 
 local function disable(item: Types.Item): ()
 	item.PrimaryDisabled = true
@@ -18,6 +26,20 @@ local function PrimaryFireClient(item: Types.Item): boolean
 	disable(item)
 
 	Client.PlaySound(item, "Primary")
+	Client.PlayAnimation(item, "Primary")
+
+	local model = Client.GetViewmodelItem() :: typeof(ReplicatedStorage.Assets.ItemModels.JBomb)?
+	if model then
+		model.DisplayUI.Label.Text = texts[1]
+		model.DisplayUI.Enabled = true
+
+		task.spawn(function()
+			for _, text in texts do
+				model.DisplayUI.Label.Text = text
+				task.wait(TEXT_INTERVAL)
+			end
+		end)
+	end
 
 	return true
 end
@@ -64,7 +86,7 @@ end
 local item = Custom({
 	Name = "JBomb",
 	DisplayName = "J-Bomb",
-	Description = "Triggers a small explosion, killing everyone but also yourself.",
+	Description = "Triggers an explosion, killing everyone in range. No refunds.",
 	IconContent = Content.none,
 
 	Cost = 1,
@@ -73,12 +95,13 @@ local item = Custom({
 	IsSuspicious = true,
 	ItemGroup = ItemGroups.RoleWeapon,
 
-	Model = Instance.new("Part"),
-	HoldAnimation = Content.none,
-
-	PrimarySound = ReplicatedStorage.Assets.ItemSounds.JBomb,
+	Model = ReplicatedStorage.Assets.ItemModels.JBomb,
+	HoldAnimation = Content.fromAssetId(109945925204096),
 
 	PrimaryToggled = true,
+	PrimarySound = ReplicatedStorage.Assets.ItemSounds.JBomb,
+	PrimaryAnimation = Content.fromAssetId(80011723264524),
+
 	PrimaryFireClient = PrimaryFireClient,
 	PrimaryFireServer = PrimaryFireServer,
 })

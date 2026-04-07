@@ -397,26 +397,28 @@ function module.Recoil(item: Types.Item): ()
     end
 
     cameraRecoilSpring.p = Vector3.new(y, x, x + y)
-
-    if item.PrimaryAnimation then
-        module.PlayAnimation(item.PrimaryAnimation)
-    else
-        armRecoilSpring.p = Vector3.new(x, y, 0)
-    end
+    armRecoilSpring.p = Vector3.new(x, y, 0)
 end
 
-function module.MuzzleFlash(): ()
+function module.GetViewmodelItem(): Types.MapObject?
     local viewmodel = workspace.CurrentCamera:FindFirstChild("Viewmodel") :: Viewmodel?
     if not viewmodel then
-        return
+        return nil
     end
 
     local item = viewmodel:FindFirstChild("Item")
-    if not item or not item:IsA("BasePart") then
-        return
+    if not item or (not item:IsA("BasePart") and not item:IsA("Model")) then
+        return nil
     end
 
-    MuzzleFlash(item)
+    return item :: Types.MapObject
+end
+
+function module.MuzzleFlash(): ()
+    local item = module.GetViewmodelItem()
+    if item then
+        MuzzleFlash(item)
+    end
 end
 
 return table.freeze(module)

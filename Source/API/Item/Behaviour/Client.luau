@@ -71,9 +71,15 @@ end
 function Client.PlayAnimation(item: Types.Item, action: "Primary" | "Alternate"): ()
 	if action == "Primary" and item.PrimaryAnimation then
 		LocalAnimation.TryPlayAnimation(item.PrimaryAnimation, action .. "Fire")
+		Viewmodel.PlayAnimation(item.PrimaryAnimation, action .. "Fire")
 	elseif action == "Alternate" and item.AlternateAnimation then
 		LocalAnimation.TryPlayAnimation(item.AlternateAnimation, action .. "Fire")
+		Viewmodel.PlayAnimation(item.AlternateAnimation, action .. "Fire")
 	end
+end
+
+function Client.GetViewmodelItem(): Types.MapObject?
+	return Viewmodel.GetViewmodelItem()
 end
 
 function Client.RunAllChecks(item: Types.Item, action: "Primary" | "Alternate", noEffects: boolean?): boolean

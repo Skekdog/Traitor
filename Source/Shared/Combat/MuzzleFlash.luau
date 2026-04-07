@@ -1,4 +1,7 @@
-return function(gun: BasePart): ()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Types = require(ReplicatedStorage.API.Types)
+
+return function(gun: Types.MapObject): ()
     local attachment = gun:FindFirstChild("MuzzleFlash")
     if not attachment or not attachment:IsA("Attachment") then
         return
