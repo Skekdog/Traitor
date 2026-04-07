@@ -65,6 +65,8 @@ local GoldenGun = Gun({
                 HitPart = params.HitPart,
 
                 Projectile = params.Projectile,
+
+                IgnoreKarma = true,
             })
         else
             MakeGolden(attacker)
