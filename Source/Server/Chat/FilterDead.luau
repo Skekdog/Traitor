@@ -6,10 +6,18 @@ local GetRound = require(ReplicatedStorage.API.GetRound)
 
 local FilterDead = {}
 
-FilterDead.Disabled = false
+local isDisabled = false
+
+function FilterDead.IsDisabled(): boolean
+	return isDisabled
+end
+
+function FilterDead.SetDisabled(disabled: boolean): ()
+	isDisabled = disabled
+end
 
 function FilterDead.ShouldSend(sender: Player?, receiver: Player?): boolean
-	if FilterDead.Disabled then
+	if isDisabled then
 		return true
 	end
 
