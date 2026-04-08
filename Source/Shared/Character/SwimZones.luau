@@ -56,8 +56,12 @@ local INVALID_START_STATES = { -- Can't start swimming if character is in one of
 	Enum.HumanoidStateType.Swimming
 }
 
+-- Originally this only was the jumping state but Roblox changed something and if all of these aren't disabled swimming breaks
 local DISABLED_STATES = { -- These states are disabled when swimming
-	Enum.HumanoidStateType.Jumping
+	Enum.HumanoidStateType.Jumping,
+	Enum.HumanoidStateType.Freefall,
+	Enum.HumanoidStateType.Running,
+	Enum.HumanoidStateType.GettingUp,
 }
 
 local CLAMP_SURFACE_MOVEMENT = true -- clamps move direction to the surface of the water
@@ -221,11 +225,11 @@ RunService.PreSimulation:Connect(function(dt)
 			if not isInSwimmingState then
 				isInSwimmingState = true
 
-				hum:ChangeState(Enum.HumanoidStateType.Swimming)
-
 				for _,state in DISABLED_STATES do
 					hum:SetStateEnabled(state, false)
 				end
+
+				hum:ChangeState(Enum.HumanoidStateType.Swimming)
 
 				table.insert(stateCleanup, function()
 					for _, state in DISABLED_STATES do
