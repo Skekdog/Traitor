@@ -1,11 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local SoundService = game:GetService("SoundService")
-local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.API.Types)
+local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 
 local DROWN_THRESHOLD = 10
 local DROWN_DAMAGE = 10
@@ -13,9 +12,8 @@ local DROWN_INTERVAL = 1
 
 local params = RaycastParams.new()
 params.IgnoreWater = false
-params.FilterDescendantsInstances = {workspace.Terrain}
-params.IgnoreWater = false
 params.FilterType = Enum.RaycastFilterType.Include
+params.CollisionGroup = "PlayerCharacterParts" -- so that we include bounds
 
 type Participant = Types.Participant & {
 	Extras: {
@@ -24,12 +22,21 @@ type Participant = Types.Participant & {
 	}
 }
 
-local overlapParams = OverlapParams.new()
-overlapParams.RespectCanCollide = false
-overlapParams.FilterType = Enum.RaycastFilterType.Include
-overlapParams.FilterDescendantsInstances = {workspace.Characters}
+local function doDrown(participant: Participant, head: BasePart): ()
+	PlaySound(220194561, nil, head, {
+		RollOffMinDistance = 15,
+		RollOffMaxDistance = 20,
+	})
 
-local function forEachParticipant(participant: Participant, dt: number, alreadySubmerged: boolean?): ()
+	participant:TryTakeDamage({
+		Amount = DROWN_DAMAGE,
+		Source = "Drown",
+	})
+
+	participant.Extras.LastDrownAt = os.clock()
+end
+
+local function forEachParticipant(participant: Participant, dt: number, map: Types.Map): ()
 	local char = participant:GetCharacter()
 	if not char then
 		return
@@ -49,13 +56,19 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 		return
 	end
 
-	local isSubmerged = alreadySubmerged
+	local isSubmerged = false
+	if humanoid:GetState() == Enum.HumanoidStateType.Swimming then
+		local include = GetTaggedDescendants(map.Structure, "Water")
+		table.insert(include, workspace.Terrain)
+		params.FilterDescendantsInstances = include
 
-	if not isSubmerged and humanoid:GetState() == Enum.HumanoidStateType.Swimming then
-		local result = workspace:Raycast(head.Position, Vector3.new(0, -0.5, 0), params)
+		local result = workspace:Raycast(head.Position, Vector3.new(0, -1.5, 0), params)
 
-		-- So this looks silly, but if we are under water then raycasting will return nothing, since the ray already started under water
 		if not result then
+			-- If we are underwater, then raycasting returns nothing as the ray is starting in the water object
+			isSubmerged = true
+		elseif result.Instance == workspace.Terrain and result.Material ~= Enum.Material.Water then
+			-- If we hit something and it isn't water then we are at the sea floor
 			isSubmerged = true
 		end
 	end
@@ -76,18 +89,7 @@ local function forEachParticipant(participant: Participant, dt: number, alreadyS
 		return
 	end
 
-	PlaySound(220194561, nil, head, {
-		SoundGroup = SoundService.AllSounds :: SoundGroup,
-		RollOffMinDistance = 15,
-		RollOffMaxDistance = 20,
-	})
-
-	participant:TryTakeDamage({
-		Amount = DROWN_DAMAGE,
-		Source = "Drown",
-	})
-
-	participant.Extras.LastDrownAt = os.clock()
+	doDrown(participant, head)
 end
 
 RunService.Heartbeat:Connect(function(dt)
@@ -98,37 +100,9 @@ RunService.Heartbeat:Connect(function(dt)
 		return
 	end
 
-	local submergedParticipants: {[Participant]: true?} = {}
-
-	for _, bound in GetTaggedDescendants(map.Structure, "Water") do
-		if not bound:IsA("BasePart") then
-			return
-		end
-
-		local size = Vector3.new(bound.Size.X, math.max(bound.Size.Y - 0.5, 0), bound.Size.Z)
-
-		for _, v in workspace:GetPartBoundsInBox(bound.CFrame, size, overlapParams) do
-			if v.Name ~= "Head" then
-				continue
-			end
-
-			local character = v:FindFirstAncestorOfClass("Model")
-			if not character then
-				continue
-			end
-
-			local participant = round:GetParticipant(character.Name)
-			if not participant then
-				continue
-			end
-
-			submergedParticipants[participant] = true
-		end
-	end
-
 	for _, v in round:GetParticipants() do
 		assert(v)
-		forEachParticipant(v, dt, submergedParticipants[v])
+		forEachParticipant(v, dt, map)
 	end
 end)
 
