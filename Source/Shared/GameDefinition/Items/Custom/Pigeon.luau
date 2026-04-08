@@ -113,18 +113,12 @@ local function scanForPlayers(data: PigeonData, dt: number): boolean
 
 	local origin = GetPrimaryPart(data.Pigeon).Position
 
-	local params = OverlapParams.new()
-	params.FilterDescendantsInstances = {workspace.Characters}
-	params.FilterType = Enum.RaycastFilterType.Include
-
-	local closestPart: BasePart?, closestDistance = nil, math.huge
+	local closestPart: BasePart?, closestDistance = nil, SEARCH_RADIUS
 
 	local foundParticipants: {Types.Participant} = {}
-	for _, part in workspace:GetPartBoundsInRadius(origin, SEARCH_RADIUS, params) do
-		if part.Name ~= "Head" then
-			continue
-		end
 
+	-- note: WAYYYY more efficient than GetPartBoundsInRadius. From ~1ms frame time (horror) to <0.1ms.
+	for _, part in workspace.Characters:QueryDescendants("BasePart #Head") do
 		local distance = (part.Position - origin).Magnitude
 		if distance >= closestDistance then
 			continue
