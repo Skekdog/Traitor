@@ -2,6 +2,8 @@
 	"className": "SoundService",
 	"properties": {
 		"RespectFilteringEnabled": true,
-		"VolumetricAudio": "Enabled"
+		"VolumetricAudio": "Enabled",
+		"CharacterSoundsUseNewApi": "Enabled",
+		"AcousticSimulationEnabled": true
 	}
 }

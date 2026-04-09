@@ -9,6 +9,7 @@
     "MeshPartHeadsAndAccessories": "Enabled",
     "PhysicsSteppingMethod": "Adaptive",
     "PlayerCharacterDestroyBehavior": "Enabled",
-    "RejectCharacterDeletions": "Enabled"
+    "RejectCharacterDeletions": "Enabled",
+    "SignalBehavior": "Deferred"
   }
 }
