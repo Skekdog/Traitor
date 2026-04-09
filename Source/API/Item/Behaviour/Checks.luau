@@ -46,22 +46,23 @@ function Checks.TargetDistance(item: Types.Item, origin: Vector3, destination: V
 	return true
 end
 
+local staticParams = RaycastParams.new()
+staticParams.CollisionGroup = "WeaponHitTargets"
+staticParams.FilterType = Enum.RaycastFilterType.Include
+staticParams.IgnoreWater = true
+
 function Checks.RaycastStatic(map: Types.Map, origin: Vector3, destination: Vector3, target: BasePart?): boolean
 	if not target then
 		return true
 	end
 
-	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {map.Structure.Static}
-	params.CollisionGroup = "WeaponHitTargets"
-	params.FilterType = Enum.RaycastFilterType.Include
-	params.IgnoreWater = true
+	staticParams.FilterDescendantsInstances = {map.Structure.Static}
 
 	-- We need to check the distance between the hit target and the actual intended target.
 	-- Reason being, some maps unfortunately feature Z-fighting, leading to hits being rejected as they were "obscured" by a part in the same exact place.
 	-- We do still set the actual target as the hit result though
 
-	local result = workspace:Raycast(origin, destination - origin, params)
+	local result = workspace:Raycast(origin, destination - origin, staticParams)
 	if result and result.Instance ~= target then
 		if (result.Position - destination).Magnitude > STATIC_OBSCURE_DISTANCE then
 			return false
