@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local ActionNodeClient = require(script.Parent.ActionNodeClient)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
@@ -8,7 +9,6 @@ local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local Types = require(ReplicatedStorage.API.Types)
 local ClimbLadder = require(script.Parent.ClimbLadder)
 local PossessProp = require(script.Parent.PossessProp)
@@ -185,7 +185,7 @@ RunService.PostSimulation:Connect(function()
 
 	local target = result.Instance
 
-	local prop = GetMapObjectWithTag(target, {"Prop", "Door"})
+	local prop = GetMapObject(target, "Prop")
 
 	if prop then
 		interactPart = target
@@ -204,7 +204,7 @@ RunService.PostSimulation:Connect(function()
 		end
 	end
 
-	local char = target:FindFirstAncestorOfClass("Model")
+	local char = GetMapObject(target, "Character") :: Model?
 	if not char then
 		return
 	end
