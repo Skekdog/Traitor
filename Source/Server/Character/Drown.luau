@@ -61,10 +61,6 @@ local function forEachParticipant(participant: Participant, dt: number, map: Typ
 
 	local isSubmerged = false
 	if humanoid:GetState() == Enum.HumanoidStateType.Swimming then
-		local include = GetTaggedDescendants(map.Structure, "Water")
-		table.insert(include, workspace.Terrain)
-		params.FilterDescendantsInstances = include
-
 		local result = workspace:Raycast(head.Position, Vector3.new(0, -1.5, 0), params)
 
 		if not result then
@@ -102,6 +98,10 @@ RunService.Heartbeat:Connect(function(dt)
 	if not map then
 		return
 	end
+
+	local include = GetTaggedDescendants(map.Structure, "Water")
+	table.insert(include, workspace.Terrain)
+	params.FilterDescendantsInstances = include
 
 	for _, v in round:GetParticipants() do
 		assert(v)
