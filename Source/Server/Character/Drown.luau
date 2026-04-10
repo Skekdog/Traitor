@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerScriptService = game:GetService("ServerScriptService")
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.API.Types)
 local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
@@ -9,6 +9,12 @@ local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.G
 local DROWN_THRESHOLD = 10
 local DROWN_DAMAGE = 10
 local DROWN_INTERVAL = 1
+
+local DROWN_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(220194561),
+	RolloffEnd = 20,
+	RolloffStart = 15,
+})
 
 local params = RaycastParams.new()
 params.IgnoreWater = false
@@ -23,10 +29,7 @@ type Participant = Types.Participant & {
 }
 
 local function doDrown(participant: Participant, head: BasePart): ()
-	PlaySound(220194561, nil, head, {
-		RollOffMinDistance = 15,
-		RollOffMaxDistance = 20,
-	})
+	Audio.PlayIn(DROWN_SOUND, head, false, "Drown")
 
 	participant:TryTakeDamage({
 		Amount = DROWN_DAMAGE,

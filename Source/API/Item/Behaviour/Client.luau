@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
@@ -56,8 +57,9 @@ function Client.Recoil(item: Types.Item): ()
 	Viewmodel.Recoil(item)
 end
 
+
 function Client.PlayEmptyClipSound(): ()
-	PlaySound(ReplicatedStorage.Assets.ItemSounds.EmptyClip)
+	Audio.Play2D(ReplicatedStorage.Assets.ItemSounds.EmptyClip, nil, "EmptyClip")
 end
 
 function Client.PlaySound(item: Types.Item, action: "Primary" | "Alternate"): ()
@@ -149,9 +151,17 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 			end
 
 			if not GetMapObject(result.Hit.Part, "Character") and not noEffects then
-				PlaySound(item.HitSound or HitSounds[GetMaterial(result.Hit.Part)] or HitSounds.Default, targetPosition, nil, {
-					RollOffMaxDistance = 20,
-				})
+				local hitSound: Sound
+				if item.HitSound then
+					hitSound = item.HitSound
+				else
+					local ids: {number} = HitSounds[GetMaterial(result.Hit.Part)] or HitSounds.Default
+					hitSound = Audio.MakeSound({
+						Content = Content.fromAssetId(ids[math.random(#ids)]),
+						RolloffEnd = 20,
+					})
+				end
+				Audio.PlayAt(hitSound, targetPosition, true)
 			end
 		end
 
