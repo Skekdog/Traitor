@@ -27,6 +27,10 @@ local function HeartbeatClient(item: Types.Item): ()
     end
 
     for _, player in Players:GetPlayers() do
+        if player == Players.LocalPlayer then
+            continue
+        end
+
         local cframe, isDecoy = Decoy.GetPlayerPosition(player)
         if not cframe then
             continue
