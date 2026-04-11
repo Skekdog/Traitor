@@ -29,7 +29,7 @@ type Participant = Types.Participant & {
 }
 
 local function doDrown(participant: Participant, head: BasePart): ()
-	Audio.PlayIn(DROWN_SOUND, head, false, "Drown")
+	Audio.PlayIn(DROWN_SOUND, head)
 
 	participant:TryTakeDamage({
 		Amount = DROWN_DAMAGE,

@@ -8,7 +8,6 @@ local Checks = require(script.Parent.Checks)
 local Raycasts = require(script.Parent.Raycasts)
 local Types = require(ReplicatedStorage.API.Types)
 local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local Aim = require(ReplicatedStorage.Shared.Combat.Aim)
@@ -57,16 +56,16 @@ function Client.Recoil(item: Types.Item): ()
 	Viewmodel.Recoil(item)
 end
 
-
+local emptyClipSound = ReplicatedStorage.Assets.ItemSounds.EmptyClip
 function Client.PlayEmptyClipSound(): ()
-	Audio.Play2D(ReplicatedStorage.Assets.ItemSounds.EmptyClip, nil, "EmptyClip")
+	Audio.Play2D(emptyClipSound, true)
 end
 
 function Client.PlaySound(item: Types.Item, action: "Primary" | "Alternate"): ()
 	if action == "Primary" and item.PrimarySound then
-		PlaySound(item.PrimarySound)
+		Audio.Play2D(item.PrimarySound)
 	elseif action == "Alternate" and item.AlternateSound then
-		PlaySound(item.AlternateSound)
+		Audio.Play2D(item.AlternateSound)
 	end
 end
 
@@ -211,7 +210,7 @@ function Client.TryReloadWeapon(item: Types.Item): boolean
 			if item.Ammo > lastAmmo then
 				lastAmmo = item.Ammo
 				if item.ReloadSound then
-					PlaySound(item.ReloadSound)
+					Audio.Play2D(item.ReloadSound)
 				end
 			elseif item.Ammo ~= lastAmmo then
 				lastAmmo = item.Ammo
@@ -233,7 +232,7 @@ function Client.TryReloadWeapon(item: Types.Item): boolean
 		Viewmodel.ReloadSpring.p = Vector3.new(10, 5, 10)
 
 		if item.ReloadSound then
-			PlaySound(item.ReloadSound)
+			Audio.Play2D(item.ReloadSound)
 		end
 	end
 
