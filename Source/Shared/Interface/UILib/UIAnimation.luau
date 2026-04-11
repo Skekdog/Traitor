@@ -85,7 +85,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 		local info = TweenInfo.new(
 			UI_TRANSITION_TIME,
 			Enum.EasingStyle.Exponential,
-			Enum.EasingDirection.Out
+			if isSize then Enum.EasingDirection.Out else Enum.EasingDirection.InOut
 		)
 
 		local properties: {[string]: any}
