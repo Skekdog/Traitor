@@ -63,9 +63,9 @@ end
 
 function Client.PlaySound(item: Types.Item, action: "Primary" | "Alternate"): ()
 	if action == "Primary" and item.PrimarySound then
-		Audio.Play2D(item.PrimarySound)
+		Audio.Play2D(item.PrimarySound, nil, true)
 	elseif action == "Alternate" and item.AlternateSound then
-		Audio.Play2D(item.AlternateSound)
+		Audio.Play2D(item.AlternateSound, nil, true)
 	end
 end
 
