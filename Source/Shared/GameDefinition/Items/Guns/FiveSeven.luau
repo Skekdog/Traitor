@@ -20,6 +20,7 @@ local FiveSeven = Gun({
     Spread = 0.01,
 
     AimSpreadMultiplier = 0.1,
+    HasMuzzleFlash = true,
 
     PrimaryInterval = 0.38,
     ReloadDuration = 1,

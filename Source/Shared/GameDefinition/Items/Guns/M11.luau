@@ -35,6 +35,7 @@ local M11 = Gun({
 
 	ImpulseForce = 1,
 
+	HasMuzzleFlash = true,
 	AimFOV = 60,
 	AimSpreadMultiplier = 0.3,
 

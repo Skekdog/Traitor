@@ -15,6 +15,8 @@ local Scout = Gun({
     AimSpreadMultiplier = 0.05,
     IsScopable = true,
 
+    HasMuzzleFlash = true,
+
     Damage = {
         Body = 50,
         Limb = 25,
