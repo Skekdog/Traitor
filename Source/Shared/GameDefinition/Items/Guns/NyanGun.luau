@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
@@ -14,8 +15,6 @@ local equipLoop = Audio.MakeSound({
 })
 equipLoop.Looped = true
 
-equipLoop.Parent = SoundService
-
 local shootLoop = Audio.MakeSound({
 	Content = Content.fromAssetId(78552787219713),
 	Name = "NyanShoot",
@@ -23,7 +22,10 @@ local shootLoop = Audio.MakeSound({
 })
 shootLoop.Looped = true
 
-shootLoop.Parent = SoundService
+if RunService:IsClient() then
+	equipLoop.Parent = SoundService
+	shootLoop.Parent = SoundService
+end
 
 local function OnEquipClient(): ()
 	equipLoop:Play()
