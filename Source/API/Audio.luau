@@ -21,9 +21,6 @@ export type AudioProperties = {
 	TimePosition: number?,
 
 	Effects: {SoundEffect}?,
-
-	RollOffMinDistance: nil,
-	RollOffMaxDistance: nil,
 }
 
 export type PlayInTarget = BasePart | Attachment | SoundService | Folder
