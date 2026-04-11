@@ -24,7 +24,7 @@ local function publish(assetsTable: AssetsTable, assetName: string): ()
 	end
 end
 
-local function PublishSDKAsset(assetsTable: AssetsTable, assetName: string | "!All"): ()
+local function PublishSDKAsset(assetsTable: AssetsTable, assetName: string | "! All"): ()
 	if assetName ~= "! All" then
 		checkName(assetName)
 		return publish(assetsTable, assetName)
@@ -41,7 +41,7 @@ local function PublishSDKAsset(assetsTable: AssetsTable, assetName: string | "!A
 			continue
 		end
 
-		publish(assetsTable, assetName)
+		publish(assetsTable, name)
 	end
 end
 
