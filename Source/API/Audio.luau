@@ -1,6 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local SoundService = game:GetService("SoundService")
+local GetRemote = require(script.Parent.GetRemote)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
+local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 
 local Audio = {}
 
@@ -35,6 +38,13 @@ local function applyBaseProperties(sound: Sound): ()
 	end
 end
 
+local remote = GetRemote("Audio", script)
+local function playToPlayer(mode: "PlayIn" | "PlayAt", sound: Sound, atOrIn: Vector3 | Attachment | BasePart | SoundService?, to: Player): ()
+	assert(RunService:IsServer(), "to can only be specified on the server")
+	assert(Replication.CanInstanceReplicate(sound), "Sound is not replicated to players")
+	remote:FireClient(to, mode, sound)
+end
+
 --- Creates a `Sound` given input properties.
 function Audio.MakeSound(properties: AudioProperties): Sound
 	local sound = Instance.new("Sound")
@@ -67,6 +77,11 @@ end
 --- Plays a sound at the given position. A copy of the `Sound` is created.
 --- If possible, prefer to use `Audio.PlayIn()` for better performance and caching.
 function Audio.PlayAt(referenceSound: Sound, position: Vector3, noClone: boolean?, to: Player?): ()
+	if to then
+		playToPlayer("PlayAt", referenceSound, position, to)
+		return
+	end
+
 	local sound = if noClone then referenceSound else referenceSound:Clone()
 	applyBaseProperties(sound)
 
@@ -90,6 +105,11 @@ local soundCache: {[Sound]: {[Instance]: Sound?}?} = {}
 --- Plays a sound in an instance. Unless specified, the sound will be cloned and cached.
 function Audio.PlayIn(referenceSound: Sound, instance: BasePart | Attachment | SoundService, noClone: boolean?, noCache: boolean?, to: Player?): ()
 	if not instance.Parent then
+		return
+	end
+
+	if to then
+		playToPlayer("PlayIn", referenceSound, instance, to)
 		return
 	end
 
@@ -174,6 +194,20 @@ function Audio.InvalidateCache(referenceSound: Sound): ()
 	end
 
 	soundCache[referenceSound] = {}
+end
+
+if RunService:IsClient() then
+	remote.OnClientEvent:Connect(function(mode: "Play2D" | "PlayIn" | "PlayAt", sound: Sound, atOrIn: Vector3 | Attachment | BasePart?): ()
+		if mode == "Play2D" then
+			Audio.Play2D(sound)
+		elseif mode == "PlayIn" then
+			assert(typeof(atOrIn) == "Instance")
+			Audio.PlayIn(sound, atOrIn)
+		else
+			assert(typeof(atOrIn) == "Vector3")
+			Audio.PlayAt(sound, atOrIn)
+		end
+	end)
 end
 
 return table.freeze(Audio)
