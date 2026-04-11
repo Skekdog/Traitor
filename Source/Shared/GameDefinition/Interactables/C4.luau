@@ -1,11 +1,10 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local Types = require(ReplicatedStorage.API.Types)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 -- NOTE: C4 should not be based on alliance with planter role! Evil roles should always see it, friendly roles should never.
@@ -19,16 +18,18 @@ local TEXT_HIGHLIGHT_COLOUR = Color3.fromRGB(66, 135, 245)
 
 local module = {}
 
-local fullSound = PlaySound.MakeSound(252142019, {
+local fullSound = Audio.MakeSound({
+	Content = Content.fromAssetId(252142019),
 	Volume = 1,
-	RollOffMinDistance = 80,
-	RollOffMaxDistance = 240,
+	RolloffStart = 80,
+	RolloffEnd = 240,
 })
 
-local reducedSound = PlaySound.MakeSound(252142019, {
+local reducedSound = Audio.MakeSound({
+	Content = Content.fromAssetId(252142019),
 	Volume = 1,
-	RollOffMinDistance = 50,
-	RollOffMaxDistance = 100,
+	RolloffStart = 50,
+	RolloffEnd = 100,
 })
 
 local explosionInfo: Types.ExplosionInfo = {
@@ -122,9 +123,23 @@ local function setDuration(c4: C4, percent: number): ()
 	c4.Extras.ArmDurationClient = duration
 end
 
-local function playBeep(position: Vector3?, parent: Instance?): ()
-	PlaySound(9117060347, position, parent)
-end
+local BEEP_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(9117060347),
+})
+
+local BEEPS_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(6992631696),
+	Volume = 1.5,
+	RolloffStart = 10,
+	RolloffEnd = 40,
+	PlaybackRegion = NumberRange.new(2.5, 7.5),
+})
+
+local CUT_WIRE_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(9118822196),
+	Volume = 1.5,
+	PlaybackRegion = NumberRange.new(0.11, 60000),
+})
 
 local isFirstInit = true
 local function showC4Menu(c4: C4, show: boolean): ()
@@ -173,7 +188,7 @@ local function showC4Menu(c4: C4, show: boolean): ()
 
 		buttons.Arm.MouseButton1Click:Connect(function()
 			showC4Menu(currentC4, false)
-			playBeep(nil, SoundService)
+			Audio.Play2D(BEEP_SOUND)
 			remote:FireServer(currentC4.Model, "Arm", currentC4.Extras.ArmDurationClient or error("ArmDurationClient is nil"))
 		end)
 
@@ -256,12 +271,7 @@ if RunService:IsClient() then
 		part.Parent = c4.Model
 
 		c4.Extras.BeganBeepingClient = true
-		PlaySound(6992631696, nil, part, {
-			Volume = 1.5,
-			RollOffMinDistance = 10,
-			RollOffMaxDistance = 40,
-			PlaybackRegion = NumberRange.new(2.5, 7.5),
-		})
+		Audio.PlayIn(BEEPS_SOUND, part)
 	end
 
 	local function forEachC4(c4: C4): ()
@@ -474,11 +484,8 @@ if RunService:IsServer() then
 			return
 		end
 
-		PlaySound(9118822196, c4.Model.Position, nil, {
-			Volume = 1.5,
-			PlaybackRegion = NumberRange.new(0.11, 60000),
-		})
-		playBeep(c4.Model.Position)
+		Audio.PlayIn(CUT_WIRE_SOUND, c4.Model)
+		Audio.PlayIn(BEEP_SOUND, c4.Model)
 
 		local alwaysDisarm = safeDisarm or false
 

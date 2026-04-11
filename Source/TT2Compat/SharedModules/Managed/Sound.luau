@@ -1,20 +1,19 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 
 local module = {}
 
 function module.Play2D(self, sound: Sound): ()
-	PlaySound(sound, nil, SoundService)
+	Audio.Play2D(sound, nil, true)
 end
 
 function module.PlayIn(self, sound: Sound, part: BasePart): ()
-	PlaySound(sound, nil, part)
+	Audio.PlayIn(sound, part, nil, true)
 end
 
 -- what the fuck is the logic in what has self parameter and what doesn't
 function module.PlayAt(sound: Sound, position: Vector3): ()
-	PlaySound(sound, position)
+	Audio.PlayAt(sound, position)
 end
 
 return table.freeze(module)

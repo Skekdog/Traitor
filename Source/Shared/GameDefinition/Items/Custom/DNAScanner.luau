@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local CreateRadarPoint = require(ReplicatedStorage.API.CreateRadarPoint)
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
@@ -9,7 +9,6 @@ local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local Message = require(ReplicatedStorage.API.Interface.Message)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local Decoy = require(ReplicatedStorage.Shared.GameDefinition.Interactables.Decoy)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
@@ -26,6 +25,10 @@ local MIN_CHARGE_DEPLETION = 5
 
 local RECHARGE_RATE = 5
 local currentCharge = 100
+
+local BEEP_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(4578451106),
+})
 
 local clientAvailableTraces: {DNATraces.DNATrace} = {}
 local clientCurrentTrace: DNATraces.DNATrace?
@@ -115,7 +118,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 		return "NoObject"
 	end
 
-	PlaySound(ReplicatedStorage.Assets.ItemSounds.DNAScanner, nil, nil, nil, participant.Player)
+	Audio.Play2D(ReplicatedStorage.Assets.ItemSounds.DNAScanner, nil, nil, participant.Player)
 
 	if not object.Extras.DNATraces then
 		Message.Popup("No DNA traces found.", participant.Player)
@@ -202,9 +205,7 @@ if RunService:IsClient() then
 		end
 
 		CreateRadarPoint(cframe, Color3.fromRGB(0, 110, 255), "DNATrace")
-		PlaySound(4578451106, nil, SoundService, {
-			SoundGroup = SoundService.AllSounds :: SoundGroup,
-		})
+		Audio.Play2D(BEEP_SOUND)
 	end
 
 	local ui = getUI()

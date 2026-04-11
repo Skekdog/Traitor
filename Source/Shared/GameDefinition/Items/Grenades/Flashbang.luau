@@ -2,9 +2,9 @@ local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Grenade = require(ReplicatedStorage.API.Item.Presets.Grenade)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local flashbangEqualiser = Instance.new("EqualizerSoundEffect")
 flashbangEqualiser.Name = "FlashbangEffect"
@@ -12,6 +12,10 @@ flashbangEqualiser.HighGain = -8
 flashbangEqualiser.LowGain = 10
 flashbangEqualiser.MidGain = -20
 flashbangEqualiser.Enabled = true
+
+local FLASHBANG_SOUND = Audio.MakeSound({
+    Content = Content.fromAssetId(223471024),
+})
 
 local flashbangTweenStart = TweenInfo.new(0.15)
 local flashbangTweenFinish = TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In, 0, false, 4)
@@ -37,10 +41,11 @@ local Flashbang = Grenade({
         Pressure = 10000,
         VisualRadius = 15,
 
-        Sound = PlaySound.MakeSound(70709185462455, {
+        Sound = Audio.MakeSound({
+            Content = Content.fromAssetId(70709185462455),
             Volume = 0.75,
-            RollOffMinDistance = 40,
-            RollOffMaxDistance = 60,
+            RolloffStart = 40,
+            RolloffEnd = 60,
         })
     },
 
@@ -74,7 +79,7 @@ local Flashbang = Grenade({
         tween:Play()
         TweenService:Create(blur, flashbangTweenStart, {Size = 48}):Play()
 
-        PlaySound("rbxassetid://223471024", nil, nil)
+        Audio.Play2D(FLASHBANG_SOUND)
     end,
 
     FuseTime = 3,

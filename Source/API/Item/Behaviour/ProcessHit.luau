@@ -1,9 +1,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
@@ -76,19 +76,19 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 	if hitPart and not hitPart:IsDescendantOf(workspace.Characters) then
 		for _, v in Players:GetPlayers() do
 			if v ~= by.Player then
-				local sound: PlaySound.SoundId | {PlaySound.SoundId}
+				local sound: Sound
 				if item.Kind == "Item" and item.HitSound then
 					sound = item.HitSound
+				else
+					local ids = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
+					sound = Audio.MakeSound({
+						Content = Content.fromAssetId(ids[math.random(#ids)]),
+						RolloffStart = 10,
+						RolloffEnd = 20,
+					})
 				end
 
-				if not sound then
-					sound = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
-				end
-
-				PlaySound(sound, hitPosition, nil, {
-					RollOffMinDistance = 10,
-					RollOffMaxDistance = 20,
-				}, v)
+				Audio.PlayAt(sound, hitPosition, nil, v)
 			end
 		end
 	end

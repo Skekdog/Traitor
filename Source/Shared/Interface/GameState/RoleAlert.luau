@@ -1,10 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetDeterminer = require(ReplicatedStorage.Shared.Grammar.GetDeterminer)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 
 local ui = UIManager.WaitForUI("RoleAlert")
@@ -19,7 +18,7 @@ participant.Role:Connect(function(role)
 	end
 
 	lastRole = role.Definition.Name
-	PlaySound(role.Definition.Sound, nil, nil, {SoundGroup = SoundService.RoleReveals :: SoundGroup})
+	Audio.Play2D(role.Definition.Sound)
 
 	UI.Frame.UIGradient.Color = ColorSequence.new(role.Definition.Color, Color3.new(1, 1, 1))
 	UI:FindFirstChild("HintLabel").Text = role.Definition.Description

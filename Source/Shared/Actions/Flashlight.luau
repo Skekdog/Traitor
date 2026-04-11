@@ -1,7 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+
+local sound = Audio.MakeSound({
+	Content = Content.fromAssetId(120344853558767),
+})
 
 local function tryGetAttachment(root: Instance): Attachment?
 	local attachment = root:FindFirstChild("FlashlightAttachment")
@@ -54,7 +58,7 @@ local function enableFlashlight(doEnable: boolean?): Enum.ContextActionResult
 	local light = getOrCreateFlashlight(workspace.CurrentCamera)
 	light.Enabled = enabled
 
-	PlaySound(120344853558767)
+	Audio.Play2D(sound)
 
 	return Enum.ContextActionResult.Pass
 end

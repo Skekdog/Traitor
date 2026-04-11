@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
@@ -7,7 +8,6 @@ local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local Pigeon = {}
 
@@ -35,9 +35,10 @@ local SOUND_INTERVAL = 2.5
 local SOUND_INTERVAL_FOLLOW = 2
 local SOUND_INTERVAL_CHARGE = 0.5
 
-local sound = PlaySound.MakeSound(88048142187812, {
-	RollOffMaxDistance = 60,
-	RollOffMinDistance = 40,
+local sound = Audio.MakeSound({
+	Content = Content.fromAssetId(88048142187812),
+	RolloffEnd = 60,
+	RolloffStart = 40,
 	Volume = 4,
 })
 
@@ -57,7 +58,7 @@ local pigeons: {PigeonData} = {}
 
 local function play(data: PigeonData): ()
 	data.LastSound = os.clock()
-	PlaySound(sound, nil, GetPrimaryPart(data.Pigeon))
+	Audio.PlayIn(sound, GetPrimaryPart(data.Pigeon))
 end
 
 local function updateRecall(data: PigeonData): ()

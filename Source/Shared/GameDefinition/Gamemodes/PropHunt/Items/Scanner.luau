@@ -1,11 +1,15 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local Scanner = {}
+
+local BEEP_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(4578451106),
+})
 
 local scannerUi = ReplicatedStorage.Assets.Gamemode.PropHunt.Scanner
 
@@ -78,7 +82,7 @@ local function HeartbeatClient(item: Types.Item, dt: number): ()
 
 	if timeCount > value.BeepRate then
 		item.Extras.TimeCount = 0
-		PlaySound(4578451106)
+		Audio.Play2D(BEEP_SOUND)
 	end
 
 	local ui = getUi().Object

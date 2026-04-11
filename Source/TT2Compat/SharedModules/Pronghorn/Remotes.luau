@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 local Doors = require(ReplicatedStorage.SharedModules.Doors)
 
 type FireServerRemote = (targets: Player?, ...any) -> ()
@@ -60,10 +59,12 @@ server.ItemService = itemService
 itemService.RelaySoundIn = newServerRemote(function(target: Player?, params: {SoundId: string, Volume: number, TimePosition: number}): ()
 	local targets: {Player} = if target then {target} else Players:GetPlayers()
 	for _, v in targets do
-		PlaySound(params.SoundId, nil, SoundService, {
+		local sound = Audio.MakeSound({
+			Content = Content.fromUri(params.SoundId),
 			Volume = params.Volume,
 			TimePosition = params.TimePosition,
-		}, target)
+		})
+		Audio.Play2D(sound, nil, nil, target)
 	end
 end)
 

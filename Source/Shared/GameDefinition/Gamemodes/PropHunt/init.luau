@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local IsValidProp = require(script.IsValidProp)
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local PropHuntItems = require(script.Items)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
@@ -35,7 +35,9 @@ local roles: {[string]: Types.RoleDefinition} = {
         Kind = "RoleDefinition",
         Name = "Hunter",
         Description = "Use your Scanner to find and eliminate the Props!",
-        Sound = PlaySound.MakeSound(9042088276),
+        Sound = Audio.MakeSound({
+		    Content = Content.fromAssetId(9042088276),
+		}),
         Color = Color3.fromRGB(229, 53, 13),
 
         Allegiance = {Kind = "Role", Role = "Hunter"},
@@ -74,7 +76,9 @@ local roles: {[string]: Types.RoleDefinition} = {
         Kind = "RoleDefinition",
         Name = "Prop",
         Description = "Hide from the Hunters! They have Scanners.",
-        Sound = PlaySound.MakeSound(9042819926),
+        Sound = Audio.MakeSound({
+		    Content = Content.fromAssetId(9042819926),
+		}),
         Color = Color3.fromRGB(13, 197, 229),
 
         Allegiance = {Kind = "Role", Role = "Prop"},

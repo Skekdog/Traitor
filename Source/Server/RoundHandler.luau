@@ -1,10 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local TeamChat = require(ServerScriptService.Chat.TeamChat)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local GameHooks = require(ReplicatedStorage.API.PlaySound)
 local RoundHooks = require(ReplicatedStorage.API.GameHooks)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
@@ -108,10 +108,14 @@ function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, par
 
     local hitPart = params.HitPart or GetPrimaryPart(prop.Model)
 
-    GameHooks(HitSounds[GetMaterial(hitPart)] or HitSounds.Default, params.HitPosition or hitPart.Position, nil, {
-        RollOffMinDistance = 10,
-        RollOffMaxDistance = 15,
+    local ids = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
+    local sound = Audio.MakeSound({
+        Content = Content.fromAssetId(ids[math.random(#ids)]),
+        RolloffStart = 10,
+        RolloffEnd = 15,
     })
+
+    Audio.PlayAt(sound, params.HitPosition or hitPart.Position)
 
     return true
 end

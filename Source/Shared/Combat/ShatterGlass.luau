@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local IS_SERVER = game:GetService("RunService"):IsServer()
@@ -34,7 +34,16 @@ local function createWedgeFragment(properties: GlassProperties, size: Vector3, c
     return wedge
 end
 
-local sounds = {2612674531, 9103909576, 9116264426, 9113850847, 9119918457}
+local soundIds = {2612674531, 9103909576, 9116264426, 9113850847, 9119918457}
+
+local sounds: {Sound} = {}
+for _, id in soundIds do
+    table.insert(sounds, Audio.MakeSound({
+        Content = Content.fromAssetId(id),
+        RolloffEnd = 50,
+        RolloffStart = 15,
+    }))
+end
 
 export type GlassProperties = {
     CFrame: CFrame,
@@ -105,10 +114,7 @@ local function shatterClient(glassProperties: BasePart | GlassProperties, direct
         end
     end
 
-    PlaySound(sounds, glassCFrame.Position, nil, {
-        RollOffMaxDistance = 50,
-        RollOffMinDistance = 15,
-    })
+    Audio.PlayAt(sounds[math.random(#sounds)], glassCFrame.Position)
 
     if Settings.GetSetting("Keep Shattered Glass") then
         return

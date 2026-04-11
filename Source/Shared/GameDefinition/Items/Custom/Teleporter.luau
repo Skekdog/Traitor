@@ -1,12 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Message = require(ReplicatedStorage.API.Interface.Message)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local MAX_USES = 6
@@ -26,6 +25,12 @@ teleportFX.CanQuery = false
 teleportFX.Color = Color3.new(0.52549, 0.858824, 0.372549)
 teleportFX.Transparency = 0.5
 teleportFX.Material = Enum.Material.Neon
+
+local TELEPORT_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(5518430240),
+	RolloffStart = 15,
+	RolloffEnd = 25,
+})
 
 local remote = GetRemote("TeleporterFX", script)
 
@@ -58,11 +63,7 @@ if RunService:IsClient() then
 			fx:Destroy()
 		end)
 
-		PlaySound(5518430240, at, nil, {
-			SoundGroup = SoundService.AllSounds :: SoundGroup,
-			RollOffMinDistance = 15,
-			RollOffMaxDistance = 25,
-		})
+		Audio.PlayAt(TELEPORT_SOUND, at)
 
 		tween:Play()
 	end

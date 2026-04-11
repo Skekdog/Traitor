@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Fire = require(ReplicatedStorage.API.Fire)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Grenade = require(ReplicatedStorage.API.Item.Presets.Grenade)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 
 local IncendiaryGrenade = {}
@@ -30,10 +30,11 @@ local item = Grenade({
         Pressure = 10000,
         VisualRadius = 15,
 
-		Sound = PlaySound.MakeSound(114507723450506, {
+		Sound = Audio.MakeSound({
+			Content = Content.fromAssetId(114507723450506),
 			Volume = 0.75,
-			RollOffMinDistance = 40,
-			RollOffMaxDistance = 60,
+			RolloffStart = 40,
+			RolloffEnd = 60,
 		})
     },
 

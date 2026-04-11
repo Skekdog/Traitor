@@ -1,9 +1,9 @@
 local PhysicsService = game:GetService("PhysicsService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local Impulse = require(ReplicatedStorage.API.Impulse)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local BehaviourTypes = require(script.Parent.BehaviourTypes)
 local Checks = require(script.Parent.Checks)
 local ProcessHit = require(script.Parent.ProcessHit)
@@ -39,7 +39,7 @@ function Server.CreateExplosion(round: Types.Round, params: Types.ExplosionParam
     folder.Name = "Explosions"
     folder.Parent = workspace
 
-	PlaySound(info.Sound or ServerStorage.Assets.Explosion, params.Position)
+	Audio.PlayAt(info.Sound or ServerStorage.Assets.Explosion, params.Position)
 
 	local hits: {Types.Participant | Types.Prop} = {}
     for _, v in workspace:GetPartBoundsInRadius(params.Position, info.FalloffEnd) do
@@ -228,7 +228,7 @@ function Server.ApplyNearMissSelfDefense(origin: Vector3, destination: Vector3, 
 			Duration = NEAR_MISS_SD_DURATION,
 		})
 
-		PlaySound(nearMissSound, nil, part, nil, target.Player)
+		Audio.PlayIn(nearMissSound, part, nil, nil, target.Player)
 	end
 end
 

@@ -1,10 +1,10 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Fire = require(ReplicatedStorage.API.Fire)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local GetRound = require(ReplicatedStorage.API.GetRound)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 
@@ -62,7 +62,7 @@ RunService.Heartbeat:Connect(function(dt)
 					Attacker = Fire.Attackers[object],
 				})
 
-				PlaySound(ReplicatedStorage.Assets.ItemSounds.FlareBurn, nil, v)
+				Audio.PlayIn(ReplicatedStorage.Assets.ItemSounds.FlareBurn, v)
 			end
 		end)
 

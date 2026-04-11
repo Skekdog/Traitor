@@ -1,11 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 local Types = require(ReplicatedStorage.API.Types)
 
 local TargetChecker = {}
 
+local EQUIP_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(9118027489),
+})
+
 local function OnEquipClient(): ()
-	PlaySound(9118027489)
+	Audio.Play2D(EQUIP_SOUND)
 end
 
 local item: Types.ItemComponents = {

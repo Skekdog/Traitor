@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Message = require(ReplicatedStorage.API.Interface.Message)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Epilogue = require(script.GamePhase.Epilogue)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Face = require(script.GameState.Face)
@@ -79,7 +79,9 @@ local framedRole: Types.RoleDefinition = {
 	Name = "Framed",
 	Description = "Find and kill your targets. Don't get caught red-handed.",
 	Color = Color3.fromRGB(200, 44, 28),
-	Sound = PlaySound.MakeSound(1848271648),
+	Sound = Audio.MakeSound({
+		Content = Content.fromAssetId(1848271648),
+	}),
 
 	Allegiance = {Kind = "Solo"},
 
@@ -105,7 +107,9 @@ local policeRole: Types.RoleDefinition = {
 	PluralName = "Police",
 	Description = "Kill anyone red-handed. Work with the Undercover.",
 	Color = Color3.fromRGB(16, 108, 172),
-	Sound = PlaySound.MakeSound(1848271643),
+	Sound = Audio.MakeSound({
+		Content = Content.fromAssetId(1848271643),
+	}),
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 
@@ -129,7 +133,9 @@ local undercoverRole: Types.RoleDefinition = {
 	Name = "Undercover",
 	Description = "Kill anyone red-handed. Keep your identity secret.",
 	Color = Color3.fromRGB(40, 140, 36),
-	Sound = PlaySound.MakeSound(1839098267),
+	Sound = Audio.MakeSound({
+		Content = Content.fromAssetId(1839098267),
+	}),
 
 	Allegiance = {Kind = "Role", Role = "Police"},
 

@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
-local PlaySound = require(ReplicatedStorage.Shared.RoundRule.Common.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 
-PlaySound.SetDefaultSoundGroup(SoundService.AllSounds)
+Audio.SetDefaultSoundGroup(SoundService.AllSounds)
 
 return nil

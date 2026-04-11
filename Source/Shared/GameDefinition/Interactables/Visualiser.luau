@@ -1,12 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
 local Types = require(ReplicatedStorage.API.Types)
 
@@ -28,6 +27,13 @@ local VISUALISE_ITEM_COLOUR = Color3.fromRGB(255, 255, 255)
 local VISUALISE_TRACE_COLOUR = Color3.fromRGB(200, 80, 80)
 
 local VISUALISATION_RADIUS = 7.5
+
+local VISUALISER_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(5114177371),
+	Volume = 0.5,
+	RolloffStart = 15,
+	RolloffEnd = 20,
+})
 
 local activeVisualisers: {Visualiser} = {}
 
@@ -108,12 +114,7 @@ local function visualise(corpses: {[Model]: DeathData}, visualiser: Visualiser):
 
 	TweenService:Create(sphere, SPHERE_TWEEN_INFO, {Size = Vector3.new(VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2, VISUALISATION_RADIUS * 2)}):Play()
 
-	PlaySound(5114177371, nil, visualiser.Model, {
-		Volume = 0.5,
-		RollOffMinDistance = 15,
-		RollOffMaxDistance = 20,
-		SoundGroup = SoundService.AllSounds :: SoundGroup,
-	})
+	Audio.PlayIn(VISUALISER_SOUND, GetPrimaryPart(visualiser.Model))
 
 	sphere.Parent = workspace.Projectiles
 

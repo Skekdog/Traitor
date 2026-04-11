@@ -2,19 +2,33 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local remotes = ReplicatedStorage.Remotes
 
 local IS_SERVER = RunService:IsServer()
 
-local DEFAULT_HINGE_OPEN_SOUND = 316089029
-local DEFAULT_HINGE_CLOSE_SOUND = 316089019
+local DEFAULT_HINGE_OPEN_SOUND = Audio.MakeSound({
+    Content = Content.fromAssetId(316089029),
+})
 
-local DEFAULT_SLIDE_OPEN_SOUND = 927222098
-local DEFAULT_SLIDE_CLOSE_SOUND = 927222098
+local DEFAULT_HINGE_CLOSE_SOUND = Audio.MakeSound({
+    Content = Content.fromAssetId(316089019),
+})
+
+local DEFAULT_SLIDE_OPEN_SOUND = Audio.MakeSound({
+    Content = Content.fromAssetId(927222098),
+})
+
+local DEFAULT_SLIDE_CLOSE_SOUND = Audio.MakeSound({
+    Content = Content.fromAssetId(927222098),
+})
+
+local LOCKED_SOUND = Audio.MakeSound({
+    Content = Content.fromAssetId(134969396),
+})
 
 export type HingeDoorServerReceive = {
     Kind: "HingeDoorServerReceive",
@@ -309,8 +323,10 @@ local function StandardDoor(request: DoorRequest): ()
             if os.clock() - (door:GetAttribute("LastPlayedLockedSound") :: number? or 0) < 1 then
                 return
             end
-            PlaySound(134969396, nil, door)
+
+            Audio.PlayIn(LOCKED_SOUND, GetPrimaryPart(door))
             door:SetAttribute("LastPlayedLockedSound", os.clock())
+
             return
         end
     end
@@ -355,14 +371,13 @@ local function StandardDoor(request: DoorRequest): ()
                 end
             end
         end
+
         if #sounds == 0 then
-            local id = if shouldOpen then if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_OPEN_SOUND else DEFAULT_HINGE_OPEN_SOUND else if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_CLOSE_SOUND else DEFAULT_HINGE_CLOSE_SOUND
-            sounds = {PlaySound.MakeSound(id, {
-                RollOffMinDistance = 15,
-                RollOffMaxDistance = 20,
-            })}
+            local sound = if shouldOpen then if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_OPEN_SOUND else DEFAULT_HINGE_OPEN_SOUND else if door:GetAttribute("DoorKind") == "Slide" then DEFAULT_SLIDE_CLOSE_SOUND else DEFAULT_HINGE_CLOSE_SOUND
+            sounds = {sound}
         end
-        PlaySound(sounds, nil, GetPrimaryPart(door))
+
+        Audio.PlayIn(sounds[math.random(#sounds)], GetPrimaryPart(door))
     end
 
     local duration = 0.75

@@ -1,8 +1,8 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local remote = GetRemote("ItemFire")
@@ -47,10 +47,10 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 	local char = assert(participant:GetCharacter())
 
 	local sound = if action == "Primary" then item.PrimarySound else item.AlternateSound
-	if sound then
+	if sound and char.PrimaryPart then
 		for _, v in Players:GetPlayers() do
 			if v ~= participant.Player then
-				PlaySound(sound, nil, char.PrimaryPart, nil, v)
+				Audio.PlayIn(sound, char.PrimaryPart, nil, nil, v)
 			end
 		end
 	end

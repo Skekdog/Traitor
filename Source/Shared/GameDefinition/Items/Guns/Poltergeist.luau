@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
@@ -7,10 +8,16 @@ local BehaviourTypes = require(ReplicatedStorage.API.Item.Behaviour.BehaviourTyp
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local GetMapObjectWithTag = require(ReplicatedStorage.Shared.RoundRule.Common.GetMapObjectWithTag)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local MAX_RANGE = 10000
+
+local THRUST_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(7129285090),
+	Volume = 0.5,
+	RolloffStart = 20,
+	RolloffEnd = 30,
+})
 
 local function isPartValid(part: BasePart): boolean
 	local prop = GetMapObjectWithTag(part, "Prop")
@@ -164,11 +171,7 @@ local function doPropPolt(prop: Types.Prop, info: PoltInfo): ()
 		return
 	end
 
-	PlaySound(7129285090, nil, GetPrimaryPart(prop.Model), {
-		Volume = 0.5,
-		RollOffMinDistance = 20,
-		RollOffMaxDistance = 30,
-	})
+	Audio.PlayIn(THRUST_SOUND, GetPrimaryPart(prop.Model))
 end
 
 local function heartbeat()

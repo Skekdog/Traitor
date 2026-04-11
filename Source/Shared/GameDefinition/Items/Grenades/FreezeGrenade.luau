@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Grenade = require(ReplicatedStorage.API.Item.Presets.Grenade)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local FreezeGrenade = {}
 
@@ -23,6 +23,14 @@ local function getUi()
 	return ui
 end
 
+local FREEZE_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(6092902279),
+})
+
+local THAW_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(80536376961252),
+})
+
 local currentFreezeId: never & {}
 local function OnHitClient(): ()
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
@@ -36,7 +44,7 @@ local function OnHitClient(): ()
 	local thisFreezeId = newproxy()
 	currentFreezeId = thisFreezeId
 
-	PlaySound(6092902279)
+	Audio.Play2D(FREEZE_SOUND)
 
 	getUi():ToggleVisible(true)
 
@@ -66,7 +74,7 @@ local function OnHitClient(): ()
 
 		JumpPower.SetModifier("FreezeGrenade", true)
 
-		PlaySound(80536376961252)
+		Audio.Play2D(THAW_SOUND)
 
 		local tween = TweenService:Create(image, TweenInfo.new(0.5), {ImageTransparency = 1})
 		tween.Completed:Once(function()

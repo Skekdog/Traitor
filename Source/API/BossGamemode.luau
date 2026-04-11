@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlaySound = require(script.Parent.PlaySound)
+local Audio = require(script.Parent.Audio)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 
@@ -9,7 +9,9 @@ local survivorRole: Types.RoleDefinition = {
 	Name = "Survivor",
 	Description = "Fight for your life!",
 	Color = Color3.new(1, 1, 1),
-	Sound = PlaySound.MakeSound(9042823666),
+	Sound = Audio.MakeSound({
+		Content = Content.fromAssetId(9042823666),
+	}),
 
 	Allegiance = {Kind = "Role", Role = "Survivor"},
 }
@@ -20,7 +22,9 @@ local bossRole: Types.RoleDefinition = {
 	Name = "Boss",
 	Description = "",
 	Color = Color3.new(1, 0, 0),
-	Sound = PlaySound.MakeSound(""),
+	Sound = Audio.MakeSound({
+		Content = Content.none,
+	}),
 
 	Allegiance = {Kind = "Solo"},
 

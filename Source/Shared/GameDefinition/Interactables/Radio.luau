@@ -1,13 +1,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
-local SoundService = game:GetService("SoundService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local DeathSounds = require(ReplicatedStorage.Shared.Config.DeathSounds)
 local Types = require(ReplicatedStorage.API.Types)
 local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
+local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
 local PLAY_COOLDOWN = 0.25
 
@@ -201,8 +202,6 @@ end
 local activeRadios: {Radio} = {}
 
 if RunService:IsServer() then
-	local PlaySound = require(ReplicatedStorage.API.PlaySound)
-
 	local lastGamemode: Types.GamemodeDefinition?
 	local lastMap: Types.Map?
 
@@ -270,9 +269,7 @@ if RunService:IsServer() then
 
 		radio.Extras.LastPlayedAt = os.clock()
 
-		PlaySound(sound, nil, radio.Model, {
-			SoundGroup = SoundService.AllSounds :: SoundGroup,
-		})
+		Audio.PlayIn(sound, GetPrimaryPart(radio.Model))
 	end)
 end
 

@@ -1,10 +1,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local SoundService = game:GetService("SoundService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local CalculateFallDamage = require(script.Parent.CalculateFallDamage)
 local IsAboveWater = require(script.Parent.IsAboveWater)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local LocalCharacter = require(script.Parent.LocalCharacter)
+
+local FALL_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(18782450650),
+	Volume = 0.45,
+	PlaybackRegion = NumberRange.new(0.05, 60000)
+})
 
 local function checkForWater(root: BasePart): boolean
     local map = LocalRoundInfo.Map()
@@ -47,12 +52,7 @@ LocalCharacter.Humanoid:Connect(function(hum)
 			return
 		end
 
-		PlaySound(18782450650, nil, root, {
-			SoundGroup = SoundService.AllSounds :: SoundGroup,
-			Volume = 0.45,
-
-			PlaybackRegion = NumberRange.new(0.05, 60000)
-		})
+		Audio.PlayIn(FALL_SOUND, root)
 
 		ReplicatedStorage.Remotes.ClientServer.Fell:FireServer(velocity)
 	end)

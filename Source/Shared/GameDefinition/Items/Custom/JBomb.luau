@@ -1,8 +1,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Types = require(ReplicatedStorage.API.Types)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 
 local JBomb = {}
 
@@ -14,9 +14,10 @@ local texts = {
 
 local TEXT_INTERVAL = 0.5
 
-local heyOverHere = PlaySound.MakeSound(1454256125, {
-	RollOffMinDistance = 40,
-	RollOffMaxDistance = 50,
+local heyOverHere = Audio.MakeSound({
+	Content = Content.fromAssetId(1454256125),
+	RolloffEnd = 40,
+	RolloffStart = 50,
 	Volume = 1,
 })
 
@@ -53,9 +54,10 @@ local function PrimaryFireClient(item: Types.Item): boolean
 	return true
 end
 
-local explosion = PlaySound.MakeSound(131518429398957, {
-	RollOffMinDistance = 30,
-	RollOffMaxDistance = 60,
+local explosion = Audio.MakeSound({
+	Content = Content.fromAssetId(131518429398957),
+	RolloffStart = 30,
+	RolloffEnd = 60,
 	Volume = 2,
 })
 

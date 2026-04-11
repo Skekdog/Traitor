@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Crowbar = require(script.Parent.Crowbar)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Types = require(ReplicatedStorage.API.Types)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
@@ -53,12 +53,18 @@ local function OnUnequipClient(): ()
 	WalkSpeed.SetModifier("HoldingSpoon", 0)
 end
 
-local attackSound = PlaySound.MakeSound(329792582, {
-	RollOffMaxDistance = 40,
-	RollOffMinDistance = 30,
+local attackSound = Audio.MakeSound({
+	Content = Content.fromAssetId(329792582),
+	Name = "Spoon",
+	RolloffEnd = 40,
+	RolloffStart = 30,
 })
 
-attackSound.Name = "Spoon"
+local eatSound = Audio.MakeSound({
+	Content = Content.fromAssetId(3043029786),
+	RolloffEnd = 25,
+	RolloffStart = 15,
+})
 
 if RunService:IsServer() then
 	attackSound.Parent = script
@@ -169,10 +175,7 @@ if RunService:IsServer() then
 					return
 				end
 
-				PlaySound(3043029786, nil, root, {
-					RollOffMaxDistance = 25,
-					RollOffMinDistance = 15,
-				})
+				Audio.PlayIn(eatSound, root)
 
 				participant:SetHealth(participant:GetHealth() + HEAL / EAT_DURATION)
 

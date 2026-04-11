@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
+local Audio = require(ReplicatedStorage.API.Audio)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
@@ -18,6 +18,24 @@ local function createInteractableForItem(item: Types.Item, round: Types.Round, p
     return prop
 end
 
+local throwSound = Audio.MakeSound({
+    Content = Content.fromAssetId(137090564514029),
+
+    Volume = 1,
+
+    RolloffStart = 10,
+    RolloffEnd = 15,
+})
+
+local plantSound = Audio.MakeSound({
+    Content = Content.fromAssetId(95346310800820),
+
+    Volume = 1,
+
+    RolloffStart = 10,
+    RolloffEnd = 15,
+})
+
 local function throwInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): Types.Prop?
     local round = participant.Round
 
@@ -32,7 +50,7 @@ local function throwInteractable(item: Types.Item, participant: Types.Participan
 
     participant:RemoveItem(item)
 
-    PlaySound(137090564514029, nil, GetPrimaryPart(interactable.Model))
+    Audio.PlayIn(throwSound, GetPrimaryPart(interactable.Model), nil, true)
 
     return interactable
 end
@@ -62,7 +80,7 @@ local function plantInteractable(item: Types.Item, participant: Types.Participan
 
     participant:RemoveItem(item)
 
-    PlaySound(95346310800820, nil, GetPrimaryPart(interactable.Model))
+    Audio.PlayIn(plantSound, GetPrimaryPart(object), nil, true)
 
     return interactable, result, weld
 end

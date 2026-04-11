@@ -1,9 +1,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local Types = require(ReplicatedStorage.API.Types)
 local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
@@ -37,6 +37,12 @@ local function beforeHitAnything(_, params: Types.DamageParams): boolean
 	return true
 end
 
+local SLIP_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(129432532096499),
+	RolloffStart = 20,
+	RolloffEnd = 30,
+})
+
 local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams, participant: Types.Participant): boolean
 	local projectile = params.Projectile
 	assert(projectile)
@@ -48,10 +54,9 @@ local function beforeHitParticipant(item: Types.Item, params: Types.DamageParams
 
 	projectile:SetAttribute("Hit_" .. char.Name, true)
 
-	PlaySound(129432532096499, nil, char.PrimaryPart, {
-		RollOffMinDistance = 20,
-		RollOffMaxDistance = 30,
-	})
+	if char.PrimaryPart then
+		Audio.PlayIn(SLIP_SOUND, char.PrimaryPart)
+	end
 
 	Ragdoll.Ragdoll(participant, char)
 

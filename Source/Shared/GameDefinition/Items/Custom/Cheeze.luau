@@ -1,6 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local Types = require(ReplicatedStorage.API.Types)
-local PlaySound = require(ReplicatedStorage.API.PlaySound)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 
@@ -14,14 +14,19 @@ local ALIGN_MAX_VELOCITY = 10
 
 local ROTATE_VELOCITY = 2
 
+local EAT_SOUND = Audio.MakeSound({
+	Content = Content.fromAssetId(3043029786),
+	RolloffStart = 15,
+	RolloffEnd = 30,
+})
+
 local function playEatSound(participant: Types.Participant): ()
 	local char = participant:GetCharacter()
 	local root = if char then char.PrimaryPart else nil
 
-	PlaySound(3043029786, nil, root, {
-		RollOffMaxDistance = 30,
-		RollOffMinDistance = 15,
-	})
+	if root then
+		Audio.PlayIn(EAT_SOUND, root)
+	end
 end
 
 local function PrimaryFireServer(item: Types.Item, _, _, participant: Types.Participant): ()
