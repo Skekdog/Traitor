@@ -204,7 +204,7 @@ RunService.PostSimulation:Connect(function()
 		end
 	end
 
-	local char = GetMapObject(target, "Character") :: Model?
+	local char = GetMapObject(target, {"Character", "Corpse"}) :: Model?
 	if not char then
 		return
 	end
