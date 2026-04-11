@@ -138,9 +138,8 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 			local spreadDirection = Raycasts.GetRaycastDirection(direction, item.Spread or 0)
 			local result = Raycasts.Hitscan(params, origin, spreadDirection, item.MaxDistance or 10000, item.CheckInitialIntersection, item.CheckInitialIntersection)
 
-			local targetPosition = result and result.Position or Raycasts.DeriveTargetPosition(origin, direction, item.MaxDistance or 10000)
 			if item.Projectile and not noEffects then
-				BulletTracer(item.Projectile, item.ProjectileSpeed or 100, origin, targetPosition)
+				BulletTracer(item.Projectile, item.ProjectileSpeed or 100, origin, result.Position)
 			end
 
 			table.insert(hits, result)
@@ -160,7 +159,7 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 						RolloffEnd = 20,
 					})
 				end
-				Audio.PlayAt(hitSound, targetPosition, true)
+				Audio.PlayAt(hitSound, result.Position, true)
 			end
 		end
 

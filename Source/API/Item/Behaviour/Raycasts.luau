@@ -92,18 +92,17 @@ function Raycasts.Hitscan(
 	fallbackToBlockcast: boolean?,
 	visualiseCasts: boolean?
 ): BehaviourTypes.HitscanResult
-	direction *= range
-	local result = workspace:Raycast(origin, direction, params)
+	local result = workspace:Raycast(origin, direction * range, params)
 
 	if visualiseCasts then
-		visualiseRay(origin, if result then result.Position else Raycasts.DeriveTargetPosition(origin, direction, 1))
+		visualiseRay(origin, if result then result.Position else Raycasts.DeriveTargetPosition(origin, direction, range))
 	end
 
 	if not result and fallbackToBlockcast then
 		local cframe = CFrame.new(origin)
 		local size = Vector3.one * 1.5
 
-		result = workspace:Blockcast(cframe, size, direction, params)
+		result = workspace:Blockcast(cframe, size, direction * range, params)
 	end
 
 	local parts: {BasePart}?
@@ -137,7 +136,7 @@ function Raycasts.Hitscan(
 		elseif part then
 			part:GetClosestPointOnSurface(origin)
 		else
-			Raycasts.DeriveTargetPosition(origin, direction, 1)
+			Raycasts.DeriveTargetPosition(origin, direction, range)
 
 	local normal = if result then result.Normal else (origin - position).Unit
 	local relativeCFrame = if part then part.CFrame:ToObjectSpace(CFrame.new(position)) else nil
