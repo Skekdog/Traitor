@@ -33,7 +33,7 @@ return function(gun: Types.MapObject): ()
     beam.Transparency = NumberSequence.new(0.25)
     beam.LightEmission = 1
     beam.Segments = 1
-    beam.TextureSpeed = math.random(-1, 1)
+    beam.TextureSpeed = math.random(-5, 5) / 10
     beam.Texture = "rbxassetid://872910628"
     beam.Color = ColorSequence.new(Color3.fromRGB(214, 171, 0), Color3.fromRGB(255, 234, 111))
     beam.Name = "MuzzleFlashBeam"
