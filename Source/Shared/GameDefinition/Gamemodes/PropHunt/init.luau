@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.API.Audio)
 local IsValidProp = require(script.IsValidProp)
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local PropHuntItems = require(script.Items)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
@@ -247,6 +248,7 @@ local function beforeDamageParticipant(_, participant: Types.Participant, params
     end
 
     if attacker:GetRole().Definition == roles.Prop then
+        Message.Screen("⚠️ You can't hurt anyone!", "Warn")
         return false
     end
 
