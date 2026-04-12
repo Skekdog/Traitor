@@ -40,6 +40,7 @@ equaliser.Parent = SoundService.AllSounds
 local reverb = Instance.new("ReverbSoundEffect")
 reverb.DecayTime = 0.5
 reverb.Density = 10
+reverb.Enabled = false
 reverb.Parent = SoundService.AllSounds
 
 local atmosphere: Atmosphere?
