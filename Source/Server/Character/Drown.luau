@@ -4,6 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local Types = require(ReplicatedStorage.API.Types)
+local IsSubmerged = require(ReplicatedStorage.Shared.Character.IsSubmerged)
 local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 
 local DROWN_THRESHOLD = 10
@@ -59,20 +60,7 @@ local function forEachParticipant(participant: Participant, dt: number, map: Typ
 		return
 	end
 
-	local isSubmerged = false
-	if humanoid:GetState() == Enum.HumanoidStateType.Swimming then
-		local result = workspace:Raycast(head.Position, Vector3.new(0, -1.5, 0), params)
-
-		if not result then
-			-- If we are underwater, then raycasting returns nothing as the ray is starting in the water object
-			isSubmerged = true
-		elseif result.Instance == workspace.Terrain and result.Material ~= Enum.Material.Water then
-			-- If we hit something and it isn't water then we are at the sea floor
-			isSubmerged = true
-		end
-	end
-
-	if not isSubmerged then
+	if not IsSubmerged(humanoid, head.Position, params) then
 		participant.Extras.DrownElapsed = 0
 		return
 	end
