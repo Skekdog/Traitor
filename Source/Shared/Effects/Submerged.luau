@@ -8,9 +8,17 @@ local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInf
 local GetTaggedDescendants = require(ReplicatedStorage.Shared.RoundRule.Common.GetTaggedDescendants)
 
 local TINT_COLOUR = Color3.fromRGB(171, 223, 255)
+
 local CONTRAST = 0.1
 local BRIGHTNESS = -0.1
 local BLUR_SIZE = 12
+
+local ATMOSPHERE_DENSITY = 0.8
+local ATMOSPHERE_COLOUR = Color3.new(0.5, 0.5, 0.5)
+local ATMOSPHERE_DECAY = Color3.new(1, 1, 1)
+local ATMOSPHERE_OFFSET = 0
+local ATMOSPHERE_GLARE = 1
+local ATMOSPHERE_HAZE = 0
 
 local colourCorrection = Instance.new("ColorCorrectionEffect")
 colourCorrection:SetAttribute("IgnoreLighting", true)
@@ -20,6 +28,8 @@ local blur = Instance.new("BlurEffect")
 blur.Size = 0
 blur:SetAttribute("IgnoreLighting", true)
 blur.Parent = Lighting
+
+local atmosphere: Atmosphere?
 
 local TWEEN_INFO = TweenInfo.new(0.15)
 
@@ -53,6 +63,24 @@ local function activateEffects(): ()
 
 	colourCorrectionActivate:Play()
 	blurActivate:Play()
+
+	if atmosphere then
+		atmosphere:Destroy()
+	end
+
+	atmosphere = Instance.new("Atmosphere")
+	assert(atmosphere)
+
+	atmosphere.Density = ATMOSPHERE_DENSITY
+	atmosphere.Decay = ATMOSPHERE_DECAY
+	atmosphere.Color = ATMOSPHERE_COLOUR
+	atmosphere.Offset = ATMOSPHERE_OFFSET
+	atmosphere.Glare = ATMOSPHERE_GLARE
+	atmosphere.Haze = ATMOSPHERE_HAZE
+	atmosphere.Decay = TINT_COLOUR
+	atmosphere:SetAttribute("IgnoreLighting", true)
+
+	atmosphere.Parent = Lighting
 end
 
 local function deactivateEffects(): ()
@@ -64,6 +92,11 @@ local function deactivateEffects(): ()
 
 	colourCorrectionDeactivate:Play()
 	blurDeactivate:Play()
+
+	if atmosphere then
+		atmosphere:Destroy()
+		atmosphere = nil
+	end
 end
 
 local params = RaycastParams.new()
