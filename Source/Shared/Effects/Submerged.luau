@@ -1,6 +1,7 @@
 local Lighting = game:GetService("Lighting")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
 local TweenService = game:GetService("TweenService")
 local IsSubmerged = require(ReplicatedStorage.Shared.Character.IsSubmerged)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
@@ -29,6 +30,18 @@ blur.Size = 0
 blur:SetAttribute("IgnoreLighting", true)
 blur.Parent = Lighting
 
+local equaliser = Instance.new("EqualizerSoundEffect")
+equaliser.HighGain = -10
+equaliser.LowGain = 5
+equaliser.MidGain = -5
+equaliser.Enabled = false
+equaliser.Parent = SoundService.AllSounds
+
+local reverb = Instance.new("ReverbSoundEffect")
+reverb.DecayTime = 0.5
+reverb.Density = 10
+reverb.Parent = SoundService.AllSounds
+
 local atmosphere: Atmosphere?
 
 local TWEEN_INFO = TweenInfo.new(0.15)
@@ -53,21 +66,7 @@ local blurDeactivate = TweenService:Create(blur, TWEEN_INFO, {
 	Size = 0,
 })
 
-local isActive = false
-local function activateEffects(): ()
-	if isActive then
-		return
-	end
-
-	isActive = true
-
-	colourCorrectionActivate:Play()
-	blurActivate:Play()
-
-	if atmosphere then
-		atmosphere:Destroy()
-	end
-
+local function createAtmosphere(): ()
 	atmosphere = Instance.new("Atmosphere")
 	assert(atmosphere)
 
@@ -83,6 +82,31 @@ local function activateEffects(): ()
 	atmosphere.Parent = Lighting
 end
 
+local function removeAtmosphere(): ()
+	if atmosphere then
+		atmosphere:Destroy()
+		atmosphere = nil
+	end
+end
+
+local isActive = false
+local function activateEffects(): ()
+	if isActive then
+		return
+	end
+
+	isActive = true
+
+	colourCorrectionActivate:Play()
+	blurActivate:Play()
+
+	removeAtmosphere()
+	createAtmosphere()
+
+	reverb.Enabled = true
+	equaliser.Enabled = true
+end
+
 local function deactivateEffects(): ()
 	if not isActive then
 		return
@@ -93,10 +117,10 @@ local function deactivateEffects(): ()
 	colourCorrectionDeactivate:Play()
 	blurDeactivate:Play()
 
-	if atmosphere then
-		atmosphere:Destroy()
-		atmosphere = nil
-	end
+	removeAtmosphere()
+
+	reverb.Enabled = false
+	equaliser.Enabled = false
 end
 
 local params = RaycastParams.new()
