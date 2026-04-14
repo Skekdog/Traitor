@@ -41,7 +41,7 @@ local remote = GetRemote("Audio", script)
 local function playToPlayer(mode: "PlayIn" | "PlayAt", sound: Sound, atOrIn: Vector3 | PlayInTarget?, to: Player): ()
 	assert(RunService:IsServer(), "to can only be specified on the server")
 	assert(Replication.CanInstanceReplicate(sound), "Sound is not replicated to players")
-	remote:FireClient(to, mode, sound)
+	remote:FireClient(to, mode, sound, atOrIn)
 end
 
 --- Creates a `Sound` given input properties.
