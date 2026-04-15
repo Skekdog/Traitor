@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TextService = game:GetService("TextService")
 local FilterDead = require(script.Parent.FilterDead)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local QuickChat = require(ReplicatedStorage.Shared.Interface.Chat.QuickChat.QuickChat)
@@ -33,9 +34,20 @@ remote.OnServerEvent:Connect(function(player: Player, messageId: unknown, id: un
 
 	rateLimits[player] = os.clock()
 
+	local formattedMessage = QuickChat.FormatMessage(baseMessage, id)
+
+	task.spawn(function()
+		-- https://devforum.roblox.com/t/-/4539685/302
+		-- According to this post, this step is only needed for "visibility into messages".
+		-- Additionally, it claims that this can be done once on load (it can't, as a user id is required).
+		-- Therefore, we make the call to filter it, but ignore the result, because we know its safe.
+		-- To be honest, all of these requirements are insanely bullshit, but whatever.
+		TextService:FilterStringAsync(formattedMessage, player.UserId, Enum.TextFilterContext.PublicChat)
+	end)
+
 	for _, v in Players:GetPlayers() do
 		if FilterDead.ShouldSend(player, v) then
-			ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireClient(v, QuickChat.FormatMessage(baseMessage, id), "QuickChat", player)
+			ReplicatedStorage.Shared.RoundRule.Remotes.SendMessage:FireClient(v, formattedMessage, "QuickChat", player)
 		end
 	end
 end)
