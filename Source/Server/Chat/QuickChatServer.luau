@@ -9,6 +9,10 @@ local remote = GetRemote("QuickChat", ReplicatedStorage.Remotes)
 
 local rateLimits: {[Player]: number?} = {}
 
+-- Stupidly high, but Roblox requires it /shrug
+-- https://create.roblox.com/docs/chat/preset-system-guidelines#requirements
+local RATE_LIMIT_INTERVAL = 10
+
 remote.OnServerEvent:Connect(function(player: Player, messageId: unknown, id: unknown): ()
 	if typeof(messageId) ~= "number" then
 		return
@@ -23,7 +27,7 @@ remote.OnServerEvent:Connect(function(player: Player, messageId: unknown, id: un
 		return
 	end
 
-	if (rateLimits[player] or 0) + 0.5 > os.clock() then
+	if (rateLimits[player] or 0) + RATE_LIMIT_INTERVAL > os.clock() then
 		return Replication.SendMessage(player, "Please do not flood the chat.", "Chat")
 	end
 
