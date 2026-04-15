@@ -13,6 +13,8 @@ local MAX_LENGTH = 200
 local MAX_MESSAGES = 100
 local AUTO_SCROLL_THRESHOLD = 5
 
+local QUICKCHAT_COLOUR = Color3.fromRGB(191, 251, 255)
+
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 
 local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.Chat)
@@ -86,16 +88,23 @@ local function displayMessage(message: TextChatMessage): ()
 		message.PrefixText = "<font color='#ff0000'>[TEAM]</font> " .. message.PrefixText
 	end
 
+	local colouredText = if message.Metadata:find("QuickChat") then
+		`<font color='#{QUICKCHAT_COLOUR:ToHex()}'>{message.Text}</font>`
+	else
+		message.Text
+
+	local finalText = message.PrefixText .. " " .. colouredText
+
 	local originalLabel = ChatWindow.MessagesFrame:FindFirstChild(message.MessageId)
 	if originalLabel and originalLabel:IsA("TextLabel") then
-		originalLabel.Text = message.PrefixText .. " " .. message.Text
+		originalLabel.Text = finalText
 		originalLabel.TextTransparency = if isOutgoing then 0.5 else 0
 		return
 	end
 
 	local messageBox = messageTemplate:Clone()
 	messageBox.Name = message.MessageId
-	messageBox.Text = message.PrefixText .. " " .. message.Text
+	messageBox.Text = finalText
 	messageBox.TextTransparency = if isOutgoing then 0.5 else 0
 	messageBox.Visible = true
 
