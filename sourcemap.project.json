@@ -1,0 +1,11 @@
+{
+  "name": "Traitor!",
+
+  "globIgnorePaths": ["Assets/Maps/*.rbxm"],
+
+  "emitLegacyScripts": false,
+
+  "tree": {
+    "$path": "build.project.json"
+  }
+}
