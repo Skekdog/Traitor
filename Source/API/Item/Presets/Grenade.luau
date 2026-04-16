@@ -39,6 +39,13 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 			end,
 
 		ProjectileSpeed = 35,
+
+		OnHitRejectServer =
+			if RunService:IsServer() then
+				require(ReplicatedStorage.API.Item.Behaviour.Server).ProcessReject
+			else
+				nil
+			,
 	}
 
 	for i, v in components do

@@ -93,6 +93,9 @@ remote.OnServerEvent:Connect(function(player, itemName: unknown, action: unknown
 
 	local result: string | {string}? = validateItemUsage(participant, item, action, origin, direction)
 	if result then
+		if item.OnHitRejectServer then
+			item.OnHitRejectServer(item)
+		end
 		return remote:FireClient(player, result)
 	end
 

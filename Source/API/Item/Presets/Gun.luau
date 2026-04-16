@@ -35,6 +35,13 @@ local function Gun(components: Types.ItemComponents): Types.ItemComponents
 			else
 				function() return true
 			end,
+
+		OnHitRejectServer =
+			if RunService:IsServer() then
+				require(ReplicatedStorage.API.Item.Behaviour.Server).ProcessReject
+			else
+				nil
+			,
 	}
 
 	for i, v in components do

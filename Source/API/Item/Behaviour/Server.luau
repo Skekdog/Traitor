@@ -232,6 +232,12 @@ function Server.ApplyNearMissSelfDefense(origin: Vector3, destination: Vector3, 
 	end
 end
 
+function Server.DeductAmmo(item: Types.Item): ()
+	if item.Ammo then
+		item.Ammo -= 1
+	end
+end
+
 function Server.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, data: unknown): {string} | string?
 	if not BehaviourTypes.IsRequest(data) then
 		return "InvalidRequest"
@@ -239,12 +245,11 @@ function Server.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 
 	local request = data :: BehaviourTypes.Request
 
-	if item.Ammo then
-		if item.Ammo <= 0 then
-			return "NoAmmo"
-		end
-		item.Ammo -= 1
+	if not Checks.Ammo(item) then
+		return "NoAmmo"
 	end
+
+	Server.DeductAmmo(item)
 
 	if not request and not item.IsProjectileSimulated then
 		return "InvalidHitscanRequest"
@@ -265,6 +270,11 @@ function Server.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 	end
 
 	return rejects
+end
+
+function Server.ProcessReject(item: Types.Item): ()
+	-- Well actually this will also run if the hit is rejected because NoAmmo but lol!
+	Server.DeductAmmo(item)
 end
 
 return table.freeze(Server)
