@@ -32,8 +32,7 @@ local function InPart(part: BasePart, part2: BasePart, heightOffset: number): bo
 	if math.abs(rel.X) <= size.X/2 and math.abs(rel.Y) <= size.Y/2 and math.abs(rel.Z) <= size.Z/2 then
 		if not part:IsA("Part") or part.Shape ~= Enum.PartType.Block or part:FindFirstChildWhichIsA("DataModelMesh") then
 			local params = OverlapParams.new()
-			params.FilterDescendantsInstances = {part2}
-			params.FilterType = Enum.RaycastFilterType.Include
+			params.IncludeInstances = {part2}
 
 			return #workspace:GetPartsInPart(part) > 0
 		end

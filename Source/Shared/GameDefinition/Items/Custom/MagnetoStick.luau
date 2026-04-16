@@ -49,7 +49,6 @@ end
 local serverControlledProps: {[Player]: Types.Prop?} = {}
 
 local clientRaycastParams = RaycastParams.new()
-clientRaycastParams.FilterType = Enum.RaycastFilterType.Exclude
 clientRaycastParams.CollisionGroup = "WeaponHitTargets"
 clientRaycastParams.IgnoreWater = true
 
@@ -61,7 +60,7 @@ local function clientRaycast(filter: {Instance} | Instance?): (BasePart?, Vector
 		return nil, nil
 	end
 
-	clientRaycastParams.FilterDescendantsInstances = {char}
+	clientRaycastParams.ExcludeInstances = {char}
 	if filter then
 		clientRaycastParams:AddToFilter(filter)
 	end
@@ -411,8 +410,7 @@ end
 
 local function clientIsAbovePart(root: BasePart, part: BasePart): boolean
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {part}
-	params.FilterType = Enum.RaycastFilterType.Include
+	params.IncludeInstances = {part}
 
 	local result = workspace:Blockcast(root.CFrame, root.Size, -root.CFrame.UpVector * 3, params)
 	return result ~= nil
@@ -455,14 +453,13 @@ local postSimulationClient: (item: Types.Item, dt: number) -> () = function(): (
 	end
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {char, part}
+	params.ExcludeInstances = {char, part}
 	if part:IsDescendantOf(workspace.Characters) then
 		local model = part:FindFirstAncestorOfClass("Model")
 		if model then
 			params:AddToFilter(model)
 		end
 	end
-	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.IgnoreWater = true
 	params.RespectCanCollide = true
 

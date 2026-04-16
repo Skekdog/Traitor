@@ -152,16 +152,15 @@ ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.H
 
 local params = RaycastParams.new()
 params.IgnoreWater = true
-params.FilterType = Enum.RaycastFilterType.Exclude
 params.CollisionGroup = "MouseInfoRay"
 
 RunService.PostSimulation:Connect(function()
 	local camera = workspace.CurrentCamera
 	local cameraSubject = camera.CameraSubject
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
-		params.FilterDescendantsInstances = {cameraSubject.Parent :: Model}
+		params.ExcludeInstances = {cameraSubject.Parent}
 	else
-		params.FilterDescendantsInstances = {}
+		params.ExcludeInstances = {}
 	end
 
 	Mouse.Reset()

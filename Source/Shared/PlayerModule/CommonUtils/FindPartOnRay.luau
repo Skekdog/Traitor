@@ -5,8 +5,7 @@ function FindPartOnRay.Including(ray: Ray, include: {Instance}, ignoreWater: boo
 	local params = RaycastParams.new()
 
 	params.IgnoreWater = ignoreWater or false
-	params.FilterDescendantsInstances = include
-	params.FilterType = Enum.RaycastFilterType.Include
+	params.IncludeInstances = include
 
 	local result = workspace:Raycast(ray.Origin, ray.Direction)
 
@@ -21,8 +20,7 @@ function FindPartOnRay.Excluding(ray: Ray, exclude: {Instance}, terrainCellsAreC
 	local params = RaycastParams.new()
 
 	params.IgnoreWater = ignoreWater or false
-	params.FilterDescendantsInstances = exclude
-	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.ExcludeInstances = exclude
 
 	local result = workspace:Raycast(ray.Origin, ray.Direction, params)
 

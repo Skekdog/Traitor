@@ -6,8 +6,7 @@ local function IsAboveWater(map: Types.Map, root: BasePart, distance: number): (
     params.RespectCanCollide = false
     params.IgnoreWater = false
     params.CollisionGroup = "PlayerCharacterParts"
-    params.FilterDescendantsInstances = {root.Parent :: Model}
-    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.ExcludeInstances = {root.Parent :: Model}
 
     -- The landed state often triggers really early so we do need to raycast quite far down. Testing on the Test map shows that -7.5 should suffice but I'll go -10 to be sure
     local result = workspace:Raycast(root.Position, Vector3.new(0, -distance, 0), params)

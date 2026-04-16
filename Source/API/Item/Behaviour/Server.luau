@@ -195,8 +195,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 end
 
 local nearMissOverlapParams = OverlapParams.new()
-nearMissOverlapParams.FilterDescendantsInstances = {workspace.Characters}
-nearMissOverlapParams.FilterType = Enum.RaycastFilterType.Include
+nearMissOverlapParams.IncludeInstances = {workspace.Characters}
 
 -- I think it makes more sense to do this on the server than on the client?
 -- I'm not honestly sure though

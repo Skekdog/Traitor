@@ -39,8 +39,7 @@ function Epilogue.Begin(framed: Types.Participant): ()
 	assert(exitCFrame, "Could not find exit")
 
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {round:GetMap().Structure.Static}
-	params.FilterType = Enum.RaycastFilterType.Include
+	params.IncludeInstances = {round:GetMap().Structure.Static}
 	params.IgnoreWater = true
 	local result = workspace:Raycast(exitCFrame.Position, Vector3.new(0, -10, 0), params)
 

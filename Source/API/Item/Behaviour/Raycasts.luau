@@ -19,8 +19,7 @@ end
 
 function Raycasts.GetDefaultRaycastParams(...: Instance): RaycastParams
 	local params = RaycastParams.new()
-	params.FilterDescendantsInstances = {...}
-	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.ExcludeInstances = {...}
 	params.IgnoreWater = true
 	params.CollisionGroup = "WeaponHitTargets"
 
@@ -108,8 +107,16 @@ function Raycasts.Hitscan(
 	local parts: {BasePart}?
 	if not result and checkInitialOverlap then
 		local overlapParams = OverlapParams.new()
-		overlapParams.FilterDescendantsInstances = params.FilterDescendantsInstances
-		overlapParams.FilterType = params.FilterType
+
+		if params.IncludeInstances then
+			overlapParams.IncludeInstances = params.IncludeInstances
+		elseif params.ExcludeInstances then
+			overlapParams.ExcludeInstances = params.ExcludeInstances
+		else
+			overlapParams.FilterDescendantsInstances = params.FilterDescendantsInstances
+			overlapParams.FilterType = params.FilterType
+		end
+
 		overlapParams.CollisionGroup = params.CollisionGroup
 
 		local cframe = workspace.CurrentCamera.CFrame

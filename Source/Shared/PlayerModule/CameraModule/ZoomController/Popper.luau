@@ -32,11 +32,9 @@ local ray = Ray.new
 
 local excludeParams = RaycastParams.new()
 excludeParams.IgnoreWater = true
-excludeParams.FilterType = Enum.RaycastFilterType.Exclude
 
 local includeParams = RaycastParams.new()
 includeParams.IgnoreWater = true
-includeParams.FilterType = Enum.RaycastFilterType.Include
 
 local connectionUtil = if FFlagUserPlayerConnectionMemoryLeak then ConnectionUtil.new() else nil
 
@@ -224,7 +222,7 @@ local QUERY_POINT_CAST_LIMIT = 64
 
 local function getCollisionPoint(origin, dir)
 	if FFlagUserRaycastUpdateAPI then
-		excludeParams.FilterDescendantsInstances = excludeList
+		excludeParams.ExcludeInstances = excludeList
 		repeat
 			local raycastResult = workspace:Raycast(origin, dir, excludeParams)
 
@@ -275,7 +273,7 @@ local function queryPoint(origin, unitDir, dist, lastPos)
 	local numPierced = 0
 
 	if FFlagUserRaycastUpdateAPI then
-		excludeParams.FilterDescendantsInstances = excludeList
+		excludeParams.ExcludeInstances = excludeList
 		repeat
 			local enterRaycastResult = workspace:Raycast(movingOrigin, target - movingOrigin, excludeParams)
 
@@ -291,7 +289,7 @@ local function queryPoint(origin, unitDir, dist, lastPos)
 			if numPierced >= QUERY_POINT_CAST_LIMIT then
 				hardLimit = lim
 			elseif canOcclude(entryInstance) then
-				includeParams.FilterDescendantsInstances = { entryInstance }
+				includeParams.IncludeInstances = { entryInstance }
 
 				local exitRaycastResult = workspace:Raycast(target, entryPosition - target, includeParams)
 				if exitRaycastResult then

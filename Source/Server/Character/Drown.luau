@@ -19,7 +19,6 @@ local DROWN_SOUND = Audio.MakeSound({
 
 local params = RaycastParams.new()
 params.IgnoreWater = false
-params.FilterType = Enum.RaycastFilterType.Include
 params.CollisionGroup = "PlayerCharacterParts" -- so that we include bounds
 
 type Participant = Types.Participant & {
@@ -89,7 +88,7 @@ RunService.Heartbeat:Connect(function(dt)
 
 	local include = GetTaggedDescendants(map.Structure, "Water")
 	table.insert(include, workspace.Terrain)
-	params.FilterDescendantsInstances = include
+	params.IncludeInstances = include
 
 	for _, v in round:GetParticipants() do
 		assert(v)

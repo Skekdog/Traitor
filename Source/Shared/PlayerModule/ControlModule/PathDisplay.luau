@@ -7,7 +7,6 @@ local FindPartOnRay = require(CommonUtils.FindPartOnRay)
 local FFlagUserRaycastUpdateAPI = FlagUtil.getUserFlag("UserRaycastUpdateAPI")
 
 local raycastParams = RaycastParams.new()
-raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 
 local PathDisplay = {}
 PathDisplay.spacing = 8
@@ -62,7 +61,7 @@ local function renderPoint(point: Vector3, isLast): ImageHandleAdornment?
 
 	local pointInstance = retrieveFromPool()
 	if FFlagUserRaycastUpdateAPI then
-		raycastParams.FilterDescendantsInstances = { (game.Players.LocalPlayer :: Player).Character :: Model, workspace.CurrentCamera :: Camera }
+		raycastParams.ExcludeInstances = { (game.Players.LocalPlayer :: Player).Character :: Model, workspace.CurrentCamera :: Camera }
 		local raycastResult = workspace:Raycast(point + Vector3.new(0, 2, 0), Vector3.new(0, -8, 0), raycastParams)
 		if not raycastResult then
 			return nil

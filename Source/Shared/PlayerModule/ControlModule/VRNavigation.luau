@@ -34,7 +34,6 @@ local XZ_VECTOR3 = Vector3.new(1,0,1)
 local HEIGHT_OFFSET = Vector3.new(0, 100, 0)
 
 local raycastParams = RaycastParams.new()
-raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 
 --[[ Flags ]]--
 local FFlagUserRaycastUpdateAPI = FlagUtil.getUserFlag("UserRaycastUpdateAPI")
@@ -373,7 +372,7 @@ function VRNavigation:OnHeartbeat(dt)
 			end
 		else
 			if FFlagUserRaycastUpdateAPI then
-				raycastParams.FilterDescendantsInstances = { (game.Players.LocalPlayer :: Player).Character, workspace.CurrentCamera}
+				raycastParams.ExcludeInstances = { (game.Players.LocalPlayer :: Player).Character, workspace.CurrentCamera}
 				local raycastResult = workspace:Raycast(currentPosition - Vector3.yAxis, moveDir * 3, raycastParams)
 
 				if raycastResult then

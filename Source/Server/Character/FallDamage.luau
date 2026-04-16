@@ -6,12 +6,11 @@ local CalculateFallDamage = require(ReplicatedStorage.Shared.Character.Calculate
 local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
-local function checkForPlayers(plr: Player, root: BasePart): {Player}
-    local params = OverlapParams.new()
-    params.FilterDescendantsInstances = {workspace.Characters}
-    params.FilterType = Enum.RaycastFilterType.Include
-    params.RespectCanCollide = false
+local params = OverlapParams.new()
+params.IncludeInstances = {workspace.Characters}
+params.RespectCanCollide = false
 
+local function checkForPlayers(plr: Player, root: BasePart): {Player}
     local parts = workspace:GetPartBoundsInBox(CFrame.lookAlong(root.Position, -Vector3.zAxis), Vector3.new(3, 40, 3))
 
     local players: {Player} = {}

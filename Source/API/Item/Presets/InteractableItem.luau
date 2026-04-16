@@ -58,8 +58,7 @@ end
 local function plantInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): (Types.Prop?, RaycastResult?, WeldConstraint?)
     local params = RaycastParams.new()
     params.CollisionGroup = "WeaponHitTargets"
-    params.FilterDescendantsInstances = {workspace.Characters, workspace.Projectiles}
-    params.FilterType = Enum.RaycastFilterType.Exclude
+    params.ExcludeInstances = {workspace.Characters, workspace.Projectiles}
 
     local result = workspace:Raycast(origin, direction * 10, params)
     if not result or not result.Instance:IsDescendantOf(participant.Round:GetMap().Structure.Static) then

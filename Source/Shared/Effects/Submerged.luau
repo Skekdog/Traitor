@@ -126,7 +126,6 @@ end
 
 local params = RaycastParams.new()
 params.IgnoreWater = false
-params.FilterType = Enum.RaycastFilterType.Include
 params.CollisionGroup = "PlayerCharacterParts" -- so that we include bounds
 
 RunService.PostSimulation:Connect(function()
@@ -149,7 +148,7 @@ RunService.PostSimulation:Connect(function()
 
 	local include = GetTaggedDescendants(map.Structure, "Water")
 	table.insert(include, workspace.Terrain)
-	params.FilterDescendantsInstances = include
+	params.IncludeInstances = include
 
 	if IsSubmerged(humanoid, head.Position, params) then
 		activateEffects()

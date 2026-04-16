@@ -55,7 +55,6 @@ local ZERO_VECTOR3 = Vector3.new(0,0,0)
 local ALMOST_ZERO = 0.000001
 
 local raycastParams = RaycastParams.new()
-raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 
 
 --------------------------UTIL LIBRARY-------------------------------
@@ -641,7 +640,7 @@ local function Pather(endPoint, surfaceNormal, overrideUseDirectPath: boolean?)
 	--We always raycast to the ground in the case that the user clicked a wall.
 	local offsetPoint = this.TargetPoint + this.TargetSurfaceNormal*1.5
 	if FFlagUserRaycastUpdateAPI then
-		raycastParams.FilterDescendantsInstances = getIgnoreList()
+		raycastParams.ExcludeInstances = getIgnoreList()
 		local raycastResult = Workspace:Raycast(offsetPoint, -Vector3.yAxis * 50, raycastParams)
 
 		if raycastResult then
@@ -754,7 +753,7 @@ function OnTap(tapPositions: {Vector3}, goToPoint: Vector3?, wasTouchTap: boolea
 				local ignoreList = getIgnoreList() or {}
 				repeat
 					local encounteredCollider = true
-					raycastParams.FilterDescendantsInstances = ignoreList
+					raycastParams.ExcludeInstances = ignoreList
 					raycastResult = Workspace:Raycast(unitRay.Origin, unitRay.Direction * 1000, raycastParams)
 
 					if raycastResult then

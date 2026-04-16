@@ -9,16 +9,15 @@ local remote = GetRemote("LoadMarking", script)
 
 local params = RaycastParams.new()
 params.IgnoreWater = true
-params.FilterType = Enum.RaycastFilterType.Exclude
 params.CollisionGroup = "MouseInfoRay"
 
 local function mark(): ()
 	local camera = workspace.CurrentCamera
 	local cameraSubject = camera.CameraSubject
 	if cameraSubject and cameraSubject.Parent and cameraSubject:IsA("Humanoid") then
-		params.FilterDescendantsInstances = {cameraSubject.Parent :: Model}
+		params.ExcludeInstances = {cameraSubject.Parent :: Model}
 	else
-		params.FilterDescendantsInstances = {}
+		params.ExcludeInstances = {}
 	end
 
 	local result = workspace:Raycast(camera.CFrame.Position, camera.CFrame.LookVector * 10000, params)

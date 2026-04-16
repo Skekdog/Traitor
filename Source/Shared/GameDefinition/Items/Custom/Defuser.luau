@@ -5,8 +5,7 @@ local C4 = require(ReplicatedStorage.Shared.GameDefinition.Interactables.C4)
 
 local params = RaycastParams.new()
 params.CollisionGroup = "WeaponHitTargets"
-params.FilterDescendantsInstances = {workspace.Characters}
-params.FilterType = Enum.RaycastFilterType.Exclude
+params.ExcludeInstances = {workspace.Characters}
 
 local item = Custom({
 	Name = "Defuser",

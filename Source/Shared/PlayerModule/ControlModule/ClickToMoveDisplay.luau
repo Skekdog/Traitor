@@ -35,7 +35,6 @@ local TRAIL_DOT_MAX_SCALE = 2.5
 local TRAIL_DOT_MAX_DISTANCE = 100
 
 local raycastParams = RaycastParams.new()
-raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 
 local raycastOriginOffset = Vector3.yAxis * 2.5
 local raycastDirection = Vector3.yAxis * -10
@@ -151,7 +150,7 @@ end
 
 local function placePathWaypoint(waypointModel, position: Vector3)
 	if FFlagUserRaycastUpdateAPI then
-		raycastParams.FilterDescendantsInstances = { Workspace.CurrentCamera, LocalPlayer.Character }
+		raycastParams.ExcludeInstances = { Workspace.CurrentCamera, LocalPlayer.Character }
 		local raycastResult = Workspace:Raycast(position + raycastOriginOffset, raycastDirection, raycastParams)
 
 		if raycastResult then
@@ -269,7 +268,7 @@ function FailureWaypoint:NewDisplayModel(position)
 	local newDisplayModel: Part = FailureWaypointTemplate:Clone()
 	placePathWaypoint(newDisplayModel, position)
 	if FFlagUserRaycastUpdateAPI then
-		raycastParams.FilterDescendantsInstances = { Workspace.CurrentCamera, LocalPlayer.Character }
+		raycastParams.ExcludeInstances = { Workspace.CurrentCamera, LocalPlayer.Character }
 
 		local raycastResult = Workspace:Raycast(position + raycastOriginOffset, raycastDirection, raycastParams)
 		if raycastResult then

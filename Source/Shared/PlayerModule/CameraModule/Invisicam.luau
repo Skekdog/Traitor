@@ -63,10 +63,7 @@ local SMART_CIRCLE_INCREMENT = 2.0 * math.pi / SMART_CIRCLE_CASTS
 local CHAR_OUTLINE_CASTS = 24
 
 local excludeParams = RaycastParams.new()
-excludeParams.FilterType = Enum.RaycastFilterType.Exclude
-
 local includeParams = RaycastParams.new()
-includeParams.FilterType = Enum.RaycastFilterType.Include
 
 -- Used to sanitize user-supplied functions
 local function AssertTypes(param, ...)
@@ -244,7 +241,7 @@ function Invisicam:CharacterOutlineBehavior(castPoints)
 		offset = Vector3.new(offset.X, math.max(offset.Y, -2.25), offset.Z)
 
 		if FFlagUserRaycastUpdateAPI then
-			includeParams.FilterDescendantsInstances = partsWhitelist
+			includeParams.IncludeInstances = partsWhitelist
 			local raycastResult = game.Workspace:Raycast(centerPoint + offset, -3 * offset, includeParams)
 
 			if raycastResult then
@@ -304,7 +301,7 @@ function Invisicam:SmartCircleBehavior(castPoints)
 
 
 		if FFlagUserRaycastUpdateAPI then
-			excludeParams.FilterDescendantsInstances = { self.char }
+			excludeParams.ExcludeInstances = { self.char }
 			local raycastResult = game.Workspace:Raycast(torsoPoint, circlePoint - torsoPoint, excludeParams)
 
 			local castPoint = circlePoint
