@@ -1,44 +1,65 @@
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
-local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
+local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
+local Types = require(ReplicatedStorage.API.Types)
 local CalculateFallDamage = require(ReplicatedStorage.Shared.Character.CalculateFallDamage)
 local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
-local params = OverlapParams.new()
-params.IncludeInstances = {workspace.Characters}
+local params = RaycastParams.new()
 params.RespectCanCollide = false
 
-local function checkForPlayers(plr: Player, root: BasePart): {Player}
-    local parts = workspace:GetPartBoundsInBox(CFrame.lookAlong(root.Position, -Vector3.zAxis), Vector3.new(3, 40, 3))
+local MAX_ABSORBER_DISTANCE = 10
 
-    local players: {Player} = {}
-    for _, part in parts do
-        local char = part.Parent
-        if char and char:IsA("Model") then
-            local player = Players:GetPlayerFromCharacter(char)
-            if player ~= plr and player and not table.find(players, player) then
-                table.insert(players, player)
-            end
-        end
+local function checkForAbsorber(plr: Player, position: Vector3, round: Types.Round): {
+    Absorber: Types.Participant | Types.Prop,
+    Part: BasePart,
+}?
+
+    local include = {workspace.Characters, round:GetMap().Structure.Dynamic} :: {Instance}
+    params.IncludeInstances = include
+    params.ExcludeInstances = {plr.Character :: Model}
+
+    local result = workspace:Raycast(position, -Vector3.yAxis * MAX_ABSORBER_DISTANCE, params)
+    if not result then
+        return nil
     end
 
-    return players
+    local mapObject = GetMapObject(result.Instance, {"Prop", "Character"})
+    if not mapObject then
+        return nil
+    end
+
+    local prop = round:GetProp(mapObject)
+    if prop then
+        return {
+            Absorber = prop,
+            Part = result.Instance,
+        }
+    end
+
+    local participant = round:GetParticipant(mapObject.Name)
+    if participant then
+        return {
+            Absorber = participant,
+            Part = result.Instance,
+        }
+    end
+
+    return nil
 end
 
-ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, velocity: unknown): ()
+ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, velocity: unknown, position: unknown): ()
     if typeof(velocity) ~= "number" or IsBadNumber(velocity) then
+        return
+    end
+
+    if typeof(position) ~= "Vector3" then
         return
     end
 
     local participant = RoundHandler.Round():GetParticipant(player.Name)
     if not participant then
-        return
-    end
-
-    local damage = CalculateFallDamage(velocity)
-    if damage == 0 then
         return
     end
 
@@ -52,26 +73,32 @@ ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(playe
         return
     end
 
-    local players = checkForPlayers(player, root)
-    if #players > 0 then
-        for _, player in players do
-            local aParticipant = GetParticipant(player)
-            if aParticipant then
-                aParticipant:TryTakeDamage({
-                    Amount = damage / #players,
-                    Source = "Stomp",
-                    Attacker = participant,
-                })
-            end
-        end
-
+    local damage = CalculateFallDamage(velocity)
+    if damage == 0 then
         return
     end
 
-    participant:TryTakeDamage({
-        Amount = damage,
-        Source = "Fall",
-    })
+    local absorber = checkForAbsorber(player, position, participant.Round)
+    if absorber then
+        local currentHealth = (absorber.Absorber :: Types.Prop):GetHealth()
+
+        local didDamage = (absorber.Absorber :: Types.Prop):TryTakeDamage({
+            Amount = damage,
+            Source = "Stomp",
+            Attacker = participant,
+        })
+
+        if didDamage then
+            damage -= currentHealth or 0
+        end
+    end
+
+    if damage > 0 then
+        participant:TryTakeDamage({
+            Amount = damage,
+            Source = "Fall",
+        })
+    end
 end)
 
 return nil

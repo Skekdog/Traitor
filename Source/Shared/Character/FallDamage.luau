@@ -54,7 +54,7 @@ LocalCharacter.Humanoid:Connect(function(hum)
 
 		Audio.PlayIn(FALL_SOUND, root)
 
-		ReplicatedStorage.Remotes.ClientServer.Fell:FireServer(velocity)
+		ReplicatedStorage.Remotes.ClientServer.Fell:FireServer(velocity, root.Position)
 	end)
 end)
 
