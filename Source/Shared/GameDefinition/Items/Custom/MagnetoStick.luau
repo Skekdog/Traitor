@@ -452,8 +452,10 @@ local postSimulationClient: (item: Types.Item, dt: number) -> () = function(): (
 		return clientRelease(part)
 	end
 
+	local prop = GetMapObjectWithTag(part, "Prop")
+
 	local params = RaycastParams.new()
-	params.ExcludeInstances = {char, part}
+	params.ExcludeInstances = {char, prop or part}
 	if part:IsDescendantOf(workspace.Characters) then
 		local model = part:FindFirstAncestorOfClass("Model")
 		if model then
