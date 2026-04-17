@@ -84,18 +84,14 @@ function Audio.PlayAt(referenceSound: Sound, position: Vector3, noClone: boolean
 	local sound = if noClone then referenceSound else referenceSound:Clone()
 	applyBaseProperties(sound)
 
-	debug.profilebegin("CreatePart")
 	local part = CreateEmptyPart(CFrame.new(position), {sound :: Instance})
 	part.Parent = workspace.Projectiles
-	debug.profileend()
 
 	sound.Ended:Once(function()
 		part:Destroy()
 	end)
 
-	debug.profilebegin("Play")
 	sound:Play()
-	debug.profileend()
 end
 
 -- Caches by reference sound to instances mapped to the actual sound that should play

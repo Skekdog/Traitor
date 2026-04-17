@@ -115,9 +115,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 
 		if isPrimary then
 			if item.PrimaryFireClient then
-				debug.profilebegin("PrimaryFire")
 				local result = item.PrimaryFireClient(item, origin, direction)
-				debug.profileend()
 				if result ~= true then
 					if typeof(result) == "string" then
 						logReject(result)
