@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 
 local storedItems: {Instance} = {}
@@ -6,10 +7,14 @@ local storedCharacters: {Instance} = {}
 
 local remote = GetRemote("CameraJoints", ReplicatedStorage.Remotes)
 
+local TWEEN_INFO = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
+
 local function rotateJoint(character: Model, jointName: "Neck" | "RightShoulder" | "LeftShoulder", angle: number): ()
 	local joint = character:FindFirstChild(jointName, true)
 	if joint and joint:IsA("AnimationConstraint") and joint.Attachment0 then
-		joint.Attachment0.CFrame = CFrame.new(joint.Attachment0.Position) * CFrame.Angles(angle, 0, 0)
+		TweenService:Create(joint.Attachment0, TWEEN_INFO, {
+			CFrame = CFrame.new(joint.Attachment0.Position) * CFrame.Angles(angle, 0, 0)
+		}):Play()
 	end
 end
 
