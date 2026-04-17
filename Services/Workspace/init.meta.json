@@ -10,6 +10,9 @@
     "PhysicsSteppingMethod": "Adaptive",
     "PlayerCharacterDestroyBehavior": "Enabled",
     "RejectCharacterDeletions": "Enabled",
-    "SignalBehavior": "Deferred"
+    "SignalBehavior": "Deferred",
+    "Attributes": {
+      "__Rojo_ProjectName": {"String": "Traitor!"}
+    }
   }
 }
