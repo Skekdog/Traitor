@@ -13,14 +13,24 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 
 	y = math.clamp(-y, -1.4, 1.4)
 
+
 	local neck = char:FindFirstChild("Neck", true)
 	if neck and neck:IsA("AnimationConstraint") and neck.Attachment0 then
 		neck.Attachment0.CFrame = CFrame.new(neck.Attachment0.Position) * CFrame.Angles(-y, 0, 0)
 	end
 
+	local item = char:FindFirstChild("Item")
+	if not item then
+		return
+	end
+
 	local rightShoulder = char:FindFirstChild("RightShoulder", true)
 	if rightShoulder and rightShoulder:IsA("AnimationConstraint") and rightShoulder.Attachment0 then
 		rightShoulder.Attachment0.CFrame = CFrame.new(rightShoulder.Attachment0.Position) * CFrame.Angles(-y, 0, 0)
+	end
+
+	if not item:GetAttribute("IsTwoHanded") then
+		return
 	end
 
 	local leftShoulder = char:FindFirstChild("LeftShoulder", true)
