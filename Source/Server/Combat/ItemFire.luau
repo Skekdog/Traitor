@@ -44,6 +44,7 @@ local function validateItemUsage(participant: Types.Participant, item: Types.Ite
 end
 
 local replicateRecoilRemote = GetRemote("RecoilJoints", ReplicatedStorage.Remotes.ServerClient)
+local replicateMuzzleFlashRemote = GetRemote("MuzzleFlash", ReplicatedStorage.Remotes.ServerClient)
 
 local function fire(action: "Primary" | "Alternate", item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3, data: unknown): string | {string}?
 	local char = assert(participant:GetCharacter())
@@ -61,8 +62,18 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 		participant:RemoveItem(item)
 	end
 
-	if item.RecoilY and item.Model then
-		replicateRecoilRemote:FireAllClients(char, item.RecoilY / -3)
+	local itemModel = char:FindFirstChild("Item")
+	if itemModel then
+		if item.RecoilY then
+			replicateRecoilRemote:FireAllClients(char, item.RecoilY / -3)
+		end
+
+		if item.HasMuzzleFlash then
+			replicateMuzzleFlashRemote:FireAllClients(itemModel)
+		end
+	end
+	if item.RecoilY and itemModel then
+
 	end
 
 	if action == "Primary" then
