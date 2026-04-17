@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local VRService = game:GetService("VRService")
+local Camera = require(ReplicatedStorage.API.Camera)
 local Raycasts = require(ReplicatedStorage.API.Item.Behaviour.Raycasts)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
@@ -427,6 +428,10 @@ function module.GetViewmodelItem(): Types.MapObject?
 end
 
 function module.MuzzleFlash(): ()
+    if not Camera.IsFirstPerson() then
+        return
+    end
+
     local item = module.GetViewmodelItem()
     if item then
         MuzzleFlash(item)
