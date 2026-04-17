@@ -59,6 +59,16 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 		participant:RemoveItem(item)
 	end
 
+	if item.RecoilY and item.Model then
+		local equippedItem = char:FindFirstChild("Item")
+		if equippedItem then
+			local rightShoulder = char:FindFirstChild("RightShoulder", true)
+			if rightShoulder and rightShoulder:IsA("AnimationConstraint") and rightShoulder.Attachment1 then
+
+			end
+		end
+	end
+
 	if action == "Primary" then
 		assert(item.PrimaryFireServer)
 		return item.PrimaryFireServer(item, origin, direction, participant, data)

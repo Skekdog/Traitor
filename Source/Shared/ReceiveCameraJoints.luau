@@ -1,8 +1,10 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 
 local storedItems: {Instance} = {}
 local storedCharacters: {Instance} = {}
+
+local remote = GetRemote("CameraJoints", ReplicatedStorage.Remotes)
 
 local function rotateJoint(character: Model, jointName: "Neck" | "RightShoulder" | "LeftShoulder", angle: number): ()
 	local joint = character:FindFirstChild(jointName, true)
@@ -20,7 +22,7 @@ local function rotateForItem(character: Model, item: Instance, angle: number): (
 
 	if not table.find(storedItems, item) then
 		table.insert(storedItems, item)
-		item.Destroying:Connect(function()
+		item.Destroying:Once(function()
 			rotateJoint(character, "RightShoulder", 0)
 			rotateJoint(character, "LeftShoulder", 0)
 
@@ -29,39 +31,33 @@ local function rotateForItem(character: Model, item: Instance, angle: number): (
 	end
 end
 
-ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function(plr, y: unknown)
-	local char = plr.Character
-	if not char or char:GetAttribute("IsRagdolled") then
-		return
-	end
+remote.OnClientEvent:Connect(function(character: Model, angle: number): ()
+	rotateJoint(character, "Neck", angle)
 
-	if typeof(y) ~= "number" or IsBadNumber(y) then
-		return
-	end
-
-	y = math.clamp(y, -1.4, 1.4)
-
-	rotateJoint(char, "Neck", y)
-
-	if not table.find(storedCharacters, char) then
-		char.ChildAdded:Connect(function(item)
+	if not table.find(storedCharacters, character) then
+		table.insert(storedCharacters, character)
+		character.ChildAdded:Connect(function(item)
 			if item.Name ~= "Item" then
 				return
 			end
 
-			local neck = char:FindFirstChild("Neck", true)
+			local neck = character:FindFirstChild("Neck", true)
 			if neck and neck:IsA("AnimationConstraint") and neck.Attachment0 then
-				rotateForItem(char, item, (neck.Attachment0.CFrame:ToEulerAnglesXYZ()))
+				rotateForItem(character, item, (neck.Attachment0.CFrame:ToEulerAnglesXYZ()))
 			end
+		end)
+
+		character.Destroying:Once(function()
+			table.remove(storedCharacters, assert(table.find(storedCharacters, character)))
 		end)
 	end
 
-	local item = char:FindFirstChild("Item")
+	local item = character:FindFirstChild("Item")
 	if not item then
 		return
 	end
 
-	rotateForItem(char, item, y)
+	rotateForItem(character, item, angle)
 end)
 
 return nil
