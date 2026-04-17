@@ -9,22 +9,30 @@ local cameraRemote = GetRemote("CameraJoints", ReplicatedStorage.Remotes.ServerC
 local recoilRemote = GetRemote("RecoilJoints", ReplicatedStorage.Remotes.ServerClient)
 
 local TWEEN_INFO = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
+local RECOIL_TWEEN_INFO = TweenInfo.new(0.1, Enum.EasingStyle.Circular, Enum.EasingDirection.In, 0, true)
 
-local function rotateJoint(character: Model, jointName: "Neck" | "RightShoulder" | "LeftShoulder", angle: number, additive: boolean?): ()
+local function rotateJoint(character: Model, jointName: "Neck" | "RightShoulder" | "LeftShoulder", angle: number, isRecoil: boolean?): ()
 	local joint = character:FindFirstChild(jointName, true)
-	if joint and joint:IsA("AnimationConstraint") and joint.Attachment0 then
+	if joint and joint:IsA("AnimationConstraint") then
 		local angles = CFrame.Angles(angle, 0, 0)
-		TweenService:Create(joint.Attachment0, TWEEN_INFO, {
-			CFrame = if additive then joint.Attachment0.CFrame * angles else CFrame.new(joint.Attachment0.Position) * angles
-		}):Play()
+		if isRecoil and joint.Attachment1 then
+			joint.Attachment1.CFrame = CFrame.new(joint.Attachment1.Position)
+			TweenService:Create(joint.Attachment1, RECOIL_TWEEN_INFO, {
+				CFrame = CFrame.new(joint.Attachment1.Position) * angles
+			}):Play()
+		elseif not isRecoil and joint.Attachment0 then
+			TweenService:Create(joint.Attachment0, TWEEN_INFO, {
+				CFrame = CFrame.new(joint.Attachment0.Position) * angles
+			}):Play()
+		end
 	end
 end
 
-local function rotateForItem(character: Model, item: Instance, angle: number, additive: boolean?, noStore: boolean?): ()
-	rotateJoint(character, "RightShoulder", angle, additive)
+local function rotateForItem(character: Model, item: Instance, angle: number, isRecoil: boolean?, noStore: boolean?): ()
+	rotateJoint(character, "RightShoulder", angle, isRecoil)
 
 	if item:GetAttribute("IsTwoHanded") then
-		rotateJoint(character, "LeftShoulder", angle, additive)
+		rotateJoint(character, "LeftShoulder", angle, isRecoil)
 	end
 
 	if not noStore and not table.find(storedItems, item) then

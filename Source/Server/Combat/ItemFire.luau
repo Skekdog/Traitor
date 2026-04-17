@@ -62,7 +62,7 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 	end
 
 	if item.RecoilY and item.Model then
-		replicateRecoilRemote:FireAllClients(char, item.RecoilY / 10)
+		replicateRecoilRemote:FireAllClients(char, item.RecoilY / -3)
 	end
 
 	if action == "Primary" then
