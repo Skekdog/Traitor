@@ -24,6 +24,10 @@ local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
 		return -- somehow happened, idk
 	end
 
+	if not prop.Model:IsDescendantOf(workspace) then
+		return -- also somehow happens??
+	end
+
 	if PropDamage.GetController(prop.Model) then
 		return
 	end
