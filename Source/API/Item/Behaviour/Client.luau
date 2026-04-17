@@ -153,13 +153,10 @@ function Client.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 				if item.HitSound then
 					hitSound = item.HitSound
 				else
-					local ids: {number} = HitSounds[GetMaterial(result.Hit.Part)] or HitSounds.Default
-					hitSound = Audio.MakeSound({
-						Content = Content.fromAssetId(ids[math.random(#ids)]),
-						RolloffEnd = 20,
-					})
+					local sounds = HitSounds[GetMaterial(result.Hit.Part)] or HitSounds.Default
+					hitSound = sounds[math.random(#sounds)]
 				end
-				Audio.PlayAt(hitSound, result.Position, true)
+				Audio.PlayAt(hitSound, result.Position)
 			end
 		end
 

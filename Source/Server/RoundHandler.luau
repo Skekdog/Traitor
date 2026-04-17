@@ -108,12 +108,8 @@ function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, par
 
     local hitPart = params.HitPart or GetPrimaryPart(prop.Model)
 
-    local ids = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
-    local sound = Audio.MakeSound({
-        Content = Content.fromAssetId(ids[math.random(#ids)]),
-        RolloffStart = 10,
-        RolloffEnd = 15,
-    })
+    local sounds = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
+	local sound = sounds[math.random(#sounds)]
 
     Audio.PlayAt(sound, params.HitPosition or hitPart.Position)
 

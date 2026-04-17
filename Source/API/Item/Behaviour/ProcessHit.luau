@@ -80,12 +80,8 @@ function ProcessHit.Part(item: Types.Item | Types.ExplosionParams, by: Types.Par
 				if item.Kind == "Item" and item.HitSound then
 					sound = item.HitSound
 				else
-					local ids = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
-					sound = Audio.MakeSound({
-						Content = Content.fromAssetId(ids[math.random(#ids)]),
-						RolloffStart = 10,
-						RolloffEnd = 20,
-					})
+					local sounds = HitSounds[GetMaterial(hitPart)] or HitSounds.Default
+					sound = sounds[math.random(#sounds)]
 				end
 
 				Audio.PlayAt(sound, hitPosition, nil, v)
