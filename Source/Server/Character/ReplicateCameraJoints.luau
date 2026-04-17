@@ -2,7 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
-local replicateRemote = GetRemote("CameraJoints", ReplicatedStorage.Remotes)
+local replicateRemote = GetRemote("CameraJoints", ReplicatedStorage.Remotes.ServerClient)
 
 local rateLimits: {[Player]: number?} = {}
 

@@ -43,6 +43,8 @@ local function validateItemUsage(participant: Types.Participant, item: Types.Ite
 	return nil
 end
 
+local replicateRecoilRemote = GetRemote("RecoilJoints", ReplicatedStorage.Remotes.ServerClient)
+
 local function fire(action: "Primary" | "Alternate", item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3, data: unknown): string | {string}?
 	local char = assert(participant:GetCharacter())
 
@@ -60,13 +62,7 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 	end
 
 	if item.RecoilY and item.Model then
-		local equippedItem = char:FindFirstChild("Item")
-		if equippedItem then
-			local rightShoulder = char:FindFirstChild("RightShoulder", true)
-			if rightShoulder and rightShoulder:IsA("AnimationConstraint") and rightShoulder.Attachment1 then
-
-			end
-		end
+		replicateRecoilRemote:FireAllClients(char, item.RecoilY / 10)
 	end
 
 	if action == "Primary" then
