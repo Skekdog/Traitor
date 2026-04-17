@@ -99,7 +99,7 @@ function Audio.PlayAt(referenceSound: Sound, position: Vector3, noClone: boolean
 end
 
 -- Caches by reference sound to instances mapped to the actual sound that should play
-local soundCache: {[Sound]: {[Instance]: Sound?}?} = {}
+local soundCache: {[Sound]: {[Instance]: {Sound}?}?} = {}
 
 --- Plays a sound in an instance. Unless specified, the sound will be cloned and cached.
 function Audio.PlayIn(referenceSound: Sound, instance: PlayInTarget, noClone: boolean?, noCache: boolean?, to: Player?): ()
@@ -112,17 +112,25 @@ function Audio.PlayIn(referenceSound: Sound, instance: PlayInTarget, noClone: bo
 		return
 	end
 
-	local cachedSound: Sound?
-	if not noCache then
-		local cache = soundCache[referenceSound]
-		if cache then
-			cachedSound = cache[instance]
+	do
+		local cachedSounds: {Sound}?
+		if not noCache then
+			local cache = soundCache[referenceSound]
+			if cache then
+				cachedSounds = cache[instance]
+			end
 		end
-	end
 
-	if cachedSound then
-		cachedSound:Play()
-		return
+		if cachedSounds then
+			for _, sound in cachedSounds do
+				if not sound.IsPlaying then
+					sound:Play()
+					return
+				end
+			end
+
+			-- If we don't return that means all sounds are in use, so we need to create another one as below.
+		end
 	end
 
 	local sound = if noClone then referenceSound else referenceSound:Clone()
@@ -131,7 +139,7 @@ function Audio.PlayIn(referenceSound: Sound, instance: PlayInTarget, noClone: bo
 	sound.Parent = instance
 
 	if not noCache then
-		local cache: {[Instance]: Sound?}? = soundCache[referenceSound]
+		local cache = soundCache[referenceSound]
 		if not cache then
 			cache = {}
 
@@ -143,9 +151,11 @@ function Audio.PlayIn(referenceSound: Sound, instance: PlayInTarget, noClone: bo
 					return
 				end
 
-				for _, cachedSound in currentCache do
-					assert(cachedSound)
-					cachedSound:Destroy()
+				for _, cachedSounds in currentCache do
+					assert(cachedSounds)
+					for _, sound in cachedSounds do
+						sound:Destroy()
+					end
 				end
 				soundCache[referenceSound] = {}
 			end)
@@ -164,7 +174,10 @@ function Audio.PlayIn(referenceSound: Sound, instance: PlayInTarget, noClone: bo
 
 		assert(cache)
 
-		cache[instance] = sound
+		local cachedSounds = cache[instance] or {}
+		table.insert(cachedSounds, sound)
+		cache[instance] = cachedSounds
+
 		soundCache[referenceSound] = cache
 	else
 		sound.Ended:Once(function()
@@ -194,9 +207,11 @@ function Audio.InvalidateCache(referenceSound: Sound): ()
 		return
 	end
 
-	for _, cachedSound in cache do
-		assert(cachedSound)
-		cachedSound:Destroy()
+	for _, cachedSounds in cache do
+		assert(cachedSounds)
+		for _, sound in cachedSounds do
+			sound:Destroy()
+		end
 	end
 
 	soundCache[referenceSound] = {}
