@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
@@ -25,6 +26,10 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 	angle = math.clamp(angle, -1.4, 1.4)
 
 	replicateRemote:FireAllClients(character, angle)
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+	rateLimits[player] = nil
 end)
 
 return nil
