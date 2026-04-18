@@ -25,7 +25,7 @@ local module = {}
 
 local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Traitor)
 
-local EXCLUDED_GAMEMODES: {Instance} = {}
+local EXCLUDED_GAMEMODES: {Instance} = {ReplicatedStorage.Shared.GameDefinition.Gamemodes.FloodEscape}
 
 Round.Config.DeathSounds = DeathSounds
 
