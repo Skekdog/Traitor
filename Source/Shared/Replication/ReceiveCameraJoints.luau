@@ -12,6 +12,10 @@ local TWEEN_INFO = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
 local RECOIL_TWEEN_INFO = TweenInfo.new(0.1, Enum.EasingStyle.Circular, Enum.EasingDirection.In, 0, true)
 
 local function rotateJoint(character: Model, jointName: "Neck" | "RightShoulder" | "LeftShoulder", angle: number, isRecoil: boolean?): ()
+	if jointName == "RightShoulder" or jointName == "LeftShoulder" then
+		return -- due to roblox bug
+	end
+
 	local joint = character:FindFirstChild(jointName, true)
 	if joint and joint:IsA("AnimationConstraint") then
 		local angles = CFrame.Angles(angle, 0, 0)
