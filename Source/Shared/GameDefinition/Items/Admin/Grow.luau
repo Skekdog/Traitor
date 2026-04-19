@@ -25,7 +25,7 @@ model.Parent = ReplicatedStorage.Assets.ItemModels
 local Grow = Gun({
 	Name = "Grow",
     Description = "Perfectly balanced, as all things should be.",
-    IconContent = Content.none,
+    IconContent = Content.fromAssetId(15640528020),
 
     ItemGroup = ItemGroups.Secondary,
 
