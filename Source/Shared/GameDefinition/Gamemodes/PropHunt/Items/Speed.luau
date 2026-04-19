@@ -5,6 +5,7 @@ local Speed = {}
 
 local item = Custom({
 	Name = "Speed",
+	DisplayName = "Speed Boost",
 	Description = "Provides a permanent speed boost.",
 	IconContent = Content.fromAssetId(2724978350),
 

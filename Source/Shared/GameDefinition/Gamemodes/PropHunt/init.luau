@@ -60,7 +60,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Golden Gun"],
 			Items["UMP"],
             Items["Grenade"],
-            Items["SpeedBoost"],
+            Items["Speed"],
         },
 
         CanSeeMissingInAction = true,
