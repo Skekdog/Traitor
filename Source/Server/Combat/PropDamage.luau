@@ -9,6 +9,7 @@ local PropDamage = {}
 
 local serverLastHeldBy: {[Types.Prop]: {By: Types.Participant, At: number, Cons: {RBXScriptConnection}}?} = {}
 local DAMAGE_TIME = 5
+local ALLOW_SELF_DAMAGE_AFTER = 1
 
 function PropDamage.GetController(prop: Types.MapObject): Player?
 	local controllerId = prop:GetAttribute("ControllerId")
@@ -67,7 +68,7 @@ local function onPropTouchedServer(prop: Types.Prop, otherPart: BasePart): ()
 	end
 
 	local damageable = prop.Round:GetProp(otherMapObject) or if otherMapObject:IsA("Model") then prop.Round:GetParticipant(otherMapObject) else nil
-	if damageable and damageable ~= lastHeld.By then
+	if damageable and (damageable ~= lastHeld.By or workspace:GetServerTimeNow() - lastHeld.At > ALLOW_SELF_DAMAGE_AFTER) then
 		(damageable :: Types.Prop):TryTakeDamage(params)
 	end
 end
