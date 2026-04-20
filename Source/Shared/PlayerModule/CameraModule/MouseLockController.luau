@@ -156,7 +156,7 @@ end
 function MouseLockController:BindContextActions()
 	ContextActionService:BindActionAtPriority(CONTEXT_ACTION_NAME, function(name, state, input)
 		return self:DoMouseLockSwitch(name, state, input)
-	end, false, MOUSELOCK_ACTION_PRIORITY, unpack(self.boundKeys))
+	end, false, MOUSELOCK_ACTION_PRIORITY, table.unpack(self.boundKeys))
 end
 
 function MouseLockController:UnbindContextActions()
