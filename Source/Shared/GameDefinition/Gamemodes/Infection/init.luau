@@ -5,6 +5,7 @@ local Message = require(ReplicatedStorage.API.Interface.Message)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Infected = require(script.Roles.Infected)
 local Survivor = require(script.Roles.Survivor)
+local Score = require(script.Score)
 local Types = require(ReplicatedStorage.API.Types)
 
 local RESPAWN_TIME = 5
@@ -60,29 +61,41 @@ local function GetRoundEndMusic(round: Types.Round, victor: Types.Victor): Sound
 end
 
 local function onSurvivorDeath(round: Types.Round, participant: Types.Participant): ()
+	participant:SetRole(Infected)
+end
+
+local function checkVictory(round: Types.Round): ()
 	local infectedRole = round:GetRoleFromRoleName("Infected")
 	local survivorRole = round:GetRoleFromRoleName("Survivor")
 
-	participant:SetRole(Infected)
-
 	if #round:GetParticipantsWithRole(survivorRole) == 0 then
 		round:Finish(infectedRole)
+	elseif #round:GetParticipantsWithRole(infectedRole) == 0 then
+		round:Finish(survivorRole)
 	end
 end
 
-local function OnDeath(round: Types.Round, participant: Types.Participant): ()
+local function OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
 	StandardGame.Highlights.OnDeath(round, participant)
 
 	local corpse = participant.Corpse
-	if corpse and corpse.Killer then
-		Highlights.Kills(corpse.Killer, participant)
+	local attacker = if corpse then corpse.Killer else nil
+	if attacker then
+		Highlights.Kills(attacker, participant)
+		Score.Kill(attacker, participant)
 	end
 
 	if participant:GetRole().Definition == Survivor then
 		onSurvivorDeath(round, participant)
 	end
 
-	task.delay(RESPAWN_TIME, participant.SpawnCharacter, participant, ZOMBIE:Clone())
+	if defer then
+		task.defer(checkVictory, round)
+	else
+		checkVictory(round)
+	end
+
+	task.delay(RESPAWN_TIME, participant.SpawnCharacter, participant, ZOMBIE:Clone(), true)
 end
 
 local function AssignRoles(round: Types.Round, participants: {Types.Participant}): ()
@@ -93,7 +106,9 @@ local function AssignRoles(round: Types.Round, participants: {Types.Participant}
 
 	for i, participant in participants do
 		if i == 1 then
+			round.Extras.InitialInfected = participant
 			participant:SetRole(Infected)
+			participant:SpawnCharacter(ZOMBIE:Clone(), true)
 			continue
 		end
 		participant:SetRole(Survivor)
@@ -147,6 +162,8 @@ local gamemode: Types.GamemodeDefinition = {
 
 	BeforeDamageParticipant = BeforeDamageParticipantOrProp,
 	BeforeDamageProp = BeforeDamageParticipantOrProp,
+
+	AddFinishHighlights = Highlights.Finish,
 }
 
 return gamemode

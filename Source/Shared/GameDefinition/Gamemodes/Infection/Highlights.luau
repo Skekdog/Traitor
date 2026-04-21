@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local Infected = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Infection.Roles.Infected)
 local Survivor = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Infection.Roles.Survivor)
@@ -115,6 +116,10 @@ function Highlights.Kills(attacker: Types.Participant, victim: Types.Participant
 			})
 		end
 	end
+end
+
+function Highlights.Finish(round: Types.Round): ()
+	StandardGame.Highlights.FinishHighlights(round)
 end
 
 return Highlights
