@@ -11,6 +11,8 @@ local Types = require(ReplicatedStorage.API.Types)
 local RESPAWN_TIME = 5
 local ZOMBIE = ReplicatedStorage.Assets.Gamemode.Infection.Zombie
 
+local AWARD_CREDITS_INTERVAL = 30
+
 local infectionItems = {}
 for i, v in StandardGame.GetItems() do
 	infectionItems[i] = v
@@ -65,6 +67,10 @@ local function onSurvivorDeath(round: Types.Round, participant: Types.Participan
 end
 
 local function checkVictory(round: Types.Round): ()
+	if not round:IsInProgress() then
+        return
+    end
+
 	local infectedRole = round:GetRoleFromRoleName("Infected")
 	local survivorRole = round:GetRoleFromRoleName("Survivor")
 
@@ -133,6 +139,25 @@ local function BeforeDamageParticipantOrProp(_, _, params: Types.DamageParams): 
 	return allowGunUsage(params)
 end
 
+local function Heartbeat(round: Types.Round, dt: number): ()
+	if not round:IsInProgress() then
+        return
+    end
+
+    local timeCount = (round.Extras.TimeCount or 0) + dt
+    round.Extras.TimeCount = timeCount
+
+	if timeCount > AWARD_CREDITS_INTERVAL and (round.Extras.LastCreditsAward or 0) < timeCount - AWARD_CREDITS_INTERVAL  then
+        round.Extras.LastCreditsAward = timeCount
+        for _, survivor in round:GetParticipantsWithRole(round:GetRoleFromRoleName("Survivor")) do
+            if survivor:IsAlive() then
+                survivor:AddCredits(1)
+                round:SendMessage(survivor.Player, survivor:GetFormattedName() .. ", you have received 1 credit for surviving this long.", "Team")
+            end
+        end
+    end
+end
+
 local gamemode: Types.GamemodeDefinition = {
 	Name = "Infection",
 	Description = "Plague upon ye!",
@@ -164,6 +189,8 @@ local gamemode: Types.GamemodeDefinition = {
 	BeforeDamageProp = BeforeDamageParticipantOrProp,
 
 	AddFinishHighlights = Highlights.Finish,
+
+	Heartbeat = Heartbeat,
 }
 
 return gamemode
