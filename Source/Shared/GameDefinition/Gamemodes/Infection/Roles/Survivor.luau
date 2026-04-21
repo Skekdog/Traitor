@@ -33,6 +33,9 @@ local survivor: Types.RoleDefinition = {
 		StandardGame.GetItem("Pigeon"),
 		StandardGame.GetItem("BAR"),
 		StandardGame.GetItem("Spoon"),
+		StandardGame.GetItem("AWP"),
+		StandardGame.GetItem("NyanGun"),
+		StandardGame.GetItem("UMP"),
 	}
 }
 
