@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Audio = require(ReplicatedStorage.API.Audio)
+local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 
 local survivor: Types.RoleDefinition = {
@@ -23,6 +24,16 @@ local survivor: Types.RoleDefinition = {
 	AwardCreditsToRolesOnDeath = {
 		Infected = 1,
 	},
+
+	EquipmentShop = {
+		StandardGame.GetItem("HealthStation"),
+		StandardGame.GetItem("Radar"),
+		StandardGame.GetItem("Cheeze"),
+		StandardGame.GetItem("Grenade"),
+		StandardGame.GetItem("Pigeon"),
+		StandardGame.GetItem("BAR"),
+		StandardGame.GetItem("Spoon"),
+	}
 }
 
 return table.freeze(survivor)
