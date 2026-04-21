@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Highlights = require(script.Highlights)
 local DamageSource = require(ReplicatedStorage.API.DamageSource)
 local Message = require(ReplicatedStorage.API.Interface.Message)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
@@ -70,6 +71,13 @@ local function onSurvivorDeath(round: Types.Round, participant: Types.Participan
 end
 
 local function OnDeath(round: Types.Round, participant: Types.Participant): ()
+	StandardGame.Highlights.OnDeath(round, participant)
+
+	local corpse = participant.Corpse
+	if corpse and corpse.Killer then
+		Highlights.Kills(corpse.Killer, participant)
+	end
+
 	if participant:GetRole().Definition == Survivor then
 		onSurvivorDeath(round, participant)
 	end
