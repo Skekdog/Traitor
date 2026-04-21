@@ -10,7 +10,7 @@ local infected: Types.RoleDefinition = {
 	Description = "Infect everyone.",
 	Color = Color3.fromRGB(42, 195, 42),
 	Sound = Audio.MakeSound({
-		Content = Content.fromAssetId(9042819926),
+		Content = Content.fromAssetId(9042088276),
 	}),
 
 	Allegiance = {Kind = "Role", Role = "Infected"},
