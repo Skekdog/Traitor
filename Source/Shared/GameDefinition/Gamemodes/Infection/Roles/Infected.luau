@@ -13,7 +13,7 @@ local infected: Types.RoleDefinition = {
 		Content = Content.fromAssetId(9042088276),
 	}),
 
-	StartingCredits = 2, -- no shop but can use traitor nodes
+	StartingCredits = 1, -- no shop but can use traitor nodes
 
 	Allegiance = {Kind = "Role", Role = "Infected"},
 	Allies = {"Infected"},
