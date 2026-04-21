@@ -95,7 +95,7 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 		checkVictory(round)
 	end
 
-	task.delay(RESPAWN_TIME, participant.SpawnCharacter, participant, ZOMBIE:Clone(), true)
+	task.delay(RESPAWN_TIME, participant.SpawnCharacter, participant, ZOMBIE:Clone(), nil, true)
 end
 
 local function AssignRoles(round: Types.Round, participants: {Types.Participant}): ()
@@ -108,7 +108,7 @@ local function AssignRoles(round: Types.Round, participants: {Types.Participant}
 		if i == 1 then
 			round.Extras.InitialInfected = participant
 			participant:SetRole(Infected)
-			participant:SpawnCharacter(ZOMBIE:Clone(), true)
+			participant:SpawnCharacter(ZOMBIE:Clone(), nil, true)
 			continue
 		end
 		participant:SetRole(Survivor)
