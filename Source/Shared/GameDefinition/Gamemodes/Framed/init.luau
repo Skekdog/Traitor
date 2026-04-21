@@ -368,6 +368,16 @@ local function OnCharacterAdded(round: Types.Round, participant: Types.Participa
 	clearObstructiveAccessories(participant)
 end
 
+local function UnloadGamemode(round: Types.Round): ()
+	for _, participant in round:GetParticipants() do
+		RedHanded.StopImmediately(participant)
+	end
+
+	loadMarkingRemote:FireAllClients(false)
+
+	Epilogue.Finish()
+end
+
 local gamemode: Types.GamemodeDefinition = {
 	Name = "Framed",
 	Description = "Find and kill your targets. Don't get caught red-handed.",
@@ -436,6 +446,8 @@ local gamemode: Types.GamemodeDefinition = {
 	BeforeDamageParticipant = BeforeHitParticipant,
 
 	OnCharacterAdded = OnCharacterAdded,
+
+	UnloadGamemode = UnloadGamemode,
 }
 
 return table.freeze(gamemode)
