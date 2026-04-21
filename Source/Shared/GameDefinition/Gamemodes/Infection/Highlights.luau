@@ -115,7 +115,6 @@ function Highlights.Kills(attacker: Types.Participant, victim: Types.Participant
 			})
 		end
 	end
-
 end
 
 return Highlights
