@@ -188,8 +188,6 @@ local gamemode: Types.GamemodeDefinition = {
 	BeforeDamageParticipant = BeforeDamageParticipantOrProp,
 	BeforeDamageProp = BeforeDamageParticipantOrProp,
 
-	AddFinishHighlights = Highlights.Finish,
-
 	Heartbeat = Heartbeat,
 }
 
