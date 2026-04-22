@@ -21,13 +21,13 @@ local ORBIT_SPEED = 0.5 * math.pi -- rad/s
 local ORBIT_RADIUS = 10 -- well, studs
 
 local RECALL_SPEED = 20
-local FOLLOW_SPEED = 20
+local FOLLOW_SPEED = 25
 local CHARGE_SPEED = 50
 local CLIMB_SPEED = 2
 
-local SEARCH_RADIUS = 40
+local SEARCH_RADIUS = 60
 
-local CHARGE_DISTANCE = 10
+local CHARGE_DISTANCE = 15
 
 local TARGET_HEIGHT = 7.5
 
