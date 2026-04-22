@@ -75,18 +75,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Shadows",
-	Tab = "Display",
-	Category = "Environment",
-	Kind = "Boolean" :: "Boolean",
-	Default = true,
-
-	Callback = function(name, value)
-		(require)(callbacks.Shadows)(name, value)
-	end,
-})
-
-table.insert(availableSettings, {
 	Name = "Item Hints",
 	Tab = "Display",
 	Category = "User Interface",
