@@ -268,7 +268,7 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 	local data: PigeonData = {
 		Velocity = velocity,
 		Pigeon = model :: BasePart,
-		CurrentAngle = 0,
+		CurrentAngle = origin:Angle(direction, Vector3.yAxis),
 		Round = participant.Round,
 		Orientation = orientation,
 		Launcher = participant,
