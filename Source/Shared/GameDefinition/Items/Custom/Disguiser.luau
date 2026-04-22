@@ -77,7 +77,7 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 		end
 
 		for _, v in char:GetDescendants() do
-			participant:OnCharacterPartAdded(v)
+			participant:OnCharacterInstanceAdded(v)
 		end
 	end)
 
