@@ -287,8 +287,10 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 			end
 
 			if target == participant then
-				model:Destroy()
-				participant:AddItem(item)
+				if not participant:GetItemOccupyingGroup(item.ItemGroup) then
+					model:Destroy()
+					participant:AddItem(item)
+				end
 				return
 			end
 
