@@ -77,7 +77,7 @@ function module.ToggleCrouching(enabled: boolean?): ()
 	WalkSpeed.SetModifier("Crouching", if isCrouching then -6 else 0)
 
 	if hum then
-		hum.CameraOffset = Vector3.new(0, if isCrouching then -0.9 else 0, 0)
+		hum.CameraOffset = Vector3.new(0, if isCrouching then -1.1 else 0, 0)
 		JumpPower.SetModifier("Crouching", not isCrouching)
 		hum:SetAttribute("IsCrouching", isCrouching)
 		ReplicatedStorage.Remotes.ClientServer.Crouch:FireServer(isCrouching)
