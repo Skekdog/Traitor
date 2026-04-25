@@ -17,6 +17,10 @@ local M11 = Gun({
 		Limb = 5,
 	},
 
+	FalloffStart = 20,
+	FalloffEnd = 40,
+	FalloffMultiplier = 0.5,
+
 	Spread = 0.02,
 
 	PrimaryInterval = 0.065,

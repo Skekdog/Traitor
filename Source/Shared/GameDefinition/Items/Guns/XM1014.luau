@@ -17,6 +17,10 @@ local XM1014 = Gun({
         Limb = 5,
     },
 
+    FalloffStart = 20,
+    FalloffEnd = 40,
+    FalloffMultiplier = 0.5,
+
     HasMuzzleFlash = true,
 
     AimFOV = 50,
