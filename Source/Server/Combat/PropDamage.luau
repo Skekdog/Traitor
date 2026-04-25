@@ -84,6 +84,9 @@ function PropDamage.SetLastHolder(prop: Types.Prop, participant: Types.Participa
 	ForEachPart(prop.Model, function(part)
 		local con: RBXScriptConnection
 		con = part.Touched:Connect(function(otherPart)
+			if otherPart == prop.Model :: BasePart or otherPart:IsDescendantOf(prop.Model) then
+				return
+			end
 			onPropTouchedServer(prop, otherPart)
 		end)
 		table.insert(cons, con)
