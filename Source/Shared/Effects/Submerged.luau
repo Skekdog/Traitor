@@ -38,8 +38,8 @@ equaliser.Enabled = false
 equaliser.Parent = SoundService.AllSounds
 
 local reverb = Instance.new("ReverbSoundEffect")
-reverb.DecayTime = 0.5
-reverb.Density = 10
+reverb.DecayTime = 0.1
+reverb.Density = 1
 reverb.Enabled = false
 reverb.Parent = SoundService.AllSounds
 
