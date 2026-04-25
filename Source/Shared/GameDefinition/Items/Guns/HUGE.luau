@@ -11,7 +11,7 @@ local HUGE = Gun({
 
     ItemGroup = ItemGroups.Primary,
 
-    Spread = 0.1,
+    Spread = 0.015,
     HasMuzzleFlash = true,
 
     Damage = {
