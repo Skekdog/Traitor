@@ -57,7 +57,6 @@ function ProcessHit.GetItemDamage(item: Types.Item | Types.ExplosionParams, hitP
 		local distance = math.max((hitPart.Position - origin).Magnitude - (data.FalloffStart or 0), 0)
 		local falloffMultiplier = math.lerp(1, data.FalloffMultiplier or 0, math.min(distance / data.FalloffEnd, 1))
 		damage *= falloffMultiplier
-		print(falloffMultiplier)
 	end
 
 	return damage
