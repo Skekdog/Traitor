@@ -171,7 +171,11 @@ sendButton.Activated:Connect(function()
 end)
 
 ControlManager.Register("Chat", function()
-	ChatWindow.InputBox:CaptureFocus()
+	task.spawn(function()
+		task.wait()
+		ChatWindow.InputBox:CaptureFocus()
+	end)
+
 	return Enum.ContextActionResult.Pass
 end)
 
@@ -181,7 +185,12 @@ ControlManager.Register("Team Chat", function()
 	end
 	selectedTeamChat = true
 	activateTeamChat()
-	ChatWindow.InputBox:CaptureFocus()
+
+	task.spawn(function()
+		task.wait()
+		ChatWindow.InputBox:CaptureFocus()
+	end)
+
 	return Enum.ContextActionResult.Pass
 end)
 

@@ -21,10 +21,13 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 			console:ToggleVisible()
 
 			if console.Visible then
-				console.Object.Input:CaptureFocus()
+				task.spawn(function()
+					task.wait()
+					console.Object.Input:CaptureFocus()
+				end)
 			end
 
-			return Enum.ContextActionResult.Pass
+			return Enum.ContextActionResult.Sink
 		end)
 
 		local object = console.Object
