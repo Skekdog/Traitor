@@ -416,7 +416,7 @@ local function clientIsAbovePart(root: BasePart, part: BasePart): boolean
 	local params = RaycastParams.new()
 	params.IncludeInstances = {part}
 
-	local result = workspace:Blockcast(root.CFrame, root.Size, -root.CFrame.UpVector * 3, params)
+	local result = workspace:Raycast(root.Position, -root.CFrame.UpVector * 8, params)
 	return result ~= nil
 end
 
