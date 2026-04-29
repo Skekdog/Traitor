@@ -434,7 +434,7 @@ end
 
 local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corpse, enable: boolean): ()
 	local model = corpse.Model
-	if not model or not model.PrimaryPart then
+	if not model then
 		return
 	end
 
@@ -521,7 +521,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 		end
 	end
 
-	if enable and impulse then
+	if enable and impulse and model.PrimaryPart then
         Impulse.ApplyImpulse(model.PrimaryPart, impulse, true)
     end
 end
