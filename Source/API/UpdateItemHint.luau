@@ -12,6 +12,7 @@ local function UpdateItemHint(item: Types.Item, fire: "primary" | "alternate", n
 
 	local currentItem = ClientInventory.EquippedItem()
 	if currentItem == item then
+		print("changed to", item.PrimaryHint)
 		ItemHint(item.PrimaryHint, item.AlternateHint)
 	end
 end

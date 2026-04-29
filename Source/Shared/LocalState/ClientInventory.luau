@@ -386,6 +386,22 @@ function module.CreateReplicatedItem(replicate: Types.ItemReplication): Types.It
 	return item
 end
 
+function module.GetItem(itemName: string): Types.Item?
+	for i, v in ourInventory.Slots() do
+		if v.Name == itemName then
+			return v
+		end
+	end
+
+	for i, v in ourInventory.Passive do
+		if v.Name == itemName then
+			return v
+		end
+	end
+
+	return nil
+end
+
 local function addItem(replicate: Types.ItemReplication): ()
 	local item = module.CreateReplicatedItem(replicate)
 

@@ -60,10 +60,10 @@ local function clientRaycast(filter: {Instance} | Instance?): (BasePart?, Vector
 		return nil, nil
 	end
 
-	clientRaycastParams.ExcludeInstances = {char}
-	if filter then
-		clientRaycastParams:AddToFilter(filter)
-	end
+	local newFilter = if typeof(filter) == "table" then table.clone(filter) else {filter :: Instance}
+	table.insert(newFilter, char)
+
+	clientRaycastParams.ExcludeInstances = newFilter
 
 	local result = workspace:Raycast(head.Position, GetCentreRay().Direction * INTERACT_DISTANCE, clientRaycastParams)
 	if not result then
@@ -176,7 +176,7 @@ local function clientGetProp(part: BasePart): Types.MapObject?
 	return GetMapObjectWithTag(part, "Prop")
 end
 
-local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
+local function clientRelease(item: Types.Item?, part: BasePart, doNotFireServer: boolean?): ()
 	local UpdateItemHint = require(ReplicatedStorage.API.UpdateItemHint)
 	if not clientControl then
 		return
@@ -195,13 +195,17 @@ local function clientRelease(part: BasePart, doNotFireServer: boolean?): ()
 	clientControl.AlignPosition:Destroy()
 	clientControl = nil
 
-	UpdateItemHint((module :: any).Item, "primary", "Push Prop")
+	if item then
+		UpdateItemHint(item, "primary", "Push Prop")
+	end
 end
 
 if RunService:IsClient() then
 	releaseRemote.OnClientEvent:Connect(function(part: BasePart): ()
+		local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
+		local item = ClientInventory.GetItem("Magneto Stick")
 		if clientControl and clientControl.Part == part then
-			clientRelease(part, true)
+			clientRelease(item, part, true)
 		end
 	end)
 end
@@ -250,7 +254,7 @@ local function clientPush(part: BasePart, position: Vector3, origin: Vector3): (
 	part:ApplyImpulseAtPosition((position - origin).Unit * PUSH_FORCE_PER_UNIT_MASS * GetAssemblyMass(part), position)
 end
 
-local function clientHang(): ()
+local function clientHang(item: Types.Item): ()
 	assert(clientControl, "clientControl is nil")
 
 	local to, at = clientRaycast(clientControl.Prop)
@@ -264,12 +268,12 @@ local function clientHang(): ()
 	end
 
 	hangRemote:FireServer(part, to, at)
-	clientRelease(part, true)
+	clientRelease(item, part, true)
 end
 
-local function onUnequipClient(): ()
+local function onUnequipClient(item: Types.Item): ()
 	if clientControl then
-		clientRelease(clientControl.Part)
+		clientRelease(item, clientControl.Part)
 	end
 end
 
@@ -277,16 +281,16 @@ local function onUnequipServer(_, participant: Types.Participant): ()
 	module.ServerStopControllingProp(participant.Player)
 end
 
-local function alternateFireClient(item, origin: Vector3, direction: Vector3): true
+local function alternateFireClient(item: Types.Item, origin: Vector3, direction: Vector3): true
 	local part = clientRaycast()
 
 	if part and clientControl and part == clientControl.Part and clientGetProp(part) == clientControl.Prop then
-		clientRelease(clientControl.Part)
+		clientRelease(item, clientControl.Part)
 		return true
 	end
 
 	if clientControl then
-		clientRelease(clientControl.Part)
+		clientRelease(item, clientControl.Part)
 	end
 
 	if part then
@@ -297,7 +301,7 @@ local function alternateFireClient(item, origin: Vector3, direction: Vector3): t
 	return true
 end
 
-local function primaryFireClient(_, origin: Vector3, direction: Vector3): true
+local function primaryFireClient(item: Types.Item, origin: Vector3, direction: Vector3): true
 	local part, position = clientRaycast()
 	if not part or not position then
 		return true
@@ -305,7 +309,7 @@ local function primaryFireClient(_, origin: Vector3, direction: Vector3): true
 
 	if clientControl then
 		if clientControl.Prop:HasTag("Corpse") then
-			clientHang()
+			clientHang(item)
 		end
 		return true
 	end
@@ -420,7 +424,7 @@ Players.PlayerRemoving:Connect(function(player)
 	module.ServerStopControllingProp(player)
 end)
 
-local postSimulationClient: (item: Types.Item, dt: number) -> () = function(): ()
+local postSimulationClient: (item: Types.Item, dt: number) -> () = function(item: Types.Item): ()
 	if not clientControl then
 		return
 	end
@@ -429,11 +433,11 @@ local postSimulationClient: (item: Types.Item, dt: number) -> () = function(): (
 
 	local distance = Players.LocalPlayer:DistanceFromCharacter(part.Position)
 	if distance == 0 or distance > MAX_DISTANCE then
-		return clientRelease(part)
+		return clientRelease(item, part)
 	end
 
 	if not part:IsDescendantOf(workspace) then
-		return clientRelease(part, true)
+		return clientRelease(item, part, true)
 	end
 
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
@@ -449,7 +453,7 @@ local postSimulationClient: (item: Types.Item, dt: number) -> () = function(): (
 	end
 
 	if PhysicsService:CollisionGroupsAreCollidable(root.CollisionGroup, part.CollisionGroup) and clientIsAbovePart(root, part) then
-		return clientRelease(part)
+		return clientRelease(item, part)
 	end
 
 	local prop = GetMapObjectWithTag(part, "Prop")
