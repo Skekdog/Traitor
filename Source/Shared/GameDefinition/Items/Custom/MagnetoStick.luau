@@ -424,7 +424,7 @@ Players.PlayerRemoving:Connect(function(player)
 	module.ServerStopControllingProp(player)
 end)
 
-local postSimulationClient: (item: Types.Item, dt: number) -> () = function(item: Types.Item): ()
+local function postSimulationClient(item: Types.Item): ()
 	if not clientControl then
 		return
 	end
