@@ -190,10 +190,6 @@ local function tryEquip(item: Types.Item): ()
 
 	if item.AmmoDefinition and item.AmmoDefinition.CanDrop then
 		ControlManager.Register("Drop Ammo", function(_, state)
-			if state ~= Enum.UserInputState.End then
-				return Enum.ContextActionResult.Pass
-			end
-
 			tryDropAmmo(item, GetCentreRay().Direction)
 			return Enum.ContextActionResult.Pass
 		end)
@@ -201,10 +197,6 @@ local function tryEquip(item: Types.Item): ()
 
 	if not item.DropDisabled and not item.UnequipDisabled then
 		ControlManager.Register("Drop", function(_, state)
-			if state ~= Enum.UserInputState.End then
-				return Enum.ContextActionResult.Pass
-			end
-
 			tryDropItem(item, GetCentreRay().Direction)
 			return Enum.ContextActionResult.Pass
 		end)

@@ -182,12 +182,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 	if item.AmmoDefinition and item.AmmoDefinition.Capacity ~= math.huge and item.AmmoDefinition.ReserveCapacity ~= 0 then
 		ControlManager.Register("Reload Weapon", function(_, state)
-			if state ~= Enum.UserInputState.End then
-				return Enum.ContextActionResult.Pass
-			end
-
 			Client.TryReloadWeapon(item)
-
 			return Enum.ContextActionResult.Pass
 		end)
 	end
