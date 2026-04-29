@@ -168,17 +168,11 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 			local isToggled = (Settings.GetSetting(self.Name) :: SettingDefinitions.ControlValue).Toggled
 
 			if isToggled then
-				if state == Enum.UserInputState.End then
-					self:ToggleVisible()
-				end
-			else
-				if state == Enum.UserInputState.Begin then
-					self:ToggleVisible(true)
-				elseif state == Enum.UserInputState.End then
-					self:ToggleVisible(false)
-				end
+				self:ToggleVisible()
+				return Enum.ContextActionResult.Pass
 			end
 
+			self:ToggleVisible(state == Enum.UserInputState.Begin)
 			return Enum.ContextActionResult.Pass
 		end)
 	end

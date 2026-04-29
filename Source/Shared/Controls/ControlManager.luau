@@ -123,7 +123,7 @@ function module.Register(actionName: string, callback: ControlTypes.ActionCallba
 
 	local function runCallback(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 		if toggled then
-			if state ~= Enum.UserInputState.End then
+			if state ~= Enum.UserInputState.Begin then
 				return Enum.ContextActionResult.Pass
 			end
 		elseif state ~= Enum.UserInputState.Begin and state ~= Enum.UserInputState.End then
