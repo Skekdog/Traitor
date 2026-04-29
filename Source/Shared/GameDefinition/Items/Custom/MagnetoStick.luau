@@ -15,7 +15,7 @@ local module = {}
 
 module.Item = (nil :: any) :: Types.ItemComponents
 
-local INTERACT_DISTANCE = 7.5
+local INTERACT_DISTANCE = 10
 local MAX_DISTANCE = 15
 
 local MAX_ROPE_DISTANCE = 6
@@ -26,7 +26,7 @@ local MAX_SIZE = 6
 local PUSH_FORCE_PER_UNIT_MASS = 1
 
 local ALIGNMENT_RESPONSIVENESS = 40
-local ALIGNMENT_DEPTH = 6
+local ALIGNMENT_DEPTH = 6.5
 local ALIGNMENT_VELOCITY = 100
 local ALIGNMENT_FORCE_MULTIPLIER = 1000
 
@@ -53,10 +53,11 @@ clientRaycastParams.CollisionGroup = "WeaponHitTargets"
 clientRaycastParams.IgnoreWater = true
 
 local function clientRaycast(filter: {Instance} | Instance?): (BasePart?, Vector3?)
+	local Raycasts = require(ReplicatedStorage.API.Item.Behaviour.Raycasts)
 	local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
+
 	local char = LocalCharacter.Character()
-	local head = LocalCharacter.Head()
-	if not char or not head then
+	if not char then
 		return nil, nil
 	end
 
@@ -64,13 +65,13 @@ local function clientRaycast(filter: {Instance} | Instance?): (BasePart?, Vector
 	table.insert(newFilter, char)
 
 	clientRaycastParams.ExcludeInstances = newFilter
+	local result = Raycasts.Hitscan(clientRaycastParams, Raycasts.GetOrigin(), Raycasts.GetDirection(), INTERACT_DISTANCE)
 
-	local result = workspace:Raycast(head.Position, GetCentreRay().Direction * INTERACT_DISTANCE, clientRaycastParams)
-	if not result then
-		return nil, nil
+	if result.Hit then
+		return result.Hit.Part, result.Position
 	end
 
-	return result.Instance, result.Position
+	return nil, nil
 end
 
 local function isSizeValid(size: Vector3): boolean
