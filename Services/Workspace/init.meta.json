@@ -11,6 +11,14 @@
     "PlayerCharacterDestroyBehavior": "Enabled",
     "RejectCharacterDeletions": "Enabled",
     "SignalBehavior": "Deferred",
+    "UseFixedSimulation": {"Enum": 2},
+    "RenderingCacheOptimizations": {"Enum": 2},
+    "MeshStreamingAndImprovedLods": {"Enum": 2},
+    "LayeredClothingCacheOptimizations": {"Enum": 2},
+    "ClientAnimatorThrottling": {"Enum": 2},
+    "PathfindingUseImprovedSearch": {"Enum": 2},
+    "NextGenerationReplication": {"Enum": 2},
+    "TouchesUseCollisionGroups": true,
     "Attributes": {
       "__Rojo_ProjectName": {"String": "Traitor!"}
     }
