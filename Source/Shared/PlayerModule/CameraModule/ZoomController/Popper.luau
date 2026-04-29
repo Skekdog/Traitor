@@ -222,15 +222,16 @@ local QUERY_POINT_CAST_LIMIT = 64
 
 local function getCollisionPoint(origin, dir)
 	if FFlagUserRaycastUpdateAPI then
-		excludeParams.ExcludeInstances = excludeList
+		local eList = table.clone(excludeList)
 		repeat
+			excludeParams.ExcludeInstances = eList
 			local raycastResult = workspace:Raycast(origin, dir, excludeParams)
 
 			if raycastResult then
 				if raycastResult.Instance.CanCollide then
 					return raycastResult.Position, true
 				end
-				excludeParams:AddToFilter(raycastResult.Instance)
+				table.insert(eList, raycastResult.Instance)
 			end
 		until not raycastResult
 	else
@@ -273,8 +274,9 @@ local function queryPoint(origin, unitDir, dist, lastPos)
 	local numPierced = 0
 
 	if FFlagUserRaycastUpdateAPI then
-		excludeParams.ExcludeInstances = excludeList
+		local eList = table.clone(excludeList)
 		repeat
+			excludeParams.ExcludeInstances = eList
 			local enterRaycastResult = workspace:Raycast(movingOrigin, target - movingOrigin, excludeParams)
 
 			if not enterRaycastResult then
@@ -310,7 +312,7 @@ local function queryPoint(origin, unitDir, dist, lastPos)
 				end
 			end
 
-			excludeParams:AddToFilter(entryInstance)
+			table.insert(eList, entryInstance)
 			movingOrigin = entryPosition - unitDir*1e-3
 		until hardLimit < inf or not entryInstance
 	else
