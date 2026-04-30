@@ -71,4 +71,6 @@ ClientVoice.Emitter:Connect(function(emitter)
 	end
 end)
 
+ClientVoice.ListenToSelf(false)
+
 return table.freeze(ClientVoice)

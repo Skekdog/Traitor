@@ -39,6 +39,7 @@ local function onPlayerAdded(player: Player): ()
 
 	player.CharacterAdded:Connect(function(char)
 		createEmitter(player, input).Parent = char
+		GhostVoice.DisconnectGhost(player)
 	end)
 
 	GhostVoice.MakeGhost(player)

@@ -49,6 +49,9 @@ function GhostVoice.DisconnectGhost(player: Player): ()
 		return
 	end
 
+	input.AccessType = Enum.AccessModifierType.Deny
+	input:SetUserIdAccessList({})
+
 	local ghostWire = input:FindFirstChildWhichIsA("Wire")
 	if ghostWire then
 		ghostWire.SourceInstance = nil :: any -- incorrect type definition here
@@ -72,8 +75,13 @@ GameHooks.OnDeath["GhostVoice"] = function(_, participant: Types.Participant): (
 	if emitter then
 		emitter:Destroy()
 	end
+
+	for _, player in Players:GetPlayers() do
+		local input = getAudioInput(player)
+		if input then
+			assignPlayers(input)
+		end
+	end
 end
-
-
 
 return table.freeze(GhostVoice)
