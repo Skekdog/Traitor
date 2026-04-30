@@ -65,6 +65,12 @@ RoundHooks.OnDeath["ImpulseCorpse"] = impulseCorpse
 RoundHooks.OnDeath["RemoveTeamChat"] = removeTeamChat
 RoundHooks.OnDeath["YouWereKilledBy"] = youWereKilledBy
 
+function Round.Config.OnPhaseChanged(round: Types.Round, phase: Types.Phase): ()
+    for _, hook in RoundHooks.OnPhaseChanged do
+        hook(round, phase)
+    end
+end
+
 function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
     for _, hook in RoundHooks.OnDeath do
         hook(round, participant, defer)

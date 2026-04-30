@@ -6,6 +6,8 @@ local GameHooks = {}
 
 GameHooks.OnDeath = {} :: Hooks<(round: Types.Round, participant: Types.Participant, defer: boolean) -> ()>
 
+GameHooks.OnPhaseChanged = {} :: Hooks<(round: Types.Round, phase: Types.Phase) -> ()>
+
 GameHooks.OnRoleAssigned = {} :: Hooks<(round: Types.Round, participant: Types.Participant, role: Types.Role) -> ()>
 
 GameHooks.OnItemDropped = {} :: Hooks<(round: Types.Round, participant: Types.Participant, item: Types.Item) -> ()>

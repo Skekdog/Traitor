@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 local GameHooks = require(ReplicatedStorage.API.GameHooks)
+local GetRound = require(ReplicatedStorage.API.GetRound)
 local Types = require(ReplicatedStorage.API.Types)
 
 local GhostVoice = {}
@@ -14,17 +15,31 @@ local function getAudioInput(player: Player): AudioDeviceInput?
 	return player:FindFirstChildWhichIsA("AudioDeviceInput")
 end
 
-local function assignPlayers(audioInput: AudioDeviceInput): ()
+local function assignPlayers(): ()
 	local players = Players:GetPlayers()
 
-	local userIds: {number} = {}
+	local hasCharacterUsers: {number} = {}
 	for _, player in players do
 		if not player.Character then
-			table.insert(userIds, player.UserId)
+			table.insert(hasCharacterUsers, player.UserId)
 		end
 	end
 
-	audioInput:SetUserIdAccessList(userIds)
+	local isRoundInProgress = GetRound():IsInProgress()
+	for _, player in players do
+		local input = getAudioInput(player)
+		if not input then
+			continue
+		end
+
+		if isRoundInProgress then
+			input.AccessType = Enum.AccessModifierType.Allow
+			input:SetUserIdAccessList(hasCharacterUsers)
+		else
+			input.AccessType = Enum.AccessModifierType.Deny
+			input:SetUserIdAccessList({})
+		end
+	end
 end
 
 function GhostVoice.MakeGhost(player: Player): ()
@@ -39,8 +54,7 @@ function GhostVoice.MakeGhost(player: Player): ()
 
 	ghostWire.Parent = input
 
-	input.AccessType = Enum.AccessModifierType.Allow
-	assignPlayers(input)
+	assignPlayers()
 end
 
 function GhostVoice.DisconnectGhost(player: Player): ()
@@ -75,15 +89,21 @@ GameHooks.OnDeath["GhostVoice"] = function(_, participant: Types.Participant): (
 	if emitter then
 		emitter:Destroy()
 	end
-
-	for _, player in Players:GetPlayers() do
-		if not player.Character then
-			local input = getAudioInput(player)
-			if input then
-				assignPlayers(input)
-			end
-		end
-	end
 end
+
+GameHooks.OnPhaseChanged["GhostVoice"] = assignPlayers
+
+local function onPlayerAdded(player: Player): ()
+	player.CharacterAdded:Connect(assignPlayers)
+	player.CharacterRemoving:Connect(assignPlayers)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+for _, player in Players:GetPlayers() do
+	onPlayerAdded(player)
+end
+
+assignPlayers()
 
 return table.freeze(GhostVoice)
