@@ -11,6 +11,7 @@
     "PlayerCharacterDestroyBehavior": "Enabled",
     "RejectCharacterDeletions": "Enabled",
     "SignalBehavior": "Deferred",
+    "Retargeting": "Disabled",
     "UseFixedSimulation": {"Enum": 2},
     "RenderingCacheOptimizations": {"Enum": 2},
     "MeshStreamingAndImprovedLods": {"Enum": 2},
