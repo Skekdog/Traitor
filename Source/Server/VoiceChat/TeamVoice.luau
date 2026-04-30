@@ -28,7 +28,7 @@ end
 
 function TeamVoice.Activate(player: Player): ()
 	local participant = GetParticipant(player)
-	if not participant then
+	if not participant or not participant:IsAlive() then
 		return
 	end
 
