@@ -77,9 +77,11 @@ GameHooks.OnDeath["GhostVoice"] = function(_, participant: Types.Participant): (
 	end
 
 	for _, player in Players:GetPlayers() do
-		local input = getAudioInput(player)
-		if input then
-			assignPlayers(input)
+		if not player.Character then
+			local input = getAudioInput(player)
+			if input then
+				assignPlayers(input)
+			end
 		end
 	end
 end
