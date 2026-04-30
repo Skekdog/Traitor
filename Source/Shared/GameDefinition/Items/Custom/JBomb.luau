@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
@@ -20,6 +21,10 @@ local heyOverHere = Audio.MakeSound({
 	RolloffStart = 50,
 	Volume = 1,
 })
+
+if RunService:IsServer() then
+	heyOverHere.Parent = ReplicatedStorage.Assets.ItemSounds
+end
 
 local function disable(item: Types.Item): ()
 	item.AlternateDisabled = true
