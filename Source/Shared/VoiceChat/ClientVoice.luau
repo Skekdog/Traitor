@@ -1,26 +1,20 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GetRemote = require(ReplicatedStorage.API.GetRemote)
-local Types = require(ReplicatedStorage.API.Types)
+local SoundService = game:GetService("SoundService")
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
-local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local ClientVoice = {}
 
-local remote = GetRemote("TeamVoice", ReplicatedStorage.Remotes.ClientServer)
+local input = Players.LocalPlayer:WaitForChild("AudioDeviceInput")
+assert(input:IsA("AudioDeviceInput"))
 
-function ClientVoice.AllowTeamVoice(role: Types.RoleDefinition, status: Types.ParticipantStatus | "Spectating"): ()
-	local allow = (role.CanTeamChat and status == "Alive") or false
-	if allow then
-		ControlManager.Register("Team Voice", function(_, state)
-			remote:FireServer(state == Enum.UserInputState.Begin)
-			return Enum.ContextActionResult.Pass
-		end)
-	else
-		ControlManager.Unregister("Team Voice")
-	end
-end
+local ghostOutput = SoundService:WaitForChild("GhostVoice")
+assert(ghostOutput:IsA("AudioDeviceOutput"))
+
+local ghostWire = input:WaitForChild("Wire")
+assert(ghostWire:IsA("Wire"))
 
 local listener = Instance.new("AudioListener")
 local output = Instance.new("AudioDeviceOutput")
@@ -34,6 +28,8 @@ output.Parent = listener
 listener.Parent = workspace.CurrentCamera
 
 function ClientVoice.ListenToSelf(active: boolean): ()
+	ghostWire.TargetInstance = if active then ghostOutput else (nil :: any) -- incorrect type definition
+
 	local char = LocalCharacter.Character()
 	if not char then
 		return

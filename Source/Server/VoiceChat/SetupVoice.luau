@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local GhostVoice = require(script.Parent.GhostVoice)
 
 local DISTANCE_ATTENUATION = {
 	[10] = 1,
@@ -13,7 +14,7 @@ local DISTANCE_ATTENUATION = {
 	[40] = 0,
 }
 
-local function createEmitter(source: AudioDeviceInput): AudioEmitter
+local function createEmitter(player: Player, source: AudioDeviceInput): AudioEmitter
 	local emitter = Instance.new("AudioEmitter")
 	emitter.Name = "VoiceEmitter"
 	emitter.AcousticSimulationEnabled = false
@@ -24,6 +25,10 @@ local function createEmitter(source: AudioDeviceInput): AudioEmitter
 	wire.TargetInstance = emitter
 	wire.Parent = emitter
 
+	wire.Destroying:Once(function()
+		GhostVoice.MakeGhost(player)
+	end)
+
 	return emitter
 end
 
@@ -33,8 +38,10 @@ local function onPlayerAdded(player: Player): ()
 	input.Parent = player
 
 	player.CharacterAdded:Connect(function(char)
-		createEmitter(input).Parent = char
+		createEmitter(player, input).Parent = char
 	end)
+
+	GhostVoice.MakeGhost(player)
 end
 
 Players.PlayerAdded:Connect(onPlayerAdded)
