@@ -49,7 +49,10 @@ local controls: {ControlInfo} = {
 	},
 	{
 		Control = "Team Chat",
-	}
+	},
+	{
+		Control = "Team Voice",
+	},
 }
 
 local controlInstances: {GuiObject} = {}

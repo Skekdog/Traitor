@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local VoiceChatService = game:GetService("VoiceChatService")
 local RelaxedPermissions = require(ReplicatedStorage.Shared.DevTools.RelaxedPermissions)
 local IsAdmin = require(ReplicatedStorage.Shared.DevTools.IsAdmin)
 
@@ -591,6 +592,25 @@ for i = 1, 9 do
 		end,
 	})
 end
+
+local isVcEnabled = RunService:IsServer() or VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
+
+table.insert(availableSettings, {
+	Name = "Team Voice",
+	Tab = "Keybinds",
+	Category = "Voice Chat",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Hidden = not isVcEnabled,
+
+	Default = {
+		Toggled = false,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.P,
+		},
+	},
+})
 
 table.insert(availableSettings, {
 	Name = "Chat",

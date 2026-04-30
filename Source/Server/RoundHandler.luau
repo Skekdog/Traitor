@@ -116,8 +116,14 @@ function Round.Config.BeforeDamageProp(round: Types.Round, prop: Types.Prop, par
     return true
 end
 
-function Round.Config.OnRoleAssigned(round: Types.Round, participant: Types.Participant): ()
+RoundHooks.OnRoleAssigned["TeamChat"] = function(round: Types.Round, participant: Types.Participant): ()
     TeamChat.TryAssign(participant)
+end
+
+function Round.Config.OnRoleAssigned(round: Types.Round, participant: Types.Participant, role: Types.Role): ()
+    for _, v in RoundHooks.OnRoleAssigned do
+        v(round, participant, role)
+    end
 end
 
 local remotes = ReplicatedStorage.Remotes
