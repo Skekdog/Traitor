@@ -18,7 +18,7 @@
     "LayeredClothingCacheOptimizations": {"Enum": 2},
     "ClientAnimatorThrottling": {"Enum": 2},
     "PathfindingUseImprovedSearch": {"Enum": 2},
-    "NextGenerationReplication": {"Enum": 2},
+    "NextGenerationReplication": {"Enum": 1},
     "TouchesUseCollisionGroups": true,
     "Attributes": {
       "__Rojo_ProjectName": {"String": "Traitor!"}
