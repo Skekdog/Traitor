@@ -16,12 +16,13 @@ local function getAudioInput(player: Player): AudioDeviceInput?
 end
 
 local function assignPlayers(): ()
+	print("\nASSIGNING\n")
 	local players = Players:GetPlayers()
 
-	local hasCharacterUsers: {number} = {}
+	local hasNoCharacterUsers: {number} = {}
 	for _, player in players do
 		if not player.Character then
-			table.insert(hasCharacterUsers, player.UserId)
+			table.insert(hasNoCharacterUsers, player.UserId)
 		end
 	end
 
@@ -32,10 +33,12 @@ local function assignPlayers(): ()
 			continue
 		end
 
-		if isRoundInProgress then
+		if isRoundInProgress and not player.Character then
+			print("Assigning", player, hasNoCharacterUsers[1], hasNoCharacterUsers[2])
 			input.AccessType = Enum.AccessModifierType.Allow
-			input:SetUserIdAccessList(hasCharacterUsers)
+			input:SetUserIdAccessList(hasNoCharacterUsers)
 		else
+			print("Assigning", player, "everyone")
 			input.AccessType = Enum.AccessModifierType.Deny
 			input:SetUserIdAccessList({})
 		end
