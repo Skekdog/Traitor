@@ -622,6 +622,11 @@ table.insert(availableSettings, {
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.P,
 		},
+
+		TouchButton = {
+			Position = UDim2.fromScale(0.9, 0.65),
+			Scale = 1,
+		},
 	},
 })
 
