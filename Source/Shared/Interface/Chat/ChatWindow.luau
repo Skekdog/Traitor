@@ -67,6 +67,11 @@ function ChatWindow.AllowTeamChat(role: Types.RoleDefinition, status: Types.Part
 end
 
 ChatWindow.TeamChatButton.Activated:Connect(function()
+	-- We can't make the button itself non-visible because that messes with the layout
+	if not ChatWindow.TeamChatButton.Icon.Visible then
+		return
+	end
+
 	selectedTeamChat = not selectedTeamChat
 	activateTeamChat()
 end)
