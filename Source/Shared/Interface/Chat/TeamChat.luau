@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ChatWindow = require(script.Parent.ChatWindow)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
-local VoiceChatClient = require(ReplicatedStorage.Shared.VoiceChat.VoiceChatClient)
+local VoiceChatClient = require(ReplicatedStorage.Shared.VoiceChat.ClientVoice)
 
 local participant = LocalParticipantInfo.GetParticipant()
 

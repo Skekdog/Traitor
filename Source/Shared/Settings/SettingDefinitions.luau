@@ -60,6 +60,7 @@ local callbacks = script.Parent.Callbacks
 local availableSettings: {SettingDefinition} = {}
 
 local isLocalAdmin = RunService:IsServer() or IsAdmin(Players.LocalPlayer) or RelaxedPermissions.HasRelaxedPermissions(Players.LocalPlayer)
+local isVcEnabled = RunService:IsServer() or VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 
 table.insert(availableSettings, {
 	Name = "Chat Tag",
@@ -164,6 +165,20 @@ table.insert(availableSettings, {
 
 	Callback = function(name: string, value: boolean): ()
 		(require)(callbacks.AutoJump)(name, value)
+	end
+})
+
+table.insert(availableSettings, {
+	Name = "Listen To Self",
+	Tab = "Gameplay",
+	Category = "Audio",
+	Tooltip = "When active, you will hear your own voice chat.",
+	Kind = "Boolean" :: "Boolean",
+	Hidden = not isVcEnabled,
+	Default = false,
+
+	Callback = function(name: string, value: boolean): ()
+		(require)(callbacks.ListenToSelf)(name, value)
 	end
 })
 
@@ -592,8 +607,6 @@ for i = 1, 9 do
 		end,
 	})
 end
-
-local isVcEnabled = RunService:IsServer() or VoiceChatService:IsVoiceEnabledForUserIdAsync(Players.LocalPlayer.UserId)
 
 table.insert(availableSettings, {
 	Name = "Team Voice",

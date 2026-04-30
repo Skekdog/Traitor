@@ -111,18 +111,4 @@ remote.OnServerEvent:Connect(function(player: Player, active: unknown)
 	end
 end)
 
-task.spawn(function()
-	while true do
-		task.wait(0.5)
-		local player = Players:FindFirstChildWhichIsA("Player")
-		if not player then
-			continue
-		end
-		local input = getAudioInput(player)
-		if input then
-			print(#input:GetUserIdAccessList())
-		end
-	end
-end)
-
 return table.freeze(TeamVoice)
