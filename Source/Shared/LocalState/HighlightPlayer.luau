@@ -45,6 +45,7 @@ local function makeIcon(player: Player, role: Types.Role): BillboardGui?
     end
 
     local textLabel = Instance.new("TextLabel")
+    textLabel.AutoLocalize = false -- todo: translate based on first letter of translated role name
     textLabel.Text = GetDisplayName(role.Definition):sub(1, 1):upper()
 
     -- I tried using the WCAG contrast guidelines for this and the results were... eh.

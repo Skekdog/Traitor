@@ -35,6 +35,7 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
         label.Font = Enum.Font.BuilderSans
         label.TextStrokeTransparency = 0
         label.AutomaticSize = Enum.AutomaticSize.X
+        label.AutoLocalize = false
         label.TextXAlignment = (Enum :: any).TextXAlignment[textXAlignment or "Center"]
 
         if not noStyle then

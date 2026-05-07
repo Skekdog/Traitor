@@ -53,6 +53,7 @@ local function highlightProp(prop: Instance): ()
 		label.TextStrokeColor3 = Color3.new(0, 0, 0)
 		label.TextScaled = true
 		label.Text = player.Name
+		label.AutoLocalize = false
 		label.Parent = newBillboard
 
 		newBillboard.Parent = prop
