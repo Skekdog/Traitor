@@ -65,16 +65,12 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 	local itemModel = char:FindFirstChild("Item")
 	if itemModel then
 		if item.RecoilY then
-			-- Disabled due to Roblox bugs wrt AnimationConstraints
 			replicateRecoilRemote:FireAllClients(char, item.RecoilY / -2)
 		end
 
 		if item.HasMuzzleFlash then
 			replicateMuzzleFlashRemote:FireAllClients(itemModel)
 		end
-	end
-	if item.RecoilY and itemModel then
-
 	end
 
 	if action == "Primary" then
