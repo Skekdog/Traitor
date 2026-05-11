@@ -11,7 +11,11 @@ local function throw(item: Types.Item): boolean
 
 	item.PrimaryDisabled = true
 
-	Client.RunAllEffects(item, "Primary")
+	Client.DeductAmmo(item)
+	Client.MuzzleFlash(item)
+	Client.Recoil(item)
+	Client.PlayAnimation(item, "Primary")
+	Client.ApplyInterval(item, "Primary")
 
 	local cookBegan = item.Extras.CookBegan or os.clock()
 	local cookStopped = os.clock()
@@ -22,10 +26,14 @@ local function throw(item: Types.Item): boolean
 end
 
 local function PrimaryActivatedClient(item: Types.Item): ()
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+
 	item.UnequipDisabled = true
 	item.DropDisabled = true
 
 	item.Extras.CookBegan = os.clock()
+
+	Client.PlaySound(item, "Primary")
 end
 
 local function PrimaryDeactivatedClient(item: Types.Item): ()
