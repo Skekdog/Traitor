@@ -29,7 +29,6 @@ local survivor: Types.RoleDefinition = {
 		StandardGame.GetItem("HealthStation"),
 		StandardGame.GetItem("Radar"),
 		StandardGame.GetItem("Cheeze"),
-		StandardGame.GetItem("Grenade"),
 		StandardGame.GetItem("Pigeon"),
 		StandardGame.GetItem("BAR"),
 		StandardGame.GetItem("Spoon"),

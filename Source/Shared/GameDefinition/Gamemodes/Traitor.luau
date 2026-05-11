@@ -88,7 +88,6 @@ local roles: {[string]: Types.RoleDefinition} = {
 			Items["Knife"],
 			Items.AWP,
 			Items["Silenced Pistol"],
-			Items.Grenade,
 			Items["Flare Gun"],
 			Items["Newton Launcher"],
 			Items["Poltergeist"],
