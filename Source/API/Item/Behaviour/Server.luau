@@ -130,7 +130,7 @@ local function explode(item: Types.Item, participant: Types.Participant, project
 	projectile:Destroy()
 end
 
-function Server.SimulateProjectile(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): ()
+function Server.SimulateProjectile(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3, cookedTime: number?): ()
 	assert(item.Projectile, "Simulated items must define a projectile")
 
 	local projectile = item.Projectile:Clone()
@@ -155,7 +155,7 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 	end
 
 	if item.FuseTime and item.ExplosionInfo then
-		task.wait(item.FuseTime)
+		task.wait(item.FuseTime - (cookedTime or 0))
 		explode(item, participant, projectile)
 	else
 		local maxBounces = item.MaxBounces or 1

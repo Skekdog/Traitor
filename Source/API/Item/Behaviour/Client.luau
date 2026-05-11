@@ -15,6 +15,7 @@ local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
 local Client = {}
 
@@ -84,6 +85,14 @@ function Client.GetViewmodelItem(): Types.MapObject?
 end
 
 function Client.RunAllChecks(item: Types.Item, action: "Primary" | "Alternate", noEffects: boolean?): boolean
+	if not Checks.ActionEnabled(item, action) then
+		return false
+	end
+
+	if not Checks.GamePhase(item, LocalRoundInfo.Phase() :: Types.Phase) then
+		return false
+	end
+
 	if not Checks.Interval(item, "Primary") then
 		return false
 	end

@@ -144,6 +144,10 @@ local function canDrop(direction: Vector3): boolean
 end
 
 local function tryDropItem(item: Types.Item, direction: Vector3): ()
+	if item.DropDisabled then
+		return
+	end
+
 	if not canDrop(direction) then
 		return
 	end

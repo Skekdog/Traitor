@@ -2,6 +2,72 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Types = require(ReplicatedStorage.API.Types)
 
+local function throw(item: Types.Item): boolean
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+
+	if not Client.RunAllChecks(item, "Primary") then
+		return false
+	end
+
+	item.PrimaryDisabled = true
+
+	Client.RunAllEffects(item, "Primary")
+
+	local cookBegan = item.Extras.CookBegan or os.clock()
+	local cookStopped = os.clock()
+
+	item:SetServerData("Primary", cookStopped - cookBegan)
+
+	return true
+end
+
+local function PrimaryActivatedClient(item: Types.Item): ()
+	item.UnequipDisabled = true
+	item.DropDisabled = true
+
+	item.Extras.CookBegan = os.clock()
+end
+
+local function PrimaryDeactivatedClient(item: Types.Item): ()
+	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
+	local Raycasts = require(ReplicatedStorage.API.Item.Behaviour.Raycasts)
+
+	if not throw(item) then
+		return
+	end
+
+	Client.ServerFire("Primary", item, Raycasts.GetOrigin(), Raycasts.GetDirection())
+end
+
+local function PrimaryFireClient(item: Types.Item): boolean
+	if (os.clock() - (item.Extras.CookBegan or math.huge)) >= item.FuseTime then
+		return throw(item)
+	end
+
+	return false
+end
+
+local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, data: unknown): string?
+	local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
+	local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
+	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
+
+	if typeof(data) ~= "number" or IsBadNumber(data) then
+		return "InvalidRequest"
+	end
+
+	if not Checks.Ammo(item) then
+		return "NoAmmo"
+	end
+
+	Server.DeductAmmo(item)
+
+	local cookedTime = math.clamp(data, 0, item.FuseTime or 0)
+	Server.SimulateProjectile(item, participant, origin, direction, cookedTime)
+
+	return nil
+end
+
 local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 	local base: Types.ItemComponents = {
 		Name = "",
@@ -11,8 +77,6 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 		IsProjectileSimulated = true,
 		PregameDisable = true,
 		IsSingleUse = true,
-
-		UseAttack = true,
 
 		DamageKind = "Explode",
 
@@ -24,19 +88,12 @@ local function Grenade(components: Types.ItemComponents): Types.ItemComponents
 			VisualRadius = 10,
 		},
 
-		PrimaryFireClient =
-			if RunService:IsClient() then
-				require(ReplicatedStorage.API.Item.Behaviour.Client).PrimaryFire
-			else
-				function() return true
-			end,
+		PrimaryFireClient = PrimaryFireClient,
 
-		PrimaryFireServer =
-			if RunService:IsServer() then
-				require(ReplicatedStorage.API.Item.Behaviour.Server).PrimaryFire
-			else
-				function() return nil
-			end,
+		PrimaryActivatedClient = PrimaryActivatedClient,
+		PrimaryDeactivatedClient = PrimaryDeactivatedClient,
+
+		PrimaryFireServer = PrimaryFireServer,
 
 		ProjectileSpeed = 35,
 

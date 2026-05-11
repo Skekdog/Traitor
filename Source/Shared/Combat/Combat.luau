@@ -72,6 +72,16 @@ Aim.IsAiming:Connect(function(isAiming)
 end)
 
 local function action(item: Types.Item, isPrimary: boolean, input: InputObject): ()
+	if
+		if
+			(if isPrimary then item.PrimaryToggled else item.AlternateToggled) then
+				input.UserInputState ~= Enum.UserInputState.End
+			else
+				input.UserInputState == Enum.UserInputState.End
+	then
+		return
+	end
+
 	if isPrimary and item.PrimaryActivatedClient then
 		item.PrimaryActivatedClient(item)
 	elseif not isPrimary and item.AlternateActivatedClient then
