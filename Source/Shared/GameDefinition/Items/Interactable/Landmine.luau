@@ -7,7 +7,7 @@ local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrim
 local Landmine = InteractableItem({
 	Name = "Landmine",
 	Description = "An exquisite area denial tool. Exercise caution when placing.",
-	IconContent = Content.fromAssetId(90),
+	IconContent = Content.fromAssetId(82684167883573),
 
 	ItemGroup = ItemGroups.RoleUtility,
 	DropDisabled = true,
