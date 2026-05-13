@@ -332,6 +332,7 @@ local item = Custom({
 	DropDisabled = true,
 
 	Model = MODEL,
+	HoldAnimation = Content.fromAssetId(105701350253589),
 
 	PrimaryFireServer = PrimaryFireServer,
 	PrimaryToggled = true,

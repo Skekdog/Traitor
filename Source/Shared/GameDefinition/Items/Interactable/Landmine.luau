@@ -13,6 +13,7 @@ local Landmine = InteractableItem({
 	DropDisabled = true,
 
 	Model = ReplicatedStorage.Assets.ItemModels.Landmine,
+	HoldAnimation = Content.fromAssetId(103107994867562),
 
 	Cost = 1,
 	MaxStock = 2,
