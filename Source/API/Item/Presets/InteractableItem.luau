@@ -84,17 +84,19 @@ local function plantInteractable(item: Types.Item, participant: Types.Participan
     return interactable, result, weld
 end
 
-local function Custom(components: Types.ItemComponents, allowThrow: boolean, allowPlant: boolean, onThrow: (interactable: Types.Prop, participant: Types.Participant) -> ()?, onPlant: (interactable: Types.Prop, raycastResult: RaycastResult, weldConstraint: WeldConstraint, participant: Types.Participant) -> ()?): Types.ItemComponents
+local function Custom(components: Types.ItemComponents, allowThrow: boolean, allowPlant: boolean, onThrow: (interactable: Types.Prop, participant: Types.Participant) -> ()?, onPlant: (interactable: Types.Prop, raycastResult: RaycastResult, weldConstraint: WeldConstraint, participant: Types.Participant) -> ()?, throwCount: number?): Types.ItemComponents
 	local base: Types.ItemComponents = {
 		Name = "",
 		Description = "",
 		IconContent = Content.none,
 
 		PrimaryFireServer = if allowThrow then function(item, origin, direction, participant)
-			local interactable = throwInteractable(item, participant, origin, direction)
-			if interactable and onThrow then
-				onThrow(interactable, participant)
-			end
+            for i = 1, throwCount or 1 do
+                local interactable = throwInteractable(item, participant, origin, direction)
+                if interactable and onThrow then
+                    onThrow(interactable, participant)
+                end
+            end
             return nil
 		end else nil,
 
