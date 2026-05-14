@@ -17,7 +17,7 @@ local function OnLoadServer(interactable: Types.Prop): ()
 
 	local participant: Types.Participant? = landmine.Extras.Participant
 	if participant then
-		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(93284379186217), interactable.Model)
+		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(82684167883573), interactable.Model)
 	end
 end
 
