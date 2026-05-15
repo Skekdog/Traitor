@@ -124,7 +124,7 @@ local function OnLoadServer(interactable: Types.Prop): ()
 
 	local participant: Types.Participant? = turtle.Extras.Participant
 	if participant then
-		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(93284379186217), interactable.Model)
+		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(101038941007868), interactable.Model)
 	end
 
 	task.delay(1, function()
