@@ -2,8 +2,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
+local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local Types = require(ReplicatedStorage.API.Types)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 
@@ -11,10 +13,10 @@ local IDLE_JUMP_INTERVAL = 1.75
 local IDLE_JUMP_INTERVAL_OFFSET = 0.25
 local IDLE_JUMP_POWER = 10
 
-local ATTACK_RADIUS = 20
+local ATTACK_RADIUS = 16
 local ATTACK_INTERVAL = 1.25
 local ATTACK_INTERVAL_OFFSET = 0.1
-local ATTACK_POWER = 20
+local ATTACK_POWER = 15
 
 local attackSound = Audio.MakeSound({
 	Content = Content.fromAssetId(123427781961789),
@@ -59,7 +61,7 @@ local function tickTurtle(turtle: TurtleServer): boolean
 	local closestDistance, closestRoot: BasePart? = ATTACK_RADIUS, nil
 	for _, participant in turtle.Round:GetParticipants() do
 		if participant == turtle.Extras.Participant or participant:IsAlliedWithParticipant(turtle.Extras.Participant) then
-			-- continue
+			continue
 		end
 
 		local char = participant:GetCharacter()
@@ -83,7 +85,7 @@ local function tickTurtle(turtle: TurtleServer): boolean
 		end
 
 		local direction = Vector3.new(math.random(), math.random(), math.random()).Unit
-		part:ApplyImpulse(direction * part.AssemblyMass * IDLE_JUMP_POWER)
+		part:ApplyImpulse((direction + Vector3.yAxis) * part.AssemblyMass * IDLE_JUMP_POWER)
 
 		turtle.Extras.LastAction = os.clock()
 
@@ -93,7 +95,7 @@ local function tickTurtle(turtle: TurtleServer): boolean
 	end
 
 	local direction = (closestRoot.Position - part.Position).Unit
-	part:ApplyImpulse(direction * part.AssemblyMass * ATTACK_POWER)
+	part:ApplyImpulse((direction + Vector3.yAxis) * part.AssemblyMass * ATTACK_POWER)
 
 	turtle.Extras.LastAction = os.clock()
 
@@ -125,7 +127,37 @@ local function OnLoadServer(interactable: Types.Prop): ()
 		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(93284379186217), interactable.Model)
 	end
 
-	table.insert(activeTurtles, turtle)
+	task.delay(1, function()
+		table.insert(activeTurtles, turtle)
+
+		ForEachPart(turtle.Model, function(part)
+			part.Touched:Connect(function(otherPart)
+				if not participant then
+					return
+				end
+
+				if not otherPart:IsDescendantOf(workspace) then
+					return
+				end
+
+				local char = GetMapObject(otherPart, "Character")
+				if not char then
+					return
+				end
+
+				local targetParticipant = participant.Round:GetParticipant(char.Name)
+				if not targetParticipant or targetParticipant == participant or targetParticipant:IsAlliedWithParticipant(participant) then
+					return
+				end
+
+				targetParticipant:TryTakeDamage({
+					Amount = 100,
+					Source = "Poison",
+					Attacker = participant,
+				})
+			end)
+		end)
+	end)
 end
 
 local function OnBreakServer(prop: Types.Prop, params: Types.DamageParams): ()
