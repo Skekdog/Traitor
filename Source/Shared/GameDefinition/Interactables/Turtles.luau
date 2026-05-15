@@ -84,7 +84,7 @@ local function tickTurtle(turtle: TurtleServer): boolean
 			return true
 		end
 
-		local direction = Vector3.new(math.random(), math.random(), math.random()).Unit
+		local direction = Vector3.new(math.random(-1000, 1000), math.random(-1000, 1000), math.random(-1000, 1000)).Unit
 		part:ApplyImpulse((direction + Vector3.yAxis) * part.AssemblyMass * IDLE_JUMP_POWER)
 
 		turtle.Extras.LastAction = os.clock()
