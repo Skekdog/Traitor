@@ -4,8 +4,8 @@ local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 
 local Turtles = InteractableItem({
 	Name = "Turtles",
-	Description = "all your face are belong to us",
-	IconContent = Content.none,
+	Description = "3 face-eating turtles, ready to eat faces.",
+	IconContent = Content.fromAssetId(101038941007868),
 
 	ItemGroup = ItemGroups.RoleUtility,
 	DropDisabled = true,
