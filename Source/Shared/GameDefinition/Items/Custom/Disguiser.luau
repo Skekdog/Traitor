@@ -32,6 +32,21 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 	local activeSources: {string} = participant.Extras.DisguiseSources or {}
 	participant.Extras.DisguiseSources = activeSources
 
+	hum = hum or participant:GetHumanoid()
+	if not hum then
+		return
+	end
+
+	char = char or participant:GetCharacter()
+	if not char then
+		return
+	end
+
+	local root = char.PrimaryPart
+	if not root then
+		return
+	end
+
 	if enable then
 		if not table.find(activeSources, source) then
 			table.insert(activeSources, source)
@@ -46,16 +61,6 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 	if enable and #activeSources > 1 then
 		return
 	elseif not enable and #activeSources > 0 then
-		return
-	end
-
-	hum = hum or participant:GetHumanoid()
-	if not hum then
-		return
-	end
-
-	char = char or participant:GetCharacter()
-	if not char then
 		return
 	end
 
