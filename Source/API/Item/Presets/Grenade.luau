@@ -28,6 +28,10 @@ end
 local function PrimaryActivatedClient(item: Types.Item): ()
 	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
 
+	if not Client.RunAllChecks(item, "Primary") then
+		return
+	end
+
 	item.UnequipDisabled = true
 	item.DropDisabled = true
 
