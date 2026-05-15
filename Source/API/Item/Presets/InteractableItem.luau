@@ -36,11 +36,11 @@ local plantSound = Audio.MakeSound({
     RolloffEnd = 15,
 })
 
-local function throwInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3): Types.Prop?
+local function throwInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3, deferParent: boolean?): Types.Prop?
     local round = participant.Round
 
     local interactable = createInteractableForItem(item, round, participant)
-    local success = participant:TryThrowAssembly(interactable.Model, 10, round:GetMap().Structure.Dynamic, nil, direction)
+    local success = participant:TryThrowAssembly(interactable.Model, 10, if deferParent then nil else round:GetMap().Structure.Dynamic, nil, direction)
 
     if not success then
         round._props[interactable.Model] = nil
@@ -51,6 +51,12 @@ local function throwInteractable(item: Types.Item, participant: Types.Participan
     participant:RemoveItem(item)
 
     Audio.PlayIn(throwSound, GetPrimaryPart(interactable.Model), nil, true)
+
+    if deferParent then
+        task.defer(function()
+            (interactable.Model :: Instance).Parent = round:GetMap().Structure.Dynamic
+        end)
+    end
 
     return interactable
 end
@@ -92,7 +98,7 @@ local function Custom(components: Types.ItemComponents, allowThrow: boolean, all
 
 		PrimaryFireServer = if allowThrow then function(item, origin, direction, participant)
             for i = 1, throwCount or 1 do
-                local interactable = throwInteractable(item, participant, origin, direction)
+                local interactable = throwInteractable(item, participant, origin, direction, throwCount ~= nil)
                 if interactable and onThrow then
                     onThrow(interactable, participant)
                 end
