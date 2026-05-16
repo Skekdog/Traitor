@@ -110,7 +110,7 @@ end
 
 local confirmDeathButton = corpseUi.Object.Actions.ConfirmDeath
 confirmDeathButton.Activated:Connect(function()
-    if getDistanceToCorpse() > Mouse.CorpseInteractDistance then
+    if getDistanceToCorpse() > Mouse.GetCorpseInteractDistance() then
         return ScreenMessage("Error", "You must be near the body to confirm death.")
     end
     ReplicatedStorage.Remotes.ClientServer.ConfirmDeath:FireServer(corpseName)
@@ -118,7 +118,7 @@ end)
 
 local callRoleButton = corpseUi.Object.Actions.CallRole
 callRoleButton.Activated:Connect(function()
-    if getDistanceToCorpse() > Mouse.CorpseInteractDistance then
+    if getDistanceToCorpse() > Mouse.GetCorpseInteractDistance() then
         return ScreenMessage("Error", "You must be near the body to call a role over.")
     end
     ReplicatedStorage.Remotes.ClientServer.CallRole:FireServer(corpseName)
@@ -141,7 +141,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     local participant = LocalParticipantInfo.GetParticipant(corpseName)
 
     corpseModel = workspace.Characters:FindFirstChild(corpseName)
-    local withinRange = getDistanceToCorpse() <= Mouse.CorpseInteractDistance
+    local withinRange = getDistanceToCorpse() <= Mouse.GetCorpseInteractDistance()
 
     local bodyIdentified = if corpseModel then not corpseModel:GetAttribute("Unidentified") else false
     confirmDeathButton.Visible = not bodyIdentified and ownParticipant.Status() == "Alive" and withinRange

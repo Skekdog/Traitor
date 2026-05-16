@@ -12,7 +12,14 @@ local Types = require(ReplicatedStorage.API.Types)
 
 local module = {}
 
-module.CorpseInteractDistance = 10
+local corpseInteractDistance = 10
+function module.GetCorpseInteractDistance(): number
+	return corpseInteractDistance
+end
+
+function module.SetCorpseInteractDistance(distance: number): ()
+	corpseInteractDistance = distance
+end
 
 local camera = workspace.CurrentCamera
 
@@ -104,7 +111,7 @@ function module.ShowCorpseHint(char: Model)
 
 	local status = LocalParticipantInfo.GetParticipant(plr.Name).Status()
 	if status == "Alive" then
-		if (plr:DistanceFromCharacter(char:GetPivot().Position) > module.CorpseInteractDistance) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > module.CorpseInteractDistance) then
+		if (plr:DistanceFromCharacter(char:GetPivot().Position) > corpseInteractDistance) or ((camera.CFrame.Position - char:GetPivot().Position).Magnitude > corpseInteractDistance) then
 			return
 		end
 	end

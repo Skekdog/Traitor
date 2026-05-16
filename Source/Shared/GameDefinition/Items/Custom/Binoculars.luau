@@ -8,19 +8,13 @@ local Types = require(ReplicatedStorage.API.Types)
 
 local module = {}
 
-module.IsZoomedIn = false
-
-local function doZoomClient(): ()
+local function doZoomClient(isZoomedIn: boolean): ()
 	local SetCameraSensitivity = require(ReplicatedStorage.Shared.Camera.SetCameraSensitivity)
 
 	local Mouse = require(ReplicatedStorage.Shared.Interface.GameState.Mouse)
-	local Interaction = (require)(ReplicatedStorage.Shared.Actions.Interaction) :: {
-		CorpseInteractDistance: number
-	}
-	Interaction.CorpseInteractDistance = if module.IsZoomedIn then 200 else 10
-	Mouse.CorpseInteractDistance = Interaction.CorpseInteractDistance
+	Mouse.SetCorpseInteractDistance(if isZoomedIn then 200 else 10)
 
-	local newFov = if module.IsZoomedIn then 30 else 70
+	local newFov = if isZoomedIn then 30 else 70
 	TweenService:Create(workspace.CurrentCamera, TweenInfo.new(0.1), {
 		FieldOfView = newFov
 	}):Play()
@@ -31,17 +25,17 @@ local function doZoomServer(participant: Types.Participant, isZoomed: boolean): 
 	participant.CorpseSearchDistance = if isZoomed then 200 else 10
 end
 
-local function AlternateFireClient(): true
-	module.IsZoomedIn = not module.IsZoomedIn
-	doZoomClient()
+local function AlternateFireClient(item: Types.Item): true
+	item.Extras.IsZoomedIn = not item.Extras.IsZoomedIn
+	doZoomClient(item.Extras.IsZoomedIn)
 	return true
 end
 
 local bodies: {[Types.MapObject]: Highlight} = {}
 
-local function OnUnequipClient(): ()
-	module.IsZoomedIn = false
-	doZoomClient()
+local function OnUnequipClient(item: Types.Item): ()
+	item.Extras.IsZoomedIn = false
+	doZoomClient(item.Extras.IsZoomedIn)
 
 	for corpse, highlight in bodies do
 		highlight.Enabled = false

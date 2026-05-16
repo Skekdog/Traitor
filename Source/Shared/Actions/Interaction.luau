@@ -39,7 +39,7 @@ end
 local function interactCorpse(corpse: Model): boolean
 	local status = participant.Status()
 	if status == "Alive" then
-		if not distanceCheck(corpse:GetPivot().Position, Mouse.CorpseInteractDistance) then
+		if not distanceCheck(corpse:GetPivot().Position, Mouse.GetCorpseInteractDistance()) then
 			return false
 		end
 	end
