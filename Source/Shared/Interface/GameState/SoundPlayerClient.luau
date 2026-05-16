@@ -15,6 +15,7 @@ local textBox = ui.Object.TextBox
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	textBox.Text = ""
 	if ui.Object.Visible then
+		task.wait()
 		textBox:CaptureFocus()
 	end
 end)
