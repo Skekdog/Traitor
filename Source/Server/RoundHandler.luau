@@ -1,3 +1,4 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
@@ -298,6 +299,17 @@ local function doMapVote(): ()
 
     remotes.ServerClient.TriggerMapVote:FireAllClients(true, votableMaps)
 
+    local playerAddedCon = Players.PlayerAdded:Connect(function(player)
+        remotes.ServerClient.TriggerMapVote:FireClient(player, true, votableMaps)
+
+        local counts: {[string]: number} = {}
+        for _, v in votes do
+            counts[v] = (counts[v] or 0) + 1
+        end
+
+        remotes.ServerClient.UpdateMapVotes:FireClient(player, counts)
+    end)
+
     local finished = false
     module.Round():SetPhase("Intermission", INTERMISSION_TIME, function()
         finished = true
@@ -307,6 +319,7 @@ local function doMapVote(): ()
         task.wait()
     end
 
+    playerAddedCon:Disconnect()
     con:Disconnect()
 
     remotes.ServerClient.TriggerMapVote:FireAllClients(false)

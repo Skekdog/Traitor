@@ -14,21 +14,6 @@ type Votes = {
 local screen = UIManager.WaitForUI("VotingScreen") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.VotingScreen)}
 type Button = typeof(screen.Object.Sample)
 
-ReplicatedStorage.Remotes.ServerClient.UpdateMapVotes.OnClientEvent:Connect(function(votes: Votes)
-    local totalVotes = 0
-    for _, v in votes do
-        totalVotes += v
-    end
-
-    for _, v in screen.Object.Choices:GetChildren() do
-        local button = v :: Button
-        if button:IsA("ImageButton") then
-            UIAnimation.Slider(button.ProgressBar, nil, votes[v.Name] or 0, totalVotes)
-            button.ProgressBar.UIStroke.Enabled = (votes[v.Name] or 0) > 0
-        end
-    end
-end)
-
 local function voteFor(clone: Button): ()
     ReplicatedStorage.Remotes.ClientServer.VoteMap:FireServer(clone.Name)
     for _, v in screen.Object.Choices:GetChildren() do
@@ -40,6 +25,7 @@ local function voteFor(clone: Button): ()
 end
 
 ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(function(triggered: boolean, votableMaps: {ClientMapInfo})
+    print("displaying")
     if not triggered then
         screen:ToggleVisible(false)
 
@@ -65,6 +51,22 @@ ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(func
     end
 
     screen:ToggleVisible(true)
+end)
+
+ReplicatedStorage.Remotes.ServerClient.UpdateMapVotes.OnClientEvent:Connect(function(votes: Votes)
+    print("updating votes")
+    local totalVotes = 0
+    for _, v in votes do
+        totalVotes += v
+    end
+
+    for _, v in screen.Object.Choices:GetChildren() do
+        local button = v :: Button
+        if button:IsA("ImageButton") then
+            UIAnimation.Slider(button.ProgressBar, nil, votes[v.Name] or 0, totalVotes)
+            button.ProgressBar.UIStroke.Enabled = (votes[v.Name] or 0) > 0
+        end
+    end
 end)
 
 return nil
