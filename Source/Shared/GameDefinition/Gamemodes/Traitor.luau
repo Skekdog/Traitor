@@ -445,7 +445,6 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 
 	local partData: {[BasePart]: {
 		Rope: {Constraint: RopeConstraint, Attachment0: Attachment}?,
-		CFrame: CFrame,
 		Joint: {Name: string, AttachmentPath: {string}}?,
 	}} = {}
 	for _, part in model:GetChildren() do
@@ -491,8 +490,6 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
 		if not newPart or not newPart:IsA("BasePart") then
 			continue
 		end
-
-		newPart.CFrame = data.CFrame
 
 		if data.Rope then
 			data.Rope.Constraint.Attachment0 = data.Rope.Attachment0

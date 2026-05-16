@@ -92,13 +92,17 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 		end
 	end)
 
-	local partData: {[BasePart]: {Material: Enum.Material, Color: Color3}} = {}
+	local partData: {[string]: {
+		Material: Enum.Material,
+		Color: Color3,
+		CFrame: CFrame,
+	}} = {}
 	for _, part in char:GetChildren() do
 		if not part:IsA("BasePart") then
 			continue
 		end
 
-		partData[part] = {Material = part.Material, Color = part.Color}
+		partData[part.Name] = {Material = part.Material, Color = part.Color, CFrame = part.CFrame}
 	end
 
 	local foundDescription = char:FindFirstChild("DisguiserHumanoidDescription")
@@ -144,12 +148,16 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 		until not tshirt
 	end
 
-	if char:GetAttribute("PreservePartAppearance") then
-		for part, data in partData do
-			local newPart = char:FindFirstChild(part.Name)
-			if not newPart or not newPart:IsA("BasePart") then
-				continue
-			end
+	local shouldPreserveAppearance = char:GetAttribute("PreservePartAppearance")
+	for part, data in partData do
+		local newPart = char:FindFirstChild(part)
+		if not newPart or not newPart:IsA("BasePart") then
+			continue
+		end
+
+		newPart.CFrame = data.CFrame
+
+		if shouldPreserveAppearance then
 			newPart.Material = data.Material
 			newPart.Color = data.Color
 		end
