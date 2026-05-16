@@ -486,6 +486,22 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Sound Player",
+	Tab = "Keybinds",
+	Category = "Menus - Enable the checkbox to make a keybind toggled",
+	Tooltip = "Opens the Sound Player menu.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.K,
+		}
+	},
+})
+
+table.insert(availableSettings, {
 	Name = "Equipment",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
