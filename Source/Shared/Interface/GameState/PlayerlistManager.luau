@@ -112,7 +112,7 @@ local function createPlr(plr: Player)
 		end)
 	end
 
-	if plr ~= Players.LocalPlayer then
+	if true or plr ~= Players.LocalPlayer then
 		clone.Mute.Text = if plr:GetAttribute("Muted") then "<s>Aa</s>" else "Aa"
 		clone.Mute.Activated:Connect(function()
 			local isMuted = not plr:GetAttribute("Muted")

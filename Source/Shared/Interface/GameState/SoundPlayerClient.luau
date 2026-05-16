@@ -61,24 +61,44 @@ local function updateMute(player: Player): ()
 	sound.Volume = if isMuted then 0 else 0.5
 end
 
-Players.PlayerAdded:Connect(function(player)
+local function setupRoot(player: Player, root: Instance): ()
+	updateMute(player)
+
+	root.ChildAdded:Connect(function(child)
+		if child:IsA("Sound") and child.Name == "SoundPlayer" then
+			updateMute(player)
+		end
+	end)
+end
+
+local function onPlayerAdded(player: Player): ()
 	if player == Players.LocalPlayer then
-		return
+		-- return
 	end
+
+	player:GetAttributeChangedSignal("SoundMuted"):Connect(function()
+		updateMute(player)
+	end)
 
 	player.CharacterAdded:Connect(function(char)
 		local root = char.PrimaryPart
 		if root then
-			updateMute(player)
+			setupRoot(player, root)
 		end
 
 		char:GetPropertyChangedSignal("PrimaryPart"):Connect(function()
 			local newRoot = char.PrimaryPart
 			if newRoot then
-				updateMute(player)
+				setupRoot(player, newRoot)
 			end
 		end)
 	end)
-end)
+end
+
+Players.PlayerAdded:Connect(onPlayerAdded)
+
+for _, player in Players:GetPlayers() do
+	onPlayerAdded(player)
+end
 
 return table.freeze(SoundPlayerClient)
