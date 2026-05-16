@@ -120,8 +120,16 @@ local function createPlr(plr: Player)
 
 			clone.Mute.Text = if isMuted then "<s>Aa</s>" else "Aa"
 		end)
+
+		clone.SoundMute.Activated:Connect(function()
+			local isMuted = not plr:GetAttribute("SoundMuted")
+			plr:SetAttribute("SoundMuted", isMuted)
+
+			clone.SoundMute.ImageContent = Content.fromUri(`rbxasset://textures/ui/VoiceChat/SpeakerLight/{if isMuted then "Muted@3x" else "Unmuted0@3x"}.png`)
+		end)
 	else
 		clone.Mute.Text = ""
+		clone.SoundMute.ImageContent = Content.none
 	end
 
 	clone.MouseButton1Click:Connect(function()

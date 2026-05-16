@@ -40,4 +40,45 @@ ui.Object.TextBox.FocusLost:Connect(function(enterPressed): ()
 	SoundPlayerClient.TryPlay(id)
 end)
 
+local function updateMute(player: Player): ()
+	local isMuted = player:GetAttribute("SoundMuted")
+
+	local char = player.Character
+	if not char then
+		return
+	end
+
+	local root = char.PrimaryPart
+	if not root then
+		return
+	end
+
+	local sound = root:FindFirstChild("SoundPlayer")
+	if not sound or not sound:IsA("Sound") then
+		return
+	end
+
+	sound.Volume = if isMuted then 0 else 0.5
+end
+
+Players.PlayerAdded:Connect(function(player)
+	if player == Players.LocalPlayer then
+		return
+	end
+
+	player.CharacterAdded:Connect(function(char)
+		local root = char.PrimaryPart
+		if root then
+			updateMute(player)
+		end
+
+		char:GetPropertyChangedSignal("PrimaryPart"):Connect(function()
+			local newRoot = char.PrimaryPart
+			if newRoot then
+				updateMute(player)
+			end
+		end)
+	end)
+end)
+
 return table.freeze(SoundPlayerClient)
