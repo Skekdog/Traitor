@@ -5,6 +5,8 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local Gamepass = require(ReplicatedStorage.Shared.Monetisation.Gamepass)
 local GamepassIDs = require(ReplicatedStorage.Shared.Monetisation.GamepassIDs)
 
+local SoundPlayerClient = {}
+
 local remote = GetRemote("SoundPlayer", ReplicatedStorage)
 
 local ui = UIManager.WaitForUI("Sound Player") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Sound Player"])}
@@ -17,13 +19,16 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	end
 end)
 
+function SoundPlayerClient.TryPlay(id: number): ()
+	if not Gamepass.PromptIfNotOwned(GamepassIDs["Sound Player"], Players.LocalPlayer) then
+		return
+	end
+	remote:FireServer(id)
+end
+
 ui.Object.TextBox.FocusLost:Connect(function(enterPressed): ()
 	ui:ToggleVisible(false)
 	if not enterPressed then
-		return
-	end
-
-	if not Gamepass.PromptIfNotOwned(GamepassIDs["Sound Player"], Players.LocalPlayer) then
 		return
 	end
 
@@ -32,7 +37,7 @@ ui.Object.TextBox.FocusLost:Connect(function(enterPressed): ()
 		return
 	end
 
-	remote:FireServer(id)
+	SoundPlayerClient.TryPlay(id)
 end)
 
-return nil
+return table.freeze(SoundPlayerClient)

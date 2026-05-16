@@ -3,8 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
 local TextChatService = game:GetService("TextChatService")
 local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local Types = require(ReplicatedStorage.API.Types)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local SoundPlayerClient = require(ReplicatedStorage.Shared.Interface.GameState.SoundPlayerClient)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local ChatWindow = {}
@@ -132,11 +134,40 @@ end
 TextChatService.MessageReceived:Connect(displayMessage)
 TextChatService.SendingMessage:Connect(displayMessage)
 
+local function trySoundPlayer(message: string): boolean
+	if message:sub(1, 2) ~= "s/" then
+		return false
+	end
+
+	local id = tonumber(message:sub(3))
+	if not id then
+		return false
+	end
+
+	-- 50% chance to not work because don't use the chat command.
+	if math.random() > 0.5 then
+		Message.Chat("Failed to play sound. Try using the GUI instead.")
+		return true
+	end
+
+	Message.Chat("Please use the GUI instead.")
+	SoundPlayerClient.TryPlay(id)
+
+	return true
+end
+
 local function sendChat(): ()
-	if ChatWindow.InputBox.Text == "" then
+	local message = ChatWindow.InputBox.Text
+	if message == "" then
 		return
 	end
-	targetChannel:SendAsync(ChatWindow.InputBox.Text)
+
+	if trySoundPlayer(message) then
+		ChatWindow.InputBox.Text = ""
+		return
+	end
+
+	targetChannel:SendAsync(message)
 	ChatWindow.InputBox.Text = ""
 end
 
