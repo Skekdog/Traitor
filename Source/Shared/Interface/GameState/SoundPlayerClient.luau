@@ -73,7 +73,7 @@ end
 
 local function onPlayerAdded(player: Player): ()
 	if player == Players.LocalPlayer then
-		-- return
+		return
 	end
 
 	player:GetAttributeChangedSignal("SoundMuted"):Connect(function()
