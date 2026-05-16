@@ -1,6 +1,9 @@
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local Gamepass = require(ReplicatedStorage.Shared.Monetisation.Gamepass)
+local GamepassIDs = require(ReplicatedStorage.Shared.Monetisation.GamepassIDs)
 
 local remote = GetRemote("SoundPlayer", ReplicatedStorage)
 
@@ -17,6 +20,10 @@ end)
 ui.Object.TextBox.FocusLost:Connect(function(enterPressed): ()
 	ui:ToggleVisible(false)
 	if not enterPressed then
+		return
+	end
+
+	if not Gamepass.PromptIfNotOwned(GamepassIDs["Sound Player"], Players.LocalPlayer) then
 		return
 	end
 

@@ -1,10 +1,10 @@
-local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ConfirmationPrompt = require(ReplicatedStorage.Shared.Interface.Util.ConfirmationPrompt)
+local Gamepass = require(ReplicatedStorage.Shared.Monetisation.Gamepass)
 local SettingsUI = require(ReplicatedStorage.Shared.Settings.SettingsUI)
 
 local alertUI = UIManager.WaitForUI("Alert") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Alert)}
@@ -26,9 +26,7 @@ LocalRoundInfo.Map:Connect(function(map)
 	for name, definition in map.Bosses do
 		SettingsUI.AddClickButton("Spawn " .. GetDisplayName(definition), "Bosses", "Bosses", nil, function()
 			if definition.GamepassId then
-				local isOwned = MarketplaceService:UserOwnsGamePassAsync(Players.LocalPlayer.UserId, definition.GamepassId)
-				if not isOwned then
-					MarketplaceService:PromptGamePassPurchase(Players.LocalPlayer, definition.GamepassId)
+				if not Gamepass.IsOwned(definition.GamepassId, Players.LocalPlayer) then
 					return
 				end
 			end

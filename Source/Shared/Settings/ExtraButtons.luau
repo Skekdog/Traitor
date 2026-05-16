@@ -36,6 +36,10 @@ SettingsUI.AddClickButton("View Welcome", "Other", "Traitor!", nil, function()
 	UIManager.WaitForUI("Welcome"):ToggleVisible(true)
 end)
 
+SettingsUI.AddClickButton("Sound Player", "Other", "Traitor!", nil, function()
+	UIManager.WaitForUI("Sound Player"):ToggleVisible(true)
+end)
+
 -- for _, v in ReplicatedStorage.Assets.Licenses:GetChildren() do
 -- 	assert(v:IsA("StringValue"))
 -- 	SettingsUI.AddClickButton(v.Name, "Other", "Acknowledgements", "These are third-party packages, without which the game would not be possible!", function()
