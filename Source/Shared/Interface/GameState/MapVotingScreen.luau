@@ -25,7 +25,6 @@ local function voteFor(clone: Button): ()
 end
 
 ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(function(triggered: boolean, votableMaps: {ClientMapInfo})
-    print("displaying")
     if not triggered then
         screen:ToggleVisible(false)
 
@@ -53,8 +52,9 @@ ReplicatedStorage.Remotes.ServerClient.TriggerMapVote.OnClientEvent:Connect(func
     screen:ToggleVisible(true)
 end)
 
+-- NOTE: UpdateMapVotes MUST come after TriggerMapVote, otherwise newly joined players will receive the events in the
+-- wrong order, and the update will not work
 ReplicatedStorage.Remotes.ServerClient.UpdateMapVotes.OnClientEvent:Connect(function(votes: Votes)
-    print("updating votes")
     local totalVotes = 0
     for _, v in votes do
         totalVotes += v
