@@ -71,13 +71,19 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 
 	hum.ApplyDescriptionFinished:Once(function()
 		local item = char:FindFirstChild("Item")
-		if item then
-			local motor = item:FindFirstChildOfClass("Motor6D")
-			if motor then
-				local hand = char:FindFirstChild("RightHand")
-				if hand and hand:IsA("BasePart") then
-					motor.Part0 = hand
+		if item and item:IsA("Model") or item and item:IsA("BasePart") then
+			local hand = char:FindFirstChild("RightHand")
+			if hand and hand:IsA("BasePart") then
+				local motor = Instance.new("Motor6D")
+				motor.Part0 = hand
+				motor.Part1 = if item:IsA("Model") then item.PrimaryPart else item
+
+				local c1 = item:GetAttribute("AnimC1")
+				if typeof(c1) == "CFrame" then
+					motor.C1 = c1
 				end
+
+				motor.Parent = item
 			end
 		end
 
