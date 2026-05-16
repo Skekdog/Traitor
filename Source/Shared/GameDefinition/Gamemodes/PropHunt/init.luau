@@ -248,7 +248,7 @@ local function beforeDamageParticipant(_, participant: Types.Participant, params
     end
 
     if attacker:GetRole().Definition == roles.Prop then
-        Message.Screen("⚠️ You can't hurt anyone!", "Warn")
+        Message.Screen("⚠️ You can't hurt anyone!", "Warn", nil, attacker.Player)
         return false
     end
 
