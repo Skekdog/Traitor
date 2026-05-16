@@ -23,18 +23,32 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 		return
 	end
 
-	local hum = char:WaitForChild("Humanoid")
-	assert(hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
+	char.ChildAdded:Connect(function(child)
+		if child:IsA("BasePart") then
+			if child.Name == "Head" then
+				module.Head:SetValue(child)
+			elseif child.Name == "HumanoidRootPart" then
+				module.RootPart:SetValue(child)
+			end
+		elseif child:IsA("Humanoid") then
+			if child.Name == "Humanoid" then
+				module.Humanoid:SetValue(child)
+			end
+		end
+	end)
+
+	local hum = char:FindFirstChild("Humanoid")
+	assert(not hum or hum:IsA("Humanoid"), "Humanoid is not a Humanoid")
 
 	module.Humanoid:SetValue(hum)
 
-	local root = char:WaitForChild("HumanoidRootPart")
-	assert(root:IsA("BasePart"), "Root is not a BasePart")
+	local root = char:FindFirstChild("HumanoidRootPart")
+	assert(not root or root:IsA("BasePart"), "Root is not a BasePart")
 
 	module.RootPart:SetValue(root)
-	
-	local head = char:WaitForChild("Head")
-	assert(head:IsA("BasePart"), "Head is not a BasePart")
+
+	local head = char:FindFirstChild("Head")
+	assert(not head or head:IsA("BasePart"), "Head is not a BasePart")
 
 	module.Head:SetValue(head)
 end)
