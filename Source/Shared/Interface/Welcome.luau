@@ -53,6 +53,9 @@ local controls: {ControlInfo} = {
 	{
 		Control = "Team Voice",
 	},
+	{
+		Control = "Sound Player",
+	}
 }
 
 local controlInstances: {GuiObject} = {}
