@@ -148,7 +148,10 @@ function module.ShowInteractableHint(mapObject: Types.MapObject, part: BasePart)
 			return
 		end
 	else
-		assert(prop)
+		if not prop then
+			return
+		end
+
 		if status ~= "Alive" or not interactable then
 			return
 		end
