@@ -37,6 +37,8 @@ remote.OnServerEvent:Connect(function(player, id: unknown): ()
 		RolloffEnd = 35,
 	})
 
+	sound.Archivable = false
+
 	Audio.PlayIn(sound, root, true, true)
 end)
 
