@@ -147,6 +147,8 @@ local Knife = Melee({
 	ItemGroup = ItemGroups.RoleWeapon,
 	IsSuspicious = true,
 
+	IsSilent = true,
+
 	Cost = 1,
 	MaxStock = 2,
 
