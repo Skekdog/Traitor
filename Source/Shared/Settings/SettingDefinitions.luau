@@ -720,4 +720,13 @@ for i = 1, 9 do
 	})
 end
 
+table.insert(availableSettings, {
+	Name = "Enable Sound Player Command",
+	Tab = "Gameplay",
+	Category = "Compatibility",
+	Kind = "Boolean" :: "Boolean",
+
+	Default = false,
+})
+
 return table.freeze(availableSettings)

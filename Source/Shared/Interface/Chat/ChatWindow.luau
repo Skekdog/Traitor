@@ -8,6 +8,7 @@ local Types = require(ReplicatedStorage.API.Types)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local SoundPlayerClient = require(ReplicatedStorage.Shared.Interface.GameState.SoundPlayerClient)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local ChatWindow = {}
 
@@ -135,6 +136,10 @@ TextChatService.MessageReceived:Connect(displayMessage)
 TextChatService.SendingMessage:Connect(displayMessage)
 
 local function trySoundPlayer(message: string): boolean
+	if not Settings.GetSetting("Enable Sound Player Command") then
+		return false
+	end
+
 	if message:sub(1, 2) ~= "s/" then
 		return false
 	end
@@ -144,8 +149,8 @@ local function trySoundPlayer(message: string): boolean
 		return false
 	end
 
-	-- 50% chance to not work because don't use the chat command.
-	if math.random() > 0.5 then
+	-- 75% chance to not work because don't use the chat command.
+	if math.random() > 0.75 then
 		Message.Chat("Failed to play sound. Try using the GUI instead.")
 		return true
 	end
