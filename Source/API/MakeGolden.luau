@@ -5,6 +5,11 @@ local function makeGolden(victim: Types.Participant)
     local char = assert(victim:GetCharacter(), "Participant has no character")
     local root = char:FindFirstChild("HumanoidRootPart")
 
+    local humanoid = char:FindFirstChildWhichIsA("Humanoid")
+    if not humanoid then
+        return
+    end
+
     if root then
         local deathSound = root:FindFirstChild("DeathSound") :: Sound?
         if deathSound then
@@ -16,10 +21,10 @@ local function makeGolden(victim: Types.Participant)
         sound.Parent = root :: any
     end
 
+    local gold = BrickColor.new("Gold")
+
     local bodyColours = char:FindFirstChildWhichIsA("BodyColors")
     if bodyColours then
-        local gold = BrickColor.new("Gold")
-
         bodyColours.HeadColor = gold
         bodyColours.LeftLegColor = gold
         bodyColours.RightLegColor = gold
@@ -28,9 +33,15 @@ local function makeGolden(victim: Types.Participant)
         bodyColours.TorsoColor = gold
     end
 
-    for _, v in char:GetChildren() do
-        if v:IsA("BasePart") then
-            v.Material = Enum.Material.Metal
+    for _, v in char:QueryDescendants("BasePart") do
+        v.Material = Enum.Material.Metal
+
+        if v:IsA("MeshPart") then
+            v.TextureContent = Content.none
+        end
+
+        if v.Parent ~= humanoid.Parent or humanoid:GetBodyPartR15(v) == Enum.BodyPartR15.Unknown then
+            v.BrickColor = gold
         end
     end
 
