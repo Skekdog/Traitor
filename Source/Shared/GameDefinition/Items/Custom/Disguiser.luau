@@ -157,15 +157,12 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 	for fullName, data in partData do
 		local part: Instance? = char
 
-		print(fullName)
 		for _, name in fullName do
 			if not part then
 				break
 			end
 			part = part:FindFirstChild(name)
 		end
-
-		print(part)
 
 		if not part or not part:IsA("BasePart") then
 			continue
