@@ -25,12 +25,6 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 	local tween: Tween?
 	local style = frame:GetAttribute("TransitionStyle")
 	if style == "Position" or style == "Size" then
-		local oldTween = frame:FindFirstChild("StateTransitionTween") :: Tween
-		if oldTween then
-			oldTween:Cancel()
-			oldTween:Destroy()
-		end
-
 		local isSize = frame:GetAttribute("TransitionStyle") == "Size"
 		local targetUDim = frame:GetAttribute("TransitionTarget") :: UDim2
 
@@ -63,7 +57,11 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			assert(scale and scale:IsA("UIScale"), "Expected UIAnimationScale to be a UIScale")
 		end
 
-		local function onFinish()
+		local function onFinish(state: Enum.PlaybackState)
+			if state == Enum.PlaybackState.Cancelled then
+				return
+			end
+
 			if open then
 				if isSize then
 					assert(scale and scale:IsA("UIScale"))
@@ -117,24 +115,13 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 		end
 
 		if tween then
-			tween.Completed:Once(function()
-				tween:Destroy()
-				onFinish()
-			end)
-			tween.Name = "StateTransitionTween"
-			tween.Parent = frame
+			tween.Completed:Once(onFinish)
 		else
-			onFinish()
+			onFinish(Enum.PlaybackState.Completed)
 		end
 	elseif style == "Transparency" then
 		local lastTween: Tween?
 		for _, v in frame:GetDescendants() do
-			local oldTween = v:FindFirstChildOfClass("Tween")
-			if oldTween then
-				oldTween:Cancel()
-				oldTween:Destroy()
-			end
-
 			local property
 			if v:IsA("ImageLabel") then
 				property = "ImageTransparency"
@@ -153,9 +140,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 
 			if tween then
 				lastTween = tween
-				tween.Parent = v
 				tween.Completed:Once(function()
-					tween:Destroy()
 					if open then
 						(v :: any)[property] = 0
 					else
