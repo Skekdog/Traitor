@@ -47,12 +47,22 @@ local function getPage(name: string): Page?
 	return pages[name]
 end
 
+local tabBase = templates.Tab
+local function getTab(name: string): typeof(tabBase)?
+	return ui.Main.TabHolder.Tabs:FindFirstChild("Tab_" .. name) :: typeof(tabBase)?
+end
+
 local function switchToPage(name: string): ()
 	local newPage = pages[name]
 	assert(newPage, `No page with name {name}`)
 
 	if newPage == currentPage then
 		return
+	end
+
+	local tab = getTab(name)
+	if tab then
+		UIAnimation.TransitionUnderline(ui.Main.TabHolder.Underline, tab)
 	end
 
 	if not currentPage then
@@ -77,7 +87,6 @@ local function createPage(name: string): ()
 	totalPages += 1
 end
 
-local tabBase = templates.Tab
 local function createTab(name: string): ()
 	local tab = tabBase:Clone()
 	tab.Name = "Tab_" .. name

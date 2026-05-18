@@ -260,12 +260,28 @@ end
 local underlineConnections: {[Frame]: {RBXScriptConnection}?} = {}
 local UNDERLINE_TRANSITION_SCALE = 0.125
 local UNDERLINE_TRANSITION_TIME = 0.5
-function module.TransitionUnderline(underline: Frame, target: TextButton)
-	local underlineSizeY = 2
-	local halfSize = UDim2.fromOffset(target.AbsoluteSize.X * UNDERLINE_TRANSITION_SCALE, underlineSizeY)
-	local fullSize = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underlineSizeY)
 
-	local newPosition = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underlineSizeY)
+local function calculatePositionAndSize(relativeParent: GuiObject, target: GuiObject, underlineSizeY: number): (UDim2, UDim2)
+	local size = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underlineSizeY)
+
+	local posX = target.AbsolutePosition.X - relativeParent.AbsolutePosition.X + target.AbsoluteSize.X / 2
+	local posY = target.AbsolutePosition.Y - relativeParent.AbsolutePosition.Y + target.AbsoluteSize.Y + underlineSizeY
+
+	local position = UDim2.fromOffset(posX, posY)
+
+	return position, size
+end
+
+function module.TransitionUnderline(underline: Frame, target: TextButton): ()
+	local relativeParent = underline:FindFirstAncestorWhichIsA("GuiObject")
+	assert(relativeParent, "Could not find positioning parent for underline")
+
+	underline.AnchorPoint = Vector2.new(0.5, 1)
+
+	local underlineSizeY = 2
+	local newPosition, fullSize = calculatePositionAndSize(relativeParent, target, underlineSizeY)
+
+	local halfSize = UDim2.new(fullSize.X.Scale * UNDERLINE_TRANSITION_SCALE, fullSize.X.Offset * UNDERLINE_TRANSITION_SCALE, fullSize.Y.Scale, fullSize.Y.Offset)
 
 	local halfSizeTween = module.Animate(underline, TweenInfo.new(
 		UNDERLINE_TRANSITION_TIME / 2,
@@ -297,20 +313,22 @@ function module.TransitionUnderline(underline: Frame, target: TextButton)
 		end
 	end
 
-	local function recalculatePositioning(): ()
-		underline.Size = UDim2.fromOffset(target.AbsoluteSize.X / 1.5, underlineSizeY)
-		underline.Position = UDim2.new(target.Position.X.Scale, target.AbsoluteSize.X / 2, 1, -underlineSizeY)
-	end
-
-	underlineConnections[underline] = {target:GetPropertyChangedSignal("AbsoluteSize"):Connect(recalculatePositioning), target:GetPropertyChangedSignal("AbsolutePosition"):Connect(recalculatePositioning)}
-
-	-- Tween position
-	module.Animate(underline, TweenInfo.new(
+	local tween = module.Animate(underline, TweenInfo.new(
 		UNDERLINE_TRANSITION_TIME,
 		Enum.EasingStyle.Exponential,
 		Enum.EasingDirection.Out
 		),
 	{ Position = newPosition })
+
+	local function recalculatePositioning(): ()
+		underline.Position, underline.Size = calculatePositionAndSize(relativeParent, target, underlineSizeY)
+
+		if tween and tween.PlaybackState == Enum.PlaybackState.Playing then
+			tween:Cancel()
+		end
+	end
+
+	underlineConnections[underline] = {target:GetPropertyChangedSignal("AbsoluteSize"):Connect(recalculatePositioning), target:GetPropertyChangedSignal("AbsolutePosition"):Connect(recalculatePositioning)}
 end
 
 function module.Slider(background: Frame, noTransition: boolean?, value: number, max: number): ()
