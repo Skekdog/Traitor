@@ -1,6 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
+local Camera = require(ReplicatedStorage.API.Camera)
 local GetItemDefinition = require(script.Parent.GetItemDefinition)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
@@ -194,14 +195,14 @@ local function tryEquip(item: Types.Item): ()
 
 	if item.AmmoDefinition and item.AmmoDefinition.CanDrop then
 		ControlManager.Register("Drop Ammo", function(_, state)
-			tryDropAmmo(item, GetCentreRay().Direction)
+			tryDropAmmo(item, GetCentreRay(nil, Camera.IsFirstPerson()).Direction)
 			return Enum.ContextActionResult.Pass
 		end)
 	end
 
 	if not item.DropDisabled and not item.UnequipDisabled then
 		ControlManager.Register("Drop", function(_, state)
-			tryDropItem(item, GetCentreRay().Direction)
+			tryDropItem(item, GetCentreRay(nil, Camera.IsFirstPerson()).Direction)
 			return Enum.ContextActionResult.Pass
 		end)
 	end

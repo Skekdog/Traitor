@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Camera = require(ReplicatedStorage.API.Camera)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Message = require(ReplicatedStorage.API.Interface.Message)
 local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
@@ -119,7 +120,7 @@ local function action(item: Types.Item, isPrimary: boolean, input: InputObject):
 			end
 		end
 
-		local centre = GetCentreRay()
+		local centre = GetCentreRay(nil, Camera.IsFirstPerson())
 		local origin = centre.Origin
 		local direction = centre.Direction
 
