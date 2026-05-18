@@ -1,9 +1,14 @@
 local LogService = game:GetService("LogService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ScriptContext = game:GetService("ScriptContext")
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local TextColor = require(ReplicatedStorage.API.TextColor)
 local EscapeRichText = require(ReplicatedStorage.Shared.Grammar.EscapeRichText)
-local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
+
+if RunService:IsStudio() then
+	return nil
+end
 
 LogService.MessageOut:Connect(function(message, kind)
 	if kind ~= Enum.MessageType.MessageWarning then
@@ -15,7 +20,7 @@ LogService.MessageOut:Connect(function(message, kind)
 	message = TextColor(message, Color3.new(1, 0.48, 0.13))
 	message = "<b>" .. message .. "</b>"
 
-	Replication.SendMessage("All", message, "Chat")
+	Message.Chat(message, if RunService:IsServer() then "All" else nil)
 end)
 
 ScriptContext.Error:Connect(function(message, trace, instance)
@@ -24,7 +29,7 @@ ScriptContext.Error:Connect(function(message, trace, instance)
 	message = TextColor(message, Color3.new(1, 0, 0))
 	message = "<b>" .. message .. "</b>"
 
-	Replication.SendMessage("All", message, "Chat")
+	Message.Chat(message, if RunService:IsServer() then "All" else nil)
 end)
 
 return nil
