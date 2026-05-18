@@ -92,17 +92,22 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 		end
 	end)
 
-	local partData: {[string]: {
+	local partData: {[{string}]: {
 		Material: Enum.Material,
 		Color: Color3,
 		CFrame: CFrame,
+		Texture: Content?,
 	}} = {}
-	for _, part in char:GetChildren() do
-		if not part:IsA("BasePart") then
-			continue
+
+	for _, part in char:QueryDescendants("BasePart") do
+		local fullName = {}
+		local parent: Instance? = part
+		while parent and parent ~= char do
+			table.insert(fullName, 1, parent.Name)
+			parent = parent.Parent
 		end
 
-		partData[part.Name] = {Material = part.Material, Color = part.Color, CFrame = part.CFrame}
+		partData[fullName] = {Material = part.Material, Color = part.Color, CFrame = part.CFrame, Texture = if part:IsA("MeshPart") then part.TextureContent else nil}
 	end
 
 	local foundDescription = char:FindFirstChild("DisguiserHumanoidDescription")
@@ -149,17 +154,32 @@ function module.DisguiseServer(source: string, participant: Types.Participant, e
 	end
 
 	local shouldPreserveAppearance = char:GetAttribute("PreservePartAppearance")
-	for part, data in partData do
-		local newPart = char:FindFirstChild(part)
-		if not newPart or not newPart:IsA("BasePart") then
+	for fullName, data in partData do
+		local part: Instance? = char
+
+		print(fullName)
+		for _, name in fullName do
+			if not part then
+				break
+			end
+			part = part:FindFirstChild(name)
+		end
+
+		print(part)
+
+		if not part or not part:IsA("BasePart") then
 			continue
 		end
 
-		newPart.CFrame = data.CFrame
+		part.CFrame = data.CFrame
 
 		if shouldPreserveAppearance then
-			newPart.Material = data.Material
-			newPart.Color = data.Color
+			part.Material = data.Material
+			part.Color = data.Color
+
+			if part:IsA("MeshPart") and data.Texture then
+				part.TextureContent = data.Texture
+			end
 		end
 	end
 end
