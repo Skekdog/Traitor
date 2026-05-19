@@ -47,7 +47,7 @@ local Scout = Gun({
         },
         {
             Title = "I Can See Your Head From Here",
-            Description = "%s knows their rifle. Now %d other people know the rifle too.",
+            Description = "%s knows their rifle. Now %d other people know their rifle too.",
             Priority = 3,
             Threshold = 4,
         }

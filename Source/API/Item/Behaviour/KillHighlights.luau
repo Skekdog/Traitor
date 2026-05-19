@@ -14,7 +14,7 @@ function module.GetIdentifier(itemName: string): string
 	return "Highlights_KillsWithItem_" .. itemName
 end
 
-local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitParticipant
+local function ItemKillHighlights(...: ItemKillHighlight): (item: {Name: string}, params: Types.DamageParams, victim: Types.Participant) -> boolean
 	local highlightsArray = table.pack(...)
 	highlightsArray.n = nil :: any
 
@@ -22,7 +22,7 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
 		return highlight1.Priority > highlight2.Priority --todo: i remember that something like this errored before, but i checked with lune and it didn't. see what's up, this might not work still.
 	end)
 
-	return function(item, params, victim)
+	return function(item: {Name: string}, params: Types.DamageParams, victim: Types.Participant)
 		local attacker = params.Attacker
 		if not attacker then
 			return true
@@ -69,7 +69,7 @@ local function ItemKillHighlights(...: ItemKillHighlight): Types.BeforeHitPartic
 end
 
 setmetatable(module, {
-	__call = function(self, ...: ItemKillHighlight): Types.BeforeHitParticipant
+	__call = function(self, ...: ItemKillHighlight)
 		return ItemKillHighlights(...)
 	end
 })

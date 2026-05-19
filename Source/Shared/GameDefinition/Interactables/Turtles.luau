@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
@@ -119,6 +120,21 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 end)
 
+local highlights: {KillHighlights.ItemKillHighlight} = {
+	{
+		Title = "Tortoise Build",
+		Description = "%s deployed several turtles, and got 1 kill with them. Nice.",
+		Priority = 1,
+		Threshold = 1,
+	},
+	{
+		Title = "Turtle Build",
+		Description = "%s deployed several turtles. They had a %d-course feast.",
+		Priority = 3,
+		Threshold = 2,
+	},
+}
+
 local function OnLoadServer(interactable: Types.Prop): ()
 	local turtle = interactable :: TurtleServer
 
@@ -126,6 +142,8 @@ local function OnLoadServer(interactable: Types.Prop): ()
 	if participant then
 		DNATraces.Add(interactable, participant, nil, Content.fromAssetId(101038941007868), interactable.Model)
 	end
+
+	local killHighlights = KillHighlights(table.unpack(highlights))
 
 	task.delay(1, function()
 		table.insert(activeTurtles, turtle)
@@ -150,11 +168,15 @@ local function OnLoadServer(interactable: Types.Prop): ()
 					return
 				end
 
-				targetParticipant:TryTakeDamage({
+				local params: Types.DamageParams = {
 					Amount = 100,
 					Source = "Poison",
 					Attacker = participant,
-				})
+				}
+
+				killHighlights({Name = "Turtles"}, params, participant)
+
+				targetParticipant:TryTakeDamage(params)
 			end)
 		end)
 	end)

@@ -4,6 +4,7 @@ local SoundService = game:GetService("SoundService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 
 local NyanGun = {}
@@ -89,6 +90,21 @@ local item = Gun({
 
 	PrimaryActivatedClient = OnActivatedClient,
 	PrimaryDeactivatedClient = OnDeactivatedClient,
+
+	BeforeHitParticipant = KillHighlights(
+		{
+			Title = "Wake Up It's 2011",
+			Description = "%s introduced %d people to this fun new internet meme, Nyan Cat!",
+			Priority = 2,
+			Threshold = 2,
+		},
+		{
+			Title = "Wake Up It's 2011",
+			Description = "%s introduced 1 person to this fun new internet meme, Nyan Cat!",
+			Priority = 1,
+			Threshold = 1,
+		}
+	)
 })
 
 NyanGun.Item = item

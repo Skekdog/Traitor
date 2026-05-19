@@ -2,6 +2,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 
 local G18 = Gun({
 	Name = "G18",
@@ -40,6 +41,21 @@ local G18 = Gun({
 
     RecoilX = 0.2,
     RecoilY = 0.8,
+
+    BeforeHitParticipant = KillHighlights(
+        {
+            Title = "It Has Personality",
+            Description = "%s introduced %d people to their tiny weapon.",
+            Priority = 3,
+            Threshold = 4,
+        },
+        {
+            Title = "Quick and Messy",
+            Description = "%s made quick work of %d people with the G18.",
+            Priority = 1,
+            Threshold = 2,
+        }
+    ),
 })
 
 return table.freeze(G18)

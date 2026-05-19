@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local BlockFriendlyDamage = require(ReplicatedStorage.API.Prop.BlockFriendlyDamage)
 local BreakSound = require(ReplicatedStorage.API.Prop.BreakSound)
 local IsHostileParticipant = require(ReplicatedStorage.API.Prop.IsHostileParticipant)
@@ -25,6 +26,21 @@ local function OnLoadServer(interactable: Types.Prop): ()
 	end
 end
 
+local highlights: {KillHighlights.ItemKillHighlight} = {
+	{
+		Title = "A Lesson in Trickery",
+		Description = "%s fooled 1 person with a Death Station.",
+		Threshold = 1,
+		Priority = 2,
+	},
+	{
+		Title = "A Lesson in Trickery",
+		Description = "%s fooled %d people with a Death Station.",
+		Threshold = 2,
+		Priority = 2,
+	}
+}
+
 local function OnInteractServer(interactable: Types.Prop, participant: Types.Participant): ()
 	local deathStation = interactable :: DeathStationServer
 	if not IsHostileParticipant(interactable, participant) then
@@ -34,12 +50,16 @@ local function OnInteractServer(interactable: Types.Prop, participant: Types.Par
 		return
 	end
 
-	participant:TryTakeDamage({
+	local params: Types.DamageParams = {
 		Amount = math.huge,
 		Source = "Poison",
 		Attacker = deathStation.Extras.Participant,
 		IgnoreKarma = true,
-	})
+	}
+
+	KillHighlights(table.unpack(highlights))({Name = "DeathStation"}, params, participant)
+
+	participant:TryTakeDamage(params)
 end
 
 local function OnLoadClient(interactable: Types.Prop): ()

@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local DNATraces = require(ReplicatedStorage.API.DNATraces)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
@@ -41,13 +42,32 @@ local function OnInteractServer(interactable: Types.Prop, participant: Types.Par
 	participant:AddItem(participant.Round:LoadItem(landmineItem))
 end
 
+local highlights: {KillHighlights.ItemKillHighlight} = {
+	{
+		Title = "It's a Trap!",
+		Description = "%s laid a trap, but they were not to blame for 1 death.",
+		Priority = 2,
+		Threshold = 1,
+	},
+	{
+		Title = "It's a Trap!",
+		Description = "%s laid a trap, but they were not to blame for %d deaths.",
+		Priority = 3,
+		Threshold = 2,
+	},
+}
+
 local function OnBreakServer(prop: Types.Prop, params: Types.DamageParams): ()
+	local killHighlights = KillHighlights(table.unpack(highlights))
 	Server.CreateExplosion(prop.Round or error("Missing round"), ExplosionParams.new({
 		Damage = 150,
 		FalloffStart = 15,
 		FalloffEnd = 25,
 		Pressure = 50000,
 		VisualRadius = 25,
+		BeforeHitParticipant = function(_, params, participant)
+			return killHighlights({Name = "Landmine"}, params, participant)
+		end,
 	}, GetPrimaryPart(prop.Model).Position, params.Attacker))
 end
 

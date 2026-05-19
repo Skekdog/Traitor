@@ -4,6 +4,7 @@ local Audio = require(ReplicatedStorage.API.Audio)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Types = require(ReplicatedStorage.API.Types)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 
 local JBomb = {}
 
@@ -66,6 +67,15 @@ local explosion = Audio.MakeSound({
 	Volume = 2,
 })
 
+local highlights: {KillHighlights.ItemKillHighlight} = {
+	{
+		Title = "Aw Man...",
+		Description = "%s took themselves and %d others to the great beyond with a JBomb.",
+		Threshold = 2,
+		Priority = 2,
+	},
+}
+
 local function PrimaryFireServer(item: Types.Item, _, _, participant: Types.Participant): ()
 	local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 
@@ -94,6 +104,13 @@ local function PrimaryFireServer(item: Types.Item, _, _, participant: Types.Part
 				Pressure = 200000,
 				VisualRadius = 25,
 				Sound = explosion,
+				BeforeHitParticipant = function(_, params, victim)
+					if params.Attacker == victim then
+						return true
+					end
+
+					return KillHighlights(table.unpack(highlights))({Name = "JBomb"}, params, victim)
+				end
 			}
 		})
 	end)
