@@ -8,6 +8,7 @@ local Types = require(ReplicatedStorage.API.Types)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
+local KillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 
 local Pigeon = {}
 
@@ -55,6 +56,27 @@ type PigeonData = {
 }
 
 local pigeons: {PigeonData} = {}
+
+local highlights: {KillHighlights.ItemKillHighlight} = {
+	{
+		Title = "When Pig(eon)s Fly",
+		Description = "%d people made a bet that pigeons could not fly. %s made those people lose that bet.",
+		Priority = 3,
+		Threshold = 3,
+	},
+	{
+		Title = "Not an Owl",
+		Description = "%s introduced 1 person to their new pet pigeon.",
+		Priority = 1,
+		Threshold = 1,
+	},
+	{
+		Title = "Not an Owl",
+		Description = "%s introduced %d people to their new pet pigeon.",
+		Priority = 2,
+		Threshold = 2,
+	},
+}
 
 local function play(data: PigeonData): ()
 	data.LastSound = os.clock()
@@ -305,6 +327,13 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 				FalloffStart = 10,
 				FalloffEnd = 15,
 				Position = GetPrimaryPart(model).Position,
+				BeforeHitParticipant = function(_, params, victim)
+					if params.Attacker == victim then
+						return true
+					end
+
+					return KillHighlights(table.unpack(highlights))({Name = "Pigeon"}, params, victim)
+				end
 			})
 		end)
 	end)
