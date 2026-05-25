@@ -4,7 +4,10 @@ local Types = require(ReplicatedStorage.API.Types)
 local Checks = {}
 
 local STATIC_OBSCURE_DISTANCE = 0.05
+
 local MAX_TARGET_DISTANCE = 10
+
+local MAX_SHOOTER_DISTANCE = 15
 
 function Checks.Ammo(item: Types.Item): boolean
 	return if item.Ammo then item.Ammo > 0 else true
@@ -20,6 +23,10 @@ end
 
 function Checks.ActionEnabled(item: Types.Item, action: "Primary" | "Alternate"): boolean
 	return if action == "Primary" then item.PrimaryDisabled ~= true else item.AlternateDisabled ~= true
+end
+
+function Checks.Alive(item: Types.Item, health: number): boolean
+	return health > 0
 end
 
 function Checks.GamePhase(item: Types.Item, phase: Types.Phase): boolean
@@ -40,6 +47,15 @@ function Checks.TargetDistance(item: Types.Item, origin: Vector3, destination: V
 	end
 
 	if item.MaxDistance and (destination - origin).Magnitude > (item.MaxDistance + 1) then
+		return false
+	end
+
+	return true
+end
+
+function Checks.OriginDistance(item: Types.Item, origin: Vector3, character: Model): boolean
+	local head = character:FindFirstChild("Head")
+	if not head or not head:IsA("BasePart") or (head.Position - origin).Magnitude > MAX_SHOOTER_DISTANCE then
 		return false
 	end
 

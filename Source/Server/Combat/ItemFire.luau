@@ -7,37 +7,11 @@ local Types = require(ReplicatedStorage.API.Types)
 
 local remote = GetRemote("ItemFire")
 
-local MAX_SHOOTER_DISTANCE = 15
-
 local function validateItemUsage(participant: Types.Participant, item: Types.Item, action: "Primary" | "Alternate", origin: Vector3, direction: Vector3): string?
 	if action == "Primary" and not item.PrimaryFireServer then
 		return "NoPrimaryFire"
 	elseif action == "Alternate" and not item.AlternateFireServer then
 		return "NoAlternateFire"
-	end
-
-	if action == "Primary" and item.PrimaryDisabled then
-		return "PrimaryFireDisabled"
-	elseif action == "Alternate" and item.AlternateDisabled then
-		return "AlternateFireDisabled"
-	end
-
-	if participant:GetHealth() <= 0 then
-		return "NotAlive"
-	end
-
-	local char = participant:GetCharacter()
-	if not char then
-		return "OriginTooFar"
-	end
-
-	local head = char:FindFirstChild("Head")
-	if not head or not head:IsA("BasePart") or (head.Position - origin).Magnitude > MAX_SHOOTER_DISTANCE then
-		return "OriginTooFar"
-	end
-
-	if item.PregameDisable and participant.Round:IsPreGame() then
-		return "PregameDisabled"
 	end
 
 	return nil

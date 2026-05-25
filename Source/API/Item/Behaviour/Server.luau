@@ -248,6 +248,23 @@ function Server.PrimaryFire(item: Types.Item, origin: Vector3, direction: Vector
 		return "NoAmmo"
 	end
 
+	if not Checks.Alive(item, participant:GetHealth()) then
+		return "NotAlive"
+	end
+
+	if not Checks.GamePhase(item, participant.Round:GetPhase()) then
+		return "PhaseInactive"
+	end
+
+	if not Checks.ActionEnabled(item, "Primary") then
+		return "PrimaryDisabled"
+	end
+
+	local char = participant:GetCharacter()
+	if not char or not Checks.OriginDistance(item, origin, char) then
+		return "OriginTooFar"
+	end
+
 	Server.DeductAmmo(item)
 
 	if not request and not item.IsProjectileSimulated then
