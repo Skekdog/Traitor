@@ -55,7 +55,11 @@ end
 
 function Checks.OriginDistance(item: Types.Item, origin: Vector3, character: Model): boolean
 	local head = character:FindFirstChild("Head")
-	if not head or not head:IsA("BasePart") or (head.Position - origin).Magnitude > MAX_SHOOTER_DISTANCE then
+	if not head then
+		return false
+	end
+
+	if not head:IsA("BasePart") or (head.Position - origin).Magnitude > (MAX_SHOOTER_DISTANCE + head.AssemblyLinearVelocity.Magnitude) then
 		return false
 	end
 
