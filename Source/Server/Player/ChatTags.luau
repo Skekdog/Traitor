@@ -16,7 +16,8 @@ function ChatTags.GetAvailableTags(player: Player): {string}
 	assert(tags)
 
 	local _, result = pcall(function()
-		local groupRole = player:GetRoleInGroupAsync(game.CreatorId)
+		-- TODO: the replacement api doesn't actually exist yet
+		local groupRole = ((player :: any) :: {GetRoleInGroupAsync: (any, number) -> string}):GetRoleInGroupAsync(game.CreatorId)
 		if groupRole ~= "Guest" and groupRole ~= "Member" then
 			table.insert(tags, groupRole)
 		end
