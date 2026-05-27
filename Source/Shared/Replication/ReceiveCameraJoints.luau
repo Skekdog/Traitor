@@ -6,23 +6,27 @@ local storedItems: {Instance} = {}
 local storedCharacters: {Instance} = {}
 
 local cameraRemote = GetRemote("CameraJoints", ReplicatedStorage.Remotes.ServerClient)
-local recoilRemote = GetRemote("RecoilJoints", ReplicatedStorage.Remotes.ServerClient)
+-- local recoilRemote = GetRemote("RecoilJoints", ReplicatedStorage.Remotes.ServerClient)
 
 local TWEEN_INFO = TweenInfo.new(0.05, Enum.EasingStyle.Linear)
 local RECOIL_TWEEN_INFO = TweenInfo.new(0.1, Enum.EasingStyle.Circular, Enum.EasingDirection.In, 0, true)
 
 local function rotateJoint(character: Model, jointName: "Neck" | "RightShoulder" | "LeftShoulder", angle: number, isRecoil: boolean?): ()
+	if jointName == "RightShoulder" or jointName == "LeftShoulder" then
+		return -- due to roblox bug
+	end
+
 	local joint = character:FindFirstChild(jointName, true)
-	if joint and joint:IsA("Motor6D") then
+	if joint and joint:IsA("AnimationConstraint") then
 		local angles = CFrame.Angles(angle, 0, 0)
-		if isRecoil then
-			joint.C1 = CFrame.new(joint.C1.Position)
-			TweenService:Create(joint, RECOIL_TWEEN_INFO, {
-				C1 = CFrame.new(joint.C1.Position) * angles
+		if isRecoil and joint.Attachment1 then
+			joint.Attachment1.CFrame = CFrame.new(joint.Attachment1.Position)
+			TweenService:Create(joint.Attachment1, RECOIL_TWEEN_INFO, {
+				CFrame = CFrame.new(joint.Attachment1.Position) * angles
 			}):Play()
-		else
-			TweenService:Create(joint, TWEEN_INFO, {
-				C0 = CFrame.new(joint.C0.Position) * angles
+		elseif not isRecoil and joint.Attachment0 then
+			TweenService:Create(joint.Attachment0, TWEEN_INFO, {
+				CFrame = CFrame.new(joint.Attachment0.Position) * angles
 			}):Play()
 		end
 	end
@@ -57,8 +61,8 @@ local function cameraTilt(character: Model, angle: number): ()
 			end
 
 			local neck = character:FindFirstChild("Neck", true)
-			if neck and neck:IsA("Motor6D") then
-				rotateForItem(character, item, (neck.C0:ToEulerAnglesXYZ()))
+			if neck and neck:IsA("AnimationConstraint") and neck.Attachment0 then
+				rotateForItem(character, item, (neck.Attachment0.CFrame:ToEulerAnglesXYZ()))
 			end
 		end)
 
@@ -75,17 +79,17 @@ local function cameraTilt(character: Model, angle: number): ()
 	rotateForItem(character, item, angle)
 end
 
-local function recoilTilt(character: Model, angle: number): ()
-	local item = character:FindFirstChild("Item")
-	if not item then
-		return
-	end
+-- local function recoilTilt(character: Model, angle: number): ()
+-- 	local item = character:FindFirstChild("Item")
+-- 	if not item then
+-- 		return
+-- 	end
 
-	rotateForItem(character, item, angle, true, true)
-end
+-- 	rotateForItem(character, item, angle, true, true)
+-- end
 
 cameraRemote.OnClientEvent:Connect(cameraTilt)
 
-recoilRemote.OnClientEvent:Connect(recoilTilt)
+-- recoilRemote.OnClientEvent:Connect(recoilTilt)
 
 return nil
