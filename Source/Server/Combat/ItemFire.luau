@@ -17,8 +17,8 @@ local function validateItemUsage(participant: Types.Participant, item: Types.Ite
 	return nil
 end
 
-local replicateRecoilRemote = GetRemote("RecoilJoints", ReplicatedStorage.Remotes.ServerClient)
-local replicateMuzzleFlashRemote = GetRemote("MuzzleFlash", ReplicatedStorage.Remotes.ServerClient)
+local replicateRecoilRemote = GetRemote("RecoilJoints", ReplicatedStorage.Remotes.ServerClient, true)
+local replicateMuzzleFlashRemote = GetRemote("MuzzleFlash", ReplicatedStorage.Remotes.ServerClient, true)
 
 local function fire(action: "Primary" | "Alternate", item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3, data: unknown): string | {string}?
 	local char = assert(participant:GetCharacter())
