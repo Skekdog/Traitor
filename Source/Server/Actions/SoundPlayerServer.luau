@@ -4,7 +4,7 @@ local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local Gamepass = require(ReplicatedStorage.Shared.Monetisation.Gamepass)
 local GamepassIDs = require(ReplicatedStorage.Shared.Monetisation.GamepassIDs)
 
-local remote = GetRemote("SoundPlayer", ReplicatedStorage)
+local remote = GetRemote("SoundPlayer", ReplicatedStorage.Remotes.ClientServer)
 
 remote.OnServerEvent:Connect(function(player, id: unknown): ()
 	if typeof(id) ~= "number" then

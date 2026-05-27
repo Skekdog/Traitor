@@ -7,7 +7,7 @@ local GamepassIDs = require(ReplicatedStorage.Shared.Monetisation.GamepassIDs)
 
 local SoundPlayerClient = {}
 
-local remote = GetRemote("SoundPlayer", ReplicatedStorage)
+local remote = GetRemote("SoundPlayer", ReplicatedStorage.Remotes.ClientServer)
 
 local ui = UIManager.WaitForUI("Sound Player") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs["Sound Player"])}
 
