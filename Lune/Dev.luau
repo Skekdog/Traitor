@@ -75,7 +75,9 @@ end
 options["Start Developing"] = function(): ()
 	Build.Build("Labs")
 
-	process.create("start", {"Traitor.rbxl"}, {shell = true})
+	local startCommand = if process.os == "linux" then "xdg-open" else "start"
+
+	process.create(startCommand, {"Traitor.rbxl"}, {shell = true})
 	process.create("rojo", {"serve", "serve.project.json"})
 end
 
