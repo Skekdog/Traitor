@@ -448,6 +448,10 @@ if IS_SERVER then
             return
         end
 
+        if not door:IsDescendantOf(workspace) then
+            return
+        end
+
         if not door:HasTag("Door") then
             return
         end
