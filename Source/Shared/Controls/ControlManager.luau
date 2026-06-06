@@ -32,7 +32,7 @@ local KEY_NAMES = {
 	Return = "ENTER",
 }
 
-module.PreferredInput = InstanceSignal.ListenProperty(UserInputService, "PreferredInput", (nil :: any) :: Enum.PreferredInput)
+module.PreferredInput = InstanceSignal.ListenProperty<<Enum.PreferredInput>>(UserInputService, "PreferredInput")
 
 function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?): string
 	if not keycode then

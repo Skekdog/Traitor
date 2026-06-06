@@ -139,7 +139,7 @@ local function createPlr(plr: Player)
 		end
 	end)
 
-	InstanceSignal.ListenAttribute(plr, "Karma", nil :: number?):Connect(function(karma)
+	InstanceSignal.ListenAttribute<<number?>>(plr, "Karma"):Connect(function(karma)
 		if not clone.Parent then
 			return
 		end
@@ -148,14 +148,14 @@ local function createPlr(plr: Player)
 		clone.Karma.Text = tostring(math.round(karma))
 	end, true)
 
-	InstanceSignal.ListenAttribute(plr, "Score", nil :: number?):Connect(function(score)
+	InstanceSignal.ListenAttribute<<number?>>(plr, "Score"):Connect(function(score)
 		if not clone.Parent then
 			return
 		end
 		clone.Score.Text = tostring(plr:GetAttribute("Score"))
 	end, true)
 
-	InstanceSignal.ListenAttribute(plr, "TotalScore", nil :: number?):Connect(function()
+	InstanceSignal.ListenAttribute<<number?>>(plr, "TotalScore"):Connect(function()
 		if not clone.Parent then
 			return
 		end

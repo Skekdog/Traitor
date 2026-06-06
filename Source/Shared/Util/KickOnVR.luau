@@ -1,10 +1,11 @@
 local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
 local VRService = game:GetService("VRService")
+local InstanceSignal = require(script.Parent.InstanceSignal)
 
-warn(VRService.VREnabled, UserInputService.VREnabled)
-if VRService.VREnabled or UserInputService.VREnabled then
-	Players.LocalPlayer:Kick("VR is not supported!")
-end
+InstanceSignal.ListenProperty<<boolean>>(VRService, "VREnabled"):Connect(function(enabled)
+	if enabled then
+		Players.LocalPlayer:Kick("VR is not supported.")
+	end
+end, true)
 
 return nil

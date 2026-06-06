@@ -23,7 +23,7 @@ type Event = {
 module.Map = DynamicValue.new(nil :: Types.Map?)
 
 module.Gamemode = DynamicValue.new(nil :: Types.GamemodeDefinition?)
-InstanceSignal.ListenAttribute(replicatedData, "Gamemode", "" :: string?):Connect(function(name: string?)
+InstanceSignal.ListenAttribute<<string?>>(replicatedData, "Gamemode"):Connect(function(name)
     if not name then
         module.Gamemode:SetValue()
         return
@@ -100,32 +100,32 @@ function module.GetOrderedRoundEvents(): {Event}
 end
 
 module.Phase = DynamicValue.new("Waiting" :: Types.Phase)
-InstanceSignal.ListenAttribute(replicatedData, "Phase", "Waiting" :: Types.Phase):Connect(function(phase: string?)
+InstanceSignal.ListenAttribute<<Types.Phase?>>(replicatedData, "Phase"):Connect(function(phase)
 	module.Phase:SetValue(phase or "Waiting")
 end, true)
 
 module.AdvanceTime = DynamicValue.new(nil :: number?)
-InstanceSignal.ListenAttribute(replicatedData, "AdvanceTime", 0 :: number?):Connect(function(advanceTime)
+InstanceSignal.ListenAttribute<<number?>>(replicatedData, "AdvanceTime"):Connect(function(advanceTime)
 	module.AdvanceTime:SetValue(advanceTime)
 end, true)
 
 module.Winner = DynamicValue.new(nil :: string?)
-InstanceSignal.ListenAttribute(replicatedData, "Winner", nil :: string?):Connect(function(winner)
+InstanceSignal.ListenAttribute<<string?>>(replicatedData, "Winner"):Connect(function(winner)
 	module.Winner:SetValue(winner)
 end, true)
 
 module.WinnerKind = DynamicValue.new(nil :: "Role" | "Participant"?)
-InstanceSignal.ListenAttribute(replicatedData, "WinnerKind", nil :: "Role" | "Participant"?):Connect(function(winnerKind)
+InstanceSignal.ListenAttribute<<"Role" | "Participant"?>>(replicatedData, "WinnerKind"):Connect(function(winnerKind)
 	module.WinnerKind:SetValue(winnerKind)
 end, true)
 
 module.Paused = DynamicValue.new(false)
-InstanceSignal.ListenAttribute(replicatedData, "Paused", false):Connect(function(paused)
+InstanceSignal.ListenAttribute<<boolean>>(replicatedData, "Paused"):Connect(function(paused)
 	module.Paused:SetValue(paused)
 end, true)
 
 module.StartTime = DynamicValue.new(nil :: number?)
-InstanceSignal.ListenAttribute(replicatedData, "StartTime", nil :: number?):Connect(function(startTime)
+InstanceSignal.ListenAttribute<<number?>>(replicatedData, "StartTime"):Connect(function(startTime)
 	module.StartTime:SetValue(startTime)
 end, true)
 
