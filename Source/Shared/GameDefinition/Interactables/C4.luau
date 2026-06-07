@@ -396,7 +396,6 @@ end
 
 if RunService:IsServer() then
 	local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
-	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
 	local function pickAndRemove<T>(list: {T}): T
 		assert(#list > 0, "List is empty")
@@ -532,7 +531,7 @@ if RunService:IsServer() then
 			return
 		end
 
-		if IsBadNumber(explodeAtOrWireCut) then
+		if typeof(explodeAtOrWireCut) == "number" and not math.isfinite(explodeAtOrWireCut) then
 			return
 		end
 

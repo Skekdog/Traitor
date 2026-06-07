@@ -3,7 +3,6 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local Types = require(ReplicatedStorage.API.Types)
 local CalculateFallDamage = require(ReplicatedStorage.Shared.Character.CalculateFallDamage)
-local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 
 local params = RaycastParams.new()
@@ -50,7 +49,7 @@ local function checkForAbsorber(plr: Player, position: Vector3, round: Types.Rou
 end
 
 ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(player: Player, velocity: unknown, position: unknown): ()
-    if typeof(velocity) ~= "number" or IsBadNumber(velocity) then
+    if typeof(velocity) ~= "number" or not math.isfinite(velocity) then
         return
     end
 

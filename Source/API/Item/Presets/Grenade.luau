@@ -62,9 +62,8 @@ end
 local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: Vector3, participant: Types.Participant, data: unknown): string?
 	local Server = require(ReplicatedStorage.API.Item.Behaviour.Server)
 	local Checks = require(ReplicatedStorage.API.Item.Behaviour.Checks)
-	local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
-	if typeof(data) ~= "number" or IsBadNumber(data) then
+	if typeof(data) ~= "number" or not math.isfinite(data) then
 		return "InvalidRequest"
 	end
 

@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
-local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
 local replicateRemote = GetRemote("CameraJoints", ReplicatedStorage.Remotes.ServerClient, true)
 
@@ -14,7 +13,7 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 
 	rateLimits[player] = os.clock() + (1 / 20)
 
-	if typeof(angle) ~= "number" or IsBadNumber(angle) then
+	if typeof(angle) ~= "number" or not math.isfinite(angle) then
 		return
 	end
 

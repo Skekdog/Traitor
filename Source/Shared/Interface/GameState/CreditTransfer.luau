@@ -4,7 +4,6 @@ local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 local EquipmentMenu = require(ReplicatedStorage.Shared.Interface.EquipmentMenu)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
-local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
 local page = ReplicatedStorage.Assets.EquipmentPages.CreditTransfer
 
@@ -21,7 +20,7 @@ amountBox.FocusLost:Connect(function()
 	end
 	assert(amount)
 
-	if amount < 0 or IsBadNumber(amount) then
+	if amount < 0 or not math.isfinite(amount) then
 		amount = 0
 	end
 

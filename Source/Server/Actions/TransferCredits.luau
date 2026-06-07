@@ -2,10 +2,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GetParticipant = require(ReplicatedStorage.API.GetParticipant)
 local Message = require(ReplicatedStorage.API.Interface.Message)
 local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
-local IsBadNumber = require(ReplicatedStorage.Shared.Util.IsBadNumber)
 
 ReplicatedStorage.Remotes.ClientServer.TransferCredits.OnServerEvent:Connect(function(player, toName: unknown, amount: unknown): ()
-	if typeof(toName) ~= "string" or typeof(amount) ~= "number" or IsBadNumber(amount) then
+	if typeof(toName) ~= "string" or typeof(amount) ~= "number" or not math.isfinite(amount) then
 		return
 	end
 
