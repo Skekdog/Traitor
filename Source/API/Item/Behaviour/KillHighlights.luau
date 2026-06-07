@@ -19,7 +19,7 @@ local function ItemKillHighlights(...: ItemKillHighlight): (item: {Name: string}
 	highlightsArray.n = nil :: any
 
 	table.sort(highlightsArray, function(highlight1, highlight2)
-		return highlight1.Priority > highlight2.Priority --todo: i remember that something like this errored before, but i checked with lune and it didn't. see what's up, this might not work still.
+		return highlight1.Priority > highlight2.Priority
 	end)
 
 	return function(item: {Name: string}, params: Types.DamageParams, victim: Types.Participant)
