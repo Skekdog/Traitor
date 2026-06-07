@@ -246,7 +246,7 @@ local shopItem = Custom({
 
 		local item = participant.Round:LoadItem(itemDefinition)
 
-		if math.random(1, 100) == 12 then
+		if math.random(1, 100) >= 98 then
 			(item.Model :: typeof(ReplicatedStorage.Assets.ItemModels.SpoonItem)).Slash.Transparency = 0
 			;(item.Model :: typeof(ReplicatedStorage.Assets.ItemModels.SpoonItem)).Transparency = 1
 		end
