@@ -1,7 +1,8 @@
-local BadgeService = game:GetService("BadgeService")
 local GroupService = game:GetService("GroupService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Badge = require(ReplicatedStorage.Shared.Monetisation.Badge)
+local BadgeIDs = require(ReplicatedStorage.Shared.Monetisation.BadgeIDs)
 
 local ChatTags = {}
 
@@ -29,14 +30,8 @@ function ChatTags.GetAvailableTags(player: Player): {string}
 		warn(result)
 	end
 
-	_, result = pcall(function()
-		if BadgeService:UserHasBadgeAsync(player.UserId, 2136698808) then
-			table.insert(tags, "Alpha Tester")
-		end
-	end)
-
-	if result then
-		warn(result)
+	if Badge.IsOwned(BadgeIDs["Tester Town"], player) then
+		table.insert(tags, "Alpha Tester")
 	end
 
 	tagCache[player] = tags

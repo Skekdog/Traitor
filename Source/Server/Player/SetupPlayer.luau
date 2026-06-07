@@ -1,8 +1,9 @@
-local BadgeService = game:GetService("BadgeService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
+local Badge = require(ReplicatedStorage.Shared.Monetisation.Badge)
+local BadgeIDs = require(ReplicatedStorage.Shared.Monetisation.BadgeIDs)
 local ProfileManager = require(ServerScriptService.PlayerData.ProfileManager)
 local RoundHandler = require(ServerScriptService.RoundHandler)
 local KarmaManager = require(script.Parent.KarmaManager)
@@ -10,27 +11,6 @@ local ScoreManager = require(script.Parent.ScoreManager)
 
 local function sendSavedSettings(plr: Player, profile: ProfileManager.Profile)
 	ReplicatedStorage.Remotes.ServerClient.LoadSavedSettings:FireClient(plr, profile.Data.Settings)
-end
-
-local BADGE_ID = 2136698808
-
-local function tryAwardTesterBadge(plr: Player): ()
-	local _, hasBadge = pcall(function()
-		return BadgeService:UserHasBadgeAsync(plr.UserId, BADGE_ID)
-	end)
-
-	if hasBadge then
-		return
-	end
-
-	local tries = 0
-	local suc = false
-	repeat
-		suc = pcall(function()
-			BadgeService:AwardBadgeAsync(plr.UserId, BADGE_ID)
-		end)
-		task.wait(1)
-	until suc or tries > 3
 end
 
 local function loadAttributes(plr: Player): ()
@@ -56,7 +36,7 @@ local function setupPlayer(plr: Player): ()
     loadAttributes(plr)
 	loadProfile(plr)
 
-	tryAwardTesterBadge(plr)
+	Badge.Award(BadgeIDs["Tester Town"], plr)
 end
 
 Players.PlayerAdded:Connect(setupPlayer)
