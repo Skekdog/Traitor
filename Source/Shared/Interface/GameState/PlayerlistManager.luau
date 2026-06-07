@@ -130,6 +130,7 @@ local function createPlr(plr: Player)
 	else
 		clone.Mute.Text = ""
 		clone.SoundMute.ImageContent = Content.none
+		TweenService:Create(clone, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.In, -1, true), {BackgroundColor3 = Color3.new(1, 1, 1)}):Play()
 	end
 
 	clone.MouseButton1Click:Connect(function()
@@ -189,10 +190,6 @@ local function createPlr(plr: Player)
 		movePlr(plr, status :: PlayerStatus)
 		toggleMarksVisible(clone, status == "Alive" and plr ~= Players.LocalPlayer)
 	end, true)
-
-	if plr == Players.LocalPlayer then
-		TweenService:Create(clone, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.In, -1, true), {BackgroundColor3 = Color3.new(1, 1, 1)}):Play()
-	end
 
 	return clone :: PlayerElement
 end
