@@ -28,6 +28,7 @@ function EquipmentMenu.AddPage(page: GuiObject, primary: boolean?): ()
 	if not currentPage and primary then
 		page.Visible = true
 		currentPage = page
+		UIAnimation.TransitionUnderline(ui.Object.TabHolder.Underline, tabButton)
 	end
 
 	page.Parent = ui.Object.Page
@@ -39,6 +40,8 @@ function EquipmentMenu.AddPage(page: GuiObject, primary: boolean?): ()
 		assert(currentPage, "No current page")
 		UIAnimation.TransitionUIPage(currentPage, page, UDim2.fromScale(0.5, 0))
 		currentPage = page
+
+		UIAnimation.TransitionUnderline(ui.Object.TabHolder.Underline, tabButton)
 	end)
 end
 
