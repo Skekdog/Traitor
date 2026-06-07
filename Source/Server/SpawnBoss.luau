@@ -1,5 +1,5 @@
-local MarketplaceService = game:GetService("MarketplaceService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Gamepass = require(ReplicatedStorage.Shared.Monetisation.Gamepass)
 local RoundHandler = require(script.Parent.RoundHandler)
 
 ReplicatedStorage.Remotes.ClientServer.SpawnBoss.OnServerEvent:Connect(function(player, bossName: unknown)
@@ -19,7 +19,7 @@ ReplicatedStorage.Remotes.ClientServer.SpawnBoss.OnServerEvent:Connect(function(
 		return
 	end
 
-	if definition.GamepassId and not MarketplaceService:UserOwnsGamePassAsync(player.UserId, definition.GamepassId) then
+	if definition.GamepassId and not Gamepass.IsOwned(definition.GamepassId, player) then
 		return
 	end
 
