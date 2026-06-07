@@ -46,7 +46,7 @@ local function getOrCreateFlashlight(root: Instance): Light
 end
 
 local enabled = false
-local function enableFlashlight(doEnable: boolean?): Enum.ContextActionResult
+local function enableFlashlight(doEnable: boolean?, noSound: boolean?): Enum.ContextActionResult
 	enabled = if typeof(doEnable) == "boolean" then doEnable else not enabled
 
 	local root = LocalCharacter.RootPart()
@@ -58,7 +58,9 @@ local function enableFlashlight(doEnable: boolean?): Enum.ContextActionResult
 	local light = getOrCreateFlashlight(workspace.CurrentCamera)
 	light.Enabled = enabled
 
-	Audio.Play2D(sound)
+	if not noSound then
+		Audio.Play2D(sound)
+	end
 
 	return Enum.ContextActionResult.Pass
 end
@@ -74,7 +76,7 @@ LocalCharacter.RootPart:Connect(function(part)
 	end
 
 	if ControlManager.PreferredInput() == Enum.PreferredInput.Touch then
-		return enableFlashlight(true)
+		return enableFlashlight(true, true)
 	end
 
 	ControlManager.Register("Flashlight", function()
