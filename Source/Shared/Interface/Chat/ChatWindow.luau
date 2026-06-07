@@ -187,8 +187,8 @@ end)
 ChatWindow.InputBox:GetPropertyChangedSignal("Text"):Connect(function()
 	local text = ChatWindow.InputBox.Text
 	local isEmpty = text == ""
-	sendButton.SendIcon.ImageColor3 = if isEmpty then Color3.fromRGB(178, 178, 178) else Color3.fromRGB(255, 255, 255)
-	sendButton.SendIcon.ImageTransparency = if isEmpty then 0.5 else 0
+	sendButton.SendIcon.TextColor3 = if isEmpty then Color3.fromRGB(178, 178, 178) else Color3.fromRGB(255, 255, 255)
+	sendButton.SendIcon.TextTransparency = if isEmpty then 0.5 else 0
 
 	ChatWindow.InputBox.Text = text:sub(1, MAX_LENGTH)
 end)
