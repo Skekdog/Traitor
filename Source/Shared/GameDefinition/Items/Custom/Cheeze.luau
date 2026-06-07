@@ -48,7 +48,7 @@ local function PrimaryFireServer(item: Types.Item, _, _, participant: Types.Part
 
 		participant:SetHealth(participant:GetHealth() + HEAL_AMOUNT)
 
-		participant:RemoveItem(item)
+		participant:RemoveItem(item, true)
 	end)
 end
 
@@ -150,7 +150,7 @@ local function AlternateFireServer(item: Types.Item, _, _, participant: Types.Pa
 		local model = item.Model:Clone()
 		participant:TryThrowAssembly(model, 10, participant.Round:GetMap().Structure.Dynamic)
 
-		participant:RemoveItem(item)
+		participant:RemoveItem(item, true)
 
 		local con
 		con = model.Touched:Connect(function(part)

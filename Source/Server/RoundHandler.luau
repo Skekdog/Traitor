@@ -378,6 +378,11 @@ task.spawn(function()
         if roundCount % MAP_VOTE_INTERVAL == 0 then
             doMapVote()
         end
+
+        for model in module.Round():GetItems() do
+            model:Destroy()
+        end
+
         newRound()
     end
 end)

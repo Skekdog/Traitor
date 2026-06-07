@@ -48,7 +48,7 @@ local function throwInteractable(item: Types.Item, participant: Types.Participan
         return nil
     end
 
-    participant:RemoveItem(item)
+    participant:RemoveItem(item, true)
 
     Audio.PlayIn(throwSound, GetPrimaryPart(interactable.Model), nil, true)
 
@@ -83,7 +83,7 @@ local function plantInteractable(item: Types.Item, participant: Types.Participan
     weld.Part1 = GetPrimaryPart(object)
     weld.Parent = object
 
-    participant:RemoveItem(item)
+    participant:RemoveItem(item, true)
 
     Audio.PlayIn(plantSound, GetPrimaryPart(object), nil, true)
 

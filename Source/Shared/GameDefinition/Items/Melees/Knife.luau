@@ -134,7 +134,7 @@ local function BeforeHitParticipant(item: Types.Item, params: Types.DamageParams
 		})
 	end
 
-	attacker:RemoveItem(item)
+	attacker:RemoveItem(item, true)
 
 	return true
 end

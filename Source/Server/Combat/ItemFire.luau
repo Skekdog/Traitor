@@ -33,7 +33,7 @@ local function fire(action: "Primary" | "Alternate", item: Types.Item, participa
 	end
 
 	if item.IsSingleUse then
-		participant:RemoveItem(item)
+		participant:RemoveItem(item, true)
 	end
 
 	local itemModel = char:FindFirstChild("Item")

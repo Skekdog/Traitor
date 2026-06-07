@@ -853,7 +853,7 @@ module.removeitem = {
 			end
 
 			if item then
-				participant:RemoveItem(item)
+				participant:RemoveItem(item, true)
 				table.insert(affectedPlayers, player)
 			end
 		end
