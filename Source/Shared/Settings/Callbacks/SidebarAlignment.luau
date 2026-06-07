@@ -5,16 +5,20 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 return function(name: string, value: string): ()
 	local ui = UIManager.WaitForUI("Sidebar").Object :: typeof(UIManager.UnregisteredUIs.Sidebar)
 
-    local position, anchorPoint, textAlignment, paddingProperty
+    local position, anchorPoint, textAlignment, leftCornerRadius, rightCornerRadius, paddingProperty
     if value == "Left" then
-        position = UDim2.new(0, -5, 0.28, 0)
-        anchorPoint = Vector2.new(0, 0)
+        position = UDim2.new(0, 0, 0.5, 0)
+        anchorPoint = Vector2.new(0, 0.5)
         textAlignment = Enum.TextXAlignment.Right
+        leftCornerRadius = UDim.new(0, 0)
+        rightCornerRadius = UDim.new(0, 8)
         paddingProperty = "PaddingRight"
     elseif value == "Right" then
-        position = UDim2.new(1, 5, 0.28, 0)
-        anchorPoint = Vector2.new(1, 0)
+        position = UDim2.new(1, 0, 0.5, 0)
+        anchorPoint = Vector2.new(1, 0.5)
         textAlignment = Enum.TextXAlignment.Left
+        leftCornerRadius = UDim.new(0, 8)
+        rightCornerRadius = UDim.new(0, 0)
         paddingProperty = "PaddingLeft"
     else
         error("Invalid alignment: " .. tostring(value))
@@ -22,7 +26,7 @@ return function(name: string, value: string): ()
 
     UIAnimation.Animate(ui, TweenInfo.new(0.1), {Position = position, AnchorPoint = anchorPoint})
 
-    for _, v in ui:QueryDescendants("UIListLayout, TextButton, TextLabel, ImageLabel") do
+    for _, v in ui:QueryDescendants("UIListLayout, TextButton, TextLabel, ImageLabel, UICorner") do
         if v:IsA("UIListLayout") then
             v.HorizontalAlignment = if value == "Right" then Enum.HorizontalAlignment.Right else Enum.HorizontalAlignment.Left
         elseif v:IsA("TextButton") then
@@ -30,6 +34,11 @@ return function(name: string, value: string): ()
             (v :: any).UIPadding[paddingProperty] = UDim.new(0, 8)
         elseif v:IsA("TextLabel") or v:IsA("ImageLabel") then
             (v :: GuiObject).LayoutOrder = if value == "Right" then 0 else 3
+        elseif v:IsA("UICorner") then
+            v.TopLeftRadius = leftCornerRadius
+            v.BottomLeftRadius = leftCornerRadius
+            v.TopRightRadius = rightCornerRadius
+            v.BottomRightRadius = rightCornerRadius
         end
     end
 end
