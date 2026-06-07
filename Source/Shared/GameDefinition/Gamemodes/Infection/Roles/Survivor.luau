@@ -21,6 +21,8 @@ local survivor: Types.RoleDefinition = {
 	CanSeeMissingInAction = true,
 	CanTeamChat = true,
 
+	CanTransferCreditsToAllies = true,
+
 	AwardCreditsToRolesOnDeath = {
 		Infected = 1,
 	},

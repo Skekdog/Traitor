@@ -26,6 +26,8 @@ local infected: Types.RoleDefinition = {
 	CanTeamChat = true,
 	IsEvil = true,
 
+	CanTransferCreditsToAllies = true,
+
 	WalkSpeed = 18,
 	JumpPower = 22,
 }

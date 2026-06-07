@@ -65,6 +65,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
         CanSeeMissingInAction = true,
         CanStealCreditsFromCorpses = true,
+		CanTransferCreditsToAllies = true,
 
         AwardCreditsToRolesOnDeath = {
             Prop = 1,
@@ -88,6 +89,7 @@ local roles: {[string]: Types.RoleDefinition} = {
         StartingCredits = 1,
 
         CanDoSuspiciousActions = true,
+		CanTransferCreditsToAllies = true,
 
         EquipmentShop = {
             Items["Radar"],

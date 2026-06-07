@@ -70,6 +70,8 @@ local roles: {[string]: Types.RoleDefinition} = {
 		ShouldAnnounceDisconnect = true,
 		CanStealCreditsFromCorpses = true,
 
+		CanTransferCreditsToAllies = true,
+
 		AwardCreditsToRolesOnDeath = {
 			Detective = 1,
 		},
@@ -170,6 +172,7 @@ local roles: {[string]: Types.RoleDefinition} = {
 
 		CanStealCreditsFromCorpses = true,
 		CorpseSearchResultsPublicised = true,
+		CanTransferCreditsToAllies = true,
 
 		DamageKarmaMultiplier = 1.5,
 

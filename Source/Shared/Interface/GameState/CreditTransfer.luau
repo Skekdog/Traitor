@@ -82,7 +82,7 @@ end
 local function updateButton(participant: LocalParticipantInfo.LocalParticipant): ()
 	local role = participant.Role()
 	local isAlive = participant.Status() == "Alive"
-	if isAlive and role:IsAlliedWith(ownParticipant.Role()) then
+	if isAlive and role:IsAlliedWith(ownParticipant.Role()) and ownParticipant.Role().Definition.CanTransferCreditsToAllies then
 		tryAddPlayerButton(participant)
 	else
 		tryRemovePlayerButton(participant)

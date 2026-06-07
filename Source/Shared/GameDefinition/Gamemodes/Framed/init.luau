@@ -125,6 +125,7 @@ local policeRole: Types.RoleDefinition = {
 	CanSeeMissingInAction = true,
 
 	CanDoSuspiciousActions = true,
+	CanTransferCreditsToAllies = true,
 }
 
 local undercoverRole: Types.RoleDefinition = {
@@ -151,6 +152,7 @@ local undercoverRole: Types.RoleDefinition = {
 	CanSeeMissingInAction = true,
 	CanUseActionNodes = true,
 	CanDoSuspiciousActions = true,
+	CanTransferCreditsToAllies = true,
 
 	OnRoleAssignedServer = OnRoleAssignedServer,
 }
