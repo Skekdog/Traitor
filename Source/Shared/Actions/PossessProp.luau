@@ -7,7 +7,7 @@ local Message = require(ReplicatedStorage.API.Interface.Message)
 local Types = require(ReplicatedStorage.API.Types)
 local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 local FreeInput = require(ReplicatedStorage.Shared.Controls.FreeInput)
-local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
+local PlayerState = require(ReplicatedStorage.Shared.Interface.GameState.PlayerState)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
@@ -42,7 +42,7 @@ local function possess(prop: Types.MapObject): ()
 
 	FreeInput.StartCapture()
 
-	RoundInfoUI.UpdatePunchMeter(0, MAX_PUNCHES)
+	PlayerState.UpdatePunchMeter(0, MAX_PUNCHES)
 
 	local lastWhole = punchMeter
 	punchConnection = RunService.PreSimulation:Connect(function(dt)
@@ -54,7 +54,7 @@ local function possess(prop: Types.MapObject): ()
 		local whole = math.floor(punchMeter)
 		if whole ~= lastWhole then
 			lastWhole = whole
-			RoundInfoUI.UpdatePunchMeter(whole, MAX_PUNCHES)
+			PlayerState.UpdatePunchMeter(whole, MAX_PUNCHES)
 		end
 
 		if punchMeter < 1 then
@@ -82,7 +82,7 @@ local function possess(prop: Types.MapObject): ()
 end
 
 function PossessProp.Stop(): ()
-	RoundInfoUI.UpdatePunchMeter(nil, MAX_PUNCHES)
+	PlayerState.UpdatePunchMeter(nil, MAX_PUNCHES)
 	ReplicatedStorage.Remotes.ClientServer.PossessProp:FireServer()
 	camera.CameraType = Enum.CameraType.Custom
 	camera.CameraSubject = nil

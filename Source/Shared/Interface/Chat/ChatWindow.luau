@@ -20,12 +20,11 @@ local QUICKCHAT_COLOUR = Color3.fromRGB(191, 251, 255)
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Chat, false)
 
-local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs.Chat)
-ui:ToggleVisible(true)
-
 local targetChannel = GetChatChannel("RBXGeneral")
 
-local frame = ui.Object
+local frame = (UIManager.WaitForUI("LeftArea").Object :: typeof(UIManager.UnregisteredUIs.LeftArea)).Chat.Frame
+frame.Visible = true
+
 ChatWindow.MessagesFrame = frame.Messages.ScrollingFrame
 local messageTemplate = ChatWindow.MessagesFrame.MessageTemplate
 

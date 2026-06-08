@@ -7,13 +7,13 @@ local BehaviourTypes = require(script.Parent.BehaviourTypes)
 local Checks = require(script.Parent.Checks)
 local Raycasts = require(script.Parent.Raycasts)
 local Types = require(ReplicatedStorage.API.Types)
-local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
 local LocalAnimation = require(ReplicatedStorage.Shared.Character.LocalAnimation)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local Aim = require(ReplicatedStorage.Shared.Combat.Aim)
 local BulletTracer = require(ReplicatedStorage.Shared.Combat.BulletTracer)
 local HitSounds = require(ReplicatedStorage.Shared.Combat.HitSounds)
 local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
+local PlayerState = require(ReplicatedStorage.Shared.Interface.GameState.PlayerState)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 
@@ -36,7 +36,7 @@ function Client.DeductAmmo(item: Types.Item): ()
 	end
 
 	item.Ammo -= 1
-	RoundInfoUI.UpdateAmmo()
+	PlayerState.UpdateAmmo()
 end
 
 function Client.ApplyInterval(item: Types.Item, action: "Primary" | "Alternate"): ()

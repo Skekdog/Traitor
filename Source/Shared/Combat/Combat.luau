@@ -6,12 +6,12 @@ local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
 local GetCentreRay = require(ReplicatedStorage.Shared.Camera.GetCentreRay)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
-local RoundInfoUI = require(ReplicatedStorage.Shared.Interface.GameState.RoundInfoUI)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ClientInventory = require(ReplicatedStorage.Shared.LocalState.ClientInventory)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local Aim = require(script.Parent.Aim)
 local Types = require(ReplicatedStorage.API.Types)
+local PlayerState = require(ReplicatedStorage.Shared.Interface.GameState.PlayerState)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
@@ -175,7 +175,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 
 	Aim.ToggleAim(item, false)
 
-	RoundInfoUI.UpdateAmmo()
+	PlayerState.UpdateAmmo()
 
 	if lastAmmoConnection then
 		lastAmmoConnection:Disconnect()
@@ -189,7 +189,7 @@ ClientInventory.EquippedItem:Connect(function(item): ()
 		return
 	end
 
-	lastAmmoConnection = ClientInventory.Ammo:Connect(RoundInfoUI.UpdateAmmo)
+	lastAmmoConnection = ClientInventory.Ammo:Connect(PlayerState.UpdateAmmo)
 
 	if item.AmmoDefinition and item.AmmoDefinition.Capacity ~= math.huge and item.AmmoDefinition.ReserveCapacity ~= 0 then
 		ControlManager.Register("Reload Weapon", function(_, state)

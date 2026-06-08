@@ -5,7 +5,7 @@ local CustomActions = {}
 
 local actions: {[number]: string} = {}
 
-local ui = (UIManager.WaitForUI("RoundInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.RoundInfo)}).Object
+local ui = (UIManager.WaitForUI("LeftArea") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.LeftArea)}).Object
 
 function CustomActions.Register(name: string, callback: () -> (), preferredSlot: number?, displayName: string?): ()
 	assert(preferredSlot == nil or preferredSlot > 0 and preferredSlot < 4, "preferredSlot must be between 1 and 3, or nil")
