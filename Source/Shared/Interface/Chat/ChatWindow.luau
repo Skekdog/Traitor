@@ -119,15 +119,22 @@ local function displayMessage(message: TextChatMessage): ()
 
 	messageBox.Parent = ChatWindow.MessagesFrame
 
-	if shouldScroll then
-		ChatWindow.MessagesFrame.CanvasPosition = Vector2.new(0, ChatWindow.MessagesFrame.AbsoluteCanvasSize.Y * 10) -- calculating the new position based on message size doesn't work correctly
-	end
-
 	table.insert(messages, messageBox)
 	if #messages > MAX_MESSAGES then
 		local oldMessage = messages[1]
 		table.remove(messages, 1)
 		oldMessage:Destroy()
+	end
+
+	local totalHeight = 0
+	for _, message in messages do
+		totalHeight += message.AbsoluteSize.Y
+	end
+
+	ChatWindow.MessagesFrame.CanvasSize = UDim2.fromOffset(0, totalHeight)
+
+	if shouldScroll then
+		ChatWindow.MessagesFrame.CanvasPosition = Vector2.new(0, ChatWindow.MessagesFrame.AbsoluteCanvasSize.Y * 10) -- calculating the new position based on message size doesn't work correctly
 	end
 end
 
