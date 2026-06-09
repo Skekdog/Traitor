@@ -10,7 +10,6 @@ local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ItemHint = require(ReplicatedStorage.Shared.Controls.ItemHint)
 local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
-local UIAnimation = require(ReplicatedStorage.Shared.Interface.UILib.UIAnimation)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
@@ -255,21 +254,8 @@ end
 
 local function tryRemoveButton(itemName: string)
 	local found = ui.Object:FindFirstChild("Item " .. itemName) :: ItemButton?
-
 	if found then
-		found.Parent = ui.Object
-
-		local tween = UIAnimation.Animate(found, TweenInfo.new(0.2), {
-			Position = UDim2.fromScale(0.5, 1.2)
-		})
-
-		if tween then
-			tween.Completed:Once(function()
-				found:Destroy()
-			end)
-		else
-			found:Destroy()
-		end
+		found:Destroy()
 	end
 end
 
