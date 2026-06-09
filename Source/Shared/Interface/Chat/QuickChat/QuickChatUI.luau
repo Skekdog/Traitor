@@ -10,22 +10,22 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ID_DURATION = 5
 local AUTO_HIDE_AFTER = 5
 
-local ui = UIManager.RegisterUI(UIManager.UnregisteredUIs["Quick Chat"])
+local ui = (UIManager.WaitForUI("LeftArea").Object :: typeof(UIManager.UnregisteredUIs.LeftArea))["Quick Chat"]
 
-type ChatButton = typeof(ui.Object.ChatTemplate)
+type ChatButton = typeof(ui.ChatTemplate)
 
 local id: Model?
 
 local function chat(button: ChatButton): ()
-	ui:ToggleVisible(false)
+	ui.Visible = false
 	QuickChatClient.Chat(button.LayoutOrder, id)
 end
 
 local lastShow
-ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+ui:GetPropertyChangedSignal("Visible"):Connect(function()
 	local thisShow = newproxy()
 	lastShow = thisShow
-	if not ui.Object.Visible then
+	if not ui.Visible then
 		for i = 1, 9 do
 			ControlManager.Unregister("Quick Chat " .. i)
 		end
@@ -34,11 +34,11 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 
 	task.delay(AUTO_HIDE_AFTER, function()
 		if lastShow == thisShow then
-			ui:ToggleVisible(false)
+			ui.Visible = false
 		end
 	end)
 
-	for _, v in ui.Object:GetChildren() do
+	for _, v in ui:GetChildren() do
 		if v:IsA("TextButton") and v.Name ~= "ChatTemplate" then
 			v:Destroy()
 		end
@@ -47,7 +47,7 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	for i = 1, 9 do
 		if QuickChat.Messages[i] then
 			ControlManager.Register("Quick Chat " .. i, function()
-				local button = ui.Object:FindFirstChild(tostring(i))
+				local button = ui:FindFirstChild(tostring(i))
 				if not button or not button:IsA("TextButton") then
 					return Enum.ContextActionResult.Pass
 				end
@@ -58,12 +58,12 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	end
 
 	for i, v in QuickChat.Messages do
-		local button = ui.Object.ChatTemplate:Clone()
+		local button = ui.ChatTemplate:Clone()
 		button.LayoutOrder = i
 		button.Name = tostring(i)
 		button:SetAttribute("Control", "Quick Chat " .. i)
 		button:AddTag("ControlHint")
-		button.Parent = ui.Object
+		button.Parent = ui
 
 		button.Activated:Connect(function()
 			chat(button)
@@ -72,17 +72,22 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 end)
 
 ChatWindow.QuickChatButton.Activated:Connect(function()
-	ui:ToggleVisible()
+	ui.Visible = not ui.Visible
+end)
+
+ControlManager.Register("Quick Chat", function()
+	ui.Visible = not ui.Visible
+	return Enum.ContextActionResult.Pass
 end)
 
 RunService.Heartbeat:Connect(function()
-	if not ui.Object.Visible then
+	if not ui.Visible then
 		return
 	end
 
 	local lastId = Interaction.GetLastId()
 	id = if lastId.At + ID_DURATION < os.clock() then nil else lastId.Id
-	for _, v in ui.Object:GetChildren() do
+	for _, v in ui:GetChildren() do
 		if v:IsA("TextButton") and v.Name ~= "ChatTemplate" then
 			local button = v :: ChatButton
 			button.Visible = true
