@@ -20,7 +20,7 @@ local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UI
 
 local module = {}
 
-local sampleButton = ui.Object.Sample
+local sampleButton = ui.Object.ButtonTemplate
 type ItemButton = typeof(sampleButton)
 
 local ourInventory: {Passive: {Types.Item}, Slots: DynamicValue.DynamicValue<{[number]: Types.Item}>, [number]: never} = {Passive = {}, Slots = DynamicValue.new({})}
@@ -102,12 +102,12 @@ local function tryUnequip(item: Types.Item, force: boolean?): boolean
 
 	module.EquippedItem:SetValue(nil)
 
-	local button = ui.Object.Container:FindFirstChild("Item " .. item.Name) :: ItemButton?
+	local button = ui.Object:FindFirstChild("Item " .. item.Name) :: ItemButton?
 	if not button then
 		return true
 	end
 
-	button.BackgroundTransparency = 0.75
+	button.BackgroundTransparency = 0.7
 	return true
 end
 
@@ -217,47 +217,13 @@ local function tryEquip(item: Types.Item): ()
 
 	selectedSlot = nil
 
-	local button = ui.Object.Container:FindFirstChild("Item " .. item.Name) :: ItemButton?
+	local button = ui.Object:FindFirstChild("Item " .. item.Name) :: ItemButton?
 	if not button then
 		return
 	end
 
 	selectedSlot = button.LayoutOrder
-	button.BackgroundTransparency = 0.25
-end
-
-local INV_BUTTON_PADDING = 25
-local function getRelativePosition(clone: typeof(sampleButton), order: number, middle: number): UDim2
-	local difference = order - middle
-	local mult = if difference < 0 then -1 else 1
-
-	local relativePosition
-	if order == middle then
-		relativePosition = UDim2.new()
-	else
-		local padding = INV_BUTTON_PADDING * mult
-		local sizeMult = 1.5
-		if (order == middle - 0.5) or (order == middle + 0.5) then
-			sizeMult = 1.25
-			padding /= 2
-		end
-		relativePosition = UDim2.new(0, padding + (clone.AbsoluteSize.X * sizeMult * difference), 0, 0)
-	end
-
-	return relativePosition
-end
-
-local function move(clone: typeof(sampleButton), order: number, middle: number): ()
-	clone:SetAttribute("Order", order)
-	clone:SetAttribute("Middle", middle)
-	if not clone:GetAttribute("ListeningToSize") then
-		clone:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-			clone.Position = UDim2.fromScale(0.5, 0) + getRelativePosition(clone, clone:GetAttribute("Order") :: number, clone:GetAttribute("Middle") :: number)
-		end)
-		clone:SetAttribute("ListeningToSize", true)
-	end
-
-	UIAnimation.Animate(clone, TweenInfo.new(0.2), {Position = UDim2.fromScale(0.5, 0) + getRelativePosition(clone, order, middle)})
+	button.BackgroundTransparency = 0.3
 end
 
 local function tryAddButton(item: Types.Item, slot: number): ()
@@ -267,9 +233,11 @@ local function tryAddButton(item: Types.Item, slot: number): ()
 	end
 
 	local clone = sampleButton:Clone()
-	clone.Text = item.DisplayName or item.Name
-	clone.TextLabel.Text = `[{slot}]`
+	clone.TextLabel.Text = item.DisplayName or item.Name
 	clone.LayoutOrder = slot
+
+	clone:SetAttribute("Control", "Slot " .. slot)
+	clone:AddTag("ControlHint")
 
 	clone.Position = UDim2.fromScale(0.5, 1.2)
 	clone.Visible = true
@@ -278,43 +246,18 @@ local function tryAddButton(item: Types.Item, slot: number): ()
 	ThemesManager.UpdateThemeInstance(clone.TextLabel, nil, true)
 
 	clone.Name = "Item " .. item.Name
-	clone.Parent = ui.Object.Container :: any
+	clone.Parent = ui.Object :: any
 
-	clone.MouseButton1Click:Connect(function()
+	clone.Activated:Connect(function()
 		tryEquip(item)
 	end)
-
-	local children = ui.Object.Container:GetChildren()
-	local buttons: {typeof(sampleButton)} = {}
-	for _, v in children do
-		if v:IsA("TextButton") then
-			table.insert(buttons, v :: typeof(sampleButton))
-		end
-	end
-
-	table.sort(buttons, function(a, b)
-		return a.LayoutOrder < b.LayoutOrder
-	end)
-
-	for _, v in buttons do
-		move(v, table.find(buttons, v) :: number, (#buttons + 1) / 2)
-	end
 end
 
 local function tryRemoveButton(itemName: string)
-	local found = ui.Object.Container:FindFirstChild("Item " .. itemName) :: ItemButton?
-	local children = ui.Object.Container:GetChildren()
-
-	local buttons: {typeof(sampleButton)} = {}
-	for _, v in children do
-		if v:IsA("TextButton") then
-			table.insert(buttons, v :: typeof(sampleButton))
-		end
-	end
+	local found = ui.Object:FindFirstChild("Item " .. itemName) :: ItemButton?
 
 	if found then
 		found.Parent = ui.Object
-		table.remove(buttons, table.find(buttons, found))
 
 		local tween = UIAnimation.Animate(found, TweenInfo.new(0.2), {
 			Position = UDim2.fromScale(0.5, 1.2)
@@ -327,14 +270,6 @@ local function tryRemoveButton(itemName: string)
 		else
 			found:Destroy()
 		end
-	end
-
-	table.sort(buttons, function(a, b)
-		return a.LayoutOrder < b.LayoutOrder
-	end)
-
-	for _, v in buttons do
-		move(v, table.find(buttons, v) :: number, (#buttons + 1) / 2)
 	end
 end
 
