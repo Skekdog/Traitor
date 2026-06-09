@@ -116,19 +116,6 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
-	Name = "Sidebar Alignment",
-	Tab = "Display",
-	Category = "User Interface",
-	PossibleValues = {"Left", "Right"},
-	Kind = "Choice" :: "Choice",
-	Default = "Right",
-
-	Callback = function(name, value)
-		(require)(callbacks.SidebarAlignment)(name, value)
-	end
-})
-
-table.insert(availableSettings, {
 	Name = "Animate UI",
 	Tab = "Display",
 	Category = "User Interface",
