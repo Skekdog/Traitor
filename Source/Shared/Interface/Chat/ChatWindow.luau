@@ -211,6 +211,11 @@ task.spawn(function()
 	end
 end)
 
+ControlManager.PreferredInput:Connect(function(preferredInput)
+	sendButton.Visible = preferredInput == Enum.PreferredInput.Touch
+	ChatWindow.QuickChatButton.Visible = preferredInput == Enum.PreferredInput.Touch
+end, true)
+
 sendButton.Activated:Connect(function()
 	sendChat()
 	selectedTeamChat = false
