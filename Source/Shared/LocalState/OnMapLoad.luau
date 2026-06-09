@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Message = require(ReplicatedStorage.API.Interface.Message)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local LocalRoundInfo = require(script.Parent.LocalRoundInfo)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
@@ -7,7 +8,6 @@ local ConfirmationPrompt = require(ReplicatedStorage.Shared.Interface.Util.Confi
 local Gamepass = require(ReplicatedStorage.Shared.Monetisation.Gamepass)
 local SettingsUI = require(ReplicatedStorage.Shared.Settings.SettingsUI)
 
-local alertUI = UIManager.WaitForUI("Alert") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Alert)}
 local playerlistUI = UIManager.WaitForUI("Playerlist") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Playerlist)}
 
 LocalRoundInfo.Map:Connect(function(map)
@@ -17,8 +17,7 @@ LocalRoundInfo.Map:Connect(function(map)
 		return
 	end
 
-	alertUI.Object.Text = `Map Loaded: {GetDisplayName(map)} by {map.Authors}`
-	alertUI:ToggleVisible(true)
+	Message.Popup(`Map Loaded: {GetDisplayName(map)} by {map.Authors}`)
 
 	playerlistUI.Object.Info.RoundInfo.Map.MapAuthors.Text = map.Authors
 	playerlistUI.Object.Info.RoundInfo.Map.MapName.Text = `Map: {GetDisplayName(map)}`
@@ -37,9 +36,6 @@ LocalRoundInfo.Map:Connect(function(map)
 			ReplicatedStorage.Remotes.ClientServer.SpawnBoss:FireServer(name)
 		end)
 	end
-
-	task.wait(5)
-	alertUI:ToggleVisible(false)
 end, true)
 
 return nil
