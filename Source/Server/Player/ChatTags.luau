@@ -1,3 +1,4 @@
+local GroupService = game:GetService("GroupService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Badge = require(ReplicatedStorage.Shared.Monetisation.Badge)
@@ -17,10 +18,11 @@ function ChatTags.GetAvailableTags(player: Player): {string}
 	assert(tags)
 
 	local _, result = pcall(function()
-		-- TODO: the replacement api doesn't actually exist yet
-		local groupRole = ((player :: any) :: {GetRoleInGroupAsync: (any, number) -> string}):GetRoleInGroupAsync(game.CreatorId)
-		if groupRole ~= "Guest" and groupRole ~= "Member" then
-			table.insert(tags, groupRole)
+		local roles: {IsMember: boolean, Roles: {{Id: number, Name: string, Rank: number}}} = GroupService:GetRolesInGroupAsync(player.UserId, game.CreatorId)
+		for _, role in roles.Roles do
+			if role.Name ~= "Guest" and role.Name ~= "Member" then
+				table.insert(tags, role.Name)
+			end
 		end
 	end)
 
