@@ -308,7 +308,7 @@ function UIManager.GetUIs(layer: Layer): {UI}
 	return uis
 end
 
-function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
+function UIManager.WaitForUI<T>(name: string, ignoreYield: boolean?): UI & {Object: T}
 	local start = os.clock()
 	local warned = false
 	repeat
@@ -320,7 +320,7 @@ function UIManager.WaitForUI(name: string, ignoreYield: boolean?): UI
 			end
 		end
 	until UIManager.TryGetUI(name)
-	return UIManager.GetUI(name)
+	return UIManager.GetUI(name) :: UI & {Object: T}
 end
 
 local orders: {[Layer]: number} = {
