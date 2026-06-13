@@ -1,13 +1,17 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local BehaviourTypes = require(ReplicatedStorage.API.Item.Behaviour.BehaviourTypes)
 local ItemKillHighlights = require(ReplicatedStorage.API.Item.Behaviour.KillHighlights)
 local Melee = require(ReplicatedStorage.API.Item.Presets.Melee)
 local Types = require(ReplicatedStorage.API.Types)
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 
 local module = {}
 
 local PUSH_FORCE = 10
 local RESPONSIBLE_DURATION = 5
+
+local pushOffLadderRemote = GetRemote("PushOffLadderRemote")
 
 function module.AlternateFireClient(item: Types.Item, origin: Vector3, direction: Vector3): boolean | string | {string}
 	local Client = require(ReplicatedStorage.API.Item.Behaviour.Client)
@@ -74,6 +78,8 @@ function module.AlternateFireServer(item: Types.Item, origin: Vector3, direction
 		return nil
 	end
 
+	pushOffLadderRemote:FireClient(hitParticipant.Player)
+
 	hitParticipant:SetLastDamagedBy(participant, RESPONSIBLE_DURATION)
 	if not participant:HasSelfDefenseAgainstParticipant(hitParticipant) then
 		hitParticipant:AddSelfDefenseEntry({
@@ -83,6 +89,11 @@ function module.AlternateFireServer(item: Types.Item, origin: Vector3, direction
 	end
 
 	return nil
+end
+
+if RunService:IsClient() then
+	local ClimbLadder = require(ReplicatedStorage.Shared.Actions.ClimbLadder)
+	pushOffLadderRemote.OnClientEvent:Connect(ClimbLadder.StopClimbing)
 end
 
 local Crowbar = Melee({
