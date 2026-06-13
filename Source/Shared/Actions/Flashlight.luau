@@ -86,7 +86,7 @@ end, true)
 
 ControlManager.PreferredInput:Connect(function(preferred)
 	if preferred == Enum.PreferredInput.Touch then
-		enableFlashlight(true)
+		enableFlashlight(true, true)
 	end
 end, true)
 
