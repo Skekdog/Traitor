@@ -15,7 +15,9 @@ local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 local Types = require(ReplicatedStorage.API.Types)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
+
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
+local inventoryButtonUi = UIManager.WaitForUI("InventoryButton") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.InventoryButton)}
 
 local module = {}
 
@@ -480,6 +482,28 @@ ReplicatedStorage.Remotes.ServerClient.UpdateAmmo.OnClientEvent:Connect(function
 			module.Ammo:Invoke()
 		end
 	end
+end)
+
+ControlManager.PreferredInput:Connect(function(preferredInput)
+	local isTouch = preferredInput == Enum.PreferredInput.Touch
+
+	ui:ToggleVisible(false, nil, function()
+		ui.Object.AnchorPoint = if isTouch then Vector2.one / 2 else Vector2.one
+
+	end)
+
+	ui.Object:SetAttribute("TransitionDirection", if isTouch then "Up" else "Left")
+	ui.Object:SetAttribute("TransitionTarget", if isTouch then UDim2.new(0.5, 0, 0.5, 0) else UDim2.new(1, -10, 1, -10))
+
+	if not isTouch then
+		ui:ToggleVisible(true)
+	end
+
+	inventoryButtonUi:ToggleVisible(isTouch)
+end, true)
+
+inventoryButtonUi.Object.Activated:Connect(function()
+	ui:ToggleVisible()
 end)
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
