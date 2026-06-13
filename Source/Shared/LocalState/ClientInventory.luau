@@ -250,6 +250,9 @@ local function tryAddButton(item: Types.Item, slot: number): ()
 	clone.Parent = ui.Object :: any
 
 	clone.Activated:Connect(function()
+		if ControlManager.PreferredInput() == Enum.PreferredInput.Touch or ControlManager.PreferredInput() == Enum.PreferredInput.Gamepad then
+			ui:ToggleVisible(false)
+		end
 		tryEquip(item)
 	end)
 end
