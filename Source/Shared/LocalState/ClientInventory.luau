@@ -492,7 +492,6 @@ ControlManager.PreferredInput:Connect(function(preferredInput)
 
 	ui:ToggleVisible(false, nil, function()
 		ui.Object.AnchorPoint = if isTouch then Vector2.one / 2 else Vector2.one
-
 	end)
 
 	ui.Object:SetAttribute("TransitionDirection", if isTouch then "Up" else "Left")
