@@ -6,6 +6,14 @@
   "emitLegacyScripts": false,
 
   "tree": {
-    "$path": "build.project.json"
+    "$path": "build.project.json",
+
+    "StarterPlayer": {
+      "$path": "Services/StarterPlayer",
+
+      "PlayerModule": {
+        "$path": "Ignore/PlayerModule"
+      }
+    }
   }
 }

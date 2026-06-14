@@ -2,6 +2,7 @@ local DevSuite = require("@devsuite/DevSuite")
 local PublishSDKAsset = require("@devsuite/PublishSDKAsset")
 local SDKAssets = require("@devsuite/SDKAssets")
 local UpdateCollisionGroups = require("@devsuite/UpdateCollisionGroups")
+local CopyPlayerModule = require("@devsuite/CopyPlayerModule")
 local Build = require("@devsuite/Build")
 local fs = require("@lune/fs")
 local datetime = require("@lune/datetime")
@@ -96,6 +97,10 @@ publishPlaceOptions["! All"] = function(): ()
 end
 
 options["Publish Game"] = publishPlaceOptions
+
+options["Copy PlayerModule"] = function(): ()
+	CopyPlayerModule("./Ignore/PlayerModule")
+end
 
 while DevSuite(options, {}) do
 	continue
