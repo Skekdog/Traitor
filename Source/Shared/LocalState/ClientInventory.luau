@@ -489,18 +489,15 @@ end)
 
 ControlManager.PreferredInput:Connect(function(preferredInput)
 	local isTouch = preferredInput == Enum.PreferredInput.Touch
-	local isGamepad = preferredInput == Enum.PreferredInput.Gamepad
-
-	local isTouchOrGamepad = isTouch or isGamepad
 
 	ui:ToggleVisible(false, nil, function()
-		ui.Object.AnchorPoint = if isTouchOrGamepad then Vector2.one / 2 else Vector2.one
+		ui.Object.AnchorPoint = if isTouch then Vector2.one / 2 else Vector2.one
 	end)
 
-	ui.Object:SetAttribute("TransitionDirection", if isTouchOrGamepad then "Up" else "Left")
-	ui.Object:SetAttribute("TransitionTarget", if isTouchOrGamepad then UDim2.new(0.5, 0, 0.5, 0) else UDim2.new(1, -10, 1, -10))
+	ui.Object:SetAttribute("TransitionDirection", if isTouch then "Up" else "Left")
+	ui.Object:SetAttribute("TransitionTarget", if isTouch then UDim2.new(0.5, 0, 0.5, 0) else UDim2.new(1, -10, 1, -10))
 
-	if not isTouchOrGamepad then
+	if not isTouch then
 		ui:ToggleVisible(true)
 	end
 
