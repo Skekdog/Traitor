@@ -1,5 +1,9 @@
 
 local function GetAssemblyMass(root: BasePart, countRopes: boolean?, _processedParts: {[BasePart]: true?}?): number
+	if root.Anchored then
+		return 0
+	end
+
 	_processedParts = _processedParts or {}
 	assert(_processedParts)
 	if _processedParts[root] then
