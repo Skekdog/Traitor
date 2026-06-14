@@ -11,8 +11,6 @@ if IsLabs then
 end
 
 require(ReplicatedStorage.Shared.DevTools.HostPermissions)
-
-require(script.Parent.PlayerModule)
 require(script.Parent.Settings.LoadSettings)
 require(script.Parent.Controls.KeybindHintManager)
 require(script.Parent.Combat.OnHitClient)

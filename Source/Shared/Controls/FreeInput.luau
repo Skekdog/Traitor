@@ -2,11 +2,10 @@ local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
-local PlayerModule = require(ReplicatedStorage.Shared.PlayerModule)
+local ControlModule = require(StarterPlayer.PlayerModule.ControlModule)
 local GetFlag = require(ReplicatedStorage.Shared.Util.GetFlag)
-
-local Controls = PlayerModule.controls
 
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
 
@@ -98,7 +97,7 @@ function module.GetVelocity(dt: number): Vector3
 		keyboard.S - keyboard.W
 	) * NAV_KEYBOARD_SPEED
 
-	local kTouch = Controls:GetMoveVector() :: Vector3
+	local kTouch = ControlModule.inputMoveVector
 
 	local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
 

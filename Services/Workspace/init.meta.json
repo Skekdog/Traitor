@@ -19,6 +19,7 @@
     "ClientAnimatorThrottling": {"Enum": 2},
     "PathfindingUseImprovedSearch": {"Enum": 2},
     "NextGenerationReplication": {"Enum": 1},
+    "PlayerScriptsUseInputActionSystem": {"Enum": 2},
     "TouchesUseCollisionGroups": true,
     "Attributes": {
       "__Rojo_ProjectName": {"String": "Traitor!"}
