@@ -101,6 +101,10 @@
 
     "VRService": {
       "$path": "Services/VRService"
+    },
+
+    "AvatarSettings": {
+      "$path": "Services/AvatarSettings"
     }
   }
 }

@@ -1,0 +1,9 @@
+{
+	"className": "AvatarAbilityRules",
+	"properties": {
+		"EnableClimbing": {"Bool": false},
+		"EnableCrouching": {"Bool": false},
+		"EnableFallingDown": {"Bool": false},
+		"EnableSitting": {"Bool": false}
+	}
+}
