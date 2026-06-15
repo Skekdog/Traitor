@@ -1,12 +1,11 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ServerScriptService = game:GetService("ServerScriptService")
 local Message = require(ReplicatedStorage.API.Interface.Message)
 local Types = require(ReplicatedStorage.API.Types)
 local Custom = require(ReplicatedStorage.API.Item.Presets.Custom)
 
 local module = {}
-
-local DISGUISED_DESCRIPTION = ReplicatedStorage.Shared.RoundRule.Assets.TestDummy.Humanoid.HumanoidDescription
 
 local serverParticipantTable: {[Player]: Types.Participant?} = {}
 
@@ -24,6 +23,9 @@ end
 local clientDisguiseActive = false
 
 function module.DisguiseServer(source: string, participant: Types.Participant, enable: boolean, char: Model?, hum: Humanoid?, applyReset: boolean?): ()
+	local Dummy = require(ServerScriptService.Character.Dummy)
+	local DISGUISED_DESCRIPTION = Dummy.Humanoid.HumanoidDescription
+
 	-- this is to prevent an error in studio when stopping the game.
 	if not participant.Player.Parent then
 		return

@@ -1,6 +1,7 @@
 {
 	"className": "AvatarAbilityRules",
 	"properties": {
+		"CharacterControllerMode": {"Enum": 3},
 		"EnableClimbing": {"Bool": false},
 		"EnableCrouching": {"Bool": false},
 		"EnableFallingDown": {"Bool": false},

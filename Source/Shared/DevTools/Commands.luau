@@ -902,6 +902,8 @@ module.spawndummy = {
 	Environment = "Server" :: "Server",
 	Arguments = {"at players"},
 	Execute = function(executor: Player, round: Round, args: Args): string
+		local Dummy = require(ServerScriptService.Character.Dummy)
+
 		local players = processPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
@@ -913,7 +915,11 @@ module.spawndummy = {
 				continue
 			end
 
-			local dummy = ReplicatedStorage.Shared.RoundRule.Assets.TestDummy:Clone()
+			local dummy = Dummy:Clone()
+
+			dummy:SetAttribute("Health", math.huge)
+			dummy:AddTag("Prop")
+
 			dummy:PivotTo(player.Character:GetPivot())
 
 			dummy.Parent = round:GetMap().Structure.Dynamic :: any
