@@ -2,8 +2,10 @@ local process = require("@lune/process")
 local fs = require("@lune/fs")
 
 local STUDIO_PATH_LINUX = "/home/admin/.var/app/org.vinegarhq.Vinegar/data/vinegar/versions/"
-local STUDIO_PATH_WINDOWS = "%LOCALAPPDATA%/Roblox/Versions/"
-local STUDIO_PATH_RSMM = "%LOCALAPPDATA%/Roblox Studio/"
+
+local LOCALAPPDATA = process.env["LOCALAPPDATA"]
+local STUDIO_PATH_WINDOWS = `{LOCALAPPDATA}/Roblox/Versions/`
+local STUDIO_PATH_RSMM = `{LOCALAPPDATA}/Roblox Studio/`
 
 local function locateStudioInstallation(): string
 	if process.os == "linux" then
