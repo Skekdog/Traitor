@@ -38,19 +38,6 @@ LocalCharacter.Character:Connect(function(char)
     end
 end)
 
-local function setHumanoidStates(hum: Humanoid): ()
-    hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.Ragdoll, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.FallingDown, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.GettingUp, true)
-    hum:SetStateEnabled(Enum.HumanoidStateType.Flying, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics, false)
-    hum:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics, false)
-end
-
 local function initRemoveDeathSound(root: BasePart): ()
     local death = root:FindFirstChild("Died")
     if death then
@@ -94,8 +81,6 @@ LocalCharacter.Humanoid:Connect(function(hum)
 
     WalkSpeed.Reset()
     JumpPower.Reset()
-
-    setHumanoidStates(hum)
 
     local char = hum.Parent
     assert(char and char:IsA("Model"), "Humanoid has no Character")
