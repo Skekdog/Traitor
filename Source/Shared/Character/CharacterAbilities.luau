@@ -1,3 +1,5 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Abilities = require(ReplicatedStorage.Shared.RoundRule.Common.Abilities)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 
 local MAX_FORCE = 500 -- Prevent most movement whilst airborne
@@ -32,12 +34,8 @@ LocalCharacter.Character:Connect(function(char)
 	groundController.DecelerationTime = DECELERATION_TIME
 	airController.MoveMaxForce = MAX_FORCE
 
-	local abilityManager = char:WaitForChild("AbilityManagerActor")
-	local abilities = abilityManager:WaitForChild("Abilities")
-
 	for _, abilityName in DISABLED_ABILITIES do
-		local ability = abilities:WaitForChild(abilityName)
-		ability:SetAttribute("Enabled", false)
+		Abilities.GetAbility(char, abilityName):SetAttribute("Enabled", false)
 	end
 end)
 
