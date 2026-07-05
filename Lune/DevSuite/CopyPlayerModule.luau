@@ -1,7 +1,8 @@
 local process = require("@lune/process")
 local fs = require("@lune/fs")
 
-local STUDIO_PATH_LINUX = "/home/admin/.var/app/org.vinegarhq.Vinegar/data/vinegar/versions/"
+local HOME = process.env["HOME"]
+local STUDIO_PATH_LINUX = `{HOME}/.var/app/org.vinegarhq.Vinegar/data/vinegar/versions/`
 
 local LOCALAPPDATA = process.env["LOCALAPPDATA"]
 local STUDIO_PATH_WINDOWS = `{LOCALAPPDATA}/Roblox/Versions/`
