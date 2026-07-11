@@ -1,4 +1,6 @@
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SubmergedVoice = require(ReplicatedStorage.Shared.Effects.SubmergedVoice)
 local GhostVoice = require(script.Parent.GhostVoice)
 
 local DISTANCE_ATTENUATION = {
@@ -14,22 +16,28 @@ local DISTANCE_ATTENUATION = {
 	[40] = 0,
 }
 
-local function createEmitter(player: Player, source: AudioDeviceInput): AudioEmitter
+local function createEmitter(player: Player, source: AudioDeviceInput): (AudioEmitter, Wire, Wire)
 	local emitter = Instance.new("AudioEmitter")
 	emitter.Name = "VoiceEmitter"
 	emitter.AcousticSimulationEnabled = false
 	emitter:SetDistanceAttenuation(DISTANCE_ATTENUATION)
 
-	local wire = Instance.new("Wire")
-	wire.SourceInstance = source
-	wire.TargetInstance = emitter
-	wire.Parent = emitter
+	local inputWire = Instance.new("Wire")
+	inputWire.SourceInstance = source
+	inputWire.TargetInstance = emitter
+	inputWire.Name = "InputWire"
+	inputWire.Parent = emitter
 
-	wire.Destroying:Once(function()
+	local outputWire = Instance.new("Wire")
+	outputWire.TargetInstance = emitter
+	outputWire.Name = "OutputWire"
+	outputWire.Parent = emitter
+
+	inputWire.Destroying:Once(function()
 		GhostVoice.MakeGhost(player)
 	end)
 
-	return emitter
+	return emitter, inputWire, outputWire
 end
 
 local function onPlayerAdded(player: Player): ()
@@ -38,8 +46,19 @@ local function onPlayerAdded(player: Player): ()
 	input.Parent = player
 
 	player.CharacterAdded:Connect(function(char)
-		createEmitter(player, input).Parent = char
+		local emitter, input, output = createEmitter(player, input)
+		emitter.Parent = char
+
 		GhostVoice.DisconnectGhost(player)
+
+		char:GetAttributeChangedSignal("IsSubmerged"):Connect(function()
+			local isSubmerged = char:GetAttribute("IsSubmerged")
+			if isSubmerged then
+				SubmergedVoice.Connect(input, output)
+			else
+				SubmergedVoice.Disconnect(input, output)
+			end
+		end)
 	end)
 
 	GhostVoice.MakeGhost(player)
