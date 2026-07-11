@@ -137,13 +137,19 @@ local function recalculateForces(root: BasePart, hum: Humanoid): ()
 	buoyancyForce = buoyancyForce
 end
 
-local root, hum
+local root, hum, controllers
+
 LocalCharacter.RootPart:Connect(function(newRoot)
 	root = newRoot
-end, true)
+end)
+
 LocalCharacter.Humanoid:Connect(function(newHum)
 	hum = newHum
-end, true)
+end)
+
+LocalCharacter.Controllers:Connect(function(newControllers)
+	controllers = newControllers
+end)
 
 local function stopSwimming(): ()
 	if not isSwimming then
@@ -193,7 +199,7 @@ local function startSwimming(zone: BasePart): ()
 end
 
 RunService.PreSimulation:Connect(function(dt)
-	if not root or not hum then
+	if not root or not hum or not controllers then
 		return
 	end
 
@@ -245,7 +251,7 @@ RunService.PreSimulation:Connect(function(dt)
 				end)
 
 				if CLAMP_SURFACE_MOVEMENT then
-					table.insert(stateCleanup, hum:GetPropertyChangedSignal("MoveDirection"):Connect(function()
+					table.insert(stateCleanup, controllers.Manager:GetPropertyChangedSignal("MovingDirection"):Connect(function()
 						local moveDir = hum.MoveDirection
 
 						if nearSurface and moveDir.Y > 0.1 then

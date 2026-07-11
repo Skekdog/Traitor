@@ -6,10 +6,19 @@ local module = {}
 
 local plr = Players.LocalPlayer
 
+type Controllers = {
+	Manager: ControllerManager,
+	Ground: GroundController,
+	Climb: ClimbController,
+	Swim: SwimController,
+	Air: AirController,
+}
+
 module.Character = DynamicValue.new(nil :: Model?)
 module.Humanoid = DynamicValue.new(nil :: Humanoid?)
 module.RootPart = DynamicValue.new(nil :: BasePart?)
 module.Head = DynamicValue.new(nil :: BasePart?)
+module.Controllers = DynamicValue.new<<Controllers?>>(nil)
 
 plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 	local char = plr.Character
@@ -17,6 +26,7 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 	module.Character:SetValue(char)
 
 	if not char then
+		module.Controllers:SetValue(nil)
 		module.Humanoid:SetValue(nil)
 		module.RootPart:SetValue(nil)
 		module.Head:SetValue(nil)
@@ -34,8 +44,33 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 			if child.Name == "Humanoid" then
 				module.Humanoid:SetValue(child)
 			end
+		elseif child:IsA("ControllerManager") then
+			local controllers: Controllers = {
+				Manager = child,
+				Ground = assert(child:FindFirstChildOfClass("GroundController")),
+				Climb = assert(child:FindFirstChildOfClass("ClimbController")),
+				Swim = assert(child:FindFirstChildOfClass("SwimController")),
+				Air = assert(child:FindFirstChildOfClass("AirController")),
+			}
+
+			module.Controllers:SetValue(controllers)
 		end
 	end)
+
+	local controllerManager = char:FindFirstChild("ControllerManager")
+	assert(not controllerManager or controllerManager:IsA("ControllerManager"), "ControllerManager is not a ControllerManager")
+
+	if controllerManager then
+		local controllers: Controllers = {
+			Manager = controllerManager,
+			Ground = assert(controllerManager:FindFirstChildOfClass("GroundController")),
+			Climb = assert(controllerManager:FindFirstChildOfClass("ClimbController")),
+			Swim = assert(controllerManager:FindFirstChildOfClass("SwimController")),
+			Air = assert(controllerManager:FindFirstChildOfClass("AirController")),
+		}
+
+		module.Controllers:SetValue(controllers)
+	end
 
 	local hum = char:FindFirstChild("Humanoid")
 	assert(not hum or hum:IsA("Humanoid"), "Humanoid is not a Humanoid")

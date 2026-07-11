@@ -16,27 +16,18 @@ LocalCharacter.Character:Connect(function(char)
 		return
 	end
 
-	local controllerManager = char:WaitForChild("ControllerManager")
-	if not controllerManager:IsA("ControllerManager") then
-		error("Invalid ControllerManager")
-	end
-
-	local airController = controllerManager:WaitForChild("AirController")
-	if not airController:IsA("AirController") then
-		error("Invalid AirController")
-	end
-
-	local groundController = controllerManager:WaitForChild("GroundController")
-	if not groundController:IsA("GroundController") then
-		error("Invalid GroundController")
-	end
-
-	groundController.DecelerationTime = DECELERATION_TIME
-	airController.MoveMaxForce = MAX_FORCE
-
 	for _, abilityName in DISABLED_ABILITIES do
 		Abilities.GetAbilityState(char, abilityName):SetAttribute("Enabled", false)
 	end
+end)
+
+LocalCharacter.Controllers:Connect(function(controllers)
+	if not controllers then
+		return
+	end
+
+	controllers.Ground.DecelerationTime = DECELERATION_TIME
+	controllers.Air.MoveMaxForce = MAX_FORCE
 end)
 
 return nil
