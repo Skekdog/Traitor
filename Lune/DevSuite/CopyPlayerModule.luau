@@ -58,6 +58,7 @@ end
 
 local function CopyPlayerModule(destination: string): ()
 	fs.copy(locatePlayerModule(), destination, true)
+	print("Copied successfully.")
 end
 
 return CopyPlayerModule
