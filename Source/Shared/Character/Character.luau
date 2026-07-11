@@ -90,7 +90,7 @@ end
 
 CollectionService:GetInstanceAddedSignal("Ragdoll"):Connect(function(instance)
     if instance == LocalCharacter.Character() then
-        ClimbLadder.StopClimbing()
+        ClimbLadder.StopClimbing(true)
     end
 end)
 

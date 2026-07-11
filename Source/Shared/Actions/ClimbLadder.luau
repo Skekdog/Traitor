@@ -33,6 +33,9 @@ local function setStates(hum: Humanoid, enabled: boolean): ()
     hum:SetStateEnabled(Enum.HumanoidStateType.Swimming, enabled)
     hum:ChangeState(if enabled then Enum.HumanoidStateType.Freefall else Enum.HumanoidStateType.Climbing)
     hum.PlatformStand = not enabled
+end
+
+local function setAutoRotate(hum: Humanoid, enabled: boolean): ()
     hum.AutoRotate = enabled
 end
 
@@ -59,6 +62,7 @@ function module.Climb(ladder: BasePart): ()
     currentClimbSoundIndex = 1
 
     setStates(hum, false)
+    setAutoRotate(hum, false)
 
     local alignPos = (root:FindFirstChild("LadderPositionAlignment") :: AlignPosition?) or Instance.new("AlignPosition")
     local ladderAttachment = (ladder:FindFirstChild("LadderAttachment") :: Attachment?) or Instance.new("Attachment")
@@ -139,7 +143,7 @@ function module.Climb(ladder: BasePart): ()
     coroutine.resume(thread)
 end
 
-function module.StopClimbing(): ()
+function module.StopClimbing(preserveStates: boolean?): ()
     Crouch.SetCrouchDisabled("Climbing", false)
     if jumpRequestCon then
         jumpRequestCon:Disconnect()
@@ -158,7 +162,11 @@ function module.StopClimbing(): ()
     if not hum then
         return
     end
-    setStates(hum, true)
+
+    if not preserveStates then
+        setStates(hum, true)
+    end
+    setAutoRotate(hum, true)
 
     local climbSound = root:FindFirstChild("ClimbSound") :: Sound?
     if climbSound then
