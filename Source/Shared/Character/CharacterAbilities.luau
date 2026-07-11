@@ -35,7 +35,7 @@ LocalCharacter.Character:Connect(function(char)
 	airController.MoveMaxForce = MAX_FORCE
 
 	for _, abilityName in DISABLED_ABILITIES do
-		Abilities.GetAbility(char, abilityName):SetAttribute("Enabled", false)
+		Abilities.GetAbilityState(char, abilityName):SetAttribute("Enabled", false)
 	end
 end)
 
