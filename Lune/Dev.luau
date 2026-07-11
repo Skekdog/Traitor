@@ -25,7 +25,7 @@ print(ASCII_ART)
 print("Wilkommen to the Traitor! Dev Suite.")
 print()
 
-local PLACE_PATH = "Traitor.rbxl"
+local PLACE_PATH = require("@placename")
 local PLACE_FILE_STALE = 3600
 
 local options: DevSuite.Options = {}
