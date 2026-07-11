@@ -18,7 +18,7 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 	end
 
 	local character = player.Character
-	if not character or character:HasTag("IsRagdolled") then
+	if not character or character:HasTag("Ragdoll") then
 		return
 	end
 
