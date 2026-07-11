@@ -7,7 +7,7 @@ local Env = require("@lib/Env")
 
 local BASE_URL = "https://apis.roblox.com/universes/v1/{universeId}/places/{placeId}/versions?versionType=Published"
 
-local NAME = "Traitor.rbxl"
+local NAME = require("@placename")
 
 local Build = {}
 
