@@ -27,6 +27,28 @@ module.Head = DynamicValue.new(nil :: BasePart?)
 module.Controllers = DynamicValue.new<<Controllers?>>(nil)
 module.Sensors = DynamicValue.new<<Sensors?>>(nil)
 
+local function getControllers(manager: ControllerManager): Controllers
+	local ground = manager:WaitForChild("GroundController")
+	assert(ground:IsA("GroundController"), "GroundController is not a GroundController")
+
+	local climb = manager:WaitForChild("ClimbController")
+	assert(climb:IsA("ClimbController"), "ClimbController is not a ClimbController")
+
+	local swim = manager:WaitForChild("SwimController")
+	assert(swim:IsA("SwimController"), "SwimController is not a SwimController")
+
+	local air = manager:WaitForChild("AirController")
+	assert(air:IsA("AirController"), "AirController is not an AirController")
+
+	return {
+		Manager = manager,
+		Ground = ground,
+		Climb = climb,
+		Swim = swim,
+		Air = air,
+	}
+end
+
 plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 	local char = plr.Character
 
@@ -52,15 +74,7 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 				module.Humanoid:SetValue(child)
 			end
 		elseif child:IsA("ControllerManager") then
-			local controllers: Controllers = {
-				Manager = child,
-				Ground = assert(child:FindFirstChildOfClass("GroundController")),
-				Climb = assert(child:FindFirstChildOfClass("ClimbController")),
-				Swim = assert(child:FindFirstChildOfClass("SwimController")),
-				Air = assert(child:FindFirstChildOfClass("AirController")),
-			}
-
-			module.Controllers:SetValue(controllers)
+			module.Controllers:SetValue(getControllers(child))
 		end
 	end)
 
@@ -68,15 +82,7 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 	assert(not controllerManager or controllerManager:IsA("ControllerManager"), "ControllerManager is not a ControllerManager")
 
 	if controllerManager then
-		local controllers: Controllers = {
-			Manager = controllerManager,
-			Ground = assert(controllerManager:FindFirstChildOfClass("GroundController")),
-			Climb = assert(controllerManager:FindFirstChildOfClass("ClimbController")),
-			Swim = assert(controllerManager:FindFirstChildOfClass("SwimController")),
-			Air = assert(controllerManager:FindFirstChildOfClass("AirController")),
-		}
-
-		module.Controllers:SetValue(controllers)
+		module.Controllers:SetValue(getControllers(controllerManager))
 	end
 
 	local hum = char:FindFirstChild("Humanoid")
