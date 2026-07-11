@@ -5,11 +5,14 @@
 		"Source/TT2Compat/**",
 		"Assets/Maps/**",
 		"Services/**",
+		"Lints/**"
 	],
 	"luau-lsp.ignoreGlobs": [
 		"Lune/Lib/Stubuau/poke/**",
-		"Ignore/PlayerModule/**"
+		"Ignore/PlayerModule/**",
+		"Lints/**"
 	],
 	"luau-lsp.types.robloxSecurityLevel": "None",
 	"luau-lsp.sourcemap.rojoProjectFile": "sourcemap.project.json",
+	"mandolin.lintConfigPath": "lint.config.luau",
 }
