@@ -4,9 +4,12 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local GetRemote = require(ReplicatedStorage.API.GetRemote)
 local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter)
 
 type CleanupTargets = { Instance | (...any) -> (...any) | RBXScriptConnection }
+
+local replicateSwimState = GetRemote("SwimState", ReplicatedStorage.Remotes.ClientServer)
 
 local function cleanup(targets: CleanupTargets): ()
 	for _, target in ipairs(targets) do
@@ -166,7 +169,6 @@ local function stopSwimming(): ()
 	didJump = false
 
 	if sensors then
-		sensors.Buoyancy:GetPropertyChangedSignal("FullySubmerged"):Once(print)
 		sensors.Buoyancy.UpdateType = Enum.SensorUpdateType.OnRead
 	end
 
@@ -186,6 +188,8 @@ local function startSwimming(zone: BasePart): ()
 		sensors.Buoyancy.UpdateType = Enum.SensorUpdateType.Manual
 		sensors.Buoyancy.TouchingSurface = true
 	end
+
+	replicateSwimState:FireServer()
 
 	isSwimming = true
 
