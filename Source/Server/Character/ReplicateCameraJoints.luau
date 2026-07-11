@@ -22,9 +22,8 @@ ReplicatedStorage.Remotes.ClientServer.RotateHead.OnServerEvent:Connect(function
 		return
 	end
 
-	angle = math.clamp(angle, -1.4, 1.4)
-
-	replicateRemote:FireAllClients(character, angle)
+	local clampedAngle = math.clamp(angle, -1.4, 1.4)
+	replicateRemote:FireAllClients(character, clampedAngle)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
