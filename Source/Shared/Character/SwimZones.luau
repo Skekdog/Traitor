@@ -137,7 +137,7 @@ local function recalculateForces(root: BasePart, hum: Humanoid): ()
 	buoyancyForce = buoyancyForce
 end
 
-local root, hum, controllers
+local root, hum, controllers, sensors
 
 LocalCharacter.RootPart:Connect(function(newRoot)
 	root = newRoot
@@ -151,6 +151,10 @@ LocalCharacter.Controllers:Connect(function(newControllers)
 	controllers = newControllers
 end)
 
+LocalCharacter.Sensors:Connect(function(newSensors)
+	sensors = newSensors
+end)
+
 local function stopSwimming(): ()
 	if not isSwimming then
 		return
@@ -160,6 +164,11 @@ local function stopSwimming(): ()
 	isInSwimmingState = false
 	nearSurface = false
 	didJump = false
+
+	if sensors then
+		sensors.Buoyancy:GetPropertyChangedSignal("FullySubmerged"):Once(print)
+		sensors.Buoyancy.UpdateType = Enum.SensorUpdateType.OnRead
+	end
 
 	cleanup(generalCleanup)
 	cleanup(stateCleanup)
@@ -171,6 +180,11 @@ local function startSwimming(zone: BasePart): ()
 
 	if isSwimming then
 		return
+	end
+
+	if sensors then
+		sensors.Buoyancy.UpdateType = Enum.SensorUpdateType.Manual
+		sensors.Buoyancy.TouchingSurface = true
 	end
 
 	isSwimming = true

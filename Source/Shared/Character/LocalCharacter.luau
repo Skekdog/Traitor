@@ -14,11 +14,18 @@ type Controllers = {
 	Air: AirController,
 }
 
+type Sensors = {
+	Buoyancy: BuoyancySensor,
+	Floor: ControllerPartSensor,
+	Ladder: ControllerPartSensor,
+}
+
 module.Character = DynamicValue.new(nil :: Model?)
 module.Humanoid = DynamicValue.new(nil :: Humanoid?)
 module.RootPart = DynamicValue.new(nil :: BasePart?)
 module.Head = DynamicValue.new(nil :: BasePart?)
 module.Controllers = DynamicValue.new<<Controllers?>>(nil)
+module.Sensors = DynamicValue.new<<Sensors?>>(nil)
 
 plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 	local char = plr.Character
@@ -86,6 +93,30 @@ plr:GetPropertyChangedSignal("Character"):Connect(function(): ()
 	assert(not head or head:IsA("BasePart"), "Head is not a BasePart")
 
 	module.Head:SetValue(head)
+end)
+
+module.RootPart:Connect(function(root)
+	if not root then
+		module.Sensors:SetValue(nil)
+		return
+	end
+
+	local floorSensor = root:WaitForChild("FloorSensor")
+	assert(floorSensor and floorSensor:IsA("ControllerPartSensor"), "FloorSensor is not a ControllerPartSensor")
+
+	local ladderSensor = root:WaitForChild("LadderSensor")
+	assert(ladderSensor and ladderSensor:IsA("ControllerPartSensor"), "LadderSensor is not a ControllerPartSensor")
+
+	local buoyancySensor = root:WaitForChild("BuoyancySensor")
+	assert(buoyancySensor and buoyancySensor:IsA("BuoyancySensor"), "BuoyancySensor is not a BuoyancySensor")
+
+	local sensors: Sensors = {
+		Floor = floorSensor,
+		Ladder = ladderSensor,
+		Buoyancy = buoyancySensor,
+	}
+
+	module.Sensors:SetValue(sensors)
 end)
 
 return table.freeze(module)
