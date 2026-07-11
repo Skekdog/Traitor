@@ -4,7 +4,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local StarterPlayer = game:GetService("StarterPlayer")
 local UserInputService = game:GetService("UserInputService")
-local ControlModule = require(StarterPlayer.PlayerModule.ControlModule)
 local GetFlag = require(ReplicatedStorage.Shared.Util.GetFlag)
 
 local UserGameSettings = UserSettings():GetService("UserGameSettings")
@@ -13,8 +12,6 @@ local module = {}
 
 local FFlagUserCameraInputDt = GetFlag("UserCameraInputDt")
 
-local NAV_GAMEPAD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
-local NAV_KEYBOARD_SPEED = Vector3.new(1, 1, 1) * 2 -- normal value is * 1
 local FOV_WHEEL_SPEED = 1.5 -- normal value is 1.0
 local FOV_GAMEPAD_SPEED = 0.25
 local NAV_SHIFT_MUL = 0.25
@@ -85,23 +82,25 @@ local function thumbstickCurve(x: number)
 end
 
 function module.GetVelocity(dt: number): Vector3
-	local kGamepad = Vector3.new(
-		gamepad.Thumbstick1.X,
-		thumbstickCurve(gamepad.ButtonR2) - thumbstickCurve(gamepad.ButtonL2),
-		gamepad.Thumbstick1.Y
-	) * NAV_GAMEPAD_SPEED
+	local input = StarterPlayer:FindFirstChild("MoveAction", true)
+	if not input or not input:IsA("InputAction") then
+		warn("Missing MoveAction, did Roblox make a breaking change?")
+		return Vector3.zero
+	end
 
-	local kKeyboard = Vector3.new(
-		keyboard.D - keyboard.A,
-		(keyboard.E + keyboard.Space) - keyboard.Q,
-		keyboard.S - keyboard.W
-	) * NAV_KEYBOARD_SPEED
+	local state = input:GetState()
+	assert(typeof(state) == "Vector2", "Expected Vector2")
 
-	local kTouch = ControlModule.inputMoveVector
+	local verticalVelocity =
+		(thumbstickCurve(gamepad.ButtonR2) - thumbstickCurve(gamepad.ButtonL2))
+		+ ((keyboard.E + keyboard.Space) - keyboard.Q)
 
 	local shift = UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
 
-	return ((kGamepad + kKeyboard + kTouch) * (if shift then NAV_SHIFT_MUL else 1)) * 60 * dt
+	-- W and S movement is inverted for... reasons?
+	local velocity = Vector3.new(state.X, verticalVelocity, -state.Y) * (if shift then NAV_SHIFT_MUL else 1) * 60 * dt
+
+	return velocity
 end
 
 -- Adjust the touch sensitivity so that sensitivity is reduced when swiping up
