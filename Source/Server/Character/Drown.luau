@@ -61,8 +61,11 @@ local function forEachParticipant(participant: Participant, dt: number, map: Typ
 
 	if not IsSubmerged(humanoid, head.Position, params) then
 		participant.Extras.DrownElapsed = 0
+		char:SetAttribute("IsSubmerged", false)
 		return
 	end
+
+	char:SetAttribute("IsSubmerged", true)
 
 	if os.clock() - (participant.Extras.LastDrownAt or 0) < DROWN_INTERVAL then
 		return
