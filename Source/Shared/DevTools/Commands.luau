@@ -922,6 +922,11 @@ module.spawndummy = {
 
 			dummy:PivotTo(player.Character:GetPivot())
 
+			local onDamage = ServerStorage.Assets.DummyOnDamage:Clone()
+			onDamage.BillboardGui.Adornee = dummy.Head
+			onDamage.Name = "OnDamage"
+			onDamage.Parent = dummy :: any
+
 			dummy.Parent = round:GetMap().Structure.Dynamic :: any
 
 			table.insert(affectedPlayers, player)
