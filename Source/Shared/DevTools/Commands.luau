@@ -1004,4 +1004,72 @@ module.seance = {
 	end
 }
 
+module.ragdoll = {
+	Name = "ragdoll",
+	Description = "Forces a player to ragdoll indefinitely.",
+	Arguments = {"players"},
+	Environment = "Server" :: "Server",
+	HasRelaxedPermissions = true,
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
+
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return `Player {args[1]} not found.`
+		end
+
+		local affectedPlayers: {Player} = {}
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local character = participant:GetCharacter()
+			if not character then
+				continue
+			end
+
+			Ragdoll.Ragdoll(participant, character)
+			table.insert(affectedPlayers, player)
+		end
+
+		return `Ragdolled {getPlayersString(affectedPlayers)}.`
+	end
+}
+
+module.unragdoll = {
+	Name = "unragdoll",
+	Description = "Forces a player to unragdoll.",
+	Arguments = {"players"},
+	Environment = "Server" :: "Server",
+	HasRelaxedPermissions = true,
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
+
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return `Player {args[1]} not found.`
+		end
+
+		local affectedPlayers: {Player} = {}
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local character = participant:GetCharacter()
+			if not character then
+				continue
+			end
+
+			Ragdoll.Unragdoll(character)
+			table.insert(affectedPlayers, player)
+		end
+
+		return `Unragdolled {getPlayersString(affectedPlayers)}.`
+	end
+}
+
 return table.freeze(module)
