@@ -993,8 +993,14 @@ module.seance = {
 	HasRelaxedPermissions = true,
 	Execute = function(executor: Player, round: Round): string
 		local FilterDead = require(ServerScriptService.Chat.FilterDead)
+		local Message = require(ReplicatedStorage.API.Interface.Message)
 		FilterDead.SetDisabled(not FilterDead.IsDisabled())
-		return `Seance is now {if FilterDead.IsDisabled() then "enabled" else "disabled"}.`
+
+		local isEnabled = FilterDead.IsDisabled()
+		local output = `Seance is now {if isEnabled then "enabled" else "disabled"}. Dead chat is {if isEnabled then "now" else "no longer"} visible to alive players.`
+		Message.Chat(output, "All")
+
+		return output
 	end
 }
 
