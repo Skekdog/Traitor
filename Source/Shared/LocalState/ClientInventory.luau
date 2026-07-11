@@ -176,7 +176,7 @@ end
 
 local function tryEquip(item: Types.Item): ()
 	local char = LocalCharacter.Character()
-	if char and char:GetAttribute("IsRagdolled") then
+	if char and char:HasTag("Ragdoll") then
 		return
 	end
 

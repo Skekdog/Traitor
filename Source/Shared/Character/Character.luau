@@ -1,3 +1,4 @@
+local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ClimbLadder = require(ReplicatedStorage.Shared.Actions.ClimbLadder)
 local Crouch = require(ReplicatedStorage.Shared.Actions.Crouch)
@@ -74,6 +75,12 @@ local function initHeadTiltAsync(char: Model): ()
     end
 end
 
+CollectionService:GetInstanceAddedSignal("Ragdoll"):Connect(function(instance)
+    if instance == LocalCharacter.Character() then
+        ClimbLadder.StopClimbing()
+    end
+end)
+
 LocalCharacter.Humanoid:Connect(function(hum)
     if not hum then
         return
@@ -84,12 +91,6 @@ LocalCharacter.Humanoid:Connect(function(hum)
 
     local char = hum.Parent
     assert(char and char:IsA("Model"), "Humanoid has no Character")
-
-    char:GetAttributeChangedSignal("IsRagolled"):Connect(function()
-        if char:GetAttribute("IsRagdolled") then
-            ClimbLadder.StopClimbing()
-        end
-    end)
 
     local root = char:WaitForChild("HumanoidRootPart")
     assert(root:IsA("BasePart"), "HumanoidRootPart is not a Part")
