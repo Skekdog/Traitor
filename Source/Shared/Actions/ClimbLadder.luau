@@ -40,7 +40,7 @@ function module.Climb(ladder: BasePart): ()
     module.StopClimbing()
 
     local char = LocalCharacter.Character()
-    if not char or char:GetAttribute("IsRagdolled") then
+    if not char or char:HasTag("Ragdoll") then
         return
     end
 

@@ -11,9 +11,6 @@ end
 
 task.spawn(function()
     while true do
-        for _, corpse in CollectionService:GetTagged("Corpse") do
-            fix(corpse)
-        end
         for _, corpse in CollectionService:GetTagged("Ragdoll") do
             fix(corpse)
         end
