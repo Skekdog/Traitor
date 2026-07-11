@@ -72,13 +72,19 @@ options["Update Collision Groups"] = function(): ()
 	UpdateCollisionGroups(PLACE_PATH)
 end
 
+local currentRojoProccess: process.ChildProcess?
 options["Start Developing"] = function(): ()
+	if currentRojoProccess then
+		currentRojoProccess:kill()
+		currentRojoProccess = nil
+	end
+
 	Build.Build("Labs")
 
 	local startCommand = if process.os == "linux" then "xdg-open" else "start"
 
-	process.create(startCommand, {"Traitor.rbxl"}, {shell = true})
-	process.create("rojo", {"serve", "serve.project.json"})
+	process.exec(startCommand, {"Traitor.rbxl"}, {shell = true})
+	currentRojoProccess = process.create("rojo", {"serve", "serve.project.json"})
 end
 
 local publishPlaceOptions: DevSuite.Options = {}
