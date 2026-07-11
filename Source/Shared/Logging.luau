@@ -15,21 +15,23 @@ LogService.MessageOut:Connect(function(message, kind)
 		return
 	end
 
-	message = "\n" .. "WARNING: " .. message .. "\n"
-	message = EscapeRichText(message)
-	message = TextColor(message, Color3.new(1, 0.48, 0.13))
-	message = "<b>" .. message .. "</b>"
+	local logOutput = message
+	logOutput = "\n" .. "WARNING: " .. message .. "\n"
+	logOutput = EscapeRichText(message)
+	logOutput = TextColor(message, Color3.new(1, 0.48, 0.13))
+	logOutput = "<b>" .. message .. "</b>"
 
-	Message.Chat(message, if RunService:IsServer() then "All" else nil)
+	Message.Chat(logOutput, if RunService:IsServer() then "All" else nil)
 end)
 
 ScriptContext.Error:Connect(function(message, trace, instance)
-	message = "\n" .. "ERROR: " .. message .. "\n" .. trace .. "\n"
-	message = EscapeRichText(message)
-	message = TextColor(message, Color3.new(1, 0, 0))
-	message = "<b>" .. message .. "</b>"
+	local logOutput = message
+	logOutput = "\n" .. "ERROR: " .. message .. "\n" .. trace .. "\n"
+	logOutput = EscapeRichText(message)
+	logOutput = TextColor(message, Color3.new(1, 0, 0))
+	logOutput = "<b>" .. message .. "</b>"
 
-	Message.Chat(message, if RunService:IsServer() then "All" else nil)
+	Message.Chat(logOutput, if RunService:IsServer() then "All" else nil)
 end)
 
 return nil
