@@ -23,15 +23,11 @@ effectWire.Parent = reverb
 function SubmergedVoice.Connect(input: Wire, output: Wire): ()
 	input.TargetInstance = effectWire.SourceInstance
 	output.SourceInstance = effectWire.TargetInstance
-
-	print("connected")
 end
 
 function SubmergedVoice.Disconnect(input: Wire, output: Wire): ()
 	input.TargetInstance = output.TargetInstance
 	output.SourceInstance = nil :: any -- type definition is wrong here
-
-	print("disconnected")
 end
 
 return table.freeze(SubmergedVoice)
