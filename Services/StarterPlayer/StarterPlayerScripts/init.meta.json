@@ -1,3 +1,4 @@
 {
-	"className": "StarterPlayerScripts"
+	"className": "StarterPlayerScripts",
+	"ignoreUnknownInstances": true
 }
