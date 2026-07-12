@@ -312,7 +312,7 @@ local item = Custom({
 	HoldAnimation = Content.fromAssetId(134193046304179),
 
 	PrimaryToggled = true,
-	PrimaryHint = "Scan DNA",
+	PrimaryHint = "Collect DNA",
 	PrimaryFireServer = PrimaryFireServer,
 	PrimaryFireClient = PrimaryFireClient,
 
