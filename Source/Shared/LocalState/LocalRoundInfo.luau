@@ -12,13 +12,15 @@ local module = {}
 local replicatedData = ReplicatedStorage.Shared.RoundRule.ReplicatedData
 local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
 
-type Event = {
+export type Event = {
     Timestamp: number,
     Description: string,
     WasFreeKill: boolean?,
     WasSelfDefense: boolean?,
     WasCorrectKill: boolean?,
 }
+
+module.RoundEvents = DynamicValue.new<<{Event}>>({})
 
 module.Map = DynamicValue.new(nil :: Types.Map?)
 
@@ -78,26 +80,33 @@ function module.GetHighlights(): {Types.Highlight}
     return highlights
 end
 
-function module.GetOrderedRoundEvents(): {Event}
-    local events: {Event} = {}
-    for _, v in replicatedData.Events:GetChildren() do
-        if v:IsA("StringValue") then
-            table.insert(events, {
-                Timestamp = tonumber(v.Name) or error("Invalid timestamp"),
-                Description = v.Value,
-                WasFreeKill = v:GetAttribute("WasFreeKill") :: boolean?,
-                WasSelfDefense = v:GetAttribute("WasSelfDefense") :: boolean?,
-                WasCorrectKill = v:GetAttribute("WasCorrectKill") :: boolean?,
-            })
+replicatedData.Events.ChildAdded:Connect(function(value)
+    assert(value:IsA("StringValue"))
+
+    local event: Event = {
+        Timestamp = tonumber(value.Name) or error("Invalid timestamp"),
+        Description = value.Value,
+        WasFreeKill = value:GetAttribute("WasFreeKill") :: boolean?,
+        WasSelfDefense = value:GetAttribute("WasSelfDefense") :: boolean?,
+        WasCorrectKill = value:GetAttribute("WasCorrectKill") :: boolean?,
+    }
+
+    local events = module.RoundEvents()
+
+    if #events == 0 then
+        table.insert(events, event)
+    else
+        -- I benched this, looping and inserting when needed is slightly better than inserting at the end and sorting
+        for i, v in events do
+            if i == #events or v.Timestamp > event.Timestamp then
+                table.insert(events, i, event)
+                break
+            end
         end
     end
 
-    table.sort(events, function(a, b)
-        return a.Timestamp < b.Timestamp
-    end)
-
-    return events
-end
+    module.RoundEvents:Invoke()
+end)
 
 module.Phase = DynamicValue.new("Waiting" :: Types.Phase)
 InstanceSignal.ListenAttribute<<Types.Phase?>>(replicatedData, "Phase"):Connect(function(phase)
