@@ -30,15 +30,15 @@ repeat
 until minimisedScoreSize > 0
 
 -- note: the "Nothing here yet..." label is cleared by populateEvents and populateScores in the destroy children section, not explicitly. It only needs to exist when the game first loads.
-local function populateEvents(): ()
+local function populateEvents(data: Types.ClientRoundFinishData): ()
 	for _, v in eventsPage:GetChildren() do
 		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.ClassName ~= "UIPadding" then
 			v:Destroy()
 		end
 	end
 
-	local roundStartTime = LocalRoundInfo.StartTime() or error("Round start time not found")
-	for _, v in LocalRoundInfo.GetOrderedRoundEvents() do
+	local roundStartTime = data.StartTime
+	for _, v in data.Events do
 		local event = eventTemplate:Clone()
 		event.Name = v.Description
 		event.TextLabel.Text = v.Description
@@ -61,14 +61,14 @@ local function populateEvents(): ()
 	end
 end
 
-local function populateScores(): ()
+local function populateScores(data: Types.ClientRoundFinishData): ()
 	for _, v in scoresPage:GetChildren() do
 		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.ClassName ~= "UIPadding" then
 			v:Destroy()
 		end
 	end
 
-	for i, v in LocalRoundInfo.GetPlayerScores() do
+	for i, v in data.Scores do
 		local scoreFrame = scoresPage.Template:Clone()
 		scoreFrame.Size = UDim2.new(1, 0, 0, minimisedScoreSize)
 
@@ -127,8 +127,8 @@ local function populateScores(): ()
 	end
 end
 
-local function setHighlights(): ()
-	local highlights = LocalRoundInfo.GetHighlights()
+local function setHighlights(data: Types.ClientRoundFinishData): ()
+	local highlights = data.Highlights
 
 	table.sort(highlights, function(highlight1, highlight2)
 		return highlight1.Priority > highlight2.Priority
@@ -154,30 +154,23 @@ local function setHighlights(): ()
 	end
 end
 
-local function setWinnerText(): ()
-	local winner, winnerKind = LocalRoundInfo.Winner(), LocalRoundInfo.WinnerKind()
-	assert(winner and winnerKind, "No winner")
-
+local function setWinnerText(data: Types.ClientRoundFinishData): ()
 	local gamemode = assert(LocalRoundInfo.Gamemode(), "No gamemode")
-	local winnerRole: Types.Role = if winnerKind == "Participant" then LocalParticipantInfo.GetParticipant(winner).Role() else Role.fromDefinition(gamemode.Roles[winner])
+	local winnerRole: Types.Role = if data.VictorKind == "Participant" then LocalParticipantInfo.GetParticipant(data.VictorName).Role() else Role.fromDefinition(gamemode.Roles[data.VictorName])
 
-	if winnerKind == "Participant" then
-		highlightsPage.Winners.Text = winnerRole:FormatString(winner) .. " wins!"
+	if data.VictorKind == "Participant" then
+		highlightsPage.Winners.Text = winnerRole:FormatString(data.VictorName) .. " wins!"
 	else
 		highlightsPage.Winners.Text = `The {winnerRole:FormatString(winnerRole:GetPluralName())} win!`
 	end
 end
 
-LocalRoundInfo.Phase:Connect(function(phase)
-	if phase ~= "Highlights" then
-		return
-	end
-
-	setWinnerText()
-
-	populateEvents()
-	populateScores()
-	setHighlights()
+LocalRoundInfo.RoundFinishData:Connect(function(data)
+	assert(data)
+	setWinnerText(data)
+	populateEvents(data)
+	populateScores(data)
+	setHighlights(data)
 
 	UI:ToggleVisible(true)
 end)
