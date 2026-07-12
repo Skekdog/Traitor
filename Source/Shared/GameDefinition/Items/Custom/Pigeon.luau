@@ -36,6 +36,14 @@ local SOUND_INTERVAL = 2.5
 local SOUND_INTERVAL_FOLLOW = 2
 local SOUND_INTERVAL_CHARGE = 0.5
 
+local DEPLOY_TIME = 5
+
+local deploySound = Audio.MakeSound({
+	Content = Content.fromAssetId(11956590),
+	RolloffStart = 20,
+	RolloffEnd = 30,
+})
+
 local sound = Audio.MakeSound({
 	Content = Content.fromAssetId(88048142187812),
 	RolloffEnd = 60,
@@ -301,40 +309,48 @@ local function PrimaryFireServer(item: Types.Item, origin: Vector3, direction: V
 
 	table.insert(pigeons, data)
 
-	ForEachPart(model, function(part)
-		part.Touched:Connect(function(otherPart)
-			local target: Types.Participant? = GetParticipant(otherPart)
-			if not target then
-				return
-			end
+	task.delay(DEPLOY_TIME, function()
+		if not model:IsDescendantOf(workspace) then
+			return
+		end
 
-			if target == participant then
-				if not participant:GetItemOccupyingGroup(item.ItemGroup) then
-					model:Destroy()
-					participant:AddItem(item)
+		Audio.PlayIn(deploySound, model, false, true)
+
+		ForEachPart(model, function(part)
+			part.Touched:Connect(function(otherPart)
+				local target: Types.Participant? = GetParticipant(otherPart)
+				if not target then
+					return
 				end
-				return
-			end
 
-			if target:GetRole():IsAlliedWith(launchRole) then
-				return
-			end
-
-			model:Destroy()
-			Combat.MakeExplosion({
-				Attacker = participant,
-				Damage = 100,
-				FalloffStart = 10,
-				FalloffEnd = 15,
-				Position = GetPrimaryPart(model).Position,
-				BeforeHitParticipant = function(_, params, victim)
-					if params.Attacker == victim then
-						return true
+				if target == participant then
+					if not participant:GetItemOccupyingGroup(item.ItemGroup) then
+						model:Destroy()
+						participant:AddItem(item)
 					end
-
-					return KillHighlights(table.unpack(highlights))({Name = "Pigeon"}, params, victim)
+					return
 				end
-			})
+
+				if target:GetRole():IsAlliedWith(launchRole) then
+					return
+				end
+
+				model:Destroy()
+				Combat.MakeExplosion({
+					Attacker = participant,
+					Damage = 100,
+					FalloffStart = 10,
+					FalloffEnd = 15,
+					Position = GetPrimaryPart(model).Position,
+					BeforeHitParticipant = function(_, params, victim)
+						if params.Attacker == victim then
+							return true
+						end
+
+						return KillHighlights(table.unpack(highlights))({Name = "Pigeon"}, params, victim)
+					end
+				})
+			end)
 		end)
 	end)
 

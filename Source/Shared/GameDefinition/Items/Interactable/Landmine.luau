@@ -1,12 +1,21 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Audio = require(ReplicatedStorage.API.Audio)
 local GetMapObject = require(ReplicatedStorage.API.GetMapObject)
 local InteractableItem = require(ReplicatedStorage.API.Item.Presets.InteractableItem)
 local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 
+local DEPLOY_TIME = 5
+
+local deploySound = Audio.MakeSound({
+	Content = Content.fromAssetId(11956590),
+	RolloffStart = 20,
+	RolloffEnd = 30,
+})
+
 local Landmine = InteractableItem({
 	Name = "Landmine",
-	Description = "An exquisite area denial tool. Exercise caution when placing.",
+	Description = "A great area denial tool. Exercise caution when placing.",
 	IconContent = Content.fromAssetId(82684167883573),
 
 	ItemGroup = ItemGroups.RoleUtility,
@@ -29,20 +38,29 @@ local Landmine = InteractableItem({
 	object.CFrame += result.Normal / 4
     weld.Enabled = true
 
-	GetPrimaryPart(prop.Model).Touched:Connect(function(part)
-		local otherCharacter = GetMapObject(part, "Character")
-		if not otherCharacter then
-			local otherPropModel = GetMapObject(part, "Prop")
-			if not otherPropModel then
-				return
-			end
+	local model = GetPrimaryPart(prop.Model)
+	task.delay(DEPLOY_TIME, function()
+		if not model:IsDescendantOf(workspace) then
+			return
 		end
 
-		prop:TryTakeDamage({
-			Attacker = prop.Extras.Participant,
-			Amount = math.huge,
-			Source = "Stomp",
-		})
+		Audio.PlayIn(deploySound, model, false, true)
+
+		model.Touched:Connect(function(part)
+			local otherCharacter = GetMapObject(part, "Character")
+			if not otherCharacter then
+				local otherPropModel = GetMapObject(part, "Prop")
+				if not otherPropModel then
+					return
+				end
+			end
+
+			prop:TryTakeDamage({
+				Attacker = prop.Extras.Participant,
+				Amount = math.huge,
+				Source = "Stomp",
+			})
+		end)
 	end)
 end)
 
