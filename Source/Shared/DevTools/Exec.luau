@@ -13,60 +13,101 @@ export type ParsedCommand = {
 	Args: {string},
 }
 
-function module.ParseCommand(command: string): ParsedCommand
-	local split = command:split(" ")
-	local cmdName = split[1]
+function module.ParseCommands(input: string): {ParsedCommand}
+	local parsedCommands: {ParsedCommand} = {}
 
-	local args = {}
-	table.move(split, 2, #split, 1, args)
+	local commands = input:split(";")
+	for _, command in commands do
+		if command == "" then
+			continue
+		end
 
-	local cmd = Commands[cmdName]
+		local split = command:split(" ")
 
-	return {
-		Command = cmd,
-		ParsedName = cmdName,
-		Args = args,
-	}
-end
+		local splitFix: {string} = {}
+		for _, part in split do
+			if part ~= "" then
+				table.insert(splitFix, part)
+			end
+		end
 
-function module.ClientExecute(command: string): string
-	local parsed = module.ParseCommand(command)
-	if not parsed.Command then
-		return `Command {parsed.ParsedName} not found.`
+		local cmdName = splitFix[1]
+
+		local args = {}
+		table.move(splitFix, 2, #splitFix, 1, args)
+
+		local cmd = Commands[cmdName]
+
+		table.insert(parsedCommands, {
+			Command = cmd,
+			ParsedName = cmdName,
+			Args = args,
+		})
 	end
 
-	if not IsAdmin(Players.LocalPlayer) then
-		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not RelaxedPermissions.HasRelaxedPermissions(Players.LocalPlayer)) then
-			return "You do not have permission to run this command."
+	return parsedCommands
+end
+
+function module.ClientExecute(input: string): {string}
+	local commands = module.ParseCommands(input)
+
+	local output: {string} = {}
+
+	for _, command in commands do
+		if not command.Command then
+			table.insert(output, `Command {command.ParsedName} not found.`)
+
+			-- Note: we early return here intentionally due to a hard error with the command.
+			return output
+		end
+
+		if not IsAdmin(Players.LocalPlayer) then
+			if not command.Command.HasRelaxedPermissions or (command.Command.HasRelaxedPermissions and not RelaxedPermissions.HasRelaxedPermissions(Players.LocalPlayer)) then
+				table.insert(output, "You do not have permission to run this command.")
+				return output
+			end
+		end
+
+		if command.Command.Environment == "Client" then
+			local _, result = pcall(command.Command.Execute, Players.LocalPlayer, command.Args)
+			table.insert(output, result)
 		end
 	end
 
-	if parsed.Command.Environment == "Client" then
-		local _, result = pcall(parsed.Command.Execute, Players.LocalPlayer, parsed.Args)
-		return result
-	end
+	local serverOutput = ReplicatedStorage.Remotes.ClientServer.Exec:InvokeServer(input)
+	table.move(serverOutput, 1, #serverOutput, #output + 1, output)
 
-	return ReplicatedStorage.Remotes.ClientServer.Exec:InvokeServer(command)
+	return output
 end
 
-function module.ServerExecute(player: Player, round: Types.Round, command: string): string
-	local parsed = module.ParseCommand(command)
-	if not parsed.Command then
-		return `Command {parsed.Args[1]} not found.`
-	end
+function module.ServerExecute(player: Player, round: Types.Round, input: string): {string}
+	local commands = module.ParseCommands(input)
 
-	if not IsAdmin(player) then
-		if not parsed.Command.HasRelaxedPermissions or (parsed.Command.HasRelaxedPermissions and not RelaxedPermissions.HasRelaxedPermissions(player)) then
-			return "You do not have permission to run this command."
+	local output: {string} = {}
+
+	for _, command in commands do
+		if not command.Command then
+			table.insert(output, `Command {command.ParsedName} not found.`)
+			return output
 		end
+
+		if command.Command.Environment ~= "Server" then
+			-- Client sends entire input string. This includes client-side commands, so we just skip them.
+			continue
+		end
+
+		if not IsAdmin(player) then
+			if not command.Command.HasRelaxedPermissions or (command.Command.HasRelaxedPermissions and not RelaxedPermissions.HasRelaxedPermissions(player)) then
+				table.insert(output, "You do not have permission to run this command.")
+				return output
+			end
+		end
+
+		local _, result = pcall(command.Command.Execute, player, round, command.Args)
+		table.insert(output, result)
 	end
 
-	if parsed.Command.Environment ~= "Server" then
-		return `Command {parsed.Command.Name} is not a server command.`
-	end
-
-	local _, result = pcall(parsed.Command.Execute, player, round, parsed.Args)
-	return result
+	return output
 end
 
 return table.freeze(module)
