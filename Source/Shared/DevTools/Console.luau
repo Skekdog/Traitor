@@ -10,7 +10,8 @@ local didConnect = false
 local console: (UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Console)})?
 RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 	if RelaxedPermissions.HasRelaxedPermissions(Players.LocalPlayer) or IsAdmin(Players.LocalPlayer) then
-		if console then
+		-- we need true here because otherwise console is incorrectly refined to "nil" / "never" later in the code.
+		if true and console then
 			return
 		end
 
@@ -40,10 +41,10 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 				end
 
 				if object.Input.Text == "" then
-								return
+					return
 				end
 
-				object.Output.Text = Exec.ClientExecute(object.Input.Text)
+				object.Output.Text = table.concat(Exec.ClientExecute(object.Input.Text), "\n")
 			end)
 
 			object.Input:GetPropertyChangedSignal("Text"):Connect(function()
