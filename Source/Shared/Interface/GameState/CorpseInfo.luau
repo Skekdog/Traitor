@@ -15,6 +15,7 @@ local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Defaults = require(ReplicatedStorage.Shared.RoundRule.Defaults)
 local Types = require(ReplicatedStorage.API.Types)
+local Plural = require(ReplicatedStorage.Shared.Grammar.Plural)
 
 local corpseUi = UIManager.WaitForUI("CorpseInfo") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.CorpseInfo)}
 local object = corpseUi.Object.CorpseInfo.ScrollingFrame
@@ -79,9 +80,16 @@ local function getFlavourText(source: Types.DamageSource): string?
     return flavourTexts[attackType] or error("Unknown death type: " .. source)
 end
 
+-- Descriptions already defined here are static, otherwise the table will be populated as they are generated.
+local iconDescriptions: {[GuiObject]: string} = {
+    [object.FreeKill] = "They did something wrong, making their death justified. Free kill!",
+    [object.Headshot] = "They were killed by a headshot. No time to scream.",
+    [object.SD] = "They were killed in self-defense.",
+}
+
 local information = corpseUi.Object.Information
-local function onIconClicked(icon: Instance)
-    information.Text = icon:GetAttribute("Description") :: string
+local function onIconClicked(icon: GuiObject)
+    information.Text = iconDescriptions[icon] or error("Missing description for icon: " .. icon.Name)
 end
 
 for _, v in object:GetChildren() do
@@ -160,7 +168,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     local source: Types.DamageSource = if typeof(corpseInfo.DamageSource) == "table" then ClientInventory.CreateReplicatedItem(corpseInfo.DamageSource) else corpseInfo.DamageSource
 
     local flavourText = getFlavourText(source)
-    object.MurderWeapon:SetAttribute("Description", flavourText)
+    iconDescriptions[object.MurderWeapon] = flavourText or error("Missing flavour text for murder weapon")
 
     object.MurderWeapon.ImageContent = if typeof(source) == "table" and source.IconContent ~= Content.none then source.IconContent else Content.fromUri(flavourImages[getItemAttackType(source)])
 
@@ -168,7 +176,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     object.DeathTime.TextLabel.Text = ToRoundTime(corpseInfo.DeathTime, timeNow)
 
     local timeSinceDeath = tostring(math.round(timeNow - corpseInfo.DeathTime))
-    object.DeathTime:SetAttribute("Description", `From their now-stopped watch, you can tell that they died {highlightedText(timeSinceDeath)} {if timeSinceDeath == "1" then "second" else "seconds"} ago.`)
+    iconDescriptions[object.DeathTime] = `From their now-stopped watch, you can tell that they died {highlightedText(timeSinceDeath)} {Plural(tonumber(timeSinceDeath) or 0, "second", "seconds")} ago.`
 
     object.FreeKill.Visible = corpseInfo.WasFreeKill or false
     object.Headshot.Visible = corpseInfo.WasHeadshot or false
@@ -200,7 +208,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
             end
         end
         killText ..= "."
-        object.KillList:SetAttribute("Description", killText)
+        iconDescriptions[object.KillList] = killText
         object.KillList.Visible = true
     else
         object.KillList.Visible = false
@@ -209,7 +217,7 @@ return function(corpseInfo: Types.ClientCorpseView?)
     for _, v in additionalIcons do
         local icon = object.DeathTime:Clone()
         icon.ImageContent = v.Icon
-        icon:SetAttribute("Description", FullParse(v.Description))
+        iconDescriptions[icon] = FullParse(v.Description)
         icon.Name = "AdditionalIcon_" .. v.Name
         icon.ScaleType = Enum.ScaleType.Fit
         icon.Visible = true
@@ -226,10 +234,10 @@ return function(corpseInfo: Types.ClientCorpseView?)
     if role ~= Defaults.Role then
         corpseUi.Object.TitleBar.Title.Text = `{role:FormatString(`@{PossessiveApostrophe(corpseName)}`)} Corpse | {role:GetFormattedName()}`
         local determiner = StringWithDeterminer(GetDisplayName(role.Definition)):split(" ")[1]
-        object.Avatar:SetAttribute("Description", `This is the body of {role:FormatString(corpseName)}. They were {determiner} {role:GetFormattedName()}.`)
+        iconDescriptions[object.Avatar] = `This is the body of {role:FormatString(corpseName)}. They were {determiner} {role:GetFormattedName()}.`
     else
         corpseUi.Object.TitleBar.Title.Text = `@{PossessiveApostrophe(corpseName)} Corpse`
-        object.Avatar:SetAttribute("Description", `This is the body of {corpseName}.`)
+        iconDescriptions[object.Avatar] = `This is the body of {corpseName}.`
     end
 
     task.defer(function()
