@@ -31,7 +31,7 @@ function module.ParseCommands(input: string): {ParsedCommand}
 			end
 		end
 
-		local cmdName = splitFix[1]
+		local cmdName = splitFix[1]:lower()
 
 		local args = {}
 		table.move(splitFix, 2, #splitFix, 1, args)
