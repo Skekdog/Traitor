@@ -22,6 +22,7 @@
     "PlayerScriptsUseInputActionSystem": {"Enum": 2},
     "ImprovedPhysicsReplication": {"Enum": 2},
     "ImprovedAnimationConstraint": {"Enum": 2},
+    "ValidateEnabledProximityPrompt": {"Enum": 2},
     "TouchesUseCollisionGroups": true,
     "Attributes": {
       "__Rojo_ProjectName": {"String": "Traitor!"}
