@@ -63,12 +63,7 @@ LocalCharacter.RootPart:Connect(function(root)
 		return
 	end
 
-	task.spawn(function()
-		local landingSound = root:WaitForChild("Landing")
-		if landingSound:IsA("AudioPlayer") then
-			landingSound.Volume = 0 -- Destroying causes the built-in RbxCharacterSounds script to warn about indefinite WaitForChild
-		end
-	end)
+	root:WaitForChild("Landing"):Destroy()
 end)
 
 return nil
