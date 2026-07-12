@@ -12,15 +12,13 @@ local module = {}
 local replicatedData = ReplicatedStorage.Shared.RoundRule.ReplicatedData
 local remotes = ReplicatedStorage.Shared.RoundRule.Remotes
 
-type Event = {
-    Timestamp: number,
-    Description: string,
-    WasFreeKill: boolean?,
-    WasSelfDefense: boolean?,
-    WasCorrectKill: boolean?,
-}
-
 module.Map = DynamicValue.new(nil :: Types.Map?)
+
+module.RoundFinishData = DynamicValue.new<<Types.ClientRoundFinishData?>>()
+
+remotes.RoundFinishData.OnClientEvent:Connect(function(data)
+    module.RoundFinishData:SetValue(data)
+end)
 
 module.Gamemode = DynamicValue.new(nil :: Types.GamemodeDefinition?)
 InstanceSignal.ListenAttribute<<string?>>(replicatedData, "Gamemode"):Connect(function(name)
@@ -62,43 +60,6 @@ remotes.FreeKill.OnClientEvent:Connect(function(reason: string?)
     module.FreeKill:SetValue(reason)
 end)
 
-function module.GetHighlights(): {Types.Highlight}
-    local highlights: {Types.Highlight} = {}
-    for _, v in replicatedData.Highlights:GetChildren() do
-        if v:IsA("StringValue") then
-            table.insert(highlights, {
-                Title = v.Name,
-                Description = v.Value,
-                Priority = v:GetAttribute("Priority") :: number,
-                Group = v:GetAttribute("Group") :: string,
-            })
-        end
-    end
-
-    return highlights
-end
-
-function module.GetOrderedRoundEvents(): {Event}
-    local events: {Event} = {}
-    for _, v in replicatedData.Events:GetChildren() do
-        if v:IsA("StringValue") then
-            table.insert(events, {
-                Timestamp = tonumber(v.Name) or error("Invalid timestamp"),
-                Description = v.Value,
-                WasFreeKill = v:GetAttribute("WasFreeKill") :: boolean?,
-                WasSelfDefense = v:GetAttribute("WasSelfDefense") :: boolean?,
-                WasCorrectKill = v:GetAttribute("WasCorrectKill") :: boolean?,
-            })
-        end
-    end
-
-    table.sort(events, function(a, b)
-        return a.Timestamp < b.Timestamp
-    end)
-
-    return events
-end
-
 module.Phase = DynamicValue.new("Waiting" :: Types.Phase)
 InstanceSignal.ListenAttribute<<Types.Phase?>>(replicatedData, "Phase"):Connect(function(phase)
 	module.Phase:SetValue(phase or "Waiting")
@@ -109,41 +70,10 @@ InstanceSignal.ListenAttribute<<number?>>(replicatedData, "AdvanceTime"):Connect
 	module.AdvanceTime:SetValue(advanceTime)
 end, true)
 
-module.Winner = DynamicValue.new(nil :: string?)
-InstanceSignal.ListenAttribute<<string?>>(replicatedData, "Winner"):Connect(function(winner)
-	module.Winner:SetValue(winner)
-end, true)
-
-module.WinnerKind = DynamicValue.new(nil :: "Role" | "Participant"?)
-InstanceSignal.ListenAttribute<<"Role" | "Participant"?>>(replicatedData, "WinnerKind"):Connect(function(winnerKind)
-	module.WinnerKind:SetValue(winnerKind)
-end, true)
-
 module.Paused = DynamicValue.new(false)
 InstanceSignal.ListenAttribute<<boolean>>(replicatedData, "Paused"):Connect(function(paused)
 	module.Paused:SetValue(paused)
 end, true)
-
-module.StartTime = DynamicValue.new(nil :: number?)
-InstanceSignal.ListenAttribute<<number?>>(replicatedData, "StartTime"):Connect(function(startTime)
-	module.StartTime:SetValue(startTime)
-end, true)
-
-function module.GetPlayerScores(): {[string]: Types.ScoreTable}
-    local playerScores: {[string]: Types.ScoreTable} = {}
-    for _, v in replicatedData.Scores:GetChildren() do
-        if v:IsA("StringValue") then
-            local name = v.Name
-            playerScores[name] = {}
-            for _, scoreValue in v:GetChildren() do
-                assert(scoreValue:IsA("IntValue"))
-                playerScores[name][scoreValue.Name] = scoreValue.Value
-            end
-        end
-    end
-
-    return playerScores
-end
 
 task.defer(function()
     local mapScript = workspace:FindFirstChild("Map")
