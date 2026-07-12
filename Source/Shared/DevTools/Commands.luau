@@ -42,6 +42,18 @@ local function processNumberArgument(str: string?): number?
 	return if str then tonumber(str) else nil
 end
 
+local function getPartiallyMatchingPlayers(players: {Player}, input: string): {Player}
+	local matches: {Player} = {}
+
+	for _, player in players do
+		if player.Name:find("^" .. input) then
+			table.insert(matches, player)
+		end
+	end
+
+	return matches
+end
+
 local function processPlayerArgument(executor: Player, str: string?): {Player}?
 	if not str then
 		return {executor}
@@ -70,7 +82,12 @@ local function processPlayerArgument(executor: Player, str: string?): {Player}?
 		return {player}
 	end
 
-	return nil
+	local partialMatches = getPartiallyMatchingPlayers(Players:GetPlayers(), str)
+	if #partialMatches == 0 then
+		return nil
+	end
+
+	return partialMatches
 end
 
 local function getPlayersString(players: {Player}): string
