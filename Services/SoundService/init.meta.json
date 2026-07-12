@@ -4,6 +4,6 @@
 		"RespectFilteringEnabled": true,
 		"VolumetricAudio": "Enabled",
 		"CharacterSoundsUseNewApi": "Enabled",
-		"AcousticSimulationEnabled": true
+		"AcousticSimulationEnabled": false
 	}
 }
