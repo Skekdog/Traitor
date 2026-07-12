@@ -54,6 +54,15 @@ local function processPlayerArgument(executor: Player, str: string?): {Player}?
 	elseif str == "@r" then
 		local players = Players:GetPlayers()
 		return {players[math.random(#players)]}
+	elseif str == "@o" then
+		local players = Players:GetPlayers()
+
+		local index = table.find(players, executor)
+		if index then
+			table.remove(players, index)
+		end
+
+		return players
 	end
 
 	local player = Players:FindFirstChild(str)
