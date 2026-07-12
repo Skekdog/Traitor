@@ -30,7 +30,7 @@ repeat
 until minimisedScoreSize > 0
 
 -- note: the "Nothing here yet..." label is cleared by populateEvents and populateScores in the destroy children section, not explicitly. It only needs to exist when the game first loads.
-local function populateEvents(events: {LocalRoundInfo.Event}): ()
+local function populateEvents(): ()
 	for _, v in eventsPage:GetChildren() do
 		if v.ClassName ~= "UIListLayout" and v.Name ~= "Template" and v.ClassName ~= "UIPadding" then
 			v:Destroy()
@@ -38,7 +38,7 @@ local function populateEvents(events: {LocalRoundInfo.Event}): ()
 	end
 
 	local roundStartTime = LocalRoundInfo.StartTime() or error("Round start time not found")
-	for _, v in events do
+	for _, v in LocalRoundInfo.GetOrderedRoundEvents() do
 		local event = eventTemplate:Clone()
 		event.Name = v.Description
 		event.TextLabel.Text = v.Description
@@ -175,13 +175,12 @@ LocalRoundInfo.Phase:Connect(function(phase)
 
 	setWinnerText()
 
+	populateEvents()
 	populateScores()
 	setHighlights()
 
 	UI:ToggleVisible(true)
 end)
-
-LocalRoundInfo.RoundEvents:Connect(populateEvents)
 
 local currentTab = "Highlights"
 local tabs = UI.Object.Tabs
