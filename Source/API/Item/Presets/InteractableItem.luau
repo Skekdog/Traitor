@@ -50,7 +50,9 @@ local function throwInteractable(item: Types.Item, participant: Types.Participan
 
     participant:RemoveItem(item, true)
 
-    Audio.PlayIn(throwSound, GetPrimaryPart(interactable.Model), nil, true)
+    if item.PrimarySound then
+        Audio.PlayIn(item.PrimarySound, GetPrimaryPart(interactable.Model), nil, true)
+    end
 
     if deferParent then
         task.defer(function()
@@ -85,7 +87,9 @@ local function plantInteractable(item: Types.Item, participant: Types.Participan
 
     participant:RemoveItem(item, true)
 
-    Audio.PlayIn(plantSound, GetPrimaryPart(object), nil, true)
+    if item.AlternateSound then
+        Audio.PlayIn(item.AlternateSound, GetPrimaryPart(object), nil, true)
+    end
 
     return interactable, result, weld
 end
@@ -113,6 +117,9 @@ local function Custom(components: Types.ItemComponents, allowThrow: boolean, all
 			end
             return nil
 		end else nil,
+
+        PrimarySound = throwSound,
+        AlternateSound = plantSound,
 	}
 
 	for i, v in components do
