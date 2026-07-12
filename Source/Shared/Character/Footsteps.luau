@@ -124,7 +124,10 @@ local function onCharacterAdded(character: Model, state: PlayerState): ()
 	state.CurrentSound.Parent = if state.Player == Players.LocalPlayer then SoundService else root
 
 	task.spawn(function()
-		root:WaitForChild("Running"):Destroy()
+		local runningSound = root:WaitForChild("Running")
+		if runningSound:IsA("AudioPlayer") then
+			runningSound.Volume = 0 -- Destroying causes the built-in RbxCharacterSounds script to warn about indefinite WaitForChild
+		end
 	end)
 end
 
