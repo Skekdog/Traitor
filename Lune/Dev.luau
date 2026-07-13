@@ -73,6 +73,18 @@ options["Update Collision Groups"] = function(): ()
 	UpdateCollisionGroups(PLACE_PATH)
 end
 
+local function open(target: string): ()
+	local osName = process.os
+
+	if osName == "windows" then
+		process.exec("", { 'explorer "' .. target .. '"' }, { shell = true })
+	elseif osName == "macos" then
+		process.exec("open", { target })
+	else
+		process.exec("xdg-open", { target })
+	end
+end
+
 local currentRojoProccess: process.ChildProcess?
 options["Start Developing"] = function(): ()
 	if currentRojoProccess then
@@ -82,9 +94,7 @@ options["Start Developing"] = function(): ()
 
 	Build.Build("Labs")
 
-	local startCommand = if process.os == "linux" then "xdg-open" else "start"
-
-	process.exec(startCommand, {"Traitor.rbxl"}, {shell = true})
+	open(PLACE_PATH)
 	currentRojoProccess = process.create("rojo", {"serve", "serve.project.json"})
 end
 
