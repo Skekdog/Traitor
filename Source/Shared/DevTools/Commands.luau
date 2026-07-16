@@ -13,6 +13,7 @@ local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 export type BaseCommand = {
 	Name: string,
 	Description: string,
+	Category: string,
 	HasRelaxedPermissions: boolean?,
 	Arguments: {string},
 }
@@ -130,34 +131,59 @@ local function toggleVictory(_: any, round: Types.Round): string
     end
 end
 
-local module: {[string]: Command} = {}
+local Commands: {[string]: Command} = {}
 
-module.help = {
+Commands.help = {
 	Name = "help",
+	Category = "Other",
 	Description = "Lists all commands",
 	Environment = "Client" :: "Client",
 	HasRelaxedPermissions = true,
 	Arguments = {},
 	Execute = function()
-		local ret = "Players can be specified using name, partial name, @s (self), @a (all players), @r (random), or @o (others).\nCommands:\n"
+		local ret = "Players can be specified using name, partial name, @s (self), @a (all players), @r (random), or @o (others).\nCommands:"
 
-		for _, v in module do
-			local args = if #v.Arguments == 0 then "" else " "
-			for i, arg in v.Arguments do
-				args ..= `<{arg}>{if i < #v.Arguments then " " else ""}`
+		local categories: {[string]: {string}?} = {}
+		for _, command in Commands do
+			local args = if #command.Arguments == 0 then "" else " "
+			for i, arg in command.Arguments do
+				args ..= `<{arg}>{if i < #command.Arguments then " " else ""}`
 			end
 
-			ret ..= `{v.Name}{args}: {v.Description}\n`
+			local help = `{command.Name}{args}: {command.Description}`
+
+			local categoryList = categories[command.Category]
+			if not categoryList then
+				categories[command.Category] = {help}
+				continue
+			end
+
+			table.insert(categoryList, help)
 		end
 
-		ret = ret:sub(1, -2)
+		-- Each item could be inserted in at the current index, instead of sorting afterwards.
+		-- That's probably faster and would get you more marks in a computer science test, but I don't care
+		local sortedCategories: {string} = {}
+		for category, commands in categories do
+			table.sort(assert(commands))
+			table.insert(sortedCategories, category)
+		end
+		table.sort(sortedCategories)
+
+
+		for _, category in sortedCategories do
+			local helpMessages = assert(categories[category])
+			table.insert(helpMessages, 1, "\n\n-- " .. category:upper() .. "\n")
+			ret ..= table.concat(helpMessages, "\n")
+		end
 
 		return ret
 	end
 }
 
-module.xray = {
+Commands.xray = {
 	Name = "xray",
+	Category = "Visuals",
 	Description = "Turns all static map parts semi-transparent.",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
@@ -200,8 +226,9 @@ module.xray = {
 	end
 }
 
-module.showbounds = {
+Commands.showbounds = {
 	Name = "showbounds",
+	Category = "Visuals",
 	Description = "Toggles showing of map bounds",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
@@ -231,8 +258,9 @@ module.showbounds = {
 	end,
 }
 
-module.noclip = {
+Commands.noclip = {
 	Name = "noclip",
+	Category = "Player",
 	Description = "Toggles noclip on/off",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
@@ -244,8 +272,9 @@ module.noclip = {
 	end
 }
 
-module.freecam = {
+Commands.freecam = {
 	Name = "freecam",
+	Category = "Visuals",
 	Description = "Toggles freecam on/off",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
@@ -257,8 +286,9 @@ module.freecam = {
 	end
 }
 
-module.thirdperson = {
+Commands.thirdperson = {
 	Name = "thirdperson",
+	Category = "Visuals",
 	Description = "Toggles thirdperson on/off",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
@@ -275,8 +305,9 @@ module.thirdperson = {
 	end
 }
 
-module.teleportplace = {
+Commands.teleportplace = {
 	Name = "teleportplace",
+	Category = "Other",
 	Description = "Teleports specified players to the specified place. Available named places: Imperium, MainPlace, TestPlace",
 	Environment = "Server" :: "Server",
 	Arguments = {"place name / id", "players"},
@@ -299,8 +330,9 @@ module.teleportplace = {
 	end
 }
 
-module.teleport = {
+Commands.teleport = {
 	Name = "teleport",
+	Category = "Character",
 	Description = "Teleports players to another player.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -338,8 +370,9 @@ module.teleport = {
 	end
 }
 
-module.setrole = {
+Commands.setrole = {
 	Name = "setrole",
+	Category = "Player",
 	Description = "Sets the roles of players",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -376,8 +409,9 @@ module.setrole = {
 	end
 }
 
-module.setfreekill = {
+Commands.setfreekill = {
 	Name = "setfreekill",
+	Category = "Player",
 	Description = "Sets free kill reason for the specified players",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -406,8 +440,9 @@ module.setfreekill = {
 	end
 }
 
-module.kill = {
+Commands.kill = {
 	Name = "kill",
+	Category = "Character",
 	Description = "Kills the specified players",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -437,8 +472,9 @@ module.kill = {
 	end
 }
 
-module.setkarma = {
+Commands.setkarma = {
 	Name = "setkarma",
+	Category = "Player",
 	Description = "Sets the karma of players",
 	Environment = "Server" :: "Server",
 	Arguments = {"karma", "players"},
@@ -473,8 +509,9 @@ module.setkarma = {
 	end
 }
 
-module.endround = {
+Commands.endround = {
 	Name = "endround",
+	Category = "Game",
 	Description = "Ends the current round with a victory for the specified role",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -504,8 +541,9 @@ module.endround = {
 	end
 }
 
-module.skipphase = {
+Commands.skipphase = {
 	Name = "skipphase",
+	Category = "Game",
 	Description = "Skips the current round phase",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -523,8 +561,9 @@ module.skipphase = {
 	end
 }
 
-module.pause = {
+Commands.pause = {
 	Name = "pause",
+	Category = "Game",
 	Description = "Pauses or unpauses the round",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -539,8 +578,9 @@ module.pause = {
 	end
 }
 
-module.togglevictory = {
+Commands.togglevictory = {
 	Name = "togglevictory",
+	Category = "Game",
 	Description = "Enables or disables victory",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -548,8 +588,9 @@ module.togglevictory = {
 	Execute = toggleVictory
 }
 
-module.respawn = {
+Commands.respawn = {
 	Name = "respawn",
+	Category = "Character",
 	Description = "Respawns the specified players",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -574,8 +615,9 @@ module.respawn = {
 	end
 }
 
-module.restart = {
+Commands.restart = {
 	Name = "restart",
+	Category = "Other",
 	Description = "Restarts the server",
 	Environment = "Server" :: "Server",
 	Arguments = {},
@@ -587,8 +629,9 @@ module.restart = {
 	end
 }
 
-module.gamemode = {
+Commands.gamemode = {
 	Name = "gamemode",
+	Category = "Game",
 	Description = "Changes the gamemode",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -624,8 +667,9 @@ module.gamemode = {
 	end
 }
 
-module.boss = {
+Commands.boss = {
 	Name = "boss",
+	Category = "Game",
 	Description = "Loads a boss from the current map or from an asset id",
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
@@ -652,8 +696,9 @@ module.boss = {
 	end
 }
 
-module.map = {
+Commands.map = {
 	Name = "map",
+	Category = "Game",
 	Description = "Changes the map",
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
@@ -681,8 +726,9 @@ module.map = {
 	end
 }
 
-module.listitems = {
+Commands.listitems = {
 	Name = "listitems",
+	Category = "Item",
 	Description = "Lists all items",
 	Environment = "Client" :: "Client",
 	HasRelaxedPermissions = true,
@@ -696,8 +742,9 @@ module.listitems = {
 	end
 }
 
-module.spawninteractable = {
+Commands.spawninteractable = {
 	Name = "spawninteractable",
+	Category = "Item",
 	Description = "Spawns an interactable",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -751,8 +798,9 @@ module.spawninteractable = {
 	end
 }
 
-module.spawnitem = {
+Commands.spawnitem = {
 	Name = "spawnitem",
+	Category = "Item",
 	Description = "Spawns an item at players",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -802,8 +850,9 @@ module.spawnitem = {
 	end
 }
 
-module.giveitem = {
+Commands.giveitem = {
 	Name = "giveitem",
+	Category = "Item",
 	Description = "Gives an item to players",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -839,8 +888,9 @@ module.giveitem = {
 	end
 }
 
-module.removeitem = {
+Commands.removeitem = {
 	Name = "removeitem",
+	Category = "Item",
 	Description = "Removes an item from players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -887,8 +937,9 @@ module.removeitem = {
 	end
 }
 
-module.givecredits = {
+Commands.givecredits = {
 	Name = "givecredits",
+	Category = "Player",
 	Description = "Gives credits to players",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -920,8 +971,9 @@ module.givecredits = {
 	end
 }
 
-module.spawndummy = {
+Commands.spawndummy = {
 	Name = "spawndummy",
+	Category = "Other",
 	Description = "Spawns a test dummy that can be damaged.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -950,8 +1002,9 @@ module.spawndummy = {
 	end
 }
 
-module.sethealth = {
+Commands.sethealth = {
 	Name = "sethealth",
+	Category = "Character",
 	Description = "Sets health of players to a specified value",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -986,8 +1039,9 @@ module.sethealth = {
 	end
 }
 
-module.relax = {
+Commands.relax = {
 	Name = "relax",
+	Category = "Other",
 	Description = "Temporarily grants relaxed command permissions to players.",
 	Arguments = {"players"},
 	Environment = "Server" :: "Server",
@@ -1010,8 +1064,9 @@ module.relax = {
 	end
 }
 
-module.seance = {
+Commands.seance = {
 	Name = "seance",
+	Category = "Game",
 	Description = "Makes chat from dead players visible to everyone.",
 	Arguments = {},
 	Environment = "Server" :: "Server",
@@ -1029,8 +1084,9 @@ module.seance = {
 	end
 }
 
-module.ragdoll = {
+Commands.ragdoll = {
 	Name = "ragdoll",
+	Category = "Character",
 	Description = "Forces a player to ragdoll indefinitely.",
 	Arguments = {"players"},
 	Environment = "Server" :: "Server",
@@ -1063,8 +1119,9 @@ module.ragdoll = {
 	end
 }
 
-module.unragdoll = {
+Commands.unragdoll = {
 	Name = "unragdoll",
+	Category = "Character",
 	Description = "Forces a player to unragdoll.",
 	Arguments = {"players"},
 	Environment = "Server" :: "Server",
@@ -1097,4 +1154,4 @@ module.unragdoll = {
 	end
 }
 
-return table.freeze(module)
+return table.freeze(Commands)
