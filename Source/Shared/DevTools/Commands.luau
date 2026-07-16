@@ -139,10 +139,9 @@ module.help = {
 	HasRelaxedPermissions = true,
 	Arguments = {},
 	Execute = function()
-		local ret = "Players can be specified using name, @s, @a, or @r.\nCommands:\n"
+		local ret = "Players can be specified using name, partial name, @s (self), @a (all players), @r (random), or @o (others).\nCommands:\n"
 
 		for _, v in module do
-
 			local args = if #v.Arguments == 0 then "" else " "
 			for i, arg in v.Arguments do
 				args ..= `<{arg}>{if i < #v.Arguments then " " else ""}`
