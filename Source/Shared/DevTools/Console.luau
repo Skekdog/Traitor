@@ -100,11 +100,11 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 
 				local result = Exec.ClientExecute(input)
 
-				object.Output.Text = table.concat(result, "\n")
+				object.OutputHolder.OutputScroll.Output.Text = table.concat(result, "\n")
 			end)
 
 			object.Input:GetPropertyChangedSignal("Text"):Connect(function()
-				object.Output.Text = ""
+				object.OutputHolder.OutputScroll.Output.Text = ""
 			end)
 		end
 	elseif console then
