@@ -1,4 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SoundService = game:GetService("SoundService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
@@ -26,6 +27,7 @@ local throwSound = Audio.MakeSound({
     RolloffStart = 10,
     RolloffEnd = 15,
 })
+throwSound.Parent = SoundService
 
 local plantSound = Audio.MakeSound({
     Content = Content.fromAssetId(95346310800820),
@@ -35,6 +37,7 @@ local plantSound = Audio.MakeSound({
     RolloffStart = 10,
     RolloffEnd = 15,
 })
+plantSound.Parent = SoundService
 
 local function throwInteractable(item: Types.Item, participant: Types.Participant, origin: Vector3, direction: Vector3, deferParent: boolean?): Types.Prop?
     local round = participant.Round
