@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
+local TextService = game:GetService("TextService")
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
@@ -415,7 +416,7 @@ Commands.setfreekill = {
 	Description = "Sets free kill reason for the specified players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
-	Arguments = {"reason / nil", "players"},
+	Arguments = {"reason?", "players"},
 	Execute = function(executor: Player, round: Round, args: Args): string
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -423,6 +424,10 @@ Commands.setfreekill = {
 		end
 
 		local reason = processStringArgument(args[1])
+		if reason then
+			local filterResult = TextService:FilterStringAsync(reason, executor.UserId)
+			reason = filterResult:GetNonChatStringForBroadcastAsync()
+		end
 
 		local affectedPlayers: {Player} = {}
 		for _, player in players do
@@ -431,7 +436,7 @@ Commands.setfreekill = {
 				continue
 			end
 
-			participant:SetFreeKill(if reason == "nil" then nil else reason)
+			participant:SetFreeKill(reason)
 
 			table.insert(affectedPlayers, player)
 		end
