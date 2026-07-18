@@ -86,6 +86,8 @@ LocalCharacter.Humanoid:Connect(function(hum)
     WalkSpeed.Reset()
     JumpPower.Reset()
 
+    hum:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
+
     local char = hum.Parent
     assert(char and char:IsA("Model"), "Humanoid has no Character")
 
