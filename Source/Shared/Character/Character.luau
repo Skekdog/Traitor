@@ -72,19 +72,16 @@ local function initHeadTiltAsync(char: Model): ()
 
     local y = camera.CFrame:ToOrientation()
     while char:IsDescendantOf(workspace) do
-        task.wait(1 / 20)
-
-        if not char:IsDescendantOf(workspace) then
-            break
-        end
-
         local newY = camera.CFrame:ToOrientation()
         if newY == y then
+            task.wait(1 / 20)
             continue
         end
 
         y = newY
         clientServer.RotateHead:FireServer(y)
+
+        task.wait(1 / 20)
     end
 end
 
