@@ -152,6 +152,11 @@ function module.Climb(ladder: BasePart): ()
     coroutine.resume(thread)
 end
 
+local lastClimbTime = 0
+function module.GetLastClimbTime(): number
+    return lastClimbTime
+end
+
 function module.StopClimbing(preserveStates: boolean?): ()
     Crouch.SetCrouchDisabled("Climbing", false)
     if jumpRequestCon then
@@ -159,6 +164,7 @@ function module.StopClimbing(preserveStates: boolean?): ()
     end
 
     if thread then
+        lastClimbTime = os.clock()
         coroutine.close(thread)
     end
 
