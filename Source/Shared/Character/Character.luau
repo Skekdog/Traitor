@@ -10,8 +10,14 @@ local WalkSpeed = require(script.Parent.WalkSpeed)
 
 local clientServer = ReplicatedStorage.Remotes.ClientServer
 
+local SNAP_COOLDOWN = 1
+
 local function initSnapToLadder(root: BasePart): ()
     root.Touched:Connect(function(part)
+        if os.clock() - ClimbLadder.GetLastClimbTime() < SNAP_COOLDOWN then
+            return
+        end
+
         if not part:HasTag("Ladder") then
             return
         end
