@@ -3,7 +3,7 @@ local Abilities = require(ReplicatedStorage.Shared.RoundRule.Common.Abilities)
 local LocalCharacter = require(script.Parent.LocalCharacter)
 
 local MAX_FORCE = 500 -- Prevent most movement whilst airborne
-local DECELERATION_TIME = 0.4 -- Fix instantly stopping when landing on the ground. IMO that's a Roblox bug but for now I can fix it like this
+local DECELERATION_TIME = 0.3 -- Fix instantly stopping when landing on the ground. IMO that's a Roblox bug but for now I can fix it like this
 
 local DISABLED_ABILITIES = {
 	"FallingDown",
