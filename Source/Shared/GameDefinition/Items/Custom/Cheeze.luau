@@ -148,6 +148,11 @@ local function AlternateFireServer(item: Types.Item, _, _, participant: Types.Pa
 		assert(item.Model and item.Model:IsA("BasePart"))
 
 		local model = item.Model:Clone()
+
+		model:RemoveTag("Interactable")
+		model:RemoveTag("Item")
+		model:RemoveTag("Prop")
+
 		participant:TryThrowAssembly(model, 10, participant.Round:GetMap().Structure.Dynamic)
 
 		participant:RemoveItem(item, true)
