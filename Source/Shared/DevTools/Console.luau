@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local PlatformDetection = require(ReplicatedStorage.API.PlatformDetection)
 local IsAdmin = require(script.Parent.IsAdmin)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
@@ -52,10 +53,11 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 			table.clear(historyConns)
 
 			if console.Visible then
-				task.spawn(function()
+				if PlatformDetection.Detect() == Enum.Platform.Linux then
 					task.wait()
-					console.Object.Input:CaptureFocus()
-				end)
+				end
+
+				console.Object.Input:CaptureFocus()
 
 				table.insert(historyConns, UserInputService.InputEnded:Connect(function(input, proc)
 					if not proc then
