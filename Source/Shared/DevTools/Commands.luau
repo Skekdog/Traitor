@@ -935,8 +935,8 @@ Commands.give = {
 	end
 }
 
-Commands.removeitem = {
-	Name = "removeitem",
+Commands.remove = {
+	Name = "remove",
 	Category = "Item",
 	Description = "Removes an item from players.",
 	HasRelaxedPermissions = true,
