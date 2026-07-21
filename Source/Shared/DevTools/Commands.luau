@@ -578,10 +578,10 @@ Commands.karma = {
 	end
 }
 
-Commands.finish = {
-	Name = "finish",
+Commands.finishround = {
+	Name = "finishround",
 	Category = "Game",
-	Description = "Ends the current round with a victory for the specified role.",
+	Description = "Finishes the current round with a victory for the specified role.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
 	Arguments = {"role name"},
