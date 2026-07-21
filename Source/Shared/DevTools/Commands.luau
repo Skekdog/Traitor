@@ -44,6 +44,24 @@ local function processNumberArgument(str: string?): number?
 	return if str then tonumber(str) else nil
 end
 
+local function processItemArgument(round: Round, str: string?): Types.ItemComponents?
+	if not str then
+		return nil
+	end
+
+	local lowercasedItems: {[string]: Types.ItemComponents} = {}
+
+	for name, components in round.Gamemode.AvailableItems do
+		lowercasedItems[name:lower()] = components
+	end
+
+	for name, components in round:GetMap().ItemDefinitions do
+		lowercasedItems[name:lower()] = components
+	end
+
+	return lowercasedItems[str:lower()]
+end
+
 local function getLowercasedPlayers(): {[string]: Player}
 	local players: {[string]: Player} = {}
 
@@ -774,14 +792,13 @@ Commands.give = {
 			return `Player {args[2]} not found.`
 		end
 
-		local itemName = processStringArgument(args[1])
-		if not itemName then
+		if not processStringArgument(args[1]) then
 			return "Missing argument 1 item name."
 		end
 
-		local item = round:GetItemDefinition(itemName)
+		local item = processItemArgument(round, args[1])
 		if not item then
-			return `Item {itemName} not found.`
+			return `Item {args[1]} not found.`
 		end
 
 		local affectedPlayers: {Player} = {}
@@ -795,7 +812,7 @@ Commands.give = {
 			table.insert(affectedPlayers, player)
 		end
 
-		return `Gave {itemName} to {getPlayersString(affectedPlayers)}.`
+		return `Gave {item.Name} to {getPlayersString(affectedPlayers)}.`
 	end
 }
 
@@ -812,14 +829,16 @@ Commands.remove = {
 			return `Player {args[2]} not found.`
 		end
 
-		local itemName = processStringArgument(args[1])
-		if not itemName then
+		if not processStringArgument(args[1]) then
 			return "Missing argument 1 item name."
 		end
 
-		if not round:GetItemDefinition(itemName) then
-			return `Item {itemName} not found.`
+		local itemComponents = processItemArgument(round, args[1])
+		if not itemComponents then
+			return `Item {args[1]} not found.`
 		end
+
+		local loweredName = itemComponents.Name:lower()
 
 		local affectedPlayers: {Player} = {}
 		for _, player in players do
@@ -832,7 +851,7 @@ Commands.remove = {
 
 			for _, found in participant:GetItems() do
 				assert(found)
-				if found.Name == itemName then
+				if found.Name:lower() == loweredName then
 					item = found
 					break
 				end
@@ -844,7 +863,7 @@ Commands.remove = {
 			end
 		end
 
-		return `Removed {itemName} from {getPlayersString(affectedPlayers)}.`
+		return `Removed {itemComponents.Name} from {getPlayersString(affectedPlayers)}.`
 	end
 }
 
