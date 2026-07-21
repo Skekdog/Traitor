@@ -473,6 +473,21 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Mouse Unlock",
+	Tab = "Keybinds",
+	Hidden = not isLocalAdmin,
+	Category = "Menus",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+	Default = {
+		Toggled = true,
+		Keybind = {
+			KBMKeybind = Enum.KeyCode.Quote,
+		},
+	},
+})
+
+table.insert(availableSettings, {
 	Name = "Sound Player",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
