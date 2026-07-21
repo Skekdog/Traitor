@@ -116,7 +116,19 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 			self.Visible = newVisible
 
 			if modal then
-				modalUI:ToggleVisible(true)
+				if newVisible then
+					modalUI:ToggleVisible(true)
+				else
+					local unlock = false
+					for _, ui in registeredUIs do
+						if ui.Visible and ui.Modal then
+							unlock = true
+							break
+						end
+					end
+
+					modalUI:ToggleVisible(unlock)
+				end
 			end
 
 			tryMakeCursorVisible()
@@ -162,16 +174,6 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 				return warn(self.Name.." is not registered!")
 			end
 			ControlManager.Unregister(self.Name)
-
-			if modal then
-				for _, ui in registeredUIs do
-					if ui.Visible and ui.Modal then
-						break
-					end
-				end
-
-				modalUI:ToggleVisible(false)
-			end
 
 			self:ToggleVisible(false, true, function()
 				object.Parent = UIManager.UnregisteredUIs
