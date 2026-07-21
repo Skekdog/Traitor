@@ -910,8 +910,8 @@ Commands.credits = {
 	end
 }
 
-Commands.spawndummy = {
-	Name = "spawndummy",
+Commands.dummy = {
+	Name = "dummy",
 	Category = "Developer",
 	Description = "Spawns a test dummy that can be damaged.",
 	HasRelaxedPermissions = true,
