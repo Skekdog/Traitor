@@ -495,7 +495,7 @@ Commands.kill = {
 
 			participant:TryTakeDamage({
 				Amount = math.huge,
-				Source = "Developer"
+				Source = "Other"
 			})
 
 			table.insert(affectedPlayers, player)
