@@ -229,8 +229,12 @@ Commands.echo = {
 			local output: string
 
 			local players = processPlayerArgument(player, arg)
+			local item = processItemArgument(round, arg)
+
 			if players then
 				output = getPlayersString(players)
+			elseif item then
+				output = item.Name
 			else
 				output = tostring(processNumberArgument(arg) or processStringArgument(arg) or "ERR")
 			end
