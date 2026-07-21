@@ -5,8 +5,8 @@ local Modify = require(ReplicatedStorage.API.Modify)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
-local CreateEmptyPart = require(ReplicatedStorage.Shared.RoundRule.Common.CreateEmptyPart)
 local IsValidProp = require(ReplicatedStorage.Shared.GameDefinition.Gamemodes.PropHunt.IsValidProp)
+local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
 
 local Propper = {}
 
@@ -14,7 +14,7 @@ local DEFAULT_HEALTH = 50
 
 local remote = GetRemote("ThirdPerson", script)
 
-local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop: Types.Prop): boolean
+local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop: Types.Prop, ...): boolean
 	if prop.Interactable then
 		return false
 	end
@@ -43,32 +43,43 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	local oldHumanoid = participant:GetHumanoid()
 
-	local humanoid = Instance.new("Humanoid")
-	humanoid.RequiresNeck = false
-	humanoid.RigType = Enum.HumanoidRigType.R6
-	humanoid.Parent = morph
-
 	local model = prop.Model:Clone()
 	model:RemoveTag("Prop")
-	local root = GetPrimaryPart(model)
 
-	for _, part in model:GetChildren() do
-		part.Parent = morph
-	end
+	local root = Instance.new("Part")
+	root.Transparency = 1
+	root.Name = "HumanoidRootPart"
 
-	local head = CreateEmptyPart(root.CFrame)
-	head.Anchored = false
+	local humanoid = Instance.new("Humanoid")
+	humanoid.RequiresNeck = false
+	humanoid.HipHeight = 0.1
+	humanoid.RigType = Enum.HumanoidRigType.R15
+	humanoid.Parent = morph
+
+	local head = GetPrimaryPart(model)
 	head.Name = "Head"
+	head:SetAttribute("PropName", model.Name)
+
+	root.CFrame = head.CFrame
 
 	local weld = Instance.new("Weld")
 	weld.Part0 = root
 	weld.Part1 = head
 	weld.Parent = head
 
-	head.Parent = morph
+	root.Destroying:Once(function()
+		humanoid.Health = 0 -- To handle falling into the void or otherwise weirdly losing character parts
+	end)
 
-	root:SetAttribute("PropName", model.Name)
-	root.Name = "HumanoidRootPart"
+	for _, part in model:GetChildren() do
+		part.Parent = morph
+	end
+	head.Parent = morph -- This doesn't always get set, if the PrimaryPart IS the prop model
+
+	ForEachPart(morph, function(part)
+		part.CanCollide = false
+	end)
+
 	morph.PrimaryPart = root
 
 	local charHead = character:FindFirstChild("Head")
@@ -79,7 +90,9 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	local propSize = if prop.Model:IsA("Model") then prop.Model:GetExtentsSize() else prop.Model.Size
 	morph:PivotTo(charHead:GetPivot() * CFrame.new(Vector3.new(0, propSize.Y, 0)))
 
-	root.Parent = morph -- ?? flipping silly nonsense, apparently the parent doesn't get set by the for loop above ?????? what the flip???
+	root.Size = propSize
+	root.Parent = morph
+
 	participant:SpawnCharacter(morph, true)
 
 	local health = prop:GetHealth() or DEFAULT_HEALTH
@@ -91,7 +104,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 		humanoid.Health = math.min(health, participant:GetHealth())
 	end
 
-	humanoid.CameraOffset = Vector3.new(0, -1.5, 0)
+	humanoid.CameraOffset = Vector3.new(0, -propSize.Y / 2, 0)
 	humanoid.MaxHealth = health
 
 	morph.Parent = workspace.Characters
