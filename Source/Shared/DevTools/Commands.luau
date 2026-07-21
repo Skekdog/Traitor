@@ -136,7 +136,7 @@ local Commands: {[string]: Command} = {}
 
 Commands.help = {
 	Name = "help",
-	Category = "Other",
+	Category = "Developer",
 	Description = "Lists all commands.",
 	Environment = "Client" :: "Client",
 	HasRelaxedPermissions = true,
@@ -179,6 +179,34 @@ Commands.help = {
 		end
 
 		return ret
+	end
+}
+
+Commands.echo = {
+	Name = "echo",
+	Category = "Developer",
+	Description = "Processes arguments and returns the interpreted result.",
+	HasRelaxedPermissions = true,
+	Environment = "Server" :: "Server",
+	Arguments = {"..."},
+
+	Execute = function(player: Player, round: Round, args: Args): string
+		local processed: {string} = {}
+
+		for _, arg in args do
+			local output: string
+
+			local players = processPlayerArgument(player, arg)
+			if players then
+				output = getPlayersString(players)
+			else
+				output = tostring(processNumberArgument(arg) or processStringArgument(arg) or "ERR")
+			end
+
+			table.insert(processed, output)
+		end
+
+		return table.concat(processed, " | ")
 	end
 }
 
@@ -308,7 +336,7 @@ Commands.thirdperson = {
 
 Commands.teleportplace = {
 	Name = "teleportplace",
-	Category = "Other",
+	Category = "Developer",
 	Description = "Teleports specified players to the specified place.\nAvailable named places: Imperium, MainPlace, TestPlace",
 	Environment = "Server" :: "Server",
 	Arguments = {"place name / id", "players"},
@@ -467,7 +495,7 @@ Commands.kill = {
 
 			participant:TryTakeDamage({
 				Amount = math.huge,
-				Source = "Other"
+				Source = "Developer"
 			})
 
 			table.insert(affectedPlayers, player)
@@ -622,7 +650,7 @@ Commands.respawn = {
 
 Commands.restart = {
 	Name = "restart",
-	Category = "Other",
+	Category = "Developer",
 	Description = "Restarts the server.",
 	Environment = "Server" :: "Server",
 	Arguments = {},
@@ -978,7 +1006,7 @@ Commands.givecredits = {
 
 Commands.spawndummy = {
 	Name = "spawndummy",
-	Category = "Other",
+	Category = "Developer",
 	Description = "Spawns a test dummy that can be damaged.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
@@ -1057,7 +1085,7 @@ Commands.sethealth = {
 
 Commands.relax = {
 	Name = "relax",
-	Category = "Other",
+	Category = "Developer",
 	Description = "Temporarily grants relaxed command permissions to players.",
 	Arguments = {"players"},
 	Environment = "Server" :: "Server",
