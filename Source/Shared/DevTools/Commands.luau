@@ -214,6 +214,38 @@ Commands.help = {
 	end
 }
 
+Commands.echo = {
+	Name = "echo",
+	Category = "Developer",
+	Description = "Processes arguments and returns the interpreted result.",
+	HasRelaxedPermissions = true,
+	Environment = "Server" :: "Server",
+	Arguments = {"..."},
+
+	Execute = function(player: Player, round: Round, args: Args): string
+		local processed: {string} = {}
+
+		for _, arg in args do
+			local output: string
+
+			local players = processPlayerArgument(player, arg)
+			local item = processItemArgument(round, arg)
+
+			if players then
+				output = getPlayersString(players)
+			elseif item then
+				output = item.Name
+			else
+				output = tostring(processNumberArgument(arg) or processStringArgument(arg) or "ERR")
+			end
+
+			table.insert(processed, output)
+		end
+
+		return table.concat(processed, " | ")
+	end
+}
+
 Commands.xray = {
 	Name = "xray",
 	Category = "Visuals",
