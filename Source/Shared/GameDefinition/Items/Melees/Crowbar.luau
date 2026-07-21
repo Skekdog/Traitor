@@ -67,7 +67,7 @@ function module.AlternateFireServer(item: Types.Item, origin: Vector3, direction
 
 	local hitParticipant = GetParticipant(part)
 	if hitParticipant then
-		force *= 6
+		force *= 2
 	end
 
 	if Impulse.CanImpulse(part) then
