@@ -27,6 +27,7 @@ LocalCharacter.Controllers:Connect(function(controllers)
 	end
 
 	controllers.Ground.DecelerationTime = DECELERATION_TIME
+	controllers.Ground.BalanceRigidityEnabled = true
 	controllers.Air.BalanceRigidityEnabled = true
 	controllers.Air.MoveMaxForce = MAX_FORCE
 end)
