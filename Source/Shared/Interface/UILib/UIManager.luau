@@ -7,7 +7,6 @@ local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ToggleMouseVisible = require(ReplicatedStorage.Shared.Interface.Util.ToggleMouseVisible)
 local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
-local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local UIAnimation = require(script.Parent.UIAnimation)
 
 local plr = Players.LocalPlayer
@@ -50,10 +49,20 @@ export type UI = {
 	Sidebar: boolean?,
 	Object: GuiObject,
 	NoCursor: boolean?,
+	Modal: boolean,
 
 	ToggleVisible: (self: UI, force: boolean?, ignoreOtherUIs: boolean?, callback: (() -> ())?) -> (),
 	Unregister: (self: UI) -> (),
 }
+
+local modalUIObject = Instance.new("TextButton")
+modalUIObject.Size = UDim2.fromOffset(1, 1)
+modalUIObject.BackgroundTransparency = 1
+modalUIObject.Text = ""
+modalUIObject.Visible = false
+modalUIObject.Modal = true
+modalUIObject:SetAttribute("Layer", "Special")
+modalUIObject.Name = "Modalise"
 
 local registeredUIs: {UI} = {}
 
@@ -70,8 +79,7 @@ local function tryMakeCursorVisible(): ()
 	ToggleMouseVisible(false)
 end
 
-UIManager.RegisteredEvent = DynamicValue.new("")
-
+local modalUI: UI & {Object: typeof(modalUIObject)}
 function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 	local ignoreInset = object:GetAttribute("IgnoreInset") :: boolean?
 	local accountForInset = object:GetAttribute("AccountForInset") :: boolean | "X" | "Y" | "XY"?
@@ -91,6 +99,7 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 		Sidebar = object:GetAttribute("Sidebar") :: boolean?,
 		Object = object,
 		NoCursor = object:GetAttribute("NoCursor") :: boolean?,
+		Modal = modal or false,
 
 		KeepCursorVisible = object:GetAttribute("KeepCursorVisible") :: boolean?,
 
@@ -105,6 +114,10 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 			end
 
 			self.Visible = newVisible
+
+			if modal then
+				modalUI:ToggleVisible(true)
+			end
 
 			tryMakeCursorVisible()
 
@@ -149,6 +162,17 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 				return warn(self.Name.." is not registered!")
 			end
 			ControlManager.Unregister(self.Name)
+
+			if modal then
+				for _, ui in registeredUIs do
+					if ui.Visible and ui.Modal then
+						break
+					end
+				end
+
+				modalUI:ToggleVisible(false)
+			end
+
 			self:ToggleVisible(false, true, function()
 				object.Parent = UIManager.UnregisteredUIs
 			end)
@@ -258,26 +282,8 @@ function UIManager.RegisterUI<T>(object: GuiObject & T): UI & {Object: T}
 		warn(self.Name.." does not have a transition style!")
 	end
 
-	-- Disabled when ui is closing but not fully closed yet
-	if modal and not object:FindFirstChild("Modalise") then
-		local modalise = Instance.new("TextButton")
-		modalise.AutoLocalize = false
-		modalise.Modal = true
-		modalise.Size = UDim2.new()
-		modalise.Name = "Modalise"
-		modalise.BackgroundTransparency = 1
-		modalise.TextTransparency = 1
-		modalise.Size = UDim2.fromOffset(1, 1)
-
-		modalise.Visible = true
-
-		modalise.Parent = object
-	end
-
-	object.Parent = plrUi:FindFirstChild(self.Layer)
+	object.Parent = plrUi:FindFirstChild(self.Layer) or error("Failed to parent " .. object.Name)
 	table.insert(registeredUIs, self)
-
-	UIManager.RegisteredEvent:SetValue(self.Name)
 
 	return self :: UI & {Object: T}
 end
@@ -350,6 +356,7 @@ for layer: Layer, order in orders do
 	screenUi.Parent = Players.LocalPlayer.PlayerGui
 end
 
+modalUI = UIManager.RegisterUI(modalUIObject)
 UIManager.RegisterUI(UIManager.UnregisteredUIs.Sidebar)
 
 local function register(object: Instance)
