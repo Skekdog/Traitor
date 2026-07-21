@@ -825,13 +825,14 @@ Commands.give = {
 			return `Player {args[2]} not found.`
 		end
 
-		if not processStringArgument(args[1]) then
+		local itemName = processStringArgument(args[1])
+		if not itemName then
 			return "Missing argument 1 item name."
 		end
 
-		local item = processItemArgument(round, args[1])
+		local item = processItemArgument(round, itemName)
 		if not item then
-			return `Item {args[1]} not found.`
+			return `Item {itemName} not found.`
 		end
 
 		local affectedPlayers: {Player} = {}
@@ -862,13 +863,14 @@ Commands.remove = {
 			return `Player {args[2]} not found.`
 		end
 
-		if not processStringArgument(args[1]) then
+		local itemName = processStringArgument(args[1])
+		if not itemName then
 			return "Missing argument 1 item name."
 		end
 
-		local itemComponents = processItemArgument(round, args[1])
+		local itemComponents = processItemArgument(round, itemName)
 		if not itemComponents then
-			return `Item {args[1]} not found.`
+			return `Item {itemName} not found.`
 		end
 
 		local loweredName = itemComponents.Name:lower()
