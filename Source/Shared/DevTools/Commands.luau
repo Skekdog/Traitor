@@ -588,8 +588,8 @@ Commands.endround = {
 	end
 }
 
-Commands.skipphase = {
-	Name = "skipphase",
+Commands.skip = {
+	Name = "skip",
 	Category = "Game",
 	Description = "Skips the current round phase.",
 	HasRelaxedPermissions = true,
