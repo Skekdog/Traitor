@@ -841,7 +841,7 @@ Commands.spawnitem = {
 		end
 
 		if not item.Model then
-			return `Item has no model and cannot be spawned, consider using giveitem instead.`
+			return `Item has no model and cannot be spawned, consider using \`give\` instead.`
 		end
 
 		local affectedPlayers: {Player} = {}
@@ -869,8 +869,8 @@ Commands.spawnitem = {
 	end
 }
 
-Commands.giveitem = {
-	Name = "giveitem",
+Commands.give = {
+	Name = "give",
 	Category = "Item",
 	Description = "Gives an item to players.",
 	HasRelaxedPermissions = true,
