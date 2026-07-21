@@ -956,8 +956,8 @@ Commands.removeitem = {
 	end
 }
 
-Commands.givecredits = {
-	Name = "givecredits",
+Commands.credits = {
+	Name = "credits",
 	Category = "Player",
 	Description = "Gives credits to players.",
 	HasRelaxedPermissions = true,
