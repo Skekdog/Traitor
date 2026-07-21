@@ -23,6 +23,8 @@ do
 		inset = -insetGui.AbsolutePosition
 		task.wait()
 	until inset.Y > 0 or GuiService:IsTenFootInterface() -- vertical inset doesn't load immediately. on consoles, there is no vertical inset.
+
+	insetGui:Destroy()
 end
 
 --[[ Principles:
