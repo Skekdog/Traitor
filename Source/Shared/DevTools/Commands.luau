@@ -399,8 +399,8 @@ Commands.teleport = {
 	end
 }
 
-Commands.setrole = {
-	Name = "setrole",
+Commands.role = {
+	Name = "role",
 	Category = "Player",
 	Description = "Sets the roles of players.",
 	HasRelaxedPermissions = true,
@@ -438,8 +438,8 @@ Commands.setrole = {
 	end
 }
 
-Commands.setfreekill = {
-	Name = "setfreekill",
+Commands.freekill = {
+	Name = "freekill",
 	Category = "Player",
 	Description = "Sets free kill reason for the specified players.",
 	HasRelaxedPermissions = true,
@@ -505,8 +505,8 @@ Commands.kill = {
 	end
 }
 
-Commands.setkarma = {
-	Name = "setkarma",
+Commands.karma = {
+	Name = "karma",
 	Category = "Player",
 	Description = "Sets the karma of players.",
 	Environment = "Server" :: "Server",
@@ -1046,8 +1046,8 @@ Commands.spawndummy = {
 	end
 }
 
-Commands.sethealth = {
-	Name = "sethealth",
+Commands.health = {
+	Name = "health",
 	Category = "Character",
 	Description = "Sets health of players to a specified value",
 	HasRelaxedPermissions = true,
