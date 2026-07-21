@@ -882,9 +882,9 @@ Commands.credits = {
 	end
 }
 
-Commands.spawndummy = {
-	Name = "spawndummy",
-	Category = "Other",
+Commands.dummy = {
+	Name = "dummy",
+	Category = "Developer",
 	Description = "Spawns a test dummy that can be damaged.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
