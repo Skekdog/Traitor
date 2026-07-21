@@ -34,10 +34,11 @@ export type Command = ClientCommand | ServerCommand
 type Round = Types.Round
 type Args = {string?}
 
-local WHITESPACE_SUBSTITUTE = "-"
+local WHITESPACE_SUBSTITUTE = "([^-])(%-)([^-])"
+local SUBSTITUTE_SUBSTITUTE = "([^-])(%-%-)([^-])"
 
 local function processStringArgument(str: string?): string?
-	return if str then str:gsub(WHITESPACE_SUBSTITUTE, " ") else nil
+	return if str then str:gsub(WHITESPACE_SUBSTITUTE, "%1 %3"):gsub(SUBSTITUTE_SUBSTITUTE, "%1-%3") else nil
 end
 
 local function processNumberArgument(str: string?): number?
