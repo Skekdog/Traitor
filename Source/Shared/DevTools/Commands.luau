@@ -51,6 +51,7 @@ local function processItemArgument(round: Round, str: string?): Types.ItemCompon
 
 	local lowercasedItems: {[string]: Types.ItemComponents} = {}
 
+	-- NOTE: Ordering here matters! Map-specific items override gamemode items of the same name!
 	for name, components in round.Gamemode.AvailableItems do
 		lowercasedItems[name:lower()] = components
 	end
