@@ -4,7 +4,6 @@ local StarterGui = game:GetService("StarterGui")
 local TextChatService = game:GetService("TextChatService")
 local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
 local Message = require(ReplicatedStorage.API.Interface.Message)
-local PlatformDetection = require(ReplicatedStorage.API.PlatformDetection)
 local Types = require(ReplicatedStorage.API.Types)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local SoundPlayerClient = require(ReplicatedStorage.Shared.Interface.GameState.SoundPlayerClient)
@@ -224,11 +223,10 @@ sendButton.Activated:Connect(function()
 end)
 
 ControlManager.Register("Chat", function()
-	if PlatformDetection.Detect() == Enum.Platform.Linux then
+	task.spawn(function()
 		task.wait()
-	end
-
-	ChatWindow.InputBox:CaptureFocus()
+		ChatWindow.InputBox:CaptureFocus()
+	end)
 
 	return Enum.ContextActionResult.Pass
 end)
