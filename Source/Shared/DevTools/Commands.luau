@@ -906,7 +906,7 @@ Commands.remove = {
 Commands.credits = {
 	Name = "credits",
 	Category = "Player",
-	Description = "Gives credits to players.",
+	Description = "Sets credit counts of players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
 	Arguments = {"amount", "players"},
@@ -933,7 +933,7 @@ Commands.credits = {
 			table.insert(affectedPlayers, player)
 		end
 
-		return `Gave {amount} credits to {getPlayersString(affectedPlayers)}.`
+		return `Set credits of {getPlayersString(affectedPlayers)} to {amount}.`
 	end
 }
 
