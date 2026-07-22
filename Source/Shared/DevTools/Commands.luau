@@ -1053,7 +1053,7 @@ Commands.seance = {
 Commands.ragdoll = {
 	Name = "ragdoll",
 	Category = "Character",
-	Description = "Forces a player to ragdoll indefinitely.",
+	Description = "Forces a player to (un)ragdoll indefinitely.",
 	Arguments = {"players"},
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
@@ -1065,7 +1065,9 @@ Commands.ragdoll = {
 			return `Player {args[1]} not found.`
 		end
 
-		local affectedPlayers: {Player} = {}
+		local ragdolledPlayers: {Player} = {}
+		local unragdolledPlayers: {Player} = {}
+
 		for _, player in players do
 			local participant = round:GetParticipant(player.Name)
 			if not participant then
@@ -1077,46 +1079,16 @@ Commands.ragdoll = {
 				continue
 			end
 
-			Ragdoll.Ragdoll(participant, character)
-			table.insert(affectedPlayers, player)
-		end
-
-		return `Ragdolled {getPlayersString(affectedPlayers)}.`
-	end
-}
-
-Commands.unragdoll = {
-	Name = "unragdoll",
-	Category = "Character",
-	Description = "Forces a player to unragdoll.",
-	Arguments = {"players"},
-	Environment = "Server" :: "Server",
-	HasRelaxedPermissions = true,
-	Execute = function(executor: Player, round: Round, args: Args): string
-		local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
-
-		local players = processPlayerArgument(executor, args[1])
-		if not players then
-			return `Player {args[1]} not found.`
-		end
-
-		local affectedPlayers: {Player} = {}
-		for _, player in players do
-			local participant = round:GetParticipant(player.Name)
-			if not participant then
-				continue
+			if character:HasTag("Ragdoll") then
+				Ragdoll.Unragdoll(character)
+				table.insert(unragdolledPlayers, player)
+			else
+				Ragdoll.Ragdoll(participant, character)
+				table.insert(ragdolledPlayers, player)
 			end
-
-			local character = participant:GetCharacter()
-			if not character then
-				continue
-			end
-
-			Ragdoll.Unragdoll(character)
-			table.insert(affectedPlayers, player)
 		end
 
-		return `Unragdolled {getPlayersString(affectedPlayers)}.`
+		return `Ragdolled {getPlayersString(ragdolledPlayers)}, unragdolled {getPlayersString(unragdolledPlayers)}`
 	end
 }
 
