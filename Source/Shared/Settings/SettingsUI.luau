@@ -220,7 +220,7 @@ local function listenForInput(kbm: boolean): Enum.UserInputType | Enum.KeyCode?
 			return
 		end
 
-		if (input.KeyCode == Enum.KeyCode.F4) then
+		if input.KeyCode == Enum.KeyCode.F4 then
 			ScreenMessage("Info", "Cancelled keybinding.")
 			if msg then
 				msg:Destroy()
@@ -238,7 +238,7 @@ local function listenForInput(kbm: boolean): Enum.UserInputType | Enum.KeyCode?
 		ScreenMessage("Success", "Keybinding updated!")
 		ContextActionService:UnbindAction("SelectKeybind")
 
-		result = if input.KeyCode ~= Enum.KeyCode.Unknown then input.KeyCode else input.UserInputType
+		result = if input.KeyCode ~= Enum.KeyCode.None then input.KeyCode else input.UserInputType
 		return
 	end, false, 100000, table.unpack(inputTypes))
 
