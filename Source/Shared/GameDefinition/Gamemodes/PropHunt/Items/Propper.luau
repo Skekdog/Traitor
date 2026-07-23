@@ -74,10 +74,6 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	weld.Parent = head
 
-	root.Destroying:Once(function()
-		humanoid.Health = 0 -- To handle falling into the void or otherwise weirdly losing character parts
-	end)
-
 	for _, part in model:GetChildren() do
 		part.Parent = morph
 	end
@@ -99,6 +95,10 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	root.Size = propSize
 	root.Parent = morph
+
+	root:GetPropertyChangedSignal("Parent"):Once(function()
+		humanoid.Health = 0
+	end)
 
 	participant.CharacterCollisionGroup = "Default"
 	participant:SpawnCharacter(morph, true)
