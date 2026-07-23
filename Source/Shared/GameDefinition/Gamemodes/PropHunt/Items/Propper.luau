@@ -62,9 +62,14 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	root.CFrame = head.CFrame
 
+	local propCFrame = if prop.Model:IsA("Model") then prop.Model:GetBoundingBox() else prop.Model.CFrame
+
 	local weld = Instance.new("Weld")
 	weld.Part0 = root
 	weld.Part1 = head
+
+	weld.C0 = CFrame.new(head.CFrame.Position - propCFrame.Position)
+
 	weld.Parent = head
 
 	root.Destroying:Once(function()
