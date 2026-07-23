@@ -79,7 +79,10 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	local propSize = if prop.Model:IsA("Model") then prop.Model:GetExtentsSize() else prop.Model.Size
 	morph:PivotTo(charHead:GetPivot() * CFrame.new(Vector3.new(0, propSize.Y, 0)))
 
-	root.Parent = morph -- ?? flipping silly nonsense, apparently the parent doesn't get set by the for loop above ?????? what the flip???
+	root.Size = propSize
+	root.Parent = morph
+
+	participant.CharacterCollisionGroup = "Default"
 	participant:SpawnCharacter(morph, true)
 
 	local health = prop:GetHealth() or DEFAULT_HEALTH
