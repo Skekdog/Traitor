@@ -241,7 +241,7 @@ end
 
 local function beforeDamageParticipant(_, participant: Types.Participant, params: Types.DamageParams): boolean
     local attacker = params.Attacker
-    if not attacker then
+    if not attacker or attacker == participant then
         return true
     end
 
