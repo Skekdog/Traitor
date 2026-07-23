@@ -1,8 +1,6 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
 require(script.Parent.Util.KickOnVR)
 
-local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
+local IsLabs = require(script.Parent.Places.IsLabs)
 
 if IsLabs then
 	while not workspace:GetAttribute("LabsGreenLight") do
@@ -10,9 +8,7 @@ if IsLabs then
 	end
 end
 
-require(ReplicatedStorage.Shared.DevTools.HostPermissions)
-
-require(script.Parent.PlayerModule)
+require(script.Parent.DevTools.HostPermissions)
 require(script.Parent.Settings.LoadSettings)
 require(script.Parent.Controls.KeybindHintManager)
 require(script.Parent.Combat.OnHitClient)
@@ -20,7 +16,7 @@ require(script.Parent.Combat.MakeBulletHole)
 require(script.Parent.Interface.Util.ShowAlert)
 require(script.Parent.Combat.BulletTracer)
 require(script.Parent.Combat.ShatterGlass)
-require(ReplicatedStorage.API.Audio)
+require(script.Parent.Parent.API.Audio)
 require(script.Parent.Combat.Combat)
 require(script.Parent.Parent.API.Impulse)
 require(script.Parent.LocalState.CorpseCollisionFix)
