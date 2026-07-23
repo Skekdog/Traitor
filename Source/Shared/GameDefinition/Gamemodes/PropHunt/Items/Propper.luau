@@ -93,6 +93,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	root.Size = propSize
 	root.Parent = morph
 
+	participant.CharacterCollisionGroup = "Default"
 	participant:SpawnCharacter(morph, true)
 
 	local health = prop:GetHealth() or DEFAULT_HEALTH
