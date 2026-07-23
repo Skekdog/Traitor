@@ -21,7 +21,8 @@ remotes.RoundFinishData.OnClientEvent:Connect(function(data)
 end)
 
 module.Gamemode = DynamicValue.new(nil :: Types.GamemodeDefinition?)
-InstanceSignal.ListenAttribute<<string?>>(replicatedData, "Gamemode"):Connect(function(name)
+
+local function updateGamemode(name: string?)
     if not name then
         module.Gamemode:SetValue()
         return
@@ -48,7 +49,10 @@ InstanceSignal.ListenAttribute<<string?>>(replicatedData, "Gamemode"):Connect(fu
     else
         module.Gamemode:SetValue()
     end
-end, true)
+end
+
+task.spawn(updateGamemode, replicatedData:GetAttribute("Gamemode") :: string?)
+remotes.Gamemode.OnClientEvent:Connect(updateGamemode)
 
 module.Credits = DynamicValue.new(0)
 remotes.UpdateCredits.OnClientEvent:Connect(function(value: number?)
