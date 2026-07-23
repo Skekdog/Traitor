@@ -8,6 +8,8 @@ if IsLabs then
 	end
 end
 
+require(script.Parent.LocalState.UpdateLocalRoundInfo)
+require(script.Parent.LocalState.UpdateLocalParticipantInfo)
 require(script.Parent.DevTools.HostPermissions)
 require(script.Parent.Settings.LoadSettings)
 require(script.Parent.Controls.KeybindHintManager)

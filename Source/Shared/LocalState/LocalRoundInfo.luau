@@ -22,38 +22,6 @@ end)
 
 module.Gamemode = DynamicValue.new(nil :: Types.GamemodeDefinition?)
 
-local function updateGamemode(name: string?)
-    if not name then
-        module.Gamemode:SetValue()
-        return
-    end
-
-    local isSucky = false
-
-    local object = ReplicatedStorage.Shared.GameDefinition.Gamemodes:FindFirstChild(name)
-    if not object then
-        local map = module.Map()
-        if map and map.Structure:FindFirstChild("Bosses") then
-            object = (map.Structure.Bosses :: Instance):FindFirstChild(name)
-            isSucky = true
-        end
-    end
-
-    if object then
-        local ret = (require)(object)
-        if isSucky then
-            module.Gamemode:SetValue(ret.Gamemode)
-        else
-            module.Gamemode:SetValue(ret)
-        end
-    else
-        module.Gamemode:SetValue()
-    end
-end
-
-task.spawn(updateGamemode, replicatedData:GetAttribute("Gamemode") :: string?)
-remotes.Gamemode.OnClientEvent:Connect(updateGamemode)
-
 module.Credits = DynamicValue.new(0)
 remotes.UpdateCredits.OnClientEvent:Connect(function(value: number?)
     module.Credits:SetValue(value or 0)
