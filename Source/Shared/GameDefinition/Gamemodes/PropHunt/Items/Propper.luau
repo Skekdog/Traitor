@@ -56,6 +56,8 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	humanoid.RigType = Enum.HumanoidRigType.R15
 	humanoid.Parent = morph
 
+	Instance.new("Animator", humanoid) -- this doesn't get used, but it creates a warning from a roblox script if missing
+
 	local head = GetPrimaryPart(model)
 	head.Name = "Head"
 	head:SetAttribute("PropName", model.Name)
