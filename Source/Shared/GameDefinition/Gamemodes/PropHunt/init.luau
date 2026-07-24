@@ -245,6 +245,11 @@ local function beforeDamageParticipant(_, participant: Types.Participant, params
         return true
     end
 
+    -- to prevent getting crushed when morphing
+    if attacker == participant and params.Source ~= "Crush" then
+        return false
+    end
+
     if params.Amount <= 0 then
         return true
     end
