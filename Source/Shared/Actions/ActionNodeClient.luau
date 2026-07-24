@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ActionNodeType = require(script.Parent.ActionNodeType)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 
@@ -17,7 +18,7 @@ function module.GetActiveNode(): ClientNodeData?
 	return activeNode
 end
 
-local nodes: {[BillboardGui]: ActionNodeType.ActionNodeParams?} = {}
+local nodes: {[BillboardGui]: ClientNodeData?} = {}
 
 local function deselect(nodeData: ClientNodeData): ()
 	if activeNode == nodeData then
@@ -64,6 +65,9 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	clickIcon.ScaleType = Enum.ScaleType.Fit
 	clickIcon.BackgroundTransparency = 1
 	clickIcon.ImageTransparency = 0.5
+
+	-- TODO: remove this when possible, this is just to patch a roblox bug: https://devforum.roblox.com/t/-/4754356
+	clickIcon.Active = ControlManager.PreferredInput() == Enum.PreferredInput.Touch
 
 	Instance.new("UIAspectRatioConstraint", clickIcon)
 
@@ -117,7 +121,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 		end
 	end)
 
-	nodes[nodeGui] = params
+	nodes[nodeGui] = nodeData
 
 	nodeGui.Adornee = params.Adornee
 	nodeGui.Parent = Players.LocalPlayer.PlayerGui -- according to the docs, input events will not work unless parented to PlayerGui
@@ -137,13 +141,21 @@ RunService.PreRender:Connect(function()
 	local timeNow = workspace:GetServerTimeNow()
 	local role = roleValue()
 
-	for gui, params in nodes do
-		assert(params)
+	for gui, nodeData in nodes do
+		assert(nodeData)
 		gui.Enabled = (role.Definition.CanUseActionNodes or false) and (gui.Adornee:GetAttribute("CooldownUntil") :: number? or 0) < timeNow and not gui.Adornee:GetAttribute("IsDisabled")
 
-		if not gui.Enabled and activeNode and activeNode.Params == params then
+		if not gui.Enabled and activeNode and activeNode.Params == nodeData.Params then
 			activeNode = nil
 		end
+	end
+end)
+
+-- TODO: remove this when possible, this is just to patch a roblox bug: https://devforum.roblox.com/t/-/4754356
+ControlManager.PreferredInput:Connect(function(preferredInput)
+	for _, nodeData in nodes do
+		assert(nodeData)
+		nodeData.ClickIcon.Active = preferredInput == Enum.PreferredInput.Touch
 	end
 end)
 
