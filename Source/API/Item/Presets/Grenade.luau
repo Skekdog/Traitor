@@ -52,7 +52,7 @@ local function PrimaryDeactivatedClient(item: Types.Item): ()
 end
 
 local function PrimaryFireClient(item: Types.Item): boolean
-	if (os.clock() - (item.Extras.CookBegan or math.huge)) >= item.FuseTime then
+	if (os.clock() - (item.Extras.CookBegan or math.huge)) >= (item.FuseTime or 0) then
 		return throw(item)
 	end
 
