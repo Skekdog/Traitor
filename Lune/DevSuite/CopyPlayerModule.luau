@@ -57,7 +57,12 @@ local function locatePlayerModule(): string
 end
 
 local function CopyPlayerModule(destination: string): ()
+	if fs.isDir(destination) then
+		fs.removeDir(destination) -- Copying on its own is not entirely safe, as an update PlayerModule may have removed some files
+	end
+
 	fs.copy(locatePlayerModule(), destination, true)
+
 	print("Copied successfully.")
 end
 
