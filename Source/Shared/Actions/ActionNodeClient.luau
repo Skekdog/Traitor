@@ -66,7 +66,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	clickIcon.BackgroundTransparency = 1
 	clickIcon.ImageTransparency = 0.5
 
-	-- TODO: remove this when possible, this is just to patch a roblox bug: https://devforum.roblox.com/t/-/4754356
+	-- Prevent clicking on non-touchscreen, as thats annoying
 	clickIcon.Active = ControlManager.PreferredInput() == Enum.PreferredInput.Touch
 
 	Instance.new("UIAspectRatioConstraint", clickIcon)
@@ -151,7 +151,7 @@ RunService.PreRender:Connect(function()
 	end
 end)
 
--- TODO: remove this when possible, this is just to patch a roblox bug: https://devforum.roblox.com/t/-/4754356
+-- Prevent clicking on non-touchscreen, as thats annoying
 ControlManager.PreferredInput:Connect(function(preferredInput)
 	for _, nodeData in nodes do
 		assert(nodeData)
