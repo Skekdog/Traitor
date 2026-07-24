@@ -241,8 +241,13 @@ end
 
 local function beforeDamageParticipant(_, participant: Types.Participant, params: Types.DamageParams): boolean
     local attacker = params.Attacker
-    if not attacker or attacker == participant then
+    if not attacker then
         return true
+    end
+
+    -- to prevent getting crushed when morphing
+    if attacker == participant and params.Source ~= "Crush" then
+        return false
     end
 
     if params.Amount <= 0 then
