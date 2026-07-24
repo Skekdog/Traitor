@@ -31,7 +31,7 @@ ScriptContext.Error:Connect(function(message, trace, instance)
 	logOutput = TextColor(logOutput, Color3.new(1, 0, 0))
 	logOutput = "<b>" .. logOutput .. "</b>"
 
-	if trace:find("PlatformLibraries.rbx.AvatarAbilities.connectHumanoidShim", nil, true) then
+	if trace:find("PlatformLibraries.rbx.AvatarAbilities.connectHumanoidShim", nil, true) or trace:find("PlatformLibraries.rbx.AvatarAbilities.serverHumanoidShim", nil, true) then
 		print("Suppressed error: " .. logOutput)
 		return
 	end
