@@ -1,31 +1,55 @@
 {
   "className": "Workspace",
   "properties": {
+    "Attributes": {
+      "__Rojo_ProjectName": {
+        "String": "Traitor!"
+      }
+    },
+    "ClientAnimatorThrottling": {
+      "Enum": 2
+    },
     "CollisionGroupData": {
-      "BinaryString": "AQ0ABPf5//8HRGVmYXVsdAEEefj//xRQbGF5ZXJDaGFyYWN0ZXJQYXJ0cwIEdfn//wdDb3Jwc2VzAwQS4P//BkJvdW5kcwQE//f//xBTdHVkaW9TZWxlY3RhYmxlBQR38P//EFdlYXBvbkhpdFRhcmdldHMGBHf5//8MRHJvcHBlZEl0ZW1zBwSR4P//DlNoYXR0ZXJlZEdsYXNzCARV8f//CEdyZW5hZGVzCQQQ4P//ClJhZGFyUG9pbnQKBBDg//8RUGxheWVyQWNjZXNzb3JpZXMLBEfw//8MTW91c2VJbmZvUmF5DAR3+f//DUludGVyYWN0YWJsZXM="
+      "BinaryString": "AQ0ABP/5//8HRGVmYXVsdAEEefj//xRQbGF5ZXJDaGFyYWN0ZXJQYXJ0cwIEffn//wdDb3Jwc2VzAwQX8f//BkJvdW5kcwQE//f//xBTdHVkaW9TZWxlY3RhYmxlBQR38P//EFdlYXBvbkhpdFRhcmdldHMGBHf5//8MRHJvcHBlZEl0ZW1zBwSR4P//DlNoYXR0ZXJlZEdsYXNzCARd8f//CEdyZW5hZGVzCQQQ4P//ClJhZGFyUG9pbnQKBBDg//8RUGxheWVyQWNjZXNzb3JpZXMLBEfw//8MTW91c2VJbmZvUmF5DAR/+f//DUludGVyYWN0YWJsZXM="
     },
     "FallenPartsDestroyHeight": -500,
     "Gravity": 50,
+    "ImprovedAnimationConstraint": {
+      "Enum": 2
+    },
+    "ImprovedPhysicsReplication": {
+      "Enum": 2
+    },
+    "LayeredClothingCacheOptimizations": {
+      "Enum": 2
+    },
     "MeshPartHeadsAndAccessories": "Enabled",
+    "MeshStreamingAndImprovedLods": {
+      "Enum": 2
+    },
+    "NextGenerationReplication": {
+      "Enum": 2
+    },
+    "PathfindingUseImprovedSearch": {
+      "Enum": 2
+    },
     "PhysicsSteppingMethod": "Adaptive",
     "PlayerCharacterDestroyBehavior": "Enabled",
+    "PlayerScriptsUseInputActionSystem": {
+      "Enum": 2
+    },
     "RejectCharacterDeletions": "Enabled",
-    "SignalBehavior": "Deferred",
+    "RenderingCacheOptimizations": {
+      "Enum": 2
+    },
     "Retargeting": "Disabled",
-    "UseFixedSimulation": {"Enum": 2},
-    "RenderingCacheOptimizations": {"Enum": 2},
-    "MeshStreamingAndImprovedLods": {"Enum": 2},
-    "LayeredClothingCacheOptimizations": {"Enum": 2},
-    "ClientAnimatorThrottling": {"Enum": 2},
-    "PathfindingUseImprovedSearch": {"Enum": 2},
-    "NextGenerationReplication": {"Enum": 2},
-    "PlayerScriptsUseInputActionSystem": {"Enum": 2},
-    "ImprovedPhysicsReplication": {"Enum": 2},
-    "ImprovedAnimationConstraint": {"Enum": 2},
-    "ValidateEnabledProximityPrompt": {"Enum": 2},
+    "SignalBehavior": "Deferred",
     "TouchesUseCollisionGroups": true,
-    "Attributes": {
-      "__Rojo_ProjectName": {"String": "Traitor!"}
+    "UseFixedSimulation": {
+      "Enum": 2
+    },
+    "ValidateEnabledProximityPrompt": {
+      "Enum": 2
     }
   }
 }
