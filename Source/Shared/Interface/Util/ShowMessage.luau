@@ -7,6 +7,7 @@ local FullParse = require(ReplicatedStorage.Shared.ParseString.FullParse)
 local UIAnimation = require(script.Parent.Parent.UILib.UIAnimation)
 local UIManager = require(script.Parent.Parent.UILib.UIManager)
 local Types = require(ReplicatedStorage.API.Types)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local ui = UIManager.WaitForUI("CornerNotification").Object :: typeof(UIManager.UnregisteredUIs.CornerNotification)
 
@@ -61,18 +62,18 @@ end
 local chatChannel = TextChatService:WaitForChild("TextChannels"):WaitForChild("RBXGeneral") :: TextChannel
 
 return function(msg: string, kind: Types.MessageKind | "QuickChat" | "Relay", from: Player?)
-	msg = FullParse(msg)
+	local parsedMessage = FullParse(msg)
 	if kind == "Chat" then
-		chatChannel:DisplaySystemMessage(msg)
+		chatChannel:DisplaySystemMessage(parsedMessage)
 	elseif kind == "QuickChat" then
 		if from then
-			HookClientMessage.ExecuteOn(chatChannel:DisplaySystemMessage(msg, "QuickChat Player_" .. from.UserId))
+			HookClientMessage.ExecuteOn(chatChannel:DisplaySystemMessage(parsedMessage, "QuickChat Player_" .. from.UserId))
 		end
 	elseif kind == "Relay" then
-		if from then
-			HookClientMessage.ExecuteOn(chatChannel:DisplaySystemMessage(msg, "Relay Player_" .. from.UserId))
+		if from and not Settings.GetSetting("Hide Padlocked Chat") then
+			HookClientMessage.ExecuteOn(chatChannel:DisplaySystemMessage(parsedMessage, "Relay Player_" .. from.UserId))
 		end
 	else
-		makeLabel(kind == "Team", msg)
+		makeLabel(kind == "Team", parsedMessage)
 	end
 end

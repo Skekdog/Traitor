@@ -77,6 +77,16 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Hide Padlocked Chat",
+	Tab = "Display",
+	Category = "Chat",
+	Kind = "Boolean" :: "Boolean",
+	Default = false,
+
+	Tooltip = "When disabled, chat messages from incompatible age groups will be censored. When enabled, those chat messages will be entirely hidden."
+})
+
+table.insert(availableSettings, {
 	Name = "Item Hints",
 	Tab = "Display",
 	Category = "User Interface",
