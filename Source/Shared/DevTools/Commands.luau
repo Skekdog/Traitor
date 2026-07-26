@@ -686,6 +686,32 @@ Commands.respawn = {
 	end
 }
 
+Commands.despawn = {
+	Name = "despawn",
+	Category = "Character",
+	Description = "Despawns the specified players.",
+	HasRelaxedPermissions = true,
+	Environment = "Server" :: "Server",
+	Arguments = {"players"},
+	Execute = function(executor: Player, round: Types.Round, args: Args): string
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return `Player {args[1]} not found.`
+		end
+
+		local affectedPlayers: {Player} = {}
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if participant and participant:GetCharacter() then
+				round:RemoveParticipant(participant, false)
+			end
+			table.insert(affectedPlayers, player)
+		end
+
+		return `Despawned {getPlayersString(players)}.`
+	end
+}
+
 Commands.restart = {
 	Name = "restart",
 	Category = "Other",
