@@ -52,7 +52,6 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	local humanoid = Instance.new("Humanoid")
 	humanoid.RequiresNeck = false
-	humanoid.HipHeight = 0.1
 	humanoid.RigType = Enum.HumanoidRigType.R15
 	humanoid.Parent = morph
 
@@ -76,10 +75,6 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	end
 	head.Parent = morph -- This doesn't always get set, if the PrimaryPart IS the prop model
 
-	ForEachPart(morph, function(part)
-		part.CanCollide = false
-	end)
-
 	morph:SetAttribute("PropName", model.Name)
 	morph.PrimaryPart = root
 
@@ -91,7 +86,10 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	local propSize = if prop.Model:IsA("Model") then prop.Model:GetExtentsSize() else prop.Model.Size
 	morph:PivotTo(charHead:GetPivot() * CFrame.new(Vector3.new(0, propSize.Y, 0)))
 
-	root.Size = propSize
+	local rootSize = propSize * 0.5
+	root.Size = rootSize
+
+	humanoid.HipHeight = rootSize.Y / 2
 	root.Parent = morph
 
 	root:GetPropertyChangedSignal("Parent"):Once(function()
@@ -115,6 +113,10 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	morph.Parent = workspace.Characters
 	root:SetNetworkOwner(participant.Player)
+
+	task.spawn(ForEachPart, morph, function(part: BasePart)
+		part.CanCollide = part == root
+	end)
 
 	if not participant.Extras.PropperCharacterChangedSignal then
 		participant.Extras.PropperCharacterChangedSignal = participant.Player:GetPropertyChangedSignal("Character"):Once(function()
