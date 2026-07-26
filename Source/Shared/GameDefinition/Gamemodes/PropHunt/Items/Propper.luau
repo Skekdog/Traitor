@@ -34,7 +34,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 		return false
 	end
 
-	if charRoot:GetAttribute("PropName") == prop.Model.Name then
+	if character:GetAttribute("PropName") == prop.Model.Name then
 		return false
 	end
 
@@ -60,9 +60,6 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 
 	local head = GetPrimaryPart(model)
 	head.Name = "Head"
-	head:SetAttribute("PropName", model.Name)
-
-	root.CFrame = head.CFrame
 
 	local propCFrame = if model:IsA("Model") then model:GetBoundingBox() else model.CFrame
 
@@ -83,6 +80,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 		part.CanCollide = false
 	end)
 
+	morph:SetAttribute("PropName", model.Name)
 	morph.PrimaryPart = root
 
 	local charHead = character:FindFirstChild("Head")
