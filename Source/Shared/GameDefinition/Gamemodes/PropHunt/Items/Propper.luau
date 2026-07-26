@@ -62,13 +62,13 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	head.Name = "Head"
 
 	local propCFrame = if model:IsA("Model") then model:GetBoundingBox() else model.CFrame
+	root.CFrame = propCFrame
 
 	local weld = Instance.new("Weld")
-	weld.Part0 = root
-	weld.Part1 = head
+	weld.Part0 = head
+	weld.Part1 = root
 
-	weld.C0 = head.CFrame - propCFrame.Position
-
+	weld.C0 = head.PivotOffset.Rotation
 	weld.Parent = head
 
 	for _, part in model:GetChildren() do
