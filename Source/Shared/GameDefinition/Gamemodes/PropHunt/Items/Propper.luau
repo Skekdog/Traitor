@@ -1,3 +1,4 @@
+local PhysicsService = game:GetService("PhysicsService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
@@ -13,6 +14,14 @@ local Propper = {}
 local DEFAULT_HEALTH = 50
 
 local remote = GetRemote("ThirdPerson", script)
+
+local COLLISION_GROUP = "PropHuntPropCollisions"
+
+if RunService:IsServer() then
+	PhysicsService:RegisterCollisionGroup(COLLISION_GROUP)
+	PhysicsService:CollisionGroupSetCollidable(COLLISION_GROUP, "Default", false)
+	PhysicsService:CollisionGroupSetCollidable(COLLISION_GROUP, "PlayerCharacterParts", true)
+end
 
 local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop: Types.Prop, ...): boolean
 	if prop.Interactable then
@@ -96,7 +105,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 		humanoid.Health = 0
 	end)
 
-	participant.CharacterCollisionGroup = "Default"
+	participant.CharacterCollisionGroup = COLLISION_GROUP
 	participant:SpawnCharacter(morph, true)
 
 	local health = prop:GetHealth() or DEFAULT_HEALTH
@@ -115,7 +124,7 @@ local function beforeHitProp(item: Types.Item, params: Types.DamageParams, prop:
 	root:SetNetworkOwner(participant.Player)
 
 	task.spawn(ForEachPart, morph, function(part: BasePart)
-		part.CanCollide = part == root
+		part.CollisionGroup = if part == root then "Default" else COLLISION_GROUP
 	end)
 
 	if not participant.Extras.PropperCharacterChangedSignal then
