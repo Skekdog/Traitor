@@ -36,7 +36,7 @@
     "PhysicsSteppingMethod": "Adaptive",
     "PlayerCharacterDestroyBehavior": "Enabled",
     "PlayerScriptsUseInputActionSystem": {
-      "Enum": 2
+      "Enum": 1
     },
     "RejectCharacterDeletions": "Enabled",
     "RenderingCacheOptimizations": {
