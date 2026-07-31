@@ -40,7 +40,7 @@ local function setHintAttributes(instance: Instance): ()
 	instance:SetAttribute("AnchorPoint", Vector2.new(0, 0.25))
 	instance:SetAttribute("Position", UDim2.fromScale(0.75, 0.5))
 	instance:SetAttribute("TextXAlignment", "Left")
-	instance:SetAttribute("AlwaysShow", true)
+	instance:SetAttribute("AlwaysShow", false)
 end
 
 local function makeGui(params: ActionNodeType.ActionNodeParams): ()
