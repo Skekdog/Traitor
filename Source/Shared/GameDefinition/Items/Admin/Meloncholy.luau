@@ -6,7 +6,7 @@ local MelonLauncher = require(ReplicatedStorage.Shared.GameDefinition.Items.Guns
 local Meloncholy = Modify(MelonLauncher.Item, "Meloncholy", {
 	DisplayName = "Meloncholy",
     AmmoDefinition = Ammo.Infinite,
-    AttackInterval = 0.5,
+    AttackInterval = 0.1,
 })
 
 return table.freeze(Meloncholy)
