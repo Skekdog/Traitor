@@ -230,7 +230,7 @@ end
 function movePlr(plr: Player, status: PlayerStatus)
 	local clone = findPlr(plr.Name) or createPlr(plr)
 	local oldOrder = clone.LayoutOrder
-	clone.LayoutOrder = layoutOrders[status] + 1
+	clone.LayoutOrder = layoutOrders[status] + (if plr == Players.LocalPlayer then 1 else 2)
 
 	recalculateCount(getStatus(oldOrder))
 
