@@ -52,7 +52,7 @@ export type ControlDefinition = BaseDefinition & {
 	Kind: "Control",
 	Default: ControlValue,
 	SpecifyToggle: boolean?,
-	Callback: SettingCallback<ControlValue>?,
+	Callback: SettingCallback<ControlValue>,
 }
 
 export type SettingDefinition = BooleanDefinition | ChoiceDefinition | ControlDefinition
@@ -496,6 +496,10 @@ table.insert(availableSettings, {
 			KBMKeybind = Enum.KeyCode.Quote,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -512,6 +516,10 @@ table.insert(availableSettings, {
 			KBMKeybind = Enum.KeyCode.K,
 		}
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -622,11 +630,15 @@ table.insert(availableSettings, {
 	SpecifyToggle = false,
 
 	Default = {
-		Toggled = false,
+		Toggled = true,
 		Keybind = {
-			Gamepad = Enum.KeyCode.ButtonL1
+			Gamepad = Enum.KeyCode.ButtonL1,
 		}
-	}
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 for i = 1, 9 do
@@ -671,6 +683,10 @@ table.insert(availableSettings, {
 			Scale = 1,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
@@ -705,6 +721,10 @@ table.insert(availableSettings, {
 			KBMKeybind = Enum.KeyCode.T,
 		},
 	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
 })
 
 table.insert(availableSettings, {
