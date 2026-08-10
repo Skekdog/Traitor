@@ -534,6 +534,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.C,
+			Gamepad = Enum.KeyCode.DPadLeft,
 		},
 	},
 
@@ -553,6 +554,7 @@ table.insert(availableSettings, {
 		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Tab,
+			Gamepad = Enum.KeyCode.DPadRight,
 		},
 	},
 
