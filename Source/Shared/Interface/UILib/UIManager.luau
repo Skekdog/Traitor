@@ -378,10 +378,10 @@ ControlManager.Register("Close UI", function()
 	for _, v in UIManager.GetUIs("Popup") do
 		if v.Visible and not v.NoClose then
 			v:ToggleVisible(false)
-			return Enum.ContextActionResult.Pass
+			return Enum.ContextActionResult.Sink
 		end
 	end
 	return Enum.ContextActionResult.Pass
-end)
+end, Enum.ContextActionPriority.High.Value + 1)
 
 return table.freeze(UIManager)
