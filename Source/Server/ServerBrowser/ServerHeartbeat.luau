@@ -1,8 +1,9 @@
 local MemoryStoreService = game:GetService("MemoryStoreService")
+local RunService = game:GetService("RunService")
 local ServerId = require(script.Parent.ServerId)
 local ServerInfo = require(script.Parent.ServerInfo)
 
-if game.PrivateServerId ~= "" then
+if game.PrivateServerId ~= "" or RunService:IsStudio() then
 	return nil
 end
 

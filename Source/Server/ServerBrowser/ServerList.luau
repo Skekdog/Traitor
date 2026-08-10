@@ -1,10 +1,21 @@
 local MemoryStoreService = game:GetService("MemoryStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local ServerId = require(script.Parent.ServerId)
 local ServerInfo = require(script.Parent.ServerInfo)
 local SharedTypes = require(ReplicatedStorage.Shared.SharedTypes)
 
 local servers: {[string]: SharedTypes.ServerInfo} = {}
+
+ReplicatedStorage.Remotes.ClientServer.FetchServerList.OnServerInvoke = function(player): {[string]: SharedTypes.ServerInfo}
+	servers[ServerId] = ServerInfo.Get()
+	return servers
+end
+
+if RunService:IsStudio() then
+	return nil
+end
+
 const hashMap = MemoryStoreService:GetHashMap("ServerList")
 
 const UPDATE_INTERVAL = 30
@@ -31,10 +42,5 @@ task.spawn(function()
 		task.wait(UPDATE_INTERVAL)
 	end
 end)
-
-ReplicatedStorage.Remotes.ClientServer.FetchServerList.OnServerInvoke = function(player): {[string]: SharedTypes.ServerInfo}
-	servers[ServerId] = ServerInfo.Get()
-	return servers
-end
 
 return nil
