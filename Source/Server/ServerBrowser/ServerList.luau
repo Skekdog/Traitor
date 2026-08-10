@@ -1,5 +1,7 @@
 local MemoryStoreService = game:GetService("MemoryStoreService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerId = require(script.Parent.ServerId)
+local ServerInfo = require(script.Parent.ServerInfo)
 local SharedTypes = require(ReplicatedStorage.Shared.SharedTypes)
 
 local servers: {[string]: SharedTypes.ServerInfo} = {}
@@ -31,6 +33,7 @@ task.spawn(function()
 end)
 
 ReplicatedStorage.Remotes.ClientServer.FetchServerList.OnServerInvoke = function(player): {[string]: SharedTypes.ServerInfo}
+	servers[ServerId] = ServerInfo.Get()
 	return servers
 end
 

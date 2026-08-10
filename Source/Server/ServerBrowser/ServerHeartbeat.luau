@@ -1,6 +1,5 @@
-local HttpService = game:GetService("HttpService")
 local MemoryStoreService = game:GetService("MemoryStoreService")
-local RunService = game:GetService("RunService")
+local ServerId = require(script.Parent.ServerId)
 local ServerInfo = require(script.Parent.ServerInfo)
 
 if game.PrivateServerId ~= "" then
@@ -11,7 +10,7 @@ const TTL = 60
 const INTERVAL = 30
 
 const hashMap = MemoryStoreService:GetHashMap("ServerList")
-const serverId = if RunService:IsStudio() then HttpService:GenerateGUID(false) else game.JobId
+const serverId = ServerId
 
 task.spawn(function()
 	while true do
