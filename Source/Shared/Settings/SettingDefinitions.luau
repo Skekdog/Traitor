@@ -503,6 +503,24 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Menu Picker",
+	Tab = "Keybinds",
+	Category = "Menus",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+	Default = {
+		Toggled = true,
+		Keybind = {
+			Gamepad = Enum.KeyCode.DPadUp,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
 	Name = "Sound Player",
 	Tab = "Keybinds",
 	Category = "Menus - Enable the checkbox to make a keybind toggled",
