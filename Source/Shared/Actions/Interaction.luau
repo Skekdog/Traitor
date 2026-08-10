@@ -130,6 +130,7 @@ function module.TryInteract(prop: Types.MapObject?, part: BasePart?, input: Inpu
 
 	if not prop:HasTag("Interactable") and LocalParticipantInfo.GetParticipant().Status() ~= "Alive" then
 		PossessProp.TryPossess(part)
+		return true
 	end
 
 	local char = LocalCharacter.Character()
@@ -138,14 +139,14 @@ function module.TryInteract(prop: Types.MapObject?, part: BasePart?, input: Inpu
 	end
 
 	if prop:HasTag("Interactable") then
-		tryInteractInteractable(prop, part, input)
+		return tryInteractInteractable(prop, part, input)
 	end
 
 	return false
 end
 
 local function interactAction(action: string, state: Enum.UserInputState, input: InputObject?): Enum.ContextActionResult
-	return if module.TryInteract(interactProp, interactPart, input, actionNode) then Enum.ContextActionResult.Pass else Enum.ContextActionResult.Pass
+	return if module.TryInteract(interactProp, interactPart, input, actionNode) then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
 end
 
 ControlManager.Register("Interact", interactAction, Enum.ContextActionPriority.High.Value + 1)
