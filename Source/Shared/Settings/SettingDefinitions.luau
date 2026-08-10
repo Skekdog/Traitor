@@ -663,6 +663,7 @@ table.insert(availableSettings, {
 		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.P,
+			Gamepad = Enum.KeyCode.ButtonL3,
 		},
 
 		TouchButton = {
