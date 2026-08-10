@@ -75,19 +75,11 @@ LocalCharacter.RootPart:Connect(function(part)
 		return
 	end
 
-	if ControlManager.PreferredInput() == Enum.PreferredInput.Touch then
-		return enableFlashlight(true, true)
-	end
+	enableFlashlight(true, true)
 
 	ControlManager.Register("Flashlight", function()
 		return enableFlashlight()
 	end)
-end, true)
-
-ControlManager.PreferredInput:Connect(function(preferred)
-	if preferred ~= Enum.PreferredInput.KeyboardAndMouse then
-		enableFlashlight(true, true)
-	end
 end, true)
 
 return nil
