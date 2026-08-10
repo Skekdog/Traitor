@@ -32,12 +32,16 @@ const function refresh(): ()
 				end
 			end)
 
-			task.spawn(function()
-				const success, result = pcall(Players.LocalPlayer.IsFriendsWithAsync, Players.LocalPlayer, userId)
-				if success and result then
-					icon.LayoutOrder = -1
-				end
-			end)
+			if userId == Players.LocalPlayer.UserId then
+				icon.LayoutOrder = -2
+			else
+				task.spawn(function()
+					const success, result = pcall(Players.LocalPlayer.IsFriendsWithAsync, Players.LocalPlayer, userId)
+					if success and result then
+						icon.LayoutOrder = -1
+					end
+				end)
+			end
 
 			icon.Visible = true
 			icon.Parent = entry.Players.ScrollingFrame
