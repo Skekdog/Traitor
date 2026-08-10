@@ -12,7 +12,6 @@ type ControlInfo = {
 local controls: {ControlInfo} = {
 	{
 		Control = "Crouch",
-		Text = "Crouch & Covert Search",
 	},
 	{
 		Control = "Equipment",
