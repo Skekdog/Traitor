@@ -7,6 +7,7 @@ local IsAdmin = require(ReplicatedStorage.Shared.DevTools.IsAdmin)
 
 export type ControlValue = {
 	Toggled: boolean,
+	LongHoldGamepad: boolean?,
 	Keybind: {
 		KBMKeybind: Enum.UserInputType | Enum.KeyCode?,
 		Gamepad: Enum.UserInputType | Enum.KeyCode?,
@@ -191,7 +192,7 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.LeftControl,
-			Gamepad = Enum.KeyCode.ButtonR3,
+			Gamepad = Enum.KeyCode.ButtonB,
 		},
 
 		TouchButton = {
@@ -267,9 +268,10 @@ table.insert(availableSettings, {
 
 	Default = {
 		Toggled = true,
+		LongHoldGamepad = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Z,
-			Gamepad = Enum.KeyCode.DPadRight,
+			Gamepad = Enum.KeyCode.DPadDown,
 		},
 
 		TouchButton = {
@@ -347,7 +349,6 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.F,
-			Gamepad = Enum.KeyCode.ButtonL1,
 		},
 	},
 
@@ -525,7 +526,6 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.C,
-			Gamepad = Enum.KeyCode.DPadUp,
 		},
 	},
 
@@ -545,7 +545,6 @@ table.insert(availableSettings, {
 		Toggled = false,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.Tab,
-			Gamepad = Enum.KeyCode.ButtonL3,
 		},
 	},
 
@@ -565,7 +564,6 @@ table.insert(availableSettings, {
 		Toggled = true,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.G,
-			Gamepad = Enum.KeyCode.DPadLeft,
 		},
 	},
 
@@ -606,13 +604,29 @@ table.insert(availableSettings, {
 	Default = {
 		Toggled = true,
 		Keybind = {
-			Gamepad = Enum.KeyCode.ButtonY,
+			Gamepad = Enum.KeyCode.ButtonR1,
 		},
 	},
 
 	Callback = function(name: string, value: ControlValue)
 		(require)(callbacks.Keybind)(name, value)
 	end,
+})
+
+table.insert(availableSettings, {
+	Name = "Previous Item",
+	Tab = "Keybinds",
+	Category = "Inventory",
+	Tooltip = "Cycles to the previous item. Intended for use with gamepads.",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+
+	Default = {
+		Toggled = false,
+		Keybind = {
+			Gamepad = Enum.KeyCode.ButtonL1
+		}
+	}
 })
 
 for i = 1, 9 do
