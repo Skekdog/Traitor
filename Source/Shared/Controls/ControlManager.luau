@@ -14,11 +14,15 @@ export type RegistrationInfo = {
 	ActionName: string,
 	Priority: number,
 	Callback: ControlTypes.ActionCallback,
+	Setting: SettingDefinitions.ControlValue,
 }
 
 export type InputMethod = "Touch" | "KBM" | "Gamepad"
 
+const LONG_PRESS_DURATION = 0.2
+
 local registered: {[string]: RegistrationInfo} = {}
+local registeredLongHold: {[string]: {Conn: RBXScriptConnection, Keybind: Enum.KeyCode}} = {}
 
 local KEY_NAMES = {
 	LeftControl = "LCTRL",
@@ -102,13 +106,23 @@ function module.Register(actionName: string, callback: ControlTypes.ActionCallba
 		ContextActionService:UnbindAction(actionName)
 	end
 
+	local longHold = registeredLongHold[actionName]
+	if longHold then
+		longHold.Conn:Disconnect()
+		registeredLongHold[actionName] = nil
+	end
+
+	local setting = settingOverride or Settings.GetSetting(actionName) :: Settings.ControlValue
+	if setting.LongHoldGamepad then
+		priority += 1
+	end
+
 	registered[actionName] =  {
 		ActionName = actionName,
 		Callback = callback,
 		Priority = priority,
+		Setting = setting,
 	}
-
-	local setting = settingOverride or Settings.GetSetting(actionName) :: Settings.ControlValue
 
 	local toggled = setting.Toggled
 
@@ -121,7 +135,7 @@ function module.Register(actionName: string, callback: ControlTypes.ActionCallba
 		table.insert(binds, setting.Keybind.KBMKeybind)
 	end
 
-	local function runCallback(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
+	local function doAction(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
 		if toggled then
 			if state ~= Enum.UserInputState.Begin then
 				return Enum.ContextActionResult.Pass
@@ -131,6 +145,61 @@ function module.Register(actionName: string, callback: ControlTypes.ActionCallba
 		end
 
 		return callback(action, state, input)
+	end
+
+	local gamepadKeybind = setting.Keybind.Gamepad
+	if setting.LongHoldGamepad and gamepadKeybind and gamepadKeybind:IsA("KeyCode") then
+		registeredLongHold[actionName] = {
+			Keybind = gamepadKeybind,
+			Conn = UserInputService.InputBegan:Connect(function(input, proc)
+				if input.KeyCode ~= setting.Keybind.Gamepad :: Enum.KeyCode? then
+					return
+				end
+
+				local state = input.UserInputState
+
+				const began = os.clock()
+				while true do
+					task.wait()
+					if (os.clock() - began) >= LONG_PRESS_DURATION then
+						break
+					end
+
+					if input.UserInputState == Enum.UserInputState.End then
+						return Enum.ContextActionResult.Pass
+					end
+				end
+
+				doAction(actionName, state, input)
+			end)
+		}
+	end
+
+	local function runCallback(action: string, state: Enum.UserInputState, input: InputObject): Enum.ContextActionResult
+		if setting.LongHoldGamepad and input.UserInputType.Name:sub(1, #"Gamepad") == "Gamepad" then
+			return Enum.ContextActionResult.Pass
+		end
+
+		if not setting.LongHoldGamepad and input.UserInputType.Name:sub(1, #"Gamepad") == "Gamepad" then
+			for _, bind in registeredLongHold do
+				if bind.Keybind == input.KeyCode then
+					const began = os.clock()
+					while true do
+						task.wait()
+						if (os.clock() - began) >= LONG_PRESS_DURATION then
+							return Enum.ContextActionResult.Pass
+						end
+
+						if input.UserInputState == Enum.UserInputState.End then
+							break
+						end
+					end
+					break
+				end
+			end
+		end
+
+		return doAction(action, state, input)
 	end
 
 	ContextActionService:BindActionAtPriority(actionName, runCallback, false, priority, table.unpack(binds))
@@ -159,6 +228,12 @@ function module.Unregister(actionName: string)
 	ContextActionService:UnbindAction(actionName)
 	ActionButton.TryHideActionButton(actionName)
 	registered[actionName] = nil
+
+	local gamepadLongHold = registeredLongHold[actionName]
+	if gamepadLongHold then
+		gamepadLongHold.Conn:Disconnect()
+		gamepadLongHold[actionName] = nil
+	end
 end
 
 function module.GetRegisteredInfo(actionName: string): RegistrationInfo?
