@@ -46,6 +46,7 @@ const function refresh(): ()
 				task.spawn(function()
 					const success, result = pcall(Players.LocalPlayer.IsFriendsWithAsync, Players.LocalPlayer, userId)
 					if success and result then
+						icon.UIStroke.Enabled = true
 						icon.LayoutOrder = -1
 					end
 				end)
