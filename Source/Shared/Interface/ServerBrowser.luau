@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local SharedTypes = require(ReplicatedStorage.Shared.SharedTypes)
 local SafeTeleport = require(ReplicatedStorage.Shared.Util.SafeTeleport)
@@ -16,7 +17,14 @@ const function refresh(): ()
 	for serverId, info in servers do
 		const entry = ui.Object.ServerFrameTemplate:Clone()
 
-		entry.ServerId.Text = serverId:split("-")[1]
+		const isCurrentServer = serverId == game.JobId or RunService:IsStudio()
+		if isCurrentServer then
+			entry.LayoutOrder = -1
+			entry.ServerId.Text = serverId:split("-")[1] .. "\n(CURRENT)"
+		else
+			entry.ServerId.Text = serverId:split("-")[1]
+		end
+
 		entry.Map.Text = info.Map
 		entry.Gamemode.Text = info.Gamemode
 
@@ -50,12 +58,14 @@ const function refresh(): ()
 		entry.Visible = true
 		entry.Parent = ui.Object.ScrollingFrame :: any
 
-		entry.Join.Activated:Connect(function()
-			local options = Instance.new("TeleportOptions")
-			options.ServerInstanceId = serverId
+		if not isCurrentServer then
+			entry.Join.Activated:Connect(function()
+				local options = Instance.new("TeleportOptions")
+				options.ServerInstanceId = serverId
 
-			SafeTeleport(info.PlaceId, {})
-		end)
+				SafeTeleport(info.PlaceId, {})
+			end)
+		end
 	end
 end
 
