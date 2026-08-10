@@ -382,6 +382,15 @@ local function selectLowest()
 	return Enum.ContextActionResult.Pass
 end
 
+local function selectHighest()
+	local highest = table.maxn(ourInventory.Slots())
+	if highest == 0 then
+		return Enum.ContextActionResult.Pass
+	end
+	tryEquip(ourInventory.Slots()[highest])
+	return Enum.ContextActionResult.Pass
+end
+
 ControlManager.Register("Next Item", function()
 	local equippedItem = module.EquippedItem()
 	if not equippedItem then
@@ -402,6 +411,35 @@ ControlManager.Register("Next Item", function()
 	end
 
 	for i = selectedSlot + 1, 9 do
+		if ourInventory.Slots()[i] then
+			tryEquip(ourInventory.Slots()[i])
+			return Enum.ContextActionResult.Pass
+		end
+	end
+
+	return Enum.ContextActionResult.Pass
+end)
+
+ControlManager.Register("Previous Item", function()
+	local equippedItem = module.EquippedItem()
+	if not equippedItem then
+		return selectHighest()
+	end
+
+	if not selectedSlot then
+		return Enum.ContextActionResult.Pass
+	end
+
+	if selectedSlot - 1 < getMinIndex(ourInventory.Slots()) then
+		return selectHighest()
+	end
+
+	if getMinIndex(ourInventory.Slots()) == selectedSlot then
+		tryUnequip(ourInventory.Slots()[selectedSlot])
+		return Enum.ContextActionResult.Pass
+	end
+
+	for i = selectedSlot - 1, 1, -1 do
 		if ourInventory.Slots()[i] then
 			tryEquip(ourInventory.Slots()[i])
 			return Enum.ContextActionResult.Pass
