@@ -13,6 +13,7 @@ require(script.Parent.Chat.ChatPrefix)
 require(script.Parent.Chat.QuickChat.QuickChatUI)
 require(script.Parent.Chat.ChatWindow)
 require(script.Parent.Chat.TeamChat)
+require(script.Parent.ServerBrowser)
 
 for _, v in script.Parent.GameState:GetChildren() do
 	if v:IsA("ModuleScript") then
