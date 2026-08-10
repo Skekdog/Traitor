@@ -4,6 +4,7 @@ export type ServerInfo = {
 	Capacity: number,
 	Gamemode: string,
 	Map: string,
+	PlaceId: number,
 }
 
 return nil

@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local SharedTypes = require(ReplicatedStorage.Shared.SharedTypes)
+local SafeTeleport = require(ReplicatedStorage.Shared.Util.SafeTeleport)
 
 const ui = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs.ServerList)>>("ServerList")
 
@@ -44,6 +45,13 @@ const function refresh(): ()
 
 		entry.Visible = true
 		entry.Parent = ui.Object.ScrollingFrame :: any
+
+		entry.Join.Activated:Connect(function()
+			local options = Instance.new("TeleportOptions")
+			options.ServerInstanceId = serverId
+
+			SafeTeleport(info.PlaceId, {})
+		end)
 	end
 end
 

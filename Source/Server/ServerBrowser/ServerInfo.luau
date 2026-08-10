@@ -12,6 +12,8 @@ const currentServerInfo: ServerInfo = {
 	Capacity = Players.MaxPlayers,
 	Gamemode = "",
 	Map = "",
+
+	PlaceId = 0
 }
 
 local function updateServerInfo(serverInfo: ServerInfo): ()
@@ -24,6 +26,7 @@ local function updateServerInfo(serverInfo: ServerInfo): ()
 
 	serverInfo.Gamemode = GetDisplayName(round.Gamemode)
 	serverInfo.Map = GetDisplayName(round:GetMap())
+	serverInfo.PlaceId = game.PlaceId
 end
 
 const ServerInfo = {}
