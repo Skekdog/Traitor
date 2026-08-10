@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local StarterGui = game:GetService("StarterGui")
@@ -526,21 +527,44 @@ ReplicatedStorage.Remotes.ServerClient.UpdateAmmo.OnClientEvent:Connect(function
 end)
 
 ControlManager.PreferredInput:Connect(function(preferredInput)
-	local isTouch = preferredInput == Enum.PreferredInput.Touch
+	local usePickerMenu = preferredInput ~= Enum.PreferredInput.KeyboardAndMouse
 
 	ui:ToggleVisible(false, nil, function()
-		ui.Object.AnchorPoint = if isTouch then Vector2.one / 2 else Vector2.one
+		ui.Object.AnchorPoint = if usePickerMenu then Vector2.one / 2 else Vector2.one
 	end)
 
-	ui.Object:SetAttribute("TransitionDirection", if isTouch then "Up" else "Left")
-	ui.Object:SetAttribute("TransitionTarget", if isTouch then UDim2.new(0.5, 0, 0.5, 0) else UDim2.new(1, -10, 1, -10))
+	ui.Object:SetAttribute("TransitionDirection", if usePickerMenu then nil else "Left")
+	ui.Object:SetAttribute("TransitionTarget", if usePickerMenu then UDim2.new(0.5, 0, 0.5, 0) else UDim2.new(1, -10, 1, -10))
 
-	if not isTouch then
+	if not usePickerMenu then
 		ui:ToggleVisible(true)
 	end
 
-	inventoryButtonUi:ToggleVisible(isTouch)
+	inventoryButtonUi:ToggleVisible(usePickerMenu)
 end, true)
+
+ControlManager.Register("Inventory", function()
+	ui:ToggleVisible()
+	return Enum.ContextActionResult.Pass
+end)
+
+ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+	if ui.Object.Visible then
+		local equippedItem = module.EquippedItem()
+		if equippedItem then
+			local found = ui.Object:FindFirstChild("Item " .. equippedItem.Name) :: ItemButton?
+			if found then
+				GuiService.SelectedObject = found
+			else
+				GuiService:Select(ui.Object)
+			end
+		else
+			GuiService:Select(ui.Object)
+		end
+	elseif GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(ui.Object) then
+		GuiService.SelectedObject = nil
+	end
+end)
 
 inventoryButtonUi.Object.Activated:Connect(function()
 	ui:ToggleVisible()

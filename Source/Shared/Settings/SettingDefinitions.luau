@@ -503,6 +503,24 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Inventory",
+	Tab = "Keybinds",
+	Category = "Menus",
+	Kind = "Control" :: "Control",
+	SpecifyToggle = false,
+	Default = {
+		Toggled = true,
+		Keybind = {
+			Gamepad = Enum.KeyCode.ButtonY,
+		},
+	},
+
+	Callback = function(name: string, value: ControlValue)
+		(require)(callbacks.Keybind)(name, value)
+	end,
+})
+
+table.insert(availableSettings, {
 	Name = "Menu Picker",
 	Tab = "Keybinds",
 	Category = "Menus",

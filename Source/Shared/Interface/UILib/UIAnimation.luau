@@ -38,8 +38,6 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			offScreenPosition = UDim2.new(targetUDim.X.Scale, targetUDim.X.Offset, (frame.Size.Y.Scale * frame.AnchorPoint.Y) + 1, targetUDim.Y.Offset)
 		elseif direction == "Down" then
 			offScreenPosition = UDim2.new(targetUDim.X.Scale, targetUDim.X.Offset, (frame.Size.Y.Scale * frame.AnchorPoint.Y) - 1, targetUDim.Y.Offset)
-		elseif not isSize then
-			error("Invalid direction for " .. frame.Name)
 		end
 
 		local UI_TRANSITION_TIME = if isSize then 0.2 else 0.4
@@ -97,7 +95,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			}
 		end
 
-		tween = module.Animate(if isSize then scale :: UIScale else frame, info, properties)
+		tween = module.Animate(if isSize then scale :: UIScale else frame, info, properties, isSize and direction == nil)
 
 		if open then
 			if isSize then
