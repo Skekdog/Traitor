@@ -111,10 +111,6 @@ function module.TryInteract(prop: Types.MapObject?, part: BasePart?, input: Inpu
 	end
 
 	if not prop or not part then
-		if input and input.UserInputState ~= Enum.UserInputState.End then
-			return false
-		end
-
 		if actionNode then
 			ActionNodeClient.Activate(actionNode)
 			return true
