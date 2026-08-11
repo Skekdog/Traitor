@@ -76,7 +76,8 @@ ui:GetPropertyChangedSignal("Visible"):Connect(function()
 	end
 
 	-- Timing issue...
-	task.wait(task.wait())
+	task.wait()
+	task.wait()
 	GuiService:Select(ui)
 end)
 
