@@ -38,6 +38,10 @@ local hideAt = math.huge
 local SHOW_DURATION = 3
 
 local function showMenu()
+	if ControlManager.PreferredInput() ~= Enum.PreferredInput.KeyboardAndMouse then
+		return
+	end
+
 	ui:ToggleVisible(true)
 	hideAt = os.clock() + SHOW_DURATION
 end
