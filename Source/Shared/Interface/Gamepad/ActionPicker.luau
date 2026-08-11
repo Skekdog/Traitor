@@ -6,6 +6,9 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ui = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs["Action Picker"])>>("Action Picker")
 local actionUi = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs.LeftArea)>>("LeftArea").Object.Actions
 
+local menuPickerUI = UIManager.WaitForUI("Menu Picker")
+local inventoryUI = UIManager.WaitForUI("Inventory")
+
 local function createButton(name: string, action: string): ()
 	local button = ui.Object.ButtonTemplate:Clone()
 	button.Name = action
@@ -45,6 +48,11 @@ end
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	if ui.Object.Visible then
+		menuPickerUI:ToggleVisible(false)
+		if inventoryUI.Object:GetAttribute("TransitionDirection") == nil then
+			inventoryUI:ToggleVisible(false)
+		end
+
 		GuiService:Select(ui.Object)
 	elseif GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(ui.Object) then
 		GuiService.SelectedObject = nil

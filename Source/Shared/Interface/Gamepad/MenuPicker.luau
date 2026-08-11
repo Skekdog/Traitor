@@ -5,6 +5,9 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ui = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs["Menu Picker"])>>("Menu Picker")
 local sidebarUi = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs.Sidebar)>>("Sidebar")
 
+local actionsUI = UIManager.WaitForUI("Action Picker")
+local inventoryUI = UIManager.WaitForUI("Inventory")
+
 -- These will be at the top of the list. Last item in the array is first
 local additionalMenus = {
 	"Sound Player",
@@ -49,6 +52,11 @@ end
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	if ui.Object.Visible then
+		actionsUI:ToggleVisible(false)
+		if inventoryUI.Object:GetAttribute("TransitionDirection") == nil then
+			inventoryUI:ToggleVisible(false)
+		end
+
 		GuiService:Select(ui.Object)
 	elseif GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(ui.Object) then
 		GuiService.SelectedObject = nil

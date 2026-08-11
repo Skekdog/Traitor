@@ -20,6 +20,9 @@ local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
 local inventoryButtonUi = UIManager.WaitForUI("InventoryButton") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.InventoryButton)}
 
+local actionsUI = UIManager.WaitForUI("Action Picker")
+local menuPickerUI = UIManager.WaitForUI("Menu Picker")
+
 local module = {}
 
 local sampleButton = ui.Object.ButtonTemplate
@@ -572,6 +575,9 @@ ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
 	if ControlManager.PreferredInput() == Enum.PreferredInput.KeyboardAndMouse then
 		return
 	end
+
+	actionsUI:ToggleVisible(false)
+	menuPickerUI:ToggleVisible(false)
 
 	if ui.Object.Visible then
 		local equippedItem = module.EquippedItem()
