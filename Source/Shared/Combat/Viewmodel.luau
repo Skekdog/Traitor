@@ -184,22 +184,35 @@ function module.Show(item: Types.Item): ()
     local viewmodel = (camera:FindFirstChild("Viewmodel") or ReplicatedStorage.Assets.Viewmodel:Clone()) :: Viewmodel
 
     if not viewmodel.Parent then
-        local function updateShirt(shirt: Shirt?): ()
-            local oldShirt = viewmodel:FindFirstChildOfClass("Shirt")
+        -- maps character instance to viewmodel instance
+        local linkedShirts: {[Shirt]: Shirt?} = {}
+        local linkedBodyColours: {[BodyColors]: BodyColors?} = {}
+
+        local function removeOldShirt(shirt: Shirt): ()
+            local oldShirt = linkedShirts[shirt]
             if oldShirt then
+                linkedShirts[shirt] = nil
                 oldShirt:Destroy()
             end
+        end
 
+        local function removeOldBodyColours(bodyColours: BodyColors): ()
+            local oldColours = linkedBodyColours[bodyColours]
+            if oldColours then
+                linkedBodyColours[bodyColours] = nil
+                oldColours:Destroy()
+            end
+        end
+
+        local function updateShirt(shirt: Shirt): ()
             if shirtCon then
                 shirtCon:Disconnect()
             end
 
-            if not shirt then
-                return
-            end
-
             local newShirt = shirt:Clone()
             newShirt.Parent = viewmodel
+
+            linkedShirts[shirt] = newShirt
 
             shirtCon = shirt.Changed:Connect(function(prop)
                 if prop == "Parent" then
@@ -208,25 +221,20 @@ function module.Show(item: Types.Item): ()
                 (newShirt :: any)[prop] = (shirt :: any)[prop]
             end)
 
-            shirt.Destroying:Once(updateShirt)
+            shirt.Destroying:Once(function()
+                removeOldShirt(shirt)
+            end)
         end
 
-        local function updateColours(colours: BodyColors?): ()
-            local oldColours = viewmodel:FindFirstChildOfClass("BodyColors")
-            if oldColours then
-                oldColours:Destroy()
-            end
-
+        local function updateColours(colours: BodyColors): ()
             if coloursCon then
                 coloursCon:Disconnect()
             end
 
-            if not colours then
-                return
-            end
-
             local newColours = colours:Clone()
             newColours.Parent = viewmodel
+
+            linkedBodyColours[colours] = newColours
 
             coloursCon = colours.Changed:Connect(function(prop)
                 if prop == "Parent" then
@@ -235,7 +243,9 @@ function module.Show(item: Types.Item): ()
                 (newColours :: any)[prop] = (colours :: any)[prop]
             end)
 
-            colours.Destroying:Once(updateColours)
+            colours.Destroying:Once(function()
+                removeOldBodyColours(colours)
+            end)
         end
 
         local shirt = char:FindFirstChildOfClass("Shirt")
