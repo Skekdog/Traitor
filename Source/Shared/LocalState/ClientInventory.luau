@@ -34,6 +34,14 @@ module.Ammo = ourAmmo
 
 local selectedSlot: number?
 
+local hideAt = math.huge
+local SHOW_DURATION = 3
+
+local function showMenu()
+	ui:ToggleVisible(true)
+	hideAt = os.clock() + SHOW_DURATION
+end
+
 local function runScheduledCallbacks(dt: number, schedulerEvent: "Heartbeat" | "PreAnimation" | "PreRender" | "PreSimulation" | "PostSimulation"): ()
 	for _, v in ourInventory.Passive do
 		if v[schedulerEvent .. "Client"] then
@@ -110,6 +118,8 @@ local function tryUnequip(item: Types.Item, force: boolean?): boolean
 	end
 
 	button.BackgroundTransparency = 0.7
+
+	showMenu()
 	return true
 end
 
@@ -226,6 +236,8 @@ local function tryEquip(item: Types.Item): ()
 
 	selectedSlot = button.LayoutOrder
 	button.BackgroundTransparency = 0.3
+
+	showMenu()
 end
 
 local function tryAddButton(item: Types.Item, slot: number): ()
@@ -256,6 +268,8 @@ local function tryAddButton(item: Types.Item, slot: number): ()
 		end
 		tryEquip(item)
 	end)
+
+	showMenu()
 end
 
 local function tryRemoveButton(itemName: string)
@@ -263,6 +277,8 @@ local function tryRemoveButton(itemName: string)
 	if found then
 		found:Destroy()
 	end
+
+	showMenu()
 end
 
 local function removeItem(itemName: string): ()
@@ -549,6 +565,10 @@ ControlManager.Register("Inventory", function()
 end)
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+	if ControlManager.PreferredInput() == Enum.PreferredInput.KeyboardAndMouse then
+		return
+	end
+
 	if ui.Object.Visible then
 		local equippedItem = module.EquippedItem()
 		if equippedItem then
@@ -571,5 +591,17 @@ inventoryButtonUi.Object.Activated:Connect(function()
 end)
 
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
+
+RunService.Heartbeat:Connect(function()
+	if ControlManager.PreferredInput() ~= Enum.PreferredInput.KeyboardAndMouse then
+		return
+	end
+
+	if os.clock() > hideAt then
+		hideAt = math.huge
+		ui:ToggleVisible(false)
+		return
+	end
+end)
 
 return table.freeze(module)
