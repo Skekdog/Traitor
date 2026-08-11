@@ -95,7 +95,7 @@ function module.TransitionUIState(frame: GuiObject, open: boolean): Tween?
 			}
 		end
 
-		tween = module.Animate(if isSize then scale :: UIScale else frame, info, properties, isSize and direction == nil)
+		tween = module.Animate(if isSize then scale :: UIScale else frame, info, properties, not isSize and direction == nil)
 
 		if open then
 			if isSize then
