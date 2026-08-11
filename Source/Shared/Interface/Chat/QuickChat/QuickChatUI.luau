@@ -1,3 +1,4 @@
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local QuickChat = require(script.Parent.QuickChat)
@@ -26,6 +27,10 @@ ui:GetPropertyChangedSignal("Visible"):Connect(function()
 	local thisShow = newproxy()
 	lastShow = thisShow
 	if not ui.Visible then
+		if GuiService.SelectedObject and GuiService.SelectedObject:IsDescendantOf(ui) then
+			GuiService.SelectedObject = nil
+		end
+
 		for i = 1, 9 do
 			ControlManager.Unregister("Quick Chat " .. i)
 		end
@@ -69,6 +74,10 @@ ui:GetPropertyChangedSignal("Visible"):Connect(function()
 			chat(button)
 		end)
 	end
+
+	-- Timing issue...
+	task.wait(task.wait())
+	GuiService:Select(ui)
 end)
 
 ChatWindow.QuickChatButton.Activated:Connect(function()
@@ -78,7 +87,7 @@ end)
 ControlManager.Register("Quick Chat", function()
 	ui.Visible = not ui.Visible
 	return Enum.ContextActionResult.Pass
-end)
+end, Enum.ContextActionPriority.High.Value + 1)
 
 RunService.Heartbeat:Connect(function()
 	if not ui.Visible then
