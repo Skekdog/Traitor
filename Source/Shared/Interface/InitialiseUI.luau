@@ -15,6 +15,7 @@ require(script.Parent.Chat.ChatWindow)
 require(script.Parent.Chat.TeamChat)
 require(script.Parent.ServerBrowser)
 require(script.Parent.Gamepad.MenuPicker)
+require(script.Parent.Gamepad.ActionPicker)
 
 for _, v in script.Parent.GameState:GetChildren() do
 	if v:IsA("ModuleScript") then

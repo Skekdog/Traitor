@@ -5,11 +5,13 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ui = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs["Menu Picker"])>>("Menu Picker")
 local sidebarUi = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs.Sidebar)>>("Sidebar")
 
+-- These will be at the top of the list. Last item in the array is first
 local additionalMenus = {
 	"Sound Player",
+	"Action Picker",
 }
 
-local function createButton(menu: string): ()
+local function createButton(menu: string, layoutOrder: number?): ()
 	local button = ui.Object.ButtonTemplate:Clone()
 	button.Name = menu
 	button.Text = menu
@@ -19,6 +21,7 @@ local function createButton(menu: string): ()
 		UIManager.GetUI(menu):ToggleVisible(true)
 	end)
 
+	button.LayoutOrder = layoutOrder or 1
 	button.Visible = true
 	button.Parent = ui.Object
 end
@@ -40,8 +43,8 @@ for _, menu in sidebarUi.Object:GetChildren() do
 	end
 end
 
-for _, menu in additionalMenus do
-	createButton(menu)
+for i, menu in additionalMenus do
+	createButton(menu, -i)
 end
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()

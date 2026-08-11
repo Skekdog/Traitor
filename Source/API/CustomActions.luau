@@ -4,6 +4,7 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local CustomActions = {}
 
 local actions: {[number]: string} = {}
+local callbacks: {[string]: () -> ()?} = {}
 
 local ui = (UIManager.WaitForUI("LeftArea") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.LeftArea)}).Object
 
@@ -28,6 +29,8 @@ function CustomActions.Register(name: string, callback: () -> (), preferredSlot:
 	button.Visible = true
 	button.Parent = ui.Actions
 
+	callbacks[name] = callback
+
 	button.Activated:Connect(function()
 		callback()
 	end)
@@ -43,6 +46,7 @@ function CustomActions.Unregister(name: string): ()
 		if action == name then
 			actions[index] = nil
 			ControlManager.Unregister("Action " .. index)
+			callbacks[name] = nil
 
 			local button = ui.Actions:FindFirstChild(tostring(index))
 			if button then
@@ -52,6 +56,11 @@ function CustomActions.Unregister(name: string): ()
 			break
 		end
 	end
+end
+
+function CustomActions.Trigger(name: string): ()
+	local callback = callbacks[name] or error("Action " .. name .. " not found")
+	callback()
 end
 
 return table.freeze(CustomActions)
