@@ -37,6 +37,7 @@ end
 
 local UIManager = {}
 
+-- Note: ActionButtons is necessary as that has a different screen inset to regular buttons
 export type Layer = "Special" | "Popup" | "Buttons" | "HUD" | "ActionButtons"
 
 export type UI = {
@@ -334,10 +335,10 @@ function UIManager.WaitForUI<T>(name: string, ignoreYield: boolean?): UI & {Obje
 end
 
 local orders: {[Layer]: number} = {
-	ActionButtons = 5,
+	ActionButtons = 3,
+	Buttons = 3,
 	Special = 4,
-	Popup = 3,
-	Buttons = 2,
+	Popup = 2,
 	HUD = 1,
 }
 
