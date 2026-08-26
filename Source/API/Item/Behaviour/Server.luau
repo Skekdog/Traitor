@@ -13,6 +13,9 @@ local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPar
 local GetPrimaryPart = require(ReplicatedStorage.Shared.RoundRule.Common.GetPrimaryPart)
 local ExplosionParams = require(ReplicatedStorage.Shared.RoundRule.ExplosionParams)
 
+local SELF_SHOT_GRACE = 0.5
+local BOUNCE_DEBOUNCE = 0.25
+
 local Server = {}
 
 local NEAR_MISS_RADIUS = 0.25 -- note this is a RADIUS, so it gets doubled when used
@@ -163,12 +166,14 @@ function Server.SimulateProjectile(item: Types.Item, participant: Types.Particip
 
 		local startTime = os.clock()
 
+		local lastBounce = 0
 		ForEachPart(projectile, function(part)
 			part.Touched:Connect(function(otherPart)
-				if (os.clock() - startTime < 0.5 and char and otherPart:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(part.CollisionGroup, otherPart.CollisionGroup) then
+				if (os.clock() - lastBounce < BOUNCE_DEBOUNCE) or (os.clock() - startTime < SELF_SHOT_GRACE and char and otherPart:IsDescendantOf(char)) or not PhysicsService:CollisionGroupsAreCollidable(part.CollisionGroup, otherPart.CollisionGroup) then
 					return
 				end
 
+				lastBounce = os.clock()
 				bounces += 1
 
 				local projPosition = primaryPart.Position
