@@ -10,7 +10,7 @@ local function createWedgeFragment(properties: GlassProperties, size: Vector3, c
     local wedge = Instance.new("WedgePart")
 
     for i, v in properties do
-        if i ~= "Size" and i ~= "CFrame" then
+        if i ~= "Size" and i ~= "CFrame" and i ~= "ShatterScale" then
             (wedge :: any)[i] = v
         end
     end
@@ -55,6 +55,8 @@ export type GlassProperties = {
     Color: Color3,
     Transparency: number,
     Reflectance: number,
+
+    ShatterScale: number?,
 }
 
 local function shatterServer(glassProperties: BasePart | GlassProperties, direction: Vector3?, force: number?): ()
@@ -70,6 +72,8 @@ local function shatterServer(glassProperties: BasePart | GlassProperties, direct
         Color = glassProperties.Color,
         Transparency = glassProperties.Transparency,
         Reflectance = glassProperties.Reflectance,
+
+        ShatterScale = glassProperties:GetAttribute("ShatterScale") :: number?,
     }
 
     ReplicatedStorage.Remotes.ServerClient.ShatterGlass:FireAllClients(properties, direction, force)
@@ -77,11 +81,9 @@ local function shatterServer(glassProperties: BasePart | GlassProperties, direct
     glassProperties:Destroy()
 end
 
-local function shatterClient(glassProperties: BasePart | GlassProperties, direction: Vector3?, force: number?): ()
-    assert(typeof(glassProperties) == "table")
-
-    local cols = math.max(1, math.floor(glassProperties.Size.X / 3))
-    local rows = math.max(1, math.floor(glassProperties.Size.Y / 3))
+local function shatterClient(glassProperties: GlassProperties, direction: Vector3?, force: number?): ()
+    local cols = math.max(1, math.floor(glassProperties.Size.X / (3 / (glassProperties.ShatterScale or 1))))
+    local rows = math.max(1, math.floor(glassProperties.Size.Y / (3 / (glassProperties.ShatterScale or 1))))
 
     local glassSize = glassProperties.Size
     local glassCFrame = glassProperties.CFrame
@@ -132,6 +134,8 @@ local function ShatterGlass(glassProperties: BasePart | GlassProperties, directi
     if IS_SERVER then
         return shatterServer(glassProperties, direction, force)
     end
+
+    assert(typeof(glassProperties) == "table")
     shatterClient(glassProperties, direction, force)
 end
 
