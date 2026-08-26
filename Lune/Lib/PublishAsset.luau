@@ -52,9 +52,9 @@ local function PublishAsset(assetId: string, assetName: string, assetPath: strin
 	})
 
 	if not response.ok then
-		error(`Upload failed ({response.statusCode}): {response.body}`)
+		error(`Failed to upload {assetName} ({assetId}): {response.statusCode} {response.body}`)
 	end
-	print("Uploaded asset", assetId)
+	print(`Uploaded asset {assetName} ({assetId})`)
 end
 
 return PublishAsset
