@@ -1,5 +1,4 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 local Audio = require(ReplicatedStorage.API.Audio)
 local Ammo = require(ReplicatedStorage.API.Item.Ammo)
 local Gun = require(ReplicatedStorage.API.Item.Presets.Gun)
@@ -7,6 +6,7 @@ local ItemGroups = require(ReplicatedStorage.API.ItemGroups)
 local Types = require(ReplicatedStorage.API.Types)
 local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 local ForEachPart = require(ReplicatedStorage.Shared.RoundRule.Common.ForEachPart)
+local Tween = require(ReplicatedStorage.API.Replication.Tween)
 
 local SealGun = {}
 
@@ -27,9 +27,9 @@ local function beforeHitAnything(_, params: Types.DamageParams): boolean
 	projectile:SetAttribute("DidHit", true)
 	task.delay(5, ForEachPart, projectile, function(part: BasePart)
 		part.Anchored = true
-		TweenService:Create(part, TweenInfo.new(1), {
+		Tween.Tween(part, TweenInfo.new(1), {
 			Transparency = 1,
-		}):Play()
+		})
 	end)
 
 	task.delay(6, projectile.Destroy, projectile)
