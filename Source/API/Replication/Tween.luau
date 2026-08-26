@@ -3,9 +3,9 @@ local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local GetRemote = require(ReplicatedStorage.API.GetRemote)
 
-const Tween = {}
+local Tween = {}
 
-const remote = GetRemote("ClientTween", ReplicatedStorage.Remotes.ServerClient)
+local remote = GetRemote("ClientTween", ReplicatedStorage.Remotes.ServerClient)
 function Tween.Tween(instance: Instance, tweenInfo: TweenInfo, propertyTable: {[string]: unknown}): ()
 	remote:FireAllClients(instance, tweenInfo, propertyTable)
 end
