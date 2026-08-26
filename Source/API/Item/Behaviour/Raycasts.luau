@@ -39,6 +39,7 @@ function Raycasts.GetDirection(): Vector3
 	return GetCentreRay().Direction
 end
 
+--- Sorts parts when multiple are caught by hitscan. Character > Interactable > Prop > Other
 local function sortParts(part1: BasePart, part2: BasePart): boolean
 	if GetMapObjectWithTag(part1, "Character") and not GetMapObjectWithTag(part2, "Character") then
 		return true
