@@ -75,6 +75,10 @@ ui:GetPropertyChangedSignal("Visible"):Connect(function()
 		end)
 	end
 
+	if not ControlManager.PreferredInput().Name:find("Gamepad") then
+		return
+	end
+
 	-- Timing issue...
 	task.wait()
 	task.wait()

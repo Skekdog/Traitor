@@ -1,6 +1,7 @@
 local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CustomActions = require(ReplicatedStorage.API.CustomActions)
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local ui = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs["Action Picker"])>>("Action Picker")
@@ -47,6 +48,10 @@ for _, action in actionUi:GetChildren() do
 end
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+	if not ControlManager.PreferredInput().Name:find("Gamepad") then
+		return
+	end
+
 	if ui.Object.Visible then
 		menuPickerUI:ToggleVisible(false)
 		if inventoryUI.Object:GetAttribute("TransitionDirection") == nil then

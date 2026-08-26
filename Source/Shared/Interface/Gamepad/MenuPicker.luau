@@ -1,5 +1,6 @@
 local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local ui = UIManager.WaitForUI<<typeof(UIManager.UnregisteredUIs["Menu Picker"])>>("Menu Picker")
@@ -51,6 +52,10 @@ for i, menu in additionalMenus do
 end
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
+	if not ControlManager.PreferredInput().Name:find("Gamepad") then
+		return
+	end
+
 	if ui.Object.Visible then
 		actionsUI:ToggleVisible(false)
 		if inventoryUI.Object:GetAttribute("TransitionDirection") == nil then

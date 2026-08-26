@@ -572,7 +572,7 @@ ControlManager.Register("Inventory", function()
 end)
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
-	if ControlManager.PreferredInput() == Enum.PreferredInput.KeyboardAndMouse then
+	if not ControlManager.PreferredInput().Name:find("Gamepad") then
 		return
 	end
 
