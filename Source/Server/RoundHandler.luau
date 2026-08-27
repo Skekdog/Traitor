@@ -4,6 +4,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local Audio = require(ReplicatedStorage.API.Audio)
 local TeamChat = require(ServerScriptService.Chat.TeamChat)
+local Ban = require(ServerScriptService.Moderation.Ban)
 local GetMaterial = require(ReplicatedStorage.API.GetMaterial)
 local Impulse = require(ReplicatedStorage.API.Impulse)
 local RoundHooks = require(ReplicatedStorage.API.GameHooks)
@@ -27,6 +28,9 @@ local module = {}
 local defaultGamemode = GamemodeValidation.ValidateGamemodeScript(ReplicatedStorage.Shared.GameDefinition.Gamemodes.Traitor)
 
 local EXCLUDED_GAMEMODES: {Instance} = {ReplicatedStorage.Shared.GameDefinition.Gamemodes.FloodEscape}
+
+const NO_KARMA_BANS = true
+const KARMA_BAN_THRESHOLD = 250
 
 Round.Config.DeathSounds = DeathSounds
 
@@ -247,6 +251,15 @@ local didEnd = false
 local function newRound(): Types.Round
     didEnd = false
     roundCount += 1
+
+    if not NO_KARMA_BANS then
+        for _, player in Players:GetPlayers() do
+            local karma = KarmaManager.GetKarma(player)
+            if karma and karma < KARMA_BAN_THRESHOLD then
+                Ban.Karma(player)
+            end
+        end
+    end
 
     TeamChat.Clear()
 
