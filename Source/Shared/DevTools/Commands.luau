@@ -10,6 +10,7 @@ local Types = require(ReplicatedStorage.API.Types)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
+local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 export type BaseCommand = {
 	Name: string,
@@ -1115,6 +1116,93 @@ Commands.ragdoll = {
 		end
 
 		return `Ragdolled {getPlayersString(ragdolledPlayers)}, unragdolled {getPlayersString(unragdolledPlayers)}`
+	end
+}
+
+Commands.ban = {
+	Name = "ban",
+	Category = "Moderation",
+	Description = "Bans a player.",
+	Arguments = {"exact username / id", "duration / perm", "display reason", "private reason"},
+	Environment = "Server" :: "Server",
+
+	-- Note: this command requires exact names / ids to avoid banning the wrong people
+	Execute = function(executor: Player, _, args: Args): string
+		local Ban = require(ServerScriptService.Moderation.Ban)
+
+		if IsLabs then
+			return "Banning is not possible in Labs."
+		end
+
+		local nameOrId = args[1]
+		if not nameOrId then
+			return `A player username or id must be provided.`
+		end
+
+		local durationArg = args[2]
+		if not durationArg then
+			return `A duration must be provided.`
+		end
+
+		local displayReason = processStringArgument(args[3])
+		if not displayReason then
+			return `A display reason must be provided.`
+		end
+
+		local privateReason = processStringArgument(args[4])
+		if not privateReason then
+			return `A private reason must be provided.`
+		end
+
+		local duration = 0
+
+		local durationAsNumber = tonumber(durationArg)
+		if durationAsNumber then
+			duration = durationAsNumber
+		elseif durationArg == "perm" then
+			duration = -1
+		else
+			return `Invalid duration. Either provide a number or "perm".`
+		end
+
+		local player = Players:FindFirstChild(nameOrId)
+		if player and player:IsA("Player") then
+			Ban.Temp(player, duration, displayReason, privateReason)
+			return "Banned " .. player.Name
+		end
+
+		local asId = processNumberArgument(nameOrId)
+		if asId then
+			player = Players:GetPlayerByUserId(asId)
+		end
+
+		if player and player:IsA("Player") then
+			Ban.Temp(player, duration, displayReason, privateReason)
+			return "Banned " .. player.Name
+		end
+
+		return "Player not found. They must be in the server to be banned via the console."
+	end
+}
+
+Commands.unban = {
+	Name = "unban",
+	Category = "Moderation",
+	Description = "Unbans a player.",
+	Arguments = {"exact id"},
+	Environment = "Server" :: "Server",
+
+	Execute = function(_, _, args: Args): string
+		local Ban = require(ServerScriptService.Moderation.Ban)
+
+		local id = processNumberArgument(args[1])
+		if not id then
+			return `Invalid user id.`
+		end
+
+		Ban.Unban(id)
+
+		return "Unbanned " .. id
 	end
 }
 
