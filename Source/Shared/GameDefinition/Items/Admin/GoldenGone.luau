@@ -5,7 +5,7 @@ local GoldenGun = require(ReplicatedStorage.Shared.GameDefinition.Items.Guns.Gol
 
 local GoldenGone = Modify(GoldenGun, "Golden Gone", {
 	PrimaryInterval = 0,
-    AmmoDefinition = Ammo["Super Gun"],
+    AmmoDefinition = Ammo.Infinite,
 })
 
 return table.freeze(GoldenGone)

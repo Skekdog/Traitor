@@ -37,7 +37,7 @@ local Grow = Gun({
 
     PrimaryInterval = 0.6,
     ReloadDuration = 1,
-    AmmoDefinition = Ammo["Mil-Spec"],
+    AmmoDefinition = Ammo.Infinite,
 
     ImpulseForce = 25,
 

@@ -7,7 +7,7 @@ local GatlingSeal = Modify(SealGun.Item, "Gatling Seal", {
 	PrimaryInterval = 0.25,
 	ProjectileSpeed = 200,
 	Damage = 0,
-    AmmoDefinition = Ammo["Super Gun"],
+    AmmoDefinition = Ammo.Infinite,
 })
 
 return table.freeze(GatlingSeal)

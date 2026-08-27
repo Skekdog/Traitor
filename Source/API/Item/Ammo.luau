@@ -4,14 +4,6 @@ local module: {[string]: Types.AmmoDefinition} = {}
 
 local boxModels = ReplicatedStorage.Assets.AmmoBoxModels
 
-module["Super Gun"] = {
-    Kind = "Ammo",
-    Name = "Super Gun",
-    Capacity = 10000,
-    ReserveCapacity = 0,
-    CanDrop = false,
-}
-
 module.HUGE = {
     Kind = "Ammo",
     Name = "HUGE",
