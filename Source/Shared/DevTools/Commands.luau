@@ -1195,6 +1195,10 @@ Commands.unban = {
 	Execute = function(_, _, args: Args): string
 		local Ban = require(ServerScriptService.Moderation.Ban)
 
+		if IsLabs then
+			return "Unbanning is not possible in Labs."
+		end
+
 		local id = processNumberArgument(args[1])
 		if not id then
 			return `Invalid user id.`

@@ -39,7 +39,7 @@ function Ban.Karma(player: Player): ()
 end
 
 function Ban.Unban(userId: number): ()
-	assert(not IsLabs, "Banning is not possible in labs")
+	assert(not IsLabs, "Unbanning is not possible in labs")
 
 	task.spawn(Players.UnbanAsync, Players, {
 		UserIds = {userId},
