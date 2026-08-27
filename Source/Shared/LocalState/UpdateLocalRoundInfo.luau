@@ -24,7 +24,7 @@ local function updateGamemode(name: string?)
     if object then
         local ret = (require)(object)
         if isSucky then
-            LocalRoundInfo.Gamemode:SetValue(ret.Gamemode)
+            LocalRoundInfo.Gamemode:SetValue(ret.Definition.Gamemode)
         else
             LocalRoundInfo.Gamemode:SetValue(ret)
         end
