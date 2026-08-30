@@ -80,7 +80,9 @@ local function PrimaryFireClient(item: Types.Item, origin: Vector3, direction: V
 				return
 			end
 
-			local impulse = (root.Position - hitscan.Position).Unit * PRESSURE / 1000
+			local direction = ((root.CFrame * CFrame.new(-(Vector3.yAxis * root.Size))).Position - hitscan.Position).Unit
+
+			local impulse = direction * PRESSURE / 1000
 			Impulse.ApplyImpulse(root, impulse, true, root:GetClosestPointOnSurface(hitscan.Position))
 		end)
 
