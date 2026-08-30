@@ -473,10 +473,37 @@ ControlManager.Register("Previous Item", function()
 	return Enum.ContextActionResult.Pass
 end)
 
-ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset", item: string | Types.ItemReplication?): ()
+ReplicatedStorage.Shared.RoundRule.Remotes.UpdateInventory.OnClientEvent:Connect(function(mode: "Add" | "Remove" | "Reset" | "Update", item: string | Types.ItemReplication?): ()
 	if mode == "Add" then
 		assert(typeof(item) == "table")
 		addItem(item)
+	elseif mode == "Update" then
+		assert(typeof(item) == "table")
+
+		local foundItem: Types.Item?
+
+		for _, invItem in ourInventory.Passive do
+			if invItem.Name == item.Name then
+				foundItem = invItem
+				break
+			end
+		end
+
+		if not foundItem then
+			for _, invItem in ourInventory.Slots() do
+				if invItem.Name == item.Name then
+					foundItem = invItem
+					break
+				end
+			end
+		end
+
+		if not foundItem then
+			return addItem(item)
+		end
+
+		foundItem.Components = item.Components
+		module.EquippedItem:Invoke()
 	elseif mode == "Remove" then
 		assert(typeof(item) == "string")
 		removeItem(item)
