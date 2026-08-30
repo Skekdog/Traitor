@@ -388,14 +388,14 @@ task.spawn(function()
             onRoundEnd()
         end
 
-        if blockNewRounds then
-            module.Round:Invoke()
-            break
-        end
-
         if module.Round():GetPhase() ~= "Intermission" then
             task.wait()
             continue
+        end
+
+        if blockNewRounds then
+            module.Round:Invoke()
+            break
         end
 
         if roundCount % MAP_VOTE_INTERVAL == 0 then
