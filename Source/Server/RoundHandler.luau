@@ -34,6 +34,11 @@ const KARMA_BAN_THRESHOLD = 250
 
 Round.Config.DeathSounds = DeathSounds
 
+local blockNewRounds = false
+function module.BlockNewRounds(): ()
+    blockNewRounds = true
+end
+
 local function impulseCorpse(round: Types.Round, participant: Types.Participant, defer: boolean): ()
     if not participant.Extras.CombatImpulse or not participant.Corpse or not participant.Corpse.Model or not participant.Corpse.Model.PrimaryPart then
         return
@@ -381,6 +386,11 @@ task.spawn(function()
     while true do
         if not didEnd and module.Round():GetPhase() == "Highlights" then
             onRoundEnd()
+        end
+
+        if blockNewRounds then
+            module.Round:Invoke()
+            break
         end
 
         if module.Round():GetPhase() ~= "Intermission" then
