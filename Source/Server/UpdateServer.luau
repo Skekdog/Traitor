@@ -17,6 +17,7 @@ local messages: {[Enum.CloseReason]: string?} = {
 game.ServerRestartScheduled:Connect(function(scheduledTime, reason, attributes): ()
 	Message.Chat(messages[reason] or DEFAULT_MESSAGE, "All")
 	isScheduled = true
+	RoundHandler.BlockNewRounds()
 end)
 
 RoundHandler.Round:Connect(function()
@@ -25,6 +26,8 @@ RoundHandler.Round:Connect(function()
 	end
 
 	Message.Chat("The server is restarting.", "All")
+
+	task.wait(1)
 
 	if IsLabs then
 		for _, player in Players:GetPlayers() do
