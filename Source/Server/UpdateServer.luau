@@ -24,6 +24,8 @@ RoundHandler.Round:Connect(function()
 		return
 	end
 
+	Message.Chat("The server is restarting.", "All")
+
 	if IsLabs then
 		for _, player in Players:GetPlayers() do
 			player:Kick("This server has shut down.")
