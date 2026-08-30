@@ -1210,4 +1210,75 @@ Commands.unban = {
 	end
 }
 
+Commands.data = {
+	Name = "data",
+	Category = "Item",
+	Description = "Edits an item's components within a player's inventory.",
+	Arguments = {"item name", "component", "value", "players"},
+	Environment = "Server" :: "Server",
+
+	Execute = function(executor: Player, round: Round, args: Args): string
+		local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
+
+		local players = processPlayerArgument(executor, args[4])
+		if not players then
+			return `Player {args[4]} not found.`
+		end
+
+		local itemName = processStringArgument(args[1])
+		if not itemName then
+			return `Missing argument 1 item name.`
+		end
+
+		local itemBase = processItemArgument(round, itemName)
+		if not itemBase then
+			return `Item {itemName} not found.`
+		end
+
+		local componentName = processStringArgument(args[2])
+		if not componentName then
+			return `Missing argument 2 component name.`
+		end
+
+		local value = processNumberArgument(args[3]) or processStringArgument(args[3])
+		if not value then
+			return `Missing argument 3 value.`
+		end
+
+		local baseValue = itemBase[componentName]
+		if typeof(baseValue) ~= typeof(value) and baseValue ~= nil then
+			return `Invalid value, expected a {typeof(baseValue)} but got a {typeof(value)}`
+		end
+
+		local affectedPlayers: {Player} = {}
+
+		for _, player in players do
+			local participant = round:GetParticipant(player.Name)
+			if not participant then
+				continue
+			end
+
+			local item: Types.Item?
+			for _, foundItem in participant:GetItems() do
+				assert(foundItem)
+				if foundItem.Base == itemBase then
+					item = foundItem
+					break
+				end
+			end
+
+			if not item then
+				continue
+			end
+
+			item[componentName] = value
+			table.insert(affectedPlayers, player)
+
+			Replication.UpdateInventory(player, "Update", item)
+		end
+
+		return `Modified "{itemBase.Name}".{componentName} to {value} for {getPlayersString(affectedPlayers)}.`
+	end
+}
+
 return table.freeze(Commands)
