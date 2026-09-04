@@ -27,6 +27,9 @@ export type ArgumentType =
 	| "place"
 	| {kind: "literal", literal: string}
 
+-- Type solver fails if we type-cast to this type in command definitions, but for correctness we can use it in the type definition for a command.
+type TypeList = {{ArgumentType?}?}
+
 export type BaseCommand = {
 	Name: string,
 	Description: string,
@@ -35,7 +38,7 @@ export type BaseCommand = {
 
 	-- note: can't map string to argumenttype because arguments must be ordered
 	Arguments: {string},
-	Types: {{ArgumentType}},
+	Types: TypeList,
 }
 
 export type ClientCommand = BaseCommand & {
