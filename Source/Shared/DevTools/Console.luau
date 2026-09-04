@@ -20,7 +20,7 @@ local function traverseHistoryUp(console: UIManager.UI & {Object: typeof(UIManag
 
 	local text = commandHistory[historyIndex]
 	if text then
-		console.Object.Input.Text = text
+		console.Object.InputFrame.TextInputFrame.Input.Text = text
 	end
 end
 
@@ -29,7 +29,7 @@ local function traverseHistoryDown(console: UIManager.UI & {Object: typeof(UIMan
 
 	local text = commandHistory[historyIndex]
 	if text then
-		console.Object.Input.Text = text
+		console.Object.InputFrame.TextInputFrame.Input.Text = text
 	end
 end
 
@@ -54,7 +54,7 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 			if console.Visible then
 				task.spawn(function()
 					task.wait()
-					console.Object.Input:CaptureFocus()
+					console.Object.InputFrame.TextInputFrame.Input:CaptureFocus()
 				end)
 
 				table.insert(historyConns, UserInputService.InputEnded:Connect(function(input, proc)
@@ -69,11 +69,11 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 					end
 				end))
 
-				table.insert(historyConns, console.Object.Input.HistoryUp.Activated:Connect(function()
+				table.insert(historyConns, console.Object.InputFrame.HistoryUp.Activated:Connect(function()
 					traverseHistoryUp(console)
 				end))
 
-				table.insert(historyConns, console.Object.Input.HistoryDown.Activated:Connect(function()
+				table.insert(historyConns, console.Object.InputFrame.HistoryDown.Activated:Connect(function()
 					traverseHistoryDown(console)
 				end))
 			end
@@ -85,12 +85,12 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 
 		if not didConnect then
 			didConnect = true
-			object.Input.FocusLost:Connect(function(enterPressed)
+			object.InputFrame.TextInputFrame.Input.FocusLost:Connect(function(enterPressed)
 				if not enterPressed then
 					return
 				end
 
-				local input = object.Input.Text
+				local input = object.InputFrame.TextInputFrame.Input.Text
 				if input == "" then
 					return
 				end
@@ -103,8 +103,29 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 				object.OutputHolder.OutputScroll.Output.Text = table.concat(result, "\n")
 			end)
 
-			object.Input:GetPropertyChangedSignal("Text"):Connect(function()
+			object.InputFrame.TextInputFrame.Input:GetPropertyChangedSignal("Text"):Connect(function()
 				object.OutputHolder.OutputScroll.Output.Text = ""
+
+				local input = object.InputFrame.TextInputFrame.Input.Text
+				local renderedInput = object.InputFrame.TextInputFrame.RenderedInput
+
+				local tokens = Exec.Tokenise(input)
+
+				local rendered = ""
+				for _, token in tokens do
+					local renderedToken: string
+					if token.Kind == "CommandName" then
+						renderedToken = "<font color='#0000ff'>" .. token.Value .. "</font>"
+					elseif token.Kind == "Argument" then
+						renderedToken = "<font color='#ff0000'>" .. token.Value .. "</font>"
+					else
+						renderedToken = token.Value
+					end
+
+					rendered ..= renderedToken
+				end
+
+				renderedInput.Text = rendered
 			end)
 		end
 	elseif console then

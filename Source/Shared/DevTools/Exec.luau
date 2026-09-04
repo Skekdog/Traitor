@@ -13,6 +13,73 @@ export type ParsedCommand = {
 	Args: {string},
 }
 
+export type Token_CommandName = {
+	Kind: "CommandName",
+	Value: string,
+}
+
+export type Token_Argument = {
+	Kind: "Argument",
+	Value: string,
+}
+
+export type Token_Semicolon = {
+	Kind: "Semicolon",
+	Value: string,
+}
+
+export type Token_Whitespace = {
+	Kind: "Whitespace",
+	Value: string,
+}
+
+export type Token = Token_CommandName | Token_Argument | Token_Semicolon | Token_Whitespace
+
+function module.Tokenise(input: string): {Token}
+	local tokens: {Token} = {}
+
+	local semicolonSplit = input:split(";")
+	for i_semicolon, semicolon in semicolonSplit do
+		if semicolon ~= "" then
+			local spaceSplit = semicolon:split(" ")
+
+			local currentIndex = 0
+			for i_space, space in spaceSplit do
+				if space ~= "" then
+					currentIndex += 1
+					if currentIndex == 1 then
+						table.insert(tokens, {
+							Kind = "CommandName",
+							Value = space,
+						})
+					else
+						table.insert(tokens, {
+							Kind = "Argument",
+							Value = space,
+						})
+					end
+				end
+
+				if i_space ~= #spaceSplit then
+					table.insert(tokens, {
+						Kind = "Whitespace",
+						Value = " ",
+					})
+				end
+			end
+		end
+
+		if i_semicolon ~= #semicolonSplit then
+			table.insert(tokens, {
+				Kind = "Semicolon",
+				Value = ";",
+			})
+		end
+	end
+
+	return tokens
+end
+
 function module.ParseCommands(input: string): {ParsedCommand}
 	local parsedCommands: {ParsedCommand} = {}
 
