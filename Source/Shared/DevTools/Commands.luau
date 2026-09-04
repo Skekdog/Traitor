@@ -12,7 +12,20 @@ local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
-export type ArgumentType = "players" | "number" | "item" | "string" | "optional" | "any" | "role" | "gamemode" | "boss" | "map" | "exact_player" | {kind: "literal", literal: string}
+export type ArgumentType =
+	| "players"
+	| "number"
+	| "item"
+	| "string"
+	| "optional"
+	| "any"
+	| "role"
+	| "gamemode"
+	| "boss"
+	| "map"
+	| "exact_player"
+	| "place"
+	| {kind: "literal", literal: string}
 
 export type BaseCommand = {
 	Name: string,
@@ -404,7 +417,7 @@ Commands.teleportplace = {
 	Environment = "Server" :: "Server",
 
 	Arguments = {"place name / id", "players"},
-	Types = {{"string", "number"}, {"players"}} :: {{ArgumentType}},
+	Types = {{"place", "number"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args)
 		local asId = processNumberArgument(args[1])
