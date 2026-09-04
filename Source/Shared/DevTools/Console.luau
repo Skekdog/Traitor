@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local Commands = require(script.Parent.Commands)
 local IsAdmin = require(script.Parent.IsAdmin)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
@@ -31,6 +32,10 @@ local function traverseHistoryDown(console: UIManager.UI & {Object: typeof(UIMan
 	if text then
 		console.Object.InputFrame.TextInputFrame.Input.Text = text
 	end
+end
+
+local function errorHighlight(text: string): string
+	return "<font color='#ff0000'>" .. text .. "</font>"
 end
 
 RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
@@ -104,7 +109,8 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 			end)
 
 			object.InputFrame.TextInputFrame.Input:GetPropertyChangedSignal("Text"):Connect(function()
-				object.OutputHolder.OutputScroll.Output.Text = ""
+				local output = object.OutputHolder.OutputScroll.Output
+				output.Text = ""
 
 				local input = object.InputFrame.TextInputFrame.Input.Text
 				local renderedInput = object.InputFrame.TextInputFrame.RenderedInput
@@ -113,13 +119,12 @@ RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
 
 				local rendered = ""
 				for _, token in tokens do
-					local renderedToken: string
+					local renderedToken = token.Value
+
 					if token.Kind == "CommandName" then
-						renderedToken = "<font color='#0000ff'>" .. token.Value .. "</font>"
-					elseif token.Kind == "Argument" then
-						renderedToken = "<font color='#ff0000'>" .. token.Value .. "</font>"
-					else
-						renderedToken = token.Value
+						if not Commands[token.Value] then
+							renderedToken = errorHighlight(token.Value)
+						end
 					end
 
 					rendered ..= renderedToken
