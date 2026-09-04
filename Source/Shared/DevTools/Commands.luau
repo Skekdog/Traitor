@@ -12,12 +12,17 @@ local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
+export type ArgumentType = "players" | "number" | "item" | "string" | "optional" | "any" | "role" | "gamemode" | "boss" | "map" | "exact_player" | {kind: "literal", literal: string}
+
 export type BaseCommand = {
 	Name: string,
 	Description: string,
 	Category: string,
 	HasRelaxedPermissions: boolean?,
+
+	-- note: can't map string to argumenttype because arguments must be ordered
 	Arguments: {string},
+	Types: {{ArgumentType}},
 }
 
 export type ClientCommand = BaseCommand & {
@@ -175,7 +180,10 @@ Commands.help = {
 	Description = "Lists all commands.",
 	Environment = "Client" :: "Client",
 	HasRelaxedPermissions = true,
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function()
 		local ret = "Players can be specified using name, partial name, @s (self), @a (all players), @r (random), or @o (others).\nCommands:"
 
@@ -223,7 +231,9 @@ Commands.echo = {
 	Description = "Processes arguments and returns the interpreted result.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"..."},
+	Types = {{"any"}} :: {{ArgumentType}},
 
 	Execute = function(player: Player, round: Round, args: Args): string
 		local processed: {string} = {}
@@ -255,7 +265,9 @@ Commands.xray = {
 	Description = "Turns all static map parts semi-transparent.",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
+
 	Arguments = {},
+	Types = {},
 
 	Execute = function(): string
 		local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
@@ -300,7 +312,10 @@ Commands.showbounds = {
 	Description = "Toggles showing of map bounds.",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function(): string
 		local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 		local map = LocalRoundInfo.Map()
@@ -332,7 +347,10 @@ Commands.noclip = {
 	Description = "Toggles noclip on/off.",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function(player: Player, args: Args)
 		local NoClip = require(script.Parent.NoClip)
 		local enabled = NoClip.Enable()
@@ -346,7 +364,10 @@ Commands.freecam = {
 	Description = "Toggles freecam on/off.",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function(player: Player, args: Args)
 		local Freecam = require(ReplicatedStorage.Shared.Camera.Freecam)
 		local enabled = Freecam.ToggleFreecam()
@@ -360,7 +381,10 @@ Commands.thirdperson = {
 	Description = "Toggles thirdperson on/off.",
 	HasRelaxedPermissions = true,
 	Environment = "Client" :: "Client",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function(player: Player, args: Args)
 		local Camera = require(ReplicatedStorage.API.Camera)
 		if Camera.IsFirstPerson() then
@@ -378,7 +402,10 @@ Commands.teleportplace = {
 	Category = "Other",
 	Description = "Teleports specified players to the specified place.\nAvailable named places: Imperium, MainPlace, TestPlace",
 	Environment = "Server" :: "Server",
+
 	Arguments = {"place name / id", "players"},
+	Types = {{"string", "number"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args)
 		local asId = processNumberArgument(args[1])
 		local asName = processStringArgument(args[1])
@@ -404,7 +431,10 @@ Commands.teleport = {
 	Description = "Teleports players to another player.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"to", "targets"},
+	Types = {{"players"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args): string
 		local to = processPlayerArgument(executor, args[1])
 		if not to then
@@ -444,7 +474,10 @@ Commands.role = {
 	Description = "Sets the roles of players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"role name", "players"},
+	Types = {{"role"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args)
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -483,7 +516,10 @@ Commands.freekill = {
 	Description = "Sets free kill reason for the specified players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"reason?", "players"},
+	Types = {{"string", "optional"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args): string
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -518,7 +554,10 @@ Commands.kill = {
 	Description = "Kills the specified players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
-	Arguments = {"player name"},
+
+	Arguments = {"players"},
+	Types = {{"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args)
 		local players = processPlayerArgument(executor, args[1])
 		if not players then
@@ -549,7 +588,10 @@ Commands.karma = {
 	Category = "Player",
 	Description = "Sets the karma of players.",
 	Environment = "Server" :: "Server",
+
 	Arguments = {"karma", "players"},
+	Types = {{"number"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args)
 		local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 
@@ -587,7 +629,10 @@ Commands.finishround = {
 	Description = "Finishes the current round with a victory for the specified role.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"role name"},
+	Types = {{"role"}} :: {{ArgumentType}},
+
 	Execute = function(_, round: Round, args: Args)
 		local roleName = args[1]
 		if not roleName then
@@ -619,7 +664,10 @@ Commands.skip = {
 	Description = "Skips the current round phase.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function(_, round: Round): string
 		local currentPhase: Types.Phase = round:GetPhase()
 
@@ -639,7 +687,10 @@ Commands.pause = {
 	Description = "Pauses or unpauses the round.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function(_, round: Types.Round)
 		if round:GetPhase() == "Waiting" then
 			return "Cannot pause during waiting phase."
@@ -656,7 +707,10 @@ Commands.togglevictory = {
 	Description = "Enables or disables victory.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = toggleVictory
 }
 
@@ -666,7 +720,10 @@ Commands.respawn = {
 	Description = "Respawns the specified players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"players"},
+	Types = {{"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Types.Round, args: Args): string
 		local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 		local players = processPlayerArgument(executor, args[1])
@@ -693,7 +750,10 @@ Commands.despawn = {
 	Description = "Despawns the specified players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"players"},
+	Types = {{"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Types.Round, args: Args): string
 		local players = processPlayerArgument(executor, args[1])
 		if not players then
@@ -718,7 +778,10 @@ Commands.restart = {
 	Category = "Other",
 	Description = "Restarts the server.",
 	Environment = "Server" :: "Server",
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function()
 		local RestartServer = require(ServerScriptService.Util.RestartServer)
 
@@ -758,7 +821,10 @@ Commands.gamemode = {
 	Description = "Changes the gamemode.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"gamemode name"},
+	Types = {{"gamemode"}} :: {{ArgumentType}},
+
 	Execute = function(_, round: Round, args: Args): string
 		local CustomGamemode = require(ServerScriptService.Labs.CustomGamemode)
 		local gamemodeName = processStringArgument(args[1])
@@ -796,7 +862,10 @@ Commands.boss = {
 	Description = "Loads a boss from the current map or from an asset id.",
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
+
 	Arguments = {"boss name / asset id"},
+	Types = {{"boss", "number"}} :: {{ArgumentType}},
+
 	Execute = function(_, round: Round, args: Args): string
 		local bossName = processStringArgument(args[1])
 		if not bossName then
@@ -825,7 +894,10 @@ Commands.map = {
 	Description = "Changes the map.",
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
+
 	Arguments = {"map name / asset id"},
+	Types = {{"map", "number"}} :: {{ArgumentType}},
+
 	Execute = function(_, round: Round, args: Args)
 		local CustomMap = require(ServerScriptService.Labs.CustomMap)
 		local RoundHandler = require(ServerScriptService.RoundHandler)
@@ -879,7 +951,10 @@ Commands.listitems = {
 	Description = "Lists all items.",
 	Environment = "Client" :: "Client",
 	HasRelaxedPermissions = true,
+
 	Arguments = {},
+	Types = {},
+
 	Execute = function(): string
 		local ret = ""
 		for _, v in StandardGame.GetItems() do
@@ -895,7 +970,10 @@ Commands.give = {
 	Description = "Gives an item to players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"item name", "players"},
+	Types = {{"item"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: {string?})
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -933,7 +1011,10 @@ Commands.remove = {
 	Description = "Removes an item from players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"item name", "players"},
+	Types = {{"item"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: {string?}): string
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -985,7 +1066,10 @@ Commands.credits = {
 	Description = "Sets credit counts of players.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"amount", "players"},
+	Types = {{"number"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args)
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -1019,7 +1103,10 @@ Commands.dummy = {
 	Description = "Spawns a test dummy that can be damaged.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"at players"},
+	Types = {{"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args): string
 		local players = processPlayerArgument(executor, args[1])
 		if not players then
@@ -1050,7 +1137,10 @@ Commands.health = {
 	Description = "Sets health of players to a specified value",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
+
 	Arguments = {"health", "players"},
+	Types = {{"number"}, {"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, round: Round, args: Args): string
 		local players = processPlayerArgument(executor, args[2])
 		if not players then
@@ -1085,7 +1175,10 @@ Commands.relax = {
 	Name = "relax",
 	Category = "Other",
 	Description = "Temporarily grants relaxed command permissions to players.",
+
 	Arguments = {"players"},
+	Types = {{"players"}} :: {{ArgumentType}},
+
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
 	Execute = function(executor: Player, round: Round, args: Args): string
@@ -1110,7 +1203,10 @@ Commands.seance = {
 	Name = "seance",
 	Category = "Game",
 	Description = "Makes chat from dead players visible to everyone.",
+
 	Arguments = {},
+	Types = {},
+
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
 	Execute = function(executor: Player, round: Round): string
@@ -1130,7 +1226,10 @@ Commands.ragdoll = {
 	Name = "ragdoll",
 	Category = "Character",
 	Description = "Forces a player to (un)ragdoll indefinitely.",
+
 	Arguments = {"players"},
+	Types = {{"players"}} :: {{ArgumentType}},
+
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
 	Execute = function(executor: Player, round: Round, args: Args): string
@@ -1168,11 +1267,15 @@ Commands.ragdoll = {
 	end
 }
 
+
 Commands.ban = {
 	Name = "ban",
 	Category = "Moderation",
 	Description = "Bans a player.",
+
 	Arguments = {"exact username / id", "duration / perm", "display reason", "private reason"},
+	Types = {{"exact_player", "number"}, {"number", {kind = "literal", literal = "perm"}}, {"string"}, {"string"}} :: {{ArgumentType}},
+
 	Environment = "Server" :: "Server",
 
 	-- Note: this command requires exact names / ids to avoid banning the wrong people
@@ -1238,7 +1341,10 @@ Commands.unban = {
 	Name = "unban",
 	Category = "Moderation",
 	Description = "Unbans a player.",
+
 	Arguments = {"exact id"},
+	Types = {{"number"}} :: {{ArgumentType}},
+
 	Environment = "Server" :: "Server",
 
 	Execute = function(_, _, args: Args): string
@@ -1263,7 +1369,10 @@ Commands.data = {
 	Name = "data",
 	Category = "Item",
 	Description = "Edits an item's components within a player's inventory.",
+
 	Arguments = {"item name", "component", "value", "players"},
+	Types = {{"item"}, {"string"}, {"number", "string"}, {"players"}} :: {{ArgumentType}},
+
 	Environment = "Server" :: "Server",
 
 	Execute = function(executor: Player, round: Round, args: Args): string
