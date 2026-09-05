@@ -5,10 +5,6 @@ local Commands = require(script.Parent.Commands)
 
 local ClientArguments = {}
 
-ClientArguments.Variadic = "..."
-
-ClientArguments.PlayerSelectors = {"@a", "@o", "@s", "@r"}
-
 function ClientArguments.IsValidType(argument: string, type: Commands.ArgumentType): string?
 	if type == "place" then
 		return if PlaceIDs[argument] then nil else "place"

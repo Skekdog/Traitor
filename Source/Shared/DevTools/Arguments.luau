@@ -7,6 +7,8 @@ local Arguments = {}
 const WHITESPACE_SUBSTITUTE = "([^-])(%-)([^-])"
 const SUBSTITUTE_SUBSTITUTE = "([^-])(%-%-)([^-])"
 
+Arguments.Variadic = "..."
+Arguments.PlayerSelectors = {"@a", "@o", "@s", "@r"}
 
 function Arguments.ProcessStringArgument(str: string?): string?
 	return if str then str:gsub(WHITESPACE_SUBSTITUTE, "%1 %3"):gsub(SUBSTITUTE_SUBSTITUTE, "%1-%3") else nil
