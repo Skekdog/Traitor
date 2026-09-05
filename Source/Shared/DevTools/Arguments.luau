@@ -1,5 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local ServerStorage = game:GetService("ServerStorage")
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
@@ -154,7 +156,7 @@ function Arguments.Gamemode(str: string?): ModuleScript?
 end
 
 const loweredMaps: {[string]: Instance?} = {}
-for _, child in ReplicatedStorage.Assets.ReplicatedMapList:GetChildren() do
+for _, child in if RunService:IsClient() then ReplicatedStorage.Assets.ReplicatedMapList:GetChildren() else ServerStorage.Maps:GetChildren() do
 	loweredMaps[child.Name:lower()] = child
 end
 

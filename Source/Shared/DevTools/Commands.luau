@@ -1,7 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local TextService = game:GetService("TextService")
@@ -10,7 +9,6 @@ local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
-local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 type ArgumentType = Arguments.ArgumentType
@@ -144,7 +142,7 @@ Commands.echo = {
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
 
-	Arguments = {"..."},
+	Arguments = {Arguments.Variadic},
 	Types = {{"any"}} :: {{ArgumentType}},
 
 	Execute = function(player: Player, round: Round, args: Args): string
@@ -154,7 +152,7 @@ Commands.echo = {
 			local output: string
 
 			local players = Arguments.Players(player, arg)
-			local item = Arguments.Item(round.Gamemode, round:GetMap(), arg)
+			local item = Arguments.Item(round.Gamemode, round:GetMap(), Arguments.String(arg))
 
 			if players then
 				output = getPlayersString(players)
@@ -321,7 +319,7 @@ Commands.teleportplace = {
 	Execute = function(executor: Player, round: Round, args: Args)
 		local asId = Arguments.Number(args[1])
 		local asName = Arguments.String(args[1])
-		local place = if asId then asId else PlaceIDs[asName]
+		local place = if asId then asId else Arguments.Place(Arguments.String(asName))
 
 		if not place then
 			return "Place not found."
@@ -396,15 +394,17 @@ Commands.role = {
 			return `Player {args[2]} not found.`
 		end
 
-		local roleName = Arguments.String(args[1])
-		if not roleName then
-			return "Missing argument 1 role name."
+		local name = Arguments.String(args[1])
+		if not name then
+			return "Missing argument 1 role."
 		end
 
-		local success, result = pcall(round.GetRoleFromRoleName, round, roleName)
-		if not success then
-			return `Role {roleName} not found.`
+		local definition = Arguments.Role(round.Gamemode, name)
+		if not definition then
+			return `Role {name} not found.`
 		end
+
+		local role = round:GetRoleFromRoleName(definition.Name)
 
 		local affectedPlayers: {Player} = {}
 		for _, player in players do
@@ -413,12 +413,12 @@ Commands.role = {
 				continue
 			end
 
-			participant:SetRole(result.Definition)
+			participant:SetRole(role.Definition)
 
 			table.insert(affectedPlayers, player)
 		end
 
-		return `Set roles of {getPlayersString(affectedPlayers)} to {roleName}.`
+		return `Set roles of {getPlayersString(affectedPlayers)} to {definition.Name}.`
 	end
 }
 
@@ -546,9 +546,14 @@ Commands.finishround = {
 	Types = {{"role"}} :: {{ArgumentType}},
 
 	Execute = function(_, round: Round, args: Args)
-		local roleName = args[1]
-		if not roleName then
+		local name = Arguments.String(args[1])
+		if not name then
 			return "Missing argument 1 role name."
+		end
+
+		local definition = Arguments.Role(round.Gamemode, name)
+		if not definition then
+			return `Role {name} not found.`
 		end
 
 		if not round:IsInProgress() then
@@ -556,7 +561,7 @@ Commands.finishround = {
 		end
 
 		local success, err = pcall(function()
-			round:Finish(round:GetRoleFromRoleName(roleName))
+			round:Finish(round:GetRoleFromRoleName(definition.Name))
 			if round.Finish == disabledEndRound then
 				toggleVictory(nil, round)
 			end
@@ -751,7 +756,7 @@ Commands.gamemode = {
 			return `Gamemode changed to asset ID {assetId}.`
 		end
 
-		local gamemodeModule = ReplicatedStorage.Shared.GameDefinition.Gamemodes:FindFirstChild(gamemodeName)
+		local gamemodeModule = Arguments.Gamemode(gamemodeName)
 		if not gamemodeModule then
 			return `Gamemode {gamemodeName} not found.`
 		end
@@ -789,7 +794,7 @@ Commands.boss = {
 			return "not implemented"
 		end
 
-		local boss = round:GetMap().Bosses[bossName]
+		local boss = Arguments.Boss(round:GetMap(), bossName)
 		if not boss then
 			return `Boss {bossName} not found.`
 		end
@@ -825,7 +830,7 @@ Commands.map = {
 			return `Map changed to asset ID {assetId}.`
 		end
 
-		local map = ServerStorage.Maps:FindFirstChild(mapName)
+		local map = Arguments.Map(mapName)
 		if not map then
 			return `Map {mapName} not found.`
 		end
