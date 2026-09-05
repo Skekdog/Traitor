@@ -13,20 +13,7 @@ local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
-export type ArgumentType =
-	| "players"
-	| "number"
-	| "item"
-	| "string"
-	| "optional"
-	| "any"
-	| "role"
-	| "gamemode"
-	| "boss"
-	| "map"
-	| "exact_player"
-	| "place"
-	| {kind: "literal", literal: string}
+type ArgumentType = Arguments.ArgumentType
 
 -- Type solver fails if we type-cast to this type in command definitions, but for correctness we can use it in the type definition for a command.
 type TypeList = {{ArgumentType?}?}

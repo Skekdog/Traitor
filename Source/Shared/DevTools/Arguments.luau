@@ -5,6 +5,21 @@ local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local Arguments = {}
 
+export type ArgumentType =
+	| "players"
+	| "number"
+	| "item"
+	| "string"
+	| "optional"
+	| "any"
+	| "role"
+	| "gamemode"
+	| "boss"
+	| "map"
+	| "exact_player"
+	| "place"
+	| {kind: "literal", literal: string}
+
 const WHITESPACE_SUBSTITUTE = "([^-])(%-)([^-])"
 const SUBSTITUTE_SUBSTITUTE = "([^-])(%-%-)([^-])"
 
@@ -127,17 +142,24 @@ function Arguments.Boss(map: Types.Map, str: string?): Types.BossDefinition?
 	return lowerBosses[str:lower()]
 end
 
-function Arguments.Gamemode(str: string?): ModuleScript?
-	if not str then
-		return nil
+const loweredGamemodes: {[string]: ModuleScript?} = {}
+for _, child in ReplicatedStorage.Shared.GameDefinition.Gamemodes:GetChildren() do
+	if child:IsA("ModuleScript") then
+		loweredGamemodes[child.Name:lower()] = child
 	end
+end
 
-	local module = ReplicatedStorage.Shared.GameDefinition.Gamemodes:FindFirstChild(str)
-	return if module and module:IsA("ModuleScript") then module else nil
+function Arguments.Gamemode(str: string?): ModuleScript?
+	return if str then loweredGamemodes[str:lower()] else nil
+end
+
+const loweredMaps: {[string]: Instance?} = {}
+for _, child in ReplicatedStorage.Assets.ReplicatedMapList:GetChildren() do
+	loweredMaps[child.Name:lower()] = child
 end
 
 function Arguments.Map(str: string?): Instance?
-	return nil
+	return if str then loweredMaps[str:lower()] else nil
 end
 
 function Arguments.Role(gamemode: Types.GamemodeDefinition, str: string?): Types.RoleDefinition?

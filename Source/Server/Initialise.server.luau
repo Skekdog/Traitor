@@ -3,6 +3,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 require(ServerScriptService.Labs.LabsRequiresPrivateServer)
 
 require(ReplicatedStorage.Shared.DevTools.HostPermissions)
+require(script.Parent.ReplicateMapList)
 require(script.Parent.Player.SetupPlayer)
 require(script.Parent.PlayerData.SaveData)
 require(script.Parent.Character.ReplicateCameraJoints)
