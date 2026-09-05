@@ -1,13 +1,13 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local ClientArguments = require(script.Parent.ClientArguments)
 local Commands = require(script.Parent.Commands)
 local IsAdmin = require(script.Parent.IsAdmin)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local Exec = require(ReplicatedStorage.Shared.DevTools.Exec)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
-local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 
 local commandHistory: {string?} = {}
 local historyIndex = 0
@@ -39,48 +39,6 @@ local function errorHighlight(text: string): string
 	return "<font color='#ff0000'>" .. text .. "</font>"
 end
 
-local function isValidType(argument: string, type: Commands.ArgumentType): string?
-	if type == "place" then
-		return if PlaceIDs[argument] then nil else "place"
-	elseif type == "number" then
-		return if tonumber(argument) then nil else "number"
-	end
-
-	return "unknown"
-end
-
-local function isValidArgument(command: Commands.Command, argument: string, index: number): string?
-	local types = command.Types[index]
-	if not types and command.Arguments[#command.Arguments] ~= "..." then
-		return "Expected at most " .. #command.Arguments .. "arguments"
-	elseif not types then
-		types = command.Types[#command.Arguments]
-		if not types then
-			return nil
-		end
-	end
-
-	assert(types)
-
-	if table.find(types, "string") or table.find(types, "any") then
-		return nil -- Any string is valid input. Obviously any any is also valid
-	end
-
-	local failedTypes: {string} = {}
-
-	for _, type in types do
-		local result = isValidType(argument, type :: Commands.ArgumentType)
-		if not result then
-			-- As soon as one matches, we are clear of any errors on this argument
-			return nil
-		end
-
-		table.insert(failedTypes, result)
-	end
-
-	return "Expected " .. table.concat(failedTypes, ", ")
-end
-
 local function processTokens(input: string): {Rendered: string, Output: string}
 	local tokens = Exec.Tokenise(input)
 
@@ -107,7 +65,7 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 
 			argumentIndex += 1
 
-			local argumentValidation = isValidArgument(currentCommand, argument, argumentIndex)
+			local argumentValidation = ClientArguments.IsValidArgument(currentCommand, argument, argumentIndex)
 			if argumentValidation then
 				renderedToken = errorHighlight(argument)
 				if output == "" then

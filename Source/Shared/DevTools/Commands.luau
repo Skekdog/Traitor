@@ -5,6 +5,7 @@ local ServerStorage = game:GetService("ServerStorage")
 local TeleportService = game:GetService("TeleportService")
 local ServerScriptService = game:GetService("ServerScriptService")
 local TextService = game:GetService("TextService")
+local Arguments = require(script.Parent.Arguments)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
@@ -55,98 +56,6 @@ export type Command = ClientCommand | ServerCommand
 
 type Round = Types.Round
 type Args = {string?}
-
-local WHITESPACE_SUBSTITUTE = "([^-])(%-)([^-])"
-local SUBSTITUTE_SUBSTITUTE = "([^-])(%-%-)([^-])"
-
-local function processStringArgument(str: string?): string?
-	return if str then str:gsub(WHITESPACE_SUBSTITUTE, "%1 %3"):gsub(SUBSTITUTE_SUBSTITUTE, "%1-%3") else nil
-end
-
-local function processNumberArgument(str: string?): number?
-	return if str then tonumber(str) else nil
-end
-
-local function processItemArgument(round: Round, str: string?): Types.ItemComponents?
-	if not str then
-		return nil
-	end
-
-	local lowercasedItems: {[string]: Types.ItemComponents} = {}
-
-	-- NOTE: Ordering here matters! Map-specific items override gamemode items of the same name!
-	for name, components in round.Gamemode.AvailableItems do
-		lowercasedItems[name:lower()] = components
-	end
-
-	for name, components in round:GetMap().ItemDefinitions do
-		lowercasedItems[name:lower()] = components
-	end
-
-	return lowercasedItems[str:lower()]
-end
-
-local function getLowercasedPlayers(): {[string]: Player}
-	local players: {[string]: Player} = {}
-
-	for _, player in Players:GetPlayers() do
-		players[player.Name:lower()] = player
-	end
-
-	return players
-end
-
-local function getPartiallyMatchingPlayers(players: {[string]: Player}, input: string): {Player}
-	local matches: {Player} = {}
-
-	local loweredInput = input:lower()
-
-	for name, player in players do
-		if name:find("^" .. loweredInput) then
-			table.insert(matches, player)
-		end
-	end
-
-	return matches
-end
-
-local function processPlayerArgument(executor: Player, str: string?): {Player}?
-	if not str then
-		return {executor}
-	end
-
-	if str == "@a" then
-		return Players:GetPlayers()
-	elseif str == "@s" then
-		return {executor}
-	elseif str == "@r" then
-		local players = Players:GetPlayers()
-		return {players[math.random(#players)]}
-	elseif str == "@o" then
-		local players = Players:GetPlayers()
-
-		local index = table.find(players, executor)
-		if index then
-			table.remove(players, index)
-		end
-
-		return players
-	end
-
-	local players = getLowercasedPlayers()
-
-	local player = players[str:lower()]
-	if player then
-		return {player}
-	end
-
-	local partialMatches = getPartiallyMatchingPlayers(players, str)
-	if #partialMatches == 0 then
-		return nil
-	end
-
-	return partialMatches
-end
 
 local function getPlayersString(players: {Player}): string
 	local ret = ""
@@ -244,7 +153,7 @@ Commands.help = {
 Commands.echo = {
 	Name = "echo",
 	Category = "Developer",
-	Description = "Processes arguments and returns the interpreted result.",
+	Description = "Processes arguments and returns the result.",
 	HasRelaxedPermissions = true,
 	Environment = "Server" :: "Server",
 
@@ -257,15 +166,15 @@ Commands.echo = {
 		for _, arg in args do
 			local output: string
 
-			local players = processPlayerArgument(player, arg)
-			local item = processItemArgument(round, arg)
+			local players = Arguments.ProcessPlayerArgument(player, arg)
+			local item = Arguments.ProcessItemArgument(round.Gamemode, round:GetMap(), arg)
 
 			if players then
 				output = getPlayersString(players)
 			elseif item then
 				output = item.Name
 			else
-				output = tostring(processNumberArgument(arg) or processStringArgument(arg) or "ERR")
+				output = tostring(Arguments.ProcessNumberArgument(arg) or Arguments.ProcessStringArgument(arg) or "ERR")
 			end
 
 			table.insert(processed, output)
@@ -423,15 +332,15 @@ Commands.teleportplace = {
 	Types = {{"place", "number"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args)
-		local asId = processNumberArgument(args[1])
-		local asName = processStringArgument(args[1])
+		local asId = Arguments.ProcessNumberArgument(args[1])
+		local asName = Arguments.ProcessStringArgument(args[1])
 		local place = if asId then asId else PlaceIDs[asName]
 
 		if not place then
 			return "Place not found."
 		end
 
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
@@ -452,12 +361,12 @@ Commands.teleport = {
 	Types = {{"players"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args): string
-		local to = processPlayerArgument(executor, args[1])
+		local to = Arguments.ProcessPlayerArgument(executor, args[1])
 		if not to then
 			return `Player {args[1]} not found.`
 		end
 
-		local targets = processPlayerArgument(executor, args[2])
+		local targets = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not targets then
 			return `Player {args[2]} not found.`
 		end
@@ -495,12 +404,12 @@ Commands.role = {
 	Types = {{"role"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args)
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
 
-		local roleName = processStringArgument(args[1])
+		local roleName = Arguments.ProcessStringArgument(args[1])
 		if not roleName then
 			return "Missing argument 1 role name."
 		end
@@ -537,12 +446,12 @@ Commands.freekill = {
 	Types = {{"string", "optional"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args): string
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
 
-		local reason = processStringArgument(args[1])
+		local reason = Arguments.ProcessStringArgument(args[1])
 		if reason then
 			local filterResult = TextService:FilterStringAsync(reason, executor.UserId)
 			reason = filterResult:GetNonChatStringForBroadcastAsync()
@@ -575,7 +484,7 @@ Commands.kill = {
 	Types = {{"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args)
-		local players = processPlayerArgument(executor, args[1])
+		local players = Arguments.ProcessPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
 		end
@@ -611,12 +520,12 @@ Commands.karma = {
 	Execute = function(executor: Player, round: Round, args: Args)
 		local KarmaManager = require(ServerScriptService.Player.KarmaManager)
 
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
 
-		local karma = processNumberArgument(args[1])
+		local karma = Arguments.ProcessNumberArgument(args[1])
 		if not karma then
 			return "Missing argument 1 karma."
 		end
@@ -742,7 +651,7 @@ Commands.respawn = {
 
 	Execute = function(executor: Player, round: Types.Round, args: Args): string
 		local KarmaManager = require(ServerScriptService.Player.KarmaManager)
-		local players = processPlayerArgument(executor, args[1])
+		local players = Arguments.ProcessPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
 		end
@@ -771,7 +680,7 @@ Commands.despawn = {
 	Types = {{"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Types.Round, args: Args): string
-		local players = processPlayerArgument(executor, args[1])
+		local players = Arguments.ProcessPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
 		end
@@ -843,13 +752,13 @@ Commands.gamemode = {
 
 	Execute = function(_, round: Round, args: Args): string
 		local CustomGamemode = require(ServerScriptService.Labs.CustomGamemode)
-		local gamemodeName = processStringArgument(args[1])
+		local gamemodeName = Arguments.ProcessStringArgument(args[1])
 
 		if not gamemodeName then
 			return "Missing argument 1 gamemode name / asset id."
 		end
 
-		local assetId = processNumberArgument(gamemodeName)
+		local assetId = Arguments.ProcessNumberArgument(gamemodeName)
 		if assetId then
 			CustomGamemode.LoadGamemode(assetId)
 			return `Gamemode changed to asset ID {assetId}.`
@@ -883,12 +792,12 @@ Commands.boss = {
 	Types = {{"boss", "number"}} :: {{ArgumentType}},
 
 	Execute = function(_, round: Round, args: Args): string
-		local bossName = processStringArgument(args[1])
+		local bossName = Arguments.ProcessStringArgument(args[1])
 		if not bossName then
 			return "Missing argument 1 boss name / asset id."
 		end
 
-		local assetId = processNumberArgument(bossName)
+		local assetId = Arguments.ProcessNumberArgument(bossName)
 		if assetId then
 			return "not implemented"
 		end
@@ -918,12 +827,12 @@ Commands.map = {
 		local CustomMap = require(ServerScriptService.Labs.CustomMap)
 		local RoundHandler = require(ServerScriptService.RoundHandler)
 
-		local mapName = processStringArgument(args[1])
+		local mapName = Arguments.ProcessStringArgument(args[1])
 		if not mapName then
 			return "Missing argument 1 map name / asset id."
 		end
 
-		local assetId = processNumberArgument(mapName)
+		local assetId = Arguments.ProcessNumberArgument(mapName)
 		if assetId then
 			RoundHandler.SetForcedMap(CustomMap.LoadMap(assetId))
 			return `Map changed to asset ID {assetId}.`
@@ -991,17 +900,17 @@ Commands.give = {
 	Types = {{"item"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: {string?})
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
 
-		local itemName = processStringArgument(args[1])
+		local itemName = Arguments.ProcessStringArgument(args[1])
 		if not itemName then
 			return "Missing argument 1 item name."
 		end
 
-		local item = processItemArgument(round, itemName)
+		local item = Arguments.ProcessItemArgument(round.Gamemode, round:GetMap(), itemName)
 		if not item then
 			return `Item {itemName} not found.`
 		end
@@ -1032,17 +941,17 @@ Commands.remove = {
 	Types = {{"item"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: {string?}): string
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
 
-		local itemName = processStringArgument(args[1])
+		local itemName = Arguments.ProcessStringArgument(args[1])
 		if not itemName then
 			return "Missing argument 1 item name."
 		end
 
-		local itemComponents = processItemArgument(round, itemName)
+		local itemComponents = Arguments.ProcessItemArgument(round.Gamemode, round:GetMap(), itemName)
 		if not itemComponents then
 			return `Item {itemName} not found.`
 		end
@@ -1087,12 +996,12 @@ Commands.credits = {
 	Types = {{"number"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args)
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
 
-		local amount = processNumberArgument(args[1])
+		local amount = Arguments.ProcessNumberArgument(args[1])
 		if not amount then
 			return "Invalid argument 1 amount."
 		end
@@ -1124,7 +1033,7 @@ Commands.dummy = {
 	Types = {{"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args): string
-		local players = processPlayerArgument(executor, args[1])
+		local players = Arguments.ProcessPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
 		end
@@ -1158,12 +1067,12 @@ Commands.health = {
 	Types = {{"number"}, {"players"}} :: {{ArgumentType}},
 
 	Execute = function(executor: Player, round: Round, args: Args): string
-		local players = processPlayerArgument(executor, args[2])
+		local players = Arguments.ProcessPlayerArgument(executor, args[2])
 		if not players then
 			return `Player {args[2]} not found.`
 		end
 
-		local health = processNumberArgument(args[1])
+		local health = Arguments.ProcessNumberArgument(args[1])
 		if not health then
 			return "Invalid argument 1 health."
 		end
@@ -1198,7 +1107,7 @@ Commands.relax = {
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
 	Execute = function(executor: Player, round: Round, args: Args): string
-		local players = processPlayerArgument(executor, args[1])
+		local players = Arguments.ProcessPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
 		end
@@ -1251,7 +1160,7 @@ Commands.ragdoll = {
 	Execute = function(executor: Player, round: Round, args: Args): string
 		local Ragdoll = require(ReplicatedStorage.Shared.RoundRule.Ragdoll)
 
-		local players = processPlayerArgument(executor, args[1])
+		local players = Arguments.ProcessPlayerArgument(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
 		end
@@ -1312,12 +1221,12 @@ Commands.ban = {
 			return `A duration must be provided.`
 		end
 
-		local displayReason = processStringArgument(args[3])
+		local displayReason = Arguments.ProcessStringArgument(args[3])
 		if not displayReason then
 			return `A display reason must be provided.`
 		end
 
-		local privateReason = processStringArgument(args[4])
+		local privateReason = Arguments.ProcessStringArgument(args[4])
 		if not privateReason then
 			return `A private reason must be provided.`
 		end
@@ -1339,7 +1248,7 @@ Commands.ban = {
 			return "Banned " .. player.Name
 		end
 
-		local asId = processNumberArgument(nameOrId)
+		local asId = Arguments.ProcessNumberArgument(nameOrId)
 		if asId then
 			player = Players:GetPlayerByUserId(asId)
 		end
@@ -1370,7 +1279,7 @@ Commands.unban = {
 			return "Unbanning is not possible in Labs."
 		end
 
-		local id = processNumberArgument(args[1])
+		local id = Arguments.ProcessNumberArgument(args[1])
 		if not id then
 			return `Invalid user id.`
 		end
@@ -1394,27 +1303,27 @@ Commands.data = {
 	Execute = function(executor: Player, round: Round, args: Args): string
 		local Replication = require(ReplicatedStorage.Shared.RoundRule.Replication)
 
-		local players = processPlayerArgument(executor, args[4])
+		local players = Arguments.ProcessPlayerArgument(executor, args[4])
 		if not players then
 			return `Player {args[4]} not found.`
 		end
 
-		local itemName = processStringArgument(args[1])
+		local itemName = Arguments.ProcessStringArgument(args[1])
 		if not itemName then
 			return `Missing argument 1 item name.`
 		end
 
-		local itemBase = processItemArgument(round, itemName)
+		local itemBase = Arguments.ProcessItemArgument(round.Gamemode, round:GetMap(), itemName)
 		if not itemBase then
 			return `Item {itemName} not found.`
 		end
 
-		local componentName = processStringArgument(args[2])
+		local componentName = Arguments.ProcessStringArgument(args[2])
 		if not componentName then
 			return `Missing argument 2 component name.`
 		end
 
-		local value = processNumberArgument(args[3]) or processStringArgument(args[3])
+		local value = Arguments.ProcessNumberArgument(args[3]) or Arguments.ProcessStringArgument(args[3])
 		if not value then
 			return `Missing argument 3 value.`
 		end
