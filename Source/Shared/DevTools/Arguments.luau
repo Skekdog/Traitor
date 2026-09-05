@@ -10,15 +10,15 @@ const SUBSTITUTE_SUBSTITUTE = "([^-])(%-%-)([^-])"
 Arguments.Variadic = "..."
 Arguments.PlayerSelectors = {"@a", "@o", "@s", "@r"}
 
-function Arguments.ProcessStringArgument(str: string?): string?
+function Arguments.String(str: string?): string?
 	return if str then str:gsub(WHITESPACE_SUBSTITUTE, "%1 %3"):gsub(SUBSTITUTE_SUBSTITUTE, "%1-%3") else nil
 end
 
-function Arguments.ProcessNumberArgument(str: string?): number?
+function Arguments.Number(str: string?): number?
 	return if str then tonumber(str) else nil
 end
 
-function Arguments.ProcessItemArgument(gamemode: Types.GamemodeDefinition, map: Types.Map, str: string?): Types.ItemComponents?
+function Arguments.Item(gamemode: Types.GamemodeDefinition, map: Types.Map, str: string?): Types.ItemComponents?
 	if not str then
 		return nil
 	end
@@ -61,7 +61,7 @@ local function getPartiallyMatchingPlayers(players: {[string]: Player}, input: s
 	return matches
 end
 
-function Arguments.ProcessPlayerArgument(executor: Player, str: string?): {Player}?
+function Arguments.Players(executor: Player, str: string?): {Player}?
 	if not str then
 		return {executor}
 	end
