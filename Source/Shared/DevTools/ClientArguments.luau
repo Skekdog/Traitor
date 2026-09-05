@@ -28,7 +28,7 @@ end
 function ClientArguments.IsValidArgument(command: Commands.Command, argument: string, index: number): string?
 	local types = command.Types[index]
 	if not types and command.Arguments[#command.Arguments] ~= "..." then
-		return "Expected at most " .. #command.Arguments .. "arguments"
+		return "Expected at most " .. #command.Arguments .. " arguments"
 	elseif not types then
 		types = command.Types[#command.Arguments]
 		if not types then
