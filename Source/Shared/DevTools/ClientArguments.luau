@@ -1,21 +1,40 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
+local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
+local Arguments = require(script.Parent.Arguments)
 local Commands = require(script.Parent.Commands)
 
 local ClientArguments = {}
 
 function ClientArguments.IsValidType(argument: string, type: Commands.ArgumentType): string?
-	if type == "place" then
-		return if PlaceIDs[argument] then nil else "place"
+	if type == "any" or type == "string" then
+		return nil
+	elseif type == "place" then
+		return if Arguments.Place(argument) then nil else "place"
 	elseif type == "number" then
-		return if tonumber(argument) then nil else "number"
+		return if Arguments.Number(argument) then nil else "number"
 	elseif type == "optional" then
 		return if argument == "nil" then nil else "'nil'"
 	elseif type == "exact_player" then
-		return if Players:FindFirstChild(argument) then nil else "exact player"
+		return if Arguments.ExactPlayer(argument) then nil else "exact player"
 	elseif typeof(type) == "table" and type.kind == "literal" then
 		return if argument == type.literal then nil else `'{type.literal}'`
+	elseif type == "boss" then
+		const map = LocalRoundInfo.Map()
+		return if map and Arguments.Boss(map, argument) then nil else "boss"
+	elseif type == "item" then
+		const map = LocalRoundInfo.Map()
+		const gamemode = LocalRoundInfo.Gamemode()
+		return if map and gamemode and Arguments.Item(gamemode, map, argument) then nil else "item"
+	elseif type == "gamemode" then
+		return if Arguments.Gamemode(argument) then nil else "gamemode"
+	elseif type == "map" then
+		return if Arguments.Map(argument) then nil else "map"
+	elseif type == "players" then
+		return if Arguments.Players(Players.LocalPlayer, argument) then nil else "players"
+	elseif type == "role" then
+		const gamemode = LocalRoundInfo.Gamemode()
+		return if gamemode and Arguments.Role(gamemode, argument) then nil else "gamemode"
 	end
 
 	return "unknown"

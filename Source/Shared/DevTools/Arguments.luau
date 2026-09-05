@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
 local Types = require(ReplicatedStorage.Shared.RoundRule.Types)
 
 local Arguments = {}
@@ -97,6 +98,59 @@ function Arguments.Players(executor: Player, str: string?): {Player}?
 	end
 
 	return partialMatches
+end
+
+function Arguments.ExactPlayer(str: string?): Player?
+	const player = if str then Players:FindFirstChild(str) else nil
+	return if player and player:IsA("Player") then player else nil
+end
+
+const lowerPlaceIds: {[string]: number?} = {}
+for name, id in PlaceIDs :: {[string]: number} do
+	lowerPlaceIds[name:lower()] = id
+end
+
+function Arguments.Place(str: string?): number?
+	return if str then lowerPlaceIds[str:lower()] else nil
+end
+
+function Arguments.Boss(map: Types.Map, str: string?): Types.BossDefinition?
+	if not str then
+		return nil
+	end
+
+	const lowerBosses: {[string]: Types.BossDefinition?} = {}
+	for name, definition in map.Bosses do
+		lowerBosses[name:lower()] = definition
+	end
+
+	return lowerBosses[str:lower()]
+end
+
+function Arguments.Gamemode(str: string?): ModuleScript?
+	if not str then
+		return nil
+	end
+
+	local module = ReplicatedStorage.Shared.GameDefinition.Gamemodes:FindFirstChild(str)
+	return if module and module:IsA("ModuleScript") then module else nil
+end
+
+function Arguments.Map(str: string?): Instance?
+	return nil
+end
+
+function Arguments.Role(gamemode: Types.GamemodeDefinition, str: string?): Types.RoleDefinition?
+	if not str then
+		return nil
+	end
+
+	const loweredRoles: {[string]: Types.RoleDefinition?} = {}
+	for name, definition in gamemode.Roles do
+		loweredRoles[name:lower()] = definition
+	end
+
+	return loweredRoles[str:lower()]
 end
 
 return table.freeze(Arguments)
