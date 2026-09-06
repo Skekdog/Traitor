@@ -33,7 +33,7 @@ function ClientArguments.IsValidType(argument: string, type: Arguments.ArgumentT
 		return if Arguments.Players(Players.LocalPlayer, processedString) then nil else "players"
 	elseif type == "role" then
 		const gamemode = LocalRoundInfo.Gamemode()
-		return if gamemode and Arguments.Role(gamemode, processedString) then nil else "gamemode"
+		return if gamemode and Arguments.Role(gamemode, processedString) then nil else "role"
 	end
 
 	return "unknown"
@@ -41,7 +41,7 @@ end
 
 function ClientArguments.IsValidArgument(command: Commands.Command, argument: string, index: number): string?
 	local types = command.Types[index]
-	if not types and command.Arguments[#command.Arguments] ~= "..." then
+	if not types and command.Arguments[#command.Arguments] ~= Arguments.Variadic then
 		return "Expected at most " .. #command.Arguments .. " arguments"
 	elseif not types then
 		types = command.Types[#command.Arguments]
