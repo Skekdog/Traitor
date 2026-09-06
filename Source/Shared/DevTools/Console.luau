@@ -43,7 +43,7 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 	local tokens = Exec.Tokenise(input)
 
 	local rendered = ""
-	local output = ""
+	local output: {string} = {}
 
 	local currentCommand: Commands.Command?
 	local argumentIndex = 0
@@ -58,7 +58,7 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 
 			if not currentCommand then
 				renderedToken = errorHighlight(name)
-				output = "Unknown command: " .. name
+				table.insert(output, "Unknown command: " .. name)
 			end
 		elseif token.Kind == "Argument" and currentCommand then
 			local argument = token.Value
@@ -68,16 +68,14 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 			local argumentValidation = ClientArguments.IsValidArgument(currentCommand, argument, argumentIndex)
 			if argumentValidation then
 				renderedToken = errorHighlight(argument)
-				if output == "" then
-					output = argumentValidation
-				end
+				table.insert(output, argumentValidation)
 			end
 		end
 
 		rendered ..= renderedToken
 	end
 
-	return {Rendered = rendered, Output = output}
+	return {Rendered = rendered, Output = table.concat(output, "\n")}
 end
 
 RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
