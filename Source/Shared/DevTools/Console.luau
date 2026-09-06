@@ -46,6 +46,7 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 	local output: {string} = {}
 
 	local currentCommand: Commands.Command?
+	local requiredArguments = 0
 	local argumentIndex = 0
 	for _, token in tokens do
 		local renderedToken = token.Value
@@ -53,8 +54,22 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 		if token.Kind == "CommandName" then
 			local name = token.Value
 
+			if currentCommand and argumentIndex < requiredArguments then
+				table.insert(output, `Expected at least {requiredArguments} arguments`)
+			end
+
+			requiredArguments = 0
 			argumentIndex = 0
 			currentCommand = Commands[name]
+
+			if currentCommand then
+				for _, types in currentCommand.Types do
+					local casted = (types :: any) :: {string}
+					if not table.find(casted, "optional") and not table.find(casted, "players") then
+						requiredArguments += 1
+					end
+				end
+			end
 
 			if not currentCommand then
 				renderedToken = errorHighlight(name)
@@ -73,6 +88,10 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 		end
 
 		rendered ..= renderedToken
+	end
+
+	if currentCommand and argumentIndex < requiredArguments then
+		table.insert(output, `Expected at least {requiredArguments} arguments`)
 	end
 
 	return {Rendered = rendered, Output = table.concat(output, "\n")}
