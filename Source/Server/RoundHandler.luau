@@ -35,8 +35,14 @@ const KARMA_BAN_THRESHOLD = 250
 Round.Config.DeathSounds = DeathSounds
 
 local forcedMap: Types.MapStructure?
+local currentMap = "International"
+
 function module.SetForcedMap(map: Types.MapStructure?): ()
     forcedMap = map
+
+    if forcedMap then
+        currentMap = forcedMap.Name
+    end
 end
 
 local blockNewRounds = false
@@ -156,8 +162,6 @@ local random = Random.new(workspace:GetServerTimeNow())
 local function getMap(name: string): Types.MapStructure
     return Map.ValidateStructure((maps :: any)[name]:Clone())
 end
-
-local currentMap = "International"
 
 type ClientMapInfo = {
     Name: string,
