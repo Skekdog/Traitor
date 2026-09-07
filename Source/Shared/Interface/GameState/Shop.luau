@@ -7,6 +7,8 @@ local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalPa
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
 local GetDisplayName = require(ReplicatedStorage.Shared.RoundRule.Common.GetDisplayName)
 local Types = require(ReplicatedStorage.API.Types)
+local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
+local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 
 local COLOUR_GOOD = Color3.fromRGB(75, 255, 62)
 local COLOUR_BAD = Color3.fromRGB(167, 0, 0)
@@ -163,6 +165,10 @@ shopPage.Purchase.Activated:Connect(function()
 	local item = selectedItem
 	if not item or not purchaseAllowed() then
 		return
+	end
+
+	if Settings.GetSetting("Auto-Close Equipment") then
+		UIManager.GetUI("Equipment"):ToggleVisible(false)
 	end
 
 	local response: Types.ItemPurchaseResult = ReplicatedStorage.Shared.RoundRule.Remotes.PurchaseItem:InvokeServer(item.Name)

@@ -136,6 +136,14 @@ table.insert(availableSettings, {
 })
 
 table.insert(availableSettings, {
+	Name = "Auto-Close Equipment",
+	Tab = "Display",
+	Category = "User Interface",
+	Kind = "Boolean" :: "Boolean",
+	Default = false,
+})
+
+table.insert(availableSettings, {
 	Name = "Show Hit Rejects",
 	Tab = "Display",
 	Category = "Debug",
