@@ -171,7 +171,14 @@ local function getMapsForVote(): {ClientMapInfo}
         end
 
         if v.Name ~= currentMap and not v:GetAttribute("Experimental") then
-            local map = Map.new(Map.ValidateStructure(v))
+            local success, structure = pcall(Map.ValidateStructure, v)
+            if not success then
+                warn(`Failed to load map {v.Name}: {structure}`)
+                continue
+            end
+
+            local map = Map.new(structure)
+
             table.insert(votableMaps, {
                 Name = GetDisplayName(map),
                 Icon = map.Icon

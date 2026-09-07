@@ -132,7 +132,13 @@ remotes.MapLoaded.OnClientEvent:Connect(function()
         child.ChildAdded:Wait()
     end
 
-    local newMap = Map.new(Map.ValidateStructure(child))
+    local success, structure = pcall(Map.ValidateStructure, child)
+    if not success then
+        warn(`Failed to load map: {structure}`)
+        return
+    end
+
+    local newMap = Map.new(structure)
     module.Map:SetValue(newMap)
 
     child.Destroying:Once(function()
