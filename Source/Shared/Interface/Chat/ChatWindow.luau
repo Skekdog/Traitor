@@ -150,7 +150,7 @@ local function trySoundPlayer(message: string): boolean
 		return false
 	end
 
-	local id = tonumber(message:sub(3))
+	local id = if message:sub(3) == "" then 0 else tonumber(message:sub(3))
 	if not id then
 		return false
 	end

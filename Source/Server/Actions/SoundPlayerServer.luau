@@ -30,6 +30,10 @@ remote.OnServerEvent:Connect(function(player, id: unknown): ()
 		lastSound:Destroy()
 	end
 
+	if id == 0 then
+		return
+	end
+
 	local sound = Audio.MakeSound({
 		Name = "SoundPlayer",
 		Content = Content.fromAssetId(id),
