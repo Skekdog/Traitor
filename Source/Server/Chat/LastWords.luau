@@ -18,7 +18,10 @@ remote.OnServerEvent:Connect(function(player, lastWords: unknown): ()
 		return
 	end
 
-	local result = TextService:FilterStringAsync(lastWords, player.UserId, Enum.TextFilterContext.PublicChat)
+	local success, result = pcall(TextService.FilterStringAsync, TextService, lastWords, player.UserId, Enum.TextFilterContext.PublicChat)
+	if not success then
+		return
+	end
 
 	participant:AddCorpseIcon({
 		Name = "Last Words",
