@@ -803,6 +803,8 @@ Commands.map = {
 	Arguments = {"map name / asset id"},
 	Execute = function(_, round: Round, args: Args)
 		local CustomMap = require(ServerScriptService.Labs.CustomMap)
+		local RoundHandler = require(ServerScriptService.RoundHandler)
+
 		local mapName = processStringArgument(args[1])
 		if not mapName then
 			return "Missing argument 1 map name / asset id."
@@ -810,7 +812,7 @@ Commands.map = {
 
 		local assetId = processNumberArgument(mapName)
 		if assetId then
-			CustomMap.LoadMap(assetId)
+			RoundHandler.SetForcedMap(CustomMap.LoadMap(assetId))
 			return `Map changed to asset ID {assetId}.`
 		end
 
@@ -818,7 +820,10 @@ Commands.map = {
 		if not map then
 			return `Map {mapName} not found.`
 		end
-		round:LoadMap(Map.ValidateStructure(map:Clone()))
+
+		local structure = Map.ValidateStructure(map:Clone())
+		round:LoadMap(structure)
+		RoundHandler.SetForcedMap(structure)
 
 		return `Map changed to {mapName}.`
 	end

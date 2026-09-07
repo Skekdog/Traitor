@@ -34,6 +34,11 @@ const KARMA_BAN_THRESHOLD = 250
 
 Round.Config.DeathSounds = DeathSounds
 
+local forcedMap: Types.MapStructure?
+function module.SetForcedMap(map: Types.MapStructure?): ()
+    forcedMap = map
+end
+
 local blockNewRounds = false
 function module.BlockNewRounds(): ()
     blockNewRounds = true
@@ -405,7 +410,7 @@ task.spawn(function()
             break
         end
 
-        if roundCount % MAP_VOTE_INTERVAL == 0 then
+        if not forcedMap and roundCount % MAP_VOTE_INTERVAL == 0 then
             doMapVote()
         end
 
