@@ -829,6 +829,25 @@ Commands.map = {
 	end
 }
 
+Commands.gravity = {
+	Name = "gravity",
+	Category = "Game",
+	Description = "Sets gravity to the specified value.",
+	Environment = "Server" :: "Server",
+	HasRelaxedPermissions = true,
+	Arguments = {},
+	Execute = function(_, _, args): string
+		local value = processNumberArgument(args[1])
+		if not value then
+			return "Invalid argument 1 gravity."
+		end
+
+		workspace.Gravity = value
+
+		return `Set gravity to {value}.`
+	end
+}
+
 Commands.listitems = {
 	Name = "listitems",
 	Category = "Item",
