@@ -731,6 +731,27 @@ Commands.restart = {
 	end
 }
 
+Commands.kick = {
+	Name = "kick",
+	Category = "Other",
+	Description = "Kicks players from the server.",
+	Environment = "Server" :: "Server",
+	HasRelaxedPermissions = true,
+	Arguments = {},
+	Execute = function(executor: Player, _, args): string
+		local players = processPlayerArgument(executor, args[1])
+		if not players then
+			return "Invalid argument 1 players."
+		end
+
+		for _, player in players do
+			player:Kick("Kicked by a moderator.")
+		end
+
+		return `Kicked {getPlayersString(players)}.`
+	end
+}
+
 Commands.gamemode = {
 	Name = "gamemode",
 	Category = "Game",
