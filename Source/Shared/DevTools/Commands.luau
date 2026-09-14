@@ -722,6 +722,10 @@ Commands.restart = {
 	Execute = function()
 		local RestartServer = require(ServerScriptService.Util.RestartServer)
 
+		if IsLabs then
+			return "Server restarts are not currently possible in Labs. Try `kick @a` instead."
+		end
+
 		RestartServer(5)
 		return "Server restarting..."
 	end
