@@ -743,7 +743,7 @@ Commands.gamemode = {
 	Environment = "Server" :: "Server",
 
 	Arguments = {"gamemode name"},
-	Types = {{"gamemode"}, {{kind = "literal", literal = "perm"}, "optional"}} :: {{ArgumentType}},
+	Types = {{"gamemode", "number"}, {{kind = "literal", literal = "perm"}, "optional"}} :: {{ArgumentType}},
 
 	Execute = function(_, round: Round, args: Args): string
 		local CustomGamemode = require(ServerScriptService.Labs.CustomGamemode)
