@@ -798,6 +798,8 @@ Commands.boss = {
 	Types = {{"boss", "number"}} :: {{ArgumentType}},
 
 	Execute = function(_, round: Round, args: Args): string
+		local CustomBoss = require(ServerScriptService.Labs.CustomBoss)
+
 		local bossName = Arguments.String(args[1])
 		if not bossName then
 			return "Missing argument 1 boss name / asset id."
@@ -805,7 +807,8 @@ Commands.boss = {
 
 		local assetId = Arguments.Number(bossName)
 		if assetId then
-			return "not implemented"
+			CustomBoss.LoadBoss(assetId)
+			return `Loaded boss, asset id {assetId}.`
 		end
 
 		local boss = Arguments.Boss(round:GetMap(), bossName)
