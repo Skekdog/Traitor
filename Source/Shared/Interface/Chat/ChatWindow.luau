@@ -207,7 +207,7 @@ ChatWindow.InputBox.PlaceholderText = "Your Roblox settings prevent you from cha
 inputFrame.HideButton.Visible = true
 
 task.spawn(function()
-	if false and TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
+	if TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
 		ChatWindow.InputBox.TextEditable = true
 		ChatWindow.InputBox.PlaceholderText = defaultText
 		inputFrame.HideButton.Visible = false
