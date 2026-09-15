@@ -204,11 +204,19 @@ local defaultText = ChatWindow.InputBox.PlaceholderText
 ChatWindow.InputBox.TextEditable = false
 ChatWindow.InputBox.PlaceholderText = "Your Roblox settings prevent you from chatting."
 
+inputFrame.HideButton.Visible = true
+
 task.spawn(function()
-	if TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
+	if false and TextChatService:CanUserChatAsync(Players.LocalPlayer.UserId) then
 		ChatWindow.InputBox.TextEditable = true
 		ChatWindow.InputBox.PlaceholderText = defaultText
+		inputFrame.HideButton.Visible = false
 	end
+end)
+
+inputFrame.HideButton.Activated:Connect(function()
+	inputFrame.HideButton.Visible = false
+	ChatWindow.InputBox.PlaceholderText = "Chat is unavailable."
 end)
 
 ControlManager.PreferredInput:Connect(function(preferredInput)
