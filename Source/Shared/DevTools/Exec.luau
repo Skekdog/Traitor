@@ -98,6 +98,10 @@ function module.ParseCommands(input: string): {ParsedCommand}
 			end
 		end
 
+		if #splitFix == 0 then
+			continue
+		end
+
 		local cmdName = splitFix[1]:lower()
 
 		local args = {}
