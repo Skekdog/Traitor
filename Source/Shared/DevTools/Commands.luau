@@ -717,9 +717,12 @@ Commands.kick = {
 	Description = "Kicks players from the server.",
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
-	Arguments = {},
+
+	Arguments = {"players"},
+	Types = {{"players"}} :: {{ArgumentType}},
+
 	Execute = function(executor: Player, _, args): string
-		local players = processPlayerArgument(executor, args[1])
+		local players = Arguments.Players(executor, args[1])
 		if not players then
 			return "Invalid argument 1 players."
 		end
@@ -849,9 +852,12 @@ Commands.gravity = {
 	Description = "Sets gravity to the specified value.",
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
-	Arguments = {},
+
+	Arguments = {"value"},
+	Types = {{"number"}} :: {{ArgumentType}},
+
 	Execute = function(_, _, args): string
-		local value = processNumberArgument(args[1])
+		local value = Arguments.Number(args[1])
 		if not value then
 			return "Invalid argument 1 gravity."
 		end
