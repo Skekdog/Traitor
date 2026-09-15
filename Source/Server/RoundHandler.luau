@@ -35,6 +35,8 @@ const KARMA_BAN_THRESHOLD = 250
 Round.Config.DeathSounds = DeathSounds
 
 local forcedMap: Types.MapStructure?
+local forcedGamemode: Types.GamemodeDefinition?
+
 local currentMap = "International"
 
 function module.SetForcedMap(map: Types.MapStructure?): ()
@@ -43,6 +45,10 @@ function module.SetForcedMap(map: Types.MapStructure?): ()
     if forcedMap then
         currentMap = forcedMap.Name
     end
+end
+
+function module.SetForcedGamemode(gamemode: Types.GamemodeDefinition?): ()
+    forcedGamemode = gamemode
 end
 
 local blockNewRounds = false
@@ -220,30 +226,6 @@ function module.UpdateLoadedGamemodes(): ()
 end
 
 module.UpdateLoadedGamemodes()
-
-local forcedGamemode = nil :: Types.GamemodeDefinition?
-
-function module.TrySetForcedGamemode(gamemode: string?): boolean
-    if not gamemode then
-        forcedGamemode = nil
-        return true
-    end
-
-    local found: Types.GamemodeDefinition?
-    for _, v in varietyGamemodes do
-        if v.Name == gamemode then
-            found = v
-            break
-        end
-    end
-
-    if not found then
-        return false
-    end
-
-    forcedGamemode = found
-    return true
-end
 
 local function pickNextGamemode(map: Types.MapStructure): Types.GamemodeDefinition
     if forcedGamemode then

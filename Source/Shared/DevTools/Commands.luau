@@ -743,10 +743,12 @@ Commands.gamemode = {
 	Environment = "Server" :: "Server",
 
 	Arguments = {"gamemode name"},
-	Types = {{"gamemode"}} :: {{ArgumentType}},
+	Types = {{"gamemode"}, {{kind = "literal", literal = "perm"}, "optional"}} :: {{ArgumentType}},
 
 	Execute = function(_, round: Round, args: Args): string
 		local CustomGamemode = require(ServerScriptService.Labs.CustomGamemode)
+		local RoundHandler = require(ServerScriptService.RoundHandler)
+
 		local gamemodeName = Arguments.String(args[1])
 
 		if not gamemodeName then
@@ -765,11 +767,20 @@ Commands.gamemode = {
 		end
 
 		local success, result = pcall(function()
-			round:LoadGamemode((require)(gamemodeModule))
+			local gamemode = (require)(gamemodeModule)
+			round:LoadGamemode(gamemode)
+			return gamemode
 		end)
 
 		if not success then
 			return result
+		end
+
+		local isPerm = (Arguments.String(args[2]) or ""):lower() == "perm"
+		if isPerm then
+			RoundHandler.SetForcedGamemode(result)
+		else
+			RoundHandler.SetForcedGamemode()
 		end
 
 		return `Gamemode changed to {gamemodeName}.`
@@ -816,7 +827,7 @@ Commands.map = {
 	HasRelaxedPermissions = true,
 
 	Arguments = {"map name / asset id"},
-	Types = {{"map", "number"}} :: {{ArgumentType}},
+	Types = {{"map", "number"}, {{kind = "literal", literal = "perm"}, "optional"}} :: {{ArgumentType}},
 
 	Execute = function(_, round: Round, args: Args)
 		local CustomMap = require(ServerScriptService.Labs.CustomMap)
@@ -840,7 +851,13 @@ Commands.map = {
 
 		local structure = Map.ValidateStructure(map:Clone())
 		round:LoadMap(structure)
-		RoundHandler.SetForcedMap(structure)
+
+		local isPerm = (Arguments.String(args[2]) or ""):lower() == "perm"
+		if isPerm then
+			RoundHandler.SetForcedMap(structure)
+		else
+			RoundHandler.SetForcedMap(nil)
+		end
 
 		return `Map changed to {mapName}.`
 	end
