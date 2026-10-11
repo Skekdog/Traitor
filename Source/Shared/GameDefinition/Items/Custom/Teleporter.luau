@@ -27,7 +27,7 @@ teleportFX.Transparency = 0.5
 teleportFX.Material = Enum.Material.Neon
 
 local TELEPORT_SOUND = Audio.MakeSound({
-	Content = Content.fromAssetId(5518430240),
+	Content = Content.fromAssetId(120313184072947),
 	RolloffStart = 15,
 	RolloffEnd = 25,
 })
