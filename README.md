@@ -32,7 +32,7 @@ Play here:
 1. Start by cloning the repo:
 
 ```bash
-git clone https://github.com/Skekdog/Traitor.git Traitor
+git clone https://github.com/Skekdog/Traitor.git
 ```
 
 2. Initialise submodules:
