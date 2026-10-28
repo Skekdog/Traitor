@@ -6,7 +6,7 @@ Note, not all maps listed below exist in the latest commits.
 
 ## Sukirizoto
 
-- [HiddenAnim](https://www.roblox.com/users/107523587/profile)
+- [HiddenAnim](https://www.roblox.com/users/107523587/profile) [(YouTube)](https://www.youtube.com/@HiddenAnim)
 
 ## Asylum
 
