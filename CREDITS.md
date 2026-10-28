@@ -28,7 +28,7 @@ Further note that some of these maps were already openly available.
 
 ## Skylands
 
-- [User](https://www.roblox.com/users/16481979/profile)
+- [User / louisd5](https://www.roblox.com/users/16481979/profile) [(GitHub)](https://github.com/User8426)
 - [B0nk](https://www.roblox.com/users/148788724/profile)
 - [meekdrip](https://www.roblox.com/users/191580478/profile)
 
