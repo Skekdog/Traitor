@@ -10,6 +10,8 @@ Unlike [Imperium](https://github.com/Skekdog/Imperium), I think that Traitor act
 
 To the people who have been around for Traitor's development - thank you.
 
+I likely will not be maintaining this much in the future.
+
 ## About
 
 Spy HQ has been infiltrated by traitor spies - will you find them, or will they find you?
