@@ -34,11 +34,11 @@ Further note that some of these maps were already openly available.
 
 ## Facility
 
-- [User](https://www.roblox.com/users/16481979/profile)
+- [User / louisd5](https://www.roblox.com/users/16481979/profile) [(GitHub)](https://github.com/User8426)
 
 ## Skyscraper
 
-- [User](https://www.roblox.com/users/16481979/profile)
+- [User / louisd5](https://www.roblox.com/users/16481979/profile) [(GitHub)](https://github.com/User8426)
 
 ## Nuketown (Creator Store)
 
