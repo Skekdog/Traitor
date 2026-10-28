@@ -4,6 +4,8 @@ Maps have been graciously provided by their creators. They have all agreed to re
 
 Note, not all maps listed below exist in the latest commits.
 
+Further note that some of these maps were already openly available.
+
 ## Sukirizoto
 
 - [HiddenAnim](https://www.roblox.com/users/107523587/profile) [(YouTube)](https://www.youtube.com/@HiddenAnim)
