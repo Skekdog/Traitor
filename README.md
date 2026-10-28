@@ -49,12 +49,6 @@ rokit install
 
 You can find the required tools and their versions in [rokit.toml](./rokit.toml).
 
-4. Run Dev Script:
-
-```bash
-lune run Lune/Dev
-```
-
 ### Required Adjustments
 
 A `.env` file should be created:
@@ -69,6 +63,18 @@ The following also need to be amended:
 - [Place IDs](./Source/Shared/Places/PlaceIDs.luau)
 - [Badge IDs](./Source/Shared/Monetisation/BadgeIDs.luau)
 - [Gamepass IDs](./Source/Shared/Monetisation/GamepassIDs.luau)
+
+Place IDs and Universe IDs also need to be updated for the [dev suite](./Lune/DevSuite/Build.luau).
+
+Default SDK asset IDs also need to be updated for the [dev suite](./Lune/DevSuite/SDKAssets.luau).
+
+### Activating the Dev Suite
+
+The dev suite provides a set of useful commands to accelerate development. It can be invoked by running:
+
+```bash
+lune run Lune/Dev
+```
 
 ### Project Structure
 
