@@ -96,7 +96,7 @@ Traitor has ended up as a project larger than just a game, and as such, there ar
 
 ### Tips
 
-- Testing can be substantially sped up using [console commands](https://skekdog.github.io/Traitor-Docs/guides/commands/).
+- Development can be substantially sped up using [console commands](https://skekdog.github.io/Traitor-Docs/guides/commands/). Make sure to set up console access, as explained in [Required Adjustments](#required-adjustments).
 
 ## Credits
 
