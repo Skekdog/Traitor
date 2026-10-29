@@ -66,6 +66,8 @@ Place IDs and Universe IDs also need to be updated for the [dev suite](./Lune/De
 
 Default SDK asset IDs also need to be updated for the [dev suite](./Lune/DevSuite/SDKAssets.luau).
 
+The console is accessible to negative user IDs and also one specific user id (me). To change this, edit [./Source/Shared/DevTools/IsAdmin.luau](./Source/Shared/DevTools/IsAdmin.luau).
+
 ### Activating the Dev Suite
 
 The dev suite provides a set of useful commands to accelerate development. It can be invoked by running:
