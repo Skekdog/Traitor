@@ -23,8 +23,6 @@ Spy HQ has been infiltrated by traitor spies - will you find them, or will they 
 
 Labs is a separate environment used to create and test custom assets. Data is not saved, and private servers must be used.
 
-Play here:
-
 ## Developing
 
 ### Setup
