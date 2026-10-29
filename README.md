@@ -39,7 +39,7 @@ git clone https://github.com/Skekdog/Traitor.git
 git submodule update --init --recursive
 ```
 
-3. Install tools required, for example with Rokit:
+3. Install tools required, for example with [Rokit](https://github.com/rojo-rbx/rokit):
 
 ```bash
 rokit install
