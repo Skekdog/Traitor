@@ -263,7 +263,7 @@ local function OnFinish(round: Types.Round): ()
 	end
 end
 
-local function OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+local function OnDeath(round: Types.Round, participant: Types.Participant): ()
 	loadMarkingRemote:FireClient(participant.Player, false)
 
 	local corpse = participant.Corpse

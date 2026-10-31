@@ -386,7 +386,7 @@ local gamemode: Types.GamemodeDefinition = {
 
     Roles = roles,
 
-    OnDeath = function(round, participant: Types.Participant, deferVictoryCheck: boolean)
+    OnDeath = function(round, participant: Types.Participant)
         StandardGame.Highlights.OnDeath(round, participant)
 
         local corpse = participant.Corpse
@@ -401,11 +401,7 @@ local gamemode: Types.GamemodeDefinition = {
             end
         end
 
-        if deferVictoryCheck then
-            task.defer(tryFinishRound, participant.Round)
-        else
-            tryFinishRound(participant.Round)
-        end
+        task.defer(tryFinishRound, participant.Round)
     end,
 
     AddFinishHighlights = function(round)

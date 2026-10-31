@@ -527,7 +527,7 @@ local function disguiseCorpse(participant: Types.Participant, corpse: Types.Corp
     end
 end
 
-local function onDeath(round: Types.Round, victim: Types.Participant, deferVictoryCheck: boolean): ()
+local function onDeath(round: Types.Round, victim: Types.Participant): ()
 	StandardGame.Highlights.OnDeath(round, victim)
 
 	local corpse = victim.Corpse
@@ -544,11 +544,8 @@ local function onDeath(round: Types.Round, victim: Types.Participant, deferVicto
 		end
 	end
 
-	if deferVictoryCheck then
-		task.defer(tryEndRound, victim.Round)
-	else
-		tryEndRound(victim.Round)
-	end
+	-- Checking for victory should always be deferred, in case multiple people die in one frame (Traitor using a JBomb for example). In this case traitors should always win
+	task.defer(tryEndRound, victim.Round)
 end
 
 local gamemode: Types.GamemodeDefinition = {

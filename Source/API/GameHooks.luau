@@ -4,7 +4,7 @@ type Hooks<Callback> = {[string]: Callback}
 
 local GameHooks = {}
 
-GameHooks.OnDeath = {} :: Hooks<(round: Types.Round, participant: Types.Participant, defer: boolean) -> ()>
+GameHooks.OnDeath = {} :: Hooks<(round: Types.Round, participant: Types.Participant) -> ()>
 
 GameHooks.OnPhaseChanged = {} :: Hooks<(round: Types.Round, phase: Types.Phase) -> ()>
 

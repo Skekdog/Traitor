@@ -56,7 +56,7 @@ function module.BlockNewRounds(): ()
     blockNewRounds = true
 end
 
-local function impulseCorpse(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+local function impulseCorpse(round: Types.Round, participant: Types.Participant): ()
     if not participant.Extras.CombatImpulse or not participant.Corpse or not participant.Corpse.Model or not participant.Corpse.Model.PrimaryPart then
         return
     end
@@ -64,11 +64,11 @@ local function impulseCorpse(round: Types.Round, participant: Types.Participant,
     Impulse.ApplyImpulse(participant.Corpse.Model.PrimaryPart, participant.Extras.CombatImpulse, true)
 end
 
-local function removeTeamChat(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+local function removeTeamChat(round: Types.Round, participant: Types.Participant): ()
     TeamChat.TryRemove(participant.Player.UserId)
 end
 
-local function youWereKilledBy(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+local function youWereKilledBy(round: Types.Round, participant: Types.Participant): ()
     if not participant.Corpse then
         return
     end
@@ -98,9 +98,9 @@ function Round.Config.OnPhaseChanged(round: Types.Round, phase: Types.Phase): ()
     end
 end
 
-function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+function Round.Config.OnDeath(round: Types.Round, participant: Types.Participant): ()
     for _, hook in RoundHooks.OnDeath do
-        hook(round, participant, defer)
+        hook(round, participant)
     end
 end
 

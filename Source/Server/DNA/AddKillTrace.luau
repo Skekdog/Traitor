@@ -7,7 +7,7 @@ local Types = require(ReplicatedStorage.API.Types)
 local MAX_KILL_DISTANCE = 60
 local MAX_KILL_TRACE_DURATION = 120
 
-GameHooks.OnDeath["DNATraces"] = function(round: Types.Round, participant: Types.Participant, deferVictoryCheck: boolean): ()
+GameHooks.OnDeath["DNATraces"] = function(round: Types.Round, participant: Types.Participant): ()
 	local corpse = participant.Corpse
 	if not corpse then
 		return

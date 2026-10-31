@@ -81,7 +81,7 @@ local function checkVictory(round: Types.Round): ()
 	end
 end
 
-local function OnDeath(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+local function OnDeath(round: Types.Round, participant: Types.Participant): ()
 	StandardGame.Highlights.OnDeath(round, participant)
 
 	local corpse = participant.Corpse
@@ -95,11 +95,7 @@ local function OnDeath(round: Types.Round, participant: Types.Participant, defer
 		onSurvivorDeath(round, participant)
 	end
 
-	if defer then
-		task.defer(checkVictory, round)
-	else
-		checkVictory(round)
-	end
+	task.defer(checkVictory, round)
 
 	task.delay(RESPAWN_TIME, participant.SpawnCharacter, participant, ZOMBIE:Clone(), nil, true)
 end

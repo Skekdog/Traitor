@@ -166,7 +166,7 @@ local function copyCharacter(char: Model): Model
 	return char
 end
 
-GameHooks.OnDeath["Visualiser"] = function(round: Types.Round, participant: Types.Participant, defer: boolean): ()
+GameHooks.OnDeath["Visualiser"] = function(round: Types.Round, participant: Types.Participant): ()
 	local corpse = participant.Corpse
 	if not corpse then
 		return

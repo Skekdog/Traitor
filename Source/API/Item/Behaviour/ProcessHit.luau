@@ -188,7 +188,7 @@ function ProcessHit.Participant(item: Types.Item | Types.ExplosionParams, by: Ty
 		victim.Extras.CombatImpulse = impulse
 	end
 
-	victim:TryTakeDamage(params, item.Kind == "ExplosionParams")
+	victim:TryTakeDamage(params)
 end
 
 function ProcessHit.Prop(item: Types.Item | Types.ExplosionParams, by: Types.Participant?, prop: Types.Prop, hitPart: BasePart, hitPosition: Vector3, origin: Vector3, projectile: Types.MapObject?, timeOrigin: number?): ()
