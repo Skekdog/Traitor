@@ -174,6 +174,9 @@ local function createPlr(plr: Player)
 		if not clone.Parent then
 			return
 		end
+
+		print(`Updating {participant.Name} in playerlist: {participant.Role().Definition.Name}. Currently: {BrickColor.new(clone.Username.TextColor3).Name:upper()}`)
+
 		if role == Defaults.Role then
 			clone.Username:SetAttribute("KeepText")
 			ThemesManager.UpdateThemeInstance(clone.Username)
