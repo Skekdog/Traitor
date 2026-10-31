@@ -9,15 +9,21 @@ local StandardGame = {}
 local items: {[string]: Types.ItemComponents} = {}
 for _, module in ReplicatedStorage.Shared.GameDefinition.Items:QueryDescendants("ModuleScript") do
     local ret = (require)(module)
+
+    local name: string, value: Types.ItemComponents
     if ret.Item then
-        items[ret.Item.Name] = ret.Item
+        name, value = ret.Item.Name, ret.Item
     else
-        items[ret.Name] = ret
+        name, value = ret.Name, ret
     end
 
     if ret.ShopItem then
-        items[ret.ShopItem.Name] = ret.ShopItem
+        name, value = ret.ShopItem.Name, ret.ShopItem
     end
+
+    assert(not items[name], `Failed to register module "{module.Name}": Item with name "{name}" already exists`)
+
+    items[name] = value
 end
 
 function StandardGame.GetItem(name: string): Types.ItemComponents
