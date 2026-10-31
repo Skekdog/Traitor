@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local ViewCorpse = require(ReplicatedStorage.Shared.Actions.ViewCorpse)
 local HookClientMessage = require(ReplicatedStorage.Shared.Interface.Chat.HookClientMessage)
-local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 local LocalRoundInfo = require(ReplicatedStorage.Shared.LocalState.LocalRoundInfo)
@@ -175,13 +174,9 @@ local function createPlr(plr: Player)
 			return
 		end
 
-		print(`Updating {participant.Name} in playerlist: {participant.Role().Definition.Name}. Currently: {BrickColor.new(clone.Username.TextColor3).Name:upper()}`)
-
 		if role == Defaults.Role then
-			clone.Username:SetAttribute("KeepText")
-			ThemesManager.UpdateThemeInstance(clone.Username)
+			clone.Username.TextColor3 = Color3.new(1, 1, 1)
 		else
-			clone.Username:SetAttribute("KeepText", true)
 			clone.Username.TextColor3 = role.Definition.Color
 		end
 	end, true)
