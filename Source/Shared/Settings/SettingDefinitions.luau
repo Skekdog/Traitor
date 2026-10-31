@@ -2,6 +2,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local VoiceChatService = game:GetService("VoiceChatService")
+local PreferredInput = require(ReplicatedStorage.Shared.Controls.PreferredInput)
 local RelaxedPermissions = require(ReplicatedStorage.Shared.DevTools.RelaxedPermissions)
 local IsAdmin = require(ReplicatedStorage.Shared.DevTools.IsAdmin)
 
@@ -191,13 +192,13 @@ table.insert(availableSettings, {
 table.insert(availableSettings, {
 	Name = "Crouch",
 	Tab = "Keybinds",
-	Category = "Movement",
+	Category = "Movement - Enable the checkbox to make a keybind toggled",
 	Kind = "Control" :: "Control",
 	Tooltip = "Also used for covert corpse searching.",
-	SpecifyToggle = false,
+	SpecifyToggle = true,
 
 	Default = {
-		Toggled = true,
+		Toggled = PreferredInput.PreferredInput() == Enum.PreferredInput.Touch,
 		Keybind = {
 			KBMKeybind = Enum.KeyCode.LeftControl,
 			Gamepad = Enum.KeyCode.ButtonB,
