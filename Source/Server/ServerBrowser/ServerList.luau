@@ -23,7 +23,10 @@ const MAX_PER_PAGE = 200
 
 task.spawn(function()
 	while true do
-		local pages = hashMap:ListItemsAsync(MAX_PER_PAGE)
+		local success, pages = pcall(hashMap.ListItemsAsync, hashMap, MAX_PER_PAGE)
+		if not success then
+			warn(pages)
+		end
 
 		local newServers: {[string]: SharedTypes.ServerInfo} = {}
 		while not pages.IsFinished do
@@ -33,7 +36,11 @@ task.spawn(function()
 			end
 
 			if not pages.IsFinished then
-				pages:AdvanceToNextPageAsync()
+				local advanceSuccess, result = pcall(pages.AdvanceToNextPageAsync, pages)
+				if not advanceSuccess then
+					warn(result)
+					break
+				end
 			end
 		end
 
