@@ -119,7 +119,19 @@ local function populateShop(role: Types.Role): ()
 		local gamemode = LocalRoundInfo.Gamemode() or error("Gamemode is not loaded")
 		shopPage.ScrollHolder.ScrollingFrame.Visible = true
 		for _, definition in role.Definition.EquipmentShop do
-			assert(definition.Cost, "missing credit cost for " .. definition.Name)
+			local success, result = pcall(assert, definition.Cost, "missing credit cost for " .. definition.Name)
+			if not success then
+				assert(typeof(result) == "string")
+
+				local definitionStr = ""
+				for k, v in definition do
+					definitionStr ..= `{k}: {v}\n`
+				end
+
+				local msg = `CAUGHT ERROR: {result}\nGAMEMODE: {gamemode.Name}\nDEFINITION: {definitionStr}`
+				warn(msg)
+				continue
+			end
 
 			local button = shopPage.EquipmentEntry:Clone()
 			button.Name = "Equipment_" .. definition.Name
