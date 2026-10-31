@@ -212,7 +212,7 @@ if RunService:IsServer() then
 end
 
 local item = Custom({
-	Name = "Jetpack",
+	Name = "Flypack",
 	Description = "Fly around, forever.",
 	IconContent = Content.fromAssetId(17576355326),
 
