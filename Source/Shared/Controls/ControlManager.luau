@@ -3,10 +3,10 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local ControlTypes = require(script.Parent.ControlTypes)
+local PreferredInput = require(script.Parent.PreferredInput)
 local SettingDefinitions = require(ReplicatedStorage.Shared.Settings.SettingDefinitions)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local ActionButton = require(ReplicatedStorage.Shared.Interface.UILib.ActionButton)
-local InstanceSignal = require(ReplicatedStorage.Shared.Util.InstanceSignal)
 
 local module = {}
 
@@ -36,7 +36,7 @@ local KEY_NAMES = {
 	Return = "ENTER",
 }
 
-module.PreferredInput = InstanceSignal.ListenProperty<<Enum.PreferredInput>>(UserInputService, "PreferredInput")
+
 
 function module.GetStringForKeyCode(keycode: Enum.KeyCode | Enum.UserInputType?): string
 	if not keycode then
@@ -79,7 +79,7 @@ function module.GetFirstKeyCode(actionName: string, blankForTouch: boolean?): st
 	local controlSetting = Settings.GetSetting(actionName) :: Settings.ControlValue
 	local keybinds = controlSetting.Keybind
 
-	local preferred = module.PreferredInput()
+	local preferred = PreferredInput.PreferredInput()
 	if preferred == Enum.PreferredInput.Touch then
 		return if blankForTouch then "" else actionName
 	end
@@ -204,14 +204,14 @@ function module.Register(actionName: string, callback: ControlTypes.ActionCallba
 
 	ContextActionService:BindActionAtPriority(actionName, runCallback, false, priority, table.unpack(binds))
 
-	if module.PreferredInput() == Enum.PreferredInput.Touch and setting.TouchButton then
+	if PreferredInput.PreferredInput() == Enum.PreferredInput.Touch and setting.TouchButton then
 		return ActionButton.ShowActionButton(actionName, runCallback, setting)
 	end
 
 	return nil
 end
 
-module.PreferredInput:Connect(function(preferred)
+PreferredInput.PreferredInput:Connect(function(preferred)
 	for actionName, info in registered do
 		local setting = Settings.GetSetting(actionName) :: Settings.ControlValue
 		if setting.TouchButton then

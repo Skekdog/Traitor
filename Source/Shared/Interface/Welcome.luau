@@ -1,5 +1,5 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local PreferredInput = require(ReplicatedStorage.Shared.Controls.PreferredInput)
 local UIManager = require(script.Parent.UILib.UIManager)
 
 local ui = UIManager.WaitForUI("Welcome") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Welcome)}
@@ -124,7 +124,7 @@ for i, info in gamepadControls do
 	table.insert(gamepadControlInstances, createControlInstance(i, info))
 end
 
-ControlManager.PreferredInput:Connect(function(preferred)
+PreferredInput.PreferredInput:Connect(function(preferred)
 	for _, instance in kbmControlInstances do
 		instance.Visible = preferred == Enum.PreferredInput.KeyboardAndMouse
 	end

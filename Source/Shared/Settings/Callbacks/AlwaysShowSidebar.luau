@@ -1,5 +1,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local PreferredInput = require(ReplicatedStorage.Shared.Controls.PreferredInput)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
@@ -30,7 +31,7 @@ function AlwaysShowSidebar.Callback(name: string, value: boolean): ()
 
     determineVisibility(value)
 
-    con = ControlManager.PreferredInput:Connect(function()
+    con = PreferredInput.PreferredInput:Connect(function()
         determineVisibility(value)
     end)
 end

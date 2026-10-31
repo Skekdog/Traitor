@@ -2,6 +2,7 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Settings = require(ReplicatedStorage.Shared.Settings.Settings)
 local ControlManager = require(script.Parent.ControlManager)
+local PreferredInput = require(script.Parent.PreferredInput)
 local boundInstances: {[string]: {Instance}} = {}
 
 type Label = TextLabel | ImageLabel
@@ -178,7 +179,7 @@ function module.TryUpdateKeybind(name: string): ()
     end
 end
 
-ControlManager.PreferredInput:Connect(function()
+PreferredInput.PreferredInput:Connect(function()
     for name in boundInstances do
         module.TryUpdateKeybind(name)
     end

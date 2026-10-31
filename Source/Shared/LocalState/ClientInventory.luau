@@ -15,6 +15,7 @@ local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
 local Types = require(ReplicatedStorage.API.Types)
+local PreferredInput = require(ReplicatedStorage.Shared.Controls.PreferredInput)
 local DynamicValue = require(ReplicatedStorage.Shared.Util.DynamicValue)
 
 local ui = UIManager.WaitForUI("Inventory") :: UIManager.UI & {Object: typeof(UIManager.UnregisteredUIs.Inventory)}
@@ -41,7 +42,7 @@ local hideAt = math.huge
 local SHOW_DURATION = 3
 
 local function showMenu()
-	if ControlManager.PreferredInput() ~= Enum.PreferredInput.KeyboardAndMouse then
+	if PreferredInput.PreferredInput() ~= Enum.PreferredInput.KeyboardAndMouse then
 		return
 	end
 
@@ -270,7 +271,7 @@ local function tryAddButton(item: Types.Item, slot: number): ()
 	clone.Parent = ui.Object :: any
 
 	clone.Activated:Connect(function()
-		if ControlManager.PreferredInput() == Enum.PreferredInput.Touch or ControlManager.PreferredInput() == Enum.PreferredInput.Gamepad then
+		if PreferredInput.PreferredInput() == Enum.PreferredInput.Touch or PreferredInput.PreferredInput() == Enum.PreferredInput.Gamepad then
 			ui:ToggleVisible(false)
 		end
 		tryEquip(item)
@@ -576,7 +577,7 @@ ReplicatedStorage.Remotes.ServerClient.UpdateAmmo.OnClientEvent:Connect(function
 	end
 end)
 
-ControlManager.PreferredInput:Connect(function(preferredInput)
+PreferredInput.PreferredInput:Connect(function(preferredInput)
 	local usePickerMenu = preferredInput ~= Enum.PreferredInput.KeyboardAndMouse
 
 	ui:ToggleVisible(false, nil, function()
@@ -599,7 +600,7 @@ ControlManager.Register("Inventory", function()
 end)
 
 ui.Object:GetPropertyChangedSignal("Visible"):Connect(function()
-	if not ControlManager.PreferredInput().Name:find("Gamepad") then
+	if not PreferredInput.PreferredInput().Name:find("Gamepad") then
 		return
 	end
 
@@ -630,7 +631,7 @@ end)
 StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack, false)
 
 RunService.Heartbeat:Connect(function()
-	if ControlManager.PreferredInput() ~= Enum.PreferredInput.KeyboardAndMouse then
+	if PreferredInput.PreferredInput() ~= Enum.PreferredInput.KeyboardAndMouse then
 		return
 	end
 

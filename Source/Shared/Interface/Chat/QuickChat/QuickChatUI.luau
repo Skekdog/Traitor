@@ -4,6 +4,7 @@ local RunService = game:GetService("RunService")
 local QuickChat = require(script.Parent.QuickChat)
 local Interaction = require(ReplicatedStorage.Shared.Actions.Interaction)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local PreferredInput = require(ReplicatedStorage.Shared.Controls.PreferredInput)
 local ChatWindow = require(ReplicatedStorage.Shared.Interface.Chat.ChatWindow)
 local QuickChatClient = require(script.Parent.QuickChatClient)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
@@ -75,7 +76,7 @@ ui:GetPropertyChangedSignal("Visible"):Connect(function()
 		end)
 	end
 
-	if not ControlManager.PreferredInput().Name:find("Gamepad") then
+	if not PreferredInput.PreferredInput().Name:find("Gamepad") then
 		return
 	end
 

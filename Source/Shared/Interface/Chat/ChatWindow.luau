@@ -5,6 +5,7 @@ local TextChatService = game:GetService("TextChatService")
 local GetChatChannel = require(ReplicatedStorage.API.GetChatChannel)
 local Types = require(ReplicatedStorage.API.Types)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local PreferredInput = require(ReplicatedStorage.Shared.Controls.PreferredInput)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local ChatWindow = {}
@@ -185,7 +186,7 @@ inputFrame.HideButton.Activated:Connect(function()
 	ChatWindow.InputBox.PlaceholderText = "Chat is unavailable."
 end)
 
-ControlManager.PreferredInput:Connect(function(preferredInput)
+PreferredInput.PreferredInput:Connect(function(preferredInput)
 	sendButton.Visible = preferredInput == Enum.PreferredInput.Touch
 	ChatWindow.QuickChatButton.Visible = preferredInput == Enum.PreferredInput.Touch
 end, true)

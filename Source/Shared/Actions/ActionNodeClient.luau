@@ -1,7 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
+local PreferredInput = require(ReplicatedStorage.Shared.Controls.PreferredInput)
 local ActionNodeType = require(script.Parent.ActionNodeType)
 local LocalParticipantInfo = require(ReplicatedStorage.Shared.LocalState.LocalParticipantInfo)
 
@@ -67,7 +67,7 @@ local function makeGui(params: ActionNodeType.ActionNodeParams): ()
 	clickIcon.ImageTransparency = 0.5
 
 	-- Prevent clicking on non-touchscreen, as thats annoying
-	clickIcon.Active = ControlManager.PreferredInput() == Enum.PreferredInput.Touch
+	clickIcon.Active = PreferredInput.PreferredInput() == Enum.PreferredInput.Touch
 
 	Instance.new("UIAspectRatioConstraint", clickIcon)
 
@@ -152,7 +152,7 @@ RunService.PreRender:Connect(function()
 end)
 
 -- Prevent clicking on non-touchscreen, as thats annoying
-ControlManager.PreferredInput:Connect(function(preferredInput)
+PreferredInput.PreferredInput:Connect(function(preferredInput)
 	for _, nodeData in nodes do
 		assert(nodeData)
 		nodeData.ClickIcon.Active = preferredInput == Enum.PreferredInput.Touch
