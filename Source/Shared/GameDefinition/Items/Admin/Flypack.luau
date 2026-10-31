@@ -147,9 +147,6 @@ local function OnEquipClient(): ()
 end
 
 local function OnUnequipClient(): ()
-	local CustomActions = require(ReplicatedStorage.API.CustomActions)
-	CustomActions.Unregister("Jetpack")
-
 	if velocity then
 		velocity:Destroy()
 		velocity = nil
