@@ -68,7 +68,7 @@ local pigeons: {PigeonData} = {}
 local highlights: {KillHighlights.ItemKillHighlight} = {
 	{
 		Title = "When Pig(eon)s Fly",
-		Description = "%d people made a bet that pigeons could not fly. %s made those people lose that bet.",
+		Description = "%s made was made a bet that pigeons couldn't fly. %d people paid up.",
 		Priority = 3,
 		Threshold = 3,
 	},
