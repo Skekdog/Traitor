@@ -85,7 +85,7 @@ ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(playe
             Amount = damage,
             Source = "Stomp",
             Attacker = participant,
-        })
+        }, true) -- Death should be deferred for the traitor win
 
         if didDamage then
             damage -= currentHealth or 0
@@ -96,7 +96,7 @@ ReplicatedStorage.Remotes.ClientServer.Fell.OnServerEvent:Connect(function(playe
         participant:TryTakeDamage({
             Amount = damage,
             Source = "Fall",
-        })
+        }, true) -- Deferred for the same reason
     end
 end)
 
