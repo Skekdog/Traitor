@@ -10,7 +10,6 @@ local LocalCharacter = require(ReplicatedStorage.Shared.Character.LocalCharacter
 local Viewmodel = require(ReplicatedStorage.Shared.Combat.Viewmodel)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local ItemHint = require(ReplicatedStorage.Shared.Controls.ItemHint)
-local ThemesManager = require(ReplicatedStorage.Shared.Interface.UILib.ThemesManager)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local ShowAlert = require(ReplicatedStorage.Shared.Interface.Util.ShowAlert)
 local Item = require(ReplicatedStorage.Shared.RoundRule.Item)
@@ -263,9 +262,6 @@ local function tryAddButton(item: Types.Item, slot: number): ()
 
 	clone.Position = UDim2.fromScale(0.5, 1.2)
 	clone.Visible = true
-
-	ThemesManager.UpdateThemeInstance(clone, nil, true)
-	ThemesManager.UpdateThemeInstance(clone.TextLabel, nil, true)
 
 	clone.Name = "Item " .. item.Name
 	clone.Parent = ui.Object :: any

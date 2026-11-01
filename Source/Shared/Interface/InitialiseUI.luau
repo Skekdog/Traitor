@@ -3,9 +3,6 @@ local StarterGui = game:GetService("StarterGui")
 
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 local PlaceIDs = require(ReplicatedStorage.Shared.Places.PlaceIDs)
-local ThemesManager = require(script.Parent.UILib.ThemesManager)
-
-ThemesManager.UpdateTheme("Dark")
 
 require(script.Parent.Welcome)
 require(script.Parent.GameState.CalledToCorpse)
