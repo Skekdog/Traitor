@@ -6,7 +6,6 @@ local SealGun = require(ReplicatedStorage.Shared.GameDefinition.Items.Guns.SealG
 local GatlingSeal = Modify(SealGun.Item, "Gatling Seal", {
 	PrimaryInterval = 0.25,
 	ProjectileSpeed = 200,
-	Damage = 0,
     AmmoDefinition = Ammo.Infinite,
 })
 

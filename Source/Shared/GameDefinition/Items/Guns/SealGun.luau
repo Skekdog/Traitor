@@ -86,7 +86,6 @@ local item = Gun({
 	Spread = 0.01,
 
 	CanHeadshot = false,
-	Damage = 10,
 
 	AmmoDefinition = Ammo.MelonLauncher,
 
