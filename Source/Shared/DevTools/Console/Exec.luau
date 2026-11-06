@@ -1,11 +1,11 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.API.Types)
-local Lexer = require(ReplicatedStorage.Shared.DevTools._Console.Lexer)
-local Parser = require(ReplicatedStorage.Shared.DevTools._Console.Parser)
+local IsAdmin = require(ReplicatedStorage.Shared.DevTools.IsAdmin)
+local RelaxedPermissions = require(ReplicatedStorage.Shared.DevTools.RelaxedPermissions)
 local Commands = require(script.Parent.Commands)
-local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
-local IsAdmin = require(script.Parent.IsAdmin)
+local Lexer = require(script.Parent.Lexer)
+local Parser = require(script.Parent.Parser)
 
 local module = {}
 

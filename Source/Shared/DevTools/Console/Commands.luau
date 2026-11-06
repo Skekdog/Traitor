@@ -8,7 +8,6 @@ local Arguments = require(script.Parent.Arguments)
 local StandardGame = require(ReplicatedStorage.API.StandardGame)
 local Types = require(ReplicatedStorage.API.Types)
 local Map = require(ReplicatedStorage.Shared.RoundRule.Map)
-local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local IsLabs = require(ReplicatedStorage.Shared.Places.IsLabs)
 
 type ArgumentType = Arguments.ArgumentType
@@ -262,7 +261,7 @@ Commands.noclip = {
 	Types = {},
 
 	Execute = function(player: Player, args: Args)
-		local NoClip = require(script.Parent.NoClip)
+		local NoClip = require(script.Parent.Parent.NoClip)
 		local enabled = NoClip.Enable()
 		return `Noclip {if enabled then "enabled" else "disabled"}.`
 	end
@@ -1125,6 +1124,8 @@ Commands.relax = {
 	Environment = "Server" :: "Server",
 	HasRelaxedPermissions = true,
 	Execute = function(executor: Player, round: Round, args: Args): string
+		local RelaxedPermissions = require(ReplicatedStorage.Shared.DevTools.RelaxedPermissions)
+
 		local players = Arguments.Players(executor, args[1])
 		if not players then
 			return `Player {args[1]} not found.`
