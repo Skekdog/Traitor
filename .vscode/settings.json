@@ -15,4 +15,7 @@
 	"luau-lsp.types.robloxSecurityLevel": "None",
 	"luau-lsp.sourcemap.rojoProjectFile": "sourcemap.project.json",
 	"mandolin.lintConfigPath": "lint.config.luau",
+	"python.analysis.exclude": [
+		"Lune/**"
+	]
 }
