@@ -38,7 +38,7 @@ local function traverseHistoryDown(console: UIManager.UI & {Object: typeof(UIMan
 end
 
 local function highlightText(text: string, colour: Color3): string
-	return `<font color='{colour:ToHex()}'>{text}</font>`
+	return `<font color='#{colour:ToHex()}'>{text}</font>`
 end
 
 type HighlightKind = "Error"
