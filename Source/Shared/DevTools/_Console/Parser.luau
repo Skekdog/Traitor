@@ -41,9 +41,10 @@ local function pushWord(tokens: {Token}, wordSequence: {Word}, isArgument: boole
 	table.clear(wordSequence)
 end
 
-function Parser.Parse(input: string, lexemes: {Lexer.Lexeme}): {Ok: true, Tokens: {Token}} | {Ok: false, Error: string}
+function Parser.Parse(input: string, lexemes: {Lexer.Lexeme}): {ok: true, tokens: {Token}} | {ok: false, err: string, span: vector}
 	local tokens: {Token} = {}
 
+	local quoteSpan: vector?
 	local isInQuote = false
 	local isEscaped = false
 	local isArgument = false
@@ -59,13 +60,21 @@ function Parser.Parse(input: string, lexemes: {Lexer.Lexeme}): {Ok: true, Tokens
 				if not isInQuote then
 					if #wordSequence ~= 0 then
 						return {
-							Ok = false,
-							Error = `Expected whitespace before quote ({lexeme.span.x}-{lexeme.span.y})`,
+							ok = false,
+							err = `Expected whitespace before quote ({lexeme.span.x}-{lexeme.span.y})`,
+							span = lexeme.span,
 						}
 					end
 				end
 
 				isInQuote = not isInQuote
+
+				if isInQuote then
+					quoteSpan = lexeme.span
+				else
+					quoteSpan = nil
+				end
+
 				pushWord(tokens, wordSequence, isArgument)
 
 				continue
@@ -93,16 +102,17 @@ function Parser.Parse(input: string, lexemes: {Lexer.Lexeme}): {Ok: true, Tokens
 
 	pushWord(tokens, wordSequence, isArgument)
 
-	if isInQuote then
+	if isInQuote and quoteSpan then
 		return {
-			Ok = false,
-			Error = "Unterminated quote"
+			ok = false,
+			err = "Unterminated quote",
+			span = quoteSpan,
 		}
 	end
 
 	return {
-		Ok = true,
-		Tokens = tokens,
+		ok = true,
+		tokens = tokens,
 	}
 end
 

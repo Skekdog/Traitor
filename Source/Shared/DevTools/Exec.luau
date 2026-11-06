@@ -1,126 +1,45 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Types = require(ReplicatedStorage.API.Types)
+local Lexer = require(ReplicatedStorage.Shared.DevTools._Console.Lexer)
+local Parser = require(ReplicatedStorage.Shared.DevTools._Console.Parser)
 local Commands = require(script.Parent.Commands)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local IsAdmin = require(script.Parent.IsAdmin)
 
 local module = {}
 
-export type ParsedCommand = {
+export type CommandSequence = {
 	Command: Commands.Command?,
 	ParsedName: string,
 	Args: {string},
 }
 
-export type Token_CommandName = {
-	Kind: "CommandName",
-	Value: string,
-}
+local function getCommandSequence(input: string): {CommandSequence}
+	local parseResult = Parser.Parse(input, Lexer.Lex(input))
+	if not parseResult.ok then
+		return {}
+	end
 
-export type Token_Argument = {
-	Kind: "Argument",
-	Value: string,
-}
-
-export type Token_Semicolon = {
-	Kind: "Semicolon",
-	Value: string,
-}
-
-export type Token_Whitespace = {
-	Kind: "Whitespace",
-	Value: string,
-}
-
-export type Token = Token_CommandName | Token_Argument | Token_Semicolon | Token_Whitespace
-
-function module.Tokenise(input: string): {Token}
-	local tokens: {Token} = {}
-
-	local semicolonSplit = input:split(";")
-	for i_semicolon, semicolon in semicolonSplit do
-		if semicolon ~= "" then
-			local spaceSplit = semicolon:split(" ")
-
-			local currentIndex = 0
-			for i_space, space in spaceSplit do
-				if space ~= "" then
-					currentIndex += 1
-					if currentIndex == 1 then
-						table.insert(tokens, {
-							Kind = "CommandName",
-							Value = space,
-						})
-					else
-						table.insert(tokens, {
-							Kind = "Argument",
-							Value = space,
-						})
-					end
-				end
-
-				if i_space ~= #spaceSplit then
-					table.insert(tokens, {
-						Kind = "Whitespace",
-						Value = " ",
-					})
-				end
-			end
-		end
-
-		if i_semicolon ~= #semicolonSplit then
-			table.insert(tokens, {
-				Kind = "Semicolon",
-				Value = ";",
+	local sequence: {CommandSequence} = {}
+	for _, token in parseResult.tokens do
+		if token.kind == "COMMAND" then
+			table.insert(sequence, {
+				Command = Commands[token.parsed_content:lower()],
+				ParsedName = token.parsed_content,
+				Args = {},
 			})
+		else
+			local command = assert(sequence[#sequence])
+			table.insert(command.Args, token.parsed_content)
 		end
 	end
 
-	return tokens
-end
-
-function module.ParseCommands(input: string): {ParsedCommand}
-	local parsedCommands: {ParsedCommand} = {}
-
-	local commands = input:split(";")
-	for _, command in commands do
-		if command == "" then
-			continue
-		end
-
-		local split = command:split(" ")
-
-		local splitFix: {string} = {}
-		for _, part in split do
-			if part ~= "" then
-				table.insert(splitFix, part)
-			end
-		end
-
-		if #splitFix == 0 then
-			continue
-		end
-
-		local cmdName = splitFix[1]:lower()
-
-		local args = {}
-		table.move(splitFix, 2, #splitFix, 1, args)
-
-		local cmd = Commands[cmdName]
-
-		table.insert(parsedCommands, {
-			Command = cmd,
-			ParsedName = cmdName,
-			Args = args,
-		})
-	end
-
-	return parsedCommands
+	return sequence
 end
 
 function module.ClientExecute(input: string): {string}
-	local commands = module.ParseCommands(input)
+	local commands = getCommandSequence(input)
 
 	local output: {string} = {}
 
@@ -152,7 +71,7 @@ function module.ClientExecute(input: string): {string}
 end
 
 function module.ServerExecute(player: Player, round: Types.Round, input: string): {string}
-	local commands = module.ParseCommands(input)
+	local commands = getCommandSequence(input)
 
 	local output: {string} = {}
 

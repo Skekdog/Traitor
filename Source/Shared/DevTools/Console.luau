@@ -7,6 +7,8 @@ local IsAdmin = require(script.Parent.IsAdmin)
 local RelaxedPermissions = require(script.Parent.RelaxedPermissions)
 local ControlManager = require(ReplicatedStorage.Shared.Controls.ControlManager)
 local Exec = require(ReplicatedStorage.Shared.DevTools.Exec)
+local Lexer = require(ReplicatedStorage.Shared.DevTools._Console.Lexer)
+local Parser = require(ReplicatedStorage.Shared.DevTools._Console.Parser)
 local UIManager = require(ReplicatedStorage.Shared.Interface.UILib.UIManager)
 
 local commandHistory: {string?} = {}
@@ -35,24 +37,53 @@ local function traverseHistoryDown(console: UIManager.UI & {Object: typeof(UIMan
 	end
 end
 
-local function errorHighlight(text: string): string
-	return "<font color='#ff0000'>" .. text .. "</font>"
+local function highlightText(text: string, colour: Color3): string
+	return `<font color='{colour:ToHex()}'>{text}</font>`
+end
+
+type HighlightKind = "Error"
+
+local highlightColours: {[HighlightKind]: Color3} = {
+	["Error"] = Color3.fromRGB(255, 0, 0),
+}
+
+type HighlightInfo = {span: vector, kind: HighlightKind}
+local function applyHighlighting(input: string, highlights: {HighlightInfo}): string
+	local parts: {string} = {}
+
+	local lastSpan = vector.create(0, 0)
+	for i, params in highlights do
+		local span = params.span
+
+		local previous = string.sub(input, lastSpan.y + 1, span.x - 1)
+		lastSpan = span
+
+		table.insert(parts, previous)
+
+		local current = string.sub(input, span.x, span.y)
+		table.insert(parts, highlightText(current, highlightColours[params.kind]))
+	end
+
+	return table.concat(parts, "")
 end
 
 local function processTokens(input: string): {Rendered: string, Output: string}
-	local tokens = Exec.Tokenise(input)
+	local parseResult = Parser.Parse(input, Lexer.Lex(input))
+	if not parseResult.ok then
+		return {Rendered = input, Output = parseResult.err}
+	end
 
-	local rendered = ""
 	local output: {string} = {}
 
 	local currentCommand: Commands.Command?
 	local requiredArguments = 0
 	local argumentIndex = 0
-	for _, token in tokens do
-		local renderedToken = token.Value
 
-		if token.Kind == "CommandName" then
-			local name = token.Value
+	local highlights: {HighlightInfo} = {}
+
+	for _, token in parseResult.tokens do
+		if token.kind == "COMMAND" then
+			local name = token.parsed_content
 
 			if currentCommand and argumentIndex < requiredArguments then
 				table.insert(output, `Expected at least {requiredArguments} arguments`)
@@ -72,29 +103,34 @@ local function processTokens(input: string): {Rendered: string, Output: string}
 			end
 
 			if not currentCommand then
-				renderedToken = errorHighlight(name)
+				table.insert(highlights, {
+					span = token.span,
+					kind = "Error",
+				})
+
 				table.insert(output, "Unknown command: " .. name)
 			end
-		elseif token.Kind == "Argument" and currentCommand then
-			local argument = token.Value
+		elseif token.kind == "ARGUMENT" and currentCommand then
+			local argument = token.parsed_content
 
 			argumentIndex += 1
 
 			local argumentValidation = ClientArguments.IsValidArgument(currentCommand, argument, argumentIndex)
 			if argumentValidation then
-				renderedToken = errorHighlight(argument)
+				table.insert(highlights, {
+					span = token.span,
+					kind = "Error",
+				})
 				table.insert(output, argumentValidation)
 			end
 		end
-
-		rendered ..= renderedToken
 	end
 
 	if currentCommand and argumentIndex < requiredArguments then
 		table.insert(output, `Expected at least {requiredArguments} arguments`)
 	end
 
-	return {Rendered = rendered, Output = table.concat(output, "\n")}
+	return {Rendered = applyHighlighting(input, highlights), Output = table.concat(output, "\n")}
 end
 
 RelaxedPermissions.TemporaryPermissions:Connect(function(perms)
