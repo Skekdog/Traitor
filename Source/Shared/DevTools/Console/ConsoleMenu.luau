@@ -72,7 +72,13 @@ end
 local function processTokens(input: string): {Rendered: string, Output: string}
 	local parseResult = Parser.Parse(input, Lexer.Lex(input))
 	if not parseResult.ok then
-		return {Rendered = input, Output = parseResult.err}
+		local rendered = applyHighlighting(input, {
+			{
+				span = parseResult.span,
+				kind = "Error",
+			}
+		})
+		return {Rendered = rendered, Output = parseResult.err}
 	end
 
 	local output: {string} = {}
