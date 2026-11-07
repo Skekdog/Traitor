@@ -19,7 +19,7 @@ local function setImageForImageLabel(image: string, label: ImageLabel): ()
     label.Image = image
 end
 
-local function createLabel(class: "TextLabel" | "ImageLabel", control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?, textXAlignment: string?, textSize: number?): Label
+local function createLabel(class: "TextLabel" | "ImageLabel", control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, textXAlignment: string?, textSize: number?): Label
     local label = Instance.new(class) :: GuiObject
 
     label.Position = position or UDim2.fromScale(1, 0)
@@ -95,9 +95,9 @@ local function updateText(control: string, instance: Instance): ()
     end
 end
 
-local function createLabels(control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, noStyle: boolean?, textXAlignment: string?, textSize: number?): ()
-    createLabel("ImageLabel", control, instance, position, size, anchorPoint, noStyle, textXAlignment, textSize)
-    createLabel("TextLabel", control, instance, position, size, anchorPoint, noStyle, textXAlignment, textSize)
+local function createLabels(control: string, instance: Instance, position: UDim2?, size: UDim2?, anchorPoint: Vector2?, textXAlignment: string?, textSize: number?): ()
+    createLabel("ImageLabel", control, instance, position, size, anchorPoint, textXAlignment, textSize)
+    createLabel("TextLabel", control, instance, position, size, anchorPoint, textXAlignment, textSize)
 
     if not boundInstances[control] then
         boundInstances[control] = {}
@@ -126,9 +126,6 @@ local function loadInstance(instance: Instance): ()
     local textXAlignment = instance:GetAttribute("TextXAlignment") :: "Left" | "Right" | "Center"?
     assert(textXAlignment == "Left" or textXAlignment == "Right" or textXAlignment == "Center" or textXAlignment == nil, "Expected attribute 'TextXAlignment' to be a 'Left' | 'Right' | 'Center' or nil " .. instance:GetFullName())
 
-    local noStyle = instance:GetAttribute("NoStyle") :: boolean?
-    assert(typeof(noStyle) == "boolean" or noStyle == nil, "Expected attribute 'NoStyle' to be a boolean or nil " .. instance:GetFullName())
-
     local alwaysShow = instance:GetAttribute("AlwaysShow") :: boolean?
     assert(typeof(alwaysShow) == "boolean" or alwaysShow == nil, "Expected attribute 'AlwaysShow' to be a boolean or nil " .. instance:GetFullName())
 
@@ -138,7 +135,7 @@ local function loadInstance(instance: Instance): ()
     local textSize = instance:GetAttribute("TextSize") :: number?
     assert(typeof(textSize) == "number" or textSize == nil, "Expected attribute 'TextSize' to be a number or nil " .. instance:GetFullName())
 
-    createLabels(control, instance, position, size, anchorPoint, noStyle, textXAlignment, textSize)
+    createLabels(control, instance, position, size, anchorPoint, textXAlignment, textSize)
 end
 
 CollectionService:GetInstanceAddedSignal("ControlHint"):Connect(loadInstance)
