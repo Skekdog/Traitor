@@ -64,6 +64,8 @@ local function applyHighlighting(input: string, highlights: {HighlightInfo}): st
 		table.insert(parts, highlightText(current, highlightColours[params.kind]))
 	end
 
+	table.insert(parts, string.sub(input, lastSpan.y + 1))
+
 	return table.concat(parts, "")
 end
 
