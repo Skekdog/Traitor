@@ -39,12 +39,7 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
         label.AutomaticSize = if textSize then Enum.AutomaticSize.XY else Enum.AutomaticSize.X
         label.AutoLocalize = false
         label.TextXAlignment = (Enum :: any).TextXAlignment[textXAlignment or "Center"]
-
-        if not noStyle then
-            label:AddTag("StyledUI")
-        else
-            label.TextColor3 = Color3.new(1, 1, 1)
-        end
+        label.TextColor3 = Color3.new(1, 1, 1)
     elseif class == "ImageLabel" then
         assert(label:IsA("ImageLabel"))
         label.ScaleType = Enum.ScaleType.Fit
@@ -61,11 +56,7 @@ local function createLabel(class: "TextLabel" | "ImageLabel", control: string, i
             uiAspectRatio.Parent = label
         end
 
-        if not noStyle then
-            label:AddTag("StyledUI")
-        else
-            label.ImageColor3 = Color3.new(1, 1, 1)
-        end
+        label.ImageColor3 = Color3.new(1, 1, 1)
     end
 
     label.Parent = instance
