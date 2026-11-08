@@ -22,15 +22,8 @@ export type ArgumentType =
 	| "place"
 	| {kind: "literal", literal: string}
 
-const WHITESPACE_SUBSTITUTE = "([^-])(%-)([^-])"
-const SUBSTITUTE_SUBSTITUTE = "([^-])(%-%-)([^-])"
-
 Arguments.Variadic = "..."
 Arguments.PlayerSelectors = {"@a", "@o", "@s", "@r"}
-
-function Arguments.String(str: string?): string?
-	return if str then str:gsub(WHITESPACE_SUBSTITUTE, "%1 %3"):gsub(SUBSTITUTE_SUBSTITUTE, "%1-%3") else nil
-end
 
 function Arguments.Number(str: string?): number?
 	return if str then tonumber(str) else nil

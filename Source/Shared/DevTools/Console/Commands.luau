@@ -151,14 +151,14 @@ Commands.echo = {
 			local output: string
 
 			local players = Arguments.Players(player, arg)
-			local item = Arguments.Item(round.Gamemode, round:GetMap(), Arguments.String(arg))
+			local item = Arguments.Item(round.Gamemode, round:GetMap(), arg)
 
 			if players then
 				output = getPlayersString(players)
 			elseif item then
 				output = item.Name
 			else
-				output = tostring(Arguments.Number(arg) or Arguments.String(arg) or "ERR")
+				output = tostring(Arguments.Number(arg) or arg or "ERR")
 			end
 
 			table.insert(processed, output)
@@ -317,8 +317,8 @@ Commands.teleportplace = {
 
 	Execute = function(executor: Player, round: Round, args: Args)
 		local asId = Arguments.Number(args[1])
-		local asName = Arguments.String(args[1])
-		local place = if asId then asId else Arguments.Place(Arguments.String(asName))
+		local asName = args[1]
+		local place = if asId then asId else Arguments.Place(asName)
 
 		if not place then
 			return "Place not found."
@@ -393,7 +393,7 @@ Commands.role = {
 			return `Player {args[2]} not found.`
 		end
 
-		local name = Arguments.String(args[1])
+		local name = args[1]
 		if not name then
 			return "Missing argument 1 role."
 		end
@@ -437,7 +437,7 @@ Commands.freekill = {
 			return `Player {args[2]} not found.`
 		end
 
-		local reason = Arguments.String(args[1])
+		local reason = args[1]
 		if reason then
 			local filterResult = TextService:FilterStringAsync(reason, executor.UserId)
 			reason = filterResult:GetNonChatStringForBroadcastAsync()
@@ -545,7 +545,7 @@ Commands.finishround = {
 	Types = {{"role"}} :: {{ArgumentType}},
 
 	Execute = function(_, round: Round, args: Args)
-		local name = Arguments.String(args[1])
+		local name = args[1]
 		if not name then
 			return "Missing argument 1 role name."
 		end
@@ -748,7 +748,7 @@ Commands.gamemode = {
 		local CustomGamemode = require(ServerScriptService.Labs.CustomGamemode)
 		local RoundHandler = require(ServerScriptService.RoundHandler)
 
-		local gamemodeName = Arguments.String(args[1])
+		local gamemodeName = args[1]
 
 		if not gamemodeName then
 			return "Missing argument 1 gamemode name / asset id."
@@ -775,7 +775,7 @@ Commands.gamemode = {
 			return result
 		end
 
-		local isPerm = (Arguments.String(args[2]) or ""):lower() == "perm"
+		local isPerm = (args[2] or ""):lower() == "perm"
 		if isPerm then
 			RoundHandler.SetForcedGamemode(result)
 		else
@@ -799,7 +799,7 @@ Commands.boss = {
 	Execute = function(_, round: Round, args: Args): string
 		local CustomBoss = require(ServerScriptService.Labs.CustomBoss)
 
-		local bossName = Arguments.String(args[1])
+		local bossName = args[1]
 		if not bossName then
 			return "Missing argument 1 boss name / asset id."
 		end
@@ -835,7 +835,7 @@ Commands.map = {
 		local CustomMap = require(ServerScriptService.Labs.CustomMap)
 		local RoundHandler = require(ServerScriptService.RoundHandler)
 
-		local mapName = Arguments.String(args[1])
+		local mapName = args[1]
 		if not mapName then
 			return "Missing argument 1 map name / asset id."
 		end
@@ -854,7 +854,7 @@ Commands.map = {
 		local structure = Map.ValidateStructure(map:Clone())
 		round:LoadMap(structure)
 
-		local isPerm = (Arguments.String(args[2]) or ""):lower() == "perm"
+		local isPerm = (args[2] or ""):lower() == "perm"
 		if isPerm then
 			RoundHandler.SetForcedMap(structure)
 		else
@@ -922,7 +922,7 @@ Commands.give = {
 			return `Player {args[2]} not found.`
 		end
 
-		local itemName = Arguments.String(args[1])
+		local itemName = args[1]
 		if not itemName then
 			return "Missing argument 1 item name."
 		end
@@ -963,7 +963,7 @@ Commands.remove = {
 			return `Player {args[2]} not found.`
 		end
 
-		local itemName = Arguments.String(args[1])
+		local itemName = args[1]
 		if not itemName then
 			return "Missing argument 1 item name."
 		end
@@ -1240,12 +1240,12 @@ Commands.ban = {
 			return `A duration must be provided.`
 		end
 
-		local displayReason = Arguments.String(args[3])
+		local displayReason = args[3]
 		if not displayReason then
 			return `A display reason must be provided.`
 		end
 
-		local privateReason = Arguments.String(args[4])
+		local privateReason = args[4]
 		if not privateReason then
 			return `A private reason must be provided.`
 		end
@@ -1327,7 +1327,7 @@ Commands.data = {
 			return `Player {args[4]} not found.`
 		end
 
-		local itemName = Arguments.String(args[1])
+		local itemName = args[1]
 		if not itemName then
 			return `Missing argument 1 item name.`
 		end
@@ -1337,12 +1337,12 @@ Commands.data = {
 			return `Item {itemName} not found.`
 		end
 
-		local componentName = Arguments.String(args[2])
+		local componentName = args[2]
 		if not componentName then
 			return `Missing argument 2 component name.`
 		end
 
-		local value = Arguments.Number(args[3]) or Arguments.String(args[3])
+		local value = Arguments.Number(args[3]) or args[3]
 		if not value then
 			return `Missing argument 3 value.`
 		end
